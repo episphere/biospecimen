@@ -1,5 +1,6 @@
 import { firebaseConfig } from "./src/config.js";
-import { homeNavBar, userNavBar } from "./src/navbar.js";
+import { homeNavBar, userNavBar, adminNavBar } from "./src/navbar.js";
+import { validateUser, showAnimation, hideAnimation } from "./src/shared.js";
 
 window.onload = () => {
     if('serviceWorker' in navigator){
@@ -43,7 +44,6 @@ const dashboard = () => {
     auth.onAuthStateChanged(async user => {
         if(user){
             document.getElementById('root').innerHTML = '';
-            document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar();
             window.location.hash = '#dashboard';
         }
         else{
@@ -55,8 +55,30 @@ const dashboard = () => {
 const userDashboard = () => {
     auth.onAuthStateChanged(async user => {
         if(user){
+            const idTokenResult = await auth.currentUser.getIdTokenResult()
+            if(!idTokenResult.claims.role) {
+                showAnimation();
+                const response = await validateUser();
+                hideAnimation();
+                if(response.code === 200) {
+                    const role = response.data.role;
+                    if(role === 'admin') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar();
+                    else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar();
+                }
+            }
+            else {
+                const customCLaim = idTokenResult.claims.role;
+                showAnimation();
+                const response = await validateUser();
+                hideAnimation();
+                if(response.code === 200) {
+                    const role = response.data.role;
+                    if(customCLaim !== role) signOut();
+                }
+                if(customCLaim === 'admin') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar();
+                else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar();
+            }
             document.getElementById('root').innerHTML = '';
-            document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar();
         }
         else{
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
