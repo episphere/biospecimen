@@ -1,5 +1,5 @@
 import { firebaseConfig } from "./src/config.js";
-import { homeNavBar, userNavBar, adminNavBar } from "./src/navbar.js";
+import { homeNavBar, userNavBar, adminNavBar, nonUserNavBar } from "./src/navbar.js";
 import { validateUser, showAnimation, hideAnimation } from "./src/shared.js";
 
 window.onload = () => {
@@ -64,6 +64,11 @@ const userDashboard = () => {
                     const role = response.data.role;
                     if(role === 'admin') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar();
                     else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar();
+                    document.getElementById('root').innerHTML = '';
+                }
+                else {
+                    document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar();
+                    document.getElementById('root').innerHTML = 'You do not have required permission to access this dashboard';
                 }
             }
             else {
@@ -77,8 +82,8 @@ const userDashboard = () => {
                 }
                 if(customCLaim === 'admin') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar();
                 else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar();
+                document.getElementById('root').innerHTML = '';
             }
-            document.getElementById('root').innerHTML = '';
         }
         else{
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
