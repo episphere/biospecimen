@@ -42,3 +42,19 @@
     height: 100%;
     margin: 1rem 0;
 }
+
+.nav-item {
+    color: rgba(0,0,0,.5) !important;
+}
+
+.nav-link {
+    color: #000000 !important;
+}
+
+.current-page {
+    border-bottom: 2px solid #918c8d !important;
+}
+
+.navbar-nav:hover {
+    border-bottom: 2px solid #bc1f40 !important;
+}
