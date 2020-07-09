@@ -1,0 +1,44 @@
+
+#footer {
+    font-size: 0.9em;
+    bottom: 0;
+    width: 100%;
+}
+
+.footer-content {
+    text-align: center;
+    width: 100%;
+    background-color: #f8f9fa;
+    margin: 0px !important;
+}
+
+.footer-links {
+    color: #4d4d4d;
+    text-decoration: underline;
+}
+
+.footer-links:hover {
+    text-decoration: none;
+    color: #4d4d4d;
+}
+
+.footer-tagline {
+    color: black;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.menu-item {
+    display: inline;
+    padding: 0.375em 9px;
+}
+
+.container {
+    min-height: calc(100vh - 112px);
+    padding-top: 5rem;
+}
+
+#root {
+    height: 100%;
+    margin: 1rem 0;
+}
