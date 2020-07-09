@@ -1,7 +1,7 @@
 import { firebaseConfig } from "./src/config.js";
 import { homeNavBar, userNavBar, adminNavBar, nonUserNavBar } from "./src/navbar.js";
 import { validateUser, showAnimation, hideAnimation } from "./src/shared.js";
-
+let userRole = '';
 window.onload = () => {
     if('serviceWorker' in navigator){
         try {
@@ -23,7 +23,7 @@ window.onhashchange = () => {
 const manageRoutes = () => {
     const route =  window.location.hash || '#';
     if(route === '#') dashboard();
-    else if (route === '#dashboard') userDashboard();
+    else if (userRole && route === '#dashboard') userDashboard();
     else if (route === '#sign_out') signOut();
     else window.location.hash = '#';
 }
@@ -44,17 +44,6 @@ const dashboard = () => {
     auth.onAuthStateChanged(async user => {
         if(user){
             document.getElementById('root').innerHTML = '';
-            window.location.hash = '#dashboard';
-        }
-        else{
-            document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
-        }
-    });
-}
-
-const userDashboard = () => {
-    auth.onAuthStateChanged(async user => {
-        if(user){
             const idTokenResult = await auth.currentUser.getIdTokenResult()
             if(!idTokenResult.claims.role) {
                 showAnimation();
@@ -62,13 +51,15 @@ const userDashboard = () => {
                 hideAnimation();
                 if(response.code === 200) {
                     const role = response.data.role;
+                    userRole = role;
                     if(role === 'admin') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar();
                     else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar();
                     document.getElementById('root').innerHTML = '';
                 }
-                else {
+                else if(response.code === 401) {
                     document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar();
                     document.getElementById('root').innerHTML = 'You do not have required permission to access this dashboard';
+                    return;
                 }
             }
             else {
@@ -76,14 +67,33 @@ const userDashboard = () => {
                 showAnimation();
                 const response = await validateUser();
                 hideAnimation();
+                let conflict = false;
                 if(response.code === 200) {
                     const role = response.data.role;
-                    if(customCLaim !== role) signOut();
+                    if(customCLaim !== role) { 
+                        conflict = true;
+                        signOut();
+                    }
                 }
+                if(conflict) return;
+                userRole = customCLaim;
                 if(customCLaim === 'admin') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar();
                 else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar();
                 document.getElementById('root').innerHTML = '';
             }
+            window.location.hash = '#dashboard';
+        }
+        else{
+            document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
+            window.location.hash = '#';
+        }
+    });
+}
+
+const userDashboard = () => {
+    auth.onAuthStateChanged(async user => {
+        if(user){
+            
         }
         else{
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
