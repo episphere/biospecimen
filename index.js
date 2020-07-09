@@ -1,4 +1,4 @@
-window.onload = {
+window.onload = () => {
     dashboard()
 }
 
