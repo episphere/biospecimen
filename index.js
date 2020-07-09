@@ -1,7 +1,8 @@
 import { firebaseConfig } from "./src/config.js";
-import { homeNavBar, userNavBar, adminNavBar, nonUserNavBar } from "./src/navbar.js";
-import { validateUser, showAnimation, hideAnimation } from "./src/shared.js";
-let userRole = '';
+import { homeNavBar } from "./src/navbar.js";
+import { userAuthorization } from "./src/shared.js";
+import { manageUsers } from "./src/pages/users.js";
+import { userDashboard } from "./src/pages/dashboard.js";
 window.onload = () => {
     if('serviceWorker' in navigator){
         try {
@@ -12,7 +13,6 @@ window.onload = () => {
             console.log(error);
         }
     }
-    dashboard();
     manageRoutes();
 }
 
@@ -20,18 +20,19 @@ window.onhashchange = () => {
     manageRoutes();
 }
 
-const manageRoutes = () => {
+const manageRoutes = async () => {
     const route =  window.location.hash || '#';
-    if(route === '#') dashboard();
-    else if (userRole && route === '#dashboard') userDashboard();
+    !firebase.apps.length ? firebase.initializeApp(firebaseConfig()) : firebase.app();
+    auth = firebase.auth();
+    if(route === '#') signIn(auth);
+    else if (route === '#dashboard') userDashboard(auth, route);
     else if (route === '#sign_out') signOut();
+    else if (route === '#manage_users') manageUsers(auth, route);
     else window.location.hash = '#';
 }
 
 let auth = '';
-const dashboard = () => {
-    !firebase.apps.length ? firebase.initializeApp(firebaseConfig()) : firebase.app();
-    auth = firebase.auth();
+const signIn = (auth) => {
     const root = document.getElementById('root');
     root.innerHTML = '';
     const signInDiv = document.createElement('div');
@@ -44,59 +45,10 @@ const dashboard = () => {
     auth.onAuthStateChanged(async user => {
         if(user){
             document.getElementById('root').innerHTML = '';
-            const idTokenResult = await auth.currentUser.getIdTokenResult()
-            if(!idTokenResult.claims.role) {
-                showAnimation();
-                const response = await validateUser();
-                hideAnimation();
-                if(response.code === 200) {
-                    const role = response.data.role;
-                    userRole = role;
-                    if(role === 'admin') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar();
-                    else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar();
-                    document.getElementById('root').innerHTML = '';
-                }
-                else if(response.code === 401) {
-                    document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar();
-                    document.getElementById('root').innerHTML = 'You do not have required permission to access this dashboard';
-                    return;
-                }
-            }
-            else {
-                const customCLaim = idTokenResult.claims.role;
-                showAnimation();
-                const response = await validateUser();
-                hideAnimation();
-                let conflict = false;
-                if(response.code === 200) {
-                    const role = response.data.role;
-                    if(customCLaim !== role) { 
-                        conflict = true;
-                        signOut();
-                    }
-                }
-                if(conflict) return;
-                userRole = customCLaim;
-                if(customCLaim === 'admin') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar();
-                else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar();
-                document.getElementById('root').innerHTML = '';
-            }
-            window.location.hash = '#dashboard';
         }
         else{
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
             window.location.hash = '#';
-        }
-    });
-}
-
-const userDashboard = () => {
-    auth.onAuthStateChanged(async user => {
-        if(user){
-            
-        }
-        else{
-            document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
         }
     });
 }
