@@ -1,7 +1,7 @@
 window.onload = {
-    dashboard();
+    dashboard()
 }
 
 const dashboard = () => {
-    
+
 }
