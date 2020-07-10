@@ -1,11 +1,12 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
 import { userAuthorization } from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4 } from "./../events.js";
+import { homeNavBar } from '../navbar.js';
 
 export const userDashboard = async (auth, route) => {
     auth.onAuthStateChanged(async user => {
         if(user){
-            const role = await userAuthorization(auth, route);
+            const role = await userAuthorization(auth, route, user.displayName);
             if(!role) return;
             searchTemplate();
         }

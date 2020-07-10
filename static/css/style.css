@@ -114,3 +114,10 @@
     right: -5rem; 
     z-index: 9;
 }
+
+.dropdown-btn {
+    background-color: transparent !important;
+    border: 0px;
+    width: 100%;
+    text-align: left;
+}

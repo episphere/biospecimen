@@ -23,7 +23,7 @@ export const homeNavBar = () => {
     `;
 }
 
-export const userNavBar = () => {
+export const userNavBar = (name) => {
     return `
         <div class="navbar-nav current-page">
             <li class="nav-item">
@@ -46,24 +46,34 @@ export const userNavBar = () => {
             </li>
         </div>
         <div class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="#sign_out" id="signOut" title="Sign Out"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
-            </li>
+            <div class="grid-elements dropdown">
+                <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn"  title="Welcome, ${name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-user"></i> ${name}
+                </button>
+                <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
+                    <a class="nav-link" href="#sign_out" id="signOut" title="Sign Out"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
+                </div>
+            </div>
         </div>
     `;
 }
 
-export const nonUserNavBar = () => {
+export const nonUserNavBar = (name) => {
     return `
         <div class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="#sign_out" id="signOut" title="Sign Out"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
-            </li>
+            <div class="grid-elements dropdown">
+                <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn"  title="Welcome, ${name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-user"></i> ${name}
+                </button>
+                <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
+                    <a class="nav-link" href="#sign_out" id="signOut" title="Sign Out"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
+                </div>
+            </div>
         </div>
     `;
 }
 
-export const adminNavBar = () => {
+export const adminNavBar = (name) => {
     return `
         <div class="navbar-nav current-page">
             <li class="nav-item">
@@ -91,9 +101,14 @@ export const adminNavBar = () => {
             </li>
         </div>
         <div class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="#sign_out" id="signOut" title="Sign Out"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
-            </li>
+            <div class="grid-elements dropdown">
+                <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn"  title="Welcome, ${name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-user"></i> ${name}
+                </button>
+                <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
+                    <a class="nav-link" href="#sign_out" id="signOut" title="Sign Out"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
+                </div>
+            </div>
         </div>
     `;
 }

@@ -1,4 +1,4 @@
-import { userNavBar, adminNavBar, nonUserNavBar, homeNavBar } from "./navbar.js";
+import { userNavBar, adminNavBar, nonUserNavBar } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
 import { addEventHideNotification } from "./events.js"
 
@@ -52,19 +52,19 @@ export const hideAnimation = () => {
     if(document.getElementById('loadingAnimation')) document.getElementById('loadingAnimation').style.display = 'none';
 }
 
-export const userAuthorization = async (auth, route) => {
+export const userAuthorization = async (auth, route, name) => {
     showAnimation();
     const response = await validateUser();
     hideAnimation();
     if(response.code === 200) {
         const role = response.data.role;
-        if(role === 'admin') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar();
-        else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar();
+        if(role === 'admin') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name);
+        else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar(name);
         toggleCurrentPage(route);
         return role;
     }
     else if(response.code === 401) {
-        document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar();
+        document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
         document.getElementById('root').innerHTML = 'You do not have required permission to access this dashboard';
         hideAnimation();
     }
