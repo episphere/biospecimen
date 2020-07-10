@@ -94,3 +94,23 @@
     -webkit-animation: spin .8s linear infinite;
     animation: spin .8s linear infinite;
 }
+
+.search-label {
+    font-weight: bold;
+    color: #868484;
+}
+
+#search1, #search2, #search3, #search4 {
+    width: 100%;
+}
+
+.form-row {
+    padding-left: 15px;
+}
+
+.notification {
+    position: absolute; 
+    top: 2rem; 
+    right: -5rem; 
+    z-index: 9;
+}

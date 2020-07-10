@@ -1,4 +1,6 @@
 import { userNavBar, adminNavBar, nonUserNavBar, homeNavBar } from "./navbar.js";
+import { searchResults } from "./pages/dashboard.js";
+import { addEventHideNotification } from "./events.js"
 
 const api = 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?';
 // const api = 'http://localhost:8010/nih-nci-dceg-episphere-dev/us-central1/biospecimen?';
@@ -105,4 +107,30 @@ export const toggleNavbarMobileView = () => {
     if(btn && btn[0]){
         if(!btn[0].classList.contains('collapsed')) btn[0].click();
     }
+}
+
+export const performSearch = async (query) => {
+    showAnimation();
+    const response = await findParticipant(query);
+    hideAnimation();
+    if(response.code === 200 && response.data.length > 0) searchResults(response.data);
+    else if(response.code === 200 && response.data.length === 0) showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'})
+}
+
+export const showNotifications = (data) => {
+    const div = document.createElement('div');
+    div.classList = ["notification"];
+    div.innerHTML = `
+        <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="mr-auto">${data.title}</strong>
+                <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">&times;</button>
+            </div>
+            <div class="toast-body">
+                ${data.body}
+            </div>
+        </div>
+    `
+    document.getElementById('showNotification').appendChild(div);
+    addEventHideNotification(div);
 }
