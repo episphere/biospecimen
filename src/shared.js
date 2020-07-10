@@ -79,8 +79,8 @@ export const toggleCurrentPage = async (route) => {
         });
     });
 
-    if(route === '#dashboard') document.getElementById('dashboard').click();
-    if(route === '#manage_users') document.getElementById('manageUsers').click();
+    if(route === '#dashboard') document.getElementById('dashboard') ? document.getElementById('dashboard').click() : '';
+    else if(route === '#manage_users') document.getElementById('manageUsers') ? document.getElementById('manageUsers').click() : '';
 }
 
 export const removeActiveClass = (className, activeClass) => {
