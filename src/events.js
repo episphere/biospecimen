@@ -120,7 +120,8 @@ const addEventNewUserForm = () => {
         const response = await addBiospecimenUsers(array);
         hideAnimation();
         if(response.code === 200) {
-            showNotifications({title: 'New user added!', body: `<b>${data.email}</b> is added as <b>${data.role}</b>`})
+            showNotifications({title: 'New user added!', body: `<b>${data.email}</b> is added as <b>${data.role}</b>`});
+            form.reset();
             const response = await biospecimenUsers(); 
             if(response.code === 200 && response.data.users.length > 0) {
                 document.getElementById('usersList').innerHTML = userListTemplate(response.data.users);
