@@ -8,7 +8,7 @@ export const manageUsers = async (auth, route) => {
             const role = await userAuthorization(auth, route, user.displayName);
             if(!role) return;
             if(role === "user") window.location.hash = '#dashboard';
-
+            document.getElementById('root').innerHTML = '';
             const response = await biospecimenUsers();
             
             const div = document.createElement('div');
