@@ -52,30 +52,22 @@ export const hideAnimation = () => {
     if(document.getElementById('loadingAnimation')) document.getElementById('loadingAnimation').style.display = 'none';
 }
 
-export const userAuthorization = (auth, route) => {
-    auth.onAuthStateChanged(async user => {
-        if(user){ 
-            showAnimation();
-            const response = await validateUser();
-            hideAnimation();
-            if(response.code === 200) {
-                const role = response.data.role;
-                if(role === 'admin') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar();
-                else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar();
-                toggleCurrentPage(route);
-                return role;
-            }
-            else if(response.code === 401) {
-                document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar();
-                document.getElementById('root').innerHTML = 'You do not have required permission to access this dashboard';
-                toggleCurrentPage(route);
-            }
-        }
-        else{
-            document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
-            window.location.hash = '#';
-        }
-    });
+export const userAuthorization = async (auth, route) => {
+    showAnimation();
+    const response = await validateUser();
+    hideAnimation();
+    if(response.code === 200) {
+        const role = response.data.role;
+        if(role === 'admin') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar();
+        else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar();
+        toggleCurrentPage(route);
+        return role;
+    }
+    else if(response.code === 401) {
+        document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar();
+        document.getElementById('root').innerHTML = 'You do not have required permission to access this dashboard';
+        toggleCurrentPage(route);
+    }
 }
 
 

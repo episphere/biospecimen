@@ -3,8 +3,16 @@ import { userAuthorization } from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4 } from "./../events.js";
 
 export const userDashboard = async (auth, route) => {
-    await userAuthorization(auth, route);
-    searchTemplate();
+    auth.onAuthStateChanged(async user => {
+        if(user){
+            await userAuthorization(auth, route);
+            searchTemplate();
+        }
+        else {
+            document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
+            window.location.hash = '#';
+        }
+    });
 }
 
 export const searchTemplate = () => {
