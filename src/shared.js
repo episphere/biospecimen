@@ -69,8 +69,8 @@ export const userAuthorization = async (auth, route, name) => {
     hideAnimation();
     if(response.code === 200) {
         const role = response.data.role;
-        if(role === 'admin' || 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name);
-        else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar(name);
+        if(role === 'admin' || role === 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name);
+        else if(role === 'user') document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar(name);
         toggleCurrentPage(route);
         return role;
     }
