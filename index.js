@@ -42,15 +42,7 @@ const signIn = (auth) => {
     
     const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebase.auth());
     ui.start('#signInDiv', signInConfig());
-    auth.onAuthStateChanged(async user => {
-        if(user){
-            document.getElementById('root').innerHTML = '';
-        }
-        else{
-            document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
-            window.location.hash = '#';
-        }
-    });
+    document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
 }
 
 const signInConfig = () => {
