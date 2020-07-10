@@ -1,5 +1,6 @@
 import { userAuthorization, biospecimenUsers } from "./../shared.js";
 import { homeNavBar } from "../navbar.js";
+import { addEventModalBtn } from "../events.js";
 
 export const manageUsers = async (auth, route) => {
     auth.onAuthStateChanged(async user => {
@@ -16,11 +17,12 @@ export const manageUsers = async (auth, route) => {
             else {
                 template = `
                     <div class="row">
-                        <button type="button" class="btn btn-primary">Add user(s)</button>
+                        <button type="button" data-target="#biospecimenModal" data-toggle="modal" id="modalBtn" class="btn btn-primary">Add user(s)</button>
                     </div>
                 `
             }
             document.getElementById('root').innerHTML = template;
+            addEventModalBtn();
         }
         else{
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
@@ -32,7 +34,7 @@ export const manageUsers = async (auth, route) => {
 const userListTemplate = (result) => {
     let template = `
         <div class="row">
-            <button type="button" class="btn btn-primary">Add user(s)</button>
+            <button type="button" data-target="#biospecimenModal" data-toggle="modal" id="modalBtn" class="btn btn-primary">Add user(s)</button>
         </div>
         <div class="row">
             <table class="table table-borderless table-responsive table-striped">

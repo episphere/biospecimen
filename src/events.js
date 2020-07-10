@@ -63,3 +63,15 @@ export const addEventHideNotification = (element) => {
         // setTimeout(() => { btn.dispatchEvent(new Event('click')) }, 5000);
     });
 }
+
+export const addEventModalBtn = () => {
+    const btn = document.getElementById("modalBtn");
+    btn.addEventListener('click', () => {
+        const header = document.getElementById('biospecimenModalHeader');
+        const body = document.getElementById('biospecimenModalBody');
+        header.innerHTML = `<h5 class="modal-title">Add user</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>`
+    })
+}

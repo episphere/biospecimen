@@ -38,6 +38,19 @@ export const biospecimenUsers = async () => {
     return await response.json();
 }
 
+export const addBiospecimenUsers = async (data) => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=addUsers`, {
+        method: "POST",
+        headers: {
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+    return await response.json();
+}
+
 export const getIdToken = () => {
     return new Promise((resolve, reject) => {
         const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
