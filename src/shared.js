@@ -27,6 +27,17 @@ export const findParticipant = async (query) => {
     return await response.json();
 }
 
+export const biospecimenUsers = async () => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=users`, {
+        method: "GET",
+        headers: {
+            Authorization:"Bearer "+idToken
+        }
+    });
+    return await response.json();
+}
+
 export const getIdToken = () => {
     return new Promise((resolve, reject) => {
         const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
@@ -58,7 +69,7 @@ export const userAuthorization = async (auth, route, name) => {
     hideAnimation();
     if(response.code === 200) {
         const role = response.data.role;
-        if(role === 'admin') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name);
+        if(role === 'admin' || 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name);
         else document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar(name);
         toggleCurrentPage(route);
         return role;

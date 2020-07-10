@@ -103,22 +103,22 @@ export const searchResults = (result) => {
                         <th>Connect Id</th>
                     </tr>
                 </thead>
-                <tbody>
-                    ${result.map(data => `
-                        <tr>
-                            <td>${data.RcrtUP_Fname_v1r0}</td>
-                            <td>${data.RcrtCS_Lname_v1r0}</td>
-                            <td>${data.RcrtUP_MOB_v1r0}/${data.RcrtUP_BD_v1r0}/${data.RcrtUP_YOB_v1r0}</td>
-                            <td>${data.RcrtUP_Email1_v1r0 ? data.RcrtUP_Email1_v1r0 : ''}</td>
-                            <td>${data.RcrtUP_Phone1_v1r0 ? data.RcrtUP_Phone1_v1r0 : ''}</td>
-                            <td>${data.RcrtUP_AddressLn1_v1r0} ${data.RcrtUP_AddressLn2_v1r0 ? data.RcrtUP_AddressLn2_v1r0 : ''}</br>${data.RcrtUP_City_v1r0} ${Object.keys(allStates)[Object.values(allStates).indexOf(parseInt(data.RcrtUP_State_v1r0))]} ${data.RcrtUP_Zip_v1r0}</td>
-                            <td>${data.Connect_ID}</td>
-                        </tr>
-                    `)}
-                </tbody>
-            </table>
-        </div>
-    `;
+                <tbody>`
+    result.forEach(data => {
+        template += `
+            <tr>
+                <td>${data.RcrtUP_Fname_v1r0}</td>
+                <td>${data.RcrtCS_Lname_v1r0}</td>
+                <td>${data.RcrtUP_MOB_v1r0}/${data.RcrtUP_BD_v1r0}/${data.RcrtUP_YOB_v1r0}</td>
+                <td>${data.RcrtUP_Email1_v1r0 ? data.RcrtUP_Email1_v1r0 : ''}</td>
+                <td>${data.RcrtUP_Phone1_v1r0 ? data.RcrtUP_Phone1_v1r0 : ''}</td>
+                <td>${data.RcrtUP_AddressLn1_v1r0} ${data.RcrtUP_AddressLn2_v1r0 ? data.RcrtUP_AddressLn2_v1r0 : ''}</br>${data.RcrtUP_City_v1r0} ${Object.keys(allStates)[Object.values(allStates).indexOf(parseInt(data.RcrtUP_State_v1r0))]} ${data.RcrtUP_Zip_v1r0}</td>
+                <td>${data.Connect_ID}</td>
+            </tr>
+        `
+    });
+    template += `</tbody></table></div>`;
+
     document.getElementById('root').innerHTML = template;
     addEventBackToSearch();
 }
