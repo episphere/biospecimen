@@ -1,11 +1,22 @@
 import { userNavBar, adminNavBar, nonUserNavBar, homeNavBar } from "./navbar.js";
 
-const api = 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/';
-// const api = 'http://localhost:8010/nih-nci-dceg-episphere-dev/us-central1/';
+const api = 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?';
+// const api = 'http://localhost:8010/nih-nci-dceg-episphere-dev/us-central1/biospecimen?';
 
 export const validateUser = async () => {
     const idToken = await getIdToken();
-    const response = await fetch(`${api}biospecimen?api=validateUsers`, {
+    const response = await fetch(`${api}api=validateUsers`, {
+        method: "GET",
+        headers: {
+            Authorization:"Bearer "+idToken
+        }
+    });
+    return await response.json();
+}
+
+export const findParticipant = async (query) => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=getParticipants&type=filter&${query}`, {
         method: "GET",
         headers: {
             Authorization:"Bearer "+idToken
