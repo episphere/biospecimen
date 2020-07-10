@@ -66,7 +66,7 @@ export const userAuthorization = async (auth, route) => {
     else if(response.code === 401) {
         document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar();
         document.getElementById('root').innerHTML = 'You do not have required permission to access this dashboard';
-        toggleCurrentPage(route);
+        hideAnimation();
     }
 }
 

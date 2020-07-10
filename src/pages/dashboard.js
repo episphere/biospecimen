@@ -5,7 +5,8 @@ import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEven
 export const userDashboard = async (auth, route) => {
     auth.onAuthStateChanged(async user => {
         if(user){
-            await userAuthorization(auth, route);
+            const role = await userAuthorization(auth, route);
+            if(!role) return;
             searchTemplate();
         }
         else {
