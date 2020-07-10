@@ -33,6 +33,10 @@
     padding: 0.375em 9px;
 }
 
+.menu {
+    padding: 0px;
+}
+
 .container {
     min-height: calc(100vh - 112px);
     padding-top: 5rem;
