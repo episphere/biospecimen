@@ -41,8 +41,7 @@ export const hideAnimation = () => {
 
 export const userAuthorization = (auth, route) => {
     auth.onAuthStateChanged(async user => {
-        if(user){
-            const idTokenResult = await auth.currentUser.getIdTokenResult()
+        if(user){ 
             showAnimation();
             const response = await validateUser();
             hideAnimation();
