@@ -1,5 +1,6 @@
-import { performSearch } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers } from './shared.js'
 import { searchTemplate } from './pages/dashboard.js';
+import { userListTemplate } from './pages/users.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -64,7 +65,7 @@ export const addEventHideNotification = (element) => {
     });
 }
 
-export const addEventModalBtn = () => {
+export const addEventModalBtn = (role) => {
     const btn = document.getElementById("modalBtn");
     btn.addEventListener('click', () => {
         const header = document.getElementById('biospecimenModalHeader');
@@ -72,6 +73,58 @@ export const addEventModalBtn = () => {
         header.innerHTML = `<h5 class="modal-title">Add user</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
-                            </button>`
+                            </button>`;
+
+        body.innerHTML = `
+            <form id="addNewUser" method="POST">
+                <div class="form-group">
+                    <label class="col-form-label search-label">Name</label>
+                    <input class="form-control" required type="name" id="userName" placeholder="Enter name"/>
+                </div>
+                <div class="form-group">
+                    <label class="col-form-label search-label">Email</label>
+                    <input class="form-control" required type="email" id="userEmail" placeholder="Enter name"/>
+                </div>
+                <div class="form-group">
+                    <label class="col-form-label search-label">Role</label>
+                    <select class="form-control" required id="userRole">
+                        <option value="">-- Select role --</option>
+                        ${role === 'admin' ? `
+                            <option value="manager">Manager</option>
+                            <option value="user">User</option>
+                        ` : `
+                            <option value="user">User</option>
+                        `}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        `;
+        addEventNewUserForm();
+    })
+};
+
+const addEventNewUserForm = () => {
+    const form = document.getElementById('addNewUser');
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const array = [];
+        let data = {};
+        data['name'] = document.getElementById('userName').value;
+        data['email'] = document.getElementById('userEmail').value;
+        data['role'] = document.getElementById('userRole').value;
+        array.push(data)
+        showAnimation();
+        const response = await addBiospecimenUsers(array);
+        hideAnimation();
+        if(response.code === 200) {
+            showNotifications({title: 'New user added!', body: `<b>${data.email}</b> is added as <b>${data.role}</b>`})
+            const response = await biospecimenUsers(); 
+            if(response.code === 200 && response.data.users.length > 0) {
+                document.getElementById('usersList').innerHTML = userListTemplate(response.data.users);
+            };
+        }
     })
 }

@@ -10,19 +10,29 @@ export const manageUsers = async (auth, route) => {
             if(role === "user") window.location.hash = '#dashboard';
 
             const response = await biospecimenUsers();
-            let template = '';
+            
+            const div = document.createElement('div');
+            div.classList = ['row'];
+
+            const button = document.createElement('button');
+            button.classList = ['btn btn-primary'];
+            button.id = 'modalBtn';
+            button.dataset.target = '#biospecimenModal';
+            button.dataset.toggle = 'modal';
+            button.innerHTML = 'Add user';
+
+            div.appendChild(button);
+            document.getElementById('root').appendChild(div);
+
+            const userListDiv = document.createElement('div');
+            userListDiv.classList = ['row'];
+            userListDiv.id = 'usersList';
+            document.getElementById('root').appendChild(userListDiv);
+
             if(response.code === 200 && response.data.users.length > 0) {
-                template = userListTemplate(response.data.users);
-            }
-            else {
-                template = `
-                    <div class="row">
-                        <button type="button" data-target="#biospecimenModal" data-toggle="modal" id="modalBtn" class="btn btn-primary">Add user(s)</button>
-                    </div>
-                `
-            }
-            document.getElementById('root').innerHTML = template;
-            addEventModalBtn();
+                document.getElementById('usersList').innerHTML = userListTemplate(response.data.users);
+            };
+            addEventModalBtn(role);
         }
         else{
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
@@ -31,12 +41,8 @@ export const manageUsers = async (auth, route) => {
     });
 };
 
-const userListTemplate = (result) => {
+export const userListTemplate = (result) => {
     let template = `
-        <div class="row">
-            <button type="button" data-target="#biospecimenModal" data-toggle="modal" id="modalBtn" class="btn btn-primary">Add user(s)</button>
-        </div>
-        <div class="row">
             <table class="table table-borderless table-responsive table-striped">
                 <thead>
                     <tr>
@@ -58,6 +64,6 @@ const userListTemplate = (result) => {
         `
     })
                     
-    template += `</tbody></table></div>`;
+    template += `</tbody></table>`;
     return template;
 }
