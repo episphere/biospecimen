@@ -21,7 +21,7 @@ export const searchTemplate = () => {
     let template =  `
         <div class="row">
             <div class="col">
-                <div class="row">
+                <div class="row form-row">
                     <form id="search1" method="POST">
                         <div class="form-group">
                             <label class="col-form-label search-label">First name</label>
@@ -90,8 +90,8 @@ export const searchResults = (result) => {
         <div class="row">
             <button class="btn btn-light" id="backToSearch"><i class="fas fa-arrow-left"></i> Back</button>
         </div>
-        <div class="row">
-            <table class="table table-borderless table-responsive table-striped">
+        <div class="row allow-overflow">
+            <table class="table table-borderless table-striped">
                 <thead>
                     <tr>
                         <th>First name</th>

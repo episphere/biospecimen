@@ -130,16 +130,16 @@ export const performSearch = async (query) => {
     const response = await findParticipant(query);
     hideAnimation();
     if(response.code === 200 && response.data.length > 0) searchResults(response.data);
-    else if(response.code === 200 && response.data.length === 0) showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'})
+    else if(response.code === 200 && response.data.length === 0) showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
 }
 
-export const showNotifications = (data) => {
+export const showNotifications = (data, error) => {
     const div = document.createElement('div');
     div.classList = ["notification"];
     div.innerHTML = `
         <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
-                <strong class="mr-auto">${data.title}</strong>
+                <strong class="mr-auto ${error ? 'error-heading': ''}">${data.title}</strong>
                 <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">&times;</button>
             </div>
             <div class="toast-body">

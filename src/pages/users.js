@@ -25,7 +25,7 @@ export const manageUsers = async (auth, route) => {
             document.getElementById('root').appendChild(div);
 
             const userListDiv = document.createElement('div');
-            userListDiv.classList = ['row'];
+            userListDiv.classList = ['row allow-overflow'];
             userListDiv.id = 'usersList';
             document.getElementById('root').appendChild(userListDiv);
 
@@ -43,7 +43,7 @@ export const manageUsers = async (auth, route) => {
 
 export const userListTemplate = (result) => {
     let template = `
-            <table class="table table-borderless table-responsive table-striped">
+            <table class="table table-borderless table-striped">
                 <thead>
                     <tr>
                         <th>Name</th>

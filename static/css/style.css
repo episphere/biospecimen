@@ -105,7 +105,7 @@
 }
 
 .form-row {
-    padding-left: 15px;
+    padding-left: 10px;
 }
 
 .notification {
@@ -120,4 +120,12 @@
     border: 0px;
     width: 100%;
     text-align: left;
+}
+
+.error-heading {
+    color: #ff0000;
+}
+
+.allow-overflow {
+    overflow: auto;
 }
