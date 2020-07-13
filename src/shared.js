@@ -79,12 +79,12 @@ export const hideAnimation = () => {
 export const userAuthorization = async (auth, route, name) => {
     showAnimation();
     const response = await validateUser();
-    hideAnimation();
     if(response.code === 200) {
         const role = response.data.role;
         if(role === 'admin' || role === 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name);
         else if(role === 'user') document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar(name);
         toggleCurrentPage(route);
+        hideAnimation();
         return role;
     }
     else if(response.code === 401) {

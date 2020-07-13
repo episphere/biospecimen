@@ -46,4 +46,4 @@ registerRoute(
     'POST'
 );
 
-workbox.precaching.precacheAndRoute([{url: 'index.html', revision: `${new Date().getTime()}`}]);
+workbox.precaching.precacheAndRoute([{url: 'index.html', revision: `2`}]);
