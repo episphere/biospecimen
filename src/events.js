@@ -61,7 +61,7 @@ export const addEventHideNotification = (element) => {
         btn.addEventListener('click', () => {
             btn.parentNode.parentNode.parentNode.parentNode.removeChild(btn.parentNode.parentNode.parentNode);
         });
-        // setTimeout(() => { btn.dispatchEvent(new Event('click')) }, 5000);
+        setTimeout(() => { btn.dispatchEvent(new Event('click')) }, 8000);
     });
 }
 
