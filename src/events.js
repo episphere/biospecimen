@@ -97,7 +97,7 @@ export const addEventModalBtn = (role, userEmail) => {
                         `}
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Add</button>
                 </div>
             </form>
