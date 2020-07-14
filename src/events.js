@@ -122,11 +122,14 @@ const addEventNewUserForm = (userEmail) => {
         if(response.code === 200) {
             showNotifications({title: 'New user added!', body: `<b>${data.email}</b> is added as <b>${data.role}</b>`});
             form.reset();
-            const response = await biospecimenUsers(); 
-            if(response.code === 200 && response.data.users.length > 0) {
-                document.getElementById('usersList').innerHTML = userListTemplate(response.data.users, userEmail);
+            const users = await biospecimenUsers();
+            if(users.code === 200 && users.data.users.length > 0) {
+                document.getElementById('usersList').innerHTML = userListTemplate(users.data.users, userEmail);
                 addEventRemoveUser();
-            };
+            }
+        }
+        else if(response.code === 400 && response.message === 'User with this email already exists') {
+            showNotifications({title: 'User already exists!', body: `User with email: <b>${data.email}</b> already exists`}, true);
         }
     })
 }
