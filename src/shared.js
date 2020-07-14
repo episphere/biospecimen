@@ -159,5 +159,6 @@ export const showNotifications = (data, error) => {
         </div>
     `
     document.getElementById('showNotification').appendChild(div);
+    document.getElementsByClassName('container')[0].scrollIntoView(true);
     addEventHideNotification(div);
 }
