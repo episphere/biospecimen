@@ -129,3 +129,7 @@
 .allow-overflow {
     overflow: auto;
 }
+
+.fa-user-minus {
+    cursor: pointer;
+}

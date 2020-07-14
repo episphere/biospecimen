@@ -51,6 +51,17 @@ export const addBiospecimenUsers = async (data) => {
     return await response.json();
 }
 
+export const removeBiospecimenUsers = async (email) => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=removeUser&email=${email}`, {
+        method: "GET",
+        headers: {
+            Authorization:"Bearer "+idToken
+        }
+    });
+    return await response.json();
+}
+
 export const getIdToken = () => {
     return new Promise((resolve, reject) => {
         const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
@@ -76,7 +87,7 @@ export const hideAnimation = () => {
     if(document.getElementById('loadingAnimation')) document.getElementById('loadingAnimation').style.display = 'none';
 }
 
-export const userAuthorization = async (auth, route, name) => {
+export const userAuthorization = async (route, name) => {
     showAnimation();
     const response = await validateUser();
     if(response.code === 200) {

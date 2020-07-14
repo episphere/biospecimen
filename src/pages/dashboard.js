@@ -6,7 +6,7 @@ import { homeNavBar } from '../navbar.js';
 export const userDashboard = async (auth, route) => {
     auth.onAuthStateChanged(async user => {
         if(user){
-            const role = await userAuthorization(auth, route, user.displayName);
+            const role = await userAuthorization(route, user.displayName);
             if(!role) return;
             searchTemplate();
         }

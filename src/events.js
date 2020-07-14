@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers } from './shared.js'
 import { searchTemplate } from './pages/dashboard.js';
 import { userListTemplate } from './pages/users.js';
 
@@ -65,7 +65,7 @@ export const addEventHideNotification = (element) => {
     });
 }
 
-export const addEventModalBtn = (role) => {
+export const addEventModalBtn = (role, userEmail) => {
     const btn = document.getElementById("modalBtn");
     btn.addEventListener('click', () => {
         const header = document.getElementById('biospecimenModalHeader');
@@ -98,15 +98,15 @@ export const addEventModalBtn = (role) => {
                     </select>
                 </div>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Search</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
                 </div>
             </form>
         `;
-        addEventNewUserForm();
+        addEventNewUserForm(userEmail);
     })
 };
 
-const addEventNewUserForm = () => {
+const addEventNewUserForm = (userEmail) => {
     const form = document.getElementById('addNewUser');
     form.addEventListener('submit', async e => {
         e.preventDefault();
@@ -124,8 +124,25 @@ const addEventNewUserForm = () => {
             form.reset();
             const response = await biospecimenUsers(); 
             if(response.code === 200 && response.data.users.length > 0) {
-                document.getElementById('usersList').innerHTML = userListTemplate(response.data.users);
+                document.getElementById('usersList').innerHTML = userListTemplate(response.data.users, userEmail);
+                addEventRemoveUser();
             };
         }
+    })
+}
+
+export const addEventRemoveUser = () => {
+    const elements = document.getElementsByClassName('fa-user-minus');
+    Array.from(elements).forEach(element => {
+        element.addEventListener('click', async () => {
+            const email = element.dataset.email;
+            showAnimation();
+            const response = await removeBiospecimenUsers(email);
+            hideAnimation();
+            if(response.code === 200) {
+                element.parentNode.parentNode.parentNode.removeChild(element.parentNode.parentNode);
+                showNotifications({title: 'User removed!', body: `<b>User with ${email} is removed.</b>`});
+            }
+        })
     })
 }
