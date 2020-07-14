@@ -122,7 +122,9 @@ const addEventNewUserForm = (userEmail) => {
         if(response.code === 200) {
             showNotifications({title: 'New user added!', body: `<b>${data.email}</b> is added as <b>${data.role}</b>`});
             form.reset();
+            showAnimation();
             const users = await biospecimenUsers();
+            hideAnimation();
             if(users.code === 200 && users.data.users.length > 0) {
                 document.getElementById('usersList').innerHTML = userListTemplate(users.data.users, userEmail);
                 addEventRemoveUser();
