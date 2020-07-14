@@ -2,7 +2,7 @@ import { userAuthorization, biospecimenUsers } from "./../shared.js";
 import { homeNavBar } from "../navbar.js";
 import { addEventModalBtn, addEventRemoveUser } from "../events.js";
 
-export const manageUsers = async (auth, route) => {
+export const manageUsers = (auth, route) => {
     auth.onAuthStateChanged(async user => {
         if(user){
             const role = await userAuthorization(route, user.displayName);

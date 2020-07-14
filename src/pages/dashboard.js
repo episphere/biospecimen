@@ -3,7 +3,7 @@ import { userAuthorization } from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4 } from "./../events.js";
 import { homeNavBar } from '../navbar.js';
 
-export const userDashboard = async (auth, route) => {
+export const userDashboard = (auth, route) => {
     auth.onAuthStateChanged(async user => {
         if(user){
             const role = await userAuthorization(route, user.displayName);
