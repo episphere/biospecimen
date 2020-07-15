@@ -133,3 +133,7 @@
 .fa-user-minus {
     cursor: pointer;
 }
+
+body {
+    scroll-behavior: smooth !important;
+}

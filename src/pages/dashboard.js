@@ -20,7 +20,7 @@ export const userDashboard = (auth, route) => {
 export const searchTemplate = () => {
     let template =  `
         <div class="row">
-            <div class="col">
+            <div class="col-lg">
                 <div class="row form-row">
                     <form id="search1" method="POST">
                         <div class="form-group">
@@ -41,7 +41,7 @@ export const searchTemplate = () => {
                     </form>
                 </div>
             </div>
-            <div class="col">
+            <div class="col-lg">
                 <div class="row form-row">
                     <form id="search2" method="POST">
                         <div class="form-group">
