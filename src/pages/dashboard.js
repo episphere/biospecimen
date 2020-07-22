@@ -95,11 +95,9 @@ export const searchResults = (result) => {
             <table class="table table-borderless table-striped">
                 <thead>
                     <tr>
-                        <th>First name</th>
                         <th>Last name</th>
+                        <th>First name</th>
                         <th>Date of birth</th>
-                        <th>Email</th>
-                        <th>Phone no.</th>
                         <th>Address</th>
                         <th>Connect Id</th>
                     </tr>
@@ -108,11 +106,9 @@ export const searchResults = (result) => {
     result.forEach(data => {
         template += `
             <tr>
-                <td>${data.RcrtUP_Fname_v1r0}</td>
                 <td>${data.RcrtCS_Lname_v1r0}</td>
+                <td>${data.RcrtUP_Fname_v1r0}</td>
                 <td>${data.RcrtUP_MOB_v1r0}/${data.RcrtUP_BD_v1r0}/${data.RcrtUP_YOB_v1r0}</td>
-                <td>${data.RcrtUP_Email1_v1r0 ? data.RcrtUP_Email1_v1r0 : ''}</td>
-                <td>${data.RcrtUP_Phone1_v1r0 ? data.RcrtUP_Phone1_v1r0 : ''}</td>
                 <td>${data.RcrtUP_AddressLn1_v1r0} ${data.RcrtUP_AddressLn2_v1r0 ? data.RcrtUP_AddressLn2_v1r0 : ''}</br>${data.RcrtUP_City_v1r0} ${Object.keys(allStates)[Object.values(allStates).indexOf(parseInt(data.RcrtUP_State_v1r0))]} ${data.RcrtUP_Zip_v1r0}</td>
                 <td>${data.Connect_ID}</td>
             </tr>
