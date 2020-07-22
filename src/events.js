@@ -170,6 +170,7 @@ export const addEventSelectParticipantForm = () => {
                 navBarBtn.classList.add('active');
                 document.getElementById('contentBody').innerHTML = checkInTemplate(data);
                 addEventBackToSearch('navBarSearch');
+                addEventBackToSearch('checkInExit');
             }
         })
     })

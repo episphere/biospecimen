@@ -71,8 +71,9 @@ export const checkInTemplate = (data) => {
                 </div>
             </div>
         </div>
-        <div>
-        
+        </br>
+        <div class="row">
+            <button class="btn btn-outline-dark" id="checkInExit"><i class="fas fa-arrow-left"></i> Exit</button>
         </div>
 
     `
