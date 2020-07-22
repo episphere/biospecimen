@@ -92,9 +92,11 @@ export const searchResults = (result) => {
             <button class="btn btn-light" id="backToSearch"><i class="fas fa-arrow-left"></i> Back</button>
         </div>
         <div class="row allow-overflow">
+            Participant Search Results
             <table class="table table-borderless table-striped">
                 <thead>
                     <tr>
+                        <th>Select</th>
                         <th>Last name</th>
                         <th>First name</th>
                         <th>Date of birth</th>
@@ -106,6 +108,7 @@ export const searchResults = (result) => {
     result.forEach(data => {
         template += `
             <tr>
+                <td></td>
                 <td>${data.RcrtCS_Lname_v1r0}</td>
                 <td>${data.RcrtUP_Fname_v1r0}</td>
                 <td>${data.RcrtUP_MOB_v1r0}/${data.RcrtUP_BD_v1r0}/${data.RcrtUP_YOB_v1r0}</td>
