@@ -146,7 +146,7 @@ export const addEventRemoveUser = () => {
             hideAnimation();
             if(response.code === 200) {
                 element.parentNode.parentNode.parentNode.removeChild(element.parentNode.parentNode);
-                showNotifications({title: 'User removed!', body: `User with <b>${email}</b> is removed.`});
+                showNotifications({title: 'User removed!', body: `User with email <b>${email}</b> is removed.`});
             }
         })
     })
