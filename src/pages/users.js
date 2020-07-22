@@ -16,7 +16,7 @@ export const manageUsers = (auth, route) => {
             div.classList = ['row'];
 
             const button = document.createElement('button');
-            button.classList = ['btn btn-primary'];
+            button.classList = ['btn btn-outline-primary'];
             button.id = 'modalBtn';
             button.dataset.target = '#biospecimenModal';
             button.dataset.toggle = 'modal';

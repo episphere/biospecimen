@@ -1,6 +1,7 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass } from './shared.js'
 import { searchTemplate } from './pages/dashboard.js';
 import { userListTemplate } from './pages/users.js';
+import { checkInTemplate } from './pages/checkIn.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -51,8 +52,8 @@ export const addEventSearchForm4 = () => {
     })
 };
 
-export const addEventBackToSearch = () => {
-    document.getElementById('backToSearch').addEventListener('click', searchTemplate)
+export const addEventBackToSearch = (id) => {
+    document.getElementById(id).addEventListener('click', searchTemplate)
 };
 
 export const addEventHideNotification = (element) => {
@@ -98,7 +99,7 @@ export const addEventModalBtn = (role, userEmail) => {
                     </select>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Add</button>
+                    <button type="submit" class="btn btn-outline-primary">Add</button>
                 </div>
             </form>
         `;
@@ -150,4 +151,27 @@ export const addEventRemoveUser = () => {
             }
         })
     })
+}
+
+export const addEventSelectParticipantForm = () => {
+    const form = document.getElementById('selectParticipant');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const radios = document.getElementsByName('selectParticipant');
+        Array.from(radios).forEach(async radio => {
+            if(radio.checked) {
+                const connectId = radio.value;
+                let query = `connectId=${parseInt(connectId)}`;
+                const response = await findParticipant(query);
+                const data = response.data[0];
+                removeActiveClass('navbar-btn', 'active')
+                const navBarBtn = document.getElementById('navBarParticipantCheckIn');
+                navBarBtn.classList.remove('disabled');
+                navBarBtn.classList.add('active');
+                document.getElementById('contentBody').innerHTML = checkInTemplate(data);
+                addEventBackToSearch('navBarSearch');
+            }
+        })
+    })
+
 }

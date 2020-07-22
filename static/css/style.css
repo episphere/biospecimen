@@ -150,3 +150,34 @@ body {
 #contentHeader {
     margin-bottom: 16px;
 }
+
+#selectParticipant {
+    width: 100%;
+}
+
+.remove-margin {
+    margin: 0px !important;
+    padding: 5px 3px !important;
+}
+
+.info-box {
+    border: 0.5px solid #000000bd;
+    border-radius: 0.25rem;
+    text-align: center !important;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.fa-check {
+    color: #76c457bf;
+}
+
+.fa-times {
+    color: #ff00009e;
+}
+
+.info-row {
+    margin-bottom: 10px;
+}
