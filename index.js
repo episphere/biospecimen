@@ -25,9 +25,16 @@ window.onhashchange = () => {
 
 const manageRoutes = async () => {
     const route =  window.location.hash || '#';
-    if(route === '#') signIn();
-    else if (route === '#dashboard') userDashboard(auth, route);
-    else if (route === '#manage_users') manageUsers(auth, route);
-    else if (route === '#sign_out') signOut();
-    else window.location.hash = '#';
+    auth.onAuthStateChanged(async user => {
+        if(user){
+            if (route === '#dashboard') userDashboard(auth, route);
+            else if (route === '#manage_users') manageUsers(auth, route);
+            else if (route === '#sign_out') signOut();
+            else window.location.hash = '#dashboard';
+        }
+        else {
+            if(route === '#') signIn();
+            else window.location.hash = '#';
+        }
+    });
 }

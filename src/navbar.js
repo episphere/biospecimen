@@ -112,3 +112,24 @@ export const adminNavBar = (name) => {
         </div>
     `;
 }
+
+export const bodyNavBar = () => {
+    return `
+        <ul class="nav">
+            <li class="nav-item">
+                <button class="nav-link active navbar-btn">Search</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link disabled navbar-btn">Participant Check-In</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link disabled navbar-btn">Specimen Link</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link disabled navbar-btn">Collect/Process</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link disabled navbar-btn">Finalize</button>
+            </li>
+        </ul>`
+}

@@ -8,7 +8,8 @@ export const manageUsers = (auth, route) => {
             const role = await userAuthorization(route, user.displayName);
             if(!role) return;
             if(role === "user") window.location.hash = '#dashboard';
-            document.getElementById('root').innerHTML = '';
+            document.getElementById('contentBody').innerHTML = '';
+            document.getElementById('contentHeader').innerHTML = '';
             const response = await biospecimenUsers();
             
             const div = document.createElement('div');
@@ -22,12 +23,12 @@ export const manageUsers = (auth, route) => {
             button.innerHTML = 'Add user';
 
             div.appendChild(button);
-            document.getElementById('root').appendChild(div);
+            document.getElementById('contentBody').appendChild(div);
 
             const userListDiv = document.createElement('div');
             userListDiv.classList = ['row allow-overflow'];
             userListDiv.id = 'usersList';
-            document.getElementById('root').appendChild(userListDiv);
+            document.getElementById('contentBody').appendChild(userListDiv);
 
             if(response.code === 200 && response.data.users.length > 0) {
                 document.getElementById('usersList').innerHTML = userListTemplate(response.data.users, user.email);
@@ -57,7 +58,6 @@ export const userListTemplate = (result, userEmail) => {
                 </thead>
                 <tbody>`;
     result.forEach(data => {
-        console.log(data)
         if(data.email === userEmail) return;
         template += `
         <tr>

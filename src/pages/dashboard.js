@@ -1,7 +1,7 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
 import { userAuthorization } from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4 } from "./../events.js";
-import { homeNavBar } from '../navbar.js';
+import { homeNavBar, bodyNavBar } from '../navbar.js';
 
 export const userDashboard = (auth, route) => {
     auth.onAuthStateChanged(async user => {
@@ -78,7 +78,8 @@ export const searchTemplate = () => {
             </div>
         </div>
     `;
-    document.getElementById('root').innerHTML = template;
+    document.getElementById('contentBody').innerHTML = template;
+    document.getElementById('contentHeader').innerHTML = bodyNavBar();
     addEventSearchForm1();
     addEventSearchForm2();
     addEventSearchForm3();
@@ -119,6 +120,6 @@ export const searchResults = (result) => {
     });
     template += `</tbody></table></div>`;
 
-    document.getElementById('root').innerHTML = template;
+    document.getElementById('contentBody').innerHTML = template;
     addEventBackToSearch();
 }

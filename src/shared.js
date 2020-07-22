@@ -1,4 +1,4 @@
-import { userNavBar, adminNavBar, nonUserNavBar } from "./navbar.js";
+import { userNavBar, adminNavBar, nonUserNavBar, bodyNavBar } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
 import { addEventHideNotification } from "./events.js"
 
@@ -100,7 +100,7 @@ export const userAuthorization = async (route, name) => {
     }
     else if(response.code === 401) {
         document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
-        document.getElementById('root').innerHTML = 'You do not have required permission to access this dashboard';
+        document.getElementById('contentBody').innerHTML = 'You do not have required permission to access this dashboard';
         hideAnimation();
     }
 }

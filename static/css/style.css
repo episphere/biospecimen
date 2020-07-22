@@ -55,12 +55,21 @@
     color: #000000 !important;
 }
 
-.current-page {
+.current-page, .active {
     border-bottom: 2px solid #918c8d !important;
 }
 
 .navbar-nav:hover {
     border-bottom: 2px solid #bc1f40 !important;
+}
+
+.disabled {
+    cursor: not-allowed !important;
+}
+
+.navbar-btn {
+    border: 0px;
+    background-color: transparent;
 }
 
 #loadingAnimation {
@@ -136,4 +145,8 @@
 
 body {
     scroll-behavior: smooth !important;
+}
+
+#contentHeader {
+    margin-bottom: 16px;
 }

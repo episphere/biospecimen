@@ -1,7 +1,7 @@
 import { homeNavBar } from "./../navbar.js";
 
 export const signIn = () => {
-    const root = document.getElementById('root');
+    const root = document.getElementById('contentBody');
     root.innerHTML = '';
     const signInDiv = document.createElement('div');
     signInDiv.id = 'signInDiv';
