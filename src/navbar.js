@@ -115,7 +115,7 @@ export const adminNavBar = (name) => {
 
 export const bodyNavBar = () => {
     return `
-        <ul class="nav">
+        <ul class="nav nav-tabs">
             <li class="nav-item">
                 <button class="nav-link active navbar-btn">Search</button>
             </li>
