@@ -1,7 +1,8 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors } from './shared.js'
 import { searchTemplate } from './pages/dashboard.js';
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
+import { specimenTemplate } from './pages/specimen.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -171,8 +172,76 @@ export const addEventSelectParticipantForm = () => {
                 document.getElementById('contentBody').innerHTML = checkInTemplate(data);
                 addEventBackToSearch('navBarSearch');
                 addEventBackToSearch('checkInExit');
+                addEventCheckInCompleteForm();
             }
         })
     })
+}
 
+const addEventCheckInCompleteForm = () => {
+    const form = document.getElementById('checkInCompleteForm');
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const connectId = parseInt(document.getElementById('biospecimenVisitType').dataset.connectId);
+        let query = `connectId=${parseInt(connectId)}`;
+        const response = await findParticipant(query);
+        const data = response.data[0];
+        removeActiveClass('navbar-btn', 'active')
+        const navBarBtn = document.getElementById('navBarSpecimenLink');
+        navBarBtn.classList.remove('disabled');
+        navBarBtn.classList.add('active');
+        document.getElementById('contentBody').innerHTML = specimenTemplate(data);
+        addEventSpecimenLinkForm();
+    })
+};
+
+const addEventSpecimenLinkForm = () => {
+    const form = document.getElementById('specimenLinkForm');
+    const specimenSaveExit = document.getElementById('specimenSaveExit');
+    const specimenContinue = document.getElementById('specimenContinue')
+    const reEnterSpecimen = document.getElementById('reEnterSpecimen');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+    });
+    specimenSaveExit.addEventListener('click', () => {
+        btnsClicked()
+    });
+    specimenContinue.addEventListener('click', () => {
+        btnsClicked(true)
+    });
+    reEnterSpecimen.addEventListener('click', () => {
+        removeAllErrors();
+        form.reset();
+    })
+}
+
+const btnsClicked = (cont) => {
+    removeAllErrors();
+    const scanSpecimenID = document.getElementById('scanSpecimenID').value;
+    const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value;
+    const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value;
+    let hasError = false;
+    let focus = true;
+    if(!scanSpecimenID && !enterSpecimenID1){
+        hasError = true;
+        errorMessage('scanSpecimenID', 'Please Scan Master Specimen ID or Type in Manually', focus);
+        focus = false;
+        errorMessage('enterSpecimenID1', 'Please Scan Master Specimen ID or Type in Manually', focus);
+        return;
+    }
+    else if(!scanSpecimenID && enterSpecimenID1){
+        if(enterSpecimenID1 !== enterSpecimenID2) {
+            hasError = true;
+            errorMessage('enterSpecimenID2', 'Does not match with Manually Entered Specimen ID', focus);
+            return;
+        }
+        else {
+
+        }
+    }
+    if(cont) {
+
+    }else {
+
+    }
 }

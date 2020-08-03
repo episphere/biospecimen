@@ -123,13 +123,13 @@ export const bodyNavBar = () => {
                 <button class="nav-link disabled navbar-btn" id="navBarParticipantCheckIn">Participant Check-In</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link disabled navbar-btn">Specimen Link</button>
+                <button class="nav-link disabled navbar-btn" id="navBarSpecimenLink">Specimen Link</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link disabled navbar-btn">Collect/Process</button>
+                <button class="nav-link disabled navbar-btn" id="navBarSpecimenProcess">Collect/Process</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link disabled navbar-btn">Finalize</button>
+                <button class="nav-link disabled navbar-btn" id="navBarSpecimenFinalize">Finalize</button>
             </li>
         </ul>`
 }
