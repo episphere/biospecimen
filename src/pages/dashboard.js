@@ -113,7 +113,7 @@ export const searchResults = (result) => {
         template += `
             <tr>
                 <td><input type="radio" name="selectParticipant" required value="${data.Connect_ID}"></td>
-                <td>${data.RcrtCS_Lname_v1r0}</td>
+                <td>${data.RcrtUP_Lname_v1r0}</td>
                 <td>${data.RcrtUP_Fname_v1r0}</td>
                 <td>${data.RcrtUP_MOB_v1r0}/${data.RcrtUP_BD_v1r0}/${data.RcrtUP_YOB_v1r0}</td>
                 <td>${data.RcrtUP_AddressLn1_v1r0} ${data.RcrtUP_AddressLn2_v1r0 ? data.RcrtUP_AddressLn2_v1r0 : ''}</br>${data.RcrtUP_City_v1r0} ${Object.keys(allStates)[Object.values(allStates).indexOf(parseInt(data.RcrtUP_State_v1r0))]} ${data.RcrtUP_Zip_v1r0}</td>
