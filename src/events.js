@@ -3,6 +3,7 @@ import { searchTemplate } from './pages/dashboard.js';
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
+import { collectProcessTemplate } from './pages/collectProcess.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -192,22 +193,25 @@ const addEventCheckInCompleteForm = () => {
         navBarBtn.classList.add('active');
         document.getElementById('contentBody').innerHTML = specimenTemplate(data);
         addEventSpecimenLinkForm();
+        addEventNavBarParticipantCheckIn();
     })
 };
 
 const addEventSpecimenLinkForm = () => {
     const form = document.getElementById('specimenLinkForm');
     const specimenSaveExit = document.getElementById('specimenSaveExit');
-    const specimenContinue = document.getElementById('specimenContinue')
+    const specimenContinue = document.getElementById('specimenContinue');
+    const connectId = specimenSaveExit.dataset.connectId || specimenContinue.dataset.connectId;
+    document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
     const reEnterSpecimen = document.getElementById('reEnterSpecimen');
     form.addEventListener('submit', e => {
         e.preventDefault();
     });
     specimenSaveExit.addEventListener('click', () => {
-        btnsClicked()
+        btnsClicked(connectId)
     });
     specimenContinue.addEventListener('click', () => {
-        btnsClicked(true)
+        btnsClicked(connectId, true)
     });
     reEnterSpecimen.addEventListener('click', () => {
         removeAllErrors();
@@ -215,14 +219,22 @@ const addEventSpecimenLinkForm = () => {
     })
 }
 
-const btnsClicked = (cont) => {
+const btnsClicked = async (connectId, cont) => {
     removeAllErrors();
     const scanSpecimenID = document.getElementById('scanSpecimenID').value;
     const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value;
     const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value;
     let hasError = false;
     let focus = true;
-    if(!scanSpecimenID && !enterSpecimenID1){
+    
+    if(scanSpecimenID && enterSpecimenID1){
+        hasError = true;
+        errorMessage('scanSpecimenID', 'Please Provide either Scanned Specimen ID or Manually typed.', focus);
+        focus = false;
+        errorMessage('enterSpecimenID1', 'Please Provide either Scanned Specimen ID or Manually typed.', focus);
+        return;
+    }
+    else if(!scanSpecimenID && !enterSpecimenID1){
         hasError = true;
         errorMessage('scanSpecimenID', 'Please Scan Master Specimen ID or Type in Manually', focus);
         focus = false;
@@ -235,13 +247,102 @@ const btnsClicked = (cont) => {
             errorMessage('enterSpecimenID2', 'Does not match with Manually Entered Specimen ID', focus);
             return;
         }
-        else {
+    }
 
+    if(cont) {
+        removeActiveClass('navbar-btn', 'active')
+        const navBarBtn = document.getElementById('navBarSpecimenProcess');
+        navBarBtn.classList.remove('disabled');
+        navBarBtn.classList.add('active');
+        let query = `connectId=${parseInt(connectId)}`;
+        const response = await findParticipant(query);
+        const data = response.data[0];
+        document.getElementById('contentBody').innerHTML = collectProcessTemplate(data);
+        addEventSelectAllCollection();
+        addEventBiospecimenCollectionForm();
+    }else {
+        // Store biospecimen information
+        searchTemplate();
+    }
+}
+
+const addEventBiospecimenCollectionForm = () => {
+    const form = document.getElementById('biospecimenCollectionForm');
+    const collectionSaveExit = document.getElementById('collectionSaveExit');
+    const collectionNext = document.getElementById('collectionNext');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+    });
+    collectionSaveExit.addEventListener('click', () => {
+        collectionSubmission();
+    })
+    collectionNext.addEventListener('click', () => {
+        collectionSubmission(true);
+    });
+}
+
+const collectionSubmission = (cntd) => {
+    const data = {};
+    const tube1Id = getValue('tube1Id');
+    const tube2Id = getValue('tube2Id');
+    const tube3Id = getValue('tube3Id');
+    const tube4Id = getValue('tube4Id');
+    const tube5Id = getValue('tube5Id');
+    const tube6Id = getValue('tube6Id');
+    const tube7Id = getValue('tube7Id');
+
+    data['tube1Id'] = tube1Id;
+    data['tube2Id'] = tube2Id;
+    data['tube3Id'] = tube3Id;
+    data['tube4Id'] = tube4Id;
+    data['tube5Id'] = tube5Id;
+    data['tube6Id'] = tube6Id;
+    data['tube7Id'] = tube7Id;
+
+    Array.from(document.getElementsByClassName('tube-collected')).forEach((dt, index) => data[`tube${index+1}collected`] = dt.checked)
+    Array.from(document.getElementsByClassName('tube-deviated')).forEach((dt, index) => data[`tube${index+1}deviated`] = dt.checked)
+    data['additionalNotes'] = document.getElementById('additionalNotes').value;
+    console.log(data)
+    const notCollected = Array.from(document.getElementsByClassName('tube-collected')).filter(dt => dt.checked === false)
+    const deviated = Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === true)
+
+
+    if(cntd) {
+        if(notCollected.length > 0 || deviated.length > 0) {
+            let template = '';
+            notCollected.forEach(ele => console.log(ele))
+            deviated.forEach(ele => console.log(ele))
         }
     }
-    if(cont) {
-
-    }else {
-
+    else {
+        // Save collection data
+        searchTemplate();
     }
+}
+
+const getValue = (id) => document.getElementById(id).value;
+
+const isChecked = (id) => document.getElementById(id).checked;
+
+const addEventSelectAllCollection = () => {
+    const checkbox = document.getElementById('selectAllCollection');
+    checkbox.addEventListener('click', () => {
+        if(checkbox.checked) Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => chk.checked = true);
+        else Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => chk.checked = false);
+    })
+}
+
+const addEventNavBarParticipantCheckIn = () => {
+    const btn = document.getElementById('navBarParticipantCheckIn');
+    btn.addEventListener('click', async () => {
+        const connectId = btn.dataset.connectId;
+        if(!connectId) return;
+        let query = `connectId=${parseInt(connectId)}`;
+        const response = await findParticipant(query);
+        const data = response.data[0];
+        document.getElementById('contentBody').innerHTML = checkInTemplate(data);
+        addEventBackToSearch('navBarSearch');
+        addEventBackToSearch('checkInExit');
+        addEventCheckInCompleteForm();
+    })
 }

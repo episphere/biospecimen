@@ -194,3 +194,13 @@ body {
 .invalid {
     border-color: #dc3545 !important;
 }
+
+.collection-table {
+    width: 100% !important;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.collection-table tbody tr {
+    height: 80px;
+}

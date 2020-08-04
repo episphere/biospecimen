@@ -41,10 +41,10 @@ export const specimenTemplate = (data) => {
                     <button class="btn btn-outline-danger" id="reEnterSpecimen">No: Re-enter Master Specimen ID</button>
                 </div>
                 <div class="ml-auto">
-                    <button class="btn btn-outline-warning" type="submit" id="specimenSaveExit">Yes: Save and Exit</button>
+                    <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="submit" id="specimenSaveExit">Yes: Save and Exit</button>
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-outline-primary" type="submit" id="specimenContinue">Yes: Continue</button>
+                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Yes: Continue</button>
                 </div>
             </div>
         </form>
