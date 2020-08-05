@@ -341,10 +341,11 @@ const collectionSubmission = (dt, cntd) => {
                 `
 
             })
+            if(deviated.length > 0) template += '<div class="row"><div class="col">Deviations</div></div>'
             deviated.forEach(ele => {
                 const tubeType = ele.dataset.tubeType;
                 const defaultTubeId = ele.dataset.defaultTubeId;
-                template += `<div class="row"><div class="col">Deviations</div></div>
+                template += `
                 <div class="row"><div class="col">Tube ID: master ID ${data[ele.id] ? data[ele.id] : defaultTubeId}</div></div>
                     <div class="row">
                         <div class="col">
