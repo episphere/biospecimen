@@ -259,14 +259,14 @@ const btnsClicked = async (connectId, cont) => {
         const data = response.data[0];
         document.getElementById('contentBody').innerHTML = collectProcessTemplate(data);
         addEventSelectAllCollection();
-        addEventBiospecimenCollectionForm();
+        addEventBiospecimenCollectionForm(data);
     }else {
         // Store biospecimen information
         searchTemplate();
     }
 }
 
-const addEventBiospecimenCollectionForm = () => {
+const addEventBiospecimenCollectionForm = (dt) => {
     const form = document.getElementById('biospecimenCollectionForm');
     const collectionSaveExit = document.getElementById('collectionSaveExit');
     const collectionNext = document.getElementById('collectionNext');
@@ -274,14 +274,14 @@ const addEventBiospecimenCollectionForm = () => {
         e.preventDefault();
     });
     collectionSaveExit.addEventListener('click', () => {
-        collectionSubmission();
+        collectionSubmission(dt);
     })
     collectionNext.addEventListener('click', () => {
-        collectionSubmission(true);
+        collectionSubmission(dt, true);
     });
 }
 
-const collectionSubmission = (cntd) => {
+const collectionSubmission = (dt, cntd) => {
     const data = {};
     const tube1Id = getValue('tube1Id');
     const tube2Id = getValue('tube2Id');
@@ -309,9 +309,45 @@ const collectionSubmission = (cntd) => {
 
     if(cntd) {
         if(notCollected.length > 0 || deviated.length > 0) {
-            let template = '';
-            notCollected.forEach(ele => console.log(ele))
-            deviated.forEach(ele => console.log(ele))
+            let template = `</br>
+            <div class="row">
+                <h5>Collection Data Entry</h5>
+            </div>
+            </br>
+            <div class="row">
+                <div class="col">
+                    <div class="row">${dt.RcrtUP_Lname_v1r0}, ${dt.RcrtUP_Fname_v1r0}</div>
+                    <div class="row">${dt.Connect_ID}</div>
+                </div>
+                <div class="ml-auto form-group">
+                    Visit: Baseline
+                </div>
+            </div>
+            </br>
+            <form id="explanation" method="POST">`;
+            notCollected.forEach(ele => {
+                console.log(ele)
+                const tubeType = ele.dataset.tubeType;
+                const defaultTubeId = ele.dataset.defaultTubeId;
+                template += `<div class="row"><div class="col">${tubeType} not collected</div></div>
+                    <div class="row"><div class="col">Tube ID: master ID ${data[ele.id] ? data[ele.id] : defaultTubeId}</div></div>
+                    
+                    <div class="row">
+                        <div class="col">
+                            <label for="${ele.id}Explanation">Provide reason tube(s)was/werenot collected:</label>
+                            </br>
+                            <textarea rows=3 class="form-control additional-explanation" id="${ele.id}Explanation"></textarea>
+                        </div>
+                    </div>
+                `
+
+            })
+            deviated.forEach(ele => {
+                console.log(ele)
+
+            })
+            template += '</form>'
+            document.getElementById('contentBody').innerHTML = template
         }
     }
     else {
