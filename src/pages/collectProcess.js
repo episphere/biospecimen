@@ -24,31 +24,31 @@ export const collectProcessTemplate = (data) => {
                     </thead>
                     <tbody>
                         <tr>
-                            <td>(1) Red Top Separator</br><img src="./../../static/images/tube1.PNG"></td>
+                            <td>(1) Red Top Separator</br><img src="./static/images/tube1.PNG"></td>
                             <td><input type="text" id="tube1Id" class="form-control" placeholder="Scan/Type in Tube ID"></td>
                             <td><input type="checkbox" class="tube-collected" data-tube-type="Blood tubes" data-default-tube-id="0001" id="tube1Collected"></td>
                             <td><input type="checkbox" class="tube-deviated" data-tube-type="Blood tubes" data-default-tube-id="0001" id="tube1Deviated"></td>
                         </tr>
                         <tr>
-                            <td>(2) Red Top Separator</br><img src="./../../static/images/tube1.PNG"></td>
+                            <td>(2) Red Top Separator</br><img src="./static/images/tube1.PNG"></td>
                             <td><input type="text" id="tube2Id" class="form-control" placeholder="Scan/Type in Tube ID"></td>
                             <td><input type="checkbox" class="tube-collected" data-tube-type="Blood tubes" data-default-tube-id="0002" id="tube2Collected"></td>
                             <td><input type="checkbox" class="tube-deviated" data-tube-type="Blood tubes" data-default-tube-id="0002" id="tube2Deviated"></td>
                         </tr>
                         <tr>
-                            <td>(3) Green Top Heparin</br><img src="./../../static/images/tube2.PNG"></td>
+                            <td>(3) Green Top Heparin</br><img src="./static/images/tube2.PNG"></td>
                             <td><input type="text" id="tube3Id" class="form-control" placeholder="Scan/Type in Tube ID"></td>
                             <td><input type="checkbox" class="tube-collected" data-tube-type="Blood tubes" data-default-tube-id="0003" id="tube3Collected"></td>
                             <td><input type="checkbox" class="tube-deviated" data-tube-type="Blood tubes" data-default-tube-id="0003" id="tube3Deviated"></td>
                         </tr>
                         <tr>
-                            <td>(4) Lavender Top EDTA</br><img src="./../../static/images/tube3.PNG"></td>
+                            <td>(4) Lavender Top EDTA</br><img src="./static/images/tube3.PNG"></td>
                             <td><input type="text" id="tube4Id" class="form-control" placeholder="Scan/Type in Tube ID"></td>
                             <td><input type="checkbox" class="tube-collected" data-tube-type="Blood tubes" data-default-tube-id="0004" id="tube4Collected"></td>
                             <td><input type="checkbox" class="tube-deviated" data-tube-type="Blood tubes" data-default-tube-id="0004" id="tube4Deviated"></td>
                         </tr>
                         <tr>
-                            <td>(5) Yellow Top ACD</br><img src="./../../static/images/tube1.PNG"></td>
+                            <td>(5) Yellow Top ACD</br><img src="./static/images/tube1.PNG"></td>
                             <td><input type="text" id="tube5Id" class="form-control" placeholder="Scan/Type in Tube ID"></td>
                             <td><input type="checkbox" class="tube-collected" data-tube-type="Blood tubes" data-default-tube-id="0005" id="tube5Collected"></td>
                             <td><input type="checkbox" class="tube-deviated" data-tube-type="Blood tubes" data-default-tube-id="0005" id="tube5Deviated"></td>
