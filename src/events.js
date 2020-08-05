@@ -326,7 +326,6 @@ const collectionSubmission = (dt, cntd) => {
             </br>
             <form id="explanation" method="POST">`;
             notCollected.forEach(ele => {
-                console.log(ele)
                 const tubeType = ele.dataset.tubeType;
                 const defaultTubeId = ele.dataset.defaultTubeId;
                 template += `<div class="row"><div class="col">${tubeType} not collected</div></div>
@@ -343,8 +342,31 @@ const collectionSubmission = (dt, cntd) => {
 
             })
             deviated.forEach(ele => {
-                console.log(ele)
-
+                const tubeType = ele.dataset.tubeType;
+                const defaultTubeId = ele.dataset.defaultTubeId;
+                template += `<div class="row"><div class="col">Deviations</div></div>
+                <div class="row"><div class="col">Tube ID: master ID ${data[ele.id] ? data[ele.id] : defaultTubeId}</div></div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="${ele.id}DExplanation">Select Deviation</label>
+                            </br>
+                            <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}DExplanation">
+                                <option value=""> -- Select deviation  -- </option>
+                                <option value="Mislabeled">Mislabeled</option>
+                                <option value="Broken">Broken</option>
+                                <option value="Failed get layer">Failed get layer</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="${ele.id}Explanation">Provide deviation detials</label>
+                            </br>
+                            <textarea rows=3 class="form-control additional-explanation" id="${ele.id}Explanation"></textarea>
+                        </div>
+                    </div>
+                `
             })
             template += '</form>'
             document.getElementById('contentBody').innerHTML = template
