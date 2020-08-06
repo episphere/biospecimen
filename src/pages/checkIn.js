@@ -9,7 +9,7 @@ export const checkInTemplate = (data) => {
             <div class="row">
                 <div class="col">
                     <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
-                    <div class="row">${data.Connect_ID}</div>
+                    <div class="row">Connect ID: ${data.Connect_ID}</div>
                 </div>
                 <div class="ml-auto form-group">
                     <label for="biospecimenVisitType">Visit</label>

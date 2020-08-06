@@ -317,7 +317,7 @@ const collectionSubmission = (dt, cntd) => {
             <div class="row">
                 <div class="col">
                     <div class="row">${dt.RcrtUP_Lname_v1r0}, ${dt.RcrtUP_Fname_v1r0}</div>
-                    <div class="row">${dt.Connect_ID}</div>
+                    <div class="row">Connect ID: ${dt.Connect_ID}</div>
                 </div>
                 <div class="ml-auto form-group">
                     Visit: Baseline
