@@ -63,9 +63,7 @@ export const addEventsearchSpecimen = () => {
         let query = `connectId=${parseInt(biospecimenData.connectId)}`;
         const response = await findParticipant(query);
         const data = response.data[0];
-        document.getElementById('contentBody').innerHTML = collectProcessTemplate(data, biospecimenData);
-        addEventSelectAllCollection();
-        addEventBiospecimenCollectionForm(data);
+        collectProcessTemplate(data, biospecimenData);
     })
 }
 
@@ -281,16 +279,14 @@ const btnsClicked = async (connectId, formData, cont) => {
         let query = `connectId=${parseInt(connectId)}`;
         const response = await findParticipant(query);
         const data = response.data[0];
-        document.getElementById('contentBody').innerHTML = collectProcessTemplate(data, formData);
-        addEventSelectAllCollection();
-        addEventBiospecimenCollectionForm(data);
+        collectProcessTemplate(data, formData);
     }else {
         await storeSpecimen([formData]);
         searchTemplate();
     }
 }
 
-const addEventBiospecimenCollectionForm = (dt) => {
+export const addEventBiospecimenCollectionForm = (dt) => {
     const form = document.getElementById('biospecimenCollectionForm');
     const collectionSaveExit = document.getElementById('collectionSaveExit');
     const collectionNext = document.getElementById('collectionNext');
@@ -407,7 +403,7 @@ const getValue = (id) => document.getElementById(id).value;
 
 const isChecked = (id) => document.getElementById(id).checked;
 
-const addEventSelectAllCollection = () => {
+export const addEventSelectAllCollection = () => {
     const checkbox = document.getElementById('selectAllCollection');
     checkbox.addEventListener('click', () => {
         if(checkbox.checked) Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => chk.checked = true);

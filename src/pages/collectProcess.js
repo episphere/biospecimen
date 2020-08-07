@@ -1,5 +1,7 @@
+import { addEventSelectAllCollection, addEventBiospecimenCollectionForm } from './../events.js'
+
 export const collectProcessTemplate = (data, formData) => {
-    return `
+    let template = `
         </br>
         <div class="row">
             <h5>Collection Data Entry</h5>
@@ -94,4 +96,7 @@ export const collectProcessTemplate = (data, formData) => {
             </div>
         </form>
     `;
+    document.getElementById('contentBody').innerHTML = template;
+    addEventSelectAllCollection();
+    addEventBiospecimenCollectionForm(data);
 }
