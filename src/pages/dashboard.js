@@ -22,7 +22,7 @@ export const searchTemplate = () => {
     let template =  `
         <div class="row">
             <div class="col-lg">
-                <h4>Participant Lookup</h4>
+                <h5>Participant Lookup</h5>
             </div>
         </div>
         <div class="row">
@@ -86,7 +86,7 @@ export const searchTemplate = () => {
         <hr>
         <div class="row">
             <div class="col-lg">
-                <h4>Specimen Lookup</h4>
+                <h5>Specimen Lookup</h5>
             </div>
         </div>
         <div class="row">

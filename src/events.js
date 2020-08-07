@@ -3,7 +3,7 @@ import { searchTemplate } from './pages/dashboard.js';
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
-import { collectProcessTemplate } from './pages/collectProcess.js';
+import { collectProcessTemplate, tubeCollectedTemplate } from './pages/collectProcess.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -59,11 +59,17 @@ export const addEventsearchSpecimen = () => {
     form.addEventListener('submit', async e => {
         e.preventDefault();
         const masterSpecimenId = document.getElementById('masterSpecimenId').value;
-        const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
+        const biospecimen = await searchSpecimen(masterSpecimenId);
+        if(biospecimen.code !== 200) {
+            showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+            return
+        }
+        const biospecimenData = biospecimen.data;
         let query = `connectId=${parseInt(biospecimenData.connectId)}`;
         const response = await findParticipant(query);
         const data = response.data[0];
-        collectProcessTemplate(data, biospecimenData);
+        if(data.tube1Id === undefined) tubeCollectedTemplate(data, biospecimenData)
+        else collectProcessTemplate(data, biospecimenData);
     })
 }
 
@@ -275,14 +281,14 @@ const btnsClicked = async (connectId, formData, cont) => {
         let query = `connectId=${parseInt(connectId)}`;
         const response = await findParticipant(query);
         const data = response.data[0];
-        collectProcessTemplate(data, formData);
+        tubeCollectedTemplate(data, formData);
     }else {
         await storeSpecimen([formData]);
         searchTemplate();
     }
 }
 
-export const addEventBiospecimenCollectionForm = (dt) => {
+export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     const form = document.getElementById('biospecimenCollectionForm');
     const collectionSaveExit = document.getElementById('collectionSaveExit');
     const collectionNext = document.getElementById('collectionNext');
@@ -290,14 +296,25 @@ export const addEventBiospecimenCollectionForm = (dt) => {
         e.preventDefault();
     });
     collectionSaveExit.addEventListener('click', () => {
-        collectionSubmission(dt);
+        collectionSubmission(dt, biospecimenData);
     })
     collectionNext.addEventListener('click', () => {
-        collectionSubmission(dt, true);
+        collectionSubmission(dt, biospecimenData, true);
     });
+};
+
+export const addEventTubeCollectedForm = (data, biospecimenData) => {
+    const form = document.getElementById('tubeCollectionForm');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        if(!isChecked('tube1Collected') && !isChecked('tube2Collected') && !isChecked['tube3Collected'] && !isChecked['tube4Collected'] && !isChecked['tube5Collected'] && !isChecked['tube6Collected'] && !isChecked['tube7Collected']) return;
+        biospecimenData['tubeCollectedAt'] = new Date().toISOString();
+        Array.from(document.getElementsByClassName('tube-collected')).forEach((dt, index) => biospecimenData[`tube${index+1}Collected`] = dt.checked)
+        collectProcessTemplate(data, biospecimenData);
+    })
 }
 
-const collectionSubmission = (dt, cntd) => {
+const collectionSubmission = async (dt, biospecimenData, cntd) => {
     const data = {};
     const tube1Id = getValue('tube1Id');
     const tube2Id = getValue('tube2Id');
@@ -314,14 +331,11 @@ const collectionSubmission = (dt, cntd) => {
     data['tube5Id'] = tube5Id;
     data['tube6Id'] = tube6Id;
     data['tube7Id'] = tube7Id;
-
-    Array.from(document.getElementsByClassName('tube-collected')).forEach((dt, index) => data[`tube${index+1}collected`] = dt.checked)
-    Array.from(document.getElementsByClassName('tube-deviated')).forEach((dt, index) => data[`tube${index+1}deviated`] = dt.checked)
+    
     data['additionalNotes'] = document.getElementById('additionalNotes').value;
-    console.log(data)
+    Array.from(document.getElementsByClassName('tube-deviated')).forEach((dt, index) => data[`tube${index+1}Deviated`] = dt.checked)
     const notCollected = Array.from(document.getElementsByClassName('tube-collected')).filter(dt => dt.checked === false)
     const deviated = Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === true)
-
 
     if(cntd) {
         if(notCollected.length > 0 || deviated.length > 0) {
@@ -343,9 +357,8 @@ const collectionSubmission = (dt, cntd) => {
             <form id="explanation" method="POST">`;
             notCollected.forEach(ele => {
                 const tubeType = ele.dataset.tubeType;
-                const defaultTubeId = ele.dataset.defaultTubeId;
                 template += `<div class="row"><div class="col">${tubeType} not collected</div></div>
-                    <div class="row"><div class="col">Tube ID: master ID ${data[ele.id] ? data[ele.id] : defaultTubeId}</div></div>
+                    <div class="row"><div class="col">Tube ID: master ID</div></div>
                     
                     <div class="row">
                         <div class="col">
@@ -360,9 +373,8 @@ const collectionSubmission = (dt, cntd) => {
             if(deviated.length > 0) template += '<div class="row"><div class="col">Deviations</div></div>'
             deviated.forEach(ele => {
                 const tubeType = ele.dataset.tubeType;
-                const defaultTubeId = ele.dataset.defaultTubeId;
                 template += `
-                <div class="row"><div class="col">Tube ID: master ID ${data[ele.id] ? data[ele.id] : defaultTubeId}</div></div>
+                <div class="row"><div class="col">Tube ID: master ID</div></div>
                     <div class="row">
                         <div class="col">
                             <label for="${ele.id}DExplanation">Select Deviation</label>
@@ -390,7 +402,8 @@ const collectionSubmission = (dt, cntd) => {
         }
     }
     else {
-        // Save collection data
+        const allData = Object.assign(biospecimenData, data);
+        await storeSpecimen([allData]);
         searchTemplate();
     }
 }
