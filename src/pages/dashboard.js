@@ -31,14 +31,14 @@ export const searchTemplate = () => {
                     <form id="search1" method="POST">
                         <div class="form-group">
                             <label class="col-form-label search-label">First name</label>
-                            <input class="form-control" type="text" id="firstName" placeholder="Enter first name"/>
+                            <input class="form-control" type="text" id="firstName" placeholder="Enter First Name"/>
                         </div>
                         <div class="form-group">
                             <label class="col-form-label search-label">Last name</label>
-                            <input class="form-control" type="text" id="lastName" placeholder="Enter last name"/>
+                            <input class="form-control" type="text" id="lastName" placeholder="Enter Last Name"/>
                         </div>
                         <div class="form-group">
-                            <label class="col-form-label search-label">Date of birth</label>
+                            <label class="col-form-label search-label">Date of Birth</label>
                             <input class="form-control" type="date" id="dob"/>
                         </div>
                         <div class="form-group">
@@ -52,7 +52,7 @@ export const searchTemplate = () => {
                     <form id="search2" method="POST">
                         <div class="form-group">
                             <label class="col-form-label search-label">Email</label>
-                            <input class="form-control" required type="email" id="email" placeholder="Enter email id"/>
+                            <input class="form-control" required type="email" id="email" placeholder="Enter Email Id"/>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>
@@ -63,7 +63,7 @@ export const searchTemplate = () => {
                     <form id="search3" method="POST">
                         <div class="form-group">
                             <label class="col-form-label search-label">Phone no.</label>
-                            <input class="form-control" required type="text" maxlength="10" id="phone" placeholder="Enter phone no."/>
+                            <input class="form-control" required type="text" maxlength="10" id="phone" placeholder="Enter Phone No."/>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>
@@ -74,7 +74,7 @@ export const searchTemplate = () => {
                     <form id="search4" method="POST">
                         <div class="form-group">
                             <label class="col-form-label search-label">Connect Id</label>
-                            <input class="form-control" required type="text" maxlength="10" id="connectId" placeholder="Enter connect id"/>
+                            <input class="form-control" required type="text" maxlength="10" id="connectId" placeholder="Enter Connect Id"/>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>
