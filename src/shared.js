@@ -2,8 +2,8 @@ import { userNavBar, adminNavBar, nonUserNavBar, bodyNavBar } from "./navbar.js"
 import { searchResults } from "./pages/dashboard.js";
 import { addEventHideNotification } from "./events.js"
 
-// const api = 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?';
-const api = 'http://localhost:8010/nih-nci-dceg-episphere-dev/us-central1/biospecimen?';
+const api = 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?';
+// const api = 'http://localhost:8010/nih-nci-dceg-episphere-dev/us-central1/biospecimen?';
 
 export const validateUser = async () => {
     const idToken = await getIdToken();
