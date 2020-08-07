@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen } from './shared.js'
 import { searchTemplate } from './pages/dashboard.js';
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
@@ -53,6 +53,21 @@ export const addEventSearchForm4 = () => {
         performSearch(query);
     })
 };
+
+export const addEventsearchSpecimen = () => {
+    const form = document.getElementById('specimenLookupForm');
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const masterSpecimenId = document.getElementById('masterSpecimenId').value;
+        const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
+        let query = `connectId=${parseInt(biospecimenData.connectId)}`;
+        const response = await findParticipant(query);
+        const data = response.data[0];
+        document.getElementById('contentBody').innerHTML = collectProcessTemplate(data, biospecimenData);
+        addEventSelectAllCollection();
+        addEventBiospecimenCollectionForm(data);
+    })
+}
 
 export const addEventBackToSearch = (id) => {
     document.getElementById(id).addEventListener('click', searchTemplate)
@@ -183,7 +198,15 @@ const addEventCheckInCompleteForm = () => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        const connectId = parseInt(document.getElementById('biospecimenVisitType').dataset.connectId);
+        let formData = {};
+        const select = document.getElementById('biospecimenVisitType');
+        const connectId = parseInt(select.dataset.connectId);
+        const biospecimenVisitType = select.value;
+        const token = select.dataset.participantToken;
+        formData['connectId'] = connectId;
+        formData['visitType'] = biospecimenVisitType;
+        formData['checkInAt'] = new Date().toISOString();
+        formData['token'] = token;
         let query = `connectId=${parseInt(connectId)}`;
         const response = await findParticipant(query);
         const data = response.data[0];
@@ -191,13 +214,13 @@ const addEventCheckInCompleteForm = () => {
         const navBarBtn = document.getElementById('navBarSpecimenLink');
         navBarBtn.classList.remove('disabled');
         navBarBtn.classList.add('active');
-        document.getElementById('contentBody').innerHTML = specimenTemplate(data);
-        addEventSpecimenLinkForm();
+        document.getElementById('contentBody').innerHTML = specimenTemplate(data, formData);
+        addEventSpecimenLinkForm(formData);
         addEventNavBarParticipantCheckIn();
     })
 };
 
-const addEventSpecimenLinkForm = () => {
+const addEventSpecimenLinkForm = (formData) => {
     const form = document.getElementById('specimenLinkForm');
     const specimenSaveExit = document.getElementById('specimenSaveExit');
     const specimenContinue = document.getElementById('specimenContinue');
@@ -208,10 +231,10 @@ const addEventSpecimenLinkForm = () => {
         e.preventDefault();
     });
     specimenSaveExit.addEventListener('click', () => {
-        btnsClicked(connectId)
+        btnsClicked(connectId, formData)
     });
     specimenContinue.addEventListener('click', () => {
-        btnsClicked(connectId, true)
+        btnsClicked(connectId, formData, true)
     });
     reEnterSpecimen.addEventListener('click', () => {
         removeAllErrors();
@@ -219,7 +242,7 @@ const addEventSpecimenLinkForm = () => {
     })
 }
 
-const btnsClicked = async (connectId, cont) => {
+const btnsClicked = async (connectId, formData, cont) => {
     removeAllErrors();
     const scanSpecimenID = document.getElementById('scanSpecimenID').value;
     const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value;
@@ -249,19 +272,20 @@ const btnsClicked = async (connectId, cont) => {
         }
     }
 
+    formData['masterSpecimenId'] = enterSpecimenID1;
     if(cont) {
-        removeActiveClass('navbar-btn', 'active')
+        removeActiveClass('navbar-btn', 'active');
         const navBarBtn = document.getElementById('navBarSpecimenProcess');
         navBarBtn.classList.remove('disabled');
         navBarBtn.classList.add('active');
         let query = `connectId=${parseInt(connectId)}`;
         const response = await findParticipant(query);
         const data = response.data[0];
-        document.getElementById('contentBody').innerHTML = collectProcessTemplate(data);
+        document.getElementById('contentBody').innerHTML = collectProcessTemplate(data, formData);
         addEventSelectAllCollection();
         addEventBiospecimenCollectionForm(data);
     }else {
-        // Store biospecimen information
+        await storeSpecimen([formData]);
         searchTemplate();
     }
 }

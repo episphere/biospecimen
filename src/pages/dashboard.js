@@ -1,6 +1,6 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
 import { userAuthorization } from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm } from "./../events.js";
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 
 export const userDashboard = (auth, route) => {
@@ -20,6 +20,11 @@ export const userDashboard = (auth, route) => {
 export const searchTemplate = () => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     let template =  `
+        <div class="row">
+            <div class="col-lg">
+                <h4>Participant Lookup</h4>
+            </div>
+        </div>
         <div class="row">
             <div class="col-lg">
                 <div class="row form-row">
@@ -78,6 +83,28 @@ export const searchTemplate = () => {
                 </div>
             </div>
         </div>
+        <hr>
+        <div class="row">
+            <div class="col-lg">
+                <h4>Specimen Lookup</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg">
+                <i class="fas fa-barcode"></i> Find by Specimen ID
+                <div class="row form-row">
+                    <form id="specimenLookupForm" method="POST">
+                        <div class="form-group">
+                            <label class="col-form-label search-label">Master Specimen ID</label>
+                            <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan Specimen ID"/>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-outline-primary">Search</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     `;
     document.getElementById('contentBody').innerHTML = template;
     document.getElementById('contentHeader').innerHTML = bodyNavBar();
@@ -85,6 +112,7 @@ export const searchTemplate = () => {
     addEventSearchForm2();
     addEventSearchForm3();
     addEventSearchForm4();
+    addEventsearchSpecimen();
 }
 
 export const searchResults = (result) => {

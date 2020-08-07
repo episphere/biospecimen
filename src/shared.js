@@ -192,3 +192,28 @@ export const removeAllErrors = () => {
         element.classList.remove('invalid');
     })
 }
+
+export const storeSpecimen = async (array) => {
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(array)
+    }
+    const response = await fetch(`${api}api=addSpecimen`, requestObj);
+    return response.json();
+}
+
+export const searchSpecimen = async (masterSpecimenId) => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=searchSpecimen&masterSpecimenId=${masterSpecimenId}`, {
+        method: "GET",
+        headers: {
+            Authorization:"Bearer "+idToken
+        }
+    });
+    return response.json();
+}

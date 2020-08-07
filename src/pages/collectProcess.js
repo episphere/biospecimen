@@ -1,4 +1,4 @@
-export const collectProcessTemplate = (data) => {
+export const collectProcessTemplate = (data, formData) => {
     return `
         </br>
         <div class="row">
@@ -9,9 +9,10 @@ export const collectProcessTemplate = (data) => {
             <div class="col">
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: ${data.Connect_ID}</div>
+                <div class="row">Master Specimen ID: ${formData.masterSpecimenId}</div>
             </div>
             <div class="ml-auto form-group">
-                Visit: Baseline
+                Visit: ${formData.visitType}
             </div>
         </div>
         </br>

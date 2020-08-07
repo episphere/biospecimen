@@ -13,9 +13,9 @@ export const checkInTemplate = (data) => {
                 </div>
                 <div class="ml-auto form-group">
                     <label for="biospecimenVisitType">Visit</label>
-                    <select class="form-control" required data-connect-id="${data.Connect_ID}" id="biospecimenVisitType">
+                    <select class="form-control" required data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}" id="biospecimenVisitType">
                         <option value=""> -- Select Visit -- </option>
-                        <option value="baseline">Baseline</option>
+                        <option value="Baseline">Baseline</option>
                     </select>
                 </div>
             </div>
