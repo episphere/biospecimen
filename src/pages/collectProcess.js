@@ -65,7 +65,7 @@ export const collectProcessTemplate = (data, formData) => {
                         </tr>
                         <tr>
                             <td>(7) Mouthwash</td>
-                            <td><input type="text" id="tube7Id" ${formData['tube7Id'] ? `value='${formData["tube8Id"]}'`: ''} class="form-control ${formData['tube7Collected'] === false ? 'disabled': ''}" ${formData['tube7Collected'] === false ? 'disabled': 'required'} placeholder="Scan/Type in Tube ID"></td>
+                            <td><input type="text" id="tube7Id" ${formData['tube7Id'] ? `value='${formData["tube7Id"]}'`: ''} class="form-control ${formData['tube7Collected'] === false ? 'disabled': ''}" ${formData['tube7Collected'] === false ? 'disabled': 'required'} placeholder="Scan/Type in Tube ID"></td>
                             <td><input type="checkbox" class="tube-collected disabled" data-tube-type="Mouthwash" disabled ${formData['tube7Collected'] === true ? 'checked': ''} id="tube7Collected"></td>
                             <td><input type="checkbox" class="tube-deviated ${formData['tube7Collected'] === false ? 'disabled': ''}" ${formData['tube7Deviated'] === true ? 'checked': ''} data-tube-type="Mouthwash" ${formData['tube7Collected'] === false ? 'disabled': ''} id="tube7Deviated"></td>
                         </tr>
