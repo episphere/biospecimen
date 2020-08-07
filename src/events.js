@@ -272,10 +272,6 @@ const btnsClicked = async (connectId, formData, cont) => {
 
     formData['masterSpecimenId'] = enterSpecimenID1;
     if(cont) {
-        removeActiveClass('navbar-btn', 'active');
-        const navBarBtn = document.getElementById('navBarSpecimenProcess');
-        navBarBtn.classList.remove('disabled');
-        navBarBtn.classList.add('active');
         let query = `connectId=${parseInt(connectId)}`;
         const response = await findParticipant(query);
         const data = response.data[0];

@@ -1,4 +1,5 @@
-import { addEventSelectAllCollection, addEventBiospecimenCollectionForm } from './../events.js'
+import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBackToSearch } from './../events.js'
+import { removeActiveClass } from '../shared.js';
 
 export const collectProcessTemplate = (data, formData) => {
     let template = `
@@ -96,6 +97,11 @@ export const collectProcessTemplate = (data, formData) => {
             </div>
         </form>
     `;
+    removeActiveClass('navbar-btn', 'active');
+    const navBarBtn = document.getElementById('navBarSpecimenProcess');
+    navBarBtn.classList.remove('disabled');
+    navBarBtn.classList.add('active');
+    addEventBackToSearch('navBarSearch');
     document.getElementById('contentBody').innerHTML = template;
     addEventSelectAllCollection();
     addEventBiospecimenCollectionForm(data);
