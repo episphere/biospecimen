@@ -451,3 +451,18 @@ const finalizeHandler = async (data, masterSpecimenId, cntd) => {
         searchTemplate();
     }
 }
+
+export const addEventReturnToCollectProcess = () => {
+    const btn = document.getElementById('returnToCollectProcess');
+    btn.addEventListener('click', async () => {
+        const masterSpecimenId = btn.dataset.masterSpecimenId;
+        const connectId = btn.dataset.connectId;
+        showAnimation();
+        let query = `connectId=${parseInt(connectId)}`;
+        const response = await findParticipant(query);
+        const data = response.data[0];
+        const specimenData = (await searchSpecimen(masterSpecimenId)).data;
+        hideAnimation();
+        tubeCollectedTemplate(data, specimenData);
+    })
+};

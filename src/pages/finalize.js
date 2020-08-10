@@ -1,5 +1,5 @@
 import { removeActiveClass } from "./../shared.js";
-import { addEventFinalizeForm } from "../events.js";
+import { addEventFinalizeForm, addEventReturnToCollectProcess } from "../events.js";
 
 export const finalizeTemplate = (data, specimenData) => {
     console.log(specimenData)
@@ -101,7 +101,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 </br>
                 <div class="form-group row">
                     <div class="col-auto">
-                        <button class="btn btn-outline-danger" id="returnToCollectProcess" data-master-specimen-id="${specimenData['masterSpecimenId']}">Return to Collect/Process</button>
+                        <button class="btn btn-outline-danger" data-connect-id="${data.Connect_ID}" id="returnToCollectProcess" data-master-specimen-id="${specimenData['masterSpecimenId']}">Return to Collect/Process</button>
                     </div>
                     <div class="ml-auto">
                         <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['masterSpecimenId']}" type="submit" id="finalizedSaveExit">Save and Exit</button>
@@ -115,4 +115,5 @@ export const finalizeTemplate = (data, specimenData) => {
     `;
     document.getElementById('contentBody').innerHTML = template;
     addEventFinalizeForm(data, specimenData.masterSpecimenId);
+    addEventReturnToCollectProcess();
 }

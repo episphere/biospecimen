@@ -1,4 +1,4 @@
-import { addEventExplanationForm } from "./../events.js";
+import { addEventExplanationForm, addEventReturnToCollectProcess } from "./../events.js";
 
 export const explanationTemplate = (dt, biospecimenData) => {
     const notCollected = Array.from(document.getElementsByClassName('tube-collected')).filter(dt => dt.checked === false);
@@ -69,7 +69,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                 </br>
                 <div class="form-group row">
                     <div class="col-auto">
-                        <button class="btn btn-outline-danger" id="returnToCollectProcess">Return to Collect/Process</button>
+                        <button class="btn btn-outline-danger" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" id="returnToCollectProcess">Return to Collect/Process</button>
                     </div>
                     <div class="ml-auto">
                         <button class="btn btn-outline-warning" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="submit" id="explanationSaveExit">Save and Exit</button>
@@ -82,5 +82,6 @@ export const explanationTemplate = (dt, biospecimenData) => {
         template += '</form>'
         document.getElementById('contentBody').innerHTML = template;
         addEventExplanationForm(dt, biospecimenData.masterSpecimenId);
+        addEventReturnToCollectProcess();
     }
 }
