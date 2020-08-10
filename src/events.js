@@ -313,7 +313,12 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
         const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
         if(!isChecked('tube1Collected') && !isChecked('tube2Collected') && !isChecked['tube3Collected'] && !isChecked['tube4Collected'] && !isChecked['tube5Collected'] && !isChecked['tube6Collected'] && !isChecked['tube7Collected']) return;
         if(biospecimenData.tubeCollectedAt === undefined) biospecimenData['tubeCollectedAt'] = new Date().toISOString();
-        Array.from(document.getElementsByClassName('tube-collected')).forEach((dt, index) => biospecimenData[`tube${index+1}Collected`] = dt.checked)
+        Array.from(document.getElementsByClassName('tube-collected')).forEach((dt, index) => {
+            biospecimenData[`tube${index+1}Collected`] = dt.checked
+            if(!dt.checked) {
+                biospecimenData[`tube${index+1}Id`] = '';
+            }
+        })
         await storeSpecimen([biospecimenData]);
         collectProcessTemplate(data, biospecimenData);
     })
