@@ -2,7 +2,6 @@ import { removeActiveClass } from "./../shared.js";
 import { addEventFinalizeForm, addEventReturnToCollectProcess } from "../events.js";
 
 export const finalizeTemplate = (data, specimenData) => {
-    console.log(specimenData)
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenFinalize');
     navBarBtn.classList.remove('disabled');
