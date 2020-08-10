@@ -73,9 +73,9 @@ export const collectProcessTemplate = (data, formData) => {
             </div>
             <div class="row">
                 <div class="col">
-                    <label for="additionalNotes">Additional notes on collection</label>
+                    <label for="collectionAdditionalNotes">Additional notes on collection</label>
                     </br>
-                    <textarea rows=3 class="form-control" id="additionalNotes">${formData['additionalNotes'] ? `${formData["additionalNotes"]}`: ''}</textarea>
+                    <textarea rows=3 class="form-control" id="collectionAdditionalNotes">${formData['collectionAdditionalNotes'] ? `${formData["collectionAdditionalNotes"]}`: ''}</textarea>
                 </div>
             </div>
             </br>

@@ -211,7 +211,7 @@ const addEventCheckInCompleteForm = () => {
         const token = select.dataset.participantToken;
         formData['connectId'] = connectId;
         formData['visitType'] = biospecimenVisitType;
-        formData['checkInAt'] = new Date().toISOString();
+        formData['checkedInAt'] = new Date().toISOString();
         formData['token'] = token;
         let query = `connectId=${parseInt(connectId)}`;
         const response = await findParticipant(query);
@@ -337,7 +337,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     data['tube6Id'] = tube6Id;
     data['tube7Id'] = tube7Id;
     
-    data['additionalNotes'] = document.getElementById('additionalNotes').value;
+    data['collectionAdditionalNotes'] = document.getElementById('collectionAdditionalNotes').value;
     Array.from(document.getElementsByClassName('tube-deviated')).forEach((dt, index) => data[`tube${index+1}Deviated`] = dt.checked)
     
     
