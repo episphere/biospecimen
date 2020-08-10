@@ -27,5 +27,6 @@ const signInConfig = () => {
 
 export const signOut = () => {
     firebase.auth().signOut();
-    window.location.hash = '#';
+    // window.location.hash = '#';
+    location.reload();
 }
