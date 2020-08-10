@@ -4,6 +4,8 @@ import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
 import { collectProcessTemplate, tubeCollectedTemplate } from './pages/collectProcess.js';
+import { finalizeTemplate } from './pages/finalize.js';
+import { explanationTemplate } from './pages/explanation.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -337,89 +339,13 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     
     data['additionalNotes'] = document.getElementById('additionalNotes').value;
     Array.from(document.getElementsByClassName('tube-deviated')).forEach((dt, index) => data[`tube${index+1}Deviated`] = dt.checked)
-    const notCollected = Array.from(document.getElementsByClassName('tube-collected')).filter(dt => dt.checked === false)
-    const deviated = Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === true)
+    
     
     if(biospecimenData.masterSpecimenId) data['masterSpecimenId'] = biospecimenData.masterSpecimenId;
     await storeSpecimen([data]);
     if(cntd) {
-        if(notCollected.length > 0 || deviated.length > 0) {
-            let template = `</br>
-            <div class="row">
-                <h5>Collection Data Entry</h5>
-            </div>
-            </br>
-            <div class="row">
-                <div class="col">
-                    <div class="row">${dt.RcrtUP_Lname_v1r0}, ${dt.RcrtUP_Fname_v1r0}</div>
-                    <div class="row">Connect ID: ${dt.Connect_ID}</div>
-                </div>
-                <div class="ml-auto form-group">
-                    Visit: ${biospecimenData.visitType}
-                </div>
-            </div>
-            </br>
-            <form id="explanation" method="POST">`;
-            let array = [];
-            notCollected.forEach(ele => {
-                const tubeType = ele.dataset.tubeType;
-                if(array.includes(tubeType)) return
-                array.push(tubeType);
-                template += `<div class="row"><div class="col">${tubeType} not collected</div></div>
-                    <div class="row"><div class="col">Tube ID: ${biospecimenData['masterSpecimenId']}</div></div>
-                    
-                    <div class="form-group row">
-                        <div class="col">
-                            <label for="${ele.id}Explanation">Provide reason tube(s)was/werenot collected:</label>
-                            </br>
-                            <textarea rows=3 class="form-control additional-explanation" id="${ele.id}Explanation"></textarea>
-                        </div>
-                    </div>
-                `
-
-            })
-            if(deviated.length > 0) template += '<div class="row"><div class="col">Deviations</div></div>'
-            deviated.forEach(ele => {
-                const tubeType = ele.dataset.tubeType;
-                template += `
-                <div class="row"><div class="col">Tube ID: ${biospecimenData['masterSpecimenId']}</div></div>
-                    <div class="form-group row">
-                        <div class="col">
-                            <label for="${ele.id}DExplanation">Select Deviation</label>
-                            </br>
-                            <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}DExplanation">
-                                <option value=""> -- Select deviation  -- </option>
-                                <option value="Mislabeled">Mislabeled</option>
-                                <option value="Broken">Broken</option>
-                                <option value="Failed get layer">Failed get layer</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col">
-                            <label for="${ele.id}Explanation">Provide deviation detials</label>
-                            </br>
-                            <textarea rows=3 class="form-control additional-explanation" id="${ele.id}Explanation"></textarea>
-                        </div>
-                    </div>
-                    </br>
-                    <div class="form-group row">
-                        <div class="col-auto">
-                            <button class="btn btn-outline-danger" id="returnToCollectProcess">Return to Collect/Process</button>
-                        </div>
-                        <div class="ml-auto">
-                            <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="submit" id="explanationSaveExit">Yes: Save and Exit</button>
-                        </div>
-                        <div class="col-auto">
-                            <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="submit" id="explanationContinue">Yes: Continue</button>
-                        </div>
-                    </div>
-                `
-            })
-            template += '</form>'
-            document.getElementById('contentBody').innerHTML = template;
-        }
+        const specimenData = (await searchSpecimen(biospecimenData.masterSpecimenId)).data;
+        explanationTemplate(dt, specimenData);
     }
     else {
         searchTemplate();
@@ -451,4 +377,44 @@ const addEventNavBarParticipantCheckIn = () => {
         addEventBackToSearch('checkInExit');
         addEventCheckInCompleteForm();
     })
+}
+
+export const addEventExplanationForm = async (data, masterSpecimenId) => {
+    const form = document.getElementById('explanationForm');
+    const explanationSaveExit = document.getElementById('explanationSaveExit');
+    const explanationContinue = document.getElementById('explanationContinue');
+    // const specimenData = (await searchSpecimen(masterSpecimenId)).data;
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+    });
+    explanationSaveExit.addEventListener('click', () => {
+        explanationHandler(data, masterSpecimenId);
+    });
+    explanationContinue.addEventListener('click', () => {
+        explanationHandler(data, masterSpecimenId, true);
+    });
+}
+
+const explanationHandler = async (data, masterSpecimenId, cntd) => {
+    const textAreas = document.getElementsByClassName('additional-explanation');
+    let formData = {};
+    Array.from(textAreas).forEach(ta => {
+        if(ta.id.includes('Collected')) {
+            formData['bloodTubeNotCollectedExplanation'] = ta.value;
+        }
+        if(ta.id.includes('Deviated')) {
+            formData[ta.id] = ta.value;
+            const tmpId = ta.id.replace('Explanation', 'Reason');
+            formData[tmpId] = document.getElementById(tmpId).value;
+        }
+    });
+    formData['masterSpecimenId'] = masterSpecimenId;
+    await storeSpecimen([formData]);
+    if(cntd) {
+        const specimenData = (await searchSpecimen(masterSpecimenId)).data;
+        finalizeTemplate(data, specimenData);
+    }
+    else {
+        searchTemplate();
+    }
 }
