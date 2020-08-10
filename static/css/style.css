@@ -204,3 +204,11 @@ body {
 .collection-table tbody tr {
     height: 80px;
 }
+
+#finalizeTable {
+    text-align: left;
+}
+
+#finalizeForm {
+    width: 100%;
+}

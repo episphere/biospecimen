@@ -1,7 +1,6 @@
 import { addEventExplanationForm } from "./../events.js";
 
 export const explanationTemplate = (dt, biospecimenData) => {
-    console.log(biospecimenData)
     const notCollected = Array.from(document.getElementsByClassName('tube-collected')).filter(dt => dt.checked === false);
     const deviated = Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === true);
     if(notCollected.length > 0 || deviated.length > 0) {
@@ -38,7 +37,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                 </div>
             `
         })
-        
+
         if(deviated.length > 0) template += '<div class="row"><div class="col">Deviations</div></div>'
         deviated.forEach(ele => {
             template += `
@@ -73,10 +72,10 @@ export const explanationTemplate = (dt, biospecimenData) => {
                         <button class="btn btn-outline-danger" id="returnToCollectProcess">Return to Collect/Process</button>
                     </div>
                     <div class="ml-auto">
-                        <button class="btn btn-outline-warning" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="submit" id="explanationSaveExit">Yes: Save and Exit</button>
+                        <button class="btn btn-outline-warning" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="submit" id="explanationSaveExit">Save and Exit</button>
                     </div>
                     <div class="col-auto">
-                        <button class="btn btn-outline-primary" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="submit" id="explanationContinue">Yes: Continue</button>
+                        <button class="btn btn-outline-primary" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="submit" id="explanationContinue">Next</button>
                     </div>
                 </div>
         `

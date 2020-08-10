@@ -379,7 +379,7 @@ const addEventNavBarParticipantCheckIn = () => {
     })
 }
 
-export const addEventExplanationForm = async (data, masterSpecimenId) => {
+export const addEventExplanationForm = (data, masterSpecimenId) => {
     const form = document.getElementById('explanationForm');
     const explanationSaveExit = document.getElementById('explanationSaveExit');
     const explanationContinue = document.getElementById('explanationContinue');
@@ -415,6 +415,39 @@ const explanationHandler = async (data, masterSpecimenId, cntd) => {
         finalizeTemplate(data, specimenData);
     }
     else {
+        searchTemplate();
+    }
+}
+
+export const addEventFinalizeForm = (data, masterSpecimenId) => {
+    const form = document.getElementById('finalizeForm');
+    const finalizedSaveExit = document.getElementById('finalizedSaveExit');
+    const finalizedContinue = document.getElementById('finalizedContinue');
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+    });
+    finalizedSaveExit.addEventListener('click', () => {
+        finalizeHandler(data, masterSpecimenId);
+    });
+    finalizedContinue.addEventListener('click', () => {
+        finalizeHandler(data, masterSpecimenId, true);
+    });
+}
+
+const finalizeHandler = async (data, masterSpecimenId, cntd) => {
+    let formData = {};
+    formData['finalizedAdditionalNotes'] = document.getElementById('finalizedAdditionalNotes').value;
+    formData['masterSpecimenId'] = masterSpecimenId;
+    if(cntd) {
+        formData['finalized'] = true;
+        formData['finalizedAt'] = new Date().toISOString();
+        await storeSpecimen([formData]);
+        showNotifications({title: 'Specimen Finalized', body: 'Specimen finalized successfully!'}, true);
+        searchTemplate();
+    }
+    else {
+        await storeSpecimen([formData]);
         searchTemplate();
     }
 }
