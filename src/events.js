@@ -443,7 +443,7 @@ const finalizeHandler = async (data, masterSpecimenId, cntd) => {
         formData['finalized'] = true;
         formData['finalizedAt'] = new Date().toISOString();
         await storeSpecimen([formData]);
-        showNotifications({title: 'Specimen Finalized', body: 'Specimen finalized successfully!'}, true);
+        showNotifications({title: 'Specimen Finalized', body: 'Specimen finalized successfully!'});
         searchTemplate();
     }
     else {
