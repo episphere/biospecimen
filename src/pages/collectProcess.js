@@ -2,7 +2,6 @@ import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEven
 import { removeActiveClass } from '../shared.js';
 
 export const collectProcessTemplate = (data, formData) => {
-    console.log(formData)
     let template = `
         </br>
         <div class="row">
@@ -100,7 +99,6 @@ export const collectProcessTemplate = (data, formData) => {
 }
 
 export const tubeCollectedTemplate = (data, formData) => {
-    console.log(formData)
     let template = `
         </br>
         <div class="row">

@@ -402,8 +402,9 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         }
     }
     else {
-        const allData = Object.assign(biospecimenData, data);
-        await storeSpecimen([allData]);
+        if(biospecimenData.masterSpecimenId) data['masterSpecimenId'] = biospecimenData.masterSpecimenId;
+        // const allData = Object.assign(biospecimenData, data);
+        await storeSpecimen([data]);
         searchTemplate();
     }
 }
