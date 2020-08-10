@@ -399,8 +399,15 @@ const explanationHandler = async (data, masterSpecimenId, cntd) => {
     const textAreas = document.getElementsByClassName('additional-explanation');
     let formData = {};
     Array.from(textAreas).forEach(ta => {
-        if(ta.id.includes('Collected')) {
+        
+        if(ta.id.includes('tube1Collected') || ta.id.includes('tube2Collected') || ta.id.includes('tube3Collected') || ta.id.includes('tube4Collected') || ta.id.includes('tube5Collected')) {
             formData['bloodTubeNotCollectedExplanation'] = ta.value;
+        }
+        if(ta.id.includes('tube6Collected')) {
+            formData['urineTubeNotCollectedExplanation'] = ta.value;
+        }
+        if(ta.id.includes('tube7Collected')) {
+            formData['mouthWashTubeNotCollectedExplanation'] = ta.value;
         }
         if(ta.id.includes('Deviated')) {
             formData[ta.id] = ta.value;
