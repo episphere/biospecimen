@@ -170,5 +170,5 @@ export const tubeCollectedTemplate = (data, formData) => {
     addEventBackToSearch('navBarSearch');
     document.getElementById('contentBody').innerHTML = template;
     addEventSelectAllCollection();
-    addEventTubeCollectedForm(data, formData);
+    addEventTubeCollectedForm(data, `${formData.masterSpecimenId}`);
 }

@@ -275,15 +275,16 @@ const btnsClicked = async (connectId, formData, cont) => {
             return;
         }
     }
-
     formData['masterSpecimenId'] = enterSpecimenID1;
+    await storeSpecimen([formData]);
+
     if(cont) {
         let query = `connectId=${parseInt(connectId)}`;
         const response = await findParticipant(query);
         const data = response.data[0];
         tubeCollectedTemplate(data, formData);
-    }else {
-        await storeSpecimen([formData]);
+    }
+    else {
         searchTemplate();
     }
 }
@@ -303,13 +304,15 @@ export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     });
 };
 
-export const addEventTubeCollectedForm = (data, biospecimenData) => {
+export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
     const form = document.getElementById('tubeCollectionForm');
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async e => {
         e.preventDefault();
+        const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
         if(!isChecked('tube1Collected') && !isChecked('tube2Collected') && !isChecked['tube3Collected'] && !isChecked['tube4Collected'] && !isChecked['tube5Collected'] && !isChecked['tube6Collected'] && !isChecked['tube7Collected']) return;
-        biospecimenData['tubeCollectedAt'] = new Date().toISOString();
+        if(biospecimenData.tubeCollectedAt === undefined) biospecimenData['tubeCollectedAt'] = new Date().toISOString();
         Array.from(document.getElementsByClassName('tube-collected')).forEach((dt, index) => biospecimenData[`tube${index+1}Collected`] = dt.checked)
+        await storeSpecimen([biospecimenData]);
         collectProcessTemplate(data, biospecimenData);
     })
 }
@@ -336,7 +339,9 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     Array.from(document.getElementsByClassName('tube-deviated')).forEach((dt, index) => data[`tube${index+1}Deviated`] = dt.checked)
     const notCollected = Array.from(document.getElementsByClassName('tube-collected')).filter(dt => dt.checked === false)
     const deviated = Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === true)
-
+    
+    if(biospecimenData.masterSpecimenId) data['masterSpecimenId'] = biospecimenData.masterSpecimenId;
+    await storeSpecimen([data]);
     if(cntd) {
         if(notCollected.length > 0 || deviated.length > 0) {
             let template = `</br>
@@ -350,17 +355,20 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
                     <div class="row">Connect ID: ${dt.Connect_ID}</div>
                 </div>
                 <div class="ml-auto form-group">
-                    Visit: Baseline
+                    Visit: ${biospecimenData.visitType}
                 </div>
             </div>
             </br>
             <form id="explanation" method="POST">`;
+            let array = [];
             notCollected.forEach(ele => {
                 const tubeType = ele.dataset.tubeType;
+                if(array.includes(tubeType)) return
+                array.push(tubeType);
                 template += `<div class="row"><div class="col">${tubeType} not collected</div></div>
-                    <div class="row"><div class="col">Tube ID: master ID</div></div>
+                    <div class="row"><div class="col">Tube ID: ${biospecimenData['masterSpecimenId']}</div></div>
                     
-                    <div class="row">
+                    <div class="form-group row">
                         <div class="col">
                             <label for="${ele.id}Explanation">Provide reason tube(s)was/werenot collected:</label>
                             </br>
@@ -374,8 +382,8 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
             deviated.forEach(ele => {
                 const tubeType = ele.dataset.tubeType;
                 template += `
-                <div class="row"><div class="col">Tube ID: master ID</div></div>
-                    <div class="row">
+                <div class="row"><div class="col">Tube ID: ${biospecimenData['masterSpecimenId']}</div></div>
+                    <div class="form-group row">
                         <div class="col">
                             <label for="${ele.id}DExplanation">Select Deviation</label>
                             </br>
@@ -388,23 +396,32 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
                             </select>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="form-group row">
                         <div class="col">
                             <label for="${ele.id}Explanation">Provide deviation detials</label>
                             </br>
                             <textarea rows=3 class="form-control additional-explanation" id="${ele.id}Explanation"></textarea>
                         </div>
                     </div>
+                    </br>
+                    <div class="form-group row">
+                        <div class="col-auto">
+                            <button class="btn btn-outline-danger" id="returnToCollectProcess">Return to Collect/Process</button>
+                        </div>
+                        <div class="ml-auto">
+                            <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="submit" id="explanationSaveExit">Yes: Save and Exit</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="submit" id="explanationContinue">Yes: Continue</button>
+                        </div>
+                    </div>
                 `
             })
             template += '</form>'
-            document.getElementById('contentBody').innerHTML = template
+            document.getElementById('contentBody').innerHTML = template;
         }
     }
     else {
-        if(biospecimenData.masterSpecimenId) data['masterSpecimenId'] = biospecimenData.masterSpecimenId;
-        // const allData = Object.assign(biospecimenData, data);
-        await storeSpecimen([data]);
         searchTemplate();
     }
 }
