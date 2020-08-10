@@ -209,6 +209,6 @@ body {
     text-align: left;
 }
 
-#finalizeForm {
+#finalizeForm, #specimenLookupForm {
     width: 100%;
 }
