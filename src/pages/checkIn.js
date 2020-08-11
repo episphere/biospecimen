@@ -31,6 +31,13 @@ export const checkInTemplate = (data) => {
                 </div>
                 <div class="col-md-3">
                     <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">Match Verification</span></div>
+                        <div class="row"><span class="full-width">${data.state.RcrtV_Verification_v1r0 === 1 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span></div>
+                        <div class="row"></br></div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="col-md-12 info-box">
                         <div class="row"><span class="full-width">SSN entered</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
                         <div class="row"><span class="full-width">Not entered</span></div>

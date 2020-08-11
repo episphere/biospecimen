@@ -140,8 +140,9 @@ export const performSearch = async (query) => {
     showAnimation();
     const response = await findParticipant(query);
     hideAnimation();
-    if(response.code === 200 && response.data.length > 0) searchResults(response.data);
-    else if(response.code === 200 && response.data.length === 0) showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+    const getVerifiedParticipants = response.data.filter(dt => dt.state.RcrtV_Verification_v1r0 === 1);
+    if(response.code === 200 && getVerifiedParticipants.length > 0) searchResults(getVerifiedParticipants);
+    else if(response.code === 200 && getVerifiedParticipants.length === 0) showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
 }
 
 export const showNotifications = (data, error) => {
