@@ -374,6 +374,9 @@ const addEventNavBarParticipantCheckIn = () => {
     btn.addEventListener('click', async () => {
         const connectId = btn.dataset.connectId;
         if(!connectId) return;
+        removeActiveClass('navbar-btn', 'active')
+        btn.classList.remove('disabled');
+        btn.classList.add('active');
         let query = `connectId=${parseInt(connectId)}`;
         const response = await findParticipant(query);
         const data = response.data[0];
