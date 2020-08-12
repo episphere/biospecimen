@@ -1,5 +1,5 @@
-import { removeActiveClass } from "./../shared.js";
-import { addEventFinalizeForm, addEventReturnToCollectProcess } from "../events.js";
+import { removeActiveClass, generateBarCode } from "./../shared.js";
+import { addEventFinalizeForm, addEventReturnToCollectProcess } from "./../events.js";
 
 export const finalizeTemplate = (data, specimenData) => {
     removeActiveClass('navbar-btn', 'active')
