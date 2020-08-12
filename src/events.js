@@ -484,3 +484,11 @@ export const addEventReturnToCollectProcess = () => {
         tubeCollectedTemplate(data, specimenData);
     })
 };
+
+export const addEventBackToTubeCollection = (data, masterSpecimenId) => {
+    const btn = document.getElementById('backToTubeCollection');
+    btn.addEventListener('click', async () => {
+        const specimenData = (await searchSpecimen(masterSpecimenId)).data;
+        tubeCollectedTemplate(data, specimenData);
+    })
+}

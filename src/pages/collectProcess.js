@@ -1,4 +1,4 @@
-import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBackToSearch, addEventTubeCollectedForm } from './../events.js'
+import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBackToSearch, addEventTubeCollectedForm, addEventBackToTubeCollection } from './../events.js'
 import { removeActiveClass, generateBarCode } from '../shared.js';
 
 export const collectProcessTemplate = (data, formData) => {
@@ -81,9 +81,12 @@ export const collectProcessTemplate = (data, formData) => {
             </br>
             <div class="row">
                 <div class="col-auto">
-                    <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="submit" id="collectionSaveExit">Save and Exit</button>
+                    <button class="btn btn-outline-danger" id="backToTubeCollection">Back to tube collection</button>
                 </div>
                 <div class="ml-auto">
+                    <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="submit" id="collectionSaveExit">Save and Exit</button>
+                </div>
+                <div class="col-auto">
                     <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="collectionNext">Next</button>
                 </div>
             </div>
@@ -96,6 +99,7 @@ export const collectProcessTemplate = (data, formData) => {
     addEventBackToSearch('navBarSearch');
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
+    addEventBackToTubeCollection(data, formData.masterSpecimenId);
     addEventBiospecimenCollectionForm(data, formData);
 }
 
