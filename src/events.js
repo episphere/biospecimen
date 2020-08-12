@@ -286,7 +286,8 @@ const btnsClicked = async (connectId, formData, cont) => {
         let query = `connectId=${parseInt(connectId)}`;
         const response = await findParticipant(query);
         const data = response.data[0];
-        tubeCollectedTemplate(data, formData);
+        const specimenData = (await searchSpecimen(formData['masterSpecimenId'])).data;
+        tubeCollectedTemplate(data, specimenData);
     }
     else {
         searchTemplate();
