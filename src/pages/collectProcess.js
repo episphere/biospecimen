@@ -1,5 +1,5 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBackToSearch, addEventTubeCollectedForm } from './../events.js'
-import { removeActiveClass } from '../shared.js';
+import { removeActiveClass, generateBarCode } from '../shared.js';
 
 export const collectProcessTemplate = (data, formData) => {
     let template = `
@@ -11,7 +11,7 @@ export const collectProcessTemplate = (data, formData) => {
         <div class="row">
             <div class="col">
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
-                <div class="row">Connect ID: ${data.Connect_ID}</div>
+                <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Master Specimen ID: ${formData.masterSpecimenId}</div>
             </div>
             <div class="ml-auto form-group">
@@ -95,6 +95,7 @@ export const collectProcessTemplate = (data, formData) => {
     navBarBtn.classList.add('active');
     addEventBackToSearch('navBarSearch');
     document.getElementById('contentBody').innerHTML = template;
+    generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventBiospecimenCollectionForm(data, formData);
 }
 
@@ -108,7 +109,7 @@ export const tubeCollectedTemplate = (data, formData) => {
         <div class="row">
             <div class="col">
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
-                <div class="row">Connect ID: ${data.Connect_ID}</div>
+                <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Master Specimen ID: ${formData.masterSpecimenId}</div>
             </div>
             <div class="ml-auto form-group">
@@ -169,6 +170,7 @@ export const tubeCollectedTemplate = (data, formData) => {
     navBarBtn.classList.add('active');
     addEventBackToSearch('navBarSearch');
     document.getElementById('contentBody').innerHTML = template;
+    generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventSelectAllCollection();
     addEventTubeCollectedForm(data, `${formData.masterSpecimenId}`);
 }

@@ -16,7 +16,7 @@ export const finalizeTemplate = (data, specimenData) => {
         <div class="row">
             <div class="col">
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
-                <div class="row">Connect ID: ${data.Connect_ID}</div>
+                <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Master Specimen ID: ${specimenData.masterSpecimenId}</div>
                 <div class="row">Specimen Collection Date & Time: ${new Date(specimenData.tubeCollectedAt).toLocaleString()}</div>
             </div>
@@ -113,6 +113,7 @@ export const finalizeTemplate = (data, specimenData) => {
         </div>
     `;
     document.getElementById('contentBody').innerHTML = template;
+    generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventFinalizeForm(data, specimenData.masterSpecimenId);
     addEventReturnToCollectProcess();
 }

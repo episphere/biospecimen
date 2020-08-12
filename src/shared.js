@@ -218,3 +218,7 @@ export const searchSpecimen = async (masterSpecimenId) => {
     });
     return response.json();
 }
+
+export const generateBarCode = (id, connectId) => {
+    JsBarcode(`#${id}`, connectId, {height: 30});
+}

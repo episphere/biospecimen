@@ -1,4 +1,5 @@
 import { addEventExplanationForm, addEventReturnToCollectProcess } from "./../events.js";
+import { generateBarCode } from "../shared.js";
 
 export const explanationTemplate = (dt, biospecimenData) => {
     const notCollected = Array.from(document.getElementsByClassName('tube-collected')).filter(dt => dt.checked === false);
@@ -12,7 +13,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
         <div class="row">
             <div class="col">
                 <div class="row">${dt.RcrtUP_Lname_v1r0}, ${dt.RcrtUP_Fname_v1r0}</div>
-                <div class="row">Connect ID: ${dt.Connect_ID}</div>
+                <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
             <div class="ml-auto form-group">
                 Visit: ${biospecimenData.visitType}
@@ -81,6 +82,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
         `
         template += '</form>'
         document.getElementById('contentBody').innerHTML = template;
+        generateBarCode('connectIdBarCode', dt.Connect_ID);
         addEventExplanationForm(dt, biospecimenData.masterSpecimenId);
         addEventReturnToCollectProcess();
     }

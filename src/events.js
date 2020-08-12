@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode } from './shared.js'
 import { searchTemplate } from './pages/dashboard.js';
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
@@ -192,6 +192,7 @@ export const addEventSelectParticipantForm = () => {
                 navBarBtn.classList.remove('disabled');
                 navBarBtn.classList.add('active');
                 document.getElementById('contentBody').innerHTML = checkInTemplate(data);
+                generateBarCode('connectIdBarCode', data.Connect_ID);
                 addEventBackToSearch('navBarSearch');
                 addEventBackToSearch('checkInExit');
                 addEventCheckInCompleteForm();
@@ -221,6 +222,7 @@ const addEventCheckInCompleteForm = () => {
         navBarBtn.classList.remove('disabled');
         navBarBtn.classList.add('active');
         document.getElementById('contentBody').innerHTML = specimenTemplate(data, formData);
+        generateBarCode('connectIdBarCode', data.Connect_ID);
         addEventSpecimenLinkForm(formData);
         addEventNavBarParticipantCheckIn();
     })
@@ -381,6 +383,7 @@ const addEventNavBarParticipantCheckIn = () => {
         const response = await findParticipant(query);
         const data = response.data[0];
         document.getElementById('contentBody').innerHTML = checkInTemplate(data);
+        generateBarCode('connectIdBarCode', data.Connect_ID);
         addEventBackToSearch('navBarSearch');
         addEventBackToSearch('checkInExit');
         addEventCheckInCompleteForm();
