@@ -280,17 +280,28 @@ const btnsClicked = async (connectId, formData, cont) => {
         }
     }
     formData['masterSpecimenId'] = enterSpecimenID1;
-    await storeSpecimen([formData]);
-
+    
+    let query = `connectId=${parseInt(connectId)}`;
+    const response = await findParticipant(query);
+    const data = response.data[0];
+    const specimenData = (await searchSpecimen(formData['masterSpecimenId'])).data;
     if(cont) {
-        let query = `connectId=${parseInt(connectId)}`;
-        const response = await findParticipant(query);
-        const data = response.data[0];
-        const specimenData = (await searchSpecimen(formData['masterSpecimenId'])).data;
-        tubeCollectedTemplate(data, specimenData);
+        if(specimenData && specimenData.connectId && specimenData.connectId !== data.Connect_ID) {
+            showNotifications({title: 'Master Specimen Id Duplication', body: 'Entered master specimen Id is already associated with a different connect Id.'}, true)
+        }
+        else {
+            await storeSpecimen([formData]);
+            tubeCollectedTemplate(data, specimenData ? specimenData : formData);
+        }
     }
     else {
-        searchTemplate();
+        if(specimenData && specimenData.connectId && specimenData.connectId !== data.Connect_ID) {
+            showNotifications({title: 'Master Specimen Id Duplication', body: 'Entered master specimen Id is already associated with a different connect Id.'}, true)
+        }
+        else {
+            await storeSpecimen([formData]);
+            searchTemplate();
+        }
     }
 }
 
