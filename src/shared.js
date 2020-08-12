@@ -73,7 +73,7 @@ export const getIdToken = () => {
                 resolve(null);
             });
             } else {
-            resolve(null);
+                resolve(null);
             }
         });
     });

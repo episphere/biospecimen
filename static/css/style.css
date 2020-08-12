@@ -212,3 +212,12 @@ body {
 #finalizeForm, #specimenLookupForm {
     width: 100%;
 }
+
+.align-left {
+    text-align: left;
+}
+
+.custom-checkbox-size {
+    height: 20px;
+    width: 20px;
+}
