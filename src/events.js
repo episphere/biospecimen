@@ -336,7 +336,7 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
     const form = document.getElementById('tubeCollectionForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        if(!isChecked('tube1Collected') && !isChecked('tube2Collected') && !isChecked['tube3Collected'] && !isChecked['tube4Collected'] && !isChecked['tube5Collected'] && !isChecked['tube6Collected'] && !isChecked['tube7Collected']) return;
+        if(!isChecked('tube1Collected') && !isChecked('tube2Collected') && !isChecked('tube3Collected') && !isChecked('tube4Collected') && !isChecked('tube5Collected') && !isChecked('tube6Collected') && !isChecked('tube7Collected')) return;
         showAnimation();
         const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
         if(biospecimenData.tubeCollectedAt === undefined) biospecimenData['tubeCollectedAt'] = new Date().toISOString();
