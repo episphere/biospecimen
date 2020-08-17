@@ -15,7 +15,7 @@ export const checkInTemplate = (data) => {
                     <label for="biospecimenVisitType">Visit</label>
                     <select class="form-control" required data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}" id="biospecimenVisitType">
                         <option value=""> -- Select Visit -- </option>
-                        <option value="Baseline">Baseline</option>
+                        <option selected value="Baseline">Baseline</option>
                     </select>
                 </div>
             </div>
