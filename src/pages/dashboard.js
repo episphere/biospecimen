@@ -116,7 +116,6 @@ export const searchTemplate = () => {
 }
 
 export const searchResults = (result) => {
-    console.log(result)
     let template = `
         </br>
         <div class="row">
