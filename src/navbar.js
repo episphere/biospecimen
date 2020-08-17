@@ -7,12 +7,12 @@ export const homeNavBar = () => {
         </div>
         <div class="navbar-nav">
             <li class="nav-item">
-                <a target="_blank" class="nav-link" href="https://github.com/episphere/biospecimen/issues" title="Please create an issue if you encounter any"><i class="fas fa-bug"></i> Report issue</a>
+                <a target="_blank" class="nav-link" href="https://github.com/episphere/connect/issues/new" title="Please create an issue if you encounter any"><i class="fas fa-bug"></i> Report issue</a>
             </li>
         </div>
         <div class="navbar-nav">
             <li class="nav-item">
-                <a target="_blank" class="nav-link" href="https://github.com/episphere/biospecimen/projects/1" title="GitHub Projects page"><i class="fas fa-tasks"></i> GitHub Projects</a>
+                <a target="_blank" class="nav-link" href="https://github.com/episphere/connect/projects/6" title="GitHub Projects page"><i class="fas fa-tasks"></i> GitHub Projects</a>
             </li>
         </div>
         <div class="navbar-nav">
