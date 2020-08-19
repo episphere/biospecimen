@@ -1,5 +1,5 @@
 import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode } from './shared.js'
-import { searchTemplate } from './pages/dashboard.js';
+import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
@@ -530,4 +530,12 @@ export const addEventBackToTubeCollection = (data, masterSpecimenId) => {
         hideAnimation();
         tubeCollectedTemplate(data, specimenData);
     })
+}
+
+export const addEventNavBarSpecimenSearch = () => {
+    const btn = document.getElementById('navBarSpecimenSearch');
+    btn.addEventListener('click', () => {
+        if(btn.classList.contains('active')) return;
+        searchBiospecimenTemplate();
+    });
 }

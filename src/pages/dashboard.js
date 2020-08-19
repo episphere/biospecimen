@@ -1,6 +1,6 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
-import { userAuthorization } from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen } from "./../events.js";
+import { userAuthorization, removeActiveClass } from "./../shared.js"
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 
 export const userDashboard = (auth, route) => {
@@ -19,7 +19,7 @@ export const userDashboard = (auth, route) => {
 
 export const searchTemplate = () => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
-    let template =  `
+    let template = `
         <div class="row">
             <div class="col-lg">
                 <h5>Participant Lookup</h5>
@@ -83,7 +83,19 @@ export const searchTemplate = () => {
                 </div>
             </div>
         </div>
-        <hr>
+    `;
+    document.getElementById('contentBody').innerHTML = template;
+    document.getElementById('contentHeader').innerHTML = bodyNavBar();
+    addEventSearchForm1();
+    addEventSearchForm2();
+    addEventSearchForm3();
+    addEventSearchForm4();
+    addEventNavBarSpecimenSearch();
+}
+
+export const searchBiospecimenTemplate = () => {
+    if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
+    let template = `
         <div class="row">
             <div class="col-lg">
                 <h5>Specimen Lookup</h5>
@@ -106,13 +118,12 @@ export const searchTemplate = () => {
             </div>
         </div>
     `;
+    removeActiveClass('navbar-btn', 'active')
+    const navBarBtn = document.getElementById('navBarSpecimenSearch');
+    navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
-    document.getElementById('contentHeader').innerHTML = bodyNavBar();
-    addEventSearchForm1();
-    addEventSearchForm2();
-    addEventSearchForm3();
-    addEventSearchForm4();
     addEventsearchSpecimen();
+    addEventBackToSearch('navBarSearch');
 }
 
 export const searchResults = (result) => {
@@ -130,7 +141,7 @@ export const searchResults = (result) => {
                     <tr>
                         <th>Select</th>
                         <th>Last name</th>
-                        <th>Middle Initial</th>
+                        <th>Middle initial</th>
                         <th>First name</th>
                         <th>Date of birth</th>
                         <th>Address</th>
