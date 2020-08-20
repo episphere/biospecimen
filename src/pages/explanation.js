@@ -41,8 +41,10 @@ export const explanationTemplate = (dt, biospecimenData) => {
 
         if(deviated.length > 0) template += '<div class="row"><div class="col">Deviations</div></div>'
         deviated.forEach(ele => {
+            const tubeLabel = ele.dataset.tubeLabel;
             template += `
-            <div class="row"><div class="col">Tube ID: ${biospecimenData['masterSpecimenId']} ${ele.parentNode.parentNode.querySelectorAll('[type="text"]')[0].value}</div></div>
+                <div class="row"><div class="col">Tube Type: ${tubeLabel}</div></div>
+                <div class="row"><div class="col">Tube ID: ${biospecimenData['masterSpecimenId']} ${ele.parentNode.parentNode.querySelectorAll('[type="text"]')[0].value}</div></div>
                 <div class="form-group row">
                     <div class="col">
                         <label for="${ele.id}Reason">Select Deviation</label>

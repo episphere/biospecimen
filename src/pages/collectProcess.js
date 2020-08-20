@@ -28,45 +28,45 @@ export const collectProcessTemplate = (data, formData) => {
                     <tbody>
                         <tr>
                             <td>(1) Red Top Separator</br><img src="./static/images/tube1.PNG"></td>
-                            <td><input type="checkbox" class="tube-collected custom-checkbox-size disabled" data-tube-type="Blood tubes" disabled ${formData['tube1Collected'] === true ? 'checked': ''} id="tube1Collected"></td>
+                            <td><input type="checkbox" data-tube-label="(1) Red Top Separator" class="tube-collected custom-checkbox-size disabled" data-tube-type="Blood tubes" disabled ${formData['tube1Collected'] === true ? 'checked': ''} id="tube1Collected"></td>
                             <td><input type="text" id="tube1Id" ${formData['tube1Id'] ? `value='${formData["tube1Id"]}'`: ''} class="form-control ${formData['tube1Collected'] === false ? 'disabled': ''}" ${formData['tube1Collected'] === false ? 'disabled': 'required'} placeholder="Scan/Type in Tube ID"></td>
-                            <td><input type="checkbox" class="tube-deviated custom-checkbox-size ${formData['tube1Collected'] === false ? 'disabled': ''}" ${formData['tube1Deviated'] === true ? 'checked': ''} data-tube-type="Blood tubes" ${formData['tube1Collected'] === false ? 'disabled': ''} id="tube1Deviated"></td>
+                            <td><input type="checkbox" data-tube-label="(1) Red Top Separator" class="tube-deviated custom-checkbox-size ${formData['tube1Collected'] === false ? 'disabled': ''}" ${formData['tube1Deviated'] === true ? 'checked': ''} data-tube-type="Blood tubes" ${formData['tube1Collected'] === false ? 'disabled': ''} id="tube1Deviated"></td>
                         </tr>
                         <tr>
                             <td>(2) Red Top Separator</br><img src="./static/images/tube1.PNG"></td>
-                            <td><input type="checkbox" class="tube-collected custom-checkbox-size disabled" data-tube-type="Blood tubes" disabled ${formData['tube2Collected'] === true ? 'checked': ''} id="tube2Collected"></td>
+                            <td><input type="checkbox" data-tube-label="(2) Red Top Separator" class="tube-collected custom-checkbox-size disabled" data-tube-type="Blood tubes" disabled ${formData['tube2Collected'] === true ? 'checked': ''} id="tube2Collected"></td>
                             <td><input type="text" id="tube2Id" ${formData['tube2Id'] ? `value='${formData["tube2Id"]}'`: ''} class="form-control ${formData['tube2Collected'] === false ? 'disabled': ''}" ${formData['tube2Collected'] === false ? 'disabled': 'required'} placeholder="Scan/Type in Tube ID"></td>
-                            <td><input type="checkbox" class="tube-deviated custom-checkbox-size ${formData['tube2Collected'] === false ? 'disabled': ''}" ${formData['tube2Deviated'] === true ? 'checked': ''} data-tube-type="Blood tubes" ${formData['tube2Collected'] === false ? 'disabled': ''} id="tube2Deviated"></td>
+                            <td><input type="checkbox" data-tube-label="(2) Red Top Separator" class="tube-deviated custom-checkbox-size ${formData['tube2Collected'] === false ? 'disabled': ''}" ${formData['tube2Deviated'] === true ? 'checked': ''} data-tube-type="Blood tubes" ${formData['tube2Collected'] === false ? 'disabled': ''} id="tube2Deviated"></td>
                         </tr>
                         <tr>
                             <td>(3) Green Top Heparin</br><img src="./static/images/tube2.PNG"></td>
-                            <td><input type="checkbox" class="tube-collected custom-checkbox-size disabled" data-tube-type="Blood tubes" disabled ${formData['tube3Collected'] === true ? 'checked': ''} id="tube3Collected"></td>
+                            <td><input type="checkbox" data-tube-label="(3) Green Top Heparin" class="tube-collected custom-checkbox-size disabled" data-tube-type="Blood tubes" disabled ${formData['tube3Collected'] === true ? 'checked': ''} id="tube3Collected"></td>
                             <td><input type="text" id="tube3Id" ${formData['tube3Id'] ? `value='${formData["tube3Id"]}'`: ''} class="form-control ${formData['tube3Collected'] === false ? 'disabled': ''}" ${formData['tube3Collected'] === false ? 'disabled': 'required'} placeholder="Scan/Type in Tube ID"></td>
-                            <td><input type="checkbox" class="tube-deviated custom-checkbox-size ${formData['tube3Collected'] === false ? 'disabled': ''}" ${formData['tube3Deviated'] === true ? 'checked': ''} data-tube-type="Blood tubes" ${formData['tube3Collected'] === false ? 'disabled': ''} id="tube3Deviated"></td>
+                            <td><input type="checkbox" data-tube-label="(3) Green Top Heparin" class="tube-deviated custom-checkbox-size ${formData['tube3Collected'] === false ? 'disabled': ''}" ${formData['tube3Deviated'] === true ? 'checked': ''} data-tube-type="Blood tubes" ${formData['tube3Collected'] === false ? 'disabled': ''} id="tube3Deviated"></td>
                         </tr>
                         <tr>
                             <td>(4) Lavender Top EDTA</br><img src="./static/images/tube3.PNG"></td>
-                            <td><input type="checkbox" class="tube-collected custom-checkbox-size disabled" data-tube-type="Blood tubes" disabled ${formData['tube4Collected'] === true ? 'checked': ''} id="tube4Collected"></td>
+                            <td><input type="checkbox" data-tube-label="(4) Lavender Top EDTA" class="tube-collected custom-checkbox-size disabled" data-tube-type="Blood tubes" disabled ${formData['tube4Collected'] === true ? 'checked': ''} id="tube4Collected"></td>
                             <td><input type="text" id="tube4Id" ${formData['tube4Id'] ? `value='${formData["tube4Id"]}'`: ''} class="form-control ${formData['tube4Collected'] === false ? 'disabled': ''}" ${formData['tube4Collected'] === false ? 'disabled': 'required'} placeholder="Scan/Type in Tube ID"></td>
-                            <td><input type="checkbox" class="tube-deviated custom-checkbox-size ${formData['tube5Collected'] === false ? 'disabled': ''}" ${formData['tube4Deviated'] === true ? 'checked': ''} data-tube-type="Blood tubes" ${formData['tube4Collected'] === false ? 'disabled': ''} id="tube4Deviated"></td>
+                            <td><input type="checkbox" data-tube-label="(4) Lavender Top EDTA" class="tube-deviated custom-checkbox-size ${formData['tube5Collected'] === false ? 'disabled': ''}" ${formData['tube4Deviated'] === true ? 'checked': ''} data-tube-type="Blood tubes" ${formData['tube4Collected'] === false ? 'disabled': ''} id="tube4Deviated"></td>
                         </tr>
                         <tr>
                             <td>(5) Yellow Top ACD</br><img src="./static/images/tube1.PNG"></td>
-                            <td><input type="checkbox" class="tube-collected custom-checkbox-size disabled" data-tube-type="Blood tubes" disabled ${formData['tube5Collected'] === true ? 'checked': ''} id="tube5Collected"></td>
+                            <td><input type="checkbox" data-tube-label="(5) Yellow Top ACD" class="tube-collected custom-checkbox-size disabled" data-tube-type="Blood tubes" disabled ${formData['tube5Collected'] === true ? 'checked': ''} id="tube5Collected"></td>
                             <td><input type="text" id="tube5Id" ${formData['tube5Id'] ? `value='${formData["tube5Id"]}'`: ''} class="form-control ${formData['tube5Collected'] === false ? 'disabled': ''}" ${formData['tube5Collected'] === false ? 'disabled': 'required'} placeholder="Scan/Type in Tube ID"></td>
-                            <td><input type="checkbox" class="tube-deviated custom-checkbox-size ${formData['tube5Collected'] === false ? 'disabled': ''}" ${formData['tube5Deviated'] === true ? 'checked': ''} data-tube-type="Blood tubes" ${formData['tube5Collected'] === false ? 'disabled': ''} id="tube5Deviated"></td>
+                            <td><input type="checkbox" data-tube-label="(5) Yellow Top ACD" class="tube-deviated custom-checkbox-size ${formData['tube5Collected'] === false ? 'disabled': ''}" ${formData['tube5Deviated'] === true ? 'checked': ''} data-tube-type="Blood tubes" ${formData['tube5Collected'] === false ? 'disabled': ''} id="tube5Deviated"></td>
                         </tr>
                         <tr>
                             <td>(6) Urine</td>
-                            <td><input type="checkbox" class="tube-collected custom-checkbox-size disabled" data-tube-type="Urine" disabled ${formData['tube6Collected'] === true ? 'checked': ''} id="tube6Collected"></td>
+                            <td><input type="checkbox" data-tube-label="(6) Urine" class="tube-collected custom-checkbox-size disabled" data-tube-type="Urine" disabled ${formData['tube6Collected'] === true ? 'checked': ''} id="tube6Collected"></td>
                             <td><input type="text" id="tube6Id" ${formData['tube6Id'] ? `value='${formData["tube6Id"]}'`: ''} class="form-control ${formData['tube6Collected'] === false ? 'disabled': ''}" ${formData['tube6Collected'] === false ? 'disabled': 'required'} placeholder="Scan/Type in Tube ID"></td>
-                            <td><input type="checkbox" class="tube-deviated custom-checkbox-size ${formData['tube6Collected'] === false ? 'disabled': ''}" ${formData['tube6Deviated'] === true ? 'checked': ''} data-tube-type="Urine" ${formData['tube6Collected'] === false ? 'disabled': ''} id="tube6Deviated"></td>
+                            <td><input type="checkbox" data-tube-label="(6) Urine" class="tube-deviated custom-checkbox-size ${formData['tube6Collected'] === false ? 'disabled': ''}" ${formData['tube6Deviated'] === true ? 'checked': ''} data-tube-type="Urine" ${formData['tube6Collected'] === false ? 'disabled': ''} id="tube6Deviated"></td>
                         </tr>
                         <tr>
                             <td>(7) Mouthwash</td>
-                            <td><input type="checkbox" class="tube-collected disabled custom-checkbox-size" data-tube-type="Mouthwash" disabled ${formData['tube7Collected'] === true ? 'checked': ''} id="tube7Collected"></td>
+                            <td><input type="checkbox" data-tube-label="(7) Mouthwash" class="tube-collected disabled custom-checkbox-size" data-tube-type="Mouthwash" disabled ${formData['tube7Collected'] === true ? 'checked': ''} id="tube7Collected"></td>
                             <td><input type="text" id="tube7Id" ${formData['tube7Id'] ? `value='${formData["tube7Id"]}'`: ''} class="form-control ${formData['tube7Collected'] === false ? 'disabled': ''}" ${formData['tube7Collected'] === false ? 'disabled': 'required'} placeholder="Scan/Type in Tube ID"></td>
-                            <td><input type="checkbox" class="tube-deviated custom-checkbox-size ${formData['tube7Collected'] === false ? 'disabled': ''}" ${formData['tube7Deviated'] === true ? 'checked': ''} data-tube-type="Mouthwash" ${formData['tube7Collected'] === false ? 'disabled': ''} id="tube7Deviated"></td>
+                            <td><input type="checkbox" data-tube-label="(7) Mouthwash" class="tube-deviated custom-checkbox-size ${formData['tube7Collected'] === false ? 'disabled': ''}" ${formData['tube7Deviated'] === true ? 'checked': ''} data-tube-type="Mouthwash" ${formData['tube7Collected'] === false ? 'disabled': ''} id="tube7Deviated"></td>
                         </tr>
                     </tbody>
                 </table>
