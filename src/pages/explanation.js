@@ -36,7 +36,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                         <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}Reason">
                             <option value=""> -- Select reason  -- </option>
                             <option ${biospecimenData[reasonLabel] === 'short draw' ? 'selected' : ''} value="short draw">Short draw</option>
-                            <option ${biospecimenData[reasonLabel] === 'participant refusal' ? 'selected' : ''} value="participant refusal">participant refusal</option>
+                            <option ${biospecimenData[reasonLabel] === 'participant refusal' ? 'selected' : ''} value="participant refusal">Participant refusal</option>
                             <option ${biospecimenData[reasonLabel] === 'participant unable' ? 'selected' : ''} value="participant unable">Participant unable</option>
                             <option ${biospecimenData[reasonLabel] === 'other' ? 'selected' : ''} value="other">Other</option>
                         </select>
@@ -63,12 +63,14 @@ export const explanationTemplate = (dt, biospecimenData) => {
                     <div class="col">
                         <label for="${ele.id}Reason">Select Deviation</label>
                         </br>
-                        <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}Reason">
-                            <option value=""> -- Select deviation  -- </option>
-                            <option ${biospecimenData[`${ele.id}Reason`] === 'Mislabeled' ? 'selected' : ''} value="Mislabeled">Mislabeled</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] === 'Broken' ? 'selected' : ''} value="Broken">Broken</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] === 'Failed get layer' ? 'selected' : ''} value="Failed get layer">Failed get layer</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] === 'Other' ? 'selected' : ''} value="Other">Other</option>
+                        <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}Reason" multiple="multiple">
+                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('broken') ? 'selected' : ''} value="broken">Broken</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('failed get layer') ? 'selected' : ''} value="failed get layer">Failed get layer</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('hemolyzed') ? 'selected' : ''} value="hemolyzed">Hemolyzed</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('improper temperature – please include details below') ? 'selected' : ''} value="improper temperature – please include details below">Improper temperature – please include details below</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('mislabeled') ? 'selected' : ''} value="mislabeled">Mislabeled</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('tube not filled') ? 'selected' : ''} value="tube not filled">Tube not filled</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('other') ? 'selected' : ''} value="other">Other</option>
                         </select>
                     </div>
                 </div>

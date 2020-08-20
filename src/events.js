@@ -455,7 +455,7 @@ const explanationHandler = async (data, masterSpecimenId, cntd) => {
         if(ta.id.includes('Deviated')) {
             formData[ta.id] = ta.value;
             const tmpId = ta.id.replace('Explanation', 'Reason');
-            formData[tmpId] = document.getElementById(tmpId).value;
+            formData[tmpId] = Array.from(document.getElementById(tmpId).options).filter(el => el.selected).map(el => el.value);
         }
     });
     formData['masterSpecimenId'] = masterSpecimenId;
