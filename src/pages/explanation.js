@@ -26,24 +26,37 @@ export const explanationTemplate = (dt, biospecimenData) => {
             const tubeType = ele.dataset.tubeType;
             if(array.includes(tubeType)) return
             array.push(tubeType);
-            template += `<div class="row"><div class="col">${tubeType} not collected</div></div>
+            template += `<div class="row"><div class="col"><strong>${tubeType} not collected</strong></div></div>
                 <div class="row"><div class="col">Master Specimen ID: ${biospecimenData['masterSpecimenId']}</div></div>
-                
                 <div class="form-group row">
                     <div class="col">
-                        <label for="${ele.id}Explanation">Provide reason tube(s) was/were not collected:</label>
+                        <label for="${ele.id}Reason">Provide reason tube(s) was/were not collected:</label>
+                        </br>
+                        <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}Reason">
+                            <option value=""> -- Select reason  -- </option>
+                            <option ${biospecimenData[`${ele.id}Reason`] === 'short draw' ? 'selected' : ''} value="short draw">Short draw</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] === 'participant refusal' ? 'selected' : ''} value="Participant refusal">participant refusal</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] === 'participant unable' ? 'selected' : ''} value="participant unable">Participant unable</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] === 'other' ? 'selected' : ''} value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col">
+                        <label for="${ele.id}Explanation">Provide details</label>
                         </br>
                         <textarea rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData.bloodTubeNotCollectedExplanation ? biospecimenData.bloodTubeNotCollectedExplanation : ''}</textarea>
                     </div>
                 </div>
+                </br>
             `
         })
 
-        if(deviated.length > 0) template += '<div class="row"><div class="col">Deviations</div></div>'
+        if(deviated.length > 0) template += '<div class="row"><div class="col"><strong>Deviations</strong></div></div>'
         deviated.forEach(ele => {
             const tubeLabel = ele.dataset.tubeLabel;
             template += `
-                <div class="row"><div class="col">Tube Type: ${tubeLabel}</div></div>
+                <div class="row"><div class="col">Tube Type: <strong>${tubeLabel}</strong></div></div>
                 <div class="row"><div class="col">Tube ID: ${biospecimenData['masterSpecimenId']} ${ele.parentNode.parentNode.querySelectorAll('[type="text"]')[0].value}</div></div>
                 <div class="form-group row">
                     <div class="col">
@@ -65,7 +78,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                         <textarea rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData[`${ele.id}Explanation`] ? biospecimenData[`${ele.id}Explanation`] : '' }</textarea>
                     </div>
                 </div>
-                
+                </br>
             `
         });
         template += `

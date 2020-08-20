@@ -440,14 +440,16 @@ const explanationHandler = async (data, masterSpecimenId, cntd) => {
     const textAreas = document.getElementsByClassName('additional-explanation');
     let formData = {};
     Array.from(textAreas).forEach(ta => {
-        
         if(ta.id.includes('tube1Collected') || ta.id.includes('tube2Collected') || ta.id.includes('tube3Collected') || ta.id.includes('tube4Collected') || ta.id.includes('tube5Collected')) {
+            formData['bloodTubeNotCollectedReason'] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
             formData['bloodTubeNotCollectedExplanation'] = ta.value;
         }
         if(ta.id.includes('tube6Collected')) {
+            formData['urineTubeNotCollectedReason'] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
             formData['urineTubeNotCollectedExplanation'] = ta.value;
         }
         if(ta.id.includes('tube7Collected')) {
+            formData['mouthWashTubeNotCollectedReason'] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
             formData['mouthWashTubeNotCollectedExplanation'] = ta.value;
         }
         if(ta.id.includes('Deviated')) {
