@@ -26,6 +26,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
             const tubeType = ele.dataset.tubeType;
             if(array.includes(tubeType)) return
             array.push(tubeType);
+            const reasonLabel = tubeType === 'Blood tubes' ? 'bloodTubeNotCollectedReason' : tubeType === 'Urine' ? 'urineTubeNotCollectedReason' : 'mouthWashTubeNotCollectedReason';
             template += `<div class="row"><div class="col"><strong>${tubeType} not collected</strong></div></div>
                 <div class="row"><div class="col">Master Specimen ID: ${biospecimenData['masterSpecimenId']}</div></div>
                 <div class="form-group row">
@@ -34,10 +35,10 @@ export const explanationTemplate = (dt, biospecimenData) => {
                         </br>
                         <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}Reason">
                             <option value=""> -- Select reason  -- </option>
-                            <option ${biospecimenData[`${ele.id}Reason`] === 'short draw' ? 'selected' : ''} value="short draw">Short draw</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] === 'participant refusal' ? 'selected' : ''} value="Participant refusal">participant refusal</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] === 'participant unable' ? 'selected' : ''} value="participant unable">Participant unable</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] === 'other' ? 'selected' : ''} value="other">Other</option>
+                            <option ${biospecimenData[reasonLabel] === 'short draw' ? 'selected' : ''} value="short draw">Short draw</option>
+                            <option ${biospecimenData[reasonLabel] === 'participant refusal' ? 'selected' : ''} value="participant refusal">participant refusal</option>
+                            <option ${biospecimenData[reasonLabel] === 'participant unable' ? 'selected' : ''} value="participant unable">Participant unable</option>
+                            <option ${biospecimenData[reasonLabel] === 'other' ? 'selected' : ''} value="other">Other</option>
                         </select>
                     </div>
                 </div>
