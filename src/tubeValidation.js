@@ -18,27 +18,32 @@ const researchCollections = {
     '0001': {
         'specimenType': 'Serum Separator Tube #1',
         'tubeType': 'Blood tube',
-        'readableValue': 'Serum Separator Tube'
+        'readableValue': 'Serum Separator Tube',
+        'image': './static/images/tube1.PNG'
     },
     '0002': {
         'specimenType': 'Serum Separator Tube #2',
         'tubeType': 'Blood tube',
-        'readableValue': 'Serum Separator Tube'
+        'readableValue': 'Serum Separator Tube',
+        'image': './static/images/tube1.PNG'
     },
     '0003': {
         'specimenType': 'Heparin Tube',
         'tubeType': 'Blood tube',
-        'readableValue': 'Heparin Tube'
+        'readableValue': 'Heparin Tube',
+        'image': './static/images/tube2.PNG'
     },
     '0004': {
         'specimenType': 'EDTA Tube',
         'tubeType': 'Blood tube',
-        'readableValue': 'EDTA Tube'
+        'readableValue': 'EDTA Tube',
+        'image': './static/images/tube3.PNG'
     },
     '0005': {
         'specimenType': 'ACD Tube',
         'tubeType': 'Blood tube',
-        'readableValue': 'ACD Tube'
+        'readableValue': 'ACD Tube',
+        'image': './static/images/tube4.PNG'
     },
     '0006': {
         'specimenType': 'Urine Tube',
@@ -66,47 +71,56 @@ const clinicalCollections = {
     '0001': {
         'specimenType': 'Serum Separator Tube #1',
         'tubeType': 'Blood tube',
-        'readableValue': 'Serum Separator Tube'
+        'readableValue': 'Serum Separator Tube',
+        'image': './static/images/tube1.PNG'
     },
     '0002': {
         'specimenType': 'Serum Separator Tube #2',
         'tubeType': 'Blood tube',
-        'readableValue': 'Serum Separator Tube'
+        'readableValue': 'Serum Separator Tube',
+        'image': './static/images/tube1.PNG'
     },
     '0011': {
         'specimenType': 'Additional Serum Separator Tube #1',
         'tubeType': 'Blood tube',
-        'readableValue': 'Serum Separator Tube'
+        'readableValue': 'Serum Separator Tube',
+        'image': './static/images/tube1.PNG'
     },
     '0012': {
         'specimenType': 'Additional Serum Separator Tube #2',
         'tubeType': 'Blood tube',
-        'readableValue': 'Serum Separator Tube'
+        'readableValue': 'Serum Separator Tube',
+        'image': './static/images/tube1.PNG'
     },
     '0003': {
         'specimenType': 'Heparin Tube',
         'tubeType': 'Blood tube',
-        'readableValue': 'Heparin Tube'
+        'readableValue': 'Heparin Tube',
+        'image': './static/images/tube2.PNG'
     },
     '0013': {
         'specimenType': 'Additional Heparin Tube',
         'tubeType': 'Blood tube',
-        'readableValue': 'Heparin Tube'
+        'readableValue': 'Heparin Tube',
+        'image': './static/images/tube2.PNG'
     },
     '0004': {
         'specimenType': 'EDTA Tube',
         'tubeType': 'Blood tube',
-        'readableValue': 'EDTA Tube'
+        'readableValue': 'EDTA Tube',
+        'image': './static/images/tube3.PNG'
     },
     '0014': {
         'specimenType': 'Additional EDTA Tube',
         'tubeType': 'Blood tube',
-        'readableValue': 'EDTA Tube'
+        'readableValue': 'EDTA Tube',
+        'image': './static/images/tube3.PNG'
     },
     '0005': {
         'specimenType': 'ACD Tube',
         'tubeType': 'Blood tube',
-        'readableValue': 'ACD Tube'
+        'readableValue': 'ACD Tube',
+        'image': './static/images/tube4.PNG'
     },
     '0008': {
         'specimenType': 'Biohazard bag for blood',

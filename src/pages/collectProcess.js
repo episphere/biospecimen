@@ -51,7 +51,7 @@ export const collectProcessTemplate = (data, formData) => {
                             <td><input type="checkbox" data-tube-label="(4) Lavender Top EDTA" class="tube-deviated custom-checkbox-size ${formData['tube5Collected'] === false ? 'disabled': ''}" ${formData['tube4Deviated'] === true ? 'checked': ''} data-tube-type="Blood tubes" ${formData['tube4Collected'] === false ? 'disabled': ''} id="tube4Deviated"></td>
                         </tr>
                         <tr>
-                            <td>(5) Yellow Top ACD</br><img src="./static/images/tube1.PNG"></td>
+                            <td>(5) Yellow Top ACD</br><img src="./static/images/tube4.PNG"></td>
                             <td><input type="checkbox" data-tube-label="(5) Yellow Top ACD" class="tube-collected custom-checkbox-size disabled" data-tube-type="Blood tubes" disabled ${formData['tube5Collected'] === true ? 'checked': ''} id="tube5Collected"></td>
                             <td><input type="text" id="tube5Id" ${formData['tube5Id'] ? `value='${formData["tube5Id"]}'`: ''} class="form-control ${formData['tube5Collected'] === false ? 'disabled': ''}" ${formData['tube5Collected'] === false ? 'disabled': 'required'} placeholder="Scan/Type in Tube ID"></td>
                             <td><input type="checkbox" data-tube-label="(5) Yellow Top ACD" class="tube-deviated custom-checkbox-size ${formData['tube5Collected'] === false ? 'disabled': ''}" ${formData['tube5Deviated'] === true ? 'checked': ''} data-tube-type="Blood tubes" ${formData['tube5Collected'] === false ? 'disabled': ''} id="tube5Deviated"></td>
@@ -146,7 +146,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                             <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData['tube4Collected'] === true ? 'checked': ''} id="tube4Collected"></td>
                         </tr>
                         <tr>
-                            <td>(5) Yellow Top ACD</br><img src="./static/images/tube1.PNG"></td>
+                            <td>(5) Yellow Top ACD</br><img src="./static/images/tube4.PNG"></td>
                             <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData['tube5Collected'] === true ? 'checked': ''} id="tube5Collected"></td>
                         </tr>
                         <tr>
