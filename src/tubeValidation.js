@@ -1,5 +1,6 @@
 export const siteSpecificTubeRequirements = {
     'UCM': researchCollections,
+    'NCI': researchCollections,
     'SFH': researchCollections,
     'HFHS': researchCollections,
     'HP': researchCollections,
@@ -115,7 +116,7 @@ const clinicalCollections = {
 }
 
 // master specimen id eg: CAX123456
-export const masterSpecimenIDRegExp = /[CAX]+[0-9]{6}/
+export const masterSpecimenIDRegExp = /^[CAX]+[0-9]{6}$/
 
 // Additional labels between 0050 - 0054
-export const additionalTubeLabels = /[00]{2}5[0-4]/
+export const additionalTubeLabels = /^[00]{2}5[0-4]$/
