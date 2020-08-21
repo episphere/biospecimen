@@ -116,7 +116,13 @@ const clinicalCollections = {
 }
 
 // master specimen id eg: CAX123456
-export const masterSpecimenIDRegExp = /^[CAX]+[0-9]{6}$/
+export const masterSpecimenIDRequirement = {
+    regExp: /^[CAX]+[0-9]{6}$/,
+    length: 10
+}
 
 // Additional labels between 0050 - 0054
-export const additionalTubeLabels = /^[00]{2}5[0-4]$/
+export const additionalTubeIDRequirement = {
+    regExp: /^[00]{2}5[0-4]$/,
+    length: 4
+}
