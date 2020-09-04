@@ -170,7 +170,7 @@ export const errorMessage = (id, msg, focus) => {
     if(Array.from(parentElement.querySelectorAll('.form-error')).length > 0) return;
     if(msg){
         const div = document.createElement('div');
-        div.classList = ['row col-md-4 offset-md-4 error-text'];
+        div.classList = ['row col-md-5 offset-md-4 error-text'];
         const span = document.createElement('span');
         span.classList = ['form-error']
         span.innerHTML = msg;

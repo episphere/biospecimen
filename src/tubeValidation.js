@@ -1,19 +1,3 @@
-export const siteSpecificTubeRequirements = {
-    'UCM': researchCollections,
-    'NCI': researchCollections,
-    'SFH': researchCollections,
-    'HFHS': researchCollections,
-    'HP': researchCollections,
-    'MFC': researchCollections,
-    'KPCO': clinicalCollections,
-    'KPNW': clinicalCollections,
-    'KPGA': clinicalCollections,
-    'KPHI': {
-        'Oahu': {},
-        'non-Oahu': {}
-    }
-}
-
 const researchCollections = {
     '0001': {
         'specimenType': 'Serum Separator Tube #1',
@@ -129,10 +113,26 @@ const clinicalCollections = {
     }
 }
 
+export const siteSpecificTubeRequirements = {
+    'UCM': researchCollections,
+    'NCI': researchCollections,
+    'SFH': researchCollections,
+    'HFHS': researchCollections,
+    'HP': researchCollections,
+    'MFC': researchCollections,
+    'KPCO': clinicalCollections,
+    'KPNW': clinicalCollections,
+    'KPGA': clinicalCollections,
+    'KPHI': {
+        'Oahu': {},
+        'non-Oahu': {}
+    }
+}
+
 // master specimen id eg: CAX123456
 export const masterSpecimenIDRequirement = {
-    regExp: /^[CAX]+[0-9]{6}$/,
-    length: 10
+    regExp: /^CXA+[0-9]{6}$/,
+    length: 9
 }
 
 // Additional labels between 0050 - 0054

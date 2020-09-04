@@ -7,6 +7,7 @@ import { specimenTemplate } from './pages/specimen.js';
 import { collectProcessTemplate, tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { explanationTemplate } from './pages/explanation.js';
+import { masterSpecimenIDRequirement } from './tubeValidation.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -280,7 +281,13 @@ const btnsClicked = async (connectId, formData, cont) => {
         errorMessage('enterSpecimenID1', 'Please Scan Master Specimen ID or Type in Manually', focus);
         return;
     }
-    else if(!scanSpecimenID && enterSpecimenID1){
+    else if(!scanSpecimenID && enterSpecimenID1) {
+        if(!masterSpecimenIDRequirement.regExp.test(enterSpecimenID1) || enterSpecimenID1.length !== masterSpecimenIDRequirement.length) {
+            hasError = true;
+            errorMessage('enterSpecimenID1', 'Specimen ID must be 9 characters long and in CXA123456 format.', focus);
+            focus = false;
+            return;
+        }
         if(enterSpecimenID1 !== enterSpecimenID2) {
             hasError = true;
             errorMessage('enterSpecimenID2', 'Does not match with Manually Entered Specimen ID', focus);
