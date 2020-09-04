@@ -7,12 +7,16 @@ export const checkInTemplate = (data) => {
         </br>
         <form method="POST" id="checkInCompleteForm">
             <div class="row">
-                <div class="col">
-                    <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
-                    <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
-                </div>
-                <div class="ml-auto form-group">
-                    <label for="biospecimenVisitType">Visit</label>
+                <div>${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
+                <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
+            </div>
+            <div class="row">
+                Verify contact information &nbsp;
+                <button type="button" class="btn btn-outline-primary" id="contactInformationModal" data-target="#biospecimenModal" data-toggle="modal">Contact Information</button>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="biospecimenVisitType">Select visit</label>
                     <select class="form-control" required data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}" id="biospecimenVisitType">
                         <option value=""> -- Select Visit -- </option>
                         <option selected value="Baseline">Baseline</option>

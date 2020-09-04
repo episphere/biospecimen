@@ -1,3 +1,4 @@
+import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
 import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { userListTemplate } from './pages/users.js';
@@ -197,6 +198,7 @@ export const addEventSelectParticipantForm = () => {
                 navBarBtn.classList.add('active');
                 document.getElementById('contentBody').innerHTML = checkInTemplate(data);
                 generateBarCode('connectIdBarCode', data.Connect_ID);
+                addEventContactInformationModal(data);
                 addEventBackToSearch('navBarSearch');
                 addEventBackToSearch('checkInExit');
                 addEventCheckInCompleteForm();
@@ -415,6 +417,7 @@ const addEventNavBarParticipantCheckIn = () => {
         const data = response.data[0];
         document.getElementById('contentBody').innerHTML = checkInTemplate(data);
         generateBarCode('connectIdBarCode', data.Connect_ID);
+        addEventContactInformationModal(data);
         addEventBackToSearch('navBarSearch');
         addEventBackToSearch('checkInExit');
         addEventCheckInCompleteForm();
@@ -541,3 +544,56 @@ export const addEventNavBarSpecimenSearch = () => {
         searchBiospecimenTemplate();
     });
 }
+
+const addEventContactInformationModal = (data) => {
+    const btn = document.getElementById('contactInformationModal');
+    btn.addEventListener('click', () => {
+        const header = document.getElementById('biospecimenModalHeader');
+        const body = document.getElementById('biospecimenModalBody');
+        header.innerHTML = `<h5 class="modal-title">Contact Information</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>`;
+        body.innerHTML = `
+            <div class="row">
+                <div class="col">${data.RcrtCS_Lname_v1r0}, ${data.RcrtCS_Fname_v1r0}</div>
+                <div class="ml-auto">Connect ID: <svg id="connectIdBarCodeModal"></svg></div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-outline-primary disabled" disabled>EDIT</button>
+                </div>
+            </div>
+            </br>
+            <div class="row">
+                <div class="col">
+                    <strong>Address:</strong> ${data.RcrtUP_AddressLn1_v1r0}${data.RcrtUP_AddressLn2_v1r0 ? ` ${data.RcrtUP_AddressLn2_v1r0}`: ''} ${data.RcrtUP_City_v1r0} ${Object.keys(allStates)[Object.values(allStates).indexOf(parseInt(data.RcrtUP_State_v1r0))]} ${data.RcrtUP_Zip_v1r0}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <strong>Email(s):</strong> ${data.RcrtUP_Email1_v1r0}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <strong>Phone:</strong> ${data.RcrtUP_Phone1_v1r0}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <strong>Preferred contact method: </strong>
+                </div>
+            </div>
+            </br>
+            <div class="row">
+                <div class="col">
+                    <button type="button" class="btn btn-outline-success" data-dismiss="modal" aria-label="Close">
+                        Information verified
+                    </button>
+                </div>
+            </div>
+        `;
+        generateBarCode('connectIdBarCodeModal', data.Connect_ID);
+    });
+};
