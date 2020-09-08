@@ -137,6 +137,6 @@ export const masterSpecimenIDRequirement = {
 
 // Additional labels between 0050 - 0054
 export const additionalTubeIDRequirement = {
-    regExp: /^[00]{2}5[0-4]$/,
+    regExp: /^00+5[0-4]$/,
     length: 4
 }

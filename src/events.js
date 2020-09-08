@@ -579,12 +579,12 @@ const addEventContactInformationModal = (data) => {
             </div>
             <div class="row">
                 <div class="col">
-                    <strong>Email(s):</strong> ${data.RcrtUP_Email1_v1r0}
+                    <strong>Email(s):</strong> ${data.RcrtUP_Email1_v1r0 ? data.RcrtUP_Email1_v1r0 : ''}
                 </div>
             </div>
             <div class="row">
                 <div class="col">
-                    <strong>Phone:</strong> ${data.RcrtUP_Phone1_v1r0}
+                    <strong>Phone:</strong> ${data.RcrtUP_Phone1_v1r0 ? data.RcrtUP_Phone1_v1r0 : ''}
                 </div>
             </div>
             <div class="row">
