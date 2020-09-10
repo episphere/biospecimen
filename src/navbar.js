@@ -25,6 +25,11 @@ export const homeNavBar = () => {
 
 export const userNavBar = (name) => {
     return `
+        <div class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="#welcome" id="welcome" title="Home"><i class="fas fa-home"></i> Home</a>
+            </li>
+        </div>
         <div class="navbar-nav current-page">
             <li class="nav-item">
                 <a class="nav-link" href="#dashboard" id="dashboard" title="Dashboard"><i class="fas fa-file-alt"></i> Dashboard</a>
@@ -60,6 +65,11 @@ export const userNavBar = (name) => {
 
 export const nonUserNavBar = (name) => {
     return `
+        <div class="navbar-nav current-page">
+            <li class="nav-item">
+                <a class="nav-link" href="#welcome" id="welcome" title="Home"><i class="fas fa-home"></i> Home</a>
+            </li>
+        </div>
         <div class="navbar-nav ml-auto">
             <div class="grid-elements dropdown">
                 <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn"  title="Welcome, ${name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -75,6 +85,11 @@ export const nonUserNavBar = (name) => {
 
 export const adminNavBar = (name) => {
     return `
+        <div class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="#welcome" id="welcome" title="Home"><i class="fas fa-home"></i> Home</a>
+            </li>
+        </div>
         <div class="navbar-nav current-page">
             <li class="nav-item">
                 <a class="nav-link" href="#dashboard" id="dashboard" title="Dashboard"><i class="fas fa-file-alt"></i> Dashboard</a>
