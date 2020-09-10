@@ -3,12 +3,12 @@ import { userAuthorization, removeActiveClass } from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 
-export const userDashboard = (auth, route) => {
+export const userDashboard = (auth, route, goToSpecimenSearch) => {
     auth.onAuthStateChanged(async user => {
         if(user){
             const role = await userAuthorization(route, user.displayName);
             if(!role) return;
-            searchTemplate();
+            searchTemplate(goToSpecimenSearch);
         }
         else {
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
@@ -17,7 +17,7 @@ export const userDashboard = (auth, route) => {
     });
 }
 
-export const searchTemplate = () => {
+export const searchTemplate = (goToSpecimenSearch) => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     let template = `
         <div class="row">
@@ -91,6 +91,7 @@ export const searchTemplate = () => {
     addEventSearchForm3();
     addEventSearchForm4();
     addEventNavBarSpecimenSearch();
+    if(goToSpecimenSearch) document.getElementById('navBarSpecimenSearch').click();
 }
 
 export const searchBiospecimenTemplate = () => {

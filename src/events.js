@@ -81,7 +81,10 @@ export const addEventsearchSpecimen = () => {
 }
 
 export const addEventBackToSearch = (id) => {
-    document.getElementById(id).addEventListener('click', searchTemplate)
+    document.getElementById(id).addEventListener('click', e => {
+        e.stopPropagation();
+        searchTemplate();
+    });
 };
 
 export const addEventHideNotification = (element) => {
@@ -546,7 +549,8 @@ export const addEventBackToTubeCollection = (data, masterSpecimenId) => {
 
 export const addEventNavBarSpecimenSearch = () => {
     const btn = document.getElementById('navBarSpecimenSearch');
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', e => {
+        e.stopPropagation();
         if(btn.classList.contains('active')) return;
         searchBiospecimenTemplate();
     });

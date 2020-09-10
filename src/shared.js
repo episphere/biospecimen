@@ -222,3 +222,16 @@ export const searchSpecimen = async (masterSpecimenId) => {
 export const generateBarCode = (id, connectId) => {
     JsBarcode(`#${id}`, connectId, {height: 30});
 }
+
+export const siteFullNames = {
+    'NCI': 'National Cancer Institute',
+    'KPGA': 'Kaiser Permanente Georgia',
+    'SFH': 'Sanford Health',
+    'UCM': 'University of Chicago Medicine',
+    'KPHI': 'Kaiser Permanente Hawaii',
+    'MFC': 'Marshfield Clinic',
+    'KPNW': 'Kaiser Permanente Northwest',
+    'KPCO': 'Kaiser Permanente Colorado',
+    'HP': 'HealthPartners',
+    'HFHS': 'Henry Ford Health System'
+}

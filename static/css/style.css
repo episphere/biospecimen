@@ -217,7 +217,19 @@ body {
     text-align: left;
 }
 
+.align-center {
+    text-align: center;
+}
+
 .custom-checkbox-size {
     height: 20px;
     width: 20px;
+}
+
+.welcome-screen-btn-div {
+    margin-top: 2rem;
+}
+
+.welcome-screen-div {
+    margin-top: 1rem;
 }
