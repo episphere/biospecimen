@@ -1,4 +1,4 @@
-import { validateUser, siteFullNames } from "./../shared.js";
+import { validateUser, siteFullNames, showAnimation, hideAnimation } from "./../shared.js";
 import { userDashboard } from "./dashboard.js";
 import { nonUserNavBar } from './../navbar.js'
 
@@ -6,7 +6,9 @@ export const welcomeScreen = async (auth, route) => {
     const user = auth.currentUser;
     if(!user) return;
     const name = user.displayName;
+    showAnimation();
     const response = await validateUser();
+    hideAnimation();
     if(response.code !== 200) return;
     welcomeScreenTemplate(name, response.data, auth, route);
 }
