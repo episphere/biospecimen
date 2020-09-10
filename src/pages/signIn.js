@@ -17,7 +17,7 @@ export const signIn = () => {
 
 const signInConfig = () => {
     return {
-        signInSuccessUrl: '#dashboard',
+        signInSuccessUrl: '#welcome',
         signInOptions: [
             firebase.auth.EmailAuthProvider.PROVIDER_ID
         ],
