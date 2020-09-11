@@ -1,5 +1,5 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
-import { userAuthorization, removeActiveClass } from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner } from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 
@@ -104,12 +104,12 @@ export const searchBiospecimenTemplate = () => {
         </div>
         <div class="row">
             <div class="col-lg">
-                <i class="fas fa-barcode"></i> Find by Specimen ID
+                Find by Specimen ID
                 <div class="row form-row">
                     <form id="specimenLookupForm" method="POST">
                         <div class="form-group">
-                            <label class="col-form-label search-label">Master Specimen ID</label>
-                            <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan Specimen ID"/>
+                            <label class="search-label">Master Specimen ID</label>
+                            <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan Specimen ID"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>
@@ -125,6 +125,7 @@ export const searchBiospecimenTemplate = () => {
     document.getElementById('contentBody').innerHTML = template;
     addEventsearchSpecimen();
     addEventBackToSearch('navBarSearch');
+    addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9);
 }
 
 export const searchResults = (result) => {

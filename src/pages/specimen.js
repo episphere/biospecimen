@@ -18,7 +18,7 @@ export const specimenTemplate = (data, formData) => {
         <form id="specimenLinkForm" method="POST">
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan Master Specimen ID</label>
-                <input type="text" class="form-control col-md-5 disabled" readonly placeholder="Scan in Master Specimen ID from Label Sheet Label" id="scanSpecimenID"/>
+                <input type="text" class="form-control col-md-5" placeholder="Scan in Master Specimen ID from Label Sheet Label" id="scanSpecimenID"/> <button class="barcode-btn-outside" type="button" id="scanSpecimenIDBarCodeBtn" data-barcode-input="scanSpecimenID"><i class="fas fa-barcode"></i></button>
             </div>
             </br>
             <div class="form-group row">

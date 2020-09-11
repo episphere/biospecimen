@@ -1,5 +1,5 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
@@ -234,6 +234,7 @@ const addEventCheckInCompleteForm = () => {
         navBarBtn.classList.remove('disabled');
         navBarBtn.classList.add('active');
         document.getElementById('contentBody').innerHTML = specimenTemplate(data, formData);
+        addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, 9);
         generateBarCode('connectIdBarCode', data.Connect_ID);
         addEventSpecimenLinkForm(formData);
         addEventNavBarParticipantCheckIn();
@@ -297,7 +298,7 @@ const btnsClicked = async (connectId, formData, cont) => {
             return;
         }
     }
-    formData['masterSpecimenId'] = enterSpecimenID1;
+    formData['masterSpecimenId'] = scanSpecimenID ? scanSpecimenID : enterSpecimenID1;
     
     let query = `connectId=${parseInt(connectId)}`;
     showAnimation();

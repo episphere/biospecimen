@@ -233,3 +233,60 @@ body {
 .welcome-screen-div {
     margin-top: 1rem;
 }
+
+#interactive.viewport {
+    position: relative; 
+    width: 100%; 
+    height: auto; 
+    overflow: hidden; 
+    text-align: center;
+}
+
+#interactive.viewport > canvas, #interactive.viewport > video {
+    max-width: 100%;
+    width: 100%;
+}
+
+canvas.drawing, canvas.drawingBuffer {
+    position: absolute; 
+    left: 0; 
+    top: 0;
+}
+
+.barcode-btn {
+    background-color: transparent;
+    border: 0px;
+    float: right;
+    margin-right: -30px;
+    margin-top: -32px;
+    position: relative;
+    z-index: 2;
+    background-color: #ffffff;
+    padding-left: 4px;
+    padding-bottom: 4px;
+}
+
+.barcode-btn-collect-process {
+    background-color: transparent;
+    border: 0px;
+    float: right;
+    margin-right: -30px;
+    margin-top: -32px;
+    position: relative;
+    z-index: 2;
+    background-color: #ffffff;
+    padding-left: 4px;
+    padding-bottom: 4px;
+}
+
+.barcode-btn-outside {
+    background-color: transparent;
+    border: 0px;
+    float: right;
+    margin-right: 6px;
+    position: relative;
+    z-index: 2;
+    background-color: #ffffff;
+    padding-left: 4px;
+    padding-bottom: 4px;
+}

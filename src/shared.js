@@ -235,3 +235,83 @@ export const siteFullNames = {
     'HP': 'HealthPartners',
     'HFHS': 'Henry Ford Health System'
 }
+
+export const addEventBarCodeScanner = (id, start, end) => {
+    const liveStreamConfig = {
+        inputStream: {
+            type : "LiveStream",
+            constraints: {
+                facingMode: "environment" // or "user" for the front camera
+            }
+        },
+        locator: {
+            patchSize: "medium",
+            halfSample: true
+        },
+        numOfWorkers: (navigator.hardwareConcurrency ? navigator.hardwareConcurrency : 4),
+        decoder: {
+            "readers":["code_128_reader"]
+        },
+        locate: true
+    };
+    
+    document.getElementById(id).addEventListener('click', () => {
+        const btn = document.createElement('button');
+		btn.dataset.toggle = 'modal';
+		btn.dataset.target = '#livestream_scanner';
+		btn.hidden = true;
+		document.body.appendChild(btn);
+        btn.click();
+        document.body.removeChild(btn);
+        Quagga.init(
+			liveStreamConfig, 
+			(err) => {
+				if (err) {
+					Quagga.stop();
+					return;
+				}
+				Quagga.start();
+			}
+		);
+        Quagga.onProcessed(result => {
+            const drawingCtx = Quagga.canvas.ctx.overlay;
+            const drawingCanvas = Quagga.canvas.dom.overlay;
+     
+            if (result) {
+                if (result.boxes) {
+                    drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+                    result.boxes.filter(box => {
+                        return box !== result.box;
+                    }).forEach(box => {
+                        Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
+                    });
+                }
+     
+                if (result.box) {
+                    Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
+                }
+     
+                if (result.codeResult && result.codeResult.code) {
+                    Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
+                }
+            }
+        });
+        
+        Quagga.onDetected(result => {	
+            if (result.codeResult.code){
+                document.getElementById(document.activeElement.dataset.barcodeInput).value = result.codeResult.code.substring(start, end);
+                Quagga.stop();
+                document.querySelector('[data-dismiss="modal"]').click();
+                return;
+            }
+        });
+        
+        Array.from(document.getElementsByClassName('close-modal')).forEach(element => {
+            element.addEventListener('click', () => {
+                if (Quagga){
+                    Quagga.stop();	
+                }
+            })
+        });
+    });
+}

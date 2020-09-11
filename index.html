@@ -41,6 +41,25 @@
                     </div>
                 </div>
             </div>
+            <div class="modal" id="livestream_scanner">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content sub-div-shadow">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Barcode Scanner</h4>
+                            <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="interactive" class="viewport"></div>
+                            <div class="error"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary close-modal" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
     <footer role="contentinfo">
@@ -70,6 +89,7 @@
     </footer>
     <script src="index.js" type="module"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script src="./static/lib/bootstrap.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-auth.js"></script>
