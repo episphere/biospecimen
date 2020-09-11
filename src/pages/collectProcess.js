@@ -122,13 +122,13 @@ export const collectProcessTemplate = (data, formData) => {
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventBackToTubeCollection(data, formData.masterSpecimenId);
     addEventBiospecimenCollectionForm(data, formData);
-    addEventBarCodeScanner('tube1IdBarCodeBtn', 9, 14);
-    addEventBarCodeScanner('tube2IdBarCodeBtn', 9, 14);
-    addEventBarCodeScanner('tube3IdBarCodeBtn', 9, 14);
-    addEventBarCodeScanner('tube4IdBarCodeBtn', 9, 14);
-    addEventBarCodeScanner('tube5IdBarCodeBtn', 9, 14);
-    addEventBarCodeScanner('tube6IdBarCodeBtn', 9, 14);
-    addEventBarCodeScanner('tube7IdBarCodeBtn', 9, 14);
+    addEventBarCodeScanner('tube1IdBarCodeBtn', 9, 14, 1);
+    addEventBarCodeScanner('tube2IdBarCodeBtn', 9, 14, 1);
+    addEventBarCodeScanner('tube3IdBarCodeBtn', 9, 14, 1);
+    addEventBarCodeScanner('tube4IdBarCodeBtn', 9, 14, 1);
+    addEventBarCodeScanner('tube5IdBarCodeBtn', 9, 14, 1);
+    addEventBarCodeScanner('tube6IdBarCodeBtn', 9, 14, 1);
+    addEventBarCodeScanner('tube7IdBarCodeBtn', 9, 14, 1);
 }
 
 export const tubeCollectedTemplate = (data, formData) => {

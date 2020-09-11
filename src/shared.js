@@ -236,7 +236,7 @@ export const siteFullNames = {
     'HFHS': 'Henry Ford Health System'
 }
 
-export const addEventBarCodeScanner = (id, start, end) => {
+export const addEventBarCodeScanner = (id, start, end, index) => {
     const liveStreamConfig = {
         inputStream: {
             type : "LiveStream",
@@ -299,7 +299,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
         
         Quagga.onDetected(result => {	
             if (result.codeResult.code){
-                document.getElementById(document.activeElement.dataset.barcodeInput).value = result.codeResult.code.substring(start, end);
+                document.getElementById(document.activeElement.dataset.barcodeInput).value = result.codeResult.code.split(' ')[index];
                 Quagga.stop();
                 document.querySelector('[data-dismiss="modal"]').click();
                 return;

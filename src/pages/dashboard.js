@@ -125,7 +125,7 @@ export const searchBiospecimenTemplate = () => {
     document.getElementById('contentBody').innerHTML = template;
     addEventsearchSpecimen();
     addEventBackToSearch('navBarSearch');
-    addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9);
+    addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
 }
 
 export const searchResults = (result) => {

@@ -234,7 +234,7 @@ const addEventCheckInCompleteForm = () => {
         navBarBtn.classList.remove('disabled');
         navBarBtn.classList.add('active');
         document.getElementById('contentBody').innerHTML = specimenTemplate(data, formData);
-        addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, 9);
+        addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, 9, 0);
         generateBarCode('connectIdBarCode', data.Connect_ID);
         addEventSpecimenLinkForm(formData);
         addEventNavBarParticipantCheckIn();
@@ -284,6 +284,14 @@ const btnsClicked = async (connectId, formData, cont) => {
         focus = false;
         errorMessage('enterSpecimenID1', 'Please Scan Master Specimen ID or Type in Manually', focus);
         return;
+    }
+    else if(scanSpecimenID && !enterSpecimenID1) {
+        if(!masterSpecimenIDRequirement.regExp.test(scanSpecimenID) || scanSpecimenID.length !== masterSpecimenIDRequirement.length) {
+            hasError = true;
+            errorMessage('scanSpecimenID', 'Specimen ID must be 9 characters long and in CXA123456 format.', focus);
+            focus = false;
+            return;
+        }
     }
     else if(!scanSpecimenID && enterSpecimenID1) {
         if(!masterSpecimenIDRequirement.regExp.test(enterSpecimenID1) || enterSpecimenID1.length !== masterSpecimenIDRequirement.length) {
