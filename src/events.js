@@ -340,16 +340,16 @@ const btnsClicked = async (connectId, formData, cont) => {
 
 export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     const form = document.getElementById('biospecimenCollectionForm');
-    const collectionSaveExit = document.getElementById('collectionSaveExit');
-    const collectionNext = document.getElementById('collectionNext');
     form.addEventListener('submit', e => {
         e.preventDefault();
+        collectionSubmission(dt, biospecimenData, true);
     });
+};
+
+export const addEventBiospecimenCollectionFormCntd = (dt, biospecimenData) => {
+    const collectionSaveExit = document.getElementById('collectionSaveExit');
     collectionSaveExit.addEventListener('click', () => {
         collectionSubmission(dt, biospecimenData);
-    })
-    collectionNext.addEventListener('click', () => {
-        collectionSubmission(dt, biospecimenData, true);
     });
 };
 
