@@ -46,7 +46,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                     <div class="col">
                         <label for="${ele.id}Explanation">Provide details</label>
                         </br>
-                        <textarea rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData.bloodTubeNotCollectedExplanation ? biospecimenData.bloodTubeNotCollectedExplanation : ''}</textarea>
+                        <textarea required rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData.bloodTubeNotCollectedExplanation ? biospecimenData.bloodTubeNotCollectedExplanation : ''}</textarea>
                     </div>
                 </div>
                 </br>
@@ -78,7 +78,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                     <div class="col">
                         <label for="${ele.id}Explanation">Provide deviation detials</label>
                         </br>
-                        <textarea rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData[`${ele.id}Explanation`] ? biospecimenData[`${ele.id}Explanation`] : '' }</textarea>
+                        <textarea required rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData[`${ele.id}Explanation`] ? biospecimenData[`${ele.id}Explanation`] : '' }</textarea>
                     </div>
                 </div>
                 </br>
