@@ -338,7 +338,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     }
 }
 
-export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
+export const addEventBiospecimenCollectionFormCntd = (dt, biospecimenData) => {
     const form = document.getElementById('biospecimenCollectionForm');
     form.addEventListener('submit', e => {
         e.preventDefault();
@@ -346,7 +346,7 @@ export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     });
 };
 
-export const addEventBiospecimenCollectionFormCntd = (dt, biospecimenData) => {
+export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     const collectionSaveExit = document.getElementById('collectionSaveExit');
     collectionSaveExit.addEventListener('click', () => {
         collectionSubmission(dt, biospecimenData);
@@ -443,18 +443,18 @@ const addEventNavBarParticipantCheckIn = () => {
     })
 }
 
-export const addEventExplanationForm = (data, masterSpecimenId) => {
+export const addEventExplanationFormCntd = (data, masterSpecimenId) => {
     const form = document.getElementById('explanationForm');
-    const explanationSaveExit = document.getElementById('explanationSaveExit');
-    const explanationContinue = document.getElementById('explanationContinue');
     form.addEventListener('submit', e => {
         e.preventDefault();
+        explanationHandler(data, masterSpecimenId, true);
     });
+}
+
+export const addEventExplanationForm = (data, masterSpecimenId) => {
+    const explanationSaveExit = document.getElementById('explanationSaveExit');
     explanationSaveExit.addEventListener('click', () => {
         explanationHandler(data, masterSpecimenId);
-    });
-    explanationContinue.addEventListener('click', () => {
-        explanationHandler(data, masterSpecimenId, true);
     });
 }
 

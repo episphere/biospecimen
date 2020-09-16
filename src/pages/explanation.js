@@ -1,4 +1,4 @@
-import { addEventExplanationForm, addEventReturnToCollectProcess } from "./../events.js";
+import { addEventExplanationForm, addEventExplanationFormCntd, addEventReturnToCollectProcess } from "./../events.js";
 import { generateBarCode } from "../shared.js";
 
 export const explanationTemplate = (dt, biospecimenData) => {
@@ -91,7 +91,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                         <button class="btn btn-outline-danger" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" id="returnToCollectProcess">Return to Collect/Process</button>
                     </div>
                     <div class="ml-auto">
-                        <button class="btn btn-outline-warning" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="submit" id="explanationSaveExit">Save and Exit</button>
+                        <button class="btn btn-outline-warning" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="button" id="explanationSaveExit">Save and Exit</button>
                     </div>
                     <div class="col-auto">
                         <button class="btn btn-outline-primary" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="submit" id="explanationContinue">Next</button>
@@ -102,6 +102,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
         document.getElementById('contentBody').innerHTML = template;
         generateBarCode('connectIdBarCode', dt.Connect_ID);
         addEventExplanationForm(dt, biospecimenData.masterSpecimenId);
+        addEventExplanationFormCntd(dt, biospecimenData.masterSpecimenId);
         addEventReturnToCollectProcess();
     }
 }
