@@ -1,5 +1,6 @@
 import { validateUser, siteFullNames, showAnimation, hideAnimation } from "./../shared.js";
 import { userDashboard } from "./dashboard.js";
+import { shipping } from "./shipping.js";
 import { nonUserNavBar } from './../navbar.js'
 
 export const welcomeScreen = async (auth, route) => {
@@ -28,7 +29,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
         <div class="row welcome-screen-btn-div">
             <div class="col"><button class="btn btn-outline-primary" id="btnParticipantSearch">Participant Search</button></div>
             <div class="col"><button class="btn btn-outline-secondary" id="btnSpecimenSearch">Specimen Search</button></div>
-            <div class="col"><button class="btn btn-outline-warning disabled" disabled>Shipping</button></div>
+            <div class="col"><button class="btn btn-outline-warning" id="btnShipping>Shipping</button></div>
         </div>
     `;
     document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
@@ -42,5 +43,9 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     document.getElementById('btnSpecimenSearch').addEventListener('click', () => {
         window.history.replaceState({},'', './#dashboard');
         userDashboard(auth, route, true);
+    });
+    document.getElementById('btnShipping').addEventListener('click', () => {
+        window.history.replaceState({},'', './#dashboard');
+        shipping(auth, route, true);
     });
 }
