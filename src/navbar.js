@@ -147,7 +147,7 @@ export const bodyNavBar = () => {
                 <button class="nav-link disabled navbar-btn" id="navBarSpecimenProcess">Collect/Process</button>
             </li>
             <li class="nav-item col-auto">
-                <button class="nav-link disabled navbar-btn" id="navBarSpecimenFinalize">Finalize</button>
+                <button class="nav-link disabled navbar-btn" id="navBarSpecimenFinalize">Ready for Shipment</button>
             </li>
         </ul>`
 }

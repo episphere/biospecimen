@@ -106,7 +106,7 @@ export const finalizeTemplate = (data, specimenData) => {
                         <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['masterSpecimenId']}" type="submit" id="finalizedSaveExit">Save and Exit</button>
                     </div>
                     <div class="col-auto">
-                        <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['masterSpecimenId']}" type="submit" id="finalizedContinue">Mark as Finalized</button>
+                        <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['masterSpecimenId']}" type="submit" id="finalizedContinue">Finalize - Ready to Ship</button>
                     </div>
                 </div>
             </form>
