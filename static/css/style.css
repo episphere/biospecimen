@@ -290,3 +290,7 @@ canvas.drawing, canvas.drawingBuffer {
     padding-left: 4px;
     padding-bottom: 4px;
 }
+
+.deviation-comments-width {
+    max-width: 120px;
+}
