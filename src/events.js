@@ -78,7 +78,7 @@ export const addEventsearchSpecimen = () => {
         const data = response.data[0];
         if(biospecimenData.finalized) checkOutScreen(data, biospecimenData);
         // if(biospecimenData.tube1Id === undefined) tubeCollectedTemplate(data, biospecimenData)
-        else collectProcessTemplate(data, biospecimenData);
+        else tubeCollectedTemplate(data, biospecimenData)
     })
 }
 
