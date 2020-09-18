@@ -1,5 +1,12 @@
+import { addEventBarCodeScanner, generateBarCode, removeActiveClass } from "./../shared.js";
+import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn } from "./../events.js";
+
 export const specimenTemplate = (data, formData) => {
-    return `
+    removeActiveClass('navbar-btn', 'active')
+    const navBarBtn = document.getElementById('navBarSpecimenLink');
+    navBarBtn.classList.remove('disabled');
+    navBarBtn.classList.add('active');
+    let template = `
         </br>
         <div class="row">
             <h5>Specimen Link</h5>
@@ -52,4 +59,9 @@ export const specimenTemplate = (data, formData) => {
         </form>
         </br>
     `;
+    document.getElementById('contentBody').innerHTML = template;
+    addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, 9, 0);
+    generateBarCode('connectIdBarCode', data.Connect_ID);
+    addEventSpecimenLinkForm(formData);
+    addEventNavBarParticipantCheckIn();
 }

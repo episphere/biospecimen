@@ -230,19 +230,11 @@ const addEventCheckInCompleteForm = () => {
         const response = await findParticipant(query);
         hideAnimation();
         const data = response.data[0];
-        removeActiveClass('navbar-btn', 'active')
-        const navBarBtn = document.getElementById('navBarSpecimenLink');
-        navBarBtn.classList.remove('disabled');
-        navBarBtn.classList.add('active');
-        document.getElementById('contentBody').innerHTML = specimenTemplate(data, formData);
-        addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, 9, 0);
-        generateBarCode('connectIdBarCode', data.Connect_ID);
-        addEventSpecimenLinkForm(formData);
-        addEventNavBarParticipantCheckIn();
+        specimenTemplate(data, formData);
     })
 };
 
-const addEventSpecimenLinkForm = (formData) => {
+export const addEventSpecimenLinkForm = (formData) => {
     const form = document.getElementById('specimenLinkForm');
     const specimenSaveExit = document.getElementById('specimenSaveExit');
     const specimenContinue = document.getElementById('specimenContinue');
@@ -422,7 +414,7 @@ export const addEventSelectAllCollection = () => {
     })
 }
 
-const addEventNavBarParticipantCheckIn = () => {
+export const addEventNavBarParticipantCheckIn = () => {
     const btn = document.getElementById('navBarParticipantCheckIn');
     btn.addEventListener('click', async () => {
         const connectId = btn.dataset.connectId;
