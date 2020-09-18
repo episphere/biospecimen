@@ -1,4 +1,4 @@
-import { addEventQRCodeBtn } from "../events.js";
+import { addEventBackToSearch, addEventQRCodeBtn } from "../events.js";
 import { generateBarCode, removeActiveClass } from "./../shared.js";
 
 export const checkOutScreen = (data, specimenData) => {
@@ -43,6 +43,9 @@ export const checkOutScreen = (data, specimenData) => {
                     <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
                 </div>
             </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-primary qr-code-dashboard" data-toggle="modal" data-target="#biospecimenModal">QR Code</button>
+            </div>
         </div>
         <div class="row info-row">
             <div class="col-md-3">
@@ -74,12 +77,13 @@ export const checkOutScreen = (data, specimenData) => {
                 <button class="btn btn-outline-dark" id="checkInExit"><i class="fas fa-arrow-left"></i> Exit</button>
             </div>
             <div class="ml-auto">
-                <button class="btn btn-outline-primary" id="checkInExit">Check-Out complete</button>
+                <button class="btn btn-outline-primary" id="checkOutExit">Check-Out complete</button>
             </div>
         </div>
     `;
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventBackToSearch('checkInExit');
+    addEventBackToSearch('checkOutExit');
     addEventQRCodeBtn();
 }

@@ -623,5 +623,26 @@ const addEventContactInformationModal = (data) => {
 };
 
 export const addEventQRCodeBtn = () => {
-    
+    const btns = Array.from(document.getElementsByClassName('qr-code-dashboard'));
+    btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const header = document.getElementById('biospecimenModalHeader');
+            const body = document.getElementById('biospecimenModalBody');
+            header.innerHTML = `<h5 class="modal-title">QR Code</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>`;
+
+            body.innerHTML = `
+                <div class="row">
+                    <div class="col">
+                        <img src="./../static/images/dashboard_QR.PNG" height="80%" width="60%" alt="QR Code">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-outline-dark" data-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+            `;
+        });
+    })
 }
