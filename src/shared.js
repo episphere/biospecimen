@@ -1,6 +1,6 @@
 import { userNavBar, adminNavBar, nonUserNavBar, bodyNavBar } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
-import { addEventHideNotification } from "./events.js"
+import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 
 const api = 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?';
 // const api = 'http://localhost:8010/nih-nci-dceg-episphere-dev/us-central1/biospecimen?';
@@ -299,19 +299,34 @@ export const addEventBarCodeScanner = (id, start, end, index) => {
         
         Quagga.onDetected(result => {	
             if (result.codeResult.code){
-                document.getElementById(document.activeElement.dataset.barcodeInput).value = result.codeResult.code.split(' ')[index];
+                const elementID = document.activeElement.dataset.barcodeInput;
+                if(elementID === 'scanSpecimenID') {
+                    disableInput('enterSpecimenID1', true);
+                    disableInput('enterSpecimenID2', true);
+                    addEventClearScannedBarcode();
+                }
+                document.getElementById(elementID).value = result.codeResult.code.split(' ')[index];
                 Quagga.stop();
                 document.querySelector('[data-dismiss="modal"]').click();
                 return;
+            }
+            else {
+                disableInput('enterSpecimenID1', false);
+                disableInput('enterSpecimenID2', false);
             }
         });
         
         Array.from(document.getElementsByClassName('close-modal')).forEach(element => {
             element.addEventListener('click', () => {
                 if (Quagga){
-                    Quagga.stop();	
+                    Quagga.stop();
                 }
             })
         });
     });
+}
+
+export const disableInput = (id, disable) => {
+    document.getElementById(id).disabled = disable
+    disable === true ? document.getElementById(id).classList.add('disabled') : document.getElementById(id).classList.remove('disabled');
 }

@@ -1,5 +1,5 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, disableInput } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
@@ -77,7 +77,6 @@ export const addEventsearchSpecimen = () => {
         hideAnimation();
         const data = response.data[0];
         if(biospecimenData.finalized) checkOutScreen(data, biospecimenData);
-        // if(biospecimenData.tube1Id === undefined) tubeCollectedTemplate(data, biospecimenData)
         else tubeCollectedTemplate(data, biospecimenData)
     })
 }
@@ -646,4 +645,15 @@ export const addEventQRCodeBtn = () => {
             `;
         });
     })
+}
+
+export const addEventClearScannedBarcode = () => {
+    const clearInputBtn = document.getElementById('clearScanSpecimenID');
+    clearInputBtn.hidden = false;
+    clearInputBtn.addEventListener('click', () => {
+        disableInput('enterSpecimenID1', false);
+        disableInput('enterSpecimenID2', false);
+        document.getElementById(clearInputBtn.dataset.barcodeInput).value = '';
+        clearInputBtn.hidden = true;
+    });
 }
