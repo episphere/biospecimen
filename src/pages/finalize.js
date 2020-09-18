@@ -1,5 +1,5 @@
 import { removeActiveClass, generateBarCode } from "./../shared.js";
-import { addEventFinalizeForm, addEventReturnToCollectProcess } from "./../events.js";
+import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollectProcess } from "./../events.js";
 
 export const finalizeTemplate = (data, specimenData) => {
     removeActiveClass('navbar-btn', 'active')
@@ -115,5 +115,6 @@ export const finalizeTemplate = (data, specimenData) => {
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventFinalizeForm(data, specimenData.masterSpecimenId);
+    addEventFinalizeFormCntd(data, specimenData.masterSpecimenId);
     addEventReturnToCollectProcess();
 }

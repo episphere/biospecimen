@@ -8,6 +8,7 @@ import { collectProcessTemplate, tubeCollectedTemplate } from './pages/collectPr
 import { finalizeTemplate } from './pages/finalize.js';
 import { explanationTemplate } from './pages/explanation.js';
 import { masterSpecimenIDRequirement } from './tubeValidation.js';
+import { checkOutScreen } from './pages/checkout.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -495,17 +496,16 @@ const explanationHandler = async (data, masterSpecimenId, cntd) => {
 }
 
 export const addEventFinalizeForm = (data, masterSpecimenId) => {
-    const form = document.getElementById('finalizeForm');
     const finalizedSaveExit = document.getElementById('finalizedSaveExit');
-    const finalizedContinue = document.getElementById('finalizedContinue');
-
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-    });
     finalizedSaveExit.addEventListener('click', () => {
         finalizeHandler(data, masterSpecimenId);
     });
-    finalizedContinue.addEventListener('click', () => {
+}
+
+export const addEventFinalizeFormCntd = (data, masterSpecimenId) => {
+    const form = document.getElementById('finalizeForm');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
         finalizeHandler(data, masterSpecimenId, true);
     });
 }
@@ -519,9 +519,13 @@ const finalizeHandler = async (data, masterSpecimenId, cntd) => {
         formData['finalizedAt'] = new Date().toISOString();
         showAnimation();
         await storeSpecimen([formData]);
-        hideAnimation();
         showNotifications({title: 'Specimen Finalized', body: 'Specimen finalized successfully!'});
-        searchTemplate();
+        const specimenData = (await searchSpecimen(masterSpecimenId)).data;
+        let query = `connectId=${parseInt(specimenData.connectId)}`;
+        const response = await findParticipant(query);
+        const participantData = response.data[0];
+        hideAnimation();
+        checkOutScreen(participantData, specimenData);
     }
     else {
         showAnimation();
@@ -617,3 +621,7 @@ const addEventContactInformationModal = (data) => {
         generateBarCode('connectIdBarCodeModal', data.Connect_ID);
     });
 };
+
+export const addEventQRCodeBtn = () => {
+    
+}
