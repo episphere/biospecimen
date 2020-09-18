@@ -637,7 +637,7 @@ export const addEventQRCodeBtn = () => {
             body.innerHTML = `
                 <div class="row">
                     <div class="col">
-                        <img src="./../static/images/dashboard_QR.PNG" height="80%" width="60%" alt="QR Code">
+                        <img src="./static/images/dashboard_QR.PNG" height="80%" width="60%" alt="QR Code">
                     </div>
                 </div>
                 <div class="modal-footer">
