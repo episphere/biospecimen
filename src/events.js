@@ -375,6 +375,8 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     const tube5Id = getValue('tube5Id');
     const tube6Id = getValue('tube6Id');
     const tube7Id = getValue('tube7Id');
+    const specimenBag1 = getValue('specimenBag1');
+    const specimenBag2 = getValue('specimenBag2');
 
     data['tube1Id'] = tube1Id;
     data['tube2Id'] = tube2Id;
@@ -383,7 +385,9 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     data['tube5Id'] = tube5Id;
     data['tube6Id'] = tube6Id;
     data['tube7Id'] = tube7Id;
-    
+    data['specimenBag1'] = specimenBag1;
+    data['specimenBag2'] = specimenBag2;
+
     data['collectionAdditionalNotes'] = document.getElementById('collectionAdditionalNotes').value;
     Array.from(document.getElementsByClassName('tube-deviated')).forEach((dt, index) => data[`tube${index+1}Deviated`] = dt.checked)
     

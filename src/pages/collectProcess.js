@@ -89,6 +89,26 @@ export const collectProcessTemplate = (data, formData) => {
                             </td>
                             <td><input type="checkbox" data-tube-label="(7) Mouthwash" class="tube-deviated custom-checkbox-size ${formData['tube7Collected'] === false ? 'disabled': ''}" ${formData['tube7Deviated'] === true ? 'checked': ''} data-tube-type="Mouthwash" ${formData['tube7Collected'] === false ? 'disabled': ''} id="tube7Deviated"></td>
                         </tr>
+
+                        <tr>
+                            <td>(8) Blood/Urine Bag</td>
+                            <td></td>
+                            <td>
+                                <input type="text" id="specimenBag1" ${formData['specimenBag1'] ? `value='${formData["specimenBag1"]}'`: ''} class="form-control" placeholder="Scan/Type in Tube ID"> 
+                                <button class="barcode-btn-collect-process" type="button" id="specimenBag1BarCodeBtn" data-barcode-input="specimenBag1"><i class="fas fa-barcode"></i></button>
+                            </td>
+                            <td></td>
+                        </tr>
+
+                        <tr>
+                            <td>(9) Mouthwash Bag</td>
+                            <td></td>
+                            <td>
+                                <input type="text" id="specimenBag2" ${formData['specimenBag2'] ? `value='${formData["specimenBag2"]}'`: ''} class="form-control" placeholder="Scan/Type in Tube ID"> 
+                                <button class="barcode-btn-collect-process" type="button" id="specimenBag2BarCodeBtn" data-barcode-input="specimenBag2"><i class="fas fa-barcode"></i></button>
+                            </td>
+                            <td></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -130,6 +150,8 @@ export const collectProcessTemplate = (data, formData) => {
     addEventBarCodeScanner('tube5IdBarCodeBtn', 9, 14, 1);
     addEventBarCodeScanner('tube6IdBarCodeBtn', 9, 14, 1);
     addEventBarCodeScanner('tube7IdBarCodeBtn', 9, 14, 1);
+    addEventBarCodeScanner('specimenBag1BarCodeBtn', 9, 14, 1);
+    addEventBarCodeScanner('specimenBag2BarCodeBtn', 9, 14, 1);
 }
 
 export const tubeCollectedTemplate = (data, formData) => {

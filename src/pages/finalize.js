@@ -86,6 +86,22 @@ export const finalizeTemplate = (data, specimenData) => {
                         <td>${specimenData.tube7Deviated === true ? 'Yes' : 'No'}</td>
                         <td class="deviation-comments-width">${specimenData.tube7DeviatedReason ? specimenData.tube7DeviatedReason : ''}</td>
                     </tr>
+
+                    <tr>
+                        <td>(8) Blood/Urine Bag</td>
+                        <td></td>
+                        <td>${specimenData.specimenBag1 ? `${specimenData.masterSpecimenId} ${specimenData.specimenBag1}` : '' }</td>
+                        <td></td>
+                        <td class="deviation-comments-width"></td>
+                    </tr>
+
+                    <tr>
+                        <td>(9) Mouthwash Bag</td>
+                        <td></td>
+                        <td>${specimenData.specimenBag2 ? `${specimenData.masterSpecimenId} ${specimenData.specimenBag2}` : '' }</td>
+                        <td></td>
+                        <td class="deviation-comments-width"></td>
+                    </tr>
                 </tbody>
             </table>
             </br>

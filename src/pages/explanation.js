@@ -1,5 +1,6 @@
 import { addEventExplanationForm, addEventExplanationFormCntd, addEventReturnToCollectProcess } from "./../events.js";
 import { generateBarCode } from "../shared.js";
+import { finalizeTemplate } from "./finalize.js";
 
 export const explanationTemplate = (dt, biospecimenData) => {
     const notCollected = Array.from(document.getElementsByClassName('tube-collected')).filter(dt => dt.checked === false);
@@ -104,5 +105,8 @@ export const explanationTemplate = (dt, biospecimenData) => {
         addEventExplanationForm(dt, biospecimenData.masterSpecimenId);
         addEventExplanationFormCntd(dt, biospecimenData.masterSpecimenId);
         addEventReturnToCollectProcess();
+    }
+    else {
+        finalizeTemplate(dt, biospecimenData);
     }
 }
