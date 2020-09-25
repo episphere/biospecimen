@@ -63,7 +63,12 @@ export const addEventsearchSpecimen = () => {
     const form = document.getElementById('specimenLookupForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
+        removeAllErrors();
         const masterSpecimenId = document.getElementById('masterSpecimenId').value;
+        if(!masterSpecimenIDRequirement.regExp.test(masterSpecimenId) || masterSpecimenId.length !== masterSpecimenIDRequirement.length) {
+            errorMessage('masterSpecimenId', 'Specimen ID must be 9 characters long and in CXA123456 format.', true);
+            return;
+        }
         showAnimation();
         const biospecimen = await searchSpecimen(masterSpecimenId);
         if(biospecimen.code !== 200) {
