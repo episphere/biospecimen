@@ -19,6 +19,7 @@ export const userDashboard = (auth, route, goToSpecimenSearch) => {
 
 export const searchTemplate = (goToSpecimenSearch) => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
+    const contentBody = document.getElementById('contentBody');
     let template = `
         <div class="row">
             <div class="col-lg">
@@ -49,28 +50,6 @@ export const searchTemplate = (goToSpecimenSearch) => {
             </div>
             <div class="col-lg">
                 <div class="row form-row">
-                    <form id="search2" method="POST">
-                        <div class="form-group">
-                            <label class="col-form-label search-label">Email</label>
-                            <input class="form-control" required type="email" id="email" placeholder="Enter Email Id"/>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-outline-primary">Search</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="row form-row">
-                    <form id="search3" method="POST">
-                        <div class="form-group">
-                            <label class="col-form-label search-label">Phone no.</label>
-                            <input class="form-control" required type="text" maxlength="10" id="phone" placeholder="Enter Phone No."/>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-outline-primary">Search</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="row form-row">
                     <form id="search4" method="POST">
                         <div class="form-group">
                             <label class="col-form-label search-label">Connect Id</label>
@@ -81,10 +60,42 @@ export const searchTemplate = (goToSpecimenSearch) => {
                         </div>
                     </form>
                 </div>
+                ${contentBody.dataset.worflow && contentBody.dataset.worflow === 'clinical' ? `
+                    <div class="row form-row">
+                        <div class="form-group" style="width: 100%;">
+                            <label class="col-form-label search-label">Scan Collection Tube</label>
+                            <input class="form-control" type="text" disabled placeholder="Scan tube"/>
+                        </div>
+                    </div>
+                `:`
+                    <div class="row form-row">
+                        <form id="search2" method="POST">
+                            <div class="form-group">
+                                <label class="col-form-label search-label">Email</label>
+                                <input class="form-control" required type="email" id="email" placeholder="Enter Email Id"/>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-outline-primary">Search</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="row form-row">
+                        <form id="search3" method="POST">
+                            <div class="form-group">
+                                <label class="col-form-label search-label">Phone no.</label>
+                                <input class="form-control" required type="text" maxlength="10" id="phone" placeholder="Enter Phone No."/>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-outline-primary">Search</button>
+                            </div>
+                        </form>
+                    </div>
+                `}
             </div>
         </div>
     `;
-    document.getElementById('contentBody').innerHTML = template;
+    
+    contentBody.innerHTML = template;
     document.getElementById('contentHeader').innerHTML = bodyNavBar();
     addEventSearchForm1();
     addEventSearchForm2();

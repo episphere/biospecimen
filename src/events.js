@@ -12,6 +12,7 @@ import { checkOutScreen } from './pages/checkout.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
+    if(!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
         const firstName = document.getElementById('firstName').value;
@@ -28,6 +29,7 @@ export const addEventSearchForm1 = () => {
 
 export const addEventSearchForm2 = () => {
     const form = document.getElementById('search2');
+    if(!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
         const email = document.getElementById('email').value;
@@ -39,6 +41,7 @@ export const addEventSearchForm2 = () => {
 
 export const addEventSearchForm3 = () => {
     const form = document.getElementById('search3');
+    if(!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
         const phone = document.getElementById('phone').value;
@@ -50,6 +53,7 @@ export const addEventSearchForm3 = () => {
 
 export const addEventSearchForm4 = () => {
     const form = document.getElementById('search4');
+    if(!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
         const connectId = document.getElementById('connectId').value;
@@ -61,6 +65,7 @@ export const addEventSearchForm4 = () => {
 
 export const addEventsearchSpecimen = () => {
     const form = document.getElementById('specimenLookupForm');
+    if(!form) return;
     form.addEventListener('submit', async e => {
         e.preventDefault();
         removeAllErrors();

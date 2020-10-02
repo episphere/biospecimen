@@ -26,7 +26,14 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             <div class="col">IHCS: ${siteFullNames[data.siteAcronym]}</div>
         </div>
         <div class="row welcome-screen-div">
-            <div class="col"><label for="dashboardSelection" class="col-form-label">Select dashboard to use </label><select required class="col form-control" id="dashboardSelection"><option value="">-- Select dashbaord --</option><option>Clinical Dashboard</option><option>Research Dashboard</option></select></div>
+            <div class="col">
+                <label for="dashboardSelection" class="col-form-label">Select dashboard to use </label>
+                <select required class="col form-control" id="dashboardSelection">
+                    <option value="">-- Select dashbaord --</option>
+                    <option value="clinical">Clinical Dashboard</option>
+                    <option value="research">Research Dashboard</option>
+                </select>
+            </div>
         </div>
         <div class="row welcome-screen-btn-div">
             <div class="col"><button class="btn btn-outline-primary" id="btnParticipantSearch">Participant Search</button></div>
@@ -45,6 +52,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             errorMessage('dashboardSelection', 'Please select Clinical or Research dashboard', true);
             return;
         }
+        document.getElementById('contentBody').dataset.worflow = selection.value;
         location.hash = '#dashboard';
     });
 
@@ -55,8 +63,8 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             errorMessage('dashboardSelection', 'Please select Clinical or Research dashboard', true);
             return;
         }
+        document.getElementById('contentBody').dataset.worflow = selection.value;
         window.history.replaceState({},'', './#dashboard');
-        
         userDashboard(auth, route, true);
     });
 }
