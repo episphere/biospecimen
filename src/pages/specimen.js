@@ -17,7 +17,7 @@ export const specimenTemplate = (data, formData) => {
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
-            ${formData ? `
+            ${formData.visitType ? `
                 <div class="ml-auto form-group">
                     Visit: ${formData.visitType}
                 </div>

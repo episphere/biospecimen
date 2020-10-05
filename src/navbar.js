@@ -130,7 +130,6 @@ export const adminNavBar = (name) => {
 
 export const bodyNavBar = () => {
     const workflow = document.getElementById('contentBody').dataset.workflow;
-    console.log(workflow)
     let template = `
         <ul class="nav nav-tabs row">
             <li class="nav-item">

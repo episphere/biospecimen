@@ -165,7 +165,7 @@ export const searchResults = (result) => {
     result.forEach(data => {
         template += `
             <tr>
-                <td><input type="radio" name="selectParticipant" required value="${data.Connect_ID}"></td>
+                <td><input type="radio" name="selectParticipant" required data-token=${data.token} value="${data.Connect_ID}"></td>
                 <td>${data.RcrtUP_Lname_v1r0}</td>
                 <td>${data.RcrtUP_Minitial_v1r0}</td>
                 <td>${data.RcrtUP_Fname_v1r0}</td>

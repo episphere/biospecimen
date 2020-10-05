@@ -202,12 +202,15 @@ export const addEventSelectParticipantForm = (skipCheckIn) => {
         Array.from(radios).forEach(async radio => {
             if(radio.checked) {
                 const connectId = radio.value;
+                let formData = {};
+                formData['connectId'] = connectId;
+                formData['token'] = radio.dataset.token;
                 let query = `connectId=${parseInt(connectId)}`;
                 showAnimation();
                 const response = await findParticipant(query);
                 hideAnimation();
                 const data = response.data[0];
-                if(skipCheckIn) specimenTemplate(data);
+                if(skipCheckIn) specimenTemplate(data, formData);
                 else checkInTemplate(data);
             }
         })
@@ -218,11 +221,11 @@ export const addEventCheckInCompleteForm = () => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        let formData = {};
         const select = document.getElementById('biospecimenVisitType');
         const connectId = parseInt(select.dataset.connectId);
         const biospecimenVisitType = select.value;
         const token = select.dataset.participantToken;
+        let formData = {};
         formData['connectId'] = connectId;
         formData['visitType'] = biospecimenVisitType;
         formData['checkedInAt'] = new Date().toISOString();
@@ -301,7 +304,7 @@ const btnsClicked = async (connectId, formData, cont) => {
             return;
         }
     }
-    formData['masterSpecimenId'] = scanSpecimenID ? scanSpecimenID : enterSpecimenID1;
+    formData['masterSpecimenId'] = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     
     let query = `connectId=${parseInt(connectId)}`;
     showAnimation();
