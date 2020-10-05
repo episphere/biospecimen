@@ -313,7 +313,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     const specimenData = (await searchSpecimen(formData['masterSpecimenId'])).data;
     hideAnimation();
     if(cont) {
-        if(specimenData && specimenData.connectId && specimenData.connectId !== data.Connect_ID) {
+        if(specimenData && specimenData.connectId && parseInt(specimenData.connectId) !== data.Connect_ID) {
             showNotifications({title: 'Master Specimen Id Duplication', body: 'Entered master specimen Id is already associated with a different connect Id.'}, true)
         }
         else {
@@ -324,7 +324,7 @@ const btnsClicked = async (connectId, formData, cont) => {
         }
     }
     else {
-        if(specimenData && specimenData.connectId && specimenData.connectId !== data.Connect_ID) {
+        if(specimenData && specimenData.connectId && parseInt(specimenData.connectId) !== data.Connect_ID) {
             showNotifications({title: 'Master Specimen Id Duplication', body: 'Entered master specimen Id is already associated with a different connect Id.'}, true)
         }
         else {
