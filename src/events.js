@@ -201,7 +201,7 @@ export const addEventSelectParticipantForm = (skipCheckIn) => {
         const radios = document.getElementsByName('selectParticipant');
         Array.from(radios).forEach(async radio => {
             if(radio.checked) {
-                const connectId = radio.value;
+                const connectId = parseInt(radio.value);
                 let formData = {};
                 formData['connectId'] = connectId;
                 formData['token'] = radio.dataset.token;

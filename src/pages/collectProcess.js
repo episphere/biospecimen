@@ -170,9 +170,12 @@ export const tubeCollectedTemplate = (data, formData) => {
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Master Specimen ID: ${formData.masterSpecimenId}</div>
             </div>
-            <div class="ml-auto form-group">
-                Visit: ${formData.visitType}
-            </div>
+            ${formData.visitType ? `
+                <div class="ml-auto form-group">
+                    Visit: ${formData.visitType}
+                </div>
+            ` : ``
+            }
         </div>
         </br>
         <form id="tubeCollectionForm" method="POST">
