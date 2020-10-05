@@ -52,7 +52,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             errorMessage('dashboardSelection', 'Please select Clinical or Research dashboard', true);
             return;
         }
-        document.getElementById('contentBody').dataset.worflow = selection.value;
+        document.getElementById('contentBody').dataset.workflow = selection.value;
         location.hash = '#dashboard';
     });
 
@@ -63,7 +63,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             errorMessage('dashboardSelection', 'Please select Clinical or Research dashboard', true);
             return;
         }
-        document.getElementById('contentBody').dataset.worflow = selection.value;
+        document.getElementById('contentBody').dataset.workflow = selection.value;
         window.history.replaceState({},'', './#dashboard');
         userDashboard(auth, route, true);
     });

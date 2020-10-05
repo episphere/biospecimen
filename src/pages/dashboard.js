@@ -60,7 +60,7 @@ export const searchTemplate = (goToSpecimenSearch) => {
                         </div>
                     </form>
                 </div>
-                ${contentBody.dataset.worflow && contentBody.dataset.worflow === 'clinical' ? `
+                ${contentBody.dataset.workflow && contentBody.dataset.workflow === 'clinical' ? `
                     <div class="row form-row">
                         <div class="form-group" style="width: 100%;">
                             <label class="col-form-label search-label">Scan Collection Tube</label>
@@ -96,7 +96,7 @@ export const searchTemplate = (goToSpecimenSearch) => {
     `;
     
     contentBody.innerHTML = template;
-    document.getElementById('contentHeader').innerHTML = bodyNavBar();
+    bodyNavBar();
     addEventSearchForm1();
     addEventSearchForm2();
     addEventSearchForm3();
