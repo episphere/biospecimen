@@ -194,7 +194,7 @@ export const addEventRemoveUser = () => {
     })
 }
 
-export const addEventSelectParticipantForm = () => {
+export const addEventSelectParticipantForm = (skipCheckIn) => {
     const form = document.getElementById('selectParticipant');
     form.addEventListener('submit', e => {
         e.preventDefault();
@@ -207,22 +207,14 @@ export const addEventSelectParticipantForm = () => {
                 const response = await findParticipant(query);
                 hideAnimation();
                 const data = response.data[0];
-                removeActiveClass('navbar-btn', 'active')
-                const navBarBtn = document.getElementById('navBarParticipantCheckIn');
-                navBarBtn.classList.remove('disabled');
-                navBarBtn.classList.add('active');
-                document.getElementById('contentBody').innerHTML = checkInTemplate(data);
-                generateBarCode('connectIdBarCode', data.Connect_ID);
-                addEventContactInformationModal(data);
-                addEventBackToSearch('navBarSearch');
-                addEventBackToSearch('checkInExit');
-                addEventCheckInCompleteForm();
+                if(skipCheckIn) specimenTemplate(data);
+                else checkInTemplate(data);
             }
         })
     })
 }
 
-const addEventCheckInCompleteForm = () => {
+export const addEventCheckInCompleteForm = () => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
@@ -249,7 +241,7 @@ export const addEventSpecimenLinkForm = (formData) => {
     const specimenSaveExit = document.getElementById('specimenSaveExit');
     const specimenContinue = document.getElementById('specimenContinue');
     const connectId = specimenSaveExit.dataset.connectId || specimenContinue.dataset.connectId;
-    document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
+    if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
     const reEnterSpecimen = document.getElementById('reEnterSpecimen');
     form.addEventListener('submit', e => {
         e.preventDefault();
@@ -430,23 +422,16 @@ export const addEventSelectAllCollection = () => {
 
 export const addEventNavBarParticipantCheckIn = () => {
     const btn = document.getElementById('navBarParticipantCheckIn');
+    if(!btn) return
     btn.addEventListener('click', async () => {
         const connectId = btn.dataset.connectId;
         if(!connectId) return;
-        removeActiveClass('navbar-btn', 'active')
-        btn.classList.remove('disabled');
-        btn.classList.add('active');
         let query = `connectId=${parseInt(connectId)}`;
         showAnimation();
         const response = await findParticipant(query);
         hideAnimation();
         const data = response.data[0];
-        document.getElementById('contentBody').innerHTML = checkInTemplate(data);
-        generateBarCode('connectIdBarCode', data.Connect_ID);
-        addEventContactInformationModal(data);
-        addEventBackToSearch('navBarSearch');
-        addEventBackToSearch('checkInExit');
-        addEventCheckInCompleteForm();
+        checkInTemplate(data);
     })
 }
 
@@ -575,7 +560,7 @@ export const addEventNavBarSpecimenSearch = () => {
     });
 }
 
-const addEventContactInformationModal = (data) => {
+export const addEventContactInformationModal = (data) => {
     const btn = document.getElementById('contactInformationModal');
     btn.addEventListener('click', () => {
         const header = document.getElementById('biospecimenModalHeader');
