@@ -21,9 +21,9 @@ export const finalizeTemplate = (data, specimenData) => {
                 <div class="row">Master Specimen ID: ${specimenData.masterSpecimenId}</div>
                 <div class="row">Specimen Collection Date & Time: ${new Date(specimenData.tubeCollectedAt).toLocaleString()}</div>
             </div>
-            ${biospecimenData.visitType ? `
+            ${specimenData.visitType ? `
                 <div class="ml-auto form-group">
-                    Visit: ${biospecimenData.visitType}
+                    Visit: ${specimenData.visitType}
                 </div>
             ` : ``
             }
