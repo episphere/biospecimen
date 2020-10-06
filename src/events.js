@@ -7,7 +7,7 @@ import { specimenTemplate } from './pages/specimen.js';
 import { collectProcessTemplate, tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { explanationTemplate } from './pages/explanation.js';
-import { masterSpecimenIDRequirement } from './tubeValidation.js';
+import { additionalTubeIDRequirement, masterSpecimenIDRequirement, workflows } from './tubeValidation.js';
 import { checkOutScreen } from './pages/checkout.js';
 
 export const addEventSearchForm1 = () => {
@@ -380,31 +380,27 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
 
 const collectionSubmission = async (dt, biospecimenData, cntd) => {
     const data = {};
-    const tube1Id = getValue('tube1Id');
-    const tube2Id = getValue('tube2Id');
-    const tube3Id = getValue('tube3Id');
-    const tube4Id = getValue('tube4Id');
-    const tube5Id = getValue('tube5Id');
-    const tube6Id = getValue('tube6Id');
-    const tube7Id = getValue('tube7Id');
-    const specimenBag1 = getValue('specimenBag1');
-    const specimenBag2 = getValue('specimenBag2');
-
-    data['tube1Id'] = tube1Id;
-    data['tube2Id'] = tube2Id;
-    data['tube3Id'] = tube3Id;
-    data['tube4Id'] = tube4Id;
-    data['tube5Id'] = tube5Id;
-    data['tube6Id'] = tube6Id;
-    data['tube7Id'] = tube7Id;
-    data['specimenBag1'] = specimenBag1;
-    data['specimenBag2'] = specimenBag2;
-
+    removeAllErrors();
+    const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
+    let hasError = false;
+    let focus = true;
+    inputFields.forEach(input => {
+        const dashboardType = document.getElementById('contentBody').dataset.workflow ? document.getElementById('contentBody').dataset.workflow : 'research';
+        let tubes = workflows[dashboardType];
+        tubes = tubes.filter(dt => dt.name === input.id.replace('Id', ''));
+        const value = getValue(`${input.id}`);
+        if(input.required && (tubes[0].id !== value && !additionalTubeIDRequirement.regExp.test(value))) {
+            hasError = true;
+            errorMessage(input.id, 'Invalid Tube Id.', focus);
+            focus = false;
+        }
+        data[`${input.id}`] = value;
+    });
+    if(hasError) return;
     data['collectionAdditionalNotes'] = document.getElementById('collectionAdditionalNotes').value;
-    Array.from(document.getElementsByClassName('tube-deviated')).forEach((dt, index) => data[`tube${index+1}Deviated`] = dt.checked)
-    
-    
+    Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[`${dt.id+1}Deviated`] = dt.checked)
     if(biospecimenData.masterSpecimenId) data['masterSpecimenId'] = biospecimenData.masterSpecimenId;
+    
     showAnimation();
     await storeSpecimen([data]);
     if(cntd) {
