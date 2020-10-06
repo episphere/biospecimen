@@ -355,16 +355,23 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
     const form = document.getElementById('tubeCollectionForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        if(!isChecked('tube1Collected') && !isChecked('tube2Collected') && !isChecked('tube3Collected') && !isChecked('tube4Collected') && !isChecked('tube5Collected') && !isChecked('tube6Collected') && !isChecked('tube7Collected')) return;
+        const checkboxes = Array.from(document.getElementsByClassName('tube-collected'));
+        let atLeastOneChecked = false;
+        checkboxes.forEach(chkbox => {
+            if(atLeastOneChecked) return
+            if(chkbox.checked) atLeastOneChecked = true;
+        });
+        if(!atLeastOneChecked) return;
+        
         showAnimation();
         const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
         if(biospecimenData.tubeCollectedAt === undefined) biospecimenData['tubeCollectedAt'] = new Date().toISOString();
         Array.from(document.getElementsByClassName('tube-collected')).forEach((dt, index) => {
-            biospecimenData[`tube${index+1}Collected`] = dt.checked
+            biospecimenData[`${dt.id}`] = dt.checked
             if(!dt.checked) {
-                biospecimenData[`tube${index+1}Id`] = '';
+                biospecimenData[`${dt.id.replace('Collected', 'Id')}`] = '';
             }
-        })
+        });
         await storeSpecimen([biospecimenData]);
         hideAnimation();
         collectProcessTemplate(data, biospecimenData);
