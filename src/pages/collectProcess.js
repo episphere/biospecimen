@@ -196,7 +196,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                     tubes.forEach((obj, index) => {
                         template += `
                             <tr>
-                                <td>(${index+1}) ${obj.readableValue}</br><img src="${obj.image}" alt="${obj.readableValue} image"></td>
+                                <td>(${index+1}) ${obj.readableValue}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
                                 <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData[`${obj.name}Collected`] === true ? 'checked': ''} id="${obj.name}Collected"></td>
                             </tr>
                         `
