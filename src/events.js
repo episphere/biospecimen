@@ -398,7 +398,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     });
     if(hasError) return;
     data['collectionAdditionalNotes'] = document.getElementById('collectionAdditionalNotes').value;
-    Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[`${dt.id+1}Deviated`] = dt.checked)
+    Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[dt.id] = dt.checked)
     if(biospecimenData.masterSpecimenId) data['masterSpecimenId'] = biospecimenData.masterSpecimenId;
     
     showAnimation();
@@ -460,23 +460,8 @@ const explanationHandler = async (data, masterSpecimenId, cntd) => {
     const textAreas = document.getElementsByClassName('additional-explanation');
     let formData = {};
     Array.from(textAreas).forEach(ta => {
-        if(ta.id.includes('tube1Collected') || ta.id.includes('tube2Collected') || ta.id.includes('tube3Collected') || ta.id.includes('tube4Collected') || ta.id.includes('tube5Collected')) {
-            formData['bloodTubeNotCollectedReason'] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
-            formData['bloodTubeNotCollectedExplanation'] = ta.value;
-        }
-        if(ta.id.includes('tube6Collected')) {
-            formData['urineTubeNotCollectedReason'] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
-            formData['urineTubeNotCollectedExplanation'] = ta.value;
-        }
-        if(ta.id.includes('tube7Collected')) {
-            formData['mouthWashTubeNotCollectedReason'] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
-            formData['mouthWashTubeNotCollectedExplanation'] = ta.value;
-        }
-        if(ta.id.includes('Deviated')) {
-            formData[ta.id] = ta.value;
-            const tmpId = ta.id.replace('Explanation', 'Reason');
-            formData[tmpId] = Array.from(document.getElementById(tmpId).options).filter(el => el.selected).map(el => el.value);
-        }
+        formData[`${ta.id.replace('Explanation','Reason')}`] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
+        formData[`${ta.id}`] = ta.value;
     });
     formData['masterSpecimenId'] = masterSpecimenId;
     showAnimation();
