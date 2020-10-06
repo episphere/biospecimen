@@ -1,5 +1,6 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventTubeCollectedForm, addEventBackToTubeCollection } from './../events.js'
 import { removeActiveClass, generateBarCode, addEventBarCodeScanner } from '../shared.js';
+import { workflows } from '../tubeValidation.js';
 
 export const collectProcessTemplate = (data, formData) => {
     let template = `
@@ -28,7 +29,11 @@ export const collectProcessTemplate = (data, formData) => {
                     <thead>
                         <tr><th>Tube Type</th><th>Collected</th><th>Scan Tube ID</th><th>Select for Deviation</th></tr>
                     </thead>
-                    <tbody>
+                    <tbody>`
+                    const dashboardType = document.getElementById('contentBody').dataset.workflow;
+                    console.log(dashboardType);
+                    // for(let )
+                    template +=`
                         <tr>
                             <td>(1) Red Top Separator</br><img src="./static/images/tube1.PNG"></td>
                             <td><input type="checkbox" data-tube-label="(1) Red Top Separator" class="tube-collected custom-checkbox-size disabled" data-tube-type="Blood tubes" disabled ${formData['tube1Collected'] === true ? 'checked': ''} id="tube1Collected"></td>
@@ -185,35 +190,47 @@ export const tubeCollectedTemplate = (data, formData) => {
                         <tr><th></th><th class="align-left"><input class="custom-checkbox-size" type="checkbox" id="selectAllCollection"><label for="selectAllCollection">&nbsp;Check All</label></th></tr>
                         <tr><th>Tube Type</th><th class="align-left">Select If Collected</th></tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>(1) Red Top Separator</br><img src="./static/images/tube1.PNG"></td>
-                            <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData['tube1Collected'] === true ? 'checked': ''} id="tube1Collected"></td>
-                        </tr>
-                        <tr>
-                            <td>(2) Red Top Separator</br><img src="./static/images/tube1.PNG"></td>
-                            <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData['tube2Collected'] === true ? 'checked': ''} id="tube2Collected"></td>
-                        </tr>
-                        <tr>
-                            <td>(3) Green Top Heparin</br><img src="./static/images/tube2.PNG"></td>
-                            <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData['tube3Collected'] === true ? 'checked': ''} id="tube3Collected"></td>
-                        </tr>
-                        <tr>
-                            <td>(4) Lavender Top EDTA</br><img src="./static/images/tube3.PNG"></td>
-                            <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData['tube4Collected'] === true ? 'checked': ''} id="tube4Collected"></td>
-                        </tr>
-                        <tr>
-                            <td>(5) Yellow Top ACD</br><img src="./static/images/tube4.PNG"></td>
-                            <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData['tube5Collected'] === true ? 'checked': ''} id="tube5Collected"></td>
-                        </tr>
-                        <tr>
-                            <td>(6) Urine</td>
-                            <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Urine" ${formData['tube6Collected'] === true ? 'checked': ''} id="tube6Collected"></td>
-                        </tr>
-                        <tr>
-                            <td>(7) Mouthwash</td>
-                            <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Mouthwash" ${formData['tube7Collected'] === true ? 'checked': ''} id="tube7Collected"></td>
-                        </tr>
+                    <tbody>`
+                    const dashboardType = document.getElementById('contentBody').dataset.workflow ? document.getElementById('contentBody').dataset.workflow : 'research';
+                    const tubes = workflows[dashboardType];
+                    tubes.forEach((obj, index) => {
+                        template += `
+                            <tr>
+                                <td>(${index+1}) ${obj.readableValue}</br><img src="${obj.image}" alt="${obj.readableValue} image"></td>
+                                <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData[`${obj.name}Collected`] === true ? 'checked': ''} id="${obj.name}Collected"></td>
+                            </tr>
+                        `
+                    })
+                    // template +=`
+                    //     <tr>
+                    //         <td>(1) Red Top Separator</br><img src="./static/images/tube1.PNG"></td>
+                    //         <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData['tube1Collected'] === true ? 'checked': ''} id="tube1Collected"></td>
+                    //     </tr>
+                    //     <tr>
+                    //         <td>(2) Red Top Separator</br><img src="./static/images/tube1.PNG"></td>
+                    //         <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData['tube2Collected'] === true ? 'checked': ''} id="tube2Collected"></td>
+                    //     </tr>
+                    //     <tr>
+                    //         <td>(3) Green Top Heparin</br><img src="./static/images/tube2.PNG"></td>
+                    //         <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData['tube3Collected'] === true ? 'checked': ''} id="tube3Collected"></td>
+                    //     </tr>
+                    //     <tr>
+                    //         <td>(4) Lavender Top EDTA</br><img src="./static/images/tube3.PNG"></td>
+                    //         <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData['tube4Collected'] === true ? 'checked': ''} id="tube4Collected"></td>
+                    //     </tr>
+                    //     <tr>
+                    //         <td>(5) Yellow Top ACD</br><img src="./static/images/tube4.PNG"></td>
+                    //         <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Blood tubes" ${formData['tube5Collected'] === true ? 'checked': ''} id="tube5Collected"></td>
+                    //     </tr>
+                    //     <tr>
+                    //         <td>(6) Urine</td>
+                    //         <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Urine" ${formData['tube6Collected'] === true ? 'checked': ''} id="tube6Collected"></td>
+                    //     </tr>
+                    //     <tr>
+                    //         <td>(7) Mouthwash</td>
+                    //         <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="Mouthwash" ${formData['tube7Collected'] === true ? 'checked': ''} id="tube7Collected"></td>
+                    //     </tr>`
+                        template +=`
                     </tbody>
                 </table>
             </div>
