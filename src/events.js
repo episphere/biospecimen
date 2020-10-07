@@ -204,6 +204,7 @@ export const addEventSelectParticipantForm = (skipCheckIn) => {
                 const connectId = parseInt(radio.value);
                 let formData = {};
                 formData['connectId'] = connectId;
+                formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
                 formData['token'] = radio.dataset.token;
                 let query = `connectId=${parseInt(connectId)}`;
                 showAnimation();
@@ -370,6 +371,9 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
             biospecimenData[`${dt.id}`] = dt.checked
             if(!dt.checked) {
                 biospecimenData[`${dt.id.replace('Collected', 'Id')}`] = '';
+            }
+            else{
+                biospecimenData[`${dt.id.replace('Collected', 'Shipped')}`] = false;
             }
         });
         await storeSpecimen([biospecimenData]);
