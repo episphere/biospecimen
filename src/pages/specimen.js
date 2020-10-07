@@ -1,5 +1,5 @@
 import { addEventBarCodeScanner, generateBarCode, removeActiveClass } from "./../shared.js";
-import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn } from "./../events.js";
+import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 
 export const specimenTemplate = (data, formData) => {
     removeActiveClass('navbar-btn', 'active')
@@ -17,9 +17,11 @@ export const specimenTemplate = (data, formData) => {
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
-            <div class="ml-auto form-group">
-                Visit: ${formData.visitType}
-            </div>
+            ${formData.visitType ? `
+                <div class="ml-auto form-group">
+                    Visit: ${formData.visitType}
+                </div>
+            `: ``}
         </div>
         </br>
         <form id="specimenLinkForm" method="POST">
@@ -63,5 +65,6 @@ export const specimenTemplate = (data, formData) => {
     addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, 9, 0);
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventSpecimenLinkForm(formData);
+    addEventBackToSearch('navBarSearch');
     addEventNavBarParticipantCheckIn();
 }

@@ -129,7 +129,8 @@ export const adminNavBar = (name) => {
 }
 
 export const bodyNavBar = () => {
-    return `
+    const workflow = document.getElementById('contentBody').dataset.workflow;
+    let template = `
         <ul class="nav nav-tabs row">
             <li class="nav-item">
                 <button class="nav-link active navbar-btn" id="navBarSearch">Participant Search</button>
@@ -137,20 +138,26 @@ export const bodyNavBar = () => {
             <li class="nav-item">
                 <button class="nav-link navbar-btn" id="navBarSpecimenSearch">Specimen Search</button>
             </li>
-            <li class="nav-item">
-                <button class="nav-link disabled navbar-btn" id="navBarParticipantCheckIn">Participant Check-In</button>
-            </li>
+            ${workflow && workflow === 'clinical' ? ``:`
+                <li class="nav-item">
+                    <button class="nav-link disabled navbar-btn" id="navBarParticipantCheckIn">Participant Check-In</button>
+                </li>
+            `}
             <li class="nav-item">
                 <button class="nav-link disabled navbar-btn" id="navBarSpecimenLink">Specimen Link</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link disabled navbar-btn" id="navBarSpecimenProcess">Collect/Process</button>
+                <button class="nav-link disabled navbar-btn" id="navBarSpecimenProcess">${workflow && workflow === 'clinical' ? `Labeling and Receipt`: `Collect/Process`}</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link disabled navbar-btn" id="navBarSpecimenFinalize">Ready for Shipment</button>
+                <button class="nav-link disabled navbar-btn" id="navBarSpecimenFinalize">${workflow && workflow === 'clinical' ? `Receipt Summary`: `Ready for Shipment`}</button>
             </li>
-            <li class="nav-item">
-                <button class="nav-link disabled navbar-btn" id="participantCheckOut">Participant Check-Out</button>
-            </li>
-        </ul>`
+            ${workflow && workflow === 'clinical' ? ``:`
+                <li class="nav-item">
+                    <button class="nav-link disabled navbar-btn" id="participantCheckOut">Participant Check-Out</button>
+                </li>
+            `}
+        </ul>`;
+        
+        document.getElementById('contentHeader').innerHTML = template;
 }

@@ -7,11 +7,12 @@ import { specimenTemplate } from './pages/specimen.js';
 import { collectProcessTemplate, tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { explanationTemplate } from './pages/explanation.js';
-import { masterSpecimenIDRequirement } from './tubeValidation.js';
+import { additionalTubeIDRequirement, masterSpecimenIDRequirement, workflows } from './tubeValidation.js';
 import { checkOutScreen } from './pages/checkout.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
+    if(!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
         const firstName = document.getElementById('firstName').value;
@@ -28,6 +29,7 @@ export const addEventSearchForm1 = () => {
 
 export const addEventSearchForm2 = () => {
     const form = document.getElementById('search2');
+    if(!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
         const email = document.getElementById('email').value;
@@ -39,6 +41,7 @@ export const addEventSearchForm2 = () => {
 
 export const addEventSearchForm3 = () => {
     const form = document.getElementById('search3');
+    if(!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
         const phone = document.getElementById('phone').value;
@@ -50,6 +53,7 @@ export const addEventSearchForm3 = () => {
 
 export const addEventSearchForm4 = () => {
     const form = document.getElementById('search4');
+    if(!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
         const connectId = document.getElementById('connectId').value;
@@ -61,6 +65,7 @@ export const addEventSearchForm4 = () => {
 
 export const addEventsearchSpecimen = () => {
     const form = document.getElementById('specimenLookupForm');
+    if(!form) return;
     form.addEventListener('submit', async e => {
         e.preventDefault();
         removeAllErrors();
@@ -189,43 +194,38 @@ export const addEventRemoveUser = () => {
     })
 }
 
-export const addEventSelectParticipantForm = () => {
+export const addEventSelectParticipantForm = (skipCheckIn) => {
     const form = document.getElementById('selectParticipant');
     form.addEventListener('submit', e => {
         e.preventDefault();
         const radios = document.getElementsByName('selectParticipant');
         Array.from(radios).forEach(async radio => {
             if(radio.checked) {
-                const connectId = radio.value;
+                const connectId = parseInt(radio.value);
+                let formData = {};
+                formData['connectId'] = connectId;
+                formData['token'] = radio.dataset.token;
                 let query = `connectId=${parseInt(connectId)}`;
                 showAnimation();
                 const response = await findParticipant(query);
                 hideAnimation();
                 const data = response.data[0];
-                removeActiveClass('navbar-btn', 'active')
-                const navBarBtn = document.getElementById('navBarParticipantCheckIn');
-                navBarBtn.classList.remove('disabled');
-                navBarBtn.classList.add('active');
-                document.getElementById('contentBody').innerHTML = checkInTemplate(data);
-                generateBarCode('connectIdBarCode', data.Connect_ID);
-                addEventContactInformationModal(data);
-                addEventBackToSearch('navBarSearch');
-                addEventBackToSearch('checkInExit');
-                addEventCheckInCompleteForm();
+                if(skipCheckIn) specimenTemplate(data, formData);
+                else checkInTemplate(data);
             }
         })
     })
 }
 
-const addEventCheckInCompleteForm = () => {
+export const addEventCheckInCompleteForm = () => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        let formData = {};
         const select = document.getElementById('biospecimenVisitType');
         const connectId = parseInt(select.dataset.connectId);
         const biospecimenVisitType = select.value;
         const token = select.dataset.participantToken;
+        let formData = {};
         formData['connectId'] = connectId;
         formData['visitType'] = biospecimenVisitType;
         formData['checkedInAt'] = new Date().toISOString();
@@ -244,7 +244,7 @@ export const addEventSpecimenLinkForm = (formData) => {
     const specimenSaveExit = document.getElementById('specimenSaveExit');
     const specimenContinue = document.getElementById('specimenContinue');
     const connectId = specimenSaveExit.dataset.connectId || specimenContinue.dataset.connectId;
-    document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
+    if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
     const reEnterSpecimen = document.getElementById('reEnterSpecimen');
     form.addEventListener('submit', e => {
         e.preventDefault();
@@ -304,7 +304,7 @@ const btnsClicked = async (connectId, formData, cont) => {
             return;
         }
     }
-    formData['masterSpecimenId'] = scanSpecimenID ? scanSpecimenID : enterSpecimenID1;
+    formData['masterSpecimenId'] = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     
     let query = `connectId=${parseInt(connectId)}`;
     showAnimation();
@@ -313,7 +313,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     const specimenData = (await searchSpecimen(formData['masterSpecimenId'])).data;
     hideAnimation();
     if(cont) {
-        if(specimenData && specimenData.connectId && specimenData.connectId !== data.Connect_ID) {
+        if(specimenData && specimenData.connectId && parseInt(specimenData.connectId) !== data.Connect_ID) {
             showNotifications({title: 'Master Specimen Id Duplication', body: 'Entered master specimen Id is already associated with a different connect Id.'}, true)
         }
         else {
@@ -324,7 +324,7 @@ const btnsClicked = async (connectId, formData, cont) => {
         }
     }
     else {
-        if(specimenData && specimenData.connectId && specimenData.connectId !== data.Connect_ID) {
+        if(specimenData && specimenData.connectId && parseInt(specimenData.connectId) !== data.Connect_ID) {
             showNotifications({title: 'Master Specimen Id Duplication', body: 'Entered master specimen Id is already associated with a different connect Id.'}, true)
         }
         else {
@@ -355,16 +355,23 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
     const form = document.getElementById('tubeCollectionForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        if(!isChecked('tube1Collected') && !isChecked('tube2Collected') && !isChecked('tube3Collected') && !isChecked('tube4Collected') && !isChecked('tube5Collected') && !isChecked('tube6Collected') && !isChecked('tube7Collected')) return;
+        const checkboxes = Array.from(document.getElementsByClassName('tube-collected'));
+        let atLeastOneChecked = false;
+        checkboxes.forEach(chkbox => {
+            if(atLeastOneChecked) return
+            if(chkbox.checked) atLeastOneChecked = true;
+        });
+        if(!atLeastOneChecked) return;
+        
         showAnimation();
         const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
         if(biospecimenData.tubeCollectedAt === undefined) biospecimenData['tubeCollectedAt'] = new Date().toISOString();
         Array.from(document.getElementsByClassName('tube-collected')).forEach((dt, index) => {
-            biospecimenData[`tube${index+1}Collected`] = dt.checked
+            biospecimenData[`${dt.id}`] = dt.checked
             if(!dt.checked) {
-                biospecimenData[`tube${index+1}Id`] = '';
+                biospecimenData[`${dt.id.replace('Collected', 'Id')}`] = '';
             }
-        })
+        });
         await storeSpecimen([biospecimenData]);
         hideAnimation();
         collectProcessTemplate(data, biospecimenData);
@@ -373,31 +380,27 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
 
 const collectionSubmission = async (dt, biospecimenData, cntd) => {
     const data = {};
-    const tube1Id = getValue('tube1Id');
-    const tube2Id = getValue('tube2Id');
-    const tube3Id = getValue('tube3Id');
-    const tube4Id = getValue('tube4Id');
-    const tube5Id = getValue('tube5Id');
-    const tube6Id = getValue('tube6Id');
-    const tube7Id = getValue('tube7Id');
-    const specimenBag1 = getValue('specimenBag1');
-    const specimenBag2 = getValue('specimenBag2');
-
-    data['tube1Id'] = tube1Id;
-    data['tube2Id'] = tube2Id;
-    data['tube3Id'] = tube3Id;
-    data['tube4Id'] = tube4Id;
-    data['tube5Id'] = tube5Id;
-    data['tube6Id'] = tube6Id;
-    data['tube7Id'] = tube7Id;
-    data['specimenBag1'] = specimenBag1;
-    data['specimenBag2'] = specimenBag2;
-
+    removeAllErrors();
+    const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
+    let hasError = false;
+    let focus = true;
+    inputFields.forEach(input => {
+        const dashboardType = document.getElementById('contentBody').dataset.workflow ? document.getElementById('contentBody').dataset.workflow : 'research';
+        let tubes = workflows[dashboardType];
+        tubes = tubes.filter(dt => dt.name === input.id.replace('Id', ''));
+        const value = getValue(`${input.id}`);
+        if(input.required && (tubes[0].id !== value && !additionalTubeIDRequirement.regExp.test(value))) {
+            hasError = true;
+            errorMessage(input.id, 'Invalid Tube Id.', focus);
+            focus = false;
+        }
+        data[`${input.id}`] = value;
+    });
+    if(hasError) return;
     data['collectionAdditionalNotes'] = document.getElementById('collectionAdditionalNotes').value;
-    Array.from(document.getElementsByClassName('tube-deviated')).forEach((dt, index) => data[`tube${index+1}Deviated`] = dt.checked)
-    
-    
+    Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[dt.id] = dt.checked)
     if(biospecimenData.masterSpecimenId) data['masterSpecimenId'] = biospecimenData.masterSpecimenId;
+    
     showAnimation();
     await storeSpecimen([data]);
     if(cntd) {
@@ -425,23 +428,16 @@ export const addEventSelectAllCollection = () => {
 
 export const addEventNavBarParticipantCheckIn = () => {
     const btn = document.getElementById('navBarParticipantCheckIn');
+    if(!btn) return
     btn.addEventListener('click', async () => {
         const connectId = btn.dataset.connectId;
         if(!connectId) return;
-        removeActiveClass('navbar-btn', 'active')
-        btn.classList.remove('disabled');
-        btn.classList.add('active');
         let query = `connectId=${parseInt(connectId)}`;
         showAnimation();
         const response = await findParticipant(query);
         hideAnimation();
         const data = response.data[0];
-        document.getElementById('contentBody').innerHTML = checkInTemplate(data);
-        generateBarCode('connectIdBarCode', data.Connect_ID);
-        addEventContactInformationModal(data);
-        addEventBackToSearch('navBarSearch');
-        addEventBackToSearch('checkInExit');
-        addEventCheckInCompleteForm();
+        checkInTemplate(data);
     })
 }
 
@@ -464,23 +460,8 @@ const explanationHandler = async (data, masterSpecimenId, cntd) => {
     const textAreas = document.getElementsByClassName('additional-explanation');
     let formData = {};
     Array.from(textAreas).forEach(ta => {
-        if(ta.id.includes('tube1Collected') || ta.id.includes('tube2Collected') || ta.id.includes('tube3Collected') || ta.id.includes('tube4Collected') || ta.id.includes('tube5Collected')) {
-            formData['bloodTubeNotCollectedReason'] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
-            formData['bloodTubeNotCollectedExplanation'] = ta.value;
-        }
-        if(ta.id.includes('tube6Collected')) {
-            formData['urineTubeNotCollectedReason'] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
-            formData['urineTubeNotCollectedExplanation'] = ta.value;
-        }
-        if(ta.id.includes('tube7Collected')) {
-            formData['mouthWashTubeNotCollectedReason'] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
-            formData['mouthWashTubeNotCollectedExplanation'] = ta.value;
-        }
-        if(ta.id.includes('Deviated')) {
-            formData[ta.id] = ta.value;
-            const tmpId = ta.id.replace('Explanation', 'Reason');
-            formData[tmpId] = Array.from(document.getElementById(tmpId).options).filter(el => el.selected).map(el => el.value);
-        }
+        formData[`${ta.id.replace('Explanation','Reason')}`] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
+        formData[`${ta.id}`] = ta.value;
     });
     formData['masterSpecimenId'] = masterSpecimenId;
     showAnimation();
@@ -570,7 +551,7 @@ export const addEventNavBarSpecimenSearch = () => {
     });
 }
 
-const addEventContactInformationModal = (data) => {
+export const addEventContactInformationModal = (data) => {
     const btn = document.getElementById('contactInformationModal');
     btn.addEventListener('click', () => {
         const header = document.getElementById('biospecimenModalHeader');
