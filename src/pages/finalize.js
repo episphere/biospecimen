@@ -34,7 +34,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 <thead>
                     <tr>
                         <th>Tube Type</th>
-                        <th>Collected</th>
+                        ${document.getElementById('contentBody').dataset.workflow && document.getElementById('contentBody').dataset.workflow === 'clinical' ? `<th>Received</th>`:`<th>Collected</th>`}
                         <th>Tube ID</th>
                         <th>Deviation</th>
                         <th>Comment</th>
