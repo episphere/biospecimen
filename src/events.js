@@ -389,11 +389,18 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     let hasError = false;
     let focus = true;
     inputFields.forEach(input => {
-        const dashboardType = document.getElementById('contentBody').dataset.workflow ? document.getElementById('contentBody').dataset.workflow : 'research';
+        const dashboardType = document.getElementById('contentBody').dataset.workflow;
+        const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
         let tubes = workflows[dashboardType];
+        if(dashboardType === 'clinical' && siteAcronym === 'KPHI' && biospecimenData.Collection_Location && biospecimenData.Collection_Location === 'non-Oahu') tubes = workflows.clinical_non_oahu;
         tubes = tubes.filter(dt => dt.name === input.id.replace('Id', ''));
         const value = getValue(`${input.id}`);
-        if(input.required && (tubes[0].id !== value && !additionalTubeIDRequirement.regExp.test(value))) {
+        if(tubes.length === 0) {
+            hasError = true;
+            errorMessage(input.id, 'Invalid Tube Id.', focus);
+            focus = false;
+        }
+        else if(input.required && (tubes[0].id !== value && !additionalTubeIDRequirement.regExp.test(value))) {
             hasError = true;
             errorMessage(input.id, 'Invalid Tube Id.', focus);
             focus = false;
