@@ -150,6 +150,120 @@ export const workflows = {
             'name': 'tube8',
             'id': '0008'
         }
+    ],
+    clinical_non_oahu : [
+        {
+            'specimenType': 'Serum Separator Tube #1',
+            'tubeType': 'Blood tube',
+            'readableValue': 'Serum Separator Tube',
+            'image': './static/images/tube1.PNG',
+            'name': 'tube1',
+            'id': '0001'   
+        },
+        {
+            'specimenType': 'Serum Separator Tube #2',
+            'tubeType': 'Blood tube',
+            'readableValue': 'Serum Separator Tube',
+            'image': './static/images/tube1.PNG',
+            'name': 'tube2',
+            'id': '0002'
+        },
+        {
+            'specimenType': 'Additional Serum Separator Tube #1',
+            'tubeType': 'Blood tube',
+            'readableValue': 'Serum Separator Tube',
+            'image': './static/images/tube1.PNG',
+            'name': 'tube11',
+            'id': '0011'
+        },
+        {
+            'specimenType': 'Additional Serum Separator Tube #2',
+            'tubeType': 'Blood tube',
+            'readableValue': 'Serum Separator Tube',
+            'image': './static/images/tube1.PNG',
+            'name': 'tube12',
+            'id': '0012'
+        },
+        {
+            'specimenType': 'Additional KP HI SST',
+            'tubeType': 'Blood tube',
+            'readableValue': 'Serum Separator Tube',
+            'image': './static/images/tube1.PNG',
+            'name': 'tube21',
+            'id': '0021'
+        },
+        {
+            'specimenType': 'Additional KP HI SST',
+            'tubeType': 'Blood tube',
+            'readableValue': 'Serum Separator Tube',
+            'image': './static/images/tube1.PNG',
+            'name': 'tube22',
+            'id': '0022'
+        },
+        {
+            'specimenType': 'Additional KP HI SST',
+            'tubeType': 'Blood tube',
+            'readableValue': 'Serum Separator Tube',
+            'image': './static/images/tube1.PNG',
+            'name': 'tube31',
+            'id': '0031'
+        },
+        {
+            'specimenType': 'Additional KP HI SST',
+            'tubeType': 'Blood tube',
+            'readableValue': 'Serum Separator Tube',
+            'image': './static/images/tube1.PNG',
+            'name': 'tube32',
+            'id': '0032'
+        },
+        {
+            'specimenType': 'Heparin Tube',
+            'tubeType': 'Blood tube',
+            'readableValue': 'Heparin Tube',
+            'image': './static/images/tube2.PNG',
+            'name': 'tube3',
+            'id': '0003'
+        },
+        {
+            'specimenType': 'Additional Heparin Tube',
+            'tubeType': 'Blood tube',
+            'readableValue': 'Heparin Tube',
+            'image': './static/images/tube2.PNG',
+            'name': 'tube13',
+            'id': '0013'
+        },
+        {
+            'specimenType': 'EDTA Tube',
+            'tubeType': 'Blood tube',
+            'readableValue': 'EDTA Tube',
+            'image': './static/images/tube3.PNG',
+            'name': 'tube4',
+            'id': '0004'
+        },
+        {
+            'specimenType': 'Additional EDTA Tube',
+            'tubeType': 'Blood tube',
+            'readableValue': 'EDTA Tube',
+            'image': './static/images/tube3.PNG',
+            'name': 'tube14',
+            'id': '0014'
+        },
+        {
+            'specimenType': 'ACD Tube',
+            'tubeType': 'Blood tube',
+            'readableValue': 'ACD Tube',
+            'image': './static/images/tube4.PNG',
+            'name': 'tube5',
+            'id': '0005'
+        },
+        {
+            'specimenType': 'Biohazard bag for blood',
+            'tubeType': 'Biohazard bag for blood',
+            'readableValue': 'Biohazard bag - blood',
+            'image': '',
+            'name': 'tube8',
+            'id': '0008'
+        }
     ]
 };
 
@@ -166,8 +280,8 @@ export const siteSpecificTubeRequirements = {
     'KPNW': workflows.clinical,
     'KPGA': workflows.clinical,
     'KPHI': {
-        'Oahu': {},
-        'non-Oahu': {}
+        'Oahu': workflows.clinical,
+        'non-Oahu': workflows.clinical_non_oahu
     }
 }
 

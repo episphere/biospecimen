@@ -1,5 +1,6 @@
-import { addEventBarCodeScanner, generateBarCode, removeActiveClass } from "./../shared.js";
+import { addEventBarCodeScanner, generateBarCode, removeActiveClass, siteLocations } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
+import { workflows } from "../tubeValidation.js";
 
 export const specimenTemplate = (data, formData) => {
     removeActiveClass('navbar-btn', 'active')
@@ -25,6 +26,18 @@ export const specimenTemplate = (data, formData) => {
         </div>
         </br>
         <form id="specimenLinkForm" method="POST">
+            <div class="form-group row">`
+                const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
+                const workflow = document.getElementById('contentBody').dataset.workflow;
+                if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {
+                    template +=`<label class="col-md-4 col-form-label" for="collectionLocation">Select Collection Location</label><select class="form-control col-md-5" id="collectionLocation">`
+                    siteLocations[workflow][siteAcronym].forEach(location => {
+                        template +=`<option value='${location}'>${location}</option>`
+                    })
+                    template +=`</select>`
+                }
+                template +=` 
+            </div>
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan Master Specimen ID</label>
                 <input type="text" class="form-control col-md-5 disabled" disabled placeholder="Scan in Master Specimen ID from Label Sheet Label" id="scanSpecimenID"/> 

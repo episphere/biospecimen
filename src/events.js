@@ -305,6 +305,7 @@ const btnsClicked = async (connectId, formData, cont) => {
             return;
         }
     }
+    if(document.getElementById('collectionLocation')) formData['Collection_Location'] = document.getElementById('collectionLocation').value;
     formData['masterSpecimenId'] = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     
     let query = `connectId=${parseInt(connectId)}`;
@@ -366,7 +367,7 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
         
         showAnimation();
         const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
-        if(biospecimenData.tubeCollectedAt === undefined) biospecimenData['tubeCollectedAt'] = new Date().toISOString();
+        if(biospecimenData['tubeCollectedAt'] === undefined) biospecimenData['tubeCollectedAt'] = new Date().toISOString();
         Array.from(document.getElementsByClassName('tube-collected')).forEach((dt, index) => {
             biospecimenData[`${dt.id}`] = dt.checked
             if(!dt.checked) {

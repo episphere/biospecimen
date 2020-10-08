@@ -1,6 +1,6 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventTubeCollectedForm, addEventBackToTubeCollection } from './../events.js'
 import { removeActiveClass, generateBarCode, addEventBarCodeScanner } from '../shared.js';
-import { workflows } from '../tubeValidation.js';
+import { siteSpecificTubeRequirements, workflows } from '../tubeValidation.js';
 
 export const collectProcessTemplate = (data, formData) => {
     let template = `
@@ -30,9 +30,10 @@ export const collectProcessTemplate = (data, formData) => {
                         <tr><th>Tube Type</th><th>Collected</th><th>Scan Tube ID</th><th>Select for Deviation</th></tr>
                     </thead>
                     <tbody>`
-                    
-                    const dashboardType = document.getElementById('contentBody').dataset.workflow ? document.getElementById('contentBody').dataset.workflow : 'research';
-                    const tubes = workflows[dashboardType];
+                    const dashboardType = document.getElementById('contentBody').dataset.workflow;
+                    const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
+                    let tubes = workflows[dashboardType];
+                    if(dashboardType === 'clinical' && siteAcronym === 'KPHI' && formData.Collection_Location && formData.Collection_Location === 'non-Oahu') tubes = workflows.clinical_non_oahu;
                     tubes.forEach((obj, index) => {
                         template += `
                             <tr>
@@ -117,8 +118,10 @@ export const tubeCollectedTemplate = (data, formData) => {
                         <tr><th>Tube Type</th><th class="align-left">Select If Collected</th></tr>
                     </thead>
                     <tbody>`
-                    const dashboardType = document.getElementById('contentBody').dataset.workflow ? document.getElementById('contentBody').dataset.workflow : 'research';
-                    const tubes = workflows[dashboardType];
+                    const dashboardType = document.getElementById('contentBody').dataset.workflow;
+                    const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
+                    let tubes = workflows[dashboardType];
+                    if(dashboardType === 'clinical' && siteAcronym === 'KPHI' && formData.Collection_Location && formData.Collection_Location === 'non-Oahu') tubes = workflows.clinical_non_oahu;
                     tubes.forEach((obj, index) => {
                         template += `
                             <tr>

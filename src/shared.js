@@ -330,3 +330,17 @@ export const disableInput = (id, disable) => {
     document.getElementById(id).disabled = disable
     disable === true ? document.getElementById(id).classList.add('disabled') : document.getElementById(id).classList.remove('disabled');
 }
+
+export const siteLocations = {
+    'research': {
+        'UCM': ['UC-DCAM'],
+        'MFC': ['Marshfield', 'Lake Hallie'],
+        'HP': ['HP Research Clinic'],
+        'HFHS': ['HFHS Research Clinic (Main Campus)'],
+        'SFH': ['SF Cancer Center LL'],
+        'NCI': ['NCI-1', 'NCI-2']
+    },
+    'clinical': {
+        'KPHI': ['Oahu', 'non-Oahu']
+    }
+}
