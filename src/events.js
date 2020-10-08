@@ -471,7 +471,12 @@ const explanationHandler = async (data, masterSpecimenId, cntd) => {
     const textAreas = document.getElementsByClassName('additional-explanation');
     let formData = {};
     Array.from(textAreas).forEach(ta => {
-        formData[`${ta.id.replace('Explanation','Reason')}`] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
+        if(document.getElementById(ta.id.replace('Explanation', 'Reason')).multiple) {
+            formData[`${ta.id.replace('Explanation','Reason')}`] = Array.from(document.getElementById(ta.id.replace('Explanation', 'Reason'))).filter(el => el.selected).map(el => el.value);
+        }
+        else {
+            formData[`${ta.id.replace('Explanation','Reason')}`] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
+        }
         formData[`${ta.id}`] = ta.value;
     });
     formData['masterSpecimenId'] = masterSpecimenId;
@@ -487,6 +492,8 @@ const explanationHandler = async (data, masterSpecimenId, cntd) => {
         searchTemplate();
     }
 }
+
+
 
 export const addEventFinalizeForm = (data, masterSpecimenId) => {
     const finalizedSaveExit = document.getElementById('finalizedSaveExit');
