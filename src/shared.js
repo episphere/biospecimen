@@ -219,6 +219,18 @@ export const searchSpecimen = async (masterSpecimenId) => {
     return response.json();
 }
 
+export const searchSpecimenInstitute = async () => {
+    //https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=searchSpecimen`, {
+        method: "GET",
+        headers: {
+            Authorization:"Bearer "+idToken
+        }
+    });
+    return response.json();
+}
+
 export const generateBarCode = (id, connectId) => {
     JsBarcode(`#${id}`, connectId, {height: 30});
 }
