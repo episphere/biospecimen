@@ -1,5 +1,4 @@
-import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner } from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates } from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 
