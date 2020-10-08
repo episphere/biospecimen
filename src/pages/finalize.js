@@ -44,7 +44,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 const dashboardType = document.getElementById('contentBody').dataset.workflow;
                 const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
                 let tubes = workflows[dashboardType];
-                if(dashboardType === 'clinical' && siteAcronym === 'KPHI' && formData.Collection_Location && formData.Collection_Location === 'non-Oahu') tubes = workflows.clinical_non_oahu;
+                if(dashboardType === 'clinical' && siteAcronym === 'KPHI' && specimenData.Collection_Location && specimenData.Collection_Location === 'non-Oahu') tubes = workflows.clinical_non_oahu;
 
                 tubes.forEach((obj, index) => {
                     template += `
