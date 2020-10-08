@@ -511,7 +511,8 @@ const finalizeHandler = async (data, masterSpecimenId, cntd) => {
         const response = await findParticipant(query);
         const participantData = response.data[0];
         hideAnimation();
-        checkOutScreen(participantData, specimenData);
+        if(!document.getElementById('participantCheckOut')) searchTemplate();
+        else checkOutScreen(participantData, specimenData);
     }
     else {
         showAnimation();
