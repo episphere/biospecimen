@@ -69,7 +69,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                         </br>
                         <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}Reason" multiple="multiple">
                             <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('broken') ? 'selected' : ''} value="broken">Broken</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('failed get layer') ? 'selected' : ''} value="failed get layer">Failed get layer</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('failed gel layer') ? 'selected' : ''} value="failed gel layer">Failed gel layer</option>
                             <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('hemolyzed') ? 'selected' : ''} value="hemolyzed">Hemolyzed</option>
                             <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('improper temperature – please include details below') ? 'selected' : ''} value="improper temperature – please include details below">Improper temperature – please include details below</option>
                             <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('mislabeled') ? 'selected' : ''} value="mislabeled">Mislabeled</option>
