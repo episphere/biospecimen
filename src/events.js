@@ -6,7 +6,7 @@ import { specimenTemplate } from './pages/specimen.js';
 import { collectProcessTemplate, tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { explanationTemplate } from './pages/explanation.js';
-import { additionalTubeIDRequirement, masterSpecimenIDRequirement, workflows } from './tubeValidation.js';
+import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, workflows } from './tubeValidation.js';
 import { checkOutScreen } from './pages/checkout.js';
 
 export const addEventSearchForm1 = () => {
@@ -397,17 +397,17 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         let value = getValue(`${input.id}`);
         const masterID = value.substr(0, 9);
         const tubeID = value.substr(10, 14);
-        if(value.length !== 14) {
+        if(input.required && value.length !== 14) {
             hasError = true;
             errorMessage(input.id, 'Combination of Master Specimen Id and Tube Id should be 14 characters long.', focus);
             focus = false;
         }
-        else if(masterID !== biospecimenData.masterSpecimenId) {
+        else if(input.required && masterID !== biospecimenData.masterSpecimenId) {
             hasError = true;
             errorMessage(input.id, 'Invalid Master Specimen Id.', focus);
             focus = false;
         }
-        else if(tubes.length === 0) {
+        else if(input.required && tubes.length === 0) {
             hasError = true;
             errorMessage(input.id, 'Invalid Tube Id.', focus);
             focus = false;

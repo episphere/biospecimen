@@ -1,6 +1,6 @@
 import { removeActiveClass, generateBarCode } from "./../shared.js";
 import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollectProcess } from "./../events.js";
-import { workflows } from "../tubeValidation.js";
+import { siteSpecificTubeRequirements, workflows } from "../tubeValidation.js";
 
 export const finalizeTemplate = (data, specimenData) => {
     removeActiveClass('navbar-btn', 'active')
@@ -43,7 +43,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 <tbody>`
                 const dashboardType = document.getElementById('contentBody').dataset.workflow;
                 const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-                const subSiteLocation = formData.Collection_Location;
+                const subSiteLocation = specimenData.Collection_Location;
                 const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType]; 
                 siteTubesList.forEach((obj, index) => {
                     template += `
