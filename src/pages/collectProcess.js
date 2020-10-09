@@ -32,9 +32,9 @@ export const collectProcessTemplate = (data, formData) => {
                     <tbody>`
                     const dashboardType = document.getElementById('contentBody').dataset.workflow;
                     const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-                    let tubes = workflows[dashboardType];
-                    if(dashboardType === 'clinical' && siteAcronym === 'KPHI' && formData.Collection_Location && formData.Collection_Location === 'non-Oahu') tubes = workflows.clinical_non_oahu;
-                    tubes.forEach((obj, index) => {
+                    const subSiteLocation = formData.Collection_Location;
+                    const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType]; 
+                    siteTubesList.forEach((obj, index) => {
                         template += `
                             <tr>
                                 <td>(${index+1}) ${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
@@ -120,9 +120,9 @@ export const tubeCollectedTemplate = (data, formData) => {
                     <tbody>`
                     const dashboardType = document.getElementById('contentBody').dataset.workflow;
                     const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-                    let tubes = workflows[dashboardType];
-                    if(dashboardType === 'clinical' && siteAcronym === 'KPHI' && formData.Collection_Location && formData.Collection_Location === 'non-Oahu') tubes = workflows.clinical_non_oahu;
-                    tubes.forEach((obj, index) => {
+                    const subSiteLocation = formData.Collection_Location;
+                    const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType]; 
+                    siteTubesList.forEach((obj, index) => {
                         template += `
                             <tr>
                                 <td>(${index+1}) ${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>

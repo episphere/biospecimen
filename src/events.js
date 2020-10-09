@@ -6,7 +6,7 @@ import { specimenTemplate } from './pages/specimen.js';
 import { collectProcessTemplate, tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { explanationTemplate } from './pages/explanation.js';
-import { additionalTubeIDRequirement, masterSpecimenIDRequirement, workflows } from './tubeValidation.js';
+import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, workflows } from './tubeValidation.js';
 import { checkOutScreen } from './pages/checkout.js';
 
 export const addEventSearchForm1 = () => {
@@ -391,23 +391,23 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     inputFields.forEach(input => {
         const dashboardType = document.getElementById('contentBody').dataset.workflow;
         const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-        let tubes = workflows[dashboardType];
-        if(dashboardType === 'clinical' && siteAcronym === 'KPHI' && biospecimenData.Collection_Location && biospecimenData.Collection_Location === 'non-Oahu') tubes = workflows.clinical_non_oahu;
-        tubes = tubes.filter(dt => dt.name === input.id.replace('Id', ''));
+        const subSiteLocation = biospecimenData.Collection_Location;
+        const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType]; 
+        const tubes = siteTubesList.filter(dt => dt.name === input.id.replace('Id', ''));
         let value = getValue(`${input.id}`);
         const masterID = value.substr(0, 9);
         const tubeID = value.substr(10, 14);
-        if(value.length !== 14) {
+        if(input.required && value.length !== 14) {
             hasError = true;
             errorMessage(input.id, 'Combination of Master Specimen Id and Tube Id should be 14 characters long.', focus);
             focus = false;
         }
-        else if(masterID !== biospecimenData.masterSpecimenId) {
+        else if(input.required && masterID !== biospecimenData.masterSpecimenId) {
             hasError = true;
             errorMessage(input.id, 'Invalid Master Specimen Id.', focus);
             focus = false;
         }
-        else if(tubes.length === 0) {
+        else if(input.required && tubes.length === 0) {
             hasError = true;
             errorMessage(input.id, 'Invalid Tube Id.', focus);
             focus = false;
