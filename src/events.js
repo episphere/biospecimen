@@ -391,9 +391,9 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     inputFields.forEach(input => {
         const dashboardType = document.getElementById('contentBody').dataset.workflow;
         const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-        let tubes = workflows[dashboardType];
-        if(dashboardType === 'clinical' && siteAcronym === 'KPHI' && biospecimenData.Collection_Location && biospecimenData.Collection_Location === 'non-Oahu') tubes = workflows.clinical_non_oahu;
-        tubes = tubes.filter(dt => dt.name === input.id.replace('Id', ''));
+        const subSiteLocation = biospecimenData.Collection_Location;
+        const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType]; 
+        const tubes = siteTubesList.filter(dt => dt.name === input.id.replace('Id', ''));
         let value = getValue(`${input.id}`);
         const masterID = value.substr(0, 9);
         const tubeID = value.substr(10, 14);

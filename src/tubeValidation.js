@@ -270,18 +270,49 @@ export const workflows = {
 
 
 export const siteSpecificTubeRequirements = {
-    'UCM': workflows.research,
-    'NCI': workflows.research,
-    'SFH': workflows.research,
-    'HFHS': workflows.research,
-    'HP': workflows.research,
-    'MFC': workflows.research,
-    'KPCO': workflows.clinical,
-    'KPNW': workflows.clinical,
-    'KPGA': workflows.clinical,
+    'UCM': {
+        'research': workflows.research,
+        'clinical': workflows.clinical
+    },
+    'NCI': {
+        'research': workflows.research,
+        'clinical': workflows.clinical
+    },
+    'SFH': {
+        'research': workflows.research,
+        'clinical': workflows.clinical
+    },
+    'HFHS': {
+        'research': workflows.research,
+        'clinical': workflows.clinical
+    },
+    'HP': {
+        'research': workflows.research,
+        'clinical': workflows.clinical
+    },
+    'MFC': {
+        'research': workflows.research,
+        'clinical': workflows.clinical
+    },
+    'KPCO': {
+        'research': workflows.research,
+        'clinical': workflows.clinical
+    },
+    'KPNW': {
+        'research': workflows.research,
+        'clinical': workflows.clinical
+    },
+    'KPGA': {
+        'research': workflows.research,
+        'clinical': workflows.clinical
+    },
     'KPHI': {
-        'Oahu': workflows.clinical,
-        'non-Oahu': workflows.clinical_non_oahu
+        'research': workflows.research,
+        'clinical': {
+            'Oahu': workflows.clinical,
+            'non-Oahu': workflows.clinical_non_oahu
+        }
+        
     }
 }
 
