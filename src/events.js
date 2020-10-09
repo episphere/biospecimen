@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, disableInput, allStates } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, disableInput, allStates } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
@@ -394,18 +394,30 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         let tubes = workflows[dashboardType];
         if(dashboardType === 'clinical' && siteAcronym === 'KPHI' && biospecimenData.Collection_Location && biospecimenData.Collection_Location === 'non-Oahu') tubes = workflows.clinical_non_oahu;
         tubes = tubes.filter(dt => dt.name === input.id.replace('Id', ''));
-        const value = getValue(`${input.id}`);
-        if(tubes.length === 0) {
+        let value = getValue(`${input.id}`);
+        const masterID = value.substr(0, 9);
+        const tubeID = value.substr(10, 14);
+        if(value.length !== 14) {
+            hasError = true;
+            errorMessage(input.id, 'Combination of Master Specimen Id and Tube Id should be 14 characters long.', focus);
+            focus = false;
+        }
+        else if(masterID !== biospecimenData.masterSpecimenId) {
+            hasError = true;
+            errorMessage(input.id, 'Invalid Master Specimen Id.', focus);
+            focus = false;
+        }
+        else if(tubes.length === 0) {
             hasError = true;
             errorMessage(input.id, 'Invalid Tube Id.', focus);
             focus = false;
         }
-        else if(input.required && (tubes[0].id !== value && !additionalTubeIDRequirement.regExp.test(value))) {
+        else if(input.required && (tubes[0].id !== tubeID && !additionalTubeIDRequirement.regExp.test(tubeID))) {
             hasError = true;
             errorMessage(input.id, 'Invalid Tube Id.', focus);
             focus = false;
         }
-        data[`${input.id}`] = value;
+        data[`${input.id}`] = tubeID;
     });
     if(hasError) return;
     data['collectionAdditionalNotes'] = document.getElementById('collectionAdditionalNotes').value;

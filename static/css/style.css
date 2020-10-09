@@ -189,6 +189,7 @@ body {
 
 .error-text {
     padding-left: 5px !important;
+    width: 100%;
 }
 
 .invalid {

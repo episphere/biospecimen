@@ -75,7 +75,8 @@ export const specimenTemplate = (data, formData) => {
         </br>
     `;
     document.getElementById('contentBody').innerHTML = template;
-    addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, 9, 0);
+    document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
+    addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, 9);
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventSpecimenLinkForm(formData);
     addEventBackToSearch('navBarSearch');
