@@ -303,6 +303,7 @@ export const addEventBarCodeScanner = (id, start, end, index) => {
                 const barcode = result.codeResult.code;
                 if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,9))) return;
                 const elementID = document.activeElement.dataset.barcodeInput;
+                if(!elementID) return;
                 if(elementID === 'scanSpecimenID') {
                     disableInput('enterSpecimenID1', true);
                     disableInput('enterSpecimenID2', true);

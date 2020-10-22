@@ -40,7 +40,7 @@ export const specimenTemplate = (data, formData) => {
             </div>
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan Master Specimen ID</label>
-                <input type="text" class="form-control col-md-5 disabled" disabled placeholder="Scan in Master Specimen ID from Label Sheet Label" id="scanSpecimenID"/> 
+                <input autocomplete="off" type="text" class="form-control col-md-5 disabled" disabled placeholder="Scan in Master Specimen ID from Label Sheet Label" id="scanSpecimenID"/> 
                 <button class="barcode-btn-outside" type="button" id="scanSpecimenIDBarCodeBtn" data-barcode-input="scanSpecimenID"><i class="fas fa-barcode"></i></button>
                 <button class="barcode-input-clear" hidden="true" type="button" id="clearScanSpecimenID" title="Clear scanned barcode" data-barcode-input="scanSpecimenID"><i class="fas fa-times"></i></button>
             </div>
@@ -50,11 +50,11 @@ export const specimenTemplate = (data, formData) => {
             </div>
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="enterSpecimenID1">Manually Enter Master Specimen ID</label>
-                <input type="text" class="form-control col-md-5" placeholder="Manually Enter in Master Specimen ID from Label Sheet Label" id="enterSpecimenID1"/>
+                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Manually Enter in Master Specimen ID from Label Sheet Label" id="enterSpecimenID1"/>
             </div>
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="enterSpecimenID2">Re-enter Master Specimen ID</label>
-                <input type="text" class="form-control col-md-5" placeholder="Re-enter Master Specimen ID" id="enterSpecimenID2"/>
+                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Re-enter Master Specimen ID" id="enterSpecimenID2"/>
             </div>
 
             <div class="form-group row">

@@ -121,11 +121,11 @@ export const addEventModalBtn = (role, userEmail) => {
             <form id="addNewUser" method="POST">
                 <div class="form-group">
                     <label class="col-form-label search-label">Name</label>
-                    <input class="form-control" required type="name" id="userName" placeholder="Enter name"/>
+                    <input class="form-control" required type="name" autocomplete="off" id="userName" placeholder="Enter name"/>
                 </div>
                 <div class="form-group">
                     <label class="col-form-label search-label">Email</label>
-                    <input class="form-control" required type="email" id="userEmail" placeholder="Enter name"/>
+                    <input class="form-control" required autocomplete="off" type="email" autocomplete="off" id="userEmail" placeholder="Enter name"/>
                 </div>
                 <div class="form-group">
                     <label class="col-form-label search-label">Role</label>

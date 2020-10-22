@@ -31,11 +31,11 @@ export const searchTemplate = (goToSpecimenSearch) => {
                     <form id="search1" method="POST">
                         <div class="form-group">
                             <label class="col-form-label search-label">First name</label>
-                            <input class="form-control" type="text" id="firstName" placeholder="Enter First Name"/>
+                            <input class="form-control" autocomplete="off" type="text" id="firstName" placeholder="Enter First Name"/>
                         </div>
                         <div class="form-group">
                             <label class="col-form-label search-label">Last name</label>
-                            <input class="form-control" type="text" id="lastName" placeholder="Enter Last Name"/>
+                            <input class="form-control" autocomplete="off" type="text" id="lastName" placeholder="Enter Last Name"/>
                         </div>
                         <div class="form-group">
                             <label class="col-form-label search-label">Date of Birth</label>
@@ -52,7 +52,7 @@ export const searchTemplate = (goToSpecimenSearch) => {
                     <form id="search4" method="POST">
                         <div class="form-group">
                             <label class="col-form-label search-label">Connect Id</label>
-                            <input class="form-control" required type="text" maxlength="10" id="connectId" placeholder="Enter Connect Id"/>
+                            <input class="form-control" autocomplete="off" required type="text" maxlength="10" id="connectId" placeholder="Enter Connect Id"/>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>
@@ -66,7 +66,7 @@ export const searchTemplate = (goToSpecimenSearch) => {
                         <form id="search2" method="POST">
                             <div class="form-group">
                                 <label class="col-form-label search-label">Email</label>
-                                <input class="form-control" required type="email" id="email" placeholder="Enter Email Id"/>
+                                <input class="form-control" required autocomplete="off" type="email" id="email" placeholder="Enter Email Id"/>
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-outline-primary">Search</button>
@@ -77,7 +77,7 @@ export const searchTemplate = (goToSpecimenSearch) => {
                         <form id="search3" method="POST">
                             <div class="form-group">
                                 <label class="col-form-label search-label">Phone no.</label>
-                                <input class="form-control" required type="text" maxlength="10" id="phone" placeholder="Enter Phone No."/>
+                                <input class="form-control" autocomplete="off" required type="text" maxlength="10" id="phone" placeholder="Enter Phone No."/>
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-outline-primary">Search</button>
@@ -114,7 +114,7 @@ export const searchBiospecimenTemplate = () => {
                     <form id="specimenLookupForm" method="POST">
                         <div class="form-group">
                             <label class="search-label">Master Specimen ID</label>
-                            <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan Specimen ID"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
+                            <input class="form-control" autocomplete="off" required type="text" id="masterSpecimenId" placeholder="Enter/Scan Specimen ID"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>
