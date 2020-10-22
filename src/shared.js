@@ -245,7 +245,7 @@ export const addEventBarCodeScanner = (id, start, end, index) => {
             }
         },
         locator: {
-            patchSize: "medium",
+            patchSize: "x-small",
             halfSample: true
         },
         numOfWorkers: (navigator.hardwareConcurrency ? navigator.hardwareConcurrency : 4),
