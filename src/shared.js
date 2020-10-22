@@ -1,6 +1,7 @@
 import { userNavBar, adminNavBar, nonUserNavBar, bodyNavBar } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
+import { masterSpecimenIDRequirement } from "./tubeValidation.js"
 
 const api = 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?';
 // const api = 'http://localhost:8010/nih-nci-dceg-episphere-dev/us-central1/biospecimen?';
@@ -299,6 +300,8 @@ export const addEventBarCodeScanner = (id, start, end, index) => {
         
         Quagga.onDetected(result => {	
             if (result.codeResult.code){
+                const barcode = result.codeResult.code;
+                if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,9))) return;
                 const elementID = document.activeElement.dataset.barcodeInput;
                 if(elementID === 'scanSpecimenID') {
                     disableInput('enterSpecimenID1', true);
