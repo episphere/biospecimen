@@ -208,6 +208,70 @@ export const storeSpecimen = async (array) => {
     return response.json();
 }
 
+export const storeBox = async (box) =>{
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(box)
+    }
+    const response = await fetch(`${api}api=addBox`, requestObj);
+    console.log(response)
+    return response.json();
+}
+
+export const ship = async (boxes) => {
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(boxes)
+    }
+    const response = await fetch(`${api}api=ship`, requestObj);
+    console.log(response)
+    return response.json();
+}
+
+export const getBoxes = async (box) =>{
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=searchBoxes`, {
+        method: "GET",
+        headers: {
+            Authorization:"Bearer "+idToken
+        }
+    });
+    let res = await response.json();
+    let toReturn  = {};
+    toReturn["data"] = [];
+    let data = res.data;
+    for(let i = 0; i < data.length; i++){
+        let currJSON = data[i];
+        if(!currJSON.hasOwnProperty("shipped") || currJSON["shipped"] != true){
+            toReturn["data"].push(currJSON);
+        }
+    }
+    console.log(JSON.stringify(res.data))
+    return toReturn;
+}
+
+export const getAllBoxes = async (box) =>{
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=searchBoxes`, {
+        method: "GET",
+        headers: {
+            Authorization:"Bearer "+idToken
+        }
+    });
+    let res = await response.json();
+    return res;
+}
+
 export const searchSpecimen = async (masterSpecimenId) => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen&masterSpecimenId=${masterSpecimenId}`, {
@@ -229,6 +293,24 @@ export const searchSpecimenInstitute = async () => {
         }
     });
     return response.json();
+}
+
+export const getLocationsInstitute = async () => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=getLocations`, {
+        method: "GET",
+        headers: {
+            Authorization:"Bearer "+idToken
+        }
+    });
+    let res = await response.json();
+    let arr = res.response;
+    let locations = [];
+    for(let i = 0; i < arr.length; i++){
+        let currJSON = arr[i];
+        locations = locations.concat(currJSON.Locations);
+    }
+    return locations;
 }
 
 export const generateBarCode = (id, connectId) => {
