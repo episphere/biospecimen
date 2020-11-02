@@ -97,6 +97,11 @@ export const adminNavBar = (name) => {
         </div>
         <div class="navbar-nav">
             <li class="nav-item">
+                <a class="nav-link" href="#shipping" id="shipping" title="Shipping"><i class="fas fa-file-alt"></i> Shipping</a>
+            </li>
+        </div>
+        <div class="navbar-nav">
+            <li class="nav-item">
                 <a class="nav-link" href="#manage_users" id="manageUsers" title="Manage users"><i class="fas fa-users"></i> Manager users</a>
             </li>
         </div>
@@ -160,4 +165,21 @@ export const bodyNavBar = () => {
         </ul>`;
         
         document.getElementById('contentHeader').innerHTML = template;
+}
+export const shippingNavBar = () => {
+    return `
+        <ul class="nav nav-tabs row">
+            <li class="nav-item col-auto">
+                <button class="nav-link navbar-btn" id="navBarShippingDash">Shipping</button>
+            </li>
+            <li class="nav-item col-auto">
+                <button class="nav-link navbar-btn" id="navBarBoxManifest">Box Manifest</button>
+            </li>
+            <li class="nav-item col-auto">
+                <button class="nav-link navbar-btn" id="navBarShippingManifest">Shipping Manifest</button>
+            </li>
+            <li class="nav-item col-auto">
+                <button class="nav-link navbar-btn" id="navBarShipmentTracking">Shipment Tracking Information</button>
+            </li>
+        </ul>`
 }
