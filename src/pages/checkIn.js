@@ -1,5 +1,12 @@
+import { generateBarCode, removeActiveClass } from "./../shared.js";
+import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch } from "./../events.js";
+
 export const checkInTemplate = (data) => {
-    return `
+    removeActiveClass('navbar-btn', 'active')
+    const navBarBtn = document.getElementById('navBarParticipantCheckIn');
+    navBarBtn.classList.remove('disabled');
+    navBarBtn.classList.add('active');
+    let template = `
         </br>
         <div class="row">
             <h5>Participant check-in</h5>
@@ -104,5 +111,11 @@ export const checkInTemplate = (data) => {
                 </div>
             </div>
         </form>
-    `
+    `;
+    document.getElementById('contentBody').innerHTML = template;
+    generateBarCode('connectIdBarCode', data.Connect_ID);
+    addEventContactInformationModal(data);
+    addEventBackToSearch('navBarSearch');
+    addEventBackToSearch('checkInExit');
+    addEventCheckInCompleteForm();
 }

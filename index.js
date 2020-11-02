@@ -18,6 +18,7 @@ window.onload = () => {
     };
     !firebase.apps.length ? firebase.initializeApp(firebaseConfig()) : firebase.app();
     auth = firebase.auth();
+    location.hash = '#welcome';
     manageRoutes();
 }
 

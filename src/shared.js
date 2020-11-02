@@ -1,6 +1,7 @@
 import { userNavBar, adminNavBar, nonUserNavBar, bodyNavBar } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
-import { addEventHideNotification } from "./events.js"
+import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
+import { masterSpecimenIDRequirement } from "./tubeValidation.js"
 
 const api = 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?';
 // const api = 'http://localhost:8010/nih-nci-dceg-episphere-dev/us-central1/biospecimen?';
@@ -170,7 +171,7 @@ export const errorMessage = (id, msg, focus) => {
     if(Array.from(parentElement.querySelectorAll('.form-error')).length > 0) return;
     if(msg){
         const div = document.createElement('div');
-        div.classList = ['row col-md-5 offset-md-4 error-text'];
+        div.classList = ['error-text'];
         const span = document.createElement('span');
         span.classList = ['form-error']
         span.innerHTML = msg;
@@ -354,7 +355,7 @@ export const addEventBarCodeScanner = (id, start, end, index) => {
             }
         },
         locator: {
-            patchSize: "medium",
+            patchSize: "x-large",
             halfSample: true
         },
         numOfWorkers: (navigator.hardwareConcurrency ? navigator.hardwareConcurrency : 4),
@@ -408,19 +409,106 @@ export const addEventBarCodeScanner = (id, start, end, index) => {
         
         Quagga.onDetected(result => {	
             if (result.codeResult.code){
-                document.getElementById(document.activeElement.dataset.barcodeInput).value = result.codeResult.code.split(' ')[index];
+                const barcode = result.codeResult.code;
+                if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,9))) return;
+                const elementID = document.activeElement.dataset.barcodeInput;
+                if(!elementID) return;
+                if(elementID === 'scanSpecimenID') {
+                    disableInput('enterSpecimenID1', true);
+                    disableInput('enterSpecimenID2', true);
+                    addEventClearScannedBarcode();
+                }
+                document.getElementById(elementID).value = result.codeResult.code.substr(start, end);
                 Quagga.stop();
                 document.querySelector('[data-dismiss="modal"]').click();
                 return;
+            }
+            else {
+                disableInput('enterSpecimenID1', false);
+                disableInput('enterSpecimenID2', false);
             }
         });
         
         Array.from(document.getElementsByClassName('close-modal')).forEach(element => {
             element.addEventListener('click', () => {
                 if (Quagga){
-                    Quagga.stop();	
+                    Quagga.stop();
                 }
             })
         });
     });
+}
+
+export const disableInput = (id, disable) => {
+    document.getElementById(id).disabled = disable
+    disable === true ? document.getElementById(id).classList.add('disabled') : document.getElementById(id).classList.remove('disabled');
+}
+
+export const siteLocations = {
+    'research': {
+        'UCM': ['UC-DCAM'],
+        'MFC': ['Marshfield', 'Lake Hallie'],
+        'HP': ['HP Research Clinic'],
+        'HFHS': ['HFHS Research Clinic (Main Campus)'],
+        'SFH': ['SF Cancer Center LL'],
+        'NCI': ['NCI-1', 'NCI-2']
+    },
+    'clinical': {
+        'KPHI': ['Oahu', 'non-Oahu']
+    }
+}
+
+export const allStates = {
+    "Alabama":1,
+    "Alaska":2,
+    "Arizona":3,
+    "Arkansas":4,
+    "California":5,
+    "Colorado":6,
+    "Connecticut":7,
+    "Delaware":8,
+    "District of Columbia": 9,
+    "Florida":10,
+    "Georgia":11,
+    "Hawaii":12,
+    "Idaho":13,
+    "Illinois":14,
+    "Indiana":15,
+    "Iowa":16,
+    "Kansas":17,
+    "Kentucky":18,
+    "Louisiana":19,
+    "Maine":20,
+    "Maryland":21,
+    "Massachusetts":22,
+    "Michigan":23,
+    "Minnesota":24,
+    "Mississippi":25,
+    "Missouri":26,
+    "Montana":27,
+    "Nebraska":28,
+    "Nevada":29,
+    "New Hampshire":30,
+    "New Jersey":31,
+    "New Mexico":32,
+    "New York":33,
+    "North Carolina":34,
+    "North Dakota":35,
+    "Ohio":36,
+    "Oklahoma":37,
+    "Oregon":38,
+    "Pennsylvania":39,
+    "Rhode Island":40,
+    "South Carolina":41,
+    "South Dakota":42,
+    "Tennessee":43,
+    "Texas":44,
+    "Utah":45,
+    "Vermont":46,
+    "Virginia":47,
+    "Washington":48,
+    "West Virginia":49,
+    "Wisconsin":50,
+    "Wyoming":51,
+    "NA": 52
 }

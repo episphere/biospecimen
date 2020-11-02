@@ -1,5 +1,6 @@
 import { addEventExplanationForm, addEventExplanationFormCntd, addEventReturnToCollectProcess } from "./../events.js";
 import { generateBarCode } from "../shared.js";
+import { finalizeTemplate } from "./finalize.js";
 
 export const explanationTemplate = (dt, biospecimenData) => {
     const notCollected = Array.from(document.getElementsByClassName('tube-collected')).filter(dt => dt.checked === false);
@@ -15,9 +16,12 @@ export const explanationTemplate = (dt, biospecimenData) => {
                 <div class="row">${dt.RcrtUP_Lname_v1r0}, ${dt.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
-            <div class="ml-auto form-group">
-                Visit: ${biospecimenData.visitType}
-            </div>
+            ${biospecimenData.visitType ? `
+                <div class="ml-auto form-group">
+                    Visit: ${biospecimenData.visitType}
+                </div>
+            ` : ``
+            }
         </div>
         </br>
         <form id="explanationForm" method="POST">`;
@@ -26,7 +30,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
             const tubeType = ele.dataset.tubeType;
             if(array.includes(tubeType)) return
             array.push(tubeType);
-            const reasonLabel = tubeType === 'Blood tubes' ? 'bloodTubeNotCollectedReason' : tubeType === 'Urine' ? 'urineTubeNotCollectedReason' : 'mouthWashTubeNotCollectedReason';
+            
             template += `<div class="row"><div class="col"><strong>${tubeType} not collected</strong></div></div>
                 <div class="row"><div class="col">Master Specimen ID: ${biospecimenData['masterSpecimenId']}</div></div>
                 <div class="form-group row">
@@ -35,10 +39,10 @@ export const explanationTemplate = (dt, biospecimenData) => {
                         </br>
                         <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}Reason">
                             <option value=""> -- Select reason  -- </option>
-                            <option ${biospecimenData[reasonLabel] === 'short draw' ? 'selected' : ''} value="short draw">Short draw</option>
-                            <option ${biospecimenData[reasonLabel] === 'participant refusal' ? 'selected' : ''} value="participant refusal">Participant refusal</option>
-                            <option ${biospecimenData[reasonLabel] === 'participant unable' ? 'selected' : ''} value="participant unable">Participant unable</option>
-                            <option ${biospecimenData[reasonLabel] === 'other' ? 'selected' : ''} value="other">Other</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] === 'short draw' ? 'selected' : ''} value="short draw">Short draw</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] === 'participant refusal' ? 'selected' : ''} value="participant refusal">Participant refusal</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] === 'participant unable' ? 'selected' : ''} value="participant unable">Participant unable</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] === 'other' ? 'selected' : ''} value="other">Other</option>
                         </select>
                     </div>
                 </div>
@@ -46,7 +50,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                     <div class="col">
                         <label for="${ele.id}Explanation">Provide details</label>
                         </br>
-                        <textarea required rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData.bloodTubeNotCollectedExplanation ? biospecimenData.bloodTubeNotCollectedExplanation : ''}</textarea>
+                        <textarea required rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData[`${ele.id}Explanation`] ? biospecimenData[`${ele.id}Explanation`] : ''}</textarea>
                     </div>
                 </div>
                 </br>
@@ -58,14 +62,14 @@ export const explanationTemplate = (dt, biospecimenData) => {
             const tubeLabel = ele.dataset.tubeLabel;
             template += `
                 <div class="row"><div class="col">Tube Type: <strong>${tubeLabel}</strong></div></div>
-                <div class="row"><div class="col">Tube ID: ${biospecimenData['masterSpecimenId']} ${ele.parentNode.parentNode.querySelectorAll('[type="text"]')[0].value}</div></div>
+                <div class="row"><div class="col">Tube ID: ${ele.parentNode.parentNode.querySelectorAll('[type="text"]')[0].value}</div></div>
                 <div class="form-group row">
                     <div class="col">
                         <label for="${ele.id}Reason">Select Deviation</label>
                         </br>
                         <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}Reason" multiple="multiple">
                             <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('broken') ? 'selected' : ''} value="broken">Broken</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('failed get layer') ? 'selected' : ''} value="failed get layer">Failed get layer</option>
+                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('failed gel layer') ? 'selected' : ''} value="failed gel layer">Failed gel layer</option>
                             <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('hemolyzed') ? 'selected' : ''} value="hemolyzed">Hemolyzed</option>
                             <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('improper temperature – please include details below') ? 'selected' : ''} value="improper temperature – please include details below">Improper temperature – please include details below</option>
                             <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('mislabeled') ? 'selected' : ''} value="mislabeled">Mislabeled</option>
@@ -104,5 +108,8 @@ export const explanationTemplate = (dt, biospecimenData) => {
         addEventExplanationForm(dt, biospecimenData.masterSpecimenId);
         addEventExplanationFormCntd(dt, biospecimenData.masterSpecimenId);
         addEventReturnToCollectProcess();
+    }
+    else {
+        finalizeTemplate(dt, biospecimenData);
     }
 }
