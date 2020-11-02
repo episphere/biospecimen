@@ -1,5 +1,4 @@
-import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner } from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates } from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 
@@ -19,6 +18,7 @@ export const userDashboard = (auth, route, goToSpecimenSearch) => {
 
 export const searchTemplate = (goToSpecimenSearch) => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
+    const contentBody = document.getElementById('contentBody');
     let template = `
         <div class="row">
             <div class="col-lg">
@@ -31,11 +31,11 @@ export const searchTemplate = (goToSpecimenSearch) => {
                     <form id="search1" method="POST">
                         <div class="form-group">
                             <label class="col-form-label search-label">First name</label>
-                            <input class="form-control" type="text" id="firstName" placeholder="Enter First Name"/>
+                            <input class="form-control" autocomplete="off" type="text" id="firstName" placeholder="Enter First Name"/>
                         </div>
                         <div class="form-group">
                             <label class="col-form-label search-label">Last name</label>
-                            <input class="form-control" type="text" id="lastName" placeholder="Enter Last Name"/>
+                            <input class="form-control" autocomplete="off" type="text" id="lastName" placeholder="Enter Last Name"/>
                         </div>
                         <div class="form-group">
                             <label class="col-form-label search-label">Date of Birth</label>
@@ -49,43 +49,48 @@ export const searchTemplate = (goToSpecimenSearch) => {
             </div>
             <div class="col-lg">
                 <div class="row form-row">
-                    <form id="search2" method="POST">
-                        <div class="form-group">
-                            <label class="col-form-label search-label">Email</label>
-                            <input class="form-control" required type="email" id="email" placeholder="Enter Email Id"/>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-outline-primary">Search</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="row form-row">
-                    <form id="search3" method="POST">
-                        <div class="form-group">
-                            <label class="col-form-label search-label">Phone no.</label>
-                            <input class="form-control" required type="text" maxlength="10" id="phone" placeholder="Enter Phone No."/>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-outline-primary">Search</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="row form-row">
                     <form id="search4" method="POST">
                         <div class="form-group">
                             <label class="col-form-label search-label">Connect Id</label>
-                            <input class="form-control" required type="text" maxlength="10" id="connectId" placeholder="Enter Connect Id"/>
+                            <input class="form-control" autocomplete="off" required type="text" maxlength="10" id="connectId" placeholder="Enter Connect Id"/>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>
                         </div>
                     </form>
                 </div>
+                ${contentBody.dataset.workflow && contentBody.dataset.workflow === 'clinical' ? `
+                    
+                `:`
+                    <div class="row form-row">
+                        <form id="search2" method="POST">
+                            <div class="form-group">
+                                <label class="col-form-label search-label">Email</label>
+                                <input class="form-control" required autocomplete="off" type="email" id="email" placeholder="Enter Email Id"/>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-outline-primary">Search</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="row form-row">
+                        <form id="search3" method="POST">
+                            <div class="form-group">
+                                <label class="col-form-label search-label">Phone no.</label>
+                                <input class="form-control" autocomplete="off" required type="text" maxlength="10" id="phone" placeholder="Enter Phone No."/>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-outline-primary">Search</button>
+                            </div>
+                        </form>
+                    </div>
+                `}
             </div>
         </div>
     `;
-    document.getElementById('contentBody').innerHTML = template;
-    document.getElementById('contentHeader').innerHTML = bodyNavBar();
+    
+    contentBody.innerHTML = template;
+    bodyNavBar();
     addEventSearchForm1();
     addEventSearchForm2();
     addEventSearchForm3();
@@ -109,7 +114,7 @@ export const searchBiospecimenTemplate = () => {
                     <form id="specimenLookupForm" method="POST">
                         <div class="form-group">
                             <label class="search-label">Master Specimen ID</label>
-                            <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan Specimen ID"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
+                            <input class="form-control" autocomplete="off" required type="text" id="masterSpecimenId" placeholder="Enter/Scan Specimen ID"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>
@@ -125,7 +130,7 @@ export const searchBiospecimenTemplate = () => {
     document.getElementById('contentBody').innerHTML = template;
     addEventsearchSpecimen();
     addEventBackToSearch('navBarSearch');
-    addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
+    addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9);
 }
 
 export const searchResults = (result) => {
@@ -154,7 +159,7 @@ export const searchResults = (result) => {
     result.forEach(data => {
         template += `
             <tr>
-                <td><input type="radio" name="selectParticipant" required value="${data.Connect_ID}"></td>
+                <td><input type="radio" name="selectParticipant" required data-token=${data.token} value="${data.Connect_ID}"></td>
                 <td>${data.RcrtUP_Lname_v1r0}</td>
                 <td>${data.RcrtUP_Minitial_v1r0}</td>
                 <td>${data.RcrtUP_Fname_v1r0}</td>
@@ -170,12 +175,17 @@ export const searchResults = (result) => {
                 <button class="btn btn-outline-dark" id="backToSearch"><i class="fas fa-arrow-left"></i> Return to search</button>
             </div>
             <div class="ml-auto">
-                <button type="Submit" class="btn btn-outline-primary">Go to participant cheeck-in</button>
+                <button type="Submit" class="btn btn-outline-primary">${document.getElementById('contentBody').dataset.workflow && document.getElementById('contentBody').dataset.workflow === 'clinical' ? `Go to Specimen Link`:`Go to participant check-in`}</button>
             </div>
         </div>
     </form></div>`;
 
     document.getElementById('contentBody').innerHTML = template;
-    addEventSelectParticipantForm();
+    if(document.getElementById('contentBody').dataset.workflow === 'clinical') {
+        addEventSelectParticipantForm(true);
+    }
+    else {
+        addEventSelectParticipantForm();
+    }
     addEventBackToSearch('backToSearch');
 }

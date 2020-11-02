@@ -189,6 +189,7 @@ body {
 
 .error-text {
     padding-left: 5px !important;
+    width: 100%;
 }
 
 .invalid {
@@ -279,7 +280,7 @@ canvas.drawing, canvas.drawingBuffer {
     padding-bottom: 4px;
 }
 
-.barcode-btn-outside {
+.barcode-btn-outside, .barcode-input-clear {
     background-color: transparent;
     border: 0px;
     float: right;
