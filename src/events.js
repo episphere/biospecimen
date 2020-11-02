@@ -1,5 +1,5 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, getIdToken, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, getIdToken, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking} from './pages/shipping.js';
 import { userListTemplate } from './pages/users.js';
@@ -200,7 +200,9 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
             tubes.push(biospecimenData[keys[i]]);
         }
     }*/
-    let response = await  getBoxes();
+    let currLocation = document.getElementById('selectLocationList').value;
+
+    let response = await getBoxesByLocation(currLocation);
     let boxJSONS = response.data;
     let hiddenJSON = {};
     console.log(boxJSONS)
@@ -275,8 +277,14 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex)=>{
         showAnimation();
         let hiddenJSON = {};
         let isBlood = true;
-        if(document.getElementById('shippingHiddenTable') != null){
-            hiddenJSON = JSON.parse(document.getElementById('shippingHiddenTable').innerText);
+        let response = await  getBoxes();
+        let boxJSONS = response.data;
+        let locations = {};
+        console.log(boxJSONS)
+        for(let i = 0; i < boxJSONS.length; i++){
+            let box = boxJSONS[i]
+            hiddenJSON[box['boxId']] = box['bags']
+            locations[box['boxId']] = box['location'];
         }
         let nextBoxNum = Object.keys(hiddenJSON).length + 1;
 
@@ -354,11 +362,12 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex)=>{
             let toPass = {};
             toPass['boxId'] = boxIds[i];
             toPass['bags'] = hiddenJSON[boxIds[i]]
+            toPass['location'] = locations[boxIds[i]]
             await storeBox(toPass);
         }
 
         let currBoxId = selectBoxList.value;
-        let response = await  getBoxes();
+        response = await  getBoxes();
         hiddenJSON = response.data;
         let currBox = {};
         for(let i = 0; i < hiddenJSON.length; i++){
@@ -602,71 +611,11 @@ export const populateSaveTable = (hiddenJSON) => {
             numTubes += currBox[boxKeys[j]]['arrElements'].length;
         }
         currRow.insertCell(4).innerHTML= numTubes.toString() + " tubes";
-        currRow.insertCell(5).innerHTML= '<input type="button" class="editButton" value = "Edit">';
-        currRow.insertCell(6).innerHTML= '<input type="button" class="boxManifestButton" value = "Box Manifest"/>';
-        let currEditButton = currRow.cells[5].getElementsByClassName("editButton")[0];
-        currEditButton.addEventListener("click", async e => {
-            var index = e.target.parentNode.parentNode.rowIndex;
-            var table = document.getElementById("shippingModalTable");
-            //bring up edit on the corresponding table
-            let currBox = hiddenJSON[boxes[i]];
-            document.getElementById('BoxNumBlood').innerText = boxes[i];
-            let toInsertTable = document.getElementById('currTubeTable')
-            if(boxKeys.length > 0 && boxKeys[0]['isBlood'] == false){
-                toInsertTable = document.getElementById('mouthwashList')
-            }
-            toInsertTable.innerText = '';
-            //set the rest of the table up
-            for(let j = 0; j < boxKeys.length; j++){
-                let currBagId = boxKeys[j];
-                let currTubes = currBox[boxKeys[j]]['arrElements'];
-                
-                for(let k = 0; k < currTubes.length; k++){
-
-                        //get the first element (tube id) from the thingx
-                        let toAddId = currTubes[k];
-                        let toAddType = 'abc';
-                        var rowCount = toInsertTable.rows.length;
-                        var row = toInsertTable.insertRow(rowCount);           
-                        
-                        if(k == 0){
-                            row.insertCell(0).innerHTML=currBagId
-                        }
-                        else{
-                            row.insertCell(0).innerHTML=""
-                        }
-                        row.insertCell(1).innerHTML= toAddId;
-                        row.insertCell(2).innerHTML= toAddType;
-                        row.insertCell(3).innerHTML= '<input type="button" class="delButton" value = "remove">';
-
-                        let currDeleteButton = row.cells[3].getElementsByClassName("delButton")[0];
-                        currDeleteButton.addEventListener("click", async e => {
-                            var index = e.target.parentNode.parentNode.rowIndex;
-                            var table = e.target.parentNode.parentNode.parentNode.parentNode;
-                            
-                            let currRow = table.rows[index];
-                            
-                            if(currRow.cells[0].innerText != ""){
-                                if(index < table.rows.length-1){
-                                    if(table.rows[index + 1].cells[0].innerText ==""){
-                                        table.rows[index+1].cells[0].innerText = currRow.cells[0].innerText;
-                                    }
-                                }
-                            }
-                            table.deleteRow(index);
-                        })
-
-                }
-            }
-            
-
-
-            //if(hiddenJSON[boxes[i]])
-            //table.deleteRow(index);
-        })
+        currRow.insertCell(5).innerHTML= '<input type="button" class="boxManifestButton" value = "Box Manifest"/>';
+        
         //boxes[i]
 
-        let currBoxButton = currRow.cells[6].getElementsByClassName("boxManifestButton")[0];
+        let currBoxButton = currRow.cells[5].getElementsByClassName("boxManifestButton")[0];
         currBoxButton.addEventListener("click", async e => {
             var index = e.target.parentNode.parentNode.rowIndex;
             var table = document.getElementById("shippingModalTable");
@@ -837,26 +786,39 @@ export const addEventAddBox = () => {
     boxButton.addEventListener('click', async () => {
         let response = await  getBoxes();
         let hiddenJSON = response.data;
+        let locations = {};
         let keys = [];
-        let largest = 0;
+        let largestOverall = 0;
         let largeIndex = -1;
+
+        let largestLocation = 0;
+        let largestLocationIndex = -1;
+        let pageLocation = document.getElementById('selectLocationList').value;
         for(let i = 0; i < hiddenJSON.length; i++){
             let curr = parseInt(hiddenJSON[i]['boxId'].substring(3))
-            if(curr > largest){
-                largest = curr;
+            let currLocation = hiddenJSON[i]['location']
+
+            if(curr > largestOverall){
+                largestOverall = curr;
                 largeIndex = i;
             }
+            if(curr > largestLocation && currLocation == pageLocation){
+                largestLocation = curr;
+                largestLocationIndex = i;
+            }
+            
         }
-        if(largeIndex != -1){
+        if(largestLocationIndex != -1){
             let lastBox = hiddenJSON[largeIndex]['boxId']
-            if(Object.keys(hiddenJSON[largeIndex]['bags']).length != 0){
+            if(Object.keys(hiddenJSON[largestLocationIndex]['bags']).length != 0){
                 //add a new Box
                 //create new Box Id
                 let newBoxNum = parseInt(lastBox.substring(3)) + 1;
                 let newBoxId = 'Box' + newBoxNum.toString();
                 let toPass = {};
                 toPass['boxId'] = newBoxId;
-                toPass['bags'] = {}
+                toPass['bags'] = {};
+                toPass['location'] = pageLocation;
                 await storeBox(toPass);
 
                 hiddenJSON.push({boxId:newBoxId, bags:{}})
@@ -867,7 +829,9 @@ export const addEventAddBox = () => {
                 console.log(boxJSONS)
                 for(let i = 0; i < boxJSONS.length; i++){
                     let box = boxJSONS[i]
-                    hiddenJSON[box['boxId']] = box['bags']
+                    if(box['location'] == pageLocation){
+                        hiddenJSON[box['boxId']] = box['bags']
+                    }
                 }
                 populateBoxSelectList(hiddenJSON)
             }
@@ -949,6 +913,28 @@ export const addEventBoxSelectListChanged = () => {
         hideAnimation();
             
 
+    })
+}
+
+export const addEventChangeLocationSelect = () => {
+    let selectBoxList = document.getElementById('selectLocationList');
+    selectBoxList.addEventListener("change",  async () => {
+        showAnimation();
+        let currLocation = selectBoxList.value;
+        let boxJSONS = (await getBoxesByLocation(currLocation)).data;
+        /*for(let i = 0; i < boxdata.length; i++){
+            console.log(boxdata[i]['location'])
+        }*/
+        //let boxJSONS = response.data;
+        let hiddenJSON = {};
+        console.log(boxJSONS)
+        for(let i = 0; i < boxJSONS.length; i++){
+            let box = boxJSONS[i]
+            hiddenJSON[box['boxId']] = box['bags']
+        }
+        populateBoxSelectList(hiddenJSON)
+        //console.log(JSON.stringify(boxdata))
+        hideAnimation();
     })
 }
 

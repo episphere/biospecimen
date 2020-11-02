@@ -1,6 +1,6 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes } from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList} from "./../events.js";
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation} from "./../shared.js"
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
@@ -39,6 +39,7 @@ export const startShipping = async () => {
         let box = boxJSONS[i]
         hiddenJSON1[box['boxId']] = box['bags']
     }
+    
     
     /*
     if(document.getElementById('shippingHiddenTable') != null){
@@ -144,7 +145,6 @@ export const startShipping = async () => {
                     <th>Last Saved</th>
                     <th>Box Number</th>
                     <th>Contents</th>
-                    <th>Action</th>
                     <th>Box Manifest</th>
                 </tr>
             </table>
@@ -178,9 +178,18 @@ export const startShipping = async () => {
     }
     
     populateSaveTable(hiddenJSON);
-
     populateSpecimensList(hiddenJSON1);
-    populateBoxSelectList(hiddenJSON);
+
+    let currLocation = document.getElementById('selectLocationList').value;
+
+    response = await getBoxesByLocation(currLocation);
+    boxJSONS = response.data;
+    let hiddenJSONLocation = {};
+    for(let i = 0; i < boxJSONS.length; i++){
+        let box = boxJSONS[i]
+        hiddenJSONLocation[box['boxId']] = box['bags']
+    }
+    populateBoxSelectList(hiddenJSONLocation);
     addEventNavBarShipment("navBarShippingDash");
     //addEventNavBarBoxManifest("viewBoxManifestMouthwash")
     //addEventNavBarBoxManifest("viewBoxManifestBlood")
@@ -188,7 +197,7 @@ export const startShipping = async () => {
     addEventAddBox();
     addEventBoxSelectListChanged();
     addEventNavBarBoxManifest("navBarBoxManifest")
-
+    addEventChangeLocationSelect();
     
 
     addEventAddSpecimenToBox();
