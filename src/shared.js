@@ -299,6 +299,21 @@ export const searchSpecimen = async (masterSpecimenId) => {
     return response.json();
 }
 
+export const removeBag = async(boxId, bags) => {
+    let toPass = {boxId:boxId, bags:bags}
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=removeBag`, {
+        method: "POST",
+        headers: {
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(toPass)
+    });
+    return await response.json();
+    
+}
+
 export const searchSpecimenInstitute = async () => {
     //https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
     const idToken = await getIdToken();

@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, getIdToken, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, getIdToken, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking} from './pages/shipping.js';
 import { userListTemplate } from './pages/users.js';
@@ -765,24 +765,49 @@ export const populateBoxSelectList = (hiddenJSON) => {
                 }
                 row.insertCell(1).innerHTML= toAddId;
                 row.insertCell(2).innerHTML= toAddType;
-                row.insertCell(3).innerHTML= '<input type="button" class="delButton" value = "remove">';
+                if(k == 0){
+                    row.insertCell(3).innerHTML='<input type="button" class="delButton" value = "remove">';
+                }
+                else{
+                    row.insertCell(3).innerHTML="";
+                }
+                //row.insertCell(3).innerHTML= '<input type="button" class="delButton" value = "remove">';
 
-                let currDeleteButton = row.cells[3].getElementsByClassName("delButton")[0];
-                currDeleteButton.addEventListener("click", async e => {
-                    var index = e.target.parentNode.parentNode.rowIndex;
-                    var table = e.target.parentNode.parentNode.parentNode.parentNode;
-                    
-                    let currRow = table.rows[index];
-                    
-                    if(currRow.cells[0].innerText != ""){
-                        if(index < table.rows.length-1){
-                            if(table.rows[index + 1].cells[0].innerText ==""){
-                                table.rows[index+1].cells[0].innerText = currRow.cells[0].innerText;
+                if(k == 0){
+                    let currDeleteButton = row.cells[3].getElementsByClassName("delButton")[0]; 
+
+                    //This should remove the entrire bag
+                    currDeleteButton.addEventListener("click", async e => {
+                        var index = e.target.parentNode.parentNode.rowIndex;
+                        var table = e.target.parentNode.parentNode.parentNode.parentNode;
+                        
+                        let currRow = table.rows[index];
+                        let currBagId = table.rows[index].cells[0].innerText;
+                        console.log('kiwju2beoiuwjvb')
+                        console.log(currBagId)
+                        console.log(boxList.value)
+
+                        /*if(currRow.cells[0].innerText != ""){
+                            if(index < table.rows.length-1){
+                                if(table.rows[index + 1].cells[0].innerText ==""){
+                                    table.rows[index+1].cells[0].innerText = currRow.cells[0].innerText;
+                                }
                             }
+                        }*/
+                        table.deleteRow(index);
+                        let result = await removeBag(boxList.value, [currBagId])
+                        console.log(JSON.stringify(result))
+                        currRow = table.rows[index];
+                        while(currRow != undefined && currRow.cells[0].innerText ==""){
+                            console.log(currRow.cells)
+                            table.deleteRow(index);
+                            currRow = table.rows[index];
                         }
-                    }
-                    table.deleteRow(index);
-                })
+                        
+                        //delete bag from json
+
+                    })
+                }
 
         }
     }
