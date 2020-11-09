@@ -147,7 +147,7 @@ export const addEventAddSpecimenToBox = () => {
         let tableIndex = -1;
         for(let i = 1; i < shippingTable.rows.length; i++){
             let currRow = shippingTable.rows[i];
-            if(currRow.cells[0].innerText == masterSpecimenId){
+            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
                 console.log(currRow.cells[2].innerText)
                 tableIndex = i;
                 biospecimensList = JSON.parse(currRow.cells[2].innerText)
@@ -541,7 +541,7 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 toReturn['orphans'] = []
             }
             for(let j = 0; j < list8.length; j++){
-                toReturn['orphans'].push(specimenData[i]['masterSpecimenId'] + list8[j])
+                toReturn['orphans'].push(specimenData[i]['masterSpecimenId'] + ' ' + list8[j])
             }
 
         }
@@ -553,7 +553,7 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 toReturn['orphans'] = []
             }
             for(let j = 0; j < list9.length; j++){
-                toReturn['orphans'].push(specimenData[i]['masterSpecimenId'] + list9[j])
+                toReturn['orphans'].push(specimenData[i]['masterSpecimenId'] + ' ' + list9[j])
             }
 
         }
@@ -585,18 +585,50 @@ export const populateSpecimensList = async (hiddenJSON) => {
     list.sort();
     
     var specimenList = document.getElementById("specimenList");
-
+    let orphansIndex = -1;
     
 
     for(let i = 0; i < list.length; i++){
-        var rowCount = specimenList.rows.length;
-        var row = specimenList.insertRow(rowCount);           
-        row.insertCell(0).innerHTML= list[i];
-        row.insertCell(1).innerHTML = specimenObject[list[i]].length;
-        let hiddenChannel = row.insertCell(2)
-        hiddenChannel.innerHTML = JSON.stringify(specimenObject[list[i]]);
-        hiddenChannel.style.display = "none";
+        if(list[i] != "orphans"){
+            var rowCount = specimenList.rows.length;
+            var row = specimenList.insertRow(rowCount);           
+            row.insertCell(0).innerHTML= list[i];
+            row.insertCell(1).innerHTML = specimenObject[list[i]].length;
+            
+            let hiddenChannel = row.insertCell(2)
+            hiddenChannel.innerHTML = JSON.stringify(specimenObject[list[i]]);
+            hiddenChannel.style.display = "none";
+        }
+        else{
+            orphansIndex = i;
+        }
     }
+    if(orphansIndex != -1){
+        let toInsert = specimenObject['orphans'];
+        console.log('ORPHANS: ' + JSON.stringify(toInsert))
+        var rowCount = specimenList.rows.length;
+        var row = specimenList.insertRow(rowCount);
+        row.insertCell(0).innerHTML= ' ';
+        row.insertCell(1).innerHTML = ' ';
+        rowCount = specimenList.rows.length;
+        row = specimenList.insertRow(rowCount); 
+        row.insertCell(0).innerHTML= 'Orphan tubes';
+        row.insertCell(1).innerHTML = toInsert.length;
+        let hiddenChannel = row.insertCell(2)
+        hiddenChannel.innerHTML = JSON.stringify(toInsert);
+        hiddenChannel.style.display = "none";
+        for(let i = 0; i < toInsert.length; i++){
+            rowCount = specimenList.rows.length;
+            row = specimenList.insertRow(rowCount); 
+            console.log(toInsert[i])
+            row.insertCell(0).innerHTML= toInsert[i];
+            row.insertCell(1).innerHTML = ' ';
+        }
+    }
+    var rowCount = specimenList.rows.length;
+    var row = specimenList.insertRow(rowCount);
+        
+    //put in orphans
     hideAnimation();
     /*
     for(let i = 0; i < list.length; i++){
@@ -1666,11 +1698,18 @@ export const addEventCompleteButton = (hiddenJSON) => {
 }
 
 export const addEventCompleteShippingButton = (hiddenJSON) => {
-    document.getElementById('completeShippingButton').addEventListener('click', async () =>{
-        let boxes = Object.keys(hiddenJSON);
-        console.log(JSON.stringify(boxes));
-        await ship(boxes);
-        startShipping();
+    document.getElementById('finalizeModalSign').addEventListener('click', async () =>{
+        let finalizeTextField = document.getElementById('finalizeSignInput');
+        if(finalizeTextField.value === "Ship"){
+            let boxes = Object.keys(hiddenJSON);
+            console.log(JSON.stringify(boxes));
+            await ship(boxes);
+            startShipping();
+        }
+        else{
+            let errorMessage = document.getElementById('finalizeModalError');
+            errorMessage.style.display = "block";
+        }
     })
 }
 

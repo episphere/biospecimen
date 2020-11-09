@@ -481,12 +481,39 @@ export const finalShipmentTracking = (hiddenJSON) => {
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Home</button>
             </div>
             <div style="float: left;width: 33%;">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="printBox">Save and Exit</button>
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completeShippingButton">Save and Continue</button>
+                <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#finalizeModal" id="completeShippingButton">Finalize</button>
             </div>
         </div>
+
+        <!-- The Modal -->
+        <div class="modal fade" id="finalizeModal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content sub-div-shadow">
+                    <div class="modal-header" id="finalizeModalHeader">
+                        Are you sure?
+                    </div>
+                    <div class="modal-body" id="finalizeModalBody">
+                        
+                    </div>
+                    <div class="modal-body"> 
+                        <h4>Please type in "Ship" to confirm: <h4>
+                        <input type="text" id="finalizeSignInput">
+                        </input>
+                        <p id="finalizeModalError" style="color:red;display:none;">
+                            *Please type in "Ship"
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                    
+                        <button type="button" class="btn btn-primary" id="finalizeModalSign">Sign</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="finalizeModalCancel">Close</button>
+                    </div>  
+                </div>
+            </div>
+        </div>
+
 
     `;
     /*var x = document.getElementById("specimenList");
