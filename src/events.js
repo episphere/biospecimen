@@ -235,7 +235,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                 var row = tubeTable.insertRow(rowCount);           
                 row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
                 row.insertCell(1).innerHTML= "abc";
-                row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "remove">';
+                row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Missing">';
 
                 let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
                 currDeleteButton.addEventListener("click", async e => {
@@ -256,7 +256,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                 var row = tubeTable.insertRow(rowCount);           
                 row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
                 row.insertCell(1).innerHTML= "abc";
-                row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "remove">';
+                row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Missing">';
 
                 let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
                 currDeleteButton.addEventListener("click", async e => {
@@ -354,10 +354,8 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex)=>{
         let currArr = JSON.parse(shippingTable.rows[tableIndex].cells[2].innerText);
         for (let i = 0; i < toDelete.length; i++){
             let currDel = toDelete[i];
-            console.log(currArr.indexOf(toDelete[i]))
             currArr.splice(currArr.indexOf(toDelete[i]),1);
         }
-        console.log(currArr.length)
         if(currArr.length == 0){
             shippingTable.deleteRow(tableIndex);
         }
@@ -415,24 +413,49 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex)=>{
                     }
                     row.insertCell(1).innerHTML= toAddId;
                     row.insertCell(2).innerHTML= toAddType;
-                    row.insertCell(3).innerHTML= '<input type="button" class="delButton" value = "remove">';
-
-                    let currDeleteButton = row.cells[3].getElementsByClassName("delButton")[0];
-                    currDeleteButton.addEventListener("click", async e => {
-                        var index = e.target.parentNode.parentNode.rowIndex;
-                        var table = e.target.parentNode.parentNode.parentNode.parentNode;
-                        
-                        let currRow = table.rows[index];
-                        
-                        if(currRow.cells[0].innerText != ""){
-                            if(index < table.rows.length-1){
-                                if(table.rows[index + 1].cells[0].innerText ==""){
-                                    table.rows[index+1].cells[0].innerText = currRow.cells[0].innerText;
+                    if(k == 0){
+                        row.insertCell(3).innerHTML='<input type="button" class="delButton" value = "remove">';
+                    }
+                    else{
+                        row.insertCell(3).innerHTML="";
+                    }
+                    //row.insertCell(3).innerHTML= '<input type="button" class="delButton" value = "remove">';
+    
+                    if(k == 0){
+                        let currDeleteButton = row.cells[3].getElementsByClassName("delButton")[0]; 
+    
+                        //This should remove the entrire bag
+                        currDeleteButton.addEventListener("click", async e => {
+                            var index = e.target.parentNode.parentNode.rowIndex;
+                            var table = e.target.parentNode.parentNode.parentNode.parentNode;
+                            
+                            let currRow = table.rows[index];
+                            let currBagId = table.rows[index].cells[0].innerText;
+                            console.log('kiwju2beoiuwjvb')
+                            console.log(currBagId)
+                            console.log(boxList.value)
+    
+                            /*if(currRow.cells[0].innerText != ""){
+                                if(index < table.rows.length-1){
+                                    if(table.rows[index + 1].cells[0].innerText ==""){
+                                        table.rows[index+1].cells[0].innerText = currRow.cells[0].innerText;
+                                    }
                                 }
+                            }*/
+                            table.deleteRow(index);
+                            let result = await removeBag(boxList.value, [currBagId])
+                            console.log(JSON.stringify(result))
+                            currRow = table.rows[index];
+                            while(currRow != undefined && currRow.cells[0].innerText ==""){
+                                console.log(currRow.cells)
+                                table.deleteRow(index);
+                                currRow = table.rows[index];
                             }
-                        }
-                        table.deleteRow(index);
-                    })
+                            
+                            //delete bag from json
+    
+                        })
+                    }
 
             }
         }
@@ -455,9 +478,8 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex)=>{
 export const getInstituteSpecimensList = async(hiddenJSON) => {
     const response = await searchSpecimenInstitute();
     let specimenData = response.data;
-    console.log(JSON.stringify(specimenData))
     let toReturn = {};
-    console.log(JSON.stringify(hiddenJSON))
+    console.log('specimenData!!!: ' + JSON.stringify(specimenData))
     for(let i = 0; i < specimenData.length; i++){
         let toExclude8 = [];
         let toExclude9 = [];
@@ -465,8 +487,6 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
             let boxes = Object.keys(hiddenJSON);
             for(let j = 0; j < boxes.length; j++){
                 let specimens = Object.keys(hiddenJSON[boxes[j]]);
-                console.log(specimens)
-                console.log(specimenData[i]['masterSpecimenId'])
                 if(specimens.includes(specimenData[i]['masterSpecimenId'] + ' 0008')){
                     let currList =  hiddenJSON[boxes[j]][specimens[specimens.indexOf(specimenData[i]['masterSpecimenId'] + ' 0008')]]['arrElements']
                     for(let k = 0; k < currList.length; k++){
@@ -512,10 +532,35 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 }
             }
         }
-        if(list8.length > 0 && specimenData[i].hasOwnProperty('masterSpecimenId')){
+        if(toExclude8.length > 0 && list8.length > 0 && specimenData[i].hasOwnProperty('masterSpecimenId')){
+            //add orphan tubes
+            let toInsert = {};
+            
+            toInsert[specimenData[i]['masterSpecimenId'] + ' 0008'] = list8
+            if(!toReturn.hasOwnProperty['orphans']){
+                toReturn['orphans'] = []
+            }
+            for(let j = 0; j < list8.length; j++){
+                toReturn['orphans'].push(specimenData[i]['masterSpecimenId'] + list8[j])
+            }
+
+        }
+        if(toExclude9.length > 0 && list9.length > 0 && specimenData[i].hasOwnProperty('masterSpecimenId')){
+            let toInsert = {};
+            
+            toInsert[specimenData[i]['masterSpecimenId'] + ' 0008'] = list9
+            if(!toReturn.hasOwnProperty['orphans']){
+                toReturn['orphans'] = []
+            }
+            for(let j = 0; j < list9.length; j++){
+                toReturn['orphans'].push(specimenData[i]['masterSpecimenId'] + list9[j])
+            }
+
+        }
+        if(toExclude8.length == 0 && list8.length > 0 && specimenData[i].hasOwnProperty('masterSpecimenId')){
             toReturn[specimenData[i]['masterSpecimenId'] + ' 0008'] = list8;
         }
-        if(list9.length > 0 && specimenData[i].hasOwnProperty('masterSpecimenId')){
+        if(toExclude9.length == 0 && list9.length > 0 && specimenData[i].hasOwnProperty('masterSpecimenId')){
             toReturn[specimenData[i]['masterSpecimenId'] + ' 0009'] = list9;
         }
     }
@@ -528,11 +573,13 @@ export const populateSpecimensList = async (hiddenJSON) => {
     let specimenObject = await getInstituteSpecimensList(hiddenJSON);
     const response = await searchSpecimenInstitute();
     let specimenData = response.data
+    console.log("SpecimenData!!: " + JSON.stringify(hiddenJSON))
     for(let i = 0; i < specimenData.length; i++){
         //let specimenData = 
         
     }
     let list = Object.keys(specimenObject);
+    console.log(list)
     //console.log(JSON.stringify(curr));
     //let list = ["KW123456 0008", "KW123456 0009"]
     list.sort();
@@ -587,7 +634,6 @@ export const populateBoxManifestHeader= (result) => {
 export const populateModalSelect = (hiddenJSON) => {
     let currSelectBox = document.getElementById('selectBoxList');
     let toFocus = currSelectBox.value;
-    console.log(toFocus)
     let boxList = document.getElementById('shippingModalChooseBox');
     let list = ''
     let keys = Object.keys(hiddenJSON).sort(compareBoxIds);
@@ -700,7 +746,6 @@ export const populateShippingManifestBody = (hiddenJSON) =>{
                 }
 
                 currRow.insertCell(2).innerHTML= currTube;
-                console.log(currRowIndex)
                 currRowIndex+=1;
             
             }
@@ -783,10 +828,6 @@ export const populateBoxSelectList = (hiddenJSON) => {
                         
                         let currRow = table.rows[index];
                         let currBagId = table.rows[index].cells[0].innerText;
-                        console.log('kiwju2beoiuwjvb')
-                        console.log(currBagId)
-                        console.log(boxList.value)
-
                         /*if(currRow.cells[0].innerText != ""){
                             if(index < table.rows.length-1){
                                 if(table.rows[index + 1].cells[0].innerText ==""){
@@ -796,10 +837,8 @@ export const populateBoxSelectList = (hiddenJSON) => {
                         }*/
                         table.deleteRow(index);
                         let result = await removeBag(boxList.value, [currBagId])
-                        console.log(JSON.stringify(result))
                         currRow = table.rows[index];
                         while(currRow != undefined && currRow.cells[0].innerText ==""){
-                            console.log(currRow.cells)
                             table.deleteRow(index);
                             currRow = table.rows[index];
                         }
@@ -812,7 +851,6 @@ export const populateBoxSelectList = (hiddenJSON) => {
         }
     }
     }
-    console.log(boxList.value)
     
 }
 
@@ -856,12 +894,11 @@ export const addEventAddBox = () => {
                 toPass['location'] = pageLocation;
                 await storeBox(toPass);
 
-                hiddenJSON.push({boxId:newBoxId, bags:{}})
+                hiddenJSON.push({boxId:newBoxId, bags:{}, location:pageLocation})
                 let boxJSONS = hiddenJSON;
                 
                 hiddenJSON = {};
 
-                console.log(boxJSONS)
                 for(let i = 0; i < boxJSONS.length; i++){
                     let box = boxJSONS[i]
                     if(box['location'] == pageLocation){
@@ -883,7 +920,6 @@ export const addEventBoxSelectListChanged = () => {
     let selectBoxList = document.getElementById('selectBoxList');
     selectBoxList.addEventListener("change",  async () => {
         showAnimation();
-        console.log("CHANGED");
         let currBoxId = selectBoxList.value;
         let response = await  getBoxes();
         let hiddenJSON = response.data;
@@ -895,8 +931,6 @@ export const addEventBoxSelectListChanged = () => {
             }
         }
         let currList = "";
-        console.log(selectBoxList.value);   
-        
         
         document.getElementById('BoxNumBlood').innerText = currBoxId;
         let toInsertTable = document.getElementById('currTubeTable')
@@ -923,24 +957,49 @@ export const addEventBoxSelectListChanged = () => {
                     }
                     row.insertCell(1).innerHTML= toAddId;
                     row.insertCell(2).innerHTML= toAddType;
-                    row.insertCell(3).innerHTML= '<input type="button" class="delButton" value = "remove">';
-
-                    let currDeleteButton = row.cells[3].getElementsByClassName("delButton")[0];
-                    currDeleteButton.addEventListener("click", async e => {
-                        var index = e.target.parentNode.parentNode.rowIndex;
-                        var table = e.target.parentNode.parentNode.parentNode.parentNode;
-                        
-                        let currRow = table.rows[index];
-                        
-                        if(currRow.cells[0].innerText != ""){
-                            if(index < table.rows.length-1){
-                                if(table.rows[index + 1].cells[0].innerText ==""){
-                                    table.rows[index+1].cells[0].innerText = currRow.cells[0].innerText;
+                    if(k == 0){
+                        row.insertCell(3).innerHTML='<input type="button" class="delButton" value = "remove">';
+                    }
+                    else{
+                        row.insertCell(3).innerHTML="";
+                    }
+                    //row.insertCell(3).innerHTML= '<input type="button" class="delButton" value = "remove">';
+    
+                    if(k == 0){
+                        let currDeleteButton = row.cells[3].getElementsByClassName("delButton")[0]; 
+    
+                        //This should remove the entrire bag
+                        currDeleteButton.addEventListener("click", async e => {
+                            var index = e.target.parentNode.parentNode.rowIndex;
+                            var table = e.target.parentNode.parentNode.parentNode.parentNode;
+                            
+                            let currRow = table.rows[index];
+                            let currBagId = table.rows[index].cells[0].innerText;
+                            console.log('kiwju2beoiuwjvb')
+                            console.log(currBagId)
+                            console.log(boxList.value)
+    
+                            /*if(currRow.cells[0].innerText != ""){
+                                if(index < table.rows.length-1){
+                                    if(table.rows[index + 1].cells[0].innerText ==""){
+                                        table.rows[index+1].cells[0].innerText = currRow.cells[0].innerText;
+                                    }
                                 }
+                            }*/
+                            table.deleteRow(index);
+                            let result = await removeBag(boxList.value, [currBagId])
+                            console.log(JSON.stringify(result))
+                            currRow = table.rows[index];
+                            while(currRow != undefined && currRow.cells[0].innerText ==""){
+                                console.log(currRow.cells)
+                                table.deleteRow(index);
+                                currRow = table.rows[index];
                             }
-                        }
-                        table.deleteRow(index);
-                    })
+                            
+                            //delete bag from json
+    
+                        })
+                    }
 
             }
         }

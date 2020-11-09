@@ -25,16 +25,15 @@ export const startShipping = async () => {
     let response = await  getBoxes();
     let boxJSONS = response.data;
     let hiddenJSON = {};
-    console.log(boxJSONS)
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
         hiddenJSON[box['boxId']] = box['bags']
     }
 
+
     response = await  getAllBoxes();
     boxJSONS = response.data;
     let hiddenJSON1 = {};
-    console.log(boxJSONS)
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
         hiddenJSON1[box['boxId']] = box['bags']
@@ -46,7 +45,6 @@ export const startShipping = async () => {
         hiddenJSON = JSON.parse(document.getElementById('shippingHiddenTable').innerText);
     }
 */
-    console.log(JSON.stringify(hiddenJSON));
     let template = `
         <div id="shippingHiddenTable" style="display:none">
         {}
@@ -212,7 +210,6 @@ export const boxManifest = async (boxId) => {
     let response = await  getBoxes();
     let boxJSONS = response.data;
     let hiddenJSON = {};
-    console.log(boxJSONS)
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
         hiddenJSON[box['boxId']] = box['bags']
@@ -292,7 +289,6 @@ export const shippingManifest = async (boxesToShip) => {
     let response = await  getBoxes();
     let boxJSONS = response.data;
     let hiddenJSON = {};
-    console.log(boxJSONS)
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
         hiddenJSON[box['boxId']] = box['bags']
@@ -303,8 +299,6 @@ export const shippingManifest = async (boxesToShip) => {
         let currBox = boxesToShip[i];
         toDisplayJSON[currBox] = hiddenJSON[currBox];
     }
-
-    console.log(JSON.stringify(hiddenJSON));
 
     let template = `
         </br>
@@ -393,7 +387,9 @@ export const shipmentTracking = (hiddenJSON) => {
         hiddenJSON = JSON.parse(document.getElementById('shippingHiddenTable').innerText);
     }
 */
-    console.log(JSON.stringify(hiddenJSON));
+
+
+
     let template = `
         <div id="shippingHiddenTable" style="display:none">
         {}
@@ -455,7 +451,6 @@ export const finalShipmentTracking = (hiddenJSON) => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     //store a secret json that has all of the packed ones in it
     //{"Box1":{specimenId:[allTubes], specimenId:[allTubes]}}
-    console.log(JSON.stringify(hiddenJSON));
     let template = `
         <div id="shippingHiddenTable" style="display:none">
         {}

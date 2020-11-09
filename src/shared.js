@@ -251,6 +251,7 @@ export const getBoxes = async (box) =>{
     let toReturn  = {};
     toReturn["data"] = [];
     let data = res.data;
+    console.log("DATA!: " + JSON.stringify(data))
     for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
         if(!currJSON.hasOwnProperty("shipped") || currJSON["shipped"] != true){
