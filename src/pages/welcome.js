@@ -69,8 +69,10 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
         window.history.replaceState({},'', './#dashboard');
         userDashboard(auth, route, true);
     });
-    document.getElementById('btnShipping').addEventListener('click', () => {
-        window.history.replaceState({},'', './#dashboard');
-        shippingDashboard(auth, route, true);
+    document.getElementById('btnShipping').addEventListener('click',  async () => {
+        //window.history.replaceState({},'', './#shipping');
+        location.hash = '#shipping';
+        //console.log('LMAO')
+        //shippingDashboard(auth, route, true);
     });
 }

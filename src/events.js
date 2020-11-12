@@ -112,12 +112,11 @@ export const addEventAddSpecimenToBox = () => {
         e.preventDefault();
         
         showAnimation();
-       
+        console.log("owiheoiwebvoewikjmcv ")
 
         //getCurrBoxNumber
 
         const masterSpecimenId = document.getElementById('masterSpecimenId').value;
-        //showAnimation();
         let mouthwashList = document.getElementById("mouthwashList")
         let currTubeTable = document.getElementById("currTubeTable")
 
@@ -476,10 +475,10 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex)=>{
 }
 
 export const getInstituteSpecimensList = async(hiddenJSON) => {
+    console.log('called getInstitute')
     const response = await searchSpecimenInstitute();
     let specimenData = response.data;
     let toReturn = {};
-    console.log('specimenData!!!: ' + JSON.stringify(specimenData))
     for(let i = 0; i < specimenData.length; i++){
         let toExclude8 = [];
         let toExclude9 = [];
@@ -521,9 +520,6 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                             }
                         }
                         else{
-                            console.log(toExclude9);
-                            console.log(specimenData[i][currKey])
-                            console.log(toExclude9.indexOf(specimenData[i][currKey]))
                             if(toExclude9.indexOf(specimenData[i][currKey]) == -1){
                                 list9.push(specimenData[i][currKey]);
                             }
@@ -532,12 +528,13 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 }
             }
         }
+        console.log(JSON.stringify(toReturn))
         if(toExclude8.length > 0 && list8.length > 0 && specimenData[i].hasOwnProperty('masterSpecimenId')){
             //add orphan tubes
-            let toInsert = {};
             
-            toInsert[specimenData[i]['masterSpecimenId'] + ' 0008'] = list8
-            if(!toReturn.hasOwnProperty['orphans']){
+            //toInsert[specimenData[i]['masterSpecimenId'] + ' 0008'] = list8
+            if(!toReturn.hasOwnProperty('orphans')){
+                //console.log(JSON.stringify(toReturn))
                 toReturn['orphans'] = []
             }
             for(let j = 0; j < list8.length; j++){
@@ -546,10 +543,9 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
 
         }
         if(toExclude9.length > 0 && list9.length > 0 && specimenData[i].hasOwnProperty('masterSpecimenId')){
-            let toInsert = {};
             
-            toInsert[specimenData[i]['masterSpecimenId'] + ' 0008'] = list9
-            if(!toReturn.hasOwnProperty['orphans']){
+            if(!toReturn.hasOwnProperty('orphans')){
+                //console.log(JSON.stringify(toReturn))
                 toReturn['orphans'] = []
             }
             for(let j = 0; j < list9.length; j++){
@@ -564,12 +560,12 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
             toReturn[specimenData[i]['masterSpecimenId'] + ' 0009'] = list9;
         }
     }
+    
     return toReturn;
 }
 
 export const populateSpecimensList = async (hiddenJSON) => {
-    
-    showAnimation();
+    console.log('CALLED')
     let specimenObject = await getInstituteSpecimensList(hiddenJSON);
     const response = await searchSpecimenInstitute();
     let specimenData = response.data
@@ -585,6 +581,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
     list.sort();
     
     var specimenList = document.getElementById("specimenList");
+    specimenList.innerHTML = '';
     let orphansIndex = -1;
     
 
@@ -629,7 +626,6 @@ export const populateSpecimensList = async (hiddenJSON) => {
     var row = specimenList.insertRow(rowCount);
         
     //put in orphans
-    hideAnimation();
     /*
     for(let i = 0; i < list.length; i++){
         var option = document.createElement("option");
@@ -1558,10 +1554,11 @@ export const addEventNavBarSpecimenSearch = () => {
 
 export const addEventNavBarShipment = (id) => {
     const btn = document.getElementById(id);
-    btn.addEventListener('click', e => {
+    btn.addEventListener('click', async e => {
         e.stopPropagation();
         if(btn.classList.contains('active')) return;
-        startShipping();
+        await startShipping();
+        
     });
 }
 
@@ -1704,7 +1701,7 @@ export const addEventCompleteShippingButton = (hiddenJSON) => {
             let boxes = Object.keys(hiddenJSON);
             console.log(JSON.stringify(boxes));
             await ship(boxes);
-            startShipping();
+            await startShipping();
         }
         else{
             let errorMessage = document.getElementById('finalizeModalError');

@@ -18,7 +18,7 @@ window.onload = () => {
     };
     !firebase.apps.length ? firebase.initializeApp(firebaseConfig()) : firebase.app();
     auth = firebase.auth();
-    location.hash = '#welcome';
+    //location.hash = '#welcome';
     manageRoutes();
 }
 
@@ -29,6 +29,7 @@ window.onhashchange = () => {
 const manageRoutes = async () => {
     const route =  window.location.hash || '#';
     if(await userLoggedIn()){
+        console.log('route: ' + route)
         if (route === '#dashboard') userDashboard(auth, route);
         else if(route === "#shipping") shippingDashboard(auth,route);
         else if (route === '#welcome') welcomeScreen(auth, route);

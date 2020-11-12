@@ -1,9 +1,10 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation} from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation} from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
+    console.log('LMAO1')
     auth.onAuthStateChanged(async user => {
         if(user){
             const role = await userAuthorization(route, user.displayName);
@@ -163,7 +164,7 @@ export const startShipping = async () => {
     option.text = "Kiwi";
     x.add(option);*/
     
-    
+    showAnimation();
     removeActiveClass('navbar-btn', 'active')
     document.getElementById('contentHeader').innerHTML = shippingNavBar();
     const navBarBtn = document.getElementById('navBarShippingDash');
@@ -171,12 +172,8 @@ export const startShipping = async () => {
     document.getElementById('contentBody').innerHTML = template;
     await populateSelectLocationList();
     
-    if(Object.keys(hiddenJSON).length > 0){
-        document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
-    }
-    
     populateSaveTable(hiddenJSON);
-    populateSpecimensList(hiddenJSON1);
+    await populateSpecimensList(hiddenJSON1);
 
     let currLocation = document.getElementById('selectLocationList').value;
 
@@ -188,19 +185,17 @@ export const startShipping = async () => {
         hiddenJSONLocation[box['boxId']] = box['bags']
     }
     populateBoxSelectList(hiddenJSONLocation);
+
     addEventNavBarShipment("navBarShippingDash");
-    //addEventNavBarBoxManifest("viewBoxManifestMouthwash")
-    //addEventNavBarBoxManifest("viewBoxManifestBlood")
     addEventNavBarShippingManifest();
     addEventAddBox();
     addEventBoxSelectListChanged();
     addEventNavBarBoxManifest("navBarBoxManifest")
     addEventChangeLocationSelect();
-    
-
     addEventAddSpecimenToBox();
-    //addEventBackToSearch('navBarShippingDash');
     addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
+
+    hideAnimation();
     //addEventSubmitAddBag();
     
 }
