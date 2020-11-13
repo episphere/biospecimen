@@ -32,9 +32,6 @@ export const checkOutScreen = (data, specimenData) => {
                     <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <button class="btn btn-outline-primary qr-code-dashboard" data-toggle="modal" data-target="#biospecimenModal">QR Code</button>
-            </div>
         </div>
         <div class="row info-row">
             <div class="col-md-3">
@@ -42,9 +39,6 @@ export const checkOutScreen = (data, specimenData) => {
                     <div class="row"><span class="full-width">Mouthwash Questionnaire</span></div>
                     <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <button class="btn btn-outline-primary qr-code-dashboard" data-toggle="modal" data-target="#biospecimenModal">QR Code</button>
             </div>
         </div>
         <div class="row info-row">
