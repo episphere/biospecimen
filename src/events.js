@@ -131,7 +131,7 @@ export const addEventAddSpecimenToBox = () => {
         <table class="table" id="shippingModalTable">
             <thead>
                 <tr>
-                    <th>Tube Id</th>
+                    <th>Tube ID</th>
                     <th>Type</th>
                     <th></th>
                 </tr>
@@ -1285,7 +1285,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     hideAnimation();
     if(cont) {
         if(specimenData && specimenData.connectId && parseInt(specimenData.connectId) !== data.Connect_ID) {
-            showNotifications({title: 'Master Specimen Id Duplication', body: 'Entered master specimen Id is already associated with a different connect Id.'}, true)
+            showNotifications({title: 'Master Specimen ID Duplication', body: 'Entered master specimen ID is already associated with a different connect ID.'}, true)
         }
         else {
             showAnimation();
@@ -1296,7 +1296,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     }
     else {
         if(specimenData && specimenData.connectId && parseInt(specimenData.connectId) !== data.Connect_ID) {
-            showNotifications({title: 'Master Specimen Id Duplication', body: 'Entered master specimen Id is already associated with a different connect Id.'}, true)
+            showNotifications({title: 'Master Specimen ID Duplication', body: 'Entered master specimen ID is already associated with a different connect ID.'}, true)
         }
         else {
             showAnimation();
@@ -1369,22 +1369,22 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         const tubeID = value.substr(10, 14);
         if(input.required && value.length !== 14) {
             hasError = true;
-            errorMessage(input.id, 'Combination of Master Specimen Id and Tube Id should be 14 characters long.', focus);
+            errorMessage(input.id, 'Combination of Master Specimen ID and Tube ID should be 14 characters long.', focus);
             focus = false;
         }
         else if(input.required && masterID !== biospecimenData.masterSpecimenId) {
             hasError = true;
-            errorMessage(input.id, 'Invalid Master Specimen Id.', focus);
+            errorMessage(input.id, 'Invalid Master Specimen ID.', focus);
             focus = false;
         }
         else if(input.required && tubes.length === 0) {
             hasError = true;
-            errorMessage(input.id, 'Invalid Tube Id.', focus);
+            errorMessage(input.id, 'Invalid Tube ID.', focus);
             focus = false;
         }
         else if(input.required && (tubes[0].id !== tubeID && !additionalTubeIDRequirement.regExp.test(tubeID))) {
             hasError = true;
-            errorMessage(input.id, 'Invalid Tube Id.', focus);
+            errorMessage(input.id, 'Invalid Tube ID.', focus);
             focus = false;
         }
         data[`${input.id}`] = tubeID;

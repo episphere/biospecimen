@@ -51,8 +51,8 @@ export const searchTemplate = (goToSpecimenSearch) => {
                 <div class="row form-row">
                     <form id="search4" method="POST">
                         <div class="form-group">
-                            <label class="col-form-label search-label">Connect Id</label>
-                            <input class="form-control" autocomplete="off" required type="text" maxlength="10" id="connectId" placeholder="Enter Connect Id"/>
+                            <label class="col-form-label search-label">Connect ID</label>
+                            <input class="form-control" autocomplete="off" required type="text" maxlength="10" id="connectId" placeholder="Enter ConnectID"/>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>
@@ -66,7 +66,7 @@ export const searchTemplate = (goToSpecimenSearch) => {
                         <form id="search2" method="POST">
                             <div class="form-group">
                                 <label class="col-form-label search-label">Email</label>
-                                <input class="form-control" required autocomplete="off" type="email" id="email" placeholder="Enter Email Id"/>
+                                <input class="form-control" required autocomplete="off" type="email" id="email" placeholder="Enter email"/>
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-outline-primary">Search</button>
@@ -153,7 +153,7 @@ export const searchResults = (result) => {
                         <th>Middle initial</th>
                         <th>Date of birth</th>
                         <th>Address</th>
-                        <th>Connect Id</th>
+                        <th>Connect ID</th>
                     </tr>
                 </thead>
                 <tbody>`
