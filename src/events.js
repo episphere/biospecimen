@@ -1501,7 +1501,7 @@ const finalizeHandler = async (data, masterSpecimenId, cntd) => {
         formData['finalizedAt'] = new Date().toISOString();
         showAnimation();
         await storeSpecimen([formData]);
-        showNotifications({title: 'Specimen Finalized', body: 'Specimen finalized successfully!'});
+        showNotifications({title: 'Specimen Finalized', body: 'Collection Finalized Successfully!'});
         const specimenData = (await searchSpecimen(masterSpecimenId)).data;
         let query = `connectId=${parseInt(specimenData.connectId)}`;
         const response = await findParticipant(query);
