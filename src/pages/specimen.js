@@ -39,8 +39,8 @@ export const specimenTemplate = (data, formData) => {
                 template +=` 
             </div>
             <div class="form-group row">
-                <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan Master Specimen ID</label>
-                <input autocomplete="off" type="text" class="form-control col-md-5 disabled" disabled placeholder="Scan in Master Specimen ID from Label Sheet Label" id="scanSpecimenID"/> 
+                <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan Collection ID</label>
+                <input autocomplete="off" type="text" class="form-control col-md-5 disabled" disabled placeholder="Scan in Collection ID from Label Sheet Label" id="scanSpecimenID"/> 
                 <button class="barcode-btn-outside" type="button" id="scanSpecimenIDBarCodeBtn" data-barcode-input="scanSpecimenID"><i class="fas fa-barcode"></i></button>
                 <button class="barcode-input-clear" hidden="true" type="button" id="clearScanSpecimenID" title="Clear scanned barcode" data-barcode-input="scanSpecimenID"><i class="fas fa-times"></i></button>
             </div>
@@ -49,20 +49,20 @@ export const specimenTemplate = (data, formData) => {
                 If it can't be scanned:
             </div>
             <div class="form-group row">
-                <label class="col-md-4 col-form-label" for="enterSpecimenID1">Manually Enter Master Specimen ID</label>
-                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Manually Enter in Master Specimen ID from Label Sheet Label" id="enterSpecimenID1"/>
+                <label class="col-md-4 col-form-label" for="enterSpecimenID1">Manually Enter Collection ID</label>
+                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Manually Enter in Collection ID from Label Sheet Label" id="enterSpecimenID1"/>
             </div>
             <div class="form-group row">
-                <label class="col-md-4 col-form-label" for="enterSpecimenID2">Re-enter Master Specimen ID</label>
-                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Re-enter Master Specimen ID" id="enterSpecimenID2"/>
+                <label class="col-md-4 col-form-label" for="enterSpecimenID2">Re-enter Collection ID</label>
+                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Re-enter Collection ID" id="enterSpecimenID2"/>
             </div>
 
             <div class="form-group row">
-                Is the Master Specimen ID correct for the participant?
+                Is the Collection ID correct for the participant?
             </div>
             <div class="form-group row">
                 <div class="col-auto">
-                    <button class="btn btn-outline-danger" id="reEnterSpecimen">No: Re-enter Master Specimen ID</button>
+                    <button class="btn btn-outline-danger" id="reEnterSpecimen">No: Re-enter Collection ID</button>
                 </div>
                 <div class="ml-auto">
                     <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="submit" id="specimenSaveExit">Yes: Save and Exit</button>

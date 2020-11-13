@@ -18,7 +18,7 @@ export const finalizeTemplate = (data, specimenData) => {
             <div class="col">
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
-                <div class="row">Master Specimen ID: ${specimenData.masterSpecimenId}</div>
+                <div class="row">Collection ID: ${specimenData.masterSpecimenId}</div>
                 <div class="row">Specimen Collection Date & Time: ${new Date(specimenData.tubeCollectedAt).toLocaleString()}</div>
             </div>
             ${specimenData.visitType ? `
@@ -35,7 +35,7 @@ export const finalizeTemplate = (data, specimenData) => {
                     <tr>
                         <th>Tube Type</th>
                         ${document.getElementById('contentBody').dataset.workflow && document.getElementById('contentBody').dataset.workflow === 'clinical' ? `<th>Received</th>`:`<th>Collected</th>`}
-                        <th>Tube ID</th>
+                        <th>Full Specimen ID</th>
                         <th>Deviation</th>
                         <th>Comment</th>
                     </tr>

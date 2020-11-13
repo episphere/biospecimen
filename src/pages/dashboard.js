@@ -105,17 +105,17 @@ export const searchBiospecimenTemplate = () => {
     let template = `
         <div class="row">
             <div class="col-lg">
-                <h5>Specimen Lookup</h5>
+                <h5>Collection Lookup</h5>
             </div>
         </div>
         <div class="row">
             <div class="col-lg">
-                Find by Specimen ID
+                Find by Collection ID
                 <div class="row form-row">
                     <form id="specimenLookupForm" method="POST">
                         <div class="form-group">
-                            <label class="search-label">Master Specimen ID</label>
-                            <input class="form-control" autocomplete="off" required type="text" id="masterSpecimenId" placeholder="Enter/Scan Specimen ID"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
+                            <label class="search-label">Collection ID</label>
+                            <input class="form-control" autocomplete="off" required type="text" id="masterSpecimenId" placeholder="Enter/Scan Collection ID"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>

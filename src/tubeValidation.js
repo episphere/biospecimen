@@ -316,7 +316,7 @@ export const siteSpecificTubeRequirements = {
     }
 }
 
-// master specimen id eg: CAX123456
+// Collection ID eg: CAX123456
 export const masterSpecimenIDRequirement = {
     regExp: /^CXA+[0-9]{6}$/,
     length: 9
