@@ -80,7 +80,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                 </div>
                 <div class="form-group row">
                     <div class="col">
-                        <label for="${ele.id}Explanation">Provide deviation detials</label>
+                        <label for="${ele.id}Explanation">Provide deviation details</label>
                         </br>
                         <textarea required rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData[`${ele.id}Explanation`] ? biospecimenData[`${ele.id}Explanation`] : '' }</textarea>
                     </div>
