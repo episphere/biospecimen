@@ -328,6 +328,21 @@ export const searchSpecimenInstitute = async () => {
     return response.json();
 }
 
+export const removeMissingSpecimen = async (tubeId) => {
+    //https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
+    let toPass = {tubeId: tubeId};
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=reportMissingSpecimen`, {
+        method: "POST",
+        headers: {
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(toPass)
+    });
+    return await response.json();
+}
+
 export const getLocationsInstitute = async () => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getLocations`, {

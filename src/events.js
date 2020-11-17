@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, getIdToken, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, getIdToken, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking} from './pages/shipping.js';
 import { userListTemplate } from './pages/users.js';
@@ -112,8 +112,6 @@ export const addEventAddSpecimenToBox = () => {
         e.preventDefault();
         
         showAnimation();
-        console.log("owiheoiwebvoewikjmcv ")
-
         //getCurrBoxNumber
 
         const masterSpecimenId = document.getElementById('masterSpecimenId').value;
@@ -142,16 +140,28 @@ export const addEventAddSpecimenToBox = () => {
 
         //get all ids from the hidden
         let shippingTable = document.getElementById('specimenList')
+        let orphanTable = document.getElementById('orphansList')
         let biospecimensList = []
         let tableIndex = -1;
+        let foundInShipping = false;
         for(let i = 1; i < shippingTable.rows.length; i++){
             let currRow = shippingTable.rows[i];
             if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
                 console.log(currRow.cells[2].innerText)
                 tableIndex = i;
                 biospecimensList = JSON.parse(currRow.cells[2].innerText)
-                
+                foundInShipping = true;
             }
+            
+        }
+        for(let i = 1; i < shippingTable.rows.length; i++){
+            let currRow = shippingTable.rows[i];
+            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
+                console.log(currRow.cells[2].innerText)
+                tableIndex = i;
+                biospecimensList = JSON.parse(currRow.cells[2].innerText)
+            }
+            
         }
 
         if(biospecimensList.length == 0){
@@ -162,6 +172,7 @@ export const addEventAddSpecimenToBox = () => {
             document.getElementById('shippingCloseButton').click();
             return
         }
+
         biospecimensList.sort();
         await createShippingModalBody(biospecimensList, masterSpecimenId)
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex);
@@ -478,6 +489,7 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
     console.log('called getInstitute')
     const response = await searchSpecimenInstitute();
     let specimenData = response.data;
+    console.log(JSON.stringify('apeuidbvaosidvbasd;vkbasv:    '  + specimenData))
     let toReturn = {};
     for(let i = 0; i < specimenData.length; i++){
         let toExclude8 = [];
@@ -511,8 +523,41 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 //get number of the tube
                 let tubeNum = currKey.substring(4, currKey.indexOf("Id"));
                 let shippedKey = keys.indexOf('tube'+tubeNum+'Shipped')
+                let missingKey = keys.indexOf('tube'+tubeNum+'Missing')
                 if(shippedKey != -1){
                     if(specimenData[i][keys[shippedKey]] == false){
+                        if(missingKey != -1){
+                            if(specimenData[i][keys[missingKey]] == false){
+                                if(specimenData[i][currKey] != '0007'){
+                                    
+                                    if(toExclude8.indexOf(specimenData[i][currKey]) == -1){
+                                        list8.push(specimenData[i][currKey])
+                                    }
+                                }
+                                else{
+                                    if(toExclude9.indexOf(specimenData[i][currKey]) == -1){
+                                        list9.push(specimenData[i][currKey]);
+                                    }
+                                }
+                            }
+                        }
+                        else{
+                            if(specimenData[i][currKey] != '0007'){
+                                
+                                if(toExclude8.indexOf(specimenData[i][currKey]) == -1){
+                                    list8.push(specimenData[i][currKey])
+                                }
+                            }
+                            else{
+                                if(toExclude9.indexOf(specimenData[i][currKey]) == -1){
+                                    list9.push(specimenData[i][currKey]);
+                                }
+                            }
+                        }
+                    }
+                }
+                if(missingKey != -1){
+                    if(specimenData[i][keys[missingKey]] == false){
                         if(specimenData[i][currKey] != '0007'){
                             
                             if(toExclude8.indexOf(specimenData[i][currKey]) == -1){
@@ -569,7 +614,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
     let specimenObject = await getInstituteSpecimensList(hiddenJSON);
     const response = await searchSpecimenInstitute();
     let specimenData = response.data
-    console.log("SpecimenData!!: " + JSON.stringify(hiddenJSON))
+    console.log("SpecimenData!!: " + JSON.stringify(specimenData))
     for(let i = 0; i < specimenData.length; i++){
         //let specimenData = 
         
@@ -581,7 +626,10 @@ export const populateSpecimensList = async (hiddenJSON) => {
     list.sort();
     
     var specimenList = document.getElementById("specimenList");
-    specimenList.innerHTML = '';
+    specimenList.innerHTML = `<tr>
+                                <th>Specimen Bag ID</th>
+                                <th># Specimens</th>
+                            </th>`;
     let orphansIndex = -1;
     
 
@@ -600,27 +648,73 @@ export const populateSpecimensList = async (hiddenJSON) => {
             orphansIndex = i;
         }
     }
+    
+    let orphanPanel = document.getElementById('orphansPanel');
+    let orphanTable = document.getElementById('orphansList')
+    let specimenPanel = document.getElementById('specimenPanel')
+    
+
     if(orphansIndex != -1){
+
+        orphanPanel.style.display = 'block'
+        specimenPanel.style.height = '400px'
+        
         let toInsert = specimenObject['orphans'];
         console.log('ORPHANS: ' + JSON.stringify(toInsert))
-        var rowCount = specimenList.rows.length;
-        var row = specimenList.insertRow(rowCount);
-        row.insertCell(0).innerHTML= ' ';
-        row.insertCell(1).innerHTML = ' ';
-        rowCount = specimenList.rows.length;
-        row = specimenList.insertRow(rowCount); 
+        var rowCount = orphanTable.rows.length;
+        var row = orphanTable.insertRow(rowCount); 
         row.insertCell(0).innerHTML= 'Orphan tubes';
         row.insertCell(1).innerHTML = toInsert.length;
         let hiddenChannel = row.insertCell(2)
         hiddenChannel.innerHTML = JSON.stringify(toInsert);
         hiddenChannel.style.display = "none";
         for(let i = 0; i < toInsert.length; i++){
-            rowCount = specimenList.rows.length;
-            row = specimenList.insertRow(rowCount); 
+            rowCount = orphanTable.rows.length;
+            row = orphanTable.insertRow(rowCount); 
             console.log(toInsert[i])
             row.insertCell(0).innerHTML= toInsert[i];
-            row.insertCell(1).innerHTML = ' ';
+            row.insertCell(1).innerHTML ='<input type="button" class="delButton" value = "Report as Missing"/>';
+        
+            //boxes[i]
+    
+            //let currBoxButton = currRow.cells[5].getElementsByClassName("delButton")[0];
+            let currDeleteButton = row.cells[1].getElementsByClassName("delButton")[0]; 
+    
+            //This should remove the entrire bag
+            currDeleteButton.addEventListener("click", async e => {
+                var index = e.target.parentNode.parentNode.rowIndex;
+                var table = e.target.parentNode.parentNode.parentNode.parentNode;
+                
+                let currRow = table.rows[index];
+                let currTubeId = table.rows[index].cells[0].innerText;
+                console.log(currTubeId);
+                /*if(currRow.cells[0].innerText != ""){
+                    if(index < table.rows.length-1){
+                        if(table.rows[index + 1].cells[0].innerText ==""){
+                            table.rows[index+1].cells[0].innerText = currRow.cells[0].innerText;
+                        }
+                    }
+                }*/
+                table.deleteRow(index);
+                let result = await removeMissingSpecimen(currTubeId);
+                console.log(result)
+                //let result = await removeBag(boxList.value, [currBagId])
+                //console.log(JSON.stringify(result))
+                currRow = table.rows[index];
+                while(currRow != undefined && currRow.cells[0].innerText ==""){
+                    console.log(currRow.cells)
+                    table.deleteRow(index);
+                    currRow = table.rows[index];
+                }
+                
+                //delete bag from json
+
+            })
         }
+    }
+    else{
+        orphanPanel.style.display = 'none'
+        specimenPanel.style.height = '600px'
     }
     var rowCount = specimenList.rows.length;
     var row = specimenList.insertRow(rowCount);

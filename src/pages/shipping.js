@@ -20,6 +20,7 @@ export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
 
 
 export const startShipping = async () => {
+    showAnimation();
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     //store a secret json that has all of the packed ones in it
     //{"Box1":{specimenId:[allTubes], specimenId:[allTubes]}}
@@ -79,12 +80,17 @@ export const startShipping = async () => {
         </div>
         <div class="row">
     <div class="col-sm">
-    <div class="panel panel-default" style="border-style:solid;height:600px;border-width:1px;overflow:auto;">
+    <div class="panel panel-default" style="border-style:solid;height:400px;border-width:1px;overflow:auto;" id="specimenPanel">
             <table class = "table" style="width: 100%" id="specimenList" >
                 <tr>
                     <th>Specimen Bag ID</th>
                     <th># Specimens</th>
-                </th>
+                </tr>
+            </table>
+    </div>
+    <div class="panel panel-default" style="border-style:solid;height:150px;border-width:1px;overflow:auto;margin-top:50px" id="orphansPanel">
+            <table class = "table" style="width: 100%" id="orphansList" >
+                
             </table>
     </div>
     </div>
@@ -164,7 +170,7 @@ export const startShipping = async () => {
     option.text = "Kiwi";
     x.add(option);*/
     
-    showAnimation();
+    
     removeActiveClass('navbar-btn', 'active')
     document.getElementById('contentHeader').innerHTML = shippingNavBar();
     const navBarBtn = document.getElementById('navBarShippingDash');
@@ -201,7 +207,7 @@ export const startShipping = async () => {
 }
 
 export const boxManifest = async (boxId) => {    
-
+    showAnimation();
     let response = await  getBoxes();
     let boxJSONS = response.data;
     let hiddenJSON = {};
@@ -266,12 +272,13 @@ export const boxManifest = async (boxId) => {
 
     document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(hiddenJSON);
     
-    addEventNavBarShipment("returnToPackaging");
+    //addEventNavBarShipment("returnToPackaging");
     //document.getElementById('boxManifestTable').appendChild(result);
     populateBoxManifestHeader(boxId,hiddenJSON);
     populateBoxManifestTable(boxId,hiddenJSON);
     addEventNavBarShipment("returnToPackaging");
-    addEventNavBarShippingManifest();
+    //addEventNavBarShippingManifest();
+    hideAnimation();
     //addEventNavBarShipment("navBarShippingDash");
     //addEventSelectParticipantForm();
     //addEventBackToSearch('backToSearch');
