@@ -51,8 +51,8 @@ export const searchTemplate = (goToSpecimenSearch) => {
                 <div class="row form-row">
                     <form id="search4" method="POST">
                         <div class="form-group">
-                            <label class="col-form-label search-label">Connect Id</label>
-                            <input class="form-control" autocomplete="off" required type="text" maxlength="10" id="connectId" placeholder="Enter Connect Id"/>
+                            <label class="col-form-label search-label">Connect ID</label>
+                            <input class="form-control" autocomplete="off" required type="text" maxlength="10" id="connectId" placeholder="Enter ConnectID"/>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>
@@ -66,7 +66,7 @@ export const searchTemplate = (goToSpecimenSearch) => {
                         <form id="search2" method="POST">
                             <div class="form-group">
                                 <label class="col-form-label search-label">Email</label>
-                                <input class="form-control" required autocomplete="off" type="email" id="email" placeholder="Enter Email Id"/>
+                                <input class="form-control" required autocomplete="off" type="email" id="email" placeholder="Enter email"/>
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-outline-primary">Search</button>
@@ -105,17 +105,17 @@ export const searchBiospecimenTemplate = () => {
     let template = `
         <div class="row">
             <div class="col-lg">
-                <h5>Specimen Lookup</h5>
+                <h5>Collection Lookup</h5>
             </div>
         </div>
         <div class="row">
             <div class="col-lg">
-                Find by Specimen ID
+                Find by Collection ID
                 <div class="row form-row">
                     <form id="specimenLookupForm" method="POST">
                         <div class="form-group">
-                            <label class="search-label">Master Specimen ID</label>
-                            <input class="form-control" autocomplete="off" required type="text" id="masterSpecimenId" placeholder="Enter/Scan Specimen ID"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
+                            <label class="search-label">Collection ID</label>
+                            <input class="form-control" autocomplete="off" required type="text" id="masterSpecimenId" placeholder="Enter/Scan Collection ID"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>
@@ -149,11 +149,11 @@ export const searchResults = (result) => {
                     <tr>
                         <th>Select</th>
                         <th>Last name</th>
-                        <th>Middle initial</th>
                         <th>First name</th>
+                        <th>Middle initial</th>
                         <th>Date of birth</th>
                         <th>Address</th>
-                        <th>Connect Id</th>
+                        <th>Connect ID</th>
                     </tr>
                 </thead>
                 <tbody>`
@@ -162,8 +162,8 @@ export const searchResults = (result) => {
             <tr>
                 <td><input type="radio" name="selectParticipant" required data-token=${data.token} value="${data.Connect_ID}"></td>
                 <td>${data.RcrtUP_Lname_v1r0}</td>
-                <td>${data.RcrtUP_Minitial_v1r0}</td>
                 <td>${data.RcrtUP_Fname_v1r0}</td>
+                <td>${data.RcrtUP_Minitial_v1r0}</td>
                 <td>${data.RcrtUP_MOB_v1r0}/${data.RcrtUP_BD_v1r0}/${data.RcrtUP_YOB_v1r0}</td>
                 <td>${data.RcrtUP_AddressLn1_v1r0} ${data.RcrtUP_AddressLn2_v1r0 ? data.RcrtUP_AddressLn2_v1r0 : ''}</br>${data.RcrtUP_City_v1r0} ${Object.keys(allStates)[Object.values(allStates).indexOf(parseInt(data.RcrtUP_State_v1r0))]} ${data.RcrtUP_Zip_v1r0}</td>
                 <td>${data.Connect_ID}</td>

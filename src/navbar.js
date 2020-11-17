@@ -155,7 +155,7 @@ export const bodyNavBar = () => {
                 <button class="nav-link disabled navbar-btn" id="navBarSpecimenProcess">${workflow && workflow === 'clinical' ? `Labeling and Receipt`: `Collect/Process`}</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link disabled navbar-btn" id="navBarSpecimenFinalize">${workflow && workflow === 'clinical' ? `Receipt Summary`: `Ready for Shipment`}</button>
+                <button class="nav-link disabled navbar-btn" id="navBarSpecimenFinalize">${workflow && workflow === 'clinical' ? `Receipt Summary`: `Review`}</button>
             </li>
             ${workflow && workflow === 'clinical' ? ``:`
                 <li class="nav-item">

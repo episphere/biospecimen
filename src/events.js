@@ -71,7 +71,7 @@ export const addEventsearchSpecimen = () => {
         removeAllErrors();
         const masterSpecimenId = document.getElementById('masterSpecimenId').value;
         if(!masterSpecimenIDRequirement.regExp.test(masterSpecimenId) || masterSpecimenId.length !== masterSpecimenIDRequirement.length) {
-            errorMessage('masterSpecimenId', 'Specimen ID must be 9 characters long and in CXA123456 format.', true);
+            errorMessage('masterSpecimenId', 'Collection ID must be 9 characters long and in CXA123456 format.', true);
             return;
         }
         showAnimation();
@@ -129,7 +129,7 @@ export const addEventAddSpecimenToBox = () => {
         <table class="table" id="shippingModalTable">
             <thead>
                 <tr>
-                    <th>Tube Id</th>
+                    <th>Tube ID</th>
                     <th>Type</th>
                     <th></th>
                 </tr>
@@ -1335,22 +1335,22 @@ const btnsClicked = async (connectId, formData, cont) => {
     
     if(scanSpecimenID && enterSpecimenID1){
         hasError = true;
-        errorMessage('scanSpecimenID', 'Please Provide either Scanned Specimen ID or Manually typed.', focus);
+        errorMessage('scanSpecimenID', 'Please Provide either Scanned Collection ID or Manually typed.', focus);
         focus = false;
-        errorMessage('enterSpecimenID1', 'Please Provide either Scanned Specimen ID or Manually typed.', focus);
+        errorMessage('enterSpecimenID1', 'Please Provide either Scanned Collection ID or Manually typed.', focus);
         return;
     }
     else if(!scanSpecimenID && !enterSpecimenID1){
         hasError = true;
-        errorMessage('scanSpecimenID', 'Please Scan Master Specimen ID or Type in Manually', focus);
+        errorMessage('scanSpecimenID', 'Please Scan Collection ID or Type in Manually', focus);
         focus = false;
-        errorMessage('enterSpecimenID1', 'Please Scan Master Specimen ID or Type in Manually', focus);
+        errorMessage('enterSpecimenID1', 'Please Scan Collection ID or Type in Manually', focus);
         return;
     }
     else if(scanSpecimenID && !enterSpecimenID1) {
         if(!masterSpecimenIDRequirement.regExp.test(scanSpecimenID) || scanSpecimenID.length !== masterSpecimenIDRequirement.length) {
             hasError = true;
-            errorMessage('scanSpecimenID', 'Specimen ID must be 9 characters long and in CXA123456 format.', focus);
+            errorMessage('scanSpecimenID', 'Collection ID must be 9 characters long and in CXA123456 format.', focus);
             focus = false;
             return;
         }
@@ -1358,13 +1358,13 @@ const btnsClicked = async (connectId, formData, cont) => {
     else if(!scanSpecimenID && enterSpecimenID1) {
         if(!masterSpecimenIDRequirement.regExp.test(enterSpecimenID1) || enterSpecimenID1.length !== masterSpecimenIDRequirement.length) {
             hasError = true;
-            errorMessage('enterSpecimenID1', 'Specimen ID must be 9 characters long and in CXA123456 format.', focus);
+            errorMessage('enterSpecimenID1', 'Collection ID must be 9 characters long and in CXA123456 format.', focus);
             focus = false;
             return;
         }
         if(enterSpecimenID1 !== enterSpecimenID2) {
             hasError = true;
-            errorMessage('enterSpecimenID2', 'Does not match with Manually Entered Specimen ID', focus);
+            errorMessage('enterSpecimenID2', 'Does not match with Manually Entered Collection ID', focus);
             return;
         }
     }
@@ -1379,7 +1379,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     hideAnimation();
     if(cont) {
         if(specimenData && specimenData.connectId && parseInt(specimenData.connectId) !== data.Connect_ID) {
-            showNotifications({title: 'Master Specimen Id Duplication', body: 'Entered master specimen Id is already associated with a different connect Id.'}, true)
+            showNotifications({title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.'}, true)
         }
         else {
             showAnimation();
@@ -1390,7 +1390,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     }
     else {
         if(specimenData && specimenData.connectId && parseInt(specimenData.connectId) !== data.Connect_ID) {
-            showNotifications({title: 'Master Specimen Id Duplication', body: 'Entered master specimen Id is already associated with a different connect Id.'}, true)
+            showNotifications({title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.'}, true)
         }
         else {
             showAnimation();
@@ -1463,22 +1463,22 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         const tubeID = value.substr(10, 14);
         if(input.required && value.length !== 14) {
             hasError = true;
-            errorMessage(input.id, 'Combination of Master Specimen Id and Tube Id should be 14 characters long.', focus);
+            errorMessage(input.id, 'Combination of Collection ID and Full Specimen ID should be 14 characters long.', focus);
             focus = false;
         }
         else if(input.required && masterID !== biospecimenData.masterSpecimenId) {
             hasError = true;
-            errorMessage(input.id, 'Invalid Master Specimen Id.', focus);
+            errorMessage(input.id, 'Invalid Collection ID.', focus);
             focus = false;
         }
         else if(input.required && tubes.length === 0) {
             hasError = true;
-            errorMessage(input.id, 'Invalid Tube Id.', focus);
+            errorMessage(input.id, 'Invalid Full Specimen ID.', focus);
             focus = false;
         }
         else if(input.required && (tubes[0].id !== tubeID && !additionalTubeIDRequirement.regExp.test(tubeID))) {
             hasError = true;
-            errorMessage(input.id, 'Invalid Tube Id.', focus);
+            errorMessage(input.id, 'Invalid Full Specimen ID.', focus);
             focus = false;
         }
         data[`${input.id}`] = tubeID;
@@ -1595,7 +1595,7 @@ const finalizeHandler = async (data, masterSpecimenId, cntd) => {
         formData['finalizedAt'] = new Date().toISOString();
         showAnimation();
         await storeSpecimen([formData]);
-        showNotifications({title: 'Specimen Finalized', body: 'Specimen finalized successfully!'});
+        showNotifications({title: 'Specimen Finalized', body: 'Collection Finalized Successfully!'});
         const specimenData = (await searchSpecimen(masterSpecimenId)).data;
         let query = `connectId=${parseInt(specimenData.connectId)}`;
         const response = await findParticipant(query);

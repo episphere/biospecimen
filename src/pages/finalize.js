@@ -18,7 +18,7 @@ export const finalizeTemplate = (data, specimenData) => {
             <div class="col">
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
-                <div class="row">Master Specimen ID: ${specimenData.masterSpecimenId}</div>
+                <div class="row">Collection ID: ${specimenData.masterSpecimenId}</div>
                 <div class="row">Specimen Collection Date & Time: ${new Date(specimenData.tubeCollectedAt).toLocaleString()}</div>
             </div>
             ${specimenData.visitType ? `
@@ -35,7 +35,7 @@ export const finalizeTemplate = (data, specimenData) => {
                     <tr>
                         <th>Tube Type</th>
                         ${document.getElementById('contentBody').dataset.workflow && document.getElementById('contentBody').dataset.workflow === 'clinical' ? `<th>Received</th>`:`<th>Collected</th>`}
-                        <th>Tube ID</th>
+                        <th>Full Specimen ID</th>
                         <th>Deviation</th>
                         <th>Comment</th>
                     </tr>
@@ -63,7 +63,7 @@ export const finalizeTemplate = (data, specimenData) => {
             <form id="finalizeForm" method="POST">
                 <div class="form-group row">
                     <div class="col">
-                        <label for="finalizedAdditionalNotes">Additional notes on finalization</label>
+                        <label for="finalizedAdditionalNotes">Additional Notes (Optional)</label>
                         </br>
                         <textarea rows=3 class="form-control" id="finalizedAdditionalNotes">${specimenData.finalizedAdditionalNotes ? `${specimenData.finalizedAdditionalNotes}` : ''}</textarea>
                     </div>
@@ -77,7 +77,7 @@ export const finalizeTemplate = (data, specimenData) => {
                         <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['masterSpecimenId']}" type="button" id="finalizedSaveExit">Save and Exit</button>
                     </div>
                     <div class="col-auto">
-                        <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['masterSpecimenId']}" type="submit" id="finalizedContinue">Finalize - Ready to Ship</button>
+                        <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['masterSpecimenId']}" type="submit" id="finalizedContinue">Review Complete</button>
                     </div>
                 </div>
             </form>

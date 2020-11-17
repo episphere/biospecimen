@@ -13,7 +13,7 @@ export const collectProcessTemplate = (data, formData) => {
             <div class="col">
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
-                <div class="row">Master Specimen ID: ${formData.masterSpecimenId}</div>
+                <div class="row">Collection ID: ${formData.masterSpecimenId}</div>
             </div>
             ${formData.visitType ? `
                 <div class="ml-auto form-group">
@@ -27,7 +27,7 @@ export const collectProcessTemplate = (data, formData) => {
             <div class="row">
                 <table class="table-borderless collection-table">
                     <thead>
-                        <tr><th>Tube Type</th><th>Collected</th><th>Scan Tube ID</th><th>Select for Deviation</th></tr>
+                        <tr><th>Tube Type</th><th>Collected</th><th>Scan Full Specimen ID</th><th>Select for Deviation</th></tr>
                     </thead>
                     <tbody>`
                     const dashboardType = document.getElementById('contentBody').dataset.workflow;
@@ -40,7 +40,7 @@ export const collectProcessTemplate = (data, formData) => {
                                 <td>(${index+1}) ${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
                                 <td><input type="checkbox" data-tube-label="(${index+1}) ${obj.specimenType}" class="tube-collected custom-checkbox-size disabled" data-tube-type="${obj.tubeType}" disabled ${formData[`${obj.name}Collected`] === true ? 'checked': ''} id="${obj.name}Collected"></td>
                                 <td>
-                                    <input type="text" autocomplete="off" id="${obj.name}Id" ${formData[`${obj.name}Id`] ? `value='${formData.masterSpecimenId} ${formData[`${obj.name}Id`]}'`: ''} class="form-control ${formData[`${obj.name}Collected`] === false ? 'disabled': ''} input-barcode-id" ${formData[`${obj.name}Collected`] === false ? 'disabled': 'required'} placeholder="Scan/Type in Tube ID">
+                                    <input type="text" autocomplete="off" id="${obj.name}Id" ${formData[`${obj.name}Id`] ? `value='${formData.masterSpecimenId} ${formData[`${obj.name}Id`]}'`: ''} class="form-control ${formData[`${obj.name}Collected`] === false ? 'disabled': ''} input-barcode-id" ${formData[`${obj.name}Collected`] === false ? 'disabled': 'required'} placeholder="Scan/Type in Full Specimen ID">
                                     <button class="barcode-btn-collect-process" type="button" id="${obj.name}IdBarCodeBtn" data-barcode-input="${obj.name}Id"><i class="fas fa-barcode"></i></button>
                                 </td>
                                 <td><input type="checkbox" data-tube-label="(${index+1}) ${obj.specimenType}" class="tube-deviated custom-checkbox-size ${formData[`${obj.name}Collected`] === false ? 'disabled': ''}" ${formData[`${obj.name}Deviated`] === true ? 'checked': ''} data-tube-type="${obj.tubeType}" ${formData[`${obj.name}Collected`] === false ? 'disabled': ''} id="${obj.name}Deviated"></td>
@@ -100,7 +100,7 @@ export const tubeCollectedTemplate = (data, formData) => {
             <div class="col">
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
-                <div class="row">Master Specimen ID: ${formData.masterSpecimenId}</div>
+                <div class="row">Collection ID: ${formData.masterSpecimenId}</div>
             </div>
             ${formData.visitType ? `
                 <div class="ml-auto form-group">

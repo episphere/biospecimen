@@ -32,7 +32,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
             array.push(tubeType);
             
             template += `<div class="row"><div class="col"><strong>${tubeType} not collected</strong></div></div>
-                <div class="row"><div class="col">Master Specimen ID: ${biospecimenData['masterSpecimenId']}</div></div>
+                <div class="row"><div class="col">Collection ID: ${biospecimenData['masterSpecimenId']}</div></div>
                 <div class="form-group row">
                     <div class="col">
                         <label for="${ele.id}Reason">Provide reason tube(s) was/were not collected:</label>
@@ -62,7 +62,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
             const tubeLabel = ele.dataset.tubeLabel;
             template += `
                 <div class="row"><div class="col">Tube Type: <strong>${tubeLabel}</strong></div></div>
-                <div class="row"><div class="col">Tube ID: ${ele.parentNode.parentNode.querySelectorAll('[type="text"]')[0].value}</div></div>
+                <div class="row"><div class="col">Full Specimen ID: ${ele.parentNode.parentNode.querySelectorAll('[type="text"]')[0].value}</div></div>
                 <div class="form-group row">
                     <div class="col">
                         <label for="${ele.id}Reason">Select Deviation</label>
@@ -80,7 +80,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                 </div>
                 <div class="form-group row">
                     <div class="col">
-                        <label for="${ele.id}Explanation">Provide deviation detials</label>
+                        <label for="${ele.id}Explanation">Provide deviation details</label>
                         </br>
                         <textarea required rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData[`${ele.id}Explanation`] ? biospecimenData[`${ele.id}Explanation`] : '' }</textarea>
                     </div>
