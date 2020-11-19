@@ -81,7 +81,7 @@ export const startShipping = async () => {
         <div class="row">
     <div class="col-sm">
     <div class="panel panel-default" style="border-style:solid;height:400px;border-width:1px;overflow:auto;" id="specimenPanel">
-            <table class = "table" style="width: 100%" id="specimenList" >
+            <table class = "table" style="width: 100%;margin-bottom:0px;" id="specimenList" >
                 <tr>
                     <th>Specimen Bag ID</th>
                     <th># Specimens</th>
@@ -89,7 +89,7 @@ export const startShipping = async () => {
             </table>
     </div>
     <div class="panel panel-default" style="border-style:solid;height:150px;border-width:1px;overflow:auto;margin-top:50px" id="orphansPanel">
-            <table class = "table" style="width: 100%" id="orphansList" >
+            <table class = "table" style="width: 100%; margin-bottom:0px;" id="orphansList" >
                 
             </table>
     </div>
@@ -509,7 +509,7 @@ export const finalShipmentTracking = (hiddenJSON) => {
                     </div>
                     <div class="modal-footer">
                     
-                        <button type="button" class="btn btn-primary" id="finalizeModalSign">Sign</button>
+                        <button type="button" class="btn btn-primary" id="finalizeModalSign" data-dismiss="modal">Sign</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" id="finalizeModalCancel">Close</button>
                     </div>  
                 </div>
