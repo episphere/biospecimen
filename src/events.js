@@ -176,7 +176,6 @@ export const addEventAddSpecimenToBox = () => {
         biospecimensList.sort();
         await createShippingModalBody(biospecimensList, masterSpecimenId)
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex);
-        
         hideAnimation();
 
         /*
@@ -1035,6 +1034,72 @@ export const addEventAddBox = () => {
 
 }
 
+export const addEventModalAddBox = () => {
+    let boxButton = document.getElementById('modalAddBoxButton');
+    
+    boxButton.addEventListener('click', async () => {
+        let response = await  getBoxes();
+        let hiddenJSON = response.data;
+        let locations = {};
+        let keys = [];
+        let largestOverall = 0;
+        let largeIndex = -1;
+
+        let largestLocation = 0;
+        let largestLocationIndex = -1;
+        let pageLocation = document.getElementById('selectLocationList').value;
+        for(let i = 0; i < hiddenJSON.length; i++){
+            let curr = parseInt(hiddenJSON[i]['boxId'].substring(3))
+            let currLocation = hiddenJSON[i]['location']
+
+            if(curr > largestOverall){
+                largestOverall = curr;
+                largeIndex = i;
+            }
+            if(curr > largestLocation && currLocation == pageLocation){
+                largestLocation = curr;
+                largestLocationIndex = i;
+            }
+            
+        }
+        if(largestLocationIndex != -1){
+            let lastBox = hiddenJSON[largeIndex]['boxId']
+            if(Object.keys(hiddenJSON[largestLocationIndex]['bags']).length != 0){
+                //add a new Box
+                //create new Box Id
+                let newBoxNum = parseInt(lastBox.substring(3)) + 1;
+                let newBoxId = 'Box' + newBoxNum.toString();
+                let toPass = {};
+                toPass['boxId'] = newBoxId;
+                toPass['bags'] = {};
+                toPass['location'] = pageLocation;
+                await storeBox(toPass);
+
+                hiddenJSON.push({boxId:newBoxId, bags:{}, location:pageLocation})
+                let boxJSONS = hiddenJSON;
+                
+                hiddenJSON = {};
+
+                for(let i = 0; i < boxJSONS.length; i++){
+                    let box = boxJSONS[i]
+                    if(box['location'] == pageLocation){
+                        hiddenJSON[box['boxId']] = box['bags']
+                    }
+                }
+                populateModalSelect(hiddenJSON);
+                let modalSelect = document.getElementById('shippingModalChooseBox');
+                modalSelect.value = newBoxId;
+                populateBoxSelectList(hiddenJSON)
+            }
+            else{
+                //error (ask them to put something in the previous box first)
+            }
+        }
+    })
+   
+
+}
+
 export const populateTubeInBoxList = async () => {
     let currBoxId = selectBoxList.value;
     let response = await  getBoxes();
@@ -1706,7 +1771,7 @@ export const addEventNavBarBoxManifest = (id) => {
     });
 }
 
-export const addEventNavBarShippingManifest = () => {
+export const addEventNavBarShippingManifest = (userName) => {
     const btn = document.getElementById('completePackaging');
     document.getElementById('completePackaging').addEventListener('click', async e => {
         e.stopPropagation();
@@ -1726,7 +1791,7 @@ export const addEventNavBarShippingManifest = () => {
         }
         console.log(boxesToShip)
         //return box 1 info
-        await shippingManifest(boxesToShip);
+        await shippingManifest(boxesToShip, userName);
     });
 }
 export const populateSelectLocationList = async () => {
@@ -1828,7 +1893,7 @@ export const populateTrackingQuery = (hiddenJSON) => {
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
 }
 
-export const addEventCompleteButton = (hiddenJSON) => {
+export const addEventCompleteButton = (hiddenJSON, userName) => {
     document.getElementById('completeTracking').addEventListener('click', () =>{
         let boxes = Object.keys(hiddenJSON);
         let emptyField= false;
@@ -1844,19 +1909,21 @@ export const addEventCompleteButton = (hiddenJSON) => {
         if(emptyField == false){
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
             console.log('done')
-            finalShipmentTracking(hiddenJSON);
+            finalShipmentTracking(hiddenJSON, userName);
         }
     })
     
 }
 
-export const addEventCompleteShippingButton = (hiddenJSON) => {
+export const addEventCompleteShippingButton = (hiddenJSON, userName) => {
     document.getElementById('finalizeModalSign').addEventListener('click', async () =>{
         let finalizeTextField = document.getElementById('finalizeSignInput');
-        if(finalizeTextField.value === "Ship"){
+
+        if(finalizeTextField.value === userName){
             let boxes = Object.keys(hiddenJSON);
             console.log(JSON.stringify(boxes));
             await ship(boxes);
+            document.getElementById('finalizeModalCancel').click();
             startShipping();
         }
         else{

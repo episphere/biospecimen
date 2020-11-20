@@ -1,15 +1,16 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect} from "./../events.js";
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
-    console.log('LMAO1')
+    
     auth.onAuthStateChanged(async user => {
         if(user){
             const role = await userAuthorization(route, user.displayName);
             if(!role) return;
-            startShipping();
+            console.log(user.displayName)
+            startShipping(user.displayName);
         }
         else {
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
@@ -19,7 +20,7 @@ export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
 }
 
 
-export const startShipping = async () => {
+export const startShipping = async (userName) => {
     showAnimation();
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     //store a secret json that has all of the packed ones in it
@@ -53,11 +54,15 @@ export const startShipping = async () => {
         </div>
         
         <div class="row">
-            Choose your location
+            <div class="col-lg">
+                Choose your location
             </div>
-            <div class="row" style="margin-bottom:10px">
-            <select class="selectpicker" id="selectLocationList">
+        </div>
+        <div class="row" style="margin-bottom:10px">
+            <div class = "col-lg">
+                <select class="selectpicker" id="selectLocationList">
                 </select>
+            </div>
         </div>
 
         <div class="row">
@@ -128,8 +133,9 @@ export const startShipping = async () => {
                 </div>
                 <div class="modal-body"> 
                     <h4>Which box this should be added to<h4>
-                    <select class="selectpicker" id="shippingModalChooseBox">
-                    </select>
+                    <select class="selectpicker" id="shippingModalChooseBox"></select>
+                    <button type="button" class="btn btn-primary" id="modalAddBoxButton">Add Box</button>
+                    
                 </div>
                 <div class="modal-footer">
                    
@@ -193,14 +199,14 @@ export const startShipping = async () => {
     populateBoxSelectList(hiddenJSONLocation);
 
     addEventNavBarShipment("navBarShippingDash");
-    addEventNavBarShippingManifest();
+    addEventNavBarShippingManifest(userName);
     addEventAddBox();
     addEventBoxSelectListChanged();
     addEventNavBarBoxManifest("navBarBoxManifest")
     addEventChangeLocationSelect();
     addEventAddSpecimenToBox();
     addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
-
+    addEventModalAddBox();
     hideAnimation();
     //addEventSubmitAddBag();
     
@@ -286,7 +292,7 @@ export const boxManifest = async (boxId) => {
 
 
 
-export const shippingManifest = async (boxesToShip) => {    
+export const shippingManifest = async (boxesToShip, userName) => {    
 
     let response = await  getBoxes();
     let boxJSONS = response.data;
@@ -370,7 +376,7 @@ export const shippingManifest = async (boxesToShip) => {
         e.stopPropagation();
         if(btn.classList.contains('active')) return;
             //return box 1 info
-            shipmentTracking(toDisplayJSON);
+            shipmentTracking(toDisplayJSON, userName);
     });
     //addEventNavBarShipment("navBarShippingDash");
     //addEventSelectParticipantForm();
@@ -378,7 +384,7 @@ export const shippingManifest = async (boxesToShip) => {
 }
 
 
-export const shipmentTracking = (hiddenJSON) => {
+export const shipmentTracking = (hiddenJSON, userName) => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     //store a secret json that has all of the packed ones in it
     //{"Box1":{specimenId:[allTubes], specimenId:[allTubes]}}
@@ -442,15 +448,16 @@ export const shipmentTracking = (hiddenJSON) => {
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
     }
     populateTrackingQuery(hiddenJSON);
-    addEventCompleteButton(hiddenJSON);
+    addEventCompleteButton(hiddenJSON, userName);
     //addEventCompleteShippingButton(hiddenJSON);
     //addEventBackToSearch('navBarShippingDash');
     addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
     //addEventSubmitAddBag();
 }
 
-export const finalShipmentTracking = (hiddenJSON) => {
+export const finalShipmentTracking = (hiddenJSON, userName) => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
+    console.log(userName)
     //store a secret json that has all of the packed ones in it
     //{"Box1":{specimenId:[allTubes], specimenId:[allTubes]}}
     let template = `
@@ -500,16 +507,16 @@ export const finalShipmentTracking = (hiddenJSON) => {
                         
                     </div>
                     <div class="modal-body"> 
-                        <h4>Please type in "Ship" to confirm: <h4>
+                        <h4>Please type in "` + userName + `" to confirm: <h4>
                         <input type="text" id="finalizeSignInput">
                         </input>
                         <p id="finalizeModalError" style="color:red;display:none;">
-                            *Please type in "Ship"
+                            *Please type in "` + userName + `"
                         </p>
                     </div>
                     <div class="modal-footer">
                     
-                        <button type="button" class="btn btn-primary" id="finalizeModalSign" data-dismiss="modal">Sign</button>
+                        <button type="button" class="btn btn-primary" id="finalizeModalSign">Sign</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" id="finalizeModalCancel">Close</button>
                     </div>  
                 </div>
@@ -535,7 +542,7 @@ export const finalShipmentTracking = (hiddenJSON) => {
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
     }
     populateFinalCheck(hiddenJSON);
-    addEventCompleteShippingButton(hiddenJSON);;
+    addEventCompleteShippingButton(hiddenJSON, userName);;
     addEventBackToSearch('navBarShippingDash');
     //addEventBackToSearch('navBarShippingDash');
     //addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
