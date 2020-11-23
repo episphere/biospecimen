@@ -38,12 +38,12 @@ export const collectProcessTemplate = (data, formData) => {
                         template += `
                             <tr>
                                 <td>(${index+1}) ${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
-                                <td><input type="checkbox" data-tube-label="(${index+1}) ${obj.specimenType}" class="tube-collected custom-checkbox-size disabled" data-tube-type="${obj.tubeType}" disabled ${formData[`${obj.name}Collected`] === true ? 'checked': ''} id="${obj.name}Collected"></td>
+                                <td>${obj.collectionChkBox === true ? `<input type="checkbox" data-tube-label="(${index+1}) ${obj.specimenType}" class="tube-collected custom-checkbox-size disabled" data-tube-type="${obj.tubeType}" disabled ${formData[`${obj.name}Collected`] === true ? 'checked': ''} id="${obj.name}Collected">`: ``}</td>
                                 <td>
                                     <input type="text" autocomplete="off" id="${obj.name}Id" ${formData[`${obj.name}Id`] ? `value='${formData.masterSpecimenId} ${formData[`${obj.name}Id`]}'`: ''} class="form-control ${formData[`${obj.name}Collected`] === false ? 'disabled': ''} input-barcode-id" ${formData[`${obj.name}Collected`] === false ? 'disabled': 'required'} placeholder="Scan/Type in Full Specimen ID">
                                     <button class="barcode-btn-collect-process" type="button" id="${obj.name}IdBarCodeBtn" data-barcode-input="${obj.name}Id"><i class="fas fa-barcode"></i></button>
                                 </td>
-                                <td><input type="checkbox" data-tube-label="(${index+1}) ${obj.specimenType}" class="tube-deviated custom-checkbox-size ${formData[`${obj.name}Collected`] === false ? 'disabled': ''}" ${formData[`${obj.name}Deviated`] === true ? 'checked': ''} data-tube-type="${obj.tubeType}" ${formData[`${obj.name}Collected`] === false ? 'disabled': ''} id="${obj.name}Deviated"></td>
+                                <td>${obj.deviationChkBox === true ? `<input type="checkbox" data-tube-label="(${index+1}) ${obj.specimenType}" class="tube-deviated custom-checkbox-size ${formData[`${obj.name}Collected`] === false ? 'disabled': ''}" ${formData[`${obj.name}Deviated`] === true ? 'checked': ''} data-tube-type="${obj.tubeType}" ${formData[`${obj.name}Collected`] === false ? 'disabled': ''} id="${obj.name}Deviated">`: ``}</td>
                             </tr>
                         `
                     });
@@ -126,7 +126,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                         template += `
                             <tr>
                                 <td>(${index+1}) ${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
-                                <td class="align-left"><input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="${obj.tubeType}" ${formData[`${obj.name}Collected`] === true ? 'checked': ''} id="${obj.name}Collected"></td>
+                                <td class="align-left">${obj.collectionChkBox === true ? `<input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="${obj.tubeType}" ${formData[`${obj.name}Collected`] === true ? 'checked': ''} id="${obj.name}Collected">`:``}</td>
                             </tr>
                         `
                     });

@@ -49,9 +49,9 @@ export const finalizeTemplate = (data, specimenData) => {
                     template += `
                         <tr>
                             <td>(${index+1}) ${obj.specimenType}</td>
-                            <td>${specimenData[`${obj.name}Collected`] === true ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>'}</td>
+                            <td>${obj.collectionChkBox === true ? `${specimenData[`${obj.name}Collected`] === true ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>'}` : ``}</td>
                             <td>${specimenData[`${obj.name}Collected`] === true ? `${specimenData.masterSpecimenId} ${specimenData[`${obj.name}Id`]}` : '' }</td>
-                            <td>${specimenData[`${obj.name}Deviated`] === true ? 'Yes' : 'No'}</td>
+                            <td>${obj.deviationChkBox === true ? `${specimenData[`${obj.name}Deviated`] === true ? 'Yes' : 'No'}`: ``}</td>
                             <td class="deviation-comments-width">${specimenData[`${obj.name}DeviatedReason`] ? specimenData[`${obj.name}DeviatedReason`] : ''}</td>
                         </tr>
                     `

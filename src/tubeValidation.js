@@ -7,7 +7,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube1',
             'id': '0001',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Serum Separator Tube',
@@ -16,7 +18,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube2',
             'id': '0002',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Heparin Tube',
@@ -25,7 +29,9 @@ export const workflows = {
             'image': './static/images/tube2.PNG',
             'name': 'tube3',
             'id': '0003',
-            'tubeColor': 'Green'
+            'tubeColor': 'Green',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'EDTA Tube',
@@ -34,7 +40,9 @@ export const workflows = {
             'image': './static/images/tube3.PNG',
             'name': 'tube4',
             'id': '0004',
-            'tubeColor': 'Lavendar'
+            'tubeColor': 'Lavendar',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'ACD Tube',
@@ -43,7 +51,9 @@ export const workflows = {
             'image': './static/images/tube4.PNG',
             'name': 'tube5',
             'id': '0005',
-            'tubeColor': 'Yellow'
+            'tubeColor': 'Yellow',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Urine Tube',
@@ -51,28 +61,36 @@ export const workflows = {
             'readableValue': 'Urine Tube',
             'name': 'tube6',
             'id': '0006',
-            'tubeColor': 'Yellow'
+            'tubeColor': 'Yellow',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Mouthwash Container',
             'tubeType': 'Mouthwash',
             'readableValue': 'Mouthwash Container',
             'name': 'tube7',
-            'id': '0007'
+            'id': '0007',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Biohazard bag',
             'tubeType': 'Biohazard bag for blood/urine',
             'readableValue': 'Biohazard bag - blood/urine',
             'name': 'tube8',
-            'id': '0008'
+            'id': '0008',
+            'collectionChkBox': false,
+            'deviationChkBox': false
         },
         {
             'specimenType': 'Biohazard bag',
             'tubeType': 'Biohazard bag for mouthwash',
             'readableValue': 'Biohazard bag - mouthwash',
             'name': 'tube9',
-            'id': '0009'
+            'id': '0009',
+            'collectionChkBox': false,
+            'deviationChkBox': false
         }
     ],
     clinical : [
@@ -83,7 +101,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube1',
             'id': '0001',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Serum Separator Tube',
@@ -92,7 +112,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube2',
             'id': '0002',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Serum Separator Tube',
@@ -101,7 +123,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube11',
             'id': '0011',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Serum Separator Tube',
@@ -110,7 +134,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube12',
             'id': '0012',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Heparin Tube',
@@ -119,7 +145,9 @@ export const workflows = {
             'image': './static/images/tube2.PNG',
             'name': 'tube3',
             'id': '0003',
-            'tubeColor': 'Green'
+            'tubeColor': 'Green',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Heparin Tube',
@@ -128,7 +156,9 @@ export const workflows = {
             'image': './static/images/tube2.PNG',
             'name': 'tube13',
             'id': '0013',
-            'tubeColor': 'Green'
+            'tubeColor': 'Green',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'EDTA Tube',
@@ -137,7 +167,9 @@ export const workflows = {
             'image': './static/images/tube3.PNG',
             'name': 'tube4',
             'id': '0004',
-            'tubeColor': 'Lavendar'
+            'tubeColor': 'Lavendar',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'EDTA Tube',
@@ -146,7 +178,9 @@ export const workflows = {
             'image': './static/images/tube3.PNG',
             'name': 'tube14',
             'id': '0014',
-            'tubeColor': 'Lavendar'
+            'tubeColor': 'Lavendar',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'ACD Tube',
@@ -155,7 +189,9 @@ export const workflows = {
             'image': './static/images/tube4.PNG',
             'name': 'tube5',
             'id': '0005',
-            'tubeColor': 'Yellow'
+            'tubeColor': 'Yellow',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Biohazard bag',
@@ -163,7 +199,9 @@ export const workflows = {
             'readableValue': 'Biohazard bag - blood',
             'image': '',
             'name': 'tube8',
-            'id': '0008'
+            'id': '0008',
+            'collectionChkBox': false,
+            'deviationChkBox': false
         }
     ],
     clinical_non_oahu : [
@@ -174,7 +212,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube1',
             'id': '0001',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Serum Separator Tube',
@@ -183,7 +223,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube2',
             'id': '0002',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Serum Separator Tube',
@@ -192,7 +234,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube11',
             'id': '0011',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Serum Separator Tube',
@@ -201,7 +245,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube12',
             'id': '0012',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Serum Separator Tube',
@@ -210,7 +256,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube21',
             'id': '0021',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Serum Separator Tube',
@@ -219,7 +267,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube22',
             'id': '0022',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Serum Separator Tube',
@@ -228,7 +278,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube31',
             'id': '0031',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Serum Separator Tube',
@@ -237,7 +289,9 @@ export const workflows = {
             'image': './static/images/tube1.PNG',
             'name': 'tube32',
             'id': '0032',
-            'tubeColor': 'Gold'
+            'tubeColor': 'Gold',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Heparin Tube',
@@ -246,7 +300,9 @@ export const workflows = {
             'image': './static/images/tube2.PNG',
             'name': 'tube3',
             'id': '0003',
-            'tubeColor': 'Green'
+            'tubeColor': 'Green',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Heparin Tube',
@@ -255,7 +311,9 @@ export const workflows = {
             'image': './static/images/tube2.PNG',
             'name': 'tube13',
             'id': '0013',
-            'tubeColor': 'Green'
+            'tubeColor': 'Green',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'EDTA Tube',
@@ -264,7 +322,9 @@ export const workflows = {
             'image': './static/images/tube3.PNG',
             'name': 'tube4',
             'id': '0004',
-            'tubeColor': 'Lavendar'
+            'tubeColor': 'Lavendar',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'EDTA Tube',
@@ -273,7 +333,9 @@ export const workflows = {
             'image': './static/images/tube3.PNG',
             'name': 'tube14',
             'id': '0014',
-            'tubeColor': 'Lavendar'
+            'tubeColor': 'Lavendar',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'ACD Tube',
@@ -282,7 +344,9 @@ export const workflows = {
             'image': './static/images/tube4.PNG',
             'name': 'tube5',
             'id': '0005',
-            'tubeColor': 'Yellow'
+            'tubeColor': 'Yellow',
+            'collectionChkBox': true,
+            'deviationChkBox': true
         },
         {
             'specimenType': 'Biohazard bag',
@@ -290,7 +354,9 @@ export const workflows = {
             'readableValue': 'Biohazard bag - blood',
             'image': '',
             'name': 'tube8',
-            'id': '0008'
+            'id': '0008',
+            'collectionChkBox': false,
+            'deviationChkBox': false
         }
     ]
 };
