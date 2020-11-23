@@ -216,11 +216,19 @@ export const boxManifest = async (boxId) => {
     showAnimation();
     let response = await  getBoxes();
     let boxJSONS = response.data;
+
+    console.log('abc:' + JSON.stringify(boxJSONS))
+    let currBox = {}
     let hiddenJSON = {};
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
+        if(box['boxId'] == boxId){
+            currBox = box;
+        }
         hiddenJSON[box['boxId']] = box['bags']
     }
+    let currInstitute = currBox.institute;
+    let currLocation = currBox.location;
 
     /*
     let boxIds = Object.keys(hiddenJSON);
@@ -246,8 +254,8 @@ export const boxManifest = async (boxId) => {
             </div>
             <div style="float: left;width: 33%;"></div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
-                <p>Site</p>
-                <p>NCI</p>
+                <p>Site: ` + currInstitute + `</p>
+                <p>Location: ` + currLocation + `</p>
             </div>
         </div>
         <div class="row">
@@ -280,7 +288,7 @@ export const boxManifest = async (boxId) => {
     
     //addEventNavBarShipment("returnToPackaging");
     //document.getElementById('boxManifestTable').appendChild(result);
-    populateBoxManifestHeader(boxId,hiddenJSON);
+    populateBoxManifestHeader(boxId,boxJSONS);
     populateBoxManifestTable(boxId,hiddenJSON);
     addEventNavBarShipment("returnToPackaging");
     //addEventNavBarShippingManifest();

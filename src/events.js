@@ -137,7 +137,7 @@ export const addEventAddSpecimenToBox = () => {
         </table>
         `;
         let masterIdSplit = masterSpecimenId.split(/\s+/);
-
+        let foundInOrphan = false;
         //get all ids from the hidden
         let shippingTable = document.getElementById('specimenList')
         let orphanTable = document.getElementById('orphansList')
@@ -151,15 +151,21 @@ export const addEventAddSpecimenToBox = () => {
                 tableIndex = i;
                 biospecimensList = JSON.parse(currRow.cells[2].innerText)
                 foundInShipping = true;
+                console.log('owikebnvolekidbnvpowivbhnwspolivkbnh')
+                console.log(JSON.stringify(biospecimensList))
             }
             
         }
-        for(let i = 1; i < shippingTable.rows.length; i++){
-            let currRow = shippingTable.rows[i];
+        
+       for(let i = 1; i < orphanTable.rows.length; i++){
+            let currRow = orphanTable.rows[i];
             if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
-                console.log(currRow.cells[2].innerText)
+                //console.log(currRow.cells[2].innerText)
                 tableIndex = i;
-                biospecimensList = JSON.parse(currRow.cells[2].innerText)
+                let currTubeNum = currRow.cells[0].innerText.split(' ')[1];
+                console.log(currTubeNum)
+                biospecimensList = [currTubeNum];
+                foundInOrphan = true;
             }
             
         }
@@ -174,8 +180,8 @@ export const addEventAddSpecimenToBox = () => {
         }
 
         biospecimensList.sort();
-        await createShippingModalBody(biospecimensList, masterSpecimenId)
-        addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex);
+        await createShippingModalBody(biospecimensList, masterSpecimenId,foundInOrphan)
+        addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan);
         hideAnimation();
 
         /*
@@ -209,7 +215,7 @@ export const addEventAddSpecimenToBox = () => {
     })
 }
 
-export const createShippingModalBody = async (biospecimensList, masterBiospecimenId) => {
+export const createShippingModalBody = async (biospecimensList, masterBiospecimenId, isOrphan) => {
     //let keys = Object.keys(biospecimenData)
     /*let tubes = [];
     for(let i = 0; i < biospecimensList.length; i++){
@@ -258,57 +264,82 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         "0053":"NA",
         "0054":"NA"
     };
-    if(currSplit.length >= 2 && currSplit[1] == '0008'){
-        //look for all non-moutwash (0007)
-        for(let i = 0; i < biospecimensList.length; i++){
-            if(biospecimensList[i] != '0007'){
-                empty = false;
-                currBag.push(biospecimensList[i])
-                var rowCount = tubeTable.rows.length;
-                var row = tubeTable.insertRow(rowCount);           
-                row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
-                let thisId =biospecimensList[i];
-                let toAddType = 'N/A'
-                if(translateNumToType.hasOwnProperty(thisId)){
-                    toAddType = translateNumToType[thisId];
-                }
-                row.insertCell(1).innerHTML= toAddType;
-                row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Missing">';
+    if(!isOrphan){
+        if(currSplit.length >= 2 && currSplit[1] == '0008'){
+            //look for all non-moutwash (0007)
+            for(let i = 0; i < biospecimensList.length; i++){
+                if(biospecimensList[i] != '0007'){
+                    empty = false;
+                    currBag.push(biospecimensList[i])
+                    var rowCount = tubeTable.rows.length;
+                    var row = tubeTable.insertRow(rowCount);           
+                    row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
+                    let thisId =biospecimensList[i];
+                    let toAddType = 'N/A'
+                    if(translateNumToType.hasOwnProperty(thisId)){
+                        toAddType = translateNumToType[thisId];
+                    }
+                    row.insertCell(1).innerHTML= toAddType;
+                    row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Missing">';
 
-                let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
-                currDeleteButton.addEventListener("click", async e => {
-                    var index = e.target.parentNode.parentNode.rowIndex;
-                    var table = document.getElementById("shippingModalTable");
-                    table.deleteRow(index);
-                })
-                
+                    let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
+                    currDeleteButton.addEventListener("click", async e => {
+                        var index = e.target.parentNode.parentNode.rowIndex;
+                        var table = document.getElementById("shippingModalTable");
+                        table.deleteRow(index);
+                    })
+                    
+                }
+            }
+        }
+        else{
+            for(let i = 0; i < biospecimensList.length; i++){
+                if(biospecimensList[i] == '0007'){
+                    empty = false;
+                    currBag.push(biospecimensList[i])
+                    var rowCount = tubeTable.rows.length;
+                    var row = tubeTable.insertRow(rowCount);           
+                    row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
+                    let thisId = biospecimensList[i]
+                    let toAddType = 'N/A'
+                    if(translateNumToType.hasOwnProperty(thisId)){
+                        toAddType = translateNumToType[thisId];
+                    }
+                    row.insertCell(1).innerHTML= toAddType;
+                    row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Missing">';
+
+                    let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
+                    currDeleteButton.addEventListener("click", async e => {
+                        var index = e.target.parentNode.parentNode.rowIndex;
+                        var table = document.getElementById("shippingModalTable");
+                        table.deleteRow(index);
+                    })
+                    
+                }
             }
         }
     }
     else{
         for(let i = 0; i < biospecimensList.length; i++){
-            if(biospecimensList[i] == '0007'){
-                empty = false;
-                currBag.push(biospecimensList[i])
-                var rowCount = tubeTable.rows.length;
-                var row = tubeTable.insertRow(rowCount);           
-                row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
-                let thisId = biospecimensList[i]
-                let toAddType = 'N/A'
-                if(translateNumToType.hasOwnProperty(thisId)){
-                    toAddType = translateNumToType[thisId];
-                }
-                row.insertCell(1).innerHTML= toAddType;
-                row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Missing">';
-
-                let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
-                currDeleteButton.addEventListener("click", async e => {
-                    var index = e.target.parentNode.parentNode.rowIndex;
-                    var table = document.getElementById("shippingModalTable");
-                    table.deleteRow(index);
-                })
-                
+            empty = false;
+            currBag.push(biospecimensList[i])
+            var rowCount = tubeTable.rows.length;
+            var row = tubeTable.insertRow(rowCount);           
+            row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
+            let thisId = biospecimensList[i]
+            let toAddType = 'N/A'
+            if(translateNumToType.hasOwnProperty(thisId)){
+                toAddType = translateNumToType[thisId];
             }
+            row.insertCell(1).innerHTML= toAddType;
+            row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Missing">';
+
+            let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
+            currDeleteButton.addEventListener("click", async e => {
+                var index = e.target.parentNode.parentNode.rowIndex;
+                var table = document.getElementById("shippingModalTable");
+                table.deleteRow(index);
+            })
         }
     }
     populateModalSelect(hiddenJSON)
@@ -322,7 +353,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     
 }
 
-export const addEventAddSpecimensToListModalButton=(bagid, tableIndex)=>{
+export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan)=>{
     let submitButton = document.getElementById('addToBagButton')
     submitButton.addEventListener('click', async e =>{
         e.preventDefault();
@@ -349,17 +380,10 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex)=>{
         let numRows = tubeTable.rows.length;
         let bagSplit = bagid.split(/\s+/);
         let boxId = ""
-        if(bagSplit.length >=2){
-                /*if(document.getElementById('BoxNumBlood').innerText == ''){
-                    boxId = "Box" + nextBoxNum.toString()
-                    document.getElementById('BoxNumBlood').innerText = boxId
-                }
-                else{
-                    boxId = document.getElementById('BoxNumBlood').innerText;
-                }*/
-                boxId = document.getElementById('shippingModalChooseBox').value;
+        boxId = document.getElementById('shippingModalChooseBox').value;
 
-            
+        if(isOrphan){
+            bagid = 'orphans'
         }
 
         let toDelete = [];
@@ -384,6 +408,8 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex)=>{
             }
 
         }
+
+        
         
 
         document.getElementById('selectBoxList').value = boxId;
@@ -430,18 +456,20 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex)=>{
 }
 
 export const getInstituteSpecimensList = async(hiddenJSON) => {
-    console.log('called getInstitute')
     const response = await searchSpecimenInstitute();
     let specimenData = response.data;
     console.log(JSON.stringify('apeuidbvaosidvbasd;vkbasv:    '  + specimenData))
     let toReturn = {};
+    let checkedOrphans = false;
     for(let i = 0; i < specimenData.length; i++){
         let toExclude8 = [];
         let toExclude9 = [];
+        let toExcludeOrphans = [];
         if(specimenData[i].hasOwnProperty('masterSpecimenId')){
             let boxes = Object.keys(hiddenJSON);
             for(let j = 0; j < boxes.length; j++){
                 let specimens = Object.keys(hiddenJSON[boxes[j]]);
+                console.log(JSON.stringify(hiddenJSON[boxes[j]]));
                 if(specimens.includes(specimenData[i]['masterSpecimenId'] + ' 0008')){
                     let currList =  hiddenJSON[boxes[j]][specimens[specimens.indexOf(specimenData[i]['masterSpecimenId'] + ' 0008')]]['arrElements']
                     for(let k = 0; k < currList.length; k++){
@@ -454,6 +482,17 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                         toExclude9.push(currList[k].split(/\s+/)[1]);
                     }
 
+                }
+                if(checkedOrphans == false){
+                    if(specimens.includes('orphans')){
+                        console.log('ipouaqwjehbdsfnvlkasjdbvloiaksudjvbgoivu')
+                        console.log(JSON.stringify( hiddenJSON[boxes[j]]['orphans']['arrElements']))
+                        let currList =  hiddenJSON[boxes[j]]['orphans']['arrElements']
+                        for(let k = 0; k < currList.length; k++){
+                            toExcludeOrphans.push(currList[k].split(/\s+/)[1]);
+                        }
+                        
+                    }
                 }
             }
         }
@@ -475,7 +514,7 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                                 if(specimenData[i][currKey] != '0007'){
                                     
                                     if(toExclude8.indexOf(specimenData[i][currKey]) == -1){
-                                        list8.push(specimenData[i][currKey])
+                                        list8.push(specimenData[i][currKey]);
                                     }
                                 }
                                 else{
@@ -527,7 +566,12 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 toReturn['orphans'] = []
             }
             for(let j = 0; j < list8.length; j++){
-                toReturn['orphans'].push(specimenData[i]['masterSpecimenId'] + ' ' + list8[j])
+                console.log('oipuwqabe vloi;uajgbdsvolisadujbvsaloidvubasdliuasdvb')
+                console.log(list8[j]);
+                console.log(JSON.stringify(toExcludeOrphans))
+                if(!toExcludeOrphans.includes(list8[j])){
+                    toReturn['orphans'].push(specimenData[i]['masterSpecimenId'] + ' ' + list8[j])
+                }
             }
 
         }
@@ -538,7 +582,11 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 toReturn['orphans'] = []
             }
             for(let j = 0; j < list9.length; j++){
-                toReturn['orphans'].push(specimenData[i]['masterSpecimenId'] + ' ' + list9[j])
+                console.log('oipuwqabe vloi;uajgbdsvolisadujbvsaloidvubasdliuasdvb1')
+                console.log(specimenData[i]['masterSpecimenId'] + ' ' + list9[j]);
+                if(!toExcludeOrphans.includes(list9[j])){
+                    toReturn['orphans'].push(specimenData[i]['masterSpecimenId'] + ' ' + list9[j])
+                }
             }
 
         }
@@ -554,11 +602,11 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
 }
 
 export const populateSpecimensList = async (hiddenJSON) => {
-    console.log('CALLED')
     let specimenObject = await getInstituteSpecimensList(hiddenJSON);
     const response = await searchSpecimenInstitute();
     let specimenData = response.data
     console.log("SpecimenData!!: " + JSON.stringify(specimenData))
+    console.log(JSON.stringify(specimenObject))
     for(let i = 0; i < specimenData.length; i++){
         //let specimenData = 
         
@@ -577,7 +625,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
                             </th>`;
     let orphansIndex = -1;
     
-
+   
     for(let i = 0; i < list.length; i++){
         if(list[i] != "orphans"){
             var rowCount = specimenList.rows.length;
@@ -603,7 +651,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
     let specimenPanel = document.getElementById('specimenPanel')
     orphanTable.innerHTML = '';
 
-    if(orphansIndex != -1){
+    if(orphansIndex != -1 && specimenObject['orphans'].length > 0){
 
         orphanPanel.style.display = 'block'
         specimenPanel.style.height = '400px'
@@ -681,7 +729,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
 
 }
 
-export const populateBoxManifestHeader= (result) => {
+export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
 
@@ -848,6 +896,7 @@ const compareBoxIds = (a,b) => {
 
 export const populateBoxSelectList = (hiddenJSON) => {
     let boxList = document.getElementById('selectBoxList');
+    let selectBoxList = document.getElementById('selectBoxList');
     let list = ''
     let keys = Object.keys(hiddenJSON).sort(compareBoxIds);
     for(let i = 0; i < keys.length; i++){
@@ -1101,6 +1150,8 @@ export const addEventModalAddBox = () => {
 }
 
 export const populateTubeInBoxList = async () => {
+    let boxList = document.getElementById('selectBoxList');
+    let selectBoxList = document.getElementById('selectBoxList');
     let currBoxId = selectBoxList.value;
     let response = await  getBoxes();
     let hiddenJSON = response.data;

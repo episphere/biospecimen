@@ -354,11 +354,34 @@ export const getLocationsInstitute = async () => {
     let res = await response.json();
     let arr = res.response;
     let locations = [];
+    console.log('LOCATIONSTUFFF 0.0 : ' + JSON.stringify(arr));
     for(let i = 0; i < arr.length; i++){
         let currJSON = arr[i];
         locations = locations.concat(currJSON.Locations);
     }
     return locations;
+}
+
+export const getNextTempCheck = async () => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=getLocations`, {
+        method: "GET",
+        headers: {
+            Authorization:"Bearer "+idToken
+        }
+    });
+    let res = await response.json();
+    let arr = res.response;
+    let locations = [];
+    let currJSON = arr[0];
+    let nextDate = currJSON['nextTempMonitor']
+    let todaysDate = new Date();
+    let tempDate = new Date(Date.parse(nextDate))
+    if(todaysDate >= tempDate){
+        return true;
+    }
+    return false;
+
 }
 
 export const generateBarCode = (id, connectId) => {
