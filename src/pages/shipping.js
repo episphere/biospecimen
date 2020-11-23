@@ -1,6 +1,6 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox} from "./../events.js";
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
@@ -148,6 +148,11 @@ export const startShipping = async (userName) => {
 </div>
 
     </br>
+    <div id="tempTubeReminder" style="color:red;display:none;">
+        <p>
+            Please put a temperature monitor in the box for shipping
+        </p>
+    </div>
     <div id="edit">
             <table  class="table" style="width:100%;border:1px solid;" id = "saveTable">
                 <tr>
@@ -197,7 +202,7 @@ export const startShipping = async (userName) => {
         hiddenJSONLocation[box['boxId']] = box['bags']
     }
     populateBoxSelectList(hiddenJSONLocation);
-
+    populateTempNotification();
     addEventNavBarShipment("navBarShippingDash");
     addEventNavBarShippingManifest(userName);
     addEventAddBox();
@@ -342,7 +347,10 @@ export const shippingManifest = async (boxesToShip, userName) => {
                 </tr>
             </table>
         </div>
-        
+        <div class="row" id="checkForTemp" style="display:none">
+            <input type="checkbox" id="tempMonitorChecked">
+            <label for="tempMonitorChecked">Temp Monitor is included in this shipment</label><br>
+        </div>
         <div class="row" style="margin-top:100px">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Return to Packaging</button>
@@ -379,12 +387,14 @@ export const shippingManifest = async (boxesToShip, userName) => {
     
     populateShippingManifestHeader(toDisplayJSON);
     populateShippingManifestBody(toDisplayJSON);
+    populateTempCheck();
     const btn = document.getElementById('completePackaging');
     document.getElementById('completePackaging').addEventListener('click', e => {
         e.stopPropagation();
         if(btn.classList.contains('active')) return;
+        let currChecked = document.getElementById('tempMonitorChecked').checked;
             //return box 1 info
-            shipmentTracking(toDisplayJSON, userName);
+            shipmentTracking(toDisplayJSON, userName, currChecked);
     });
     //addEventNavBarShipment("navBarShippingDash");
     //addEventSelectParticipantForm();
@@ -392,7 +402,7 @@ export const shippingManifest = async (boxesToShip, userName) => {
 }
 
 
-export const shipmentTracking = (hiddenJSON, userName) => {
+export const shipmentTracking = (hiddenJSON, userName, tempCheckChecked) => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     //store a secret json that has all of the packed ones in it
     //{"Box1":{specimenId:[allTubes], specimenId:[allTubes]}}
@@ -456,14 +466,14 @@ export const shipmentTracking = (hiddenJSON, userName) => {
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
     }
     populateTrackingQuery(hiddenJSON);
-    addEventCompleteButton(hiddenJSON, userName);
+    addEventCompleteButton(hiddenJSON, userName, tempCheckChecked);
     //addEventCompleteShippingButton(hiddenJSON);
     //addEventBackToSearch('navBarShippingDash');
     addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
     //addEventSubmitAddBag();
 }
 
-export const finalShipmentTracking = (hiddenJSON, userName) => {
+export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     console.log(userName)
     //store a secret json that has all of the packed ones in it
@@ -550,7 +560,7 @@ export const finalShipmentTracking = (hiddenJSON, userName) => {
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
     }
     populateFinalCheck(hiddenJSON);
-    addEventCompleteShippingButton(hiddenJSON, userName);;
+    addEventCompleteShippingButton(hiddenJSON, userName, tempChecked);;
     addEventBackToSearch('navBarShippingDash');
     //addEventBackToSearch('navBarShippingDash');
     //addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);

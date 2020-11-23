@@ -225,6 +225,17 @@ export const storeBox = async (box) =>{
     return response.json();
 }
 
+export const updateNewTempDate = async () =>{
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=updateTempCheckDate`, {
+        method: "GET",
+        headers: {
+            Authorization:"Bearer "+idToken
+        }
+    });
+    return response.json();
+}
+
 export const ship = async (boxes) => {
     const idToken = await getIdToken();
     let requestObj = {
@@ -377,6 +388,8 @@ export const getNextTempCheck = async () => {
     let nextDate = currJSON['nextTempMonitor']
     let todaysDate = new Date();
     let tempDate = new Date(Date.parse(nextDate))
+    console.log('DATEweopibvwoidvbsdv: ' + tempDate.toString())
+    console.log(todaysDate.toString())
     if(todaysDate >= tempDate){
         return true;
     }

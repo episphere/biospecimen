@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, getIdToken, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, getIdToken, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking} from './pages/shipping.js';
 import { userListTemplate } from './pages/users.js';
@@ -241,23 +241,23 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let currBag = [];
     let empty = true;
     let translateNumToType = {
-        "0001":"Serum Seperator",
-        "0002":"Serum Seperator",
-        "0003":"Heparin",
-        "0004":"EDTA",
-        "0005":"ACD",
-        "0006":"Urine Tube",
+        "0001":"SST/Gold",
+        "0002":"SST/Gold",
+        "0003":"Heparin/Green",
+        "0004":"EDTA/Lavender",
+        "0005":"ACD/Yellow",
+        "0006":"Urine/Yellow",
         "0007":"Mouthwash Container",
-        "0011":"Serum Seperator",
-        "0012":"Serum Seperator",
-        "0013":"Heparin",
-        "0014":"EDTA",
+        "0011":"SST/Gold",
+        "0012":"SST/Gold",
+        "0013":"Heparin/Green",
+        "0014":"EDTA/Lavender",
         "0016":"Urine Cup",
-        "0021":"Serum Seperator",
-        "0022":"Serum Seperator",
-        "0031":"Serum Seperator",
-        "0032":"Serum Seperator",
-        "0024":"EDTA",
+        "0021":"SST/Gold",
+        "0022":"SST/Gold",
+        "0031":"SST/Gold",
+        "0032":"SST/Gold",
+        "0024":"EDTA/Lavender",
         "0050":"NA",
         "0051":"NA",
         "0052":"NA",
@@ -814,6 +814,29 @@ export const populateSaveTable = (hiddenJSON) => {
 }
 }
 
+export const populateTempNotification = () => {
+    
+    let checkDate = getNextTempCheck();
+    let toToggle = document.getElementById('tempTubeReminder');
+    if(checkDate == true){
+        toToggle.style.display='block';
+    }
+    else{
+        toToggle.style.display='none';
+    }
+}
+
+export const populateTempCheck = () => {
+    let checkDate = getNextTempCheck();
+    let toToggle = document.getElementById('checkForTemp');
+    if(checkDate == true){
+        toToggle.style.display='block';
+    }
+    else{
+        toToggle.style.display='none';
+    }
+}
+
 export const populateShippingManifestHeader = (hiddenJSON) => {
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
@@ -917,23 +940,23 @@ export const populateBoxSelectList = (hiddenJSON) => {
     let boxKeys = Object.keys(currBox)
     toInsertTable.innerText = '';
     let translateNumToType = {
-        "0001":"Serum Seperator",
-        "0002":"Serum Seperator",
-        "0003":"Heparin",
-        "0004":"EDTA",
-        "0005":"ACD",
-        "0006":"Urine Tube",
+        "0001":"SST/Gold",
+        "0002":"SST/Gold",
+        "0003":"Heparin/Green",
+        "0004":"EDTA/Lavender",
+        "0005":"ACD/Yellow",
+        "0006":"Urine/Yellow",
         "0007":"Mouthwash Container",
-        "0011":"Serum Seperator",
-        "0012":"Serum Seperator",
-        "0013":"Heparin",
-        "0014":"EDTA",
+        "0011":"SST/Gold",
+        "0012":"SST/Gold",
+        "0013":"Heparin/Green",
+        "0014":"EDTA/Lavender",
         "0016":"Urine Cup",
-        "0021":"Serum Seperator",
-        "0022":"Serum Seperator",
-        "0031":"Serum Seperator",
-        "0032":"Serum Seperator",
-        "0024":"EDTA",
+        "0021":"SST/Gold",
+        "0022":"SST/Gold",
+        "0031":"SST/Gold",
+        "0032":"SST/Gold",
+        "0024":"EDTA/Lavender",
         "0050":"NA",
         "0051":"NA",
         "0052":"NA",
@@ -1170,23 +1193,23 @@ export const populateTubeInBoxList = async () => {
     toInsertTable.innerText = '';
     //set the rest of the table up
     let translateNumToType = {
-        "0001":"Serum Seperator",
-        "0002":"Serum Seperator",
-        "0003":"Heparin",
-        "0004":"EDTA",
-        "0005":"ACD",
-        "0006":"Urine Tube",
+        "0001":"SST/Gold",
+        "0002":"SST/Gold",
+        "0003":"Heparin/Green",
+        "0004":"EDTA/Lavender",
+        "0005":"ACD/Yellow",
+        "0006":"Urine/Yellow",
         "0007":"Mouthwash Container",
-        "0011":"Serum Seperator",
-        "0012":"Serum Seperator",
-        "0013":"Heparin",
-        "0014":"EDTA",
+        "0011":"SST/Gold",
+        "0012":"SST/Gold",
+        "0013":"Heparin/Green",
+        "0014":"EDTA/Lavender",
         "0016":"Urine Cup",
-        "0021":"Serum Seperator",
-        "0022":"Serum Seperator",
-        "0031":"Serum Seperator",
-        "0032":"Serum Seperator",
-        "0024":"EDTA",
+        "0021":"SST/Gold",
+        "0022":"SST/Gold",
+        "0031":"SST/Gold",
+        "0032":"SST/Gold",
+        "0024":"EDTA/Lavender",
         "0050":"NA",
         "0051":"NA",
         "0052":"NA",
@@ -1866,23 +1889,23 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
     let bags = Object.keys(currBox);
     let rowCount = 1;
     let translateNumToType = {
-        "0001":"Serum Seperator",
-        "0002":"Serum Seperator",
-        "0003":"Heparin",
-        "0004":"EDTA",
-        "0005":"ACD",
-        "0006":"Urine Tube",
+        "0001":"SST/Gold",
+        "0002":"SST/Gold",
+        "0003":"Heparin/Green",
+        "0004":"EDTA/Lavender",
+        "0005":"ACD/Yellow",
+        "0006":"Urine/Yellow",
         "0007":"Mouthwash Container",
-        "0011":"Serum Seperator",
-        "0012":"Serum Seperator",
-        "0013":"Heparin",
-        "0014":"EDTA",
+        "0011":"SST/Gold",
+        "0012":"SST/Gold",
+        "0013":"Heparin/Green",
+        "0014":"EDTA/Lavender",
         "0016":"Urine Cup",
-        "0021":"Serum Seperator",
-        "0022":"Serum Seperator",
-        "0031":"Serum Seperator",
-        "0032":"Serum Seperator",
-        "0024":"EDTA",
+        "0021":"SST/Gold",
+        "0022":"SST/Gold",
+        "0031":"SST/Gold",
+        "0032":"SST/Gold",
+        "0024":"EDTA/Lavender",
         "0050":"NA",
         "0051":"NA",
         "0052":"NA",
@@ -1944,7 +1967,7 @@ export const populateTrackingQuery = (hiddenJSON) => {
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
 }
 
-export const addEventCompleteButton = (hiddenJSON, userName) => {
+export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
     document.getElementById('completeTracking').addEventListener('click', () =>{
         let boxes = Object.keys(hiddenJSON);
         let emptyField= false;
@@ -1960,13 +1983,13 @@ export const addEventCompleteButton = (hiddenJSON, userName) => {
         if(emptyField == false){
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
             console.log('done')
-            finalShipmentTracking(hiddenJSON, userName);
+            finalShipmentTracking(hiddenJSON, userName, tempChecked);
         }
     })
     
 }
 
-export const addEventCompleteShippingButton = (hiddenJSON, userName) => {
+export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked) => {
     document.getElementById('finalizeModalSign').addEventListener('click', async () =>{
         let finalizeTextField = document.getElementById('finalizeSignInput');
 
@@ -1975,6 +1998,9 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName) => {
             console.log(JSON.stringify(boxes));
             await ship(boxes);
             document.getElementById('finalizeModalCancel').click();
+            if(tempChecked){
+                updateNewTempDate();
+            }
             startShipping();
         }
         else{
