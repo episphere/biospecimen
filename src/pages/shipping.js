@@ -202,7 +202,7 @@ export const startShipping = async (userName) => {
         hiddenJSONLocation[box['boxId']] = box['bags']
     }
     populateBoxSelectList(hiddenJSONLocation);
-    populateTempNotification();
+    await populateTempNotification();
     addEventNavBarShipment("navBarShippingDash");
     addEventNavBarShippingManifest(userName);
     addEventAddBox();
@@ -387,7 +387,7 @@ export const shippingManifest = async (boxesToShip, userName) => {
     
     populateShippingManifestHeader(toDisplayJSON);
     populateShippingManifestBody(toDisplayJSON);
-    populateTempCheck();
+    await populateTempCheck();
     const btn = document.getElementById('completePackaging');
     document.getElementById('completePackaging').addEventListener('click', e => {
         e.stopPropagation();

@@ -814,9 +814,9 @@ export const populateSaveTable = (hiddenJSON) => {
 }
 }
 
-export const populateTempNotification = () => {
+export const populateTempNotification = async () => {
     
-    let checkDate = getNextTempCheck();
+    let checkDate = await getNextTempCheck();
     let toToggle = document.getElementById('tempTubeReminder');
     if(checkDate == true){
         toToggle.style.display='block';
@@ -826,8 +826,8 @@ export const populateTempNotification = () => {
     }
 }
 
-export const populateTempCheck = () => {
-    let checkDate = getNextTempCheck();
+export const populateTempCheck = async () => {
+    let checkDate = await getNextTempCheck();
     let toToggle = document.getElementById('checkForTemp');
     if(checkDate == true){
         toToggle.style.display='block';
