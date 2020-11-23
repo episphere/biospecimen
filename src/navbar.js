@@ -97,7 +97,7 @@ export const adminNavBar = (name) => {
         </div>
         <div class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link" href="#shipping" id="shipping" title="Shipping"><i class="fas fa-file-alt"></i> Shipping</a>
+                <a class="nav-link" href="#shipping" id="shipping" title="Shipping"><i class="fas fa-shipping-fast"></i> Shipping</a>
             </li>
         </div>
         <div class="navbar-nav">
