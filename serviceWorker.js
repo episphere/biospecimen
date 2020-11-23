@@ -45,5 +45,5 @@ registerRoute(
     }),
     'POST'
 );
-
+workbox.setConfig({debug: false});
 workbox.precaching.precacheAndRoute([{url: 'index.html', revision: `4`}]);
