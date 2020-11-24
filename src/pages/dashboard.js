@@ -150,7 +150,7 @@ export const searchResults = (result) => {
                         <th>Select</th>
                         <th>Last name</th>
                         <th>First name</th>
-                        <th>Middle initial</th>
+                        <th>Middle Name</th>
                         <th>Date of birth</th>
                         <th>Address</th>
                         <th>Connect ID</th>
