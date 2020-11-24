@@ -1329,7 +1329,8 @@ export const addEventChangeLocationSelect = () => {
 export const addEventBackToSearch = (id) => {
     document.getElementById(id).addEventListener('click', e => {
         e.stopPropagation();
-        searchTemplate();
+        if(id !== 'checkOutExit') searchTemplate();
+        else location.hash = '#welcome';
     });
 };
 
@@ -1773,7 +1774,7 @@ const finalizeHandler = async (data, masterSpecimenId, cntd) => {
         const response = await findParticipant(query);
         const participantData = response.data[0];
         hideAnimation();
-        if(!document.getElementById('participantCheckOut')) searchTemplate();
+        if(!document.getElementById('participantCheckOut')) location.hash = '#welcome'
         else checkOutScreen(participantData, specimenData);
     }
     else {
