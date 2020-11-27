@@ -61,7 +61,8 @@ export const collectProcessTemplate = (data, formData) => {
                                         data-tube-type="${obj.tubeType}" 
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} 
                                         id="${obj.concept}Deviated"
-                                    >`: ``}</td>
+                                    >`: ``}
+                                </td>
                             </tr>
                         `
                     });
