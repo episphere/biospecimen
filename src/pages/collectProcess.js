@@ -44,12 +44,12 @@ export const collectProcessTemplate = (data, formData) => {
                                         type="text" 
                                         autocomplete="off" 
                                         id="${obj.concept}Id" 
-                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['label'] ? `value='${formData[`${obj.concept}`]['label']}'`: ''}
+                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['label'] ? `value='${formData[`${obj.concept}`]['label']}'`: ' '}
                                         class="form-control ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} input-barcode-id" 
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': 'required'} 
                                         placeholder="Scan/Type in Full Specimen ID"
                                     >
-                                    <button class="barcode-btn-collect-process" type="button" id="${obj.concept}IdBarCodeBtn" data-barcode-input="${obj.concept}Id"><i class="fas fa-barcode"></i></button>
+                                    ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? `<button class="barcode-btn-collect-process" type="button" id="${obj.concept}IdBarCodeBtn" data-barcode-input="${obj.concept}Id"><i class="fas fa-barcode"></i></button>`: ''}
                                 </td>
                                 <td>${obj.deviationChkBox === true ? `
                                     <input 

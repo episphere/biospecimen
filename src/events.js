@@ -1607,7 +1607,7 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
 
         if(biospecimenData && biospecimenData['tubeCollectedAt'] === undefined) biospecimenData['tubeCollectedAt'] = new Date().toISOString();
         checkboxes.forEach((dt) => {
-            biospecimenData[`${dt.id}`]['593843561'] = dt.checked ? 353358909 : 104430631;
+            if(biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
             if(biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
                 biospecimenData[`${dt.id}`]['678857215'] = 104430631
                 biospecimenData[`${dt.id}`]['label'] = '';
@@ -1615,11 +1615,12 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
                 biospecimenData[`${dt.id}`]['410912345'] = 104430631;
                 biospecimenData[`${dt.id}`]['536710547'] = '';
             }
+            biospecimenData[`${dt.id}`]['593843561'] = dt.checked ? 353358909 : 104430631;
         });
 
         // Explicitely specify 2 biohazard bags
-        if(biospecimenData['787237543'] === undefined) biospecimenData['787237543'] = {}
-        if(biospecimenData['223999569'] === undefined) biospecimenData['223999569'] = {}
+        if(biospecimenData['787237543'] === undefined) biospecimenData['787237543'] = { '593843561': 353358909 }
+        if(biospecimenData['223999569'] === undefined) biospecimenData['223999569'] = { '593843561': 353358909 }
 
         await storeSpecimen([biospecimenData]);
         hideAnimation();
