@@ -478,7 +478,7 @@ export const addEventBarCodeScanner = (id, start, end, index) => {
         Quagga.onDetected(result => {	
             if (result.codeResult.code){
                 const barcode = result.codeResult.code;
-                if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,9))) return;
+                if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,masterSpecimenIDRequirement.length))) return;
                 const elementID = document.activeElement.dataset.barcodeInput;
                 if(!elementID) return;
                 if(elementID === 'scanSpecimenID') {

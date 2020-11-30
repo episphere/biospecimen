@@ -1,6 +1,6 @@
 import { addEventBarCodeScanner, generateBarCode, removeActiveClass, siteLocations } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
-import { workflows } from "../tubeValidation.js";
+import { masterSpecimenIDRequirement, workflows } from "../tubeValidation.js";
 
 export const specimenTemplate = (data, formData) => {
     removeActiveClass('navbar-btn', 'active')
@@ -76,7 +76,7 @@ export const specimenTemplate = (data, formData) => {
     `;
     document.getElementById('contentBody').innerHTML = template;
     document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
-    addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, 9);
+    addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, masterSpecimenIDRequirement.length);
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventSpecimenLinkForm(formData);
     addEventBackToSearch('navBarSearch');

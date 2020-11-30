@@ -1,6 +1,6 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventTubeCollectedForm, addEventBackToTubeCollection } from './../events.js'
 import { removeActiveClass, generateBarCode, addEventBarCodeScanner } from '../shared.js';
-import { siteSpecificTubeRequirements, workflows } from '../tubeValidation.js';
+import { siteSpecificTubeRequirements, totalCollectionIDLength, workflows } from '../tubeValidation.js';
 
 export const collectProcessTemplate = (data, formData) => {
     let template = `
@@ -103,7 +103,7 @@ export const collectProcessTemplate = (data, formData) => {
     addEventBiospecimenCollectionFormCntd(data, formData);
     const barCodeBtns = Array.from(document.getElementsByClassName('barcode-btn-collect-process'));
     barCodeBtns.forEach(btn => {
-        addEventBarCodeScanner(btn.id, 0, 14);
+        addEventBarCodeScanner(btn.id, 0, totalCollectionIDLength);
     });
 }
 

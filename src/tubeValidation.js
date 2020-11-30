@@ -419,6 +419,8 @@ export const siteSpecificTubeRequirements = {
     }
 }
 
+export const totalCollectionIDLength = 14;
+
 // Collection ID eg: CAX123456
 export const masterSpecimenIDRequirement = {
     regExp: /^CXA+[0-9]{6}$/,
