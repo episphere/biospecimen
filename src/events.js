@@ -268,11 +268,11 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         if(currSplit.length >= 2 && currSplit[1] == '0008'){
             //look for all non-moutwash (0007)
             for(let i = 0; i < biospecimensList.length; i++){
-                if(biospecimensList[i] != '0007'){
+                if(biospecimensList[i] != '0007' && biospecimensList[i] != '0008'){
                     empty = false;
                     currBag.push(biospecimensList[i])
                     var rowCount = tubeTable.rows.length;
-                    var row = tubeTable.insertRow(rowCount);           
+                    var row = tubeTable.insertRow(rowCount);
                     row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
                     let thisId =biospecimensList[i];
                     let toAddType = 'N/A'
@@ -294,7 +294,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         }
         else{
             for(let i = 0; i < biospecimensList.length; i++){
-                if(biospecimensList[i] == '0007'){
+                if(biospecimensList[i] == '0007' && biospecimensList[i] != '0009'){
                     empty = false;
                     currBag.push(biospecimensList[i])
                     var rowCount = tubeTable.rows.length;
@@ -432,10 +432,25 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan)
 
         console.log(boxIds);    
         for(let i = 0; i < boxIds.length; i++){
+            let currTime = new Date();
             let toPass = {};
+            let found = false;
+            for(let j = 0; j < boxJSONS.length; j++){
+                if(boxJSONS[j]['boxId'] == boxIds[i]){
+                    if(boxJSONS[j].hasOwnProperty('dateCreated')){
+                        toPass['dateCreated'] = boxJSONS[j]['dateCreated'];
+                        found = true;
+                    }
+                }
+            }
+
+            if(found == false){
+                toPass['dateCreated'] = currTime.toString();
+            }
             toPass['boxId'] = boxIds[i];
             toPass['bags'] = hiddenJSON[boxIds[i]]
             toPass['location'] = locations[boxIds[i]]
+            toPass['lastUpdatedTiime'] = currTime.toString();
             await storeBox(toPass);
         }
 
@@ -456,8 +471,11 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan)
 }
 
 export const getInstituteSpecimensList = async(hiddenJSON) => {
-    const response = await searchSpecimenInstitute();
-    let specimenData = response.data;
+    //const response = await searchSpecimenInstitute();
+    let specimenData = await searchSpecimenInstitute();
+    console.log('waoikebnp;oisdgbvspoiduvbgaoiwluejfbolafiujbf');
+    console.log(JSON.stringify(specimenData));
+    //let specimenData = response.data;
     console.log(JSON.stringify('apeuidbvaosidvbasd;vkbasv:    '  + specimenData))
     let toReturn = {};
     let checkedOrphans = false;
@@ -603,8 +621,8 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
 
 export const populateSpecimensList = async (hiddenJSON) => {
     let specimenObject = await getInstituteSpecimensList(hiddenJSON);
-    const response = await searchSpecimenInstitute();
-    let specimenData = response.data
+    let specimenData = await searchSpecimenInstitute();
+    //let specimenData = response.data
     console.log("SpecimenData!!: " + JSON.stringify(specimenData))
     console.log(JSON.stringify(specimenObject))
     for(let i = 0; i < specimenData.length; i++){

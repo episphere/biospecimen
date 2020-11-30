@@ -55,7 +55,7 @@ export const startShipping = async (userName) => {
         
         <div class="row">
             <div class="col-lg">
-                Choose your location
+                Choose your shipping location
             </div>
         </div>
         <div class="row" style="margin-bottom:10px">
@@ -84,7 +84,7 @@ export const startShipping = async (userName) => {
             
         </div>
         <div class="row">
-    <div class="col-sm">
+    <div class="col-5">
     <div class="panel panel-default" style="border-style:solid;height:400px;border-width:1px;overflow:auto;" id="specimenPanel">
             <table class = "table" style="width: 100%;margin-bottom:0px;" id="specimenList" >
                 <tr>
@@ -99,7 +99,7 @@ export const startShipping = async (userName) => {
             </table>
     </div>
     </div>
-    <div class="col-lg">
+    <div class="col-7">
         <div class="row" style="margin-bottom:10px;">
             <div class="col" style="width:50%;float:left;">
                 <select class="selectpicker" id="selectBoxList">

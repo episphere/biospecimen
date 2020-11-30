@@ -336,7 +336,23 @@ export const searchSpecimenInstitute = async () => {
             Authorization:"Bearer "+idToken
         }
     });
-    return response.json();
+
+    let a = await response.json();
+    let data = a.data;
+    for(let i = 0; i < data.length; i++){
+        let currJSON = data[i];
+        let keys = Object.keys(currJSON);
+        for(let j = 0; j < keys.length; j++){
+            if(keys[j].match(/tube[0-9]*Id/) != null){
+                if(currJSON[keys[j]] == '0008' || currJSON[keys[j]] == '0009'){
+                    delete currJSON[keys[j]]
+                }
+            }
+        }
+    }
+    //for ()
+
+    return data;
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
