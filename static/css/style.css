@@ -298,3 +298,7 @@ canvas.drawing, canvas.drawingBuffer {
 .deviation-comments-width {
     max-width: 120px;
 }
+
+.active {
+    background-color: #bbcffc85 !important;
+}
