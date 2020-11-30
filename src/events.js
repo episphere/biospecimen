@@ -1667,7 +1667,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         data[`${input.id.replace('Id', '')}`]['label'] = `${masterID} ${tubeID}`;
     });
     if(hasError) return;
-    data['collectionAdditionalNotes'] = document.getElementById('collectionAdditionalNotes').value;
+    data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
     Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[dt.id.replace('Deviated', '')]['678857215'] = dt.checked ? 353358909 : 104430631)
     
     showAnimation();
@@ -1737,6 +1737,8 @@ const explanationHandler = async (data, masterSpecimenId, cntd) => {
         }
         formData[`${ta.id}`] = ta.value;
     });
+    console.log(formData)
+    return
     formData['820476880'] = masterSpecimenId;
     showAnimation();
     await storeSpecimen([formData]);
