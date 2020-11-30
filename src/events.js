@@ -1605,7 +1605,7 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
         showAnimation();
         const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
 
-        if(biospecimenData && biospecimenData['tubeCollectedAt'] === undefined) biospecimenData['tubeCollectedAt'] = new Date().toISOString();
+        if(biospecimenData && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
         checkboxes.forEach((dt) => {
             if(biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
             if(biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
@@ -1614,6 +1614,7 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
                 biospecimenData[`${dt.id}`]['248868659'] = [];
                 biospecimenData[`${dt.id}`]['410912345'] = 104430631;
                 biospecimenData[`${dt.id}`]['536710547'] = '';
+                biospecimenData[`${dt.id}`]['226562200'] = 104430631;
             }
             biospecimenData[`${dt.id}`]['593843561'] = dt.checked ? 353358909 : 104430631;
         });
@@ -1664,6 +1665,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
             errorMessage(input.id, 'Invalid Full Specimen ID.', focus);
             focus = false;
         }
+        if(additionalTubeIDRequirement.regExp.test(tubeID))  data[`${input.id.replace('Id', '')}`]['226562200'] = 353358909;
         data[`${input.id.replace('Id', '')}`]['label'] = `${masterID} ${tubeID}`;
     });
     if(hasError) return;
