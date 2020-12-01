@@ -1635,6 +1635,7 @@ const btnsClicked = async (connectId, formData, cont) => {
             return;
         }
     }
+    if(hasError) return;
     if(document.getElementById('collectionLocation')) formData['Collection_Location'] = document.getElementById('collectionLocation').value;
     formData['820476880'] = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     if(enterSpecimenID1) formData['387108065'] = 353358909
