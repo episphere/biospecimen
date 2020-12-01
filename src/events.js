@@ -1815,20 +1815,23 @@ const explanationHandler = async (data, biospecimenData, cntd) => {
     Array.from(textAreas).forEach(ta => {
         const tubeId = ta.id.replace('Explanation','').replace('Deviated', '');
         if(document.getElementById(ta.id.replace('Explanation', 'Reason')).multiple) {
-            biospecimenData[tubeId]['248868659'] = Array.from(document.getElementById(ta.id.replace('Explanation', 'Reason'))).filter(el => el.selected).map(el => el.value);
+            biospecimenData[tubeId]['248868659'] = Array.from(document.getElementById(ta.id.replace('Explanation', 'Reason'))).filter(el => el.selected).map(el => parseInt(el.value));
             biospecimenData[tubeId]['536710547'] = ta.value;
+            // Discard tube
+            if(biospecimenData[tubeId]['248868659'].includes(472864016) || biospecimenData[tubeId]['248868659'].includes(956345366)) {
+                biospecimenData[tubeId]['762124027'] = 353358909
+            }
+            else {
+                biospecimenData[tubeId]['762124027'] = 104430631
+            }
         }
         else {
             biospecimenData[tubeId]['883732523'] = parseInt(document.getElementById(ta.id.replace('Explanation', 'Reason')).value);
             biospecimenData[tubeId]['338286049'] = ta.value;
         }
     });
-    console.log(biospecimenData)
-    debugger
-    return
-    formData['820476880'] = masterSpecimenId;
     showAnimation();
-    await storeSpecimen([formData]);
+    await storeSpecimen([biospecimenData]);
     if(cntd) {
         const specimenData = (await searchSpecimen(masterSpecimenId)).data;
         hideAnimation();
