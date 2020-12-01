@@ -1,4 +1,4 @@
-import { addEventBackToSearch, addEventQRCodeBtn } from "../events.js";
+import { addEventBackToSearch, addEventCheckOutComplete, addEventQRCodeBtn } from "../events.js";
 import { generateBarCode, removeActiveClass } from "./../shared.js";
 
 export const checkOutScreen = (data, specimenData) => {
@@ -78,6 +78,6 @@ export const checkOutScreen = (data, specimenData) => {
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventBackToSearch('checkInExit');
-    addEventBackToSearch('checkOutExit');
+    addEventCheckOutComplete(specimenData);
     addEventQRCodeBtn();
 }

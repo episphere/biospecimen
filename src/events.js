@@ -78,7 +78,6 @@ export const addEventsearchSpecimen = () => {
         const biospecimen = await searchSpecimen(masterSpecimenId);
         if(biospecimen.code !== 200) {
             hideAnimation();
-            
             showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
             return
         }
@@ -87,7 +86,11 @@ export const addEventsearchSpecimen = () => {
         const response = await findParticipant(query);
         hideAnimation();
         const data = response.data[0];
-        if(biospecimenData.finalized) checkOutScreen(data, biospecimenData);
+        if(biospecimenData['410912345'] && biospecimenData['410912345'] === 353358909 && biospecimenData['420757389'] && biospecimenData['420757389'] === 353358909) {
+            searchTemplate();
+            showNotifications({title: 'Completed', body: 'Specimen is finalized and the Participant is already checked out!'})
+        }
+        else if(biospecimenData['410912345'] && biospecimenData['410912345'] === 353358909) checkOutScreen(data, biospecimenData);
         else tubeCollectedTemplate(data, biospecimenData)
     })
 }
@@ -1409,10 +1412,21 @@ export const addEventChangeLocationSelect = () => {
 export const addEventBackToSearch = (id) => {
     document.getElementById(id).addEventListener('click', e => {
         e.stopPropagation();
-        if(id !== 'checkOutExit') searchTemplate();
-        else location.hash = '#welcome';
+        location.hash = '#welcome';
     });
 };
+
+export const addEventCheckOutComplete = (specimenData) => {
+    const btn = document.getElementById('checkOutExit');
+    btn.addEventListener('click', async () => {
+        specimenData['420757389'] = 353358909;
+        specimenData['343048998'] = new Date().toISOString();
+        showAnimation();
+        await storeSpecimen([specimenData]);
+        hideAnimation();
+        searchTemplate();
+    })
+}
 
 export const addEventHideNotification = (element) => {
     const hideNotification = element.querySelectorAll('.hideNotification');
@@ -1845,30 +1859,31 @@ const explanationHandler = async (data, biospecimenData, cntd) => {
 
 
 
-export const addEventFinalizeForm = (data, masterSpecimenId) => {
+export const addEventFinalizeForm = (specimenData) => {
     const finalizedSaveExit = document.getElementById('finalizedSaveExit');
     finalizedSaveExit.addEventListener('click', () => {
-        finalizeHandler(data, masterSpecimenId);
+        finalizeHandler(specimenData);
     });
 }
 
-export const addEventFinalizeFormCntd = (data, masterSpecimenId) => {
+export const addEventFinalizeFormCntd = (specimenData) => {
     const form = document.getElementById('finalizeForm');
     form.addEventListener('submit', e => {
         e.preventDefault();
-        finalizeHandler(data, masterSpecimenId, true);
+        finalizeHandler(specimenData, true);
     });
 }
 
-const finalizeHandler = async (data, masterSpecimenId, cntd) => {
+const finalizeHandler = async (biospecimenData, cntd) => {
+    const masterSpecimenId = biospecimenData['820476880']
     let formData = {};
-    formData['finalizedAdditionalNotes'] = document.getElementById('finalizedAdditionalNotes').value;
-    formData['820476880'] = masterSpecimenId;
+    biospecimenData['260133861'] = document.getElementById('finalizedAdditionalNotes').value;
+    
     if(cntd) {
-        formData['finalized'] = true;
-        formData['finalizedAt'] = new Date().toISOString();
+        biospecimenData['410912345'] = 353358909;
+        biospecimenData['556788178'] = new Date().toISOString();
         showAnimation();
-        await storeSpecimen([formData]);
+        await storeSpecimen([biospecimenData]);
         showNotifications({title: 'Specimen Finalized', body: 'Collection Finalized Successfully!'});
         const specimenData = (await searchSpecimen(masterSpecimenId)).data;
         let query = `connectId=${parseInt(specimenData.connectId)}`;
