@@ -1,5 +1,5 @@
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
-
+workbox.setConfig({debug: false});
 const { registerRoute } = workbox.routing;
 const { CacheFirst, NetworkFirst, StaleWhileRevalidate, NetworkOnly } = workbox.strategies;
 const { CacheableResponse, CacheableResponsePlugin } = workbox.cacheableResponse;
@@ -45,5 +45,4 @@ registerRoute(
     }),
     'POST'
 );
-workbox.setConfig({debug: false});
-workbox.precaching.precacheAndRoute([{url: 'index.html', revision: `4`}]);
+workbox.precaching.precacheAndRoute([{url: 'index.html', revision: `5`}]);

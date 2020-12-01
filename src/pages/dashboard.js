@@ -1,6 +1,7 @@
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates } from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
+import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
 export const userDashboard = (auth, route, goToSpecimenSearch) => {
     auth.onAuthStateChanged(async user => {
@@ -131,7 +132,7 @@ export const searchBiospecimenTemplate = () => {
     document.getElementById('contentBody').innerHTML = template;
     addEventsearchSpecimen();
     addEventBackToSearch('navBarSearch');
-    addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9);
+    addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, masterSpecimenIDRequirement.length);
 }
 
 export const searchResults = (result) => {

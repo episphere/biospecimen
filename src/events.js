@@ -7,7 +7,7 @@ import { specimenTemplate } from './pages/specimen.js';
 import { collectProcessTemplate, tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { explanationTemplate } from './pages/explanation.js';
-import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, workflows } from './tubeValidation.js';
+import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength, workflows } from './tubeValidation.js';
 import { checkOutScreen } from './pages/checkout.js';
 
 export const addEventSearchForm1 = () => {
@@ -71,7 +71,7 @@ export const addEventsearchSpecimen = () => {
         removeAllErrors();
         const masterSpecimenId = document.getElementById('masterSpecimenId').value;
         if(!masterSpecimenIDRequirement.regExp.test(masterSpecimenId) || masterSpecimenId.length !== masterSpecimenIDRequirement.length) {
-            errorMessage('masterSpecimenId', 'Collection ID must be 9 characters long and in CXA123456 format.', true);
+            errorMessage('masterSpecimenId', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, true);
             return;
         }
         showAnimation();
@@ -83,14 +83,6 @@ export const addEventsearchSpecimen = () => {
             return
         }
         const biospecimenData = biospecimen.data;
-        let keys = Object.keys(biospecimenData)
-        for(let i = 0; i < keys.length; i++){
-            let currData = biospecimenData[keys[i]];
-            let re = /tube[0-9]*Id/
-            console.log(keys[i])
-            console.log(keys[i].match(/tube[0-9]*Id/)==null)
-        }
-        console.log(JSON.stringify(biospecimenData))
         let query = `connectId=${parseInt(biospecimenData.connectId)}`;
         const response = await findParticipant(query);
         hideAnimation();
@@ -1552,7 +1544,7 @@ export const addEventCheckInCompleteForm = () => {
         const token = select.dataset.participantToken;
         let formData = {};
         formData['connectId'] = connectId;
-        formData['visitType'] = biospecimenVisitType;
+        formData['331584571'] = parseInt(biospecimenVisitType);
         formData['checkedInAt'] = new Date().toISOString();
         formData['token'] = token;
         let query = `connectId=${parseInt(connectId)}`;
@@ -1611,7 +1603,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     else if(scanSpecimenID && !enterSpecimenID1) {
         if(!masterSpecimenIDRequirement.regExp.test(scanSpecimenID) || scanSpecimenID.length !== masterSpecimenIDRequirement.length) {
             hasError = true;
-            errorMessage('scanSpecimenID', 'Collection ID must be 9 characters long and in CXA123456 format.', focus);
+            errorMessage('scanSpecimenID', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, focus);
             focus = false;
             return;
         }
@@ -1619,7 +1611,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     else if(!scanSpecimenID && enterSpecimenID1) {
         if(!masterSpecimenIDRequirement.regExp.test(enterSpecimenID1) || enterSpecimenID1.length !== masterSpecimenIDRequirement.length) {
             hasError = true;
-            errorMessage('enterSpecimenID1', 'Collection ID must be 9 characters long and in CXA123456 format.', focus);
+            errorMessage('enterSpecimenID1', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, focus);
             focus = false;
             return;
         }
@@ -1630,13 +1622,14 @@ const btnsClicked = async (connectId, formData, cont) => {
         }
     }
     if(document.getElementById('collectionLocation')) formData['Collection_Location'] = document.getElementById('collectionLocation').value;
-    formData['masterSpecimenId'] = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
-    
+    formData['820476880'] = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
+    if(enterSpecimenID1) formData['387108065'] = 353358909
+    else formData['387108065'] = 104430631;
     let query = `connectId=${parseInt(connectId)}`;
     showAnimation();
     const response = await findParticipant(query);
     const data = response.data[0];
-    const specimenData = (await searchSpecimen(formData['masterSpecimenId'])).data;
+    const specimenData = (await searchSpecimen(formData['820476880'])).data;
     hideAnimation();
     if(cont) {
         if(specimenData && specimenData.connectId && parseInt(specimenData.connectId) !== data.Connect_ID) {
@@ -1691,16 +1684,25 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
         
         showAnimation();
         const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
-        if(biospecimenData && biospecimenData['tubeCollectedAt'] === undefined) biospecimenData['tubeCollectedAt'] = new Date().toISOString();
-        Array.from(document.getElementsByClassName('tube-collected')).forEach((dt, index) => {
-            biospecimenData[`${dt.id}`] = dt.checked
-            if(!dt.checked) {
-                biospecimenData[`${dt.id.replace('Collected', 'Id')}`] = '';
+
+        if(biospecimenData && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+        checkboxes.forEach((dt) => {
+            if(biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
+            if(biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
+                biospecimenData[`${dt.id}`]['678857215'] = 104430631
+                biospecimenData[`${dt.id}`]['825582494'] = '';
+                biospecimenData[`${dt.id}`]['248868659'] = [];
+                biospecimenData[`${dt.id}`]['410912345'] = 104430631;
+                biospecimenData[`${dt.id}`]['536710547'] = '';
+                biospecimenData[`${dt.id}`]['226562200'] = 104430631;
             }
-            else{
-                biospecimenData[`${dt.id.replace('Collected', 'Shipped')}`] = false;
-            }
+            biospecimenData[`${dt.id}`]['593843561'] = dt.checked ? 353358909 : 104430631;
         });
+
+        // Explicitely specify 2 biohazard bags
+        if(biospecimenData['787237543'] === undefined) biospecimenData['787237543'] = { '593843561': 353358909 }
+        if(biospecimenData['223999569'] === undefined) biospecimenData['223999569'] = { '593843561': 353358909 }
+
         await storeSpecimen([biospecimenData]);
         hideAnimation();
         collectProcessTemplate(data, biospecimenData);
@@ -1708,7 +1710,7 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
 }
 
 const collectionSubmission = async (dt, biospecimenData, cntd) => {
-    const data = {};
+    const data = biospecimenData;
     removeAllErrors();
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
     let hasError = false;
@@ -1718,16 +1720,18 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
         const subSiteLocation = biospecimenData.Collection_Location;
         const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType]; 
-        const tubes = siteTubesList.filter(dt => dt.name === input.id.replace('Id', ''));
+        const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
+        
         let value = getValue(`${input.id}`);
-        const masterID = value.substr(0, 9);
-        const tubeID = value.substr(10, 14);
-        if(input.required && value.length !== 14) {
+        const masterID = value.substr(0, masterSpecimenIDRequirement.length);
+        const tubeID = value.substr(masterSpecimenIDRequirement.length + 1, totalCollectionIDLength);
+        
+        if(input.required && value.length !== totalCollectionIDLength) {
             hasError = true;
-            errorMessage(input.id, 'Combination of Collection ID and Full Specimen ID should be 14 characters long.', focus);
+            errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long.`, focus);
             focus = false;
         }
-        else if(input.required && masterID !== biospecimenData.masterSpecimenId) {
+        else if(input.required && masterID !== biospecimenData['820476880']) {
             hasError = true;
             errorMessage(input.id, 'Invalid Collection ID.', focus);
             focus = false;
@@ -1742,17 +1746,17 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
             errorMessage(input.id, 'Invalid Full Specimen ID.', focus);
             focus = false;
         }
-        data[`${input.id}`] = tubeID;
+        if(additionalTubeIDRequirement.regExp.test(tubeID))  data[`${input.id.replace('Id', '')}`]['226562200'] = 353358909;
+        data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`;
     });
     if(hasError) return;
-    data['collectionAdditionalNotes'] = document.getElementById('collectionAdditionalNotes').value;
-    Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[dt.id] = dt.checked)
-    if(biospecimenData.masterSpecimenId) data['masterSpecimenId'] = biospecimenData.masterSpecimenId;
+    data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
+    Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[dt.id.replace('Deviated', '')]['678857215'] = dt.checked ? 353358909 : 104430631)
     
     showAnimation();
     await storeSpecimen([data]);
     if(cntd) {
-        const specimenData = (await searchSpecimen(biospecimenData.masterSpecimenId)).data;
+        const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
         explanationTemplate(dt, specimenData);
     }
@@ -1816,7 +1820,9 @@ const explanationHandler = async (data, masterSpecimenId, cntd) => {
         }
         formData[`${ta.id}`] = ta.value;
     });
-    formData['masterSpecimenId'] = masterSpecimenId;
+    console.log(formData)
+    return
+    formData['820476880'] = masterSpecimenId;
     showAnimation();
     await storeSpecimen([formData]);
     if(cntd) {
@@ -1850,7 +1856,7 @@ export const addEventFinalizeFormCntd = (data, masterSpecimenId) => {
 const finalizeHandler = async (data, masterSpecimenId, cntd) => {
     let formData = {};
     formData['finalizedAdditionalNotes'] = document.getElementById('finalizedAdditionalNotes').value;
-    formData['masterSpecimenId'] = masterSpecimenId;
+    formData['820476880'] = masterSpecimenId;
     if(cntd) {
         formData['finalized'] = true;
         formData['finalizedAt'] = new Date().toISOString();

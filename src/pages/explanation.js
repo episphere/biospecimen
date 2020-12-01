@@ -1,5 +1,5 @@
 import { addEventExplanationForm, addEventExplanationFormCntd, addEventReturnToCollectProcess } from "./../events.js";
-import { generateBarCode } from "../shared.js";
+import { generateBarCode, visitType } from "../shared.js";
 import { finalizeTemplate } from "./finalize.js";
 
 export const explanationTemplate = (dt, biospecimenData) => {
@@ -16,9 +16,9 @@ export const explanationTemplate = (dt, biospecimenData) => {
                 <div class="row">${dt.RcrtUP_Lname_v1r0}, ${dt.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
-            ${biospecimenData.visitType ? `
+            ${biospecimenData['331584571'] ? `
                 <div class="ml-auto form-group">
-                    Visit: ${biospecimenData.visitType}
+                    Visit: ${visitType[biospecimenData['331584571']]}
                 </div>
             ` : ``
             }
@@ -32,7 +32,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
             array.push(tubeType);
             
             template += `<div class="row"><div class="col"><strong>${tubeType} not collected</strong></div></div>
-                <div class="row"><div class="col">Collection ID: ${biospecimenData['masterSpecimenId']}</div></div>
+                <div class="row"><div class="col">Collection ID: ${biospecimenData['820476880']}</div></div>
                 <div class="form-group row">
                     <div class="col">
                         <label for="${ele.id}Reason">Provide reason tube(s) was/were not collected:</label>
@@ -92,21 +92,21 @@ export const explanationTemplate = (dt, biospecimenData) => {
                 </br>
                 <div class="form-group row">
                     <div class="col-auto">
-                        <button class="btn btn-outline-danger" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" id="returnToCollectProcess">Return to Collect/Process</button>
+                        <button class="btn btn-outline-danger" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['820476880']}" id="returnToCollectProcess">Return to Collect/Process</button>
                     </div>
                     <div class="ml-auto">
-                        <button class="btn btn-outline-warning" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="button" id="explanationSaveExit">Save and Exit</button>
+                        <button class="btn btn-outline-warning" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['820476880']}" type="button" id="explanationSaveExit">Save and Exit</button>
                     </div>
                     <div class="col-auto">
-                        <button class="btn btn-outline-primary" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['masterSpecimenId']}" type="submit" id="explanationContinue">Next</button>
+                        <button class="btn btn-outline-primary" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['820476880']}" type="submit" id="explanationContinue">Next</button>
                     </div>
                 </div>
         `
         template += '</form>'
         document.getElementById('contentBody').innerHTML = template;
         generateBarCode('connectIdBarCode', dt.Connect_ID);
-        addEventExplanationForm(dt, biospecimenData.masterSpecimenId);
-        addEventExplanationFormCntd(dt, biospecimenData.masterSpecimenId);
+        addEventExplanationForm(dt, biospecimenData['820476880']);
+        addEventExplanationFormCntd(dt, biospecimenData['820476880']);
         addEventReturnToCollectProcess();
     }
     else {

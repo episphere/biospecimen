@@ -1,6 +1,6 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventTubeCollectedForm, addEventBackToTubeCollection } from './../events.js'
-import { removeActiveClass, generateBarCode, addEventBarCodeScanner } from '../shared.js';
-import { siteSpecificTubeRequirements, workflows } from '../tubeValidation.js';
+import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType } from '../shared.js';
+import { siteSpecificTubeRequirements, totalCollectionIDLength, workflows } from '../tubeValidation.js';
 
 export const collectProcessTemplate = (data, formData) => {
     let template = `
@@ -13,11 +13,11 @@ export const collectProcessTemplate = (data, formData) => {
             <div class="col">
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
-                <div class="row">Collection ID: ${formData.masterSpecimenId}</div>
+                <div class="row">Collection ID: ${formData['820476880']}</div>
             </div>
-            ${formData.visitType ? `
+            ${formData['331584571'] ? `
                 <div class="ml-auto form-group">
-                    Visit: ${formData.visitType}
+                    Visit: ${visitType[formData['331584571']]}
                 </div>
             ` : ``
             }
@@ -38,12 +38,30 @@ export const collectProcessTemplate = (data, formData) => {
                         template += `
                             <tr>
                                 <td>(${index+1}) ${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
-                                <td>${obj.collectionChkBox === true ? `<input type="checkbox" data-tube-label="(${index+1}) ${obj.specimenType}" class="tube-collected custom-checkbox-size disabled" data-tube-type="${obj.tubeType}" disabled ${formData[`${obj.name}Collected`] === true ? 'checked': ''} id="${obj.name}Collected">`: ``}</td>
+                                <td>${obj.collectionChkBox === true ? `<input type="checkbox" data-tube-label="(${index+1}) ${obj.specimenType}" class="tube-collected custom-checkbox-size disabled" data-tube-type="${obj.tubeType}" disabled ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? 'checked': ''} id="${obj.concept}">`: ``}</td>
                                 <td>
-                                    <input type="text" autocomplete="off" id="${obj.name}Id" ${formData[`${obj.name}Id`] ? `value='${formData.masterSpecimenId} ${formData[`${obj.name}Id`]}'`: ''} class="form-control ${formData[`${obj.name}Collected`] === false ? 'disabled': ''} input-barcode-id" ${formData[`${obj.name}Collected`] === false ? 'disabled': 'required'} placeholder="Scan/Type in Full Specimen ID">
-                                    <button class="barcode-btn-collect-process" type="button" id="${obj.name}IdBarCodeBtn" data-barcode-input="${obj.name}Id"><i class="fas fa-barcode"></i></button>
+                                    <input 
+                                        type="text" 
+                                        autocomplete="off" 
+                                        id="${obj.concept}Id" 
+                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['825582494'] ? `value='${formData[`${obj.concept}`]['825582494']}'`: ``}
+                                        class="form-control ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} input-barcode-id" 
+                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': 'required'} 
+                                        placeholder="Scan/Type in Full Specimen ID"
+                                    >
+                                    ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? `<button class="barcode-btn-collect-process" type="button" id="${obj.concept}IdBarCodeBtn" data-barcode-input="${obj.concept}Id"><i class="fas fa-barcode"></i></button>`: ''}
                                 </td>
-                                <td>${obj.deviationChkBox === true ? `<input type="checkbox" data-tube-label="(${index+1}) ${obj.specimenType}" class="tube-deviated custom-checkbox-size ${formData[`${obj.name}Collected`] === false ? 'disabled': ''}" ${formData[`${obj.name}Deviated`] === true ? 'checked': ''} data-tube-type="${obj.tubeType}" ${formData[`${obj.name}Collected`] === false ? 'disabled': ''} id="${obj.name}Deviated">`: ``}</td>
+                                <td>${obj.deviationChkBox === true ? `
+                                    <input 
+                                        type="checkbox" 
+                                        data-tube-label="(${index+1}) ${obj.specimenType}" 
+                                        class="tube-deviated custom-checkbox-size ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''}" 
+                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['678857215'] === 353358909 ? 'checked': ''} 
+                                        data-tube-type="${obj.tubeType}" 
+                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} 
+                                        id="${obj.concept}Deviated"
+                                    >`: ``}
+                                </td>
                             </tr>
                         `
                     });
@@ -56,7 +74,7 @@ export const collectProcessTemplate = (data, formData) => {
                 <div class="col">
                     <label for="collectionAdditionalNotes">Additional notes on collection</label>
                     </br>
-                    <textarea rows=3 class="form-control" id="collectionAdditionalNotes">${formData['collectionAdditionalNotes'] ? `${formData["collectionAdditionalNotes"]}`: ''}</textarea>
+                    <textarea rows=3 class="form-control" id="collectionAdditionalNotes">${formData['338570265'] ? `${formData["338570265"]}`: ''}</textarea>
                 </div>
             </div>
             </br>
@@ -80,12 +98,12 @@ export const collectProcessTemplate = (data, formData) => {
     addEventBackToSearch('navBarSearch');
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
-    addEventBackToTubeCollection(data, formData.masterSpecimenId);
+    addEventBackToTubeCollection(data, formData['820476880']);
     addEventBiospecimenCollectionForm(data, formData);
     addEventBiospecimenCollectionFormCntd(data, formData);
     const barCodeBtns = Array.from(document.getElementsByClassName('barcode-btn-collect-process'));
     barCodeBtns.forEach(btn => {
-        addEventBarCodeScanner(btn.id, 0, 14);
+        addEventBarCodeScanner(btn.id, 0, totalCollectionIDLength);
     });
 }
 
@@ -100,11 +118,11 @@ export const tubeCollectedTemplate = (data, formData) => {
             <div class="col">
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
-                <div class="row">Collection ID: ${formData.masterSpecimenId}</div>
+                <div class="row">Collection ID: ${formData['820476880']}</div>
             </div>
-            ${formData.visitType ? `
+            ${formData['331584571'] ? `
                 <div class="ml-auto form-group">
-                    Visit: ${formData.visitType}
+                    Visit: ${visitType[formData['331584571']]}
                 </div>
             ` : ``
             }
@@ -126,7 +144,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                         template += `
                             <tr>
                                 <td>(${index+1}) ${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
-                                <td class="align-left">${obj.collectionChkBox === true ? `<input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="${obj.tubeType}" ${formData[`${obj.name}Collected`] === true ? 'checked': ''} id="${obj.name}Collected">`:``}</td>
+                                <td class="align-left">${obj.collectionChkBox === true ? `<input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="${obj.tubeType}" ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? 'checked': ''} id="${obj.concept}">`:``}</td>
                             </tr>
                         `
                     });
@@ -150,5 +168,5 @@ export const tubeCollectedTemplate = (data, formData) => {
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventSelectAllCollection();
-    addEventTubeCollectedForm(data, `${formData.masterSpecimenId}`);
+    addEventTubeCollectedForm(data, `${formData['820476880']}`);
 }

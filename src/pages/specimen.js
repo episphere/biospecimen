@@ -1,6 +1,6 @@
-import { addEventBarCodeScanner, generateBarCode, removeActiveClass, siteLocations } from "./../shared.js";
+import { addEventBarCodeScanner, generateBarCode, removeActiveClass, siteLocations, visitType } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
-import { workflows } from "../tubeValidation.js";
+import { masterSpecimenIDRequirement, workflows } from "../tubeValidation.js";
 
 export const specimenTemplate = (data, formData) => {
     removeActiveClass('navbar-btn', 'active')
@@ -18,9 +18,9 @@ export const specimenTemplate = (data, formData) => {
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
-            ${formData.visitType ? `
+            ${formData['331584571'] ? `
                 <div class="ml-auto form-group">
-                    Visit: ${formData.visitType}
+                    Visit: ${visitType[formData['331584571']]}
                 </div>
             `: ``}
         </div>
@@ -76,7 +76,7 @@ export const specimenTemplate = (data, formData) => {
     `;
     document.getElementById('contentBody').innerHTML = template;
     document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
-    addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, 9);
+    addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, masterSpecimenIDRequirement.length);
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventSpecimenLinkForm(formData);
     addEventBackToSearch('navBarSearch');
