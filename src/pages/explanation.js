@@ -1,10 +1,13 @@
 import { addEventExplanationForm, addEventExplanationFormCntd, addEventReturnToCollectProcess } from "./../events.js";
 import { generateBarCode, visitType } from "../shared.js";
 import { finalizeTemplate } from "./finalize.js";
+import { workflows } from "../tubeValidation.js";
 
 export const explanationTemplate = (dt, biospecimenData) => {
     const notCollected = Array.from(document.getElementsByClassName('tube-collected')).filter(dt => dt.checked === false);
     const deviated = Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === true);
+    const dashboardType = document.getElementById('contentBody').dataset.workflow;
+    const tubes = workflows[dashboardType];
     if(notCollected.length > 0 || deviated.length > 0) {
         let template = `</br>
         <div class="row">
@@ -27,10 +30,10 @@ export const explanationTemplate = (dt, biospecimenData) => {
         <form id="explanationForm" method="POST">`;
         let array = [];
         notCollected.forEach(ele => {
+            const notCollectedOptions = tubes.filter(tube => tube.concept === ele.id)[0].tubeNotCollectedOptions
             const tubeType = ele.dataset.tubeType;
             if(array.includes(tubeType)) return
             array.push(tubeType);
-            
             template += `<div class="row"><div class="col"><strong>${tubeType} not collected</strong></div></div>
                 <div class="row"><div class="col">Collection ID: ${biospecimenData['820476880']}</div></div>
                 <div class="form-group row">
@@ -38,12 +41,11 @@ export const explanationTemplate = (dt, biospecimenData) => {
                         <label for="${ele.id}Reason">Provide reason tube(s) was/were not collected:</label>
                         </br>
                         <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}Reason">
-                            <option value=""> -- Select reason  -- </option>
-                            <option ${biospecimenData[`${ele.id}Reason`] === 'short draw' ? 'selected' : ''} value="short draw">Short draw</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] === 'participant refusal' ? 'selected' : ''} value="participant refusal">Participant refusal</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] === 'participant unable' ? 'selected' : ''} value="participant unable">Participant unable</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] === 'other' ? 'selected' : ''} value="other">Other</option>
-                        </select>
+                            <option value=""> -- Select reason  -- </option>`
+                            notCollectedOptions.forEach(obj => {
+                                template += `<option ${biospecimenData[`${ele.id}Reason`] === `${obj.concept}` ? 'selected' : ''} value="${obj.concept}">${obj.label}</option>`;
+                            })
+                        template += `</select>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -59,6 +61,8 @@ export const explanationTemplate = (dt, biospecimenData) => {
 
         if(deviated.length > 0) template += '<div class="row"><div class="col"><strong>Deviations</strong></div></div>'
         deviated.forEach(ele => {
+            const tubeId = ele.id.replace('Deviated', '');
+            const deviationOptions = tubes.filter(tube => tube.concept === tubeId)[0].deviationOptions;
             const tubeLabel = ele.dataset.tubeLabel;
             template += `
                 <div class="row"><div class="col">Tube Type: <strong>${tubeLabel}</strong></div></div>
@@ -67,15 +71,12 @@ export const explanationTemplate = (dt, biospecimenData) => {
                     <div class="col">
                         <label for="${ele.id}Reason">Select Deviation</label>
                         </br>
-                        <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}Reason" multiple="multiple">
-                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('broken') ? 'selected' : ''} value="broken">Broken</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('failed gel layer') ? 'selected' : ''} value="failed gel layer">Failed gel layer</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('hemolyzed') ? 'selected' : ''} value="hemolyzed">Hemolyzed</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('improper temperature – please include details below') ? 'selected' : ''} value="improper temperature – please include details below">Improper temperature – please include details below</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('mislabeled') ? 'selected' : ''} value="mislabeled">Mislabeled</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('tube not filled') ? 'selected' : ''} value="tube not filled">Tube not filled</option>
-                            <option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes('other') ? 'selected' : ''} value="other">Other</option>
-                        </select>
+                        <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}Reason" multiple="multiple">`
+                            for(let obj of deviationOptions){
+                                template += `<option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes(`${obj.concept}`) ? 'selected' : ''} value="${obj.concept}">${obj.label}</option>`
+                            };
+
+                        template +=`</select>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -105,8 +106,8 @@ export const explanationTemplate = (dt, biospecimenData) => {
         template += '</form>'
         document.getElementById('contentBody').innerHTML = template;
         generateBarCode('connectIdBarCode', dt.Connect_ID);
-        addEventExplanationForm(dt, biospecimenData['820476880']);
-        addEventExplanationFormCntd(dt, biospecimenData['820476880']);
+        addEventExplanationForm(dt, biospecimenData);
+        addEventExplanationFormCntd(dt, biospecimenData);
         addEventReturnToCollectProcess();
     }
     else {

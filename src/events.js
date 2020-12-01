@@ -1747,7 +1747,8 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
             focus = false;
         }
         if(additionalTubeIDRequirement.regExp.test(tubeID))  data[`${input.id.replace('Id', '')}`]['226562200'] = 353358909;
-        data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`;
+        
+        if(input.required) data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`;
     });
     if(hasError) return;
     data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
@@ -1766,7 +1767,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     }
 }
 
-const getValue = (id) => document.getElementById(id).value;
+const getValue = (id) => document.getElementById(id).value.trim();
 
 const isChecked = (id) => document.getElementById(id).checked;
 
@@ -1793,34 +1794,37 @@ export const addEventNavBarParticipantCheckIn = () => {
     })
 }
 
-export const addEventExplanationFormCntd = (data, masterSpecimenId) => {
+export const addEventExplanationFormCntd = (data, biospecimenData) => {
     const form = document.getElementById('explanationForm');
     form.addEventListener('submit', e => {
         e.preventDefault();
-        explanationHandler(data, masterSpecimenId, true);
+        explanationHandler(data, biospecimenData, true);
     });
 }
 
-export const addEventExplanationForm = (data, masterSpecimenId) => {
+export const addEventExplanationForm = (data, biospecimenData) => {
     const explanationSaveExit = document.getElementById('explanationSaveExit');
     explanationSaveExit.addEventListener('click', () => {
-        explanationHandler(data, masterSpecimenId);
+        explanationHandler(data, biospecimenData);
     });
 }
 
-const explanationHandler = async (data, masterSpecimenId, cntd) => {
+const explanationHandler = async (data, biospecimenData, cntd) => {
+    const masterSpecimenId = biospecimenData['820476880'];
     const textAreas = document.getElementsByClassName('additional-explanation');
-    let formData = {};
     Array.from(textAreas).forEach(ta => {
+        const tubeId = ta.id.replace('Explanation','').replace('Deviated', '');
         if(document.getElementById(ta.id.replace('Explanation', 'Reason')).multiple) {
-            formData[`${ta.id.replace('Explanation','Reason')}`] = Array.from(document.getElementById(ta.id.replace('Explanation', 'Reason'))).filter(el => el.selected).map(el => el.value);
+            biospecimenData[tubeId]['248868659'] = Array.from(document.getElementById(ta.id.replace('Explanation', 'Reason'))).filter(el => el.selected).map(el => el.value);
+            biospecimenData[tubeId]['536710547'] = ta.value;
         }
         else {
-            formData[`${ta.id.replace('Explanation','Reason')}`] = document.getElementById(ta.id.replace('Explanation', 'Reason')).value;
+            biospecimenData[tubeId]['883732523'] = parseInt(document.getElementById(ta.id.replace('Explanation', 'Reason')).value);
+            biospecimenData[tubeId]['338286049'] = ta.value;
         }
-        formData[`${ta.id}`] = ta.value;
     });
-    console.log(formData)
+    console.log(biospecimenData)
+    debugger
     return
     formData['820476880'] = masterSpecimenId;
     showAnimation();

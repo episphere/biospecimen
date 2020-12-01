@@ -1,3 +1,35 @@
+const deviationReason1 = {'concept': 472864016, 'label':'Broken'}
+const deviationReason2 = {'concept': 102695484, 'label':'Centrifuge -  did not clot at least 30 minutes'}
+const deviationReason3 = {'concept': 912088602, 'label':'Centrifuge -  clotted for longer than 2 hours'}
+const deviationReason4 = {'concept': 861162895, 'label':'Centrifuge - Improper speed/force setting used (too high)'}
+const deviationReason5 = {'concept': 561005927, 'label':'Centrifuge - Improper speed/force setting used (too low)'}
+const deviationReason6 = {'concept': 654002184, 'label':'Centrifuge - improper time of spinning (too long)'}
+const deviationReason7 = {'concept': 937362785, 'label':'Centrifuge - improper time of spinning (too short)'}
+const deviationReason8 = {'concept': 635875253, 'label':'Failed/broken gel layer'}
+const deviationReason9 = {'concept': 242307474, 'label':'Hemolyzed'}
+const deviationReason10 = {'concept': 550088682, 'label':'Improper temperature - too low/frozen (record time and temperature Deviation in the comments)'}
+const deviationReason11 = {'concept': 690540566, 'label':'Improper temperature - too high (record time and temperature Deviation in the comments)'}
+const deviationReason12 = {'concept': 956345366, 'label':'Insufficient volume - not enough volume to transfer to urine tube (discard)'}
+const deviationReason13 = {'concept': 757246707, 'label':'Leaked/spilled'}
+const deviationReason14 = {'concept': 262420266, 'label':'Lipemia'}
+const deviationReason15 = {'concept': 728366619, 'label':'Low volume - (tube/container partially filled but still usable)'}
+const deviationReason16 = {'concept': 806820884, 'label':'Mislabeled'}
+const deviationReason17 = {'concept': 468668640, 'label':'Urine hat used'}
+const deviationReason18 = {'concept': 453343022, 'label':'Other'}
+
+const deviationCollection1 = [deviationReason1, deviationReason2, deviationReason3, deviationReason4, deviationReason5, deviationReason6, deviationReason7, deviationReason8, deviationReason9, deviationReason10, deviationReason11, deviationReason13, deviationReason14, deviationReason15, deviationReason16, deviationReason18];
+const deviationCollection2 = [deviationReason1, deviationReason9, deviationReason10, deviationReason11, deviationReason13, deviationReason14, deviationReason15, deviationReason16, deviationReason18];
+const deviationCollection3 = [deviationReason1, deviationReason10, deviationReason11, deviationReason12, deviationReason13, deviationReason15, deviationReason16, deviationReason17, deviationReason18];
+const deviationCollection4 = [deviationReason1, deviationReason13, deviationReason15, deviationReason16, deviationReason18];
+
+const tubeNotCollectedReason1 = {'concept': 234139565, 'label': 'Short draw'};
+const tubeNotCollectedReason2 = {'concept': 681745422, 'label': 'Participant refusal'};
+const tubeNotCollectedReason3 = {'concept': 745205161, 'label': 'Participant unable'};
+const tubeNotCollectedReason4 = {'concept': 181769837, 'label': 'Other'};
+
+const tubeNotCollectedOptions1 = [tubeNotCollectedReason1, tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason4];
+const tubeNotCollectedOptions2 = [tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason4];
+
 const tube0001 = {
     'specimenType': 'Serum Separator Tube',
     'tubeType': 'Blood tube',
@@ -8,7 +40,9 @@ const tube0001 = {
     'id': '0001',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection1,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
 const tube0002 = {
@@ -21,7 +55,9 @@ const tube0002 = {
     'id': '0002',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection1,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
 const tube0011 = {
@@ -34,7 +70,9 @@ const tube0011 = {
     'id': '0011',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection1,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
 const tube0012 = {
@@ -47,7 +85,9 @@ const tube0012 = {
     'id': '0012',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection1,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
 const tube0021 = {
@@ -60,7 +100,9 @@ const tube0021 = {
     'id': '0021',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection1,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
 const tube0022 = {
@@ -73,7 +115,9 @@ const tube0022 = {
     'concept': '746999767',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection1,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
 const tube0031 = {
@@ -86,7 +130,9 @@ const tube0031 = {
     'id': '0031',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection1,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
 const tube0032 = {
@@ -99,7 +145,9 @@ const tube0032 = {
     'id': '0032',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection1,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
 const tube0003 = {
@@ -112,7 +160,9 @@ const tube0003 = {
     'id': '0003',
     'tubeColor': 'Green',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection2,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
 const tube0013 = {
@@ -125,7 +175,9 @@ const tube0013 = {
     'id': '0013',
     'tubeColor': 'Green',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection2,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
 const tube0004 = {
@@ -138,7 +190,9 @@ const tube0004 = {
     'id': '0004',
     'tubeColor': 'Lavendar',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection2,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
 const tube0014 = {
@@ -151,7 +205,9 @@ const tube0014 = {
     'id': '0014',
     'tubeColor': 'Lavendar',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection2,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
 const tube0005 = {
@@ -164,7 +220,9 @@ const tube0005 = {
     'id': '0005',
     'tubeColor': 'Yellow',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection2,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
 const tube0006 = {
@@ -176,7 +234,9 @@ const tube0006 = {
     'id': '0006',
     'tubeColor': 'Yellow',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection3,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions2
 };
 
 const tube0007 = {
@@ -187,7 +247,9 @@ const tube0007 = {
     'concept': '143615646',
     'id': '0007',
     'collectionChkBox': true,
-    'deviationChkBox': true
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection4,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions2
 };
 
 const tube0008 = {
