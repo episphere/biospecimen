@@ -1602,7 +1602,7 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
             if(biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
             if(biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
                 biospecimenData[`${dt.id}`]['678857215'] = 104430631
-                biospecimenData[`${dt.id}`]['label'] = '';
+                biospecimenData[`${dt.id}`]['825582494'] = '';
                 biospecimenData[`${dt.id}`]['248868659'] = [];
                 biospecimenData[`${dt.id}`]['410912345'] = 104430631;
                 biospecimenData[`${dt.id}`]['536710547'] = '';
@@ -1659,7 +1659,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
             focus = false;
         }
         if(additionalTubeIDRequirement.regExp.test(tubeID))  data[`${input.id.replace('Id', '')}`]['226562200'] = 353358909;
-        data[`${input.id.replace('Id', '')}`]['label'] = `${masterID} ${tubeID}`;
+        data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`;
     });
     if(hasError) return;
     data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
