@@ -33,7 +33,6 @@ export const startShipping = async (userName) => {
         hiddenJSON[box['boxId']] = box['bags']
     }
 
-
     response = await  getAllBoxes();
     boxJSONS = response.data;
     let hiddenJSON1 = {};
@@ -42,6 +41,7 @@ export const startShipping = async (userName) => {
         hiddenJSON1[box['boxId']] = box['bags']
     }
     
+    console.log('pwnjefbpoewkinbpoefibnepobinoieoiboribvr' + JSON.stringify(boxJSONS))
     
     /*
     if(document.getElementById('shippingHiddenTable') != null){
@@ -106,7 +106,7 @@ export const startShipping = async (userName) => {
                 </select>
             </div>
             <div class="col" style="width:50%;">
-                <button type="button" class="btn btn-primary" style="float:right;" id="addBoxButton">Add Box</button>
+                <button type="button" class="btn btn-primary" style="float:right;" id="addBoxButton">Create New Box</button>
             </div>
         </div>
         <div class="row">
@@ -134,13 +134,13 @@ export const startShipping = async (userName) => {
                 <div class="modal-body"> 
                     <h4>Which box this should be added to<h4>
                     <select class="selectpicker" id="shippingModalChooseBox"></select>
-                    <button type="button" class="btn btn-primary" id="modalAddBoxButton">Add Box</button>
+                    <button type="button" class="btn btn-primary" id="modalAddBoxButton">Create New Box</button>
                     
                 </div>
                 <div class="modal-footer">
                    
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="addToBagButton">Save changes</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="shippingModalCancel">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="addToBagButton">Add to Box</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="shippingModalCancel">Cancel</button>
                 </div>  
             </div>
         </div>
@@ -161,7 +161,7 @@ export const startShipping = async (userName) => {
                     <th>Last Saved</th>
                     <th>Box Number</th>
                     <th>Contents</th>
-                    <th>Box Manifest</th>
+                    <th>View/Print Box Manifest</th>
                 </tr>
             </table>
     </div>
@@ -189,7 +189,7 @@ export const startShipping = async (userName) => {
     document.getElementById('contentBody').innerHTML = template;
     await populateSelectLocationList();
     
-    populateSaveTable(hiddenJSON);
+    populateSaveTable(hiddenJSON, boxJSONS);
     await populateSpecimensList(hiddenJSON1);
 
     let currLocation = document.getElementById('selectLocationList').value;

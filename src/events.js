@@ -435,23 +435,29 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan)
             let currTime = new Date();
             let toPass = {};
             let found = false;
-            for(let j = 0; j < boxJSONS.length; j++){
-                if(boxJSONS[j]['boxId'] == boxIds[i]){
-                    if(boxJSONS[j].hasOwnProperty('dateCreated')){
-                        toPass['dateCreated'] = boxJSONS[j]['dateCreated'];
-                        found = true;
+            if(boxIds[i] == boxId){
+                for(let j = 0; j < boxJSONS.length; j++){
+                    if(boxJSONS[j]['boxId'] == boxIds[i]){
+                        if(boxJSONS[j].hasOwnProperty('dateCreated')){
+                            toPass['dateCreated'] = boxJSONS[j]['dateCreated'];
+                            found = true;
+                        }
+                        if(boxJSONS[j].hasOwnProperty('lastUpdatedTiime')){
+                            toPass['lastUpdatedTiime'] = boxJSONS[j]['lastUpdatedTiime'];
+                        }
                     }
                 }
-            }
 
-            if(found == false){
-                toPass['dateCreated'] = currTime.toString();
+                if(found == false){
+                    toPass['dateCreated'] = currTime.toString();
+                }
+                
+                toPass['boxId'] = boxIds[i];
+                toPass['bags'] = hiddenJSON[boxIds[i]]
+                toPass['location'] = locations[boxIds[i]]
+                toPass['lastUpdatedTiime'] = currTime.toString();
+                await storeBox(toPass);
             }
-            toPass['boxId'] = boxIds[i];
-            toPass['bags'] = hiddenJSON[boxIds[i]]
-            toPass['location'] = locations[boxIds[i]]
-            toPass['lastUpdatedTiime'] = currTime.toString();
-            await storeBox(toPass);
         }
 
         response = await  getAllBoxes();
@@ -465,6 +471,15 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan)
             
         await populateTubeInBoxList();
         await populateSpecimensList(hiddenJSON);
+        hiddenJSON = {};
+        for(let i = 0; i < boxJSONS.length; i++){
+            if(!boxJSONS[i].hasOwnProperty('shipped') || boxJSONS[i]['shipped'] != true){
+                let box = boxJSONS[i]
+                hiddenJSON[box['boxId']] = box['bags']
+            }
+           
+        }
+        await populateSaveTable(hiddenJSON, boxJSONS)
         hideAnimation();
     },{once:true})
     //ppulateSpecimensList();
@@ -700,6 +715,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
     
             //This should remove the entrire bag
             currDeleteButton.addEventListener("click", async e => {
+                showAnimation();
                 var index = e.target.parentNode.parentNode.rowIndex;
                 var table = e.target.parentNode.parentNode.parentNode.parentNode;
                 
@@ -724,8 +740,19 @@ export const populateSpecimensList = async (hiddenJSON) => {
                     table.deleteRow(index);
                     currRow = table.rows[index];
                 }
-                
+
+
+                let response = await  getAllBoxes();
+                let boxJSONS = response.data;
+                let hiddenJSON = {};
+                for(let i = 0; i < boxJSONS.length; i++){
+                    let box = boxJSONS[i]
+                    hiddenJSON[box['boxId']] = box['bags']
+                }
+
+                await populateSpecimensList(hiddenJSON);
                 //delete bag from json
+                hideAnimation();
 
             })
         }
@@ -787,49 +814,74 @@ export const populateModalSelect = (hiddenJSON) => {
     currSelectBox.value = document.getElementById('selectBoxList').value;
 }
 
-export const populateSaveTable = (hiddenJSON) => {
+export const populateSaveTable = (hiddenJSON, boxJSONS) => {
     let table = document.getElementById("saveTable");
+    table.innerHTML = `<tr>
+                        <th>To Ship</th>
+                        <th>Started</th>
+                        <th>Last Saved</th>
+                        <th>Box Number</th>
+                        <th>Contents</th>
+                        <th>Box Manifest</th>
+                    </tr>`
+    console.log(table.innerHTML)
     let count = 0;
     let boxes = Object.keys(hiddenJSON)
     for(let i = 0; i < boxes.length; i++){
         if(Object.keys(hiddenJSON[boxes[i]]).length > 0 ){
-        let currRow = table.insertRow(count+1);
-        if(count % 2 == 1){
-            currRow.style['background-color'] = 'lightgrey'
-        }
-        currRow.style.
-        count += 1;
-        currRow.insertCell(0).innerHTML=`<input type="checkbox" class="markForShipping">`
-        currRow.insertCell(1).innerHTML= '';
-        currRow.insertCell(2).innerHTML= '';
-        currRow.insertCell(3).innerHTML= boxes[i];
-        //get num tubes
-        let currBox = hiddenJSON[boxes[i]];
-        let numTubes = 0;
-        let boxKeys=Object.keys(currBox);
-        for(let j = 0; j < boxKeys.length; j++ ){
-            numTubes += currBox[boxKeys[j]]['arrElements'].length;
-        }
-        currRow.insertCell(4).innerHTML= numTubes.toString() + " tubes";
-        currRow.insertCell(5).innerHTML= '<input type="button" class="boxManifestButton" value = "Box Manifest"/>';
-        
-        //boxes[i]
-
-        let currBoxButton = currRow.cells[5].getElementsByClassName("boxManifestButton")[0];
-        currBoxButton.addEventListener("click", async e => {
-            var index = e.target.parentNode.parentNode.rowIndex;
-            var table = document.getElementById("shippingModalTable");
-            //bring up edit on the corresponding table
+            let currRow = table.insertRow(count+1);
+            if(count % 2 == 1){
+                currRow.style['background-color'] = 'lightgrey'
+            }
+            currRow.style.
+            count += 1;
+            currRow.insertCell(0).innerHTML=`<input type="checkbox" class="markForShipping">`
+            let dateStarted = '';
+            let lastModified = '';
+            for(let j = 0; j < boxJSONS.length; j++){
+                console.log('BWVIBLOISD BGV LOIVBGWEOLVI WBGEVOLWIBVGDV' + boxJSONS[j].boxId)
+                if(boxJSONS[j].boxId == boxes[i]){
+                    if(boxJSONS[j].hasOwnProperty('dateCreated')){
+                        dateStarted = boxJSONS[j]['dateCreated'];
+                    }
+                    if(boxJSONS[j].hasOwnProperty('lastUpdatedTiime')){
+                        lastModified = boxJSONS[j]['lastUpdatedTiime']
+                    }
+                }
+            }
+            currRow.insertCell(1).innerHTML= dateStarted;
+            currRow.insertCell(2).innerHTML= lastModified;
+            currRow.insertCell(3).innerHTML= boxes[i];
+            //get num tubes
+            let currBox = hiddenJSON[boxes[i]];
+            let numTubes = 0;
+            let boxKeys=Object.keys(currBox);
+            for(let j = 0; j < boxKeys.length; j++ ){
+                numTubes += currBox[boxKeys[j]]['arrElements'].length;
+            }
+            currRow.insertCell(4).innerHTML= numTubes.toString() + " tubes";
+            currRow.insertCell(5).innerHTML= '<input type="button" class="boxManifestButton" value = "Box Manifest"/>';
             
-            await boxManifest(boxes[i]);
+            //boxes[i]
+
+            let currBoxButton = currRow.cells[5].getElementsByClassName("boxManifestButton")[0];
+            
+            currBoxButton.addEventListener("click", async e => {
+                var index = e.target.parentNode.parentNode.rowIndex;
+                var table = document.getElementById("shippingModalTable");
+                //bring up edit on the corresponding table
+                
+                await boxManifest(boxes[i]);
 
 
-            //addEventNavBarBoxManifest("viewBoxManifestBlood")
-            //if(hiddenJSON[boxes[i]])
-            //table.deleteRow(index);
-        })
+                //addEventNavBarBoxManifest("viewBoxManifestBlood")
+                //if(hiddenJSON[boxes[i]])
+                //table.deleteRow(index);
+            })
+        }    
     }
-}
+    console.log('I was found here this many times!')
+    console.log(table.innerHTML)
 }
 
 export const populateTempNotification = async () => {
@@ -1050,6 +1102,15 @@ export const populateBoxSelectList = (hiddenJSON) => {
                         }
 
                         await populateSpecimensList(hiddenJSON);
+                        hiddenJSON = {};
+                        for(let i = 0; i < boxJSONS.length; i++){
+                            if(!boxJSONS[i].hasOwnProperty('shipped') || boxJSONS[i]['shipped'] != true){
+                                let box = boxJSONS[i]
+                                hiddenJSON[box['boxId']] = box['bags']
+                            }
+                        
+                        }
+                        await populateSaveTable(hiddenJSON, boxJSONS)
                         hideAnimation();
                         //delete bag from json
 
@@ -1302,6 +1363,15 @@ export const populateTubeInBoxList = async () => {
                         }
 
                         await populateSpecimensList(hiddenJSON);
+                        hiddenJSON = {};
+                        for(let i = 0; i < boxJSONS.length; i++){
+                            if(!boxJSONS[i].hasOwnProperty('shipped') || boxJSONS[i]['shipped'] != true){
+                                let box = boxJSONS[i]
+                                hiddenJSON[box['boxId']] = box['bags']
+                            }
+                        
+                        }
+                        await populateSaveTable(hiddenJSON, boxJSONS)
                         hideAnimation();
                         //delete bag from json
 
