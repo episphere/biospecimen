@@ -3,6 +3,7 @@ import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollect
 import { siteSpecificTubeRequirements, workflows } from "../tubeValidation.js";
 
 export const finalizeTemplate = (data, specimenData) => {
+    console.log(specimenData)
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenFinalize');
     navBarBtn.classList.remove('disabled');
@@ -19,7 +20,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${specimenData['820476880']}</div>
-                <div class="row">Specimen Collection Date & Time: ${new Date(specimenData.tubeCollectedAt).toLocaleString()}</div>
+                <div class="row">Specimen Collection Date & Time: ${new Date(specimenData['678166505']).toLocaleString()}</div>
             </div>
             ${specimenData['331584571'] ? `
                 <div class="ml-auto form-group">
@@ -49,10 +50,10 @@ export const finalizeTemplate = (data, specimenData) => {
                     template += `
                         <tr>
                             <td>(${index+1}) ${obj.specimenType}</td>
-                            <td>${obj.collectionChkBox === true ? `${specimenData[`${obj.name}Collected`] === true ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>'}` : ``}</td>
-                            <td>${specimenData[`${obj.name}Collected`] === true ? `${specimenData['820476880']} ${specimenData[`${obj.name}Id`]}` : '' }</td>
-                            <td>${obj.deviationChkBox === true ? `${specimenData[`${obj.name}Deviated`] === true ? 'Yes' : 'No'}`: ``}</td>
-                            <td class="deviation-comments-width">${specimenData[`${obj.name}DeviatedReason`] ? specimenData[`${obj.name}DeviatedReason`] : ''}</td>
+                            <td>${obj.collectionChkBox === true ? `${specimenData[`${obj.concept}`]['593843561'] === 353358909 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>'}` : ``}</td>
+                            <td>${specimenData[`${obj.concept}`]['593843561'] === 353358909 ? `${specimenData[`${obj.concept}`]['825582494']}` : '' }</td>
+                            <td>${obj.deviationChkBox === true ? `${specimenData[`${obj.concept}`]['678857215'] === 353358909 ? 'Yes' : 'No'}`: ``}</td>
+                            <td class="deviation-comments-width">${specimenData[`${obj.concept}`]['248868659'] ? specimenData[`${obj.concept}`]['248868659'].map(concept => obj.deviationOptions.filter(dt => dt.concept === concept)[0].label) : ''}</td>
                         </tr>
                     `
                 });
