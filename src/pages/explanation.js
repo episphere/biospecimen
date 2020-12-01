@@ -43,7 +43,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                         <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}Reason">
                             <option value=""> -- Select reason  -- </option>`
                             notCollectedOptions.forEach(obj => {
-                                template += `<option ${biospecimenData[`${ele.id}Reason`] === `${obj.concept}` ? 'selected' : ''} value="${obj.concept}">${obj.label}</option>`;
+                                template += `<option ${biospecimenData[`${ele.id}`]['883732523'] == `${obj.concept}` ? 'selected' : ''} value="${obj.concept}">${obj.label}</option>`;
                             })
                         template += `</select>
                     </div>
@@ -52,7 +52,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                     <div class="col">
                         <label for="${ele.id}Explanation">Details (Optional)</label>
                         </br>
-                        <textarea rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData[`${ele.id}Explanation`] ? biospecimenData[`${ele.id}Explanation`] : ''}</textarea>
+                        <textarea rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData[`${ele.id}`]['338286049'] ? biospecimenData[`${ele.id}`]['338286049'] : ''}</textarea>
                     </div>
                 </div>
                 </br>
@@ -73,7 +73,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                         </br>
                         <select class="form-control" required data-connect-id="${dt.Connect_ID}" id="${ele.id}Reason" multiple="multiple">`
                             for(let obj of deviationOptions){
-                                template += `<option ${biospecimenData[`${ele.id}Reason`] && biospecimenData[`${ele.id}Reason`].includes(`${obj.concept}`) ? 'selected' : ''} value="${obj.concept}">${obj.label}</option>`
+                                template += `<option ${biospecimenData[tubeId]['248868659'] && biospecimenData[tubeId]['248868659'].includes(obj.concept) ? 'selected' : ''} value="${obj.concept}">${obj.label}</option>`
                             };
 
                         template +=`</select>
@@ -83,7 +83,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                     <div class="col">
                         <label for="${ele.id}Explanation">Provide deviation details</label>
                         </br>
-                        <textarea required rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData[`${ele.id}Explanation`] ? biospecimenData[`${ele.id}Explanation`] : '' }</textarea>
+                        <textarea required rows=3 class="form-control additional-explanation" id="${ele.id}Explanation">${biospecimenData[tubeId]['536710547'] ? biospecimenData[tubeId]['536710547'] : '' }</textarea>
                     </div>
                 </div>
                 </br>
