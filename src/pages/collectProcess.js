@@ -1,5 +1,5 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventTubeCollectedForm, addEventBackToTubeCollection } from './../events.js'
-import { removeActiveClass, generateBarCode, addEventBarCodeScanner } from '../shared.js';
+import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType } from '../shared.js';
 import { siteSpecificTubeRequirements, totalCollectionIDLength, workflows } from '../tubeValidation.js';
 
 export const collectProcessTemplate = (data, formData) => {
@@ -15,9 +15,9 @@ export const collectProcessTemplate = (data, formData) => {
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${formData['820476880']}</div>
             </div>
-            ${formData.visitType ? `
+            ${formData['331584571'] ? `
                 <div class="ml-auto form-group">
-                    Visit: ${formData.visitType}
+                    Visit: ${visitType[formData['331584571']]}
                 </div>
             ` : ``
             }
@@ -120,9 +120,9 @@ export const tubeCollectedTemplate = (data, formData) => {
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${formData['820476880']}</div>
             </div>
-            ${formData.visitType ? `
+            ${formData['331584571'] ? `
                 <div class="ml-auto form-group">
-                    Visit: ${formData.visitType}
+                    Visit: ${visitType[formData['331584571']]}
                 </div>
             ` : ``
             }

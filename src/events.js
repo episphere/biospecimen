@@ -1456,7 +1456,7 @@ export const addEventCheckInCompleteForm = () => {
         const token = select.dataset.participantToken;
         let formData = {};
         formData['connectId'] = connectId;
-        formData['visitType'] = biospecimenVisitType;
+        formData['331584571'] = parseInt(biospecimenVisitType);
         formData['checkedInAt'] = new Date().toISOString();
         formData['token'] = token;
         let query = `connectId=${parseInt(connectId)}`;

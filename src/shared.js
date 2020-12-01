@@ -580,3 +580,7 @@ export const allStates = {
     "Wyoming":51,
     "NA": 52
 }
+
+export const visitType = {
+    '153098257': 'Baseline'
+}

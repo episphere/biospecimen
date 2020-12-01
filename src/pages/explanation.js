@@ -1,5 +1,5 @@
 import { addEventExplanationForm, addEventExplanationFormCntd, addEventReturnToCollectProcess } from "./../events.js";
-import { generateBarCode } from "../shared.js";
+import { generateBarCode, visitType } from "../shared.js";
 import { finalizeTemplate } from "./finalize.js";
 
 export const explanationTemplate = (dt, biospecimenData) => {
@@ -16,9 +16,9 @@ export const explanationTemplate = (dt, biospecimenData) => {
                 <div class="row">${dt.RcrtUP_Lname_v1r0}, ${dt.RcrtUP_Fname_v1r0}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
-            ${biospecimenData.visitType ? `
+            ${biospecimenData['331584571'] ? `
                 <div class="ml-auto form-group">
-                    Visit: ${biospecimenData.visitType}
+                    Visit: ${visitType[biospecimenData['331584571']]}
                 </div>
             ` : ``
             }

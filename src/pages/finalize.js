@@ -1,4 +1,4 @@
-import { removeActiveClass, generateBarCode } from "./../shared.js";
+import { removeActiveClass, generateBarCode, visitType } from "./../shared.js";
 import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollectProcess } from "./../events.js";
 import { siteSpecificTubeRequirements, workflows } from "../tubeValidation.js";
 
@@ -21,9 +21,9 @@ export const finalizeTemplate = (data, specimenData) => {
                 <div class="row">Collection ID: ${specimenData['820476880']}</div>
                 <div class="row">Specimen Collection Date & Time: ${new Date(specimenData.tubeCollectedAt).toLocaleString()}</div>
             </div>
-            ${specimenData.visitType ? `
+            ${specimenData['331584571'] ? `
                 <div class="ml-auto form-group">
-                    Visit: ${specimenData.visitType}
+                    Visit: ${visitType[specimenData['331584571']]}
                 </div>
             ` : ``
             }
