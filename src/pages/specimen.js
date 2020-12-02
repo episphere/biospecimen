@@ -39,7 +39,7 @@ export const specimenTemplate = async (data, formData, collections) => {
                 collections.forEach(collection => {
                     template += `<tr>
                         <td>${collection['820476880']}</td>
-                        <td>${collection['331584571'] ? collection['331584571'] : ''}</td>
+                        <td>${collection['331584571'] ? visitType[collection['331584571']] : ''}</td>
                         <td>${collection['678166505'] ? new Date(collection['678166505']).toLocaleString() : ''}</td>
                         <td><button class="custom-btn continue-collect-process" data-connect-id="${data.Connect_ID}" data-collection-id="${collection['820476880']}">Continue to Collect/Process</button></td>
                     </tr>`
