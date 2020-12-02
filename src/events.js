@@ -1559,6 +1559,7 @@ export const addEventCheckInCompleteForm = () => {
         let formData = {};
         formData['connectId'] = connectId;
         formData['331584571'] = parseInt(biospecimenVisitType);
+        formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['checkedInAt'] = new Date().toISOString();
         formData['token'] = token;
         let query = `connectId=${parseInt(connectId)}`;
