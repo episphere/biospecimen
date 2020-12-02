@@ -70,9 +70,13 @@ body {
     cursor: not-allowed !important;
 }
 
-.navbar-btn {
+.navbar-btn, .custom-btn {
     border: 0px;
     background-color: transparent;
+}
+
+.custom-btn {
+    color: #2155e4;
 }
 
 #loadingAnimation {

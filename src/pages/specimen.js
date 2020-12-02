@@ -1,8 +1,8 @@
 import { addEventBarCodeScanner, generateBarCode, removeActiveClass, siteLocations, visitType } from "./../shared.js";
-import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
+import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch, addEventCntdToCollectProcess } from "./../events.js";
 import { masterSpecimenIDRequirement, workflows } from "../tubeValidation.js";
 
-export const specimenTemplate = (data, formData) => {
+export const specimenTemplate = async (data, formData, collections) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenLink');
     navBarBtn.classList.remove('disabled');
@@ -24,7 +24,30 @@ export const specimenTemplate = (data, formData) => {
                 </div>
             `: ``}
         </div>
-        </br>
+        </hr>`;
+        if(collections){
+            template+=`<h4>Participant Collections</h4><table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Collection ID</th>
+                        <th>Visit</th>
+                        <th>Date of Collection</th>
+                        <th>Select Action</th>
+                    </tr>
+                </thead>
+                <tbody>`
+                collections.forEach(collection => {
+                    template += `<tr>
+                        <td>${collection['820476880']}</td>
+                        <td>${collection['331584571'] ? collection['331584571'] : ''}</td>
+                        <td>${collection['678166505'] ? new Date(collection['678166505']).toLocaleString() : ''}</td>
+                        <td><button class="custom-btn continue-collect-process" data-connect-id="${data.Connect_ID}" data-collection-id="${collection['820476880']}">Continue to Collect/Process</button></td>
+                    </tr>`
+                })
+            template +=`</tbody></table></hr>`
+        }
+        
+        template += `<h4>Start a new Collection</h4>
         <form id="specimenLinkForm" method="POST">
             <div class="form-group row">`
                 const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
@@ -78,6 +101,7 @@ export const specimenTemplate = (data, formData) => {
     document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
     addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, masterSpecimenIDRequirement.length);
     generateBarCode('connectIdBarCode', data.Connect_ID);
+    addEventCntdToCollectProcess();
     addEventSpecimenLinkForm(formData);
     addEventBackToSearch('navBarSearch');
     addEventNavBarParticipantCheckIn();

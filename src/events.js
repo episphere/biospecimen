@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, getIdToken, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, getIdToken, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking} from './pages/shipping.js';
 import { userListTemplate } from './pages/users.js';
@@ -1565,9 +1565,10 @@ export const addEventCheckInCompleteForm = () => {
         let query = `connectId=${parseInt(connectId)}`;
         showAnimation();
         const response = await findParticipant(query);
-        hideAnimation();
         const data = response.data[0];
-        specimenTemplate(data, formData);
+        const collections = (await getParticipantCollections(data.token)).data;
+        hideAnimation();
+        specimenTemplate(data, formData, collections);
     })
 };
 
@@ -2236,4 +2237,21 @@ export const addEventClearScannedBarcode = () => {
         document.getElementById(clearInputBtn.dataset.barcodeInput).value = '';
         clearInputBtn.hidden = true;
     });
+}
+
+export const addEventCntdToCollectProcess = () => {
+    const btns = document.getElementsByClassName('continue-collect-process');
+    Array.from(btns).forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const connectID = btn.dataset.connectId;
+            const collectionID = btn.dataset.collectionId;
+            let query = `connectId=${parseInt(connectID)}`;
+            showAnimation();
+            const response = await findParticipant(query);
+            const data = response.data[0];
+            const specimenData = (await searchSpecimen(collectionID)).data;
+            hideAnimation();
+            tubeCollectedTemplate(data, specimenData);
+        });
+    })
 }
