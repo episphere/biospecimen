@@ -121,8 +121,8 @@ export const addEventAddSpecimenToBox = () => {
         <table class="table" id="shippingModalTable">
             <thead>
                 <tr>
-                    <th>Tube ID</th>
-                    <th>Type</th>
+                    <th>Full Specimen ID</th>
+                    <th>Type/Color</th>
                     <th></th>
                 </tr>
             </thead>
@@ -813,6 +813,7 @@ export const populateSaveTable = (hiddenJSON, boxJSONS) => {
                         <th>Started</th>
                         <th>Last Saved</th>
                         <th>Box Number</th>
+                        <th>Location</th>
                         <th>Contents</th>
                         <th>Box Manifest</th>
                     </tr>`
@@ -830,6 +831,8 @@ export const populateSaveTable = (hiddenJSON, boxJSONS) => {
             currRow.insertCell(0).innerHTML=`<input type="checkbox" class="markForShipping">`
             let dateStarted = '';
             let lastModified = '';
+            let thisLocation = '';
+
             for(let j = 0; j < boxJSONS.length; j++){
                 console.log('BWVIBLOISD BGV LOIVBGWEOLVI WBGEVOLWIBVGDV' + boxJSONS[j].boxId)
                 if(boxJSONS[j].boxId == boxes[i]){
@@ -839,11 +842,15 @@ export const populateSaveTable = (hiddenJSON, boxJSONS) => {
                     if(boxJSONS[j].hasOwnProperty('lastUpdatedTiime')){
                         lastModified = boxJSONS[j]['lastUpdatedTiime']
                     }
+                    if(boxJSONS[j].hasOwnProperty('location')){
+                        thisLocation = boxJSONS[j]['location'];
+                    }
                 }
             }
             currRow.insertCell(1).innerHTML= dateStarted;
             currRow.insertCell(2).innerHTML= lastModified;
             currRow.insertCell(3).innerHTML= boxes[i];
+            currRow.insertCell(4).innerHTML = thisLocation;
             //get num tubes
             let currBox = hiddenJSON[boxes[i]];
             let numTubes = 0;
@@ -851,12 +858,12 @@ export const populateSaveTable = (hiddenJSON, boxJSONS) => {
             for(let j = 0; j < boxKeys.length; j++ ){
                 numTubes += currBox[boxKeys[j]]['arrElements'].length;
             }
-            currRow.insertCell(4).innerHTML= numTubes.toString() + " tubes";
-            currRow.insertCell(5).innerHTML= '<input type="button" class="boxManifestButton" value = "Box Manifest"/>';
+            currRow.insertCell(5).innerHTML= numTubes.toString() + " tubes";
+            currRow.insertCell(6).innerHTML= '<input type="button" class="boxManifestButton" value = "Box Manifest"/>';
             
             //boxes[i]
 
-            let currBoxButton = currRow.cells[5].getElementsByClassName("boxManifestButton")[0];
+            let currBoxButton = currRow.cells[6].getElementsByClassName("boxManifestButton")[0];
             
             currBoxButton.addEventListener("click", async e => {
                 var index = e.target.parentNode.parentNode.rowIndex;
@@ -979,7 +986,7 @@ const compareBoxIds = (a,b) => {
 
 }
 
-export const populateBoxSelectList = (hiddenJSON) => {
+export const populateBoxSelectList = async (hiddenJSON) => {
     let boxList = document.getElementById('selectBoxList');
     let selectBoxList = document.getElementById('selectBoxList');
     let list = ''
@@ -988,7 +995,8 @@ export const populateBoxSelectList = (hiddenJSON) => {
         list += '<option>' + keys[i] + '</option>';
     }
     if(list == ''){
-        list = 'remember to add Box'
+        await addNewBox();
+        return;
     }
     boxList.innerHTML = list;
 
@@ -997,10 +1005,15 @@ export const populateBoxSelectList = (hiddenJSON) => {
     let currBox = hiddenJSON[currBoxId];
         
     
-    document.getElementById('BoxNumBlood').innerText = currBoxId;
+    //document.getElementById('BoxNumBlood').innerText = currBoxId;
     let toInsertTable = document.getElementById('currTubeTable')
     let boxKeys = Object.keys(currBox)
-    toInsertTable.innerText = '';
+    toInsertTable.innerHTML = ` <tr>
+                                    <th style = "border-bottom:1px solid;">Specimen Bag ID</th>
+                                    <th style = "border-bottom:1px solid;">Full Specimen ID</th>
+                                    <th style = "border-bottom:1px solid;">Type/Color</th>
+                                    <th style = "border-bottom:1px solid;"></th>
+                                </tr>`;
     let translateNumToType = {
         "0001":"SST/Gold",
         "0002":"SST/Gold",
@@ -1040,7 +1053,7 @@ export const populateBoxSelectList = (hiddenJSON) => {
                     toAddType = translateNumToType[thisId[1]];
                 }
                 var rowCount = toInsertTable.rows.length;
-                var row = toInsertTable.insertRow(rowCount);           
+                var row = toInsertTable.insertRow(rowCount);
                 if(j % 2 == 1){
                     row.style['background-color'] = "lightgrey"
                 }
@@ -1053,7 +1066,7 @@ export const populateBoxSelectList = (hiddenJSON) => {
                 row.insertCell(1).innerHTML= toAddId;
                 row.insertCell(2).innerHTML= toAddType;
                 if(k == 0){
-                    row.insertCell(3).innerHTML='<input type="button" class="delButton" value = "remove">';
+                    row.insertCell(3).innerHTML='<input type="button" class="delButton" value = "remove bag" style="margin-top:2px;margin-bottom:2px">';
                 }
                 else{
                     row.insertCell(3).innerHTML="";
@@ -1115,63 +1128,67 @@ export const populateBoxSelectList = (hiddenJSON) => {
     
 }
 
+const addNewBox = async  () => {
+    let response = await  getBoxes();
+    let hiddenJSON = response.data;
+    let locations = {};
+    let keys = [];
+    let largestOverall = 0;
+    let largeIndex = -1;
+
+    let largestLocation = 0;
+    let largestLocationIndex = -1;
+    let pageLocation = document.getElementById('selectLocationList').value;
+    for(let i = 0; i < hiddenJSON.length; i++){
+        let curr = parseInt(hiddenJSON[i]['boxId'].substring(3))
+        let currLocation = hiddenJSON[i]['location']
+
+        if(curr > largestOverall){
+            largestOverall = curr;
+            largeIndex = i;
+        }
+        if(curr > largestLocation && currLocation == pageLocation){
+            largestLocation = curr;
+            largestLocationIndex = i;
+        }
+        
+    }
+    if(largestLocationIndex != -1){
+        let lastBox = hiddenJSON[largeIndex]['boxId']
+        if(Object.keys(hiddenJSON[largestLocationIndex]['bags']).length != 0){
+            //add a new Box
+            //create new Box Id
+            let newBoxNum = parseInt(lastBox.substring(3)) + 1;
+            let newBoxId = 'Box' + newBoxNum.toString();
+            let toPass = {};
+            toPass['boxId'] = newBoxId;
+            toPass['bags'] = {};
+            toPass['location'] = pageLocation;
+            await storeBox(toPass);
+
+            hiddenJSON.push({boxId:newBoxId, bags:{}, location:pageLocation})
+            let boxJSONS = hiddenJSON;
+            
+            hiddenJSON = {};
+
+            for(let i = 0; i < boxJSONS.length; i++){
+                let box = boxJSONS[i]
+                if(box['location'] == pageLocation){
+                    hiddenJSON[box['boxId']] = box['bags']
+                }
+            }
+            await populateBoxSelectList(hiddenJSON)
+        }
+        else{
+            //error (ask them to put something in the previous box first)
+        }
+    }
+}
+
 export const addEventAddBox = () => {
     let boxButton = document.getElementById('addBoxButton');
     boxButton.addEventListener('click', async () => {
-        let response = await  getBoxes();
-        let hiddenJSON = response.data;
-        let locations = {};
-        let keys = [];
-        let largestOverall = 0;
-        let largeIndex = -1;
-
-        let largestLocation = 0;
-        let largestLocationIndex = -1;
-        let pageLocation = document.getElementById('selectLocationList').value;
-        for(let i = 0; i < hiddenJSON.length; i++){
-            let curr = parseInt(hiddenJSON[i]['boxId'].substring(3))
-            let currLocation = hiddenJSON[i]['location']
-
-            if(curr > largestOverall){
-                largestOverall = curr;
-                largeIndex = i;
-            }
-            if(curr > largestLocation && currLocation == pageLocation){
-                largestLocation = curr;
-                largestLocationIndex = i;
-            }
-            
-        }
-        if(largestLocationIndex != -1){
-            let lastBox = hiddenJSON[largeIndex]['boxId']
-            if(Object.keys(hiddenJSON[largestLocationIndex]['bags']).length != 0){
-                //add a new Box
-                //create new Box Id
-                let newBoxNum = parseInt(lastBox.substring(3)) + 1;
-                let newBoxId = 'Box' + newBoxNum.toString();
-                let toPass = {};
-                toPass['boxId'] = newBoxId;
-                toPass['bags'] = {};
-                toPass['location'] = pageLocation;
-                await storeBox(toPass);
-
-                hiddenJSON.push({boxId:newBoxId, bags:{}, location:pageLocation})
-                let boxJSONS = hiddenJSON;
-                
-                hiddenJSON = {};
-
-                for(let i = 0; i < boxJSONS.length; i++){
-                    let box = boxJSONS[i]
-                    if(box['location'] == pageLocation){
-                        hiddenJSON[box['boxId']] = box['bags']
-                    }
-                }
-                populateBoxSelectList(hiddenJSON)
-            }
-            else{
-                //error (ask them to put something in the previous box first)
-            }
-        }
+        addNewBox();
     })
    
 
@@ -1181,63 +1198,7 @@ export const addEventModalAddBox = () => {
     let boxButton = document.getElementById('modalAddBoxButton');
     
     boxButton.addEventListener('click', async () => {
-        let response = await  getBoxes();
-        let hiddenJSON = response.data;
-        let locations = {};
-        let keys = [];
-        let largestOverall = 0;
-        let largeIndex = -1;
-
-        let largestLocation = 0;
-        let largestLocationIndex = -1;
-        let pageLocation = document.getElementById('selectLocationList').value;
-        for(let i = 0; i < hiddenJSON.length; i++){
-            let curr = parseInt(hiddenJSON[i]['boxId'].substring(3))
-            let currLocation = hiddenJSON[i]['location']
-
-            if(curr > largestOverall){
-                largestOverall = curr;
-                largeIndex = i;
-            }
-            if(curr > largestLocation && currLocation == pageLocation){
-                largestLocation = curr;
-                largestLocationIndex = i;
-            }
-            
-        }
-        if(largestLocationIndex != -1){
-            let lastBox = hiddenJSON[largeIndex]['boxId']
-            if(Object.keys(hiddenJSON[largestLocationIndex]['bags']).length != 0){
-                //add a new Box
-                //create new Box Id
-                let newBoxNum = parseInt(lastBox.substring(3)) + 1;
-                let newBoxId = 'Box' + newBoxNum.toString();
-                let toPass = {};
-                toPass['boxId'] = newBoxId;
-                toPass['bags'] = {};
-                toPass['location'] = pageLocation;
-                await storeBox(toPass);
-
-                hiddenJSON.push({boxId:newBoxId, bags:{}, location:pageLocation})
-                let boxJSONS = hiddenJSON;
-                
-                hiddenJSON = {};
-
-                for(let i = 0; i < boxJSONS.length; i++){
-                    let box = boxJSONS[i]
-                    if(box['location'] == pageLocation){
-                        hiddenJSON[box['boxId']] = box['bags']
-                    }
-                }
-                populateModalSelect(hiddenJSON);
-                let modalSelect = document.getElementById('shippingModalChooseBox');
-                modalSelect.value = newBoxId;
-                populateBoxSelectList(hiddenJSON)
-            }
-            else{
-                //error (ask them to put something in the previous box first)
-            }
-        }
+        addNewBox();
     })
    
 
@@ -1258,10 +1219,15 @@ export const populateTubeInBoxList = async () => {
     }
     let currList = "";
     
-    document.getElementById('BoxNumBlood').innerText = currBoxId;
+    //document.getElementById('BoxNumBlood').innerText = currBoxId;
     let toInsertTable = document.getElementById('currTubeTable')
     let boxKeys = Object.keys(currBox)
-    toInsertTable.innerText = '';
+    toInsertTable.innerHTML = ` <tr>
+                                    <th style = "border-bottom:1px solid;">Specimen Bag ID</th>
+                                    <th style = "border-bottom:1px solid;">Full Specimen ID</th>
+                                    <th style = "border-bottom:1px solid;">Type/Color</th>
+                                    <th style = "border-bottom:1px solid;"></th>
+                                </tr>`;
     //set the rest of the table up
     let translateNumToType = {
         "0001":"SST/Gold",
@@ -1314,7 +1280,7 @@ export const populateTubeInBoxList = async () => {
                 row.insertCell(1).innerHTML= toAddId;
                 row.insertCell(2).innerHTML= toAddType;
                 if(k == 0){
-                    row.insertCell(3).innerHTML='<input type="button" class="delButton" value = "remove">';
+                    row.insertCell(3).innerHTML='<input type="button" class="delButton" value = "remove bag" style="margin-top:2px;margin-bottom:2px;">';
                 }
                 else{
                     row.insertCell(3).innerHTML="";
@@ -1400,7 +1366,7 @@ export const addEventChangeLocationSelect = () => {
             let box = boxJSONS[i]
             hiddenJSON[box['boxId']] = box['bags']
         }
-        populateBoxSelectList(hiddenJSON)
+        await populateBoxSelectList(hiddenJSON)
         //console.log(JSON.stringify(boxdata))
         hideAnimation();
     })

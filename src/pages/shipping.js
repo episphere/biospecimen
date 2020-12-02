@@ -67,7 +67,7 @@ export const startShipping = async (userName) => {
 
         <div class="row">
             <div class="col-lg">
-            To start packing the shipping boxes, scan specimen bag ID or Tube ID here:
+            To start packing the shipping boxes, scan specimen bag ID or Full Specimen ID here:
                 <div class="row form-row">
                     <form id="addSpecimenForm" method="POST" style="width:100%;">
                         <div class="form-group">
@@ -112,7 +112,6 @@ export const startShipping = async (userName) => {
         <div class="row">
             <div class="col">
                 <div class="panel panel-default" style="border-style:solid;height:550px;border-width:1px;overflow:auto">
-                <p id="BoxNumBlood"></p>
                     <table style="width: 100%;" id="currTubeTable">
                     </table>
                 </div>
@@ -132,7 +131,7 @@ export const startShipping = async (userName) => {
                 <div class="modal-body" id="shippingModalBody">
                 </div>
                 <div class="modal-body"> 
-                    <h4>Which box this should be added to<h4>
+                    <h4>Select Box<h4>
                     <select class="selectpicker" id="shippingModalChooseBox"></select>
                     <button type="button" class="btn btn-primary" id="modalAddBoxButton">Create New Box</button>
                     
@@ -171,7 +170,7 @@ export const startShipping = async (userName) => {
             <div style="float: left;width: 33%;">
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging" style="margin:auto;display:block;">Packaging Complete</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging" style="margin:auto;display:block;">Review/Ship</button>
             </div>
         </div>
 
@@ -189,7 +188,7 @@ export const startShipping = async (userName) => {
     document.getElementById('contentBody').innerHTML = template;
     await populateSelectLocationList();
     
-    populateSaveTable(hiddenJSON, boxJSONS);
+    await populateSaveTable(hiddenJSON, boxJSONS);
     await populateSpecimensList(hiddenJSON1);
 
     let currLocation = document.getElementById('selectLocationList').value;
@@ -201,7 +200,7 @@ export const startShipping = async (userName) => {
         let box = boxJSONS[i]
         hiddenJSONLocation[box['boxId']] = box['bags']
     }
-    populateBoxSelectList(hiddenJSONLocation);
+    await populateBoxSelectList(hiddenJSONLocation);
     await populateTempNotification();
     addEventNavBarShipment("navBarShippingDash");
     addEventNavBarShippingManifest(userName);
@@ -267,8 +266,8 @@ export const boxManifest = async (boxId) => {
             <table id="boxManifestTable" style="width: 100%;">
                 <tr>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Specimen Bag ID</th>
-                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Tube ID</th>
-                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Specimen Type</th>
+                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Full Specimen ID</th>
+                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Type/Color</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Scanned By</th>
                 </tr>
             </table>
@@ -342,7 +341,7 @@ export const shippingManifest = async (boxesToShip, userName) => {
                 <tr>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Box Number</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Specimen Bag ID</th>
-                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Tube ID</th>
+                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Full Specimen ID</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Scanned By</th>
                 </tr>
             </table>
