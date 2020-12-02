@@ -78,7 +78,7 @@ export const addEventsearchSpecimen = () => {
         const biospecimen = await searchSpecimen(masterSpecimenId);
         if(biospecimen.code !== 200) {
             hideAnimation();
-            showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+            showNotifications({title: 'Not found', body: 'Specimen not found!'}, true)
             return
         }
         const biospecimenData = biospecimen.data;
