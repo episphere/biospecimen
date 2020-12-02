@@ -1552,17 +1552,10 @@ export const addEventCheckInCompleteForm = () => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        const select = document.getElementById('biospecimenVisitType');
-        const connectId = parseInt(select.dataset.connectId);
-        const biospecimenVisitType = select.value;
-        const token = select.dataset.participantToken;
         let formData = {};
-        formData['connectId'] = connectId;
-        formData['331584571'] = parseInt(biospecimenVisitType);
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['checkedInAt'] = new Date().toISOString();
-        formData['token'] = token;
-        let query = `connectId=${parseInt(connectId)}`;
+        let query = `connectId=${parseInt(form.dataset.connectId)}`;
         showAnimation();
         const response = await findParticipant(query);
         const data = response.data[0];
@@ -1599,6 +1592,8 @@ const btnsClicked = async (connectId, formData, cont) => {
     const scanSpecimenID = document.getElementById('scanSpecimenID').value;
     const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value;
     const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value;
+    const select = document.getElementById('biospecimenVisitType');
+    const biospecimenVisitType = select.value;
     let hasError = false;
     let focus = true;
     
@@ -1642,33 +1637,32 @@ const btnsClicked = async (connectId, formData, cont) => {
     formData['820476880'] = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     if(enterSpecimenID1) formData['387108065'] = 353358909
     else formData['387108065'] = 104430631;
+    formData['331584571'] = parseInt(biospecimenVisitType);
+    formData['connectId'] = parseInt(select.dataset.connectId);
+    formData['token'] = select.dataset.participantToken;
     let query = `connectId=${parseInt(connectId)}`;
     showAnimation();
     const response = await findParticipant(query);
     const data = response.data[0];
     const specimenData = (await searchSpecimen(formData['820476880'])).data;
     hideAnimation();
+    if(specimenData && specimenData.connectId && parseInt(specimenData.connectId) !== data.Connect_ID) {
+        showNotifications({title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.'}, true)
+        return;
+    }
+
     if(cont) {
-        if(specimenData && specimenData.connectId && parseInt(specimenData.connectId) !== data.Connect_ID) {
-            showNotifications({title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.'}, true)
-        }
-        else {
-            showAnimation();
-            await storeSpecimen([formData]);
-            hideAnimation();
-            tubeCollectedTemplate(data, specimenData ? specimenData : formData);
-        }
+        showAnimation();
+        await storeSpecimen([formData]);
+        const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
+        hideAnimation();
+        tubeCollectedTemplate(data, biospecimenData);
     }
     else {
-        if(specimenData && specimenData.connectId && parseInt(specimenData.connectId) !== data.Connect_ID) {
-            showNotifications({title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.'}, true)
-        }
-        else {
-            showAnimation();
-            await storeSpecimen([formData]);
-            showAnimation();
-            searchTemplate();
-        }
+        showAnimation();
+        await storeSpecimen([formData]);
+        showAnimation();
+        searchTemplate();
     }
 }
 

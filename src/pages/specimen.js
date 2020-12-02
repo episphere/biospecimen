@@ -3,6 +3,7 @@ import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBac
 import { masterSpecimenIDRequirement, workflows } from "../tubeValidation.js";
 
 export const specimenTemplate = async (data, formData, collections) => {
+    const dashboardType = document.getElementById('contentBody').dataset.workflow;
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenLink');
     navBarBtn.classList.remove('disabled');
@@ -24,9 +25,10 @@ export const specimenTemplate = async (data, formData, collections) => {
                 </div>
             `: ``}
         </div>
-        </hr>`;
+        `;
         if(collections){
-            template+=`<h4>Participant Collections</h4><table class="table table-bordered table-striped">
+            template+=`</br><div class="row"><h4>Participant Collections</h4></div>
+            <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
                         <th>Collection ID</th>
@@ -44,16 +46,27 @@ export const specimenTemplate = async (data, formData, collections) => {
                         <td><button class="custom-btn continue-collect-process" data-connect-id="${data.Connect_ID}" data-collection-id="${collection['820476880']}">Continue to Collect/Process</button></td>
                     </tr>`
                 })
-            template +=`</tbody></table></hr>`
+            template +=`</tbody></table>`
         }
         
-        template += `<h4>Start a new Collection</h4>
+        template += `</br><div class="row"><h4>Start a new Collection</h4></div>
         <form id="specimenLinkForm" method="POST">
+            ${dashboardType === 'research' ? `
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label" for="biospecimenVisitType">Select visit</label>
+                    <select class="form-control col-md-5" required data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}" id="biospecimenVisitType">
+                        <option value=""> -- Select Visit -- </option>
+                        <option selected value="153098257">Baseline</option>
+                    </select>
+                </div>
+            `:``}
+            
             <div class="form-group row">`
                 const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
                 const workflow = document.getElementById('contentBody').dataset.workflow;
                 if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {
-                    template +=`<label class="col-md-4 col-form-label" for="collectionLocation">Select Collection Location</label><select class="form-control col-md-5" id="collectionLocation">`
+                    template +=`<label class="col-md-4 col-form-label" for="collectionLocation">Select Collection Location</label>
+                    <select class="form-control col-md-5" id="collectionLocation">`
                     siteLocations[workflow][siteAcronym].forEach(location => {
                         template +=`<option value='${location}'>${location}</option>`
                     })
