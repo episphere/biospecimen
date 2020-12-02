@@ -349,7 +349,10 @@ export const searchSpecimenInstitute = async () => {
     });
 
     let a = await response.json();
-    let data = a.data;
+
+    let data = a.data;    
+    console.log(';wopiebnvopdivbloisadijvchboiauwehcl;kdscnsoiudchsoefdcivnew: ' + JSON.stringify(data))
+    
     for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
         let keys = Object.keys(currJSON);
