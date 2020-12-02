@@ -312,6 +312,17 @@ export const searchSpecimen = async (masterSpecimenId) => {
     return response.json();
 }
 
+export const getParticipantCollections = async (token) => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=getParticipantCollections&token=${token}`, {
+        method: "GET",
+        headers: {
+            Authorization:"Bearer "+idToken
+        }
+    });
+    return response.json();
+}
+
 export const removeBag = async(boxId, bags) => {
     let toPass = {boxId:boxId, bags:bags}
     const idToken = await getIdToken();

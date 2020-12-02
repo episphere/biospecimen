@@ -86,7 +86,7 @@ export const finalizeTemplate = (data, specimenData) => {
     `;
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
-    addEventFinalizeForm(data, specimenData['820476880']);
-    addEventFinalizeFormCntd(data, specimenData['820476880']);
+    addEventFinalizeForm(specimenData);
+    addEventFinalizeFormCntd(specimenData);
     addEventReturnToCollectProcess();
 }

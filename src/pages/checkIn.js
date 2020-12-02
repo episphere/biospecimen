@@ -12,7 +12,7 @@ export const checkInTemplate = (data) => {
             <h5>Participant check-in</h5>
         </div>
         </br>
-        <form method="POST" id="checkInCompleteForm">
+        <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
             <div class="row">
                 <div>${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
@@ -20,15 +20,6 @@ export const checkInTemplate = (data) => {
             <div class="row">
                 Verify contact information &nbsp;
                 <button type="button" class="btn btn-outline-primary" id="contactInformationModal" data-target="#biospecimenModal" data-toggle="modal">Contact Information</button>
-            </div>
-            <div class="row">
-                <div class="form-group">
-                    <label for="biospecimenVisitType">Select visit</label>
-                    <select class="form-control" required data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}" id="biospecimenVisitType">
-                        <option value=""> -- Select Visit -- </option>
-                        <option selected value="153098257">Baseline</option>
-                    </select>
-                </div>
             </div>
             
             </br>

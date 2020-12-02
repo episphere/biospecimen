@@ -1,8 +1,9 @@
 import { addEventBarCodeScanner, generateBarCode, removeActiveClass, siteLocations, visitType } from "./../shared.js";
-import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
+import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch, addEventCntdToCollectProcess } from "./../events.js";
 import { masterSpecimenIDRequirement, workflows } from "../tubeValidation.js";
 
-export const specimenTemplate = (data, formData) => {
+export const specimenTemplate = async (data, formData, collections) => {
+    const dashboardType = document.getElementById('contentBody').dataset.workflow;
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenLink');
     navBarBtn.classList.remove('disabled');
@@ -24,13 +25,48 @@ export const specimenTemplate = (data, formData) => {
                 </div>
             `: ``}
         </div>
-        </br>
+        `;
+        if(collections){
+            template+=`</br><div class="row"><h4>Participant Collections</h4></div>
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Collection ID</th>
+                        <th>Visit</th>
+                        <th>Date of Collection</th>
+                        <th>Select Action</th>
+                    </tr>
+                </thead>
+                <tbody>`
+                collections.forEach(collection => {
+                    template += `<tr>
+                        <td>${collection['820476880']}</td>
+                        <td>${collection['331584571'] ? visitType[collection['331584571']] : ''}</td>
+                        <td>${collection['678166505'] ? new Date(collection['678166505']).toLocaleString() : ''}</td>
+                        <td><button class="custom-btn continue-collect-process" data-connect-id="${data.Connect_ID}" data-collection-id="${collection['820476880']}">Continue to Collect/Process</button></td>
+                    </tr>`
+                })
+            template +=`</tbody></table>`
+        }
+        
+        template += `</br><div class="row"><h4>Start a new Collection</h4></div>
         <form id="specimenLinkForm" method="POST">
+            ${dashboardType === 'research' ? `
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label" for="biospecimenVisitType">Select visit</label>
+                    <select class="form-control col-md-5" required data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}" id="biospecimenVisitType">
+                        <option value=""> -- Select Visit -- </option>
+                        <option selected value="153098257">Baseline</option>
+                    </select>
+                </div>
+            `:``}
+            
             <div class="form-group row">`
                 const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
                 const workflow = document.getElementById('contentBody').dataset.workflow;
                 if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {
-                    template +=`<label class="col-md-4 col-form-label" for="collectionLocation">Select Collection Location</label><select class="form-control col-md-5" id="collectionLocation">`
+                    template +=`<label class="col-md-4 col-form-label" for="collectionLocation">Select Collection Location</label>
+                    <select class="form-control col-md-5" id="collectionLocation">`
                     siteLocations[workflow][siteAcronym].forEach(location => {
                         template +=`<option value='${location}'>${location}</option>`
                     })
@@ -78,6 +114,7 @@ export const specimenTemplate = (data, formData) => {
     document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
     addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, masterSpecimenIDRequirement.length);
     generateBarCode('connectIdBarCode', data.Connect_ID);
+    addEventCntdToCollectProcess();
     addEventSpecimenLinkForm(formData);
     addEventBackToSearch('navBarSearch');
     addEventNavBarParticipantCheckIn();
