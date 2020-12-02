@@ -1699,17 +1699,12 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
         
         showAnimation();
         const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
-
-        if(biospecimenData && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+        const dashboardType = document.getElementById('contentBody').dataset.workflow;
+        if(dashboardType === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
         checkboxes.forEach((dt) => {
             if(biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
             if(biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
-                biospecimenData[`${dt.id}`]['678857215'] = 104430631
-                biospecimenData[`${dt.id}`]['825582494'] = '';
-                biospecimenData[`${dt.id}`]['248868659'] = [];
-                biospecimenData[`${dt.id}`]['410912345'] = 104430631;
-                biospecimenData[`${dt.id}`]['536710547'] = '';
-                biospecimenData[`${dt.id}`]['226562200'] = 104430631;
+                biospecimenData[`${dt.id}`] = {};
             }
             biospecimenData[`${dt.id}`]['593843561'] = dt.checked ? 353358909 : 104430631;
         });
@@ -1730,9 +1725,9 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
     let hasError = false;
     let focus = true;
+    const dashboardType = document.getElementById('contentBody').dataset.workflow;
+    const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
     inputFields.forEach(input => {
-        const dashboardType = document.getElementById('contentBody').dataset.workflow;
-        const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
         const subSiteLocation = biospecimenData.Collection_Location;
         const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType]; 
         const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
@@ -1770,13 +1765,19 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[dt.id.replace('Deviated', '')]['678857215'] = dt.checked ? 353358909 : 104430631)
     
     showAnimation();
-    await storeSpecimen([data]);
+    
     if(cntd) {
+        if(dashboardType === 'clinical') {
+            data['539197670'] = 353358909;
+            if(data['915838974'] === undefined) data['915838974'] = new Date().toISOString();
+        }
+        await storeSpecimen([data]);
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
         explanationTemplate(dt, specimenData);
     }
     else {
+        await storeSpecimen([data]);
         hideAnimation();
         searchTemplate();
     }
