@@ -1476,7 +1476,7 @@ export const addEventChangeLocationSelect = (userName) => {
 export const addEventBackToSearch = (id) => {
     document.getElementById(id).addEventListener('click', e => {
         e.stopPropagation();
-        location.hash = '#welcome';
+        searchTemplate();
     });
 };
 
