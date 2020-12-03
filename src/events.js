@@ -1659,7 +1659,6 @@ const btnsClicked = async (connectId, formData, cont) => {
     const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value;
     const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value;
     const select = document.getElementById('biospecimenVisitType');
-    const biospecimenVisitType = select.value;
     let hasError = false;
     let focus = true;
     
@@ -1704,7 +1703,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     formData['820476880'] = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     if(enterSpecimenID1) formData['387108065'] = 353358909
     else formData['387108065'] = 104430631;
-    formData['331584571'] = parseInt(biospecimenVisitType);
+    if(select) formData['331584571'] = parseInt(select.value);
     formData['connectId'] = parseInt(select.dataset.connectId);
     formData['token'] = select.dataset.participantToken;
     let query = `connectId=${parseInt(connectId)}`;
