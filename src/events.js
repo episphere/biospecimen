@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, getIdToken, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, getIdToken, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, siteLocations} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking} from './pages/shipping.js';
 import { userListTemplate } from './pages/users.js';
@@ -1620,6 +1620,7 @@ export const addEventCheckInCompleteForm = () => {
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['962267121'] = new Date().toISOString();
         formData['135591601'] = 353358909;
+        formData['650516960'] = document.getElementById('contentBody').dataset.workflow === 'research' ? 534621077 : 664882224;
         let query = `connectId=${parseInt(form.dataset.connectId)}`;
         showAnimation();
         const response = await findParticipant(query);
@@ -1698,7 +1699,8 @@ const btnsClicked = async (connectId, formData, cont) => {
         }
     }
     if(hasError) return;
-    if(document.getElementById('collectionLocation')) formData['Collection_Location'] = document.getElementById('collectionLocation').value;
+
+    if(document.getElementById('collectionLocation')) formData[document.getElementById('contentBody').dataset.workflow === 'research' ? '951355211' : '525480516'] = parseInt(document.getElementById('collectionLocation').value);
     formData['820476880'] = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     if(enterSpecimenID1) formData['387108065'] = 353358909
     else formData['387108065'] = 104430631;
@@ -1789,7 +1791,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     const dashboardType = document.getElementById('contentBody').dataset.workflow;
     const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
     inputFields.forEach(input => {
-        const subSiteLocation = biospecimenData.Collection_Location;
+        const subSiteLocation = siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === biospecimenData[document.getElementById('contentBody').dataset.workflow === 'research' ? '951355211' : '525480516'])[0].location
         const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType]; 
         const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
         

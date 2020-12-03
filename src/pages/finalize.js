@@ -1,4 +1,4 @@
-import { removeActiveClass, generateBarCode, visitType } from "./../shared.js";
+import { removeActiveClass, generateBarCode, visitType, siteLocations } from "./../shared.js";
 import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollectProcess } from "./../events.js";
 import { siteSpecificTubeRequirements, workflows } from "../tubeValidation.js";
 
@@ -44,7 +44,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 <tbody>`
                 const dashboardType = document.getElementById('contentBody').dataset.workflow;
                 const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-                const subSiteLocation = specimenData.Collection_Location;
+                const subSiteLocation = siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === specimenData[document.getElementById('contentBody').dataset.workflow === 'research' ? '951355211' : '525480516'])[0].location;
                 const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType]; 
                 siteTubesList.forEach((obj, index) => {
                     template += `

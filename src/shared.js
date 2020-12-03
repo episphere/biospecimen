@@ -619,15 +619,15 @@ export const disableInput = (id, disable) => {
 
 export const siteLocations = {
     'research': {
-        'UCM': ['UC-DCAM'],
-        'MFC': ['Marshfield', 'Lake Hallie'],
-        'HP': ['HP Research Clinic'],
-        'HFHS': ['HFHS Research Clinic (Main Campus)'],
-        'SFH': ['SF Cancer Center LL'],
-        'NCI': ['NCI-1', 'NCI-2']
+        'UCM': [{location: 'UC-DCAM', concept: 777644826}],
+        'MFC': [{location: 'Marshfield', concept: 692275326}, {location: 'Lake Hallie', concept: 698283667}],
+        'HP': [{location: 'HP Research Clinic', concept: 834825425}],
+        'HFHS': [{location: 'HFHS Research Clinic (Main Campus)', concept: 736183094}],
+        'SFH': [{location: 'SF Cancer Center LL', concept: 589224449}],
+        'NCI': [{location: 'NCI-1', concept: 111111111}, {location: 'NCI-2', concept: 222222222}]
     },
     'clinical': {
-        'KPHI': ['Oahu', 'non-Oahu']
+        'KPHI': [{location:'Oahu', concept: 945449846}, {location: 'Non-Oahu', concept: 704199032}]
     }
 }
 

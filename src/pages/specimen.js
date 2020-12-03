@@ -67,8 +67,8 @@ export const specimenTemplate = async (data, formData, collections) => {
                 if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {
                     template +=`<label class="col-md-4 col-form-label" for="collectionLocation">Select Collection Location</label>
                     <select class="form-control col-md-5" id="collectionLocation">`
-                    siteLocations[workflow][siteAcronym].forEach(location => {
-                        template +=`<option value='${location}'>${location}</option>`
+                    siteLocations[workflow][siteAcronym].forEach(site => {
+                        template +=`<option value='${site.concept}'>${site.location}</option>`
                     })
                     template +=`</select>`
                 }
