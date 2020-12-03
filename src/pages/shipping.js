@@ -3,6 +3,27 @@ import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox,
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
+const conversion = {
+    "299553921":"0001",
+    "703954371":"0002",
+    "838567176":"0003",
+    "454453939":"0004",
+    "652357376":"0005",
+    "973670172":"0006",
+    "143615646":"0007",
+    "787237543":"0008",
+    "223999569":"0009",
+    "376960806":"0011",
+    "232343615":"0012",
+    "589588440":"0021",
+    "746999767":"0022",
+    "857757831":"0031",
+    "654812257":"0032",
+    "958646668":"0013",
+    "677469051":"0014",
+    "683613884":"0024",
+}
+
 export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
     
     auth.onAuthStateChanged(async user => {
@@ -74,7 +95,7 @@ export const startShipping = async (userName) => {
                             <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="btn btn-outline-primary" data-toggle="modal" data-target="#shippingModal" data-backdrop="static">Add specimen to box</button>
+                            <button type="submit" class="btn btn-outline-primary" data-toggle="modal" data-target="#shippingModal" data-backdrop="static" style = "display:none;">Add specimen to box</button>
                         </div>
                     </form>
                 </div>
@@ -202,7 +223,7 @@ export const startShipping = async (userName) => {
     }
     await populateBoxSelectList(hiddenJSONLocation);
     await populateTempNotification();
-    addEventNavBarShipment("navBarShippingDash");
+    addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarShippingManifest(userName);
     addEventAddBox();
     addEventBoxSelectListChanged();
@@ -283,10 +304,11 @@ export const boxManifest = async (boxId) => {
             </div>
         </div>
         `;
+    removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarBoxManifest');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
-    removeActiveClass('navbar-btn', 'active')
+   
 
     document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(hiddenJSON);
     
@@ -294,7 +316,11 @@ export const boxManifest = async (boxId) => {
     //document.getElementById('boxManifestTable').appendChild(result);
     populateBoxManifestHeader(boxId,boxJSONS);
     populateBoxManifestTable(boxId,hiddenJSON);
-    addEventNavBarShipment("returnToPackaging");
+    addEventNavBarShipment("returnToPackaging", userName);
+    document.getElementById('printBox').addEventListener('click', e => {
+        window.print();
+    });
+    addEventNavBarShipment("returnToPackaging", userName);
     //addEventNavBarShippingManifest();
     hideAnimation();
     //addEventNavBarShipment("navBarShippingDash");
@@ -332,8 +358,6 @@ export const shippingManifest = async (boxesToShip, userName) => {
             </div>
             <div style="float: left;width: 33%;"></div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
-                <p>abc</p>
-                <p>abc</p>
             </div>
         </div>
         <div class="row">
@@ -374,20 +398,28 @@ export const shippingManifest = async (boxesToShip, userName) => {
             </div>
         </div>
         `;*/
+    removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarShippingManifest');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
-    removeActiveClass('navbar-btn', 'active')
+    
 
     document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(hiddenJSON);
     
     
     //document.getElementById('boxManifestTable').appendChild(result);
     
-    populateShippingManifestHeader(toDisplayJSON);
+    populateShippingManifestHeader(toDisplayJSON, userName);
     populateShippingManifestBody(toDisplayJSON);
     await populateTempCheck();
     const btn = document.getElementById('completePackaging');
+    document.getElementById('printBox').addEventListener('click', e => {
+        window.print();
+    });
+    addEventNavBarShipment('returnToPackaging', userName);
+
+    
+
     document.getElementById('completePackaging').addEventListener('click', e => {
         e.stopPropagation();
         if(btn.classList.contains('active')) return;
@@ -440,10 +472,10 @@ export const shipmentTracking = (hiddenJSON, userName, tempCheckChecked) => {
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Home</button>
             </div>
             <div style="float: left;width: 33%;">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="printBox">Save and Exit</button>
+                
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completeTracking">Save and Continue</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completeTracking">Continue</button>
             </div>
         </div>
 
@@ -460,7 +492,7 @@ export const shipmentTracking = (hiddenJSON, userName, tempCheckChecked) => {
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
     
-    
+    addEventNavBarShipment("returnToPackaging", userName);
     if(Object.keys(hiddenJSON).length > 0){
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
     }
@@ -518,7 +550,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content sub-div-shadow">
                     <div class="modal-header" id="finalizeModalHeader">
-                        Are you sure?
+                        Thie will finalize the shipment
                     </div>
                     <div class="modal-body" id="finalizeModalBody">
                         
@@ -554,6 +586,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
     
+    addEventNavBarShipment("returnToPackaging", userName);
     
     if(Object.keys(hiddenJSON).length > 0){
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
