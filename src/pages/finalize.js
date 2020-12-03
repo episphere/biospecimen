@@ -3,7 +3,6 @@ import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollect
 import { siteSpecificTubeRequirements, workflows } from "../tubeValidation.js";
 
 export const finalizeTemplate = (data, specimenData) => {
-    console.log(specimenData)
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenFinalize');
     navBarBtn.classList.remove('disabled');
@@ -44,7 +43,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 <tbody>`
                 const dashboardType = document.getElementById('contentBody').dataset.workflow;
                 const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-                const subSiteLocation = siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === specimenData[document.getElementById('contentBody').dataset.workflow === 'research' ? '951355211' : '525480516'])[0].location;
+                const subSiteLocation = siteLocations[dashboardType][siteAcronym] ? siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === specimenData[document.getElementById('contentBody').dataset.workflow === 'research' ? '951355211' : '525480516'])[0].location : undefined;
                 const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType]; 
                 siteTubesList.forEach((obj, index) => {
                     template += `
@@ -66,7 +65,7 @@ export const finalizeTemplate = (data, specimenData) => {
                     <div class="col">
                         <label for="finalizedAdditionalNotes">Additional Notes (Optional)</label>
                         </br>
-                        <textarea rows=3 class="form-control" id="finalizedAdditionalNotes">${specimenData.finalizedAdditionalNotes ? `${specimenData.finalizedAdditionalNotes}` : ''}</textarea>
+                        <textarea rows=3 class="form-control" id="finalizedAdditionalNotes">${specimenData['260133861'] ? `${specimenData['260133861']}` : ''}</textarea>
                     </div>
                 </div>
                 </br>

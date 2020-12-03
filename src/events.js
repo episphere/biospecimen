@@ -1790,7 +1790,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     const dashboardType = document.getElementById('contentBody').dataset.workflow;
     const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
     inputFields.forEach(input => {
-        const subSiteLocation = siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === biospecimenData[document.getElementById('contentBody').dataset.workflow === 'research' ? '951355211' : '525480516'])[0].location
+        const subSiteLocation = siteLocations[dashboardType][siteAcronym] ? siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === biospecimenData[document.getElementById('contentBody').dataset.workflow === 'research' ? '951355211' : '525480516'])[0].location : undefined;
         const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType]; 
         const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
         
