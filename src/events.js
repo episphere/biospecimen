@@ -842,6 +842,23 @@ export const populateModalSelect = (hiddenJSON) => {
     currSelectBox.value = document.getElementById('selectBoxList').value;
 }
 
+export const populateTempSelect = (boxes) => {
+    let boxDiv = document.getElementById("tempCheckList");
+    boxDiv.style.display = "block";
+    boxDiv.innerHTML = `<p>Select the box that contains the temp monitor</p>
+    <select name="tempBox" id="tempBox">`;
+
+    let toPopulate = document.getElementById('tempBox')
+    for(let i = 0; i<  boxes.length; i++){
+        var opt = document.createElement("option");
+        opt.value= boxes[i];
+        opt.innerHTML = boxes[i]; 
+     
+        // then append it to the select element
+        toPopulate.appendChild(opt);
+    }
+}
+
 export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
     let table = document.getElementById("saveTable");
     table.innerHTML = `<tr>
@@ -957,10 +974,12 @@ export const populateTempCheck = async () => {
     }
 }
 
-export const populateShippingManifestHeader = (hiddenJSON, userName) => {
+export const populateShippingManifestHeader = (hiddenJSON, userName, location, site) => {
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
 
+    console.log('weoibnsoidvbsodlvibaoiwbgeoiv')
+    console.log(JSON.stringify(hiddenJSON))
 
     console.log(JSON.stringify(hiddenJSON))
     let newP = document.createElement("p");
@@ -986,6 +1005,14 @@ export const populateShippingManifestHeader = (hiddenJSON, userName) => {
     
     newP = document.createElement("p");
     newP.innerHTML = "Sender: " + userName;
+    document.getElementById('boxManifestCol1').appendChild(newP);
+
+    newP = document.createElement("p");
+    newP.innerHTML = "Site: " + site;
+    document.getElementById('boxManifestCol3').appendChild(newP);
+
+    newP = document.createElement("p");
+    newP.innerHTML = "Location: " + location;
     document.getElementById('boxManifestCol3').appendChild(newP);
 
 } 

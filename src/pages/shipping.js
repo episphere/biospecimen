@@ -1,6 +1,6 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck} from "./../events.js";
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 const conversion = {
@@ -185,6 +185,12 @@ export const startShipping = async (userName) => {
                 </tr>
             </table>
     </div>
+    <div class="row" id="checkForTemp">
+        <div class="col-lg">
+            <input type="checkbox" id="tempMonitorChecked" style="transform: scale(1.5); margin-right:10px; margin-top:5px;">
+            <label for="tempMonitorChecked">Temp Monitor is included in this shipment</label><br>
+        </div>
+    </div>
     <div class="row" style="margin-top:50px;margin-bottom:50px;">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
             </div>
@@ -332,18 +338,30 @@ export const boxManifest = async (boxId, userName) => {
 
 export const shippingManifest = async (boxesToShip, userName) => {    
 
+
+    let tempMonitorThere = document.getElementById('tempMonitorChecked').checked;
+    
+
     let response = await  getBoxes();
     let boxJSONS = response.data;
     let hiddenJSON = {};
+    let locations = {};
+    let site = '';
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
         hiddenJSON[box['boxId']] = box['bags']
+        locations[box['boxId']] = box['location'];
+        site = box['institute'];
     }
 
     let toDisplayJSON = {};
+    let location = ''
+    console.log('wojebviowueviduvbsiduviuvb');
+    console.log(JSON.stringify(hiddenJSON))
     for(let i = 0; i < boxesToShip.length; i++){
         let currBox = boxesToShip[i];
         toDisplayJSON[currBox] = hiddenJSON[currBox];
+        location = locations[currBox];
     }
 
     let template = `
@@ -374,6 +392,11 @@ export const shippingManifest = async (boxesToShip, userName) => {
             <input type="checkbox" id="tempMonitorChecked">
             <label for="tempMonitorChecked">Temp Monitor is included in this shipment</label><br>
         </div>
+        <div class="row" style="display:none" id="tempCheckList">
+            <p>Select the box that contains the temp monitor</p>
+            <select name="tempBox" id="tempBox">
+            </select>
+        </div>
         <div class="row" style="margin-top:100px">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Return to Packaging</button>
@@ -384,7 +407,9 @@ export const shippingManifest = async (boxesToShip, userName) => {
             <div style="float:left;width: 33%;" id="boxManifestCol3">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging">Continue</button>
             </div>
-        </div>`;
+        </div>
+        
+        `;
         /*
         <div class="row" style="margin-top:100px">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
@@ -402,14 +427,17 @@ export const shippingManifest = async (boxesToShip, userName) => {
     const navBarBtn = document.getElementById('navBarShippingManifest');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
-    
+    console.log('owikbvlovboweigbvwe: ' + tempMonitorThere)
+    if(tempMonitorThere){
+        populateTempSelect(boxesToShip);
+    }
 
     document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(hiddenJSON);
     
     
     //document.getElementById('boxManifestTable').appendChild(result);
     
-    populateShippingManifestHeader(toDisplayJSON, userName);
+    populateShippingManifestHeader(toDisplayJSON, userName, location, site);
     populateShippingManifestBody(toDisplayJSON);
     await populateTempCheck();
     const btn = document.getElementById('completePackaging');

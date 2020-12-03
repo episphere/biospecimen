@@ -170,7 +170,7 @@ export const shippingNavBar = () => {
     return `
         <ul class="nav nav-tabs row">
             <li class="nav-item col-auto">
-                <button class="nav-link navbar-btn" id="navBarShippingDash">Shipping</button>
+                <button class="nav-link navbar-btn" id="navBarShippingDash">Packaging</button>
             </li>
             <li class="nav-item col-auto">
                 <button class="nav-link navbar-btn" id="navBarBoxManifest">Box Manifest</button>
