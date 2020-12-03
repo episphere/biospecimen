@@ -50,11 +50,11 @@ export const specimenTemplate = async (data, formData, collections) => {
         }
         
         template += `</br><div class="row"><h4>Start a new Collection</h4></div>
-        <form id="specimenLinkForm" method="POST">
+        <form id="specimenLinkForm" method="POST" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">
             ${dashboardType === 'research' ? `
                 <div class="form-group row">
                     <label class="col-md-4 col-form-label" for="biospecimenVisitType">Select visit</label>
-                    <select class="form-control col-md-5" required data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}" id="biospecimenVisitType">
+                    <select class="form-control col-md-5" required id="biospecimenVisitType">
                         <option value=""> -- Select Visit -- </option>
                         <option selected value="153098257">Baseline</option>
                     </select>

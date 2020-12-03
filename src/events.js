@@ -1704,8 +1704,8 @@ const btnsClicked = async (connectId, formData, cont) => {
     if(enterSpecimenID1) formData['387108065'] = 353358909
     else formData['387108065'] = 104430631;
     if(select) formData['331584571'] = parseInt(select.value);
-    formData['connectId'] = parseInt(select.dataset.connectId);
-    formData['token'] = select.dataset.participantToken;
+    formData['connectId'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
+    formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
     let query = `connectId=${parseInt(connectId)}`;
     showAnimation();
     const response = await findParticipant(query);
