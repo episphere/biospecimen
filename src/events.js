@@ -1591,7 +1591,8 @@ export const addEventCheckInCompleteForm = () => {
         e.preventDefault();
         let formData = {};
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
-        formData['checkedInAt'] = new Date().toISOString();
+        formData['962267121'] = new Date().toISOString();
+        formData['135591601'] = 353358909;
         let query = `connectId=${parseInt(form.dataset.connectId)}`;
         showAnimation();
         const response = await findParticipant(query);
