@@ -223,7 +223,7 @@ export const startShipping = async (userName) => {
     }
     await populateBoxSelectList(hiddenJSONLocation);
     await populateTempNotification();
-    addEventNavBarShipment("navBarShippingDash");
+    addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarShippingManifest(userName);
     addEventAddBox();
     addEventBoxSelectListChanged();
@@ -316,11 +316,11 @@ export const boxManifest = async (boxId) => {
     //document.getElementById('boxManifestTable').appendChild(result);
     populateBoxManifestHeader(boxId,boxJSONS);
     populateBoxManifestTable(boxId,hiddenJSON);
-    addEventNavBarShipment("returnToPackaging");
+    addEventNavBarShipment("returnToPackaging", userName);
     document.getElementById('printBox').addEventListener('click', e => {
         window.print();
     });
-    addEventNavBarShipment("returnToPackaging");
+    addEventNavBarShipment("returnToPackaging", userName);
     //addEventNavBarShippingManifest();
     hideAnimation();
     //addEventNavBarShipment("navBarShippingDash");
@@ -358,8 +358,6 @@ export const shippingManifest = async (boxesToShip, userName) => {
             </div>
             <div style="float: left;width: 33%;"></div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
-                <p>abc</p>
-                <p>abc</p>
             </div>
         </div>
         <div class="row">
@@ -411,14 +409,14 @@ export const shippingManifest = async (boxesToShip, userName) => {
     
     //document.getElementById('boxManifestTable').appendChild(result);
     
-    populateShippingManifestHeader(toDisplayJSON);
+    populateShippingManifestHeader(toDisplayJSON, userName);
     populateShippingManifestBody(toDisplayJSON);
     await populateTempCheck();
     const btn = document.getElementById('completePackaging');
     document.getElementById('printBox').addEventListener('click', e => {
         window.print();
     });
-    addEventNavBarShipment('returnToPackaging');
+    addEventNavBarShipment('returnToPackaging', userName);
 
     
 
@@ -494,7 +492,7 @@ export const shipmentTracking = (hiddenJSON, userName, tempCheckChecked) => {
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
     
-    addEventNavBarShipment("returnToPackaging");
+    addEventNavBarShipment("returnToPackaging", userName);
     if(Object.keys(hiddenJSON).length > 0){
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
     }
@@ -552,7 +550,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content sub-div-shadow">
                     <div class="modal-header" id="finalizeModalHeader">
-                        Are you sure?
+                        Thie will finalize the shipment
                     </div>
                     <div class="modal-body" id="finalizeModalBody">
                         
@@ -588,7 +586,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
     
-    addEventNavBarShipment("returnToPackaging");
+    addEventNavBarShipment("returnToPackaging", userName);
     
     if(Object.keys(hiddenJSON).length > 0){
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)

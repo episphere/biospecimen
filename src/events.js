@@ -864,7 +864,7 @@ export const populateSaveTable = (hiddenJSON, boxJSONS) => {
             }
             currRow.style.
             count += 1;
-            currRow.insertCell(0).innerHTML=`<input type="checkbox" class="markForShipping">`
+            currRow.insertCell(0).innerHTML=`<input type="checkbox" class="markForShipping" style="transform: scale(1.5);">`
             let dateStarted = '';
             let lastModified = '';
             let thisLocation = '';
@@ -879,7 +879,7 @@ export const populateSaveTable = (hiddenJSON, boxJSONS) => {
                         if(newDate.getHours() >= 12){
                             am = 'PM'
                         }
-                        dateStarted = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() - 1)%12 + 1) + ':' + newDate.getMinutes() + ' ' + am;
+                        dateStarted = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() - 11)%12 + 1) + ':' + newDate.getMinutes() + ' ' + am;
                         //dateStarted = boxJSONS[j]['dateCreated'];
                     }
                     if(boxJSONS[j].hasOwnProperty('lastUpdatedTiime')){
@@ -889,7 +889,7 @@ export const populateSaveTable = (hiddenJSON, boxJSONS) => {
                         if(newDate.getHours() >= 12){
                             am = 'PM'
                         }
-                        lastModified = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() - 1)%12 + 1)  + ':' + newDate.getMinutes() + ' ' + am;
+                        lastModified = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11)%12 + 1)  + ':' + newDate.getMinutes() + ' ' + am;
                         //lastModified = boxJSONS[j]['lastUpdatedTiime']
 
                     }
@@ -957,26 +957,37 @@ export const populateTempCheck = async () => {
     }
 }
 
-export const populateShippingManifestHeader = (hiddenJSON) => {
+export const populateShippingManifestHeader = (hiddenJSON, userName) => {
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
 
+
+    console.log(JSON.stringify(hiddenJSON))
     let newP = document.createElement("p");
-    newP.innerHTML = "Box 1 Manifest";
+    newP.innerHTML = "Shipment Manifest";
     document.getElementById('boxManifestCol1').appendChild(newP);
 
     //let date = "";
     let currentdate = new Date(); 
     let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
-    let hour = parseInt(currentdate.getHours())%12;
+    let hour = (currentdate.getHours() - 1 + 12)%12 + 1;
+    let minutes = currentdate.getMinutes();
+    if(minutes < 10){
+        minutes = "0" + minutes;
+    }
     let datetime =  (currentdate.getMonth()+1) + "/"
                     + currentdate.getDate()  + "/" 
                     + currentdate.getFullYear() + " "  
                     + hour.toString()+ ":"  
-                    + currentdate.getMinutes() + ampm;
+                    + minutes + ampm;
     newP = document.createElement("p");
-    newP.innerHTML = "Date/Time: " + datetime;
+    newP.innerHTML = "Current Date/Time: " + datetime;
     document.getElementById('boxManifestCol1').appendChild(newP);
+    
+    newP = document.createElement("p");
+    newP.innerHTML = "Sender: " + userName;
+    document.getElementById('boxManifestCol3').appendChild(newP);
+
 } 
 
 export const populateShippingManifestBody = (hiddenJSON) =>{
@@ -1975,13 +1986,13 @@ export const addEventNavBarSpecimenSearch = () => {
     });
 }
 
-export const addEventNavBarShipment = (id) => {
+export const addEventNavBarShipment = (id, userName) => {
     const btn = document.getElementById(id);
     btn.addEventListener('click', async e => {
         e.stopPropagation();
         let navButton = document.getElementById('navBarShippingDash')
         if(navButton.classList.contains('active')) return;
-        await startShipping();
+        await startShipping(userName);
         
     });
 }
@@ -2169,7 +2180,7 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
             if(tempChecked){
                 updateNewTempDate();
             }
-            startShipping();
+            startShipping(userName);
         }
         else{
             let errorMessage = document.getElementById('finalizeModalError');

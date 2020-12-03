@@ -409,27 +409,39 @@ export const searchSpecimenInstitute = async () => {
 
         }
     */
-
-    let idKeys = Object.keys(conversion);
     
+    let idKeys = Object.keys(conversion);
+    let toReturn = []
     for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
         let keys = Object.keys(currJSON);
-        
+
+        let listOfTubes = {};
+
+        listOfTubes['masterSpecimenId'] = currJSON['820476880'];
+        console.log(JSON.stringify(listOfTubes))
         for(let j = 0; j < keys.length; j++){
             if(idKeys.includes(keys[j])){
-                
+                if(conversion[keys[j]] != '0008' && !conversion[keys[j]] != '0009'){
+                    listOfTubes[conversion[keys[j]]] = currJSON[keys[j]];
+                }
             }
-            if(keys[j].match(/tube[0-9]*Id/) != null){
+            //console.log(JSON.stringify(listOfTubes))
+            /*if(keys[j].match(/tube[0-9]*Id/) != null){
                 if(currJSON[keys[j]] == '0008' || currJSON[keys[j]] == '0009'){
                     delete currJSON[keys[j]]
                 }
-            }
+            }*/
+            
         }
+        toReturn.push(listOfTubes);
+        
     }
     //for ()
+    console.log('oiwge98go98vg23okblkjvci7sudgvcq23oi')
+        console.log(JSON.stringify(toReturn));
 
-    return data;
+    return toReturn;
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
