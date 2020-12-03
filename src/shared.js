@@ -3,6 +3,27 @@ import { searchResults } from "./pages/dashboard.js";
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement } from "./tubeValidation.js"
 
+
+const conversion = {
+    "299553921":"0001",
+    "703954371":"0002",
+    "838567176":"0003",
+    "454453939":"0004",
+    "652357376":"0005",
+    "973670172":"0006",
+    "143615646":"0007",
+    "787237543":"0008",
+    "223999569":"0009",
+    "376960806":"0011",
+    "232343615":"0012",
+    "589588440":"0021",
+    "746999767":"0022",
+    "857757831":"0031",
+    "654812257":"0032",
+    "958646668":"0013",
+    "677469051":"0014",
+    "683613884":"0024"
+}
 const api = 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?';
 // const api = 'http://localhost:8010/nih-nci-dceg-episphere-dev/us-central1/biospecimen?';
 
@@ -324,7 +345,8 @@ export const getParticipantCollections = async (token) => {
 }
 
 export const removeBag = async(boxId, bags) => {
-    let toPass = {boxId:boxId, bags:bags}
+    let currDate = new Date();
+    let toPass = {boxId:boxId, bags:bags, date:currDate.toString()}
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=removeBag`, {
         method: "POST",
@@ -352,11 +374,52 @@ export const searchSpecimenInstitute = async () => {
 
     let data = a.data;    
     console.log(';wopiebnvopdivbloisadijvchboiauwehcl;kdscnsoiudchsoefdcivnew: ' + JSON.stringify(data))
+
+    const conversion = {
+        "299553921":"0001",
+        "703954371":"0002",
+        "838567176":"0003",
+        "454453939":"0004",
+        "652357376":"0005",
+        "973670172":"0006",
+        "143615646":"0007",
+        "787237543":"0008",
+        "223999569":"0009",
+        "376960806":"0011",
+        "232343615":"0012",
+        "589588440":"0021",
+        "746999767":"0022",
+        "857757831":"0031",
+        "654812257":"0032",
+        "958646668":"0013",
+        "677469051":"0014",
+        "683613884":"0024"
+    }
+
+    /*
+
+        {
+            
+            820476880: masterSpecimenId
+            conversion[search]:{
+                shipped:
+                otherstuff:
+            }
+
+
+        }
+    */
+
+    let idKeys = Object.keys(conversion);
     
     for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
         let keys = Object.keys(currJSON);
+        
         for(let j = 0; j < keys.length; j++){
+            if(idKeys.includes(keys[j])){
+                
+            }
             if(keys[j].match(/tube[0-9]*Id/) != null){
                 if(currJSON[keys[j]] == '0008' || currJSON[keys[j]] == '0009'){
                     delete currJSON[keys[j]]

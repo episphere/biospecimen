@@ -486,26 +486,26 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
     console.log('waoikebnp;oisdgbvspoiduvbgaoiwluejfbolafiujbf');
     console.log(JSON.stringify(specimenData));
     //let specimenData = response.data;
-    console.log(JSON.stringify('apeuidbvaosidvbasd;vkbasv:    '  + specimenData))
     let toReturn = {};
     let checkedOrphans = false;
+
     for(let i = 0; i < specimenData.length; i++){
         let toExclude8 = [];
         let toExclude9 = [];
         let toExcludeOrphans = [];
-        if(specimenData[i].hasOwnProperty('masterSpecimenId')){
+        if(specimenData[i].hasOwnProperty('820476880')){
             let boxes = Object.keys(hiddenJSON);
             for(let j = 0; j < boxes.length; j++){
                 let specimens = Object.keys(hiddenJSON[boxes[j]]);
                 console.log(JSON.stringify(hiddenJSON[boxes[j]]));
-                if(specimens.includes(specimenData[i]['masterSpecimenId'] + ' 0008')){
-                    let currList =  hiddenJSON[boxes[j]][specimens[specimens.indexOf(specimenData[i]['masterSpecimenId'] + ' 0008')]]['arrElements']
+                if(specimens.includes(specimenData[i]['820476880'] + ' 0008')){
+                    let currList =  hiddenJSON[boxes[j]][specimens[specimens.indexOf(specimenData[i]['820476880'] + ' 0008')]]['arrElements']
                     for(let k = 0; k < currList.length; k++){
                         toExclude8.push(currList[k].split(/\s+/)[1]);
                     }
                 }
-                if(specimens.includes(specimenData[i]['masterSpecimenId'] + ' 0009')){
-                    let currList =  hiddenJSON[boxes[j]][specimens[specimens.indexOf(specimenData[i]['masterSpecimenId'] + ' 0009')]]['arrElements']
+                if(specimens.includes(specimenData[i]['820476880'] + ' 0009')){
+                    let currList =  hiddenJSON[boxes[j]][specimens[specimens.indexOf(specimenData[i]['820476880'] + ' 0009')]]['arrElements']
                     for(let k = 0; k < currList.length; k++){
                         toExclude9.push(currList[k].split(/\s+/)[1]);
                     }
@@ -773,21 +773,54 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
 
+    let currJSON = {};
+    for(let i =0;i < hiddenJSON.length; i++){
+        if(hiddenJSON[i]['boxId'] == boxId){
+            console.log('91283ghr9iubgv0987g23bfouwegvo87weub')
+            currJSON = hiddenJSON[i]
+        }
+    }
+    console.log(JSON.stringify(currJSON))
+
     let newP = document.createElement("p");
-    newP.innerHTML = "Box 1 Manifest";
+    newP.innerHTML = boxId + " Manifest";
     document.getElementById('boxManifestCol1').appendChild(newP);
 
-    //let date = "";
-    let currentdate = new Date(); 
-    let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
-    let hour = parseInt(currentdate.getHours())%12;
-    let datetime =  (currentdate.getMonth()+1) + "/"
-                    + currentdate.getDate()  + "/" 
-                    + currentdate.getFullYear() + " "  
-                    + hour.toString()+ ":"  
-                    + currentdate.getMinutes() + ampm;
+    let toInsertDate = ''
+    if(currJSON.hasOwnProperty('dateCreated')){
+        let dateStarted = Date.parse(currJSON['dateCreated'])
+        
+        let currentdate = new Date(dateStarted); 
+        console.log('oaliwjbdvlicakjbdvoilasudvb ' + JSON.stringify(hiddenJSON))
+        let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
+        let hour = parseInt(currentdate.getHours())%12;
+        toInsertDate =  (currentdate.getMonth()+1) + "/"
+                        + currentdate.getDate()  + "/" 
+                        + currentdate.getFullYear() + " "  
+                        + hour.toString()+ ":"  
+                        + currentdate.getMinutes() + ampm;
+
+    }
+    let toInsertDate2 = ''
+    if(currJSON.hasOwnProperty('lastUpdatedTiime')){
+        let dateStarted = Date.parse(currJSON['lastUpdatedTiime'])
+        
+        let currentdate = new Date(dateStarted); 
+        console.log('oaliwjbdvlicakjbdvoilasudvb ' + JSON.stringify(hiddenJSON))
+        let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
+        let hour = parseInt(currentdate.getHours())%12;
+        toInsertDate2 =  (currentdate.getMonth()+1) + "/"
+                        + currentdate.getDate()  + "/" 
+                        + currentdate.getFullYear() + " "  
+                        + hour.toString()+ ":"  
+                        + currentdate.getMinutes() + ampm;
+
+    }
     newP = document.createElement("p");
-    newP.innerHTML = "Date/Time: " + datetime;
+    newP.innerHTML = "Date Started: " + toInsertDate;
+    document.getElementById('boxManifestCol1').appendChild(newP);
+    newP = document.createElement("p");
+    newP.innerHTML = "Last Modified: " + toInsertDate2;
     document.getElementById('boxManifestCol1').appendChild(newP);
      
 
@@ -840,10 +873,25 @@ export const populateSaveTable = (hiddenJSON, boxJSONS) => {
                 console.log('BWVIBLOISD BGV LOIVBGWEOLVI WBGEVOLWIBVGDV' + boxJSONS[j].boxId)
                 if(boxJSONS[j].boxId == boxes[i]){
                     if(boxJSONS[j].hasOwnProperty('dateCreated')){
-                        dateStarted = boxJSONS[j]['dateCreated'];
+                        let timestamp = Date.parse(boxJSONS[j]['dateCreated']);
+                        let newDate = new Date(timestamp);
+                        let am = 'AM'
+                        if(newDate.getHours() >= 12){
+                            am = 'PM'
+                        }
+                        dateStarted = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() - 1)%12 + 1) + ':' + newDate.getMinutes() + ' ' + am;
+                        //dateStarted = boxJSONS[j]['dateCreated'];
                     }
                     if(boxJSONS[j].hasOwnProperty('lastUpdatedTiime')){
-                        lastModified = boxJSONS[j]['lastUpdatedTiime']
+                        let timestamp = Date.parse(boxJSONS[j]['lastUpdatedTiime']);
+                        let newDate = new Date(timestamp);
+                        let am = 'AM'
+                        if(newDate.getHours() >= 12){
+                            am = 'PM'
+                        }
+                        lastModified = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() - 1)%12 + 1)  + ':' + newDate.getMinutes() + ' ' + am;
+                        //lastModified = boxJSONS[j]['lastUpdatedTiime']
+
                     }
                     if(boxJSONS[j].hasOwnProperty('location')){
                         thisLocation = boxJSONS[j]['location'];
@@ -935,6 +983,7 @@ export const populateShippingManifestBody = (hiddenJSON) =>{
     let table = document.getElementById("shippingManifestTable");
     let boxes = Object.keys(hiddenJSON);
     let currRowIndex = 1;
+    let greyIndex = 0;
     for(let i = 0; i < boxes.length; i++){
         let firstSpec = true;
         let currBox = boxes[i];
@@ -967,11 +1016,22 @@ export const populateShippingManifestBody = (hiddenJSON) =>{
                 }
 
                 currRow.insertCell(2).innerHTML= currTube;
+                if(hiddenJSON[boxes[i]][specimen].hasOwnProperty('scanner') && k == 0){
+                    currRow.insertCell(3).innerHTML = hiddenJSON[boxes[i]][specimen]['scanner']
+                }
+                else{
+                    currRow.insertCell(3).innerHTML = '';
+                }
+                if(greyIndex % 2 == 0){
+                    currRow.style['background-color'] = "lightgrey";
+                }
+                
                 currRowIndex+=1;
             
             }
-
+                greyIndex += 1;
         }
+       
 
     }
 }
@@ -1919,7 +1979,8 @@ export const addEventNavBarShipment = (id) => {
     const btn = document.getElementById(id);
     btn.addEventListener('click', async e => {
         e.stopPropagation();
-        if(btn.classList.contains('active')) return;
+        let navButton = document.getElementById('navBarShippingDash')
+        if(navButton.classList.contains('active')) return;
         await startShipping();
         
     });
@@ -2026,6 +2087,16 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
                 toAddType = translateNumToType[thisId[1]];
             }
             currRow.insertCell(2).innerHTML = toAddType
+            console.log('wpoeifhn;posdiuvgbhnasloidkvubnaslikovuhbasnvo ' + JSON.stringify(currBox[bags[i]]))
+            if(currBox[bags[i]].hasOwnProperty('scanner') && j == 0){
+                currRow.insertCell(3).innerHTML = currBox[bags[i]]['scanner'];
+            }
+            else{
+                currRow.insertCell(3).innerHTML = '';
+            }
+            if(i % 2 == 0){
+                currRow.style['background-color'] = "lightgrey";
+            }
             rowCount += 1;
 
         }
