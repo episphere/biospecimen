@@ -1,7 +1,7 @@
 import { userNavBar, adminNavBar, nonUserNavBar, bodyNavBar } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
-import { masterSpecimenIDRequirement } from "./tubeValidation.js"
+import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
 
 
 const conversion = {
@@ -688,4 +688,12 @@ export const allStates = {
 
 export const visitType = {
     '153098257': 'Baseline'
+}
+
+export const getSiteTubesLists = (specimenData) => {
+    const dashboardType = document.getElementById('contentBody').dataset.workflow;
+    const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
+    const subSiteLocation = siteLocations[dashboardType][siteAcronym] ? siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === specimenData[document.getElementById('contentBody').dataset.workflow === 'research' ? '951355211' : '525480516'])[0].location : undefined;
+    const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType];
+    return siteTubesList;
 }

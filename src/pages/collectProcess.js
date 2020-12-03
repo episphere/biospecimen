@@ -1,6 +1,6 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventTubeCollectedForm, addEventBackToTubeCollection } from './../events.js'
-import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, siteLocations } from '../shared.js';
-import { siteSpecificTubeRequirements, totalCollectionIDLength, workflows } from '../tubeValidation.js';
+import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists } from '../shared.js';
+import { totalCollectionIDLength } from '../tubeValidation.js';
 
 export const collectProcessTemplate = (data, formData) => {
     let template = `
@@ -30,10 +30,8 @@ export const collectProcessTemplate = (data, formData) => {
                         <tr><th>Tube Type</th><th>Collected</th><th>Scan Full Specimen ID</th><th>Select for Deviation</th></tr>
                     </thead>
                     <tbody>`
-                    const dashboardType = document.getElementById('contentBody').dataset.workflow;
-                    const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-                    const subSiteLocation = siteLocations[dashboardType][siteAcronym] ? siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === formData[document.getElementById('contentBody').dataset.workflow === 'research' ? '951355211' : '525480516'])[0].location : undefined;
-                    const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType]; 
+                    
+                    const siteTubesList = getSiteTubesLists(formData);
                     siteTubesList.forEach((obj, index) => {
                         template += `
                             <tr>
@@ -136,10 +134,8 @@ export const tubeCollectedTemplate = (data, formData) => {
                         <tr><th>Tube Type</th><th class="align-left">Select If Collected</th></tr>
                     </thead>
                     <tbody>`
-                    const dashboardType = document.getElementById('contentBody').dataset.workflow;
-                    const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-                    const subSiteLocation = siteLocations[dashboardType][siteAcronym] ? siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === formData[document.getElementById('contentBody').dataset.workflow === 'research' ? '951355211' : '525480516'])[0].location : undefined;
-                    const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType]; 
+                    
+                    const siteTubesList = getSiteTubesLists(formData)
                     siteTubesList.forEach((obj, index) => {
                         template += `
                             <tr>
