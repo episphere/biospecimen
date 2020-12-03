@@ -209,7 +209,7 @@ export const startShipping = async (userName) => {
     document.getElementById('contentBody').innerHTML = template;
     await populateSelectLocationList();
     
-    await populateSaveTable(hiddenJSON, boxJSONS);
+    await populateSaveTable(hiddenJSON, boxJSONS, userName);
     await populateSpecimensList(hiddenJSON1);
 
     let currLocation = document.getElementById('selectLocationList').value;
@@ -221,23 +221,23 @@ export const startShipping = async (userName) => {
         let box = boxJSONS[i]
         hiddenJSONLocation[box['boxId']] = box['bags']
     }
-    await populateBoxSelectList(hiddenJSONLocation);
+    await populateBoxSelectList(hiddenJSONLocation,userName);
     await populateTempNotification();
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarShippingManifest(userName);
-    addEventAddBox();
+    addEventAddBox(userName);
     addEventBoxSelectListChanged();
-    addEventNavBarBoxManifest("navBarBoxManifest")
-    addEventChangeLocationSelect();
-    addEventAddSpecimenToBox();
+    addEventNavBarBoxManifest("navBarBoxManifest", userName)
+    addEventChangeLocationSelect(userName);
+    addEventAddSpecimenToBox(userName);
     addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
-    addEventModalAddBox();
+    addEventModalAddBox(userName);
     hideAnimation();
     //addEventSubmitAddBag();
     
 }
 
-export const boxManifest = async (boxId) => {    
+export const boxManifest = async (boxId, userName) => {    
     showAnimation();
     let response = await  getBoxes();
     let boxJSONS = response.data;

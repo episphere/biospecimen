@@ -101,7 +101,7 @@ export const getCurrBoxNumber=(j)=>{
     return keys.length;
 }
 
-export const addEventAddSpecimenToBox = () => {
+export const addEventAddSpecimenToBox = (userName) => {
     const form = document.getElementById('addSpecimenForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
@@ -176,7 +176,7 @@ export const addEventAddSpecimenToBox = () => {
 
         biospecimensList.sort();
         await createShippingModalBody(biospecimensList, masterSpecimenId,foundInOrphan)
-        addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan);
+        addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
 
         /*
@@ -348,7 +348,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     
 }
 
-export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan)=>{
+export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan, userName)=>{
     let submitButton = document.getElementById('addToBagButton')
     submitButton.addEventListener('click', async e =>{
         e.preventDefault();
@@ -464,7 +464,7 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan)
         }
         
             
-        await populateTubeInBoxList();
+        await populateTubeInBoxList(userName);
         await populateSpecimensList(hiddenJSON);
         hiddenJSON = {};
         for(let i = 0; i < boxJSONS.length; i++){
@@ -474,7 +474,7 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan)
             }
            
         }
-        await populateSaveTable(hiddenJSON, boxJSONS)
+        await populateSaveTable(hiddenJSON, boxJSONS, userName)
         hideAnimation();
     },{once:true})
     //ppulateSpecimensList();
@@ -842,7 +842,7 @@ export const populateModalSelect = (hiddenJSON) => {
     currSelectBox.value = document.getElementById('selectBoxList').value;
 }
 
-export const populateSaveTable = (hiddenJSON, boxJSONS) => {
+export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
     let table = document.getElementById("saveTable");
     table.innerHTML = `<tr>
                         <th>To Ship</th>
@@ -921,7 +921,7 @@ export const populateSaveTable = (hiddenJSON, boxJSONS) => {
                 var table = document.getElementById("shippingModalTable");
                 //bring up edit on the corresponding table
                 
-                await boxManifest(boxes[i]);
+                await boxManifest(boxes[i], userName);
 
 
                 //addEventNavBarBoxManifest("viewBoxManifestBlood")
@@ -1060,7 +1060,7 @@ const compareBoxIds = (a,b) => {
 
 }
 
-export const populateBoxSelectList = async (hiddenJSON) => {
+export const populateBoxSelectList = async (hiddenJSON, userName) => {
     let boxList = document.getElementById('selectBoxList');
     let selectBoxList = document.getElementById('selectBoxList');
     let list = ''
@@ -1069,7 +1069,7 @@ export const populateBoxSelectList = async (hiddenJSON) => {
         list += '<option>' + keys[i] + '</option>';
     }
     if(list == ''){
-        await addNewBox();
+        await addNewBox(userName);
         return;
     }
     boxList.innerHTML = list;
@@ -1189,7 +1189,7 @@ export const populateBoxSelectList = async (hiddenJSON) => {
                             }
                         
                         }
-                        await populateSaveTable(hiddenJSON, boxJSONS)
+                        await populateSaveTable(hiddenJSON, boxJSONS, userName)
                         hideAnimation();
                         //delete bag from json
 
@@ -1202,7 +1202,7 @@ export const populateBoxSelectList = async (hiddenJSON) => {
     
 }
 
-const addNewBox = async  () => {
+const addNewBox = async  (userName) => {
     let response = await  getBoxes();
     let hiddenJSON = response.data;
     let locations = {};
@@ -1251,7 +1251,7 @@ const addNewBox = async  () => {
                     hiddenJSON[box['boxId']] = box['bags']
                 }
             }
-            await populateBoxSelectList(hiddenJSON)
+            await populateBoxSelectList(hiddenJSO, userName)
         }
         else{
             //error (ask them to put something in the previous box first)
@@ -1259,26 +1259,26 @@ const addNewBox = async  () => {
     }
 }
 
-export const addEventAddBox = () => {
+export const addEventAddBox = (userName) => {
     let boxButton = document.getElementById('addBoxButton');
     boxButton.addEventListener('click', async () => {
-        addNewBox();
+        addNewBox(userName);
     })
    
 
 }
 
-export const addEventModalAddBox = () => {
+export const addEventModalAddBox = (userName) => {
     let boxButton = document.getElementById('modalAddBoxButton');
     
     boxButton.addEventListener('click', async () => {
-        addNewBox();
+        addNewBox(userName);
     })
    
 
 }
 
-export const populateTubeInBoxList = async () => {
+export const populateTubeInBoxList = async (userName) => {
     let boxList = document.getElementById('selectBoxList');
     let selectBoxList = document.getElementById('selectBoxList');
     let currBoxId = selectBoxList.value;
@@ -1403,7 +1403,7 @@ export const populateTubeInBoxList = async () => {
                             }
                         
                         }
-                        await populateSaveTable(hiddenJSON, boxJSONS)
+                        await populateSaveTable(hiddenJSON, boxJSONS, userName)
                         hideAnimation();
                         //delete bag from json
 
@@ -1424,7 +1424,7 @@ export const addEventBoxSelectListChanged = () => {
     })
 }
 
-export const addEventChangeLocationSelect = () => {
+export const addEventChangeLocationSelect = (userName) => {
     let selectBoxList = document.getElementById('selectLocationList');
     selectBoxList.addEventListener("change",  async () => {
         showAnimation();
@@ -1440,7 +1440,7 @@ export const addEventChangeLocationSelect = () => {
             let box = boxJSONS[i]
             hiddenJSON[box['boxId']] = box['bags']
         }
-        await populateBoxSelectList(hiddenJSON)
+        await populateBoxSelectList(hiddenJSON, userName)
         //console.log(JSON.stringify(boxdata))
         hideAnimation();
     })
@@ -1998,18 +1998,18 @@ export const addEventNavBarShipment = (id, userName) => {
 }
 
 
-export const addEventNavBarBoxManifest = (id) => {
+export const addEventNavBarBoxManifest = (id, userName) => {
     const btn = document.getElementById(id);
     document.getElementById(id).addEventListener('click', e => {
         e.stopPropagation();
         if(btn.classList.contains('active')) return;
         if(id == 'viewBoxManifestBlood'){
             //return box 1 info
-            boxManifest(document.getElementById('currTubeTable'));
+            boxManifest(document.getElementById('currTubeTable'), userName);
         }
         else if(id == 'viewBoxManifestMouthwash'){
             //return box 2 info
-            boxManifest(document.getElementById('mouthwashList'))
+            boxManifest(document.getElementById('mouthwashList'), userName)
         }
     });
 }
