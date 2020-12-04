@@ -136,7 +136,7 @@ export const adminNavBar = (name) => {
 }
 
 export const bodyNavBar = () => {
-    const workflow = getWorflow;
+    const workflow = getWorflow();
     let template = `
         <ul class="nav nav-tabs row">
             <li class="nav-item">

@@ -6,7 +6,7 @@ import { workflows } from "../tubeValidation.js";
 export const explanationTemplate = (dt, biospecimenData) => {
     const notCollected = Array.from(document.getElementsByClassName('tube-collected')).filter(dt => dt.checked === false);
     const deviated = Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === true);
-    const tubes = workflows[getWorflow];
+    const tubes = workflows[getWorflow()];
     if(notCollected.length > 0 || deviated.length > 0) {
         let template = `</br>
         <div class="row">

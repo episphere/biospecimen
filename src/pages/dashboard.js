@@ -177,13 +177,13 @@ export const searchResults = (result) => {
                 <button class="btn btn-outline-dark" id="backToSearch"><i class="fas fa-arrow-left"></i> Return to search</button>
             </div>
             <div class="ml-auto">
-                <button type="Submit" class="btn btn-outline-primary">${getWorflow && getWorflow === 'clinical' ? `Go to Specimen Link`:`Go to participant check-in`}</button>
+                <button type="Submit" class="btn btn-outline-primary">${getWorflow() === 'clinical' ? `Go to Specimen Link`:`Go to participant check-in`}</button>
             </div>
         </div>
     </form></div>`;
 
     document.getElementById('contentBody').innerHTML = template;
-    if(getWorflow === 'clinical') {
+    if(getWorflow() === 'clinical') {
         addEventSelectParticipantForm(true);
     }
     else {

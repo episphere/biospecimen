@@ -689,7 +689,7 @@ export const allStates = {
 export const visitType = {
     '153098257': 'Baseline'
 }
-export const getWorflow = document.getElementById('contentBody').dataset.workflow;
+export const getWorflow = () => document.getElementById('contentBody').dataset.workflow;
 
 export const getSiteTubesLists = (specimenData) => {
     const dashboardType = document.getElementById('contentBody').dataset.workflow;

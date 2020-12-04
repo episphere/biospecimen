@@ -33,7 +33,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 <thead>
                     <tr>
                         <th>Tube Type</th>
-                        ${getWorflow && getWorflow === 'clinical' ? `<th>Received</th>`:`<th>Collected</th>`}
+                        ${getWorflow() === 'clinical' ? `<th>Received</th>`:`<th>Collected</th>`}
                         <th>Full Specimen ID</th>
                         <th>Deviation</th>
                         <th>Comment</th>
