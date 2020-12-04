@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates } from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates, getWorflow } from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
@@ -177,13 +177,13 @@ export const searchResults = (result) => {
                 <button class="btn btn-outline-dark" id="backToSearch"><i class="fas fa-arrow-left"></i> Return to search</button>
             </div>
             <div class="ml-auto">
-                <button type="Submit" class="btn btn-outline-primary">${document.getElementById('contentBody').dataset.workflow && document.getElementById('contentBody').dataset.workflow === 'clinical' ? `Go to Specimen Link`:`Go to participant check-in`}</button>
+                <button type="Submit" class="btn btn-outline-primary">${getWorflow && getWorflow === 'clinical' ? `Go to Specimen Link`:`Go to participant check-in`}</button>
             </div>
         </div>
     </form></div>`;
 
     document.getElementById('contentBody').innerHTML = template;
-    if(document.getElementById('contentBody').dataset.workflow === 'clinical') {
+    if(getWorflow === 'clinical') {
         addEventSelectParticipantForm(true);
     }
     else {

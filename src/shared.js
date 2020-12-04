@@ -1,4 +1,4 @@
-import { userNavBar, adminNavBar, nonUserNavBar, bodyNavBar } from "./navbar.js";
+import { userNavBar, adminNavBar, nonUserNavBar } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
@@ -689,11 +689,18 @@ export const allStates = {
 export const visitType = {
     '153098257': 'Baseline'
 }
+export const getWorflow = document.getElementById('contentBody').dataset.workflow;
 
 export const getSiteTubesLists = (specimenData) => {
     const dashboardType = document.getElementById('contentBody').dataset.workflow;
     const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-    const subSiteLocation = siteLocations[dashboardType][siteAcronym] ? siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === specimenData[document.getElementById('contentBody').dataset.workflow === 'research' ? '951355211' : '525480516'])[0].location : undefined;
+    const subSiteLocation = siteLocations[dashboardType][siteAcronym] ? siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === specimenData[dashboardType === 'research' ? '951355211' : '525480516'])[0].location : undefined;
     const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType];
     return siteTubesList;
+}
+
+export const collectionSettings = {
+    534621077: 'research',
+    664882224: 'clinical',
+    103209024: 'home'
 }

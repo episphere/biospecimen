@@ -1,4 +1,4 @@
-import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists } from "./../shared.js";
+import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorflow } from "./../shared.js";
 import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollectProcess } from "./../events.js";
 
 export const finalizeTemplate = (data, specimenData) => {
@@ -33,7 +33,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 <thead>
                     <tr>
                         <th>Tube Type</th>
-                        ${document.getElementById('contentBody').dataset.workflow && document.getElementById('contentBody').dataset.workflow === 'clinical' ? `<th>Received</th>`:`<th>Collected</th>`}
+                        ${getWorflow && getWorflow === 'clinical' ? `<th>Received</th>`:`<th>Collected</th>`}
                         <th>Full Specimen ID</th>
                         <th>Deviation</th>
                         <th>Comment</th>

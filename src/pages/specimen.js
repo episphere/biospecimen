@@ -1,9 +1,8 @@
-import { addEventBarCodeScanner, generateBarCode, removeActiveClass, siteLocations, visitType } from "./../shared.js";
+import { addEventBarCodeScanner, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch, addEventCntdToCollectProcess } from "./../events.js";
 import { masterSpecimenIDRequirement, workflows } from "../tubeValidation.js";
 
 export const specimenTemplate = async (data, formData, collections) => {
-    const dashboardType = document.getElementById('contentBody').dataset.workflow;
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenLink');
     navBarBtn.classList.remove('disabled');
@@ -51,7 +50,7 @@ export const specimenTemplate = async (data, formData, collections) => {
         
         template += `</br><div class="row"><h4>Start a new Collection</h4></div>
         <form id="specimenLinkForm" method="POST" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">
-            ${dashboardType === 'research' ? `
+            ${getWorflow === 'research' ? `
                 <div class="form-group row">
                     <label class="col-md-4 col-form-label" for="biospecimenVisitType">Select visit</label>
                     <select class="form-control col-md-5" required id="biospecimenVisitType">
@@ -63,7 +62,7 @@ export const specimenTemplate = async (data, formData, collections) => {
             
             <div class="form-group row">`
                 const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-                const workflow = document.getElementById('contentBody').dataset.workflow;
+                const workflow = getWorflow;
                 if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {
                     template +=`<label class="col-md-4 col-form-label" for="collectionLocation">Select Collection Location</label>
                     <select class="form-control col-md-5" id="collectionLocation">`

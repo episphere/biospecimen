@@ -1,13 +1,12 @@
 import { addEventExplanationForm, addEventExplanationFormCntd, addEventReturnToCollectProcess } from "./../events.js";
-import { generateBarCode, visitType } from "../shared.js";
+import { generateBarCode, getWorflow, visitType } from "../shared.js";
 import { finalizeTemplate } from "./finalize.js";
 import { workflows } from "../tubeValidation.js";
 
 export const explanationTemplate = (dt, biospecimenData) => {
     const notCollected = Array.from(document.getElementsByClassName('tube-collected')).filter(dt => dt.checked === false);
     const deviated = Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === true);
-    const dashboardType = document.getElementById('contentBody').dataset.workflow;
-    const tubes = workflows[dashboardType];
+    const tubes = workflows[getWorflow];
     if(notCollected.length > 0 || deviated.length > 0) {
         let template = `</br>
         <div class="row">

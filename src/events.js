@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, removeActiveClass, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, addEventBarCodeScanner, getIdToken, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, siteLocations, getSiteTubesLists} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking} from './pages/shipping.js';
 import { userListTemplate } from './pages/users.js';
@@ -82,6 +82,11 @@ export const addEventsearchSpecimen = () => {
             return
         }
         const biospecimenData = biospecimen.data;
+        // const dashboardType = getWorflow;
+        // if(biospecimenData[650516960] === 534621077 && dashboardType === 'research'){
+
+        // }
+        // debugger
         let query = `connectId=${parseInt(biospecimenData.connectId)}`;
         const response = await findParticipant(query);
         hideAnimation();
@@ -1620,7 +1625,7 @@ export const addEventCheckInCompleteForm = () => {
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['962267121'] = new Date().toISOString();
         formData['135591601'] = 353358909;
-        formData['650516960'] = document.getElementById('contentBody').dataset.workflow === 'research' ? 534621077 : 664882224;
+        formData['650516960'] = getWorflow === 'research' ? 534621077 : 664882224;
         let query = `connectId=${parseInt(form.dataset.connectId)}`;
         showAnimation();
         const response = await findParticipant(query);
@@ -1699,7 +1704,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     }
     if(hasError) return;
 
-    if(document.getElementById('collectionLocation')) formData[document.getElementById('contentBody').dataset.workflow === 'research' ? '951355211' : '525480516'] = parseInt(document.getElementById('collectionLocation').value);
+    if(document.getElementById('collectionLocation')) formData[getWorflow === 'research' ? '951355211' : '525480516'] = parseInt(document.getElementById('collectionLocation').value);
     formData['820476880'] = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     if(enterSpecimenID1) formData['387108065'] = 353358909
     else formData['387108065'] = 104430631;
@@ -1761,8 +1766,7 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
         
         showAnimation();
         const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
-        const dashboardType = document.getElementById('contentBody').dataset.workflow;
-        if(dashboardType === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+        if(getWorflow === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
         checkboxes.forEach((dt) => {
             if(biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
             if(biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
@@ -1787,7 +1791,6 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
     let hasError = false;
     let focus = true;
-    const dashboardType = document.getElementById('contentBody').dataset.workflow;
     inputFields.forEach(input => {
         const siteTubesList = getSiteTubesLists(biospecimenData)
         const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
@@ -1827,7 +1830,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     showAnimation();
     
     if(cntd) {
-        if(dashboardType === 'clinical') {
+        if(getWorflow === 'clinical') {
             data['539197670'] = 353358909;
             if(data['915838974'] === undefined) data['915838974'] = new Date().toISOString();
         }

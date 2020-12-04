@@ -1,3 +1,5 @@
+import { getWorflow } from "./shared.js";
+
 export const homeNavBar = () => {
     return `
         <div class="navbar-nav current-page">
@@ -134,7 +136,7 @@ export const adminNavBar = (name) => {
 }
 
 export const bodyNavBar = () => {
-    const workflow = document.getElementById('contentBody').dataset.workflow;
+    const workflow = getWorflow;
     let template = `
         <ul class="nav nav-tabs row">
             <li class="nav-item">
