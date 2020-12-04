@@ -98,7 +98,7 @@ export const specimenTemplate = async (data, formData, collections) => {
             </div>
             <div class="form-group row">
                 <div class="col-auto">
-                    <button class="btn btn-outline-danger" id="reEnterSpecimen">No: Re-enter Collection ID</button>
+                    <button class="btn btn-outline-danger" type="button" id="reEnterSpecimen">No: Re-enter Collection ID</button>
                 </div>
                 <div class="ml-auto">
                     <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="submit" id="specimenSaveExit">Yes: Save and Exit</button>

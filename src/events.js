@@ -1726,7 +1726,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     else {
         showAnimation();
         await storeSpecimen([formData]);
-        showAnimation();
+        hideAnimation();
         searchTemplate();
     }
 }
