@@ -81,12 +81,6 @@ export const addEventsearchSpecimen = () => {
             showNotifications({title: 'Not found', body: 'Specimen not found!'}, true)
             return
         }
-        // const biospecimenData = biospecimen.data;
-        // debugger
-        // if(collectionSettings[biospecimenData[650516960]] === getWorflow()){
-
-        //     debugger
-        // }
         let query = `connectId=${parseInt(biospecimenData.connectId)}`;
         const response = await findParticipant(query);
         hideAnimation();
