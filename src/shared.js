@@ -187,7 +187,7 @@ export const showNotifications = (data, error) => {
     addEventHideNotification(div);
 }
 
-export const errorMessage = (id, msg, focus) => {
+export const errorMessage = (id, msg, focus, offset) => {
     const currentElement = document.getElementById(id);
     const parentElement = currentElement.parentNode;
     if(Array.from(parentElement.querySelectorAll('.form-error')).length > 0) return;
@@ -196,6 +196,7 @@ export const errorMessage = (id, msg, focus) => {
         div.classList = ['error-text'];
         const span = document.createElement('span');
         span.classList = ['form-error']
+        span.classList.add('offset-4');
         span.innerHTML = msg;
         div.append(span);
         parentElement.appendChild(div);
@@ -519,7 +520,7 @@ export const siteFullNames = {
     'HFHS': 'Henry Ford Health System'
 }
 
-export const addEventBarCodeScanner = (id, start, end, index) => {
+export const addEventBarCodeScanner = (id, start, end) => {
     const liveStreamConfig = {
         inputStream: {
             type : "LiveStream",
@@ -583,18 +584,24 @@ export const addEventBarCodeScanner = (id, start, end, index) => {
         Quagga.onDetected(result => {	
             if (result.codeResult.code){
                 const barcode = result.codeResult.code;
-                if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,masterSpecimenIDRequirement.length))) return;
                 const elementID = document.activeElement.dataset.barcodeInput;
+                if(elementID === 'accessionID1') {
+                    disableInput('accessionID2', true);
+                    addEventClearScannedBarcode('clearScanAccessionID');
+                    document.getElementById(elementID).value = result.codeResult.code;
+                    Quagga.stop();
+                    document.querySelector('[data-dismiss="modal"]').click();
+                }
+                if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,masterSpecimenIDRequirement.length))) return;
                 if(!elementID) return;
                 if(elementID === 'scanSpecimenID') {
                     disableInput('enterSpecimenID1', true);
                     disableInput('enterSpecimenID2', true);
-                    addEventClearScannedBarcode();
+                    addEventClearScannedBarcode('clearScanSpecimenID');
+                    document.getElementById(elementID).value = start && end ? result.codeResult.code.substr(start, end) : result.codeResult.code;
+                    Quagga.stop();
+                    document.querySelector('[data-dismiss="modal"]').click();
                 }
-                document.getElementById(elementID).value = result.codeResult.code.substr(start, end);
-                Quagga.stop();
-                document.querySelector('[data-dismiss="modal"]').click();
-                return;
             }
             else {
                 disableInput('enterSpecimenID1', false);

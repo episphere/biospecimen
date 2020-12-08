@@ -1602,10 +1602,13 @@ export const addEventSelectParticipantForm = (skipCheckIn) => {
                 let query = `connectId=${parseInt(connectId)}`;
                 showAnimation();
                 const response = await findParticipant(query);
-                hideAnimation();
                 const data = response.data[0];
-                if(skipCheckIn) specimenTemplate(data, formData);
+                if(skipCheckIn) {
+                    // const collections = (await getParticipantCollections(data.token)).data;
+                    specimenTemplate(data, formData);
+                }
                 else checkInTemplate(data);
+                hideAnimation();
             }
         })
     })
@@ -1657,43 +1660,49 @@ const btnsClicked = async (connectId, formData, cont) => {
     const scanSpecimenID = document.getElementById('scanSpecimenID').value;
     const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value;
     const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value;
+    const accessionID1 = document.getElementById('accessionID1');
+    const accessionID2 = document.getElementById('accessionID2');
     const select = document.getElementById('biospecimenVisitType');
     let hasError = false;
     let focus = true;
-    
+    if(accessionID1 && accessionID1.value && !accessionID2.value && !accessionID2.classList.contains('disabled')) {
+        hasError = true;
+        errorMessage('accessionID2', 'Please re-type Accession ID from tube.', focus, true);
+        focus = false;
+    }
+    else if(accessionID1 && accessionID1.value && accessionID2.value && accessionID1.value !== accessionID2.value) {
+        hasError = true;
+        errorMessage('accessionID2', 'Accession ID doesn\'t match', focus, true);
+        focus = false;
+    }
     if(scanSpecimenID && enterSpecimenID1){
         hasError = true;
-        errorMessage('scanSpecimenID', 'Please Provide either Scanned Collection ID or Manually typed.', focus);
+        errorMessage('scanSpecimenID', 'Please Provide either Scanned Collection ID or Manually typed.', focus, true);
         focus = false;
-        errorMessage('enterSpecimenID1', 'Please Provide either Scanned Collection ID or Manually typed.', focus);
-        return;
+        errorMessage('enterSpecimenID1', 'Please Provide either Scanned Collection ID or Manually typed.', focus, true);
     }
     else if(!scanSpecimenID && !enterSpecimenID1){
         hasError = true;
-        errorMessage('scanSpecimenID', 'Please Scan Collection ID or Type in Manually', focus);
+        errorMessage('scanSpecimenID', 'Please Scan Collection ID or Type in Manually', focus, true);
         focus = false;
-        errorMessage('enterSpecimenID1', 'Please Scan Collection ID or Type in Manually', focus);
-        return;
+        errorMessage('enterSpecimenID1', 'Please Scan Collection ID or Type in Manually', focus, true);
     }
     else if(scanSpecimenID && !enterSpecimenID1) {
         if(!masterSpecimenIDRequirement.regExp.test(scanSpecimenID) || scanSpecimenID.length !== masterSpecimenIDRequirement.length) {
             hasError = true;
-            errorMessage('scanSpecimenID', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, focus);
+            errorMessage('scanSpecimenID', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, focus, true);
             focus = false;
-            return;
         }
     }
     else if(!scanSpecimenID && enterSpecimenID1) {
         if(!masterSpecimenIDRequirement.regExp.test(enterSpecimenID1) || enterSpecimenID1.length !== masterSpecimenIDRequirement.length) {
             hasError = true;
-            errorMessage('enterSpecimenID1', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, focus);
+            errorMessage('enterSpecimenID1', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, focus, true);
             focus = false;
-            return;
         }
         if(enterSpecimenID1 !== enterSpecimenID2) {
             hasError = true;
-            errorMessage('enterSpecimenID2', 'Does not match with Manually Entered Collection ID', focus);
-            return;
+            errorMessage('enterSpecimenID2', 'Does not match with Manually Entered Collection ID', focus, true);
         }
     }
     if(hasError) return;
@@ -1702,6 +1711,10 @@ const btnsClicked = async (connectId, formData, cont) => {
     formData['820476880'] = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     if(enterSpecimenID1) formData['387108065'] = 353358909
     else formData['387108065'] = 104430631;
+    if(accessionID1 && accessionID1.value) {
+        formData['646899796'] = accessionID1.value;
+        formData['148996099'] = 353358909;
+    }
     if(select) formData['331584571'] = parseInt(select.value);
     formData['connectId'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
     formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
@@ -2310,12 +2323,11 @@ export const addEventQRCodeBtn = () => {
     })
 }
 
-export const addEventClearScannedBarcode = () => {
-    const clearInputBtn = document.getElementById('clearScanSpecimenID');
+export const addEventClearScannedBarcode = (id) => {
+    const clearInputBtn = document.getElementById(id);
     clearInputBtn.hidden = false;
     clearInputBtn.addEventListener('click', () => {
-        disableInput('enterSpecimenID1', false);
-        disableInput('enterSpecimenID2', false);
+        clearInputBtn.dataset.enableInput.split(',').forEach(ele => disableInput(ele, false));
         document.getElementById(clearInputBtn.dataset.barcodeInput).value = '';
         clearInputBtn.hidden = true;
     });
