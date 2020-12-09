@@ -14,7 +14,7 @@ export const checkOutScreen = (data, specimenData) => {
         </br>
         <div class="row">
             <div class="col">
-                <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
+                <div class="row">${data['996038075']}, ${data['399159511']}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
         </div>

@@ -15,7 +15,7 @@ export const finalizeTemplate = (data, specimenData) => {
         </br>
         <div class="row">
             <div class="col">
-                <div class="row">${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
+                <div class="row">${data['996038075']}, ${data['399159511']}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${specimenData['820476880']}</div>
                 <div class="row">Specimen Collection Date & Time: ${new Date(specimenData['678166505']).toLocaleString()}</div>

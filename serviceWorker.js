@@ -22,7 +22,7 @@ registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico)$/,
 );
 
 registerRoute(
-    new RegExp('https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/.+'),
+    new RegExp('https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/.+'),
     new NetworkFirst({
         cacheName: 'api-cache',
         plugins: [
@@ -39,10 +39,10 @@ const bgSyncPlugin = new BackgroundSyncPlugin('connectBiospecimen', {
 });
 
 registerRoute(
-    new RegExp('https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/.+'),
+    new RegExp('https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/.+'),
     new NetworkOnly({
       plugins: [bgSyncPlugin]
     }),
     'POST'
 );
-workbox.precaching.precacheAndRoute([{url: 'index.html', revision: `5`}]);
+workbox.precaching.precacheAndRoute([{url: 'index.html', revision: `6`}]);

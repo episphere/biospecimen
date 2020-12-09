@@ -24,8 +24,8 @@ const conversion = {
     "677469051":"0014",
     "683613884":"0024"
 }
-const api = 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?';
-// const api = 'http://localhost:8010/nih-nci-dceg-episphere-dev/us-central1/biospecimen?';
+const api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
+// const api = 'http://localhost:8010/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
 
 export const validateUser = async () => {
     const idToken = await getIdToken();
@@ -163,7 +163,7 @@ export const performSearch = async (query) => {
     showAnimation();
     const response = await findParticipant(query);
     hideAnimation();
-    const getVerifiedParticipants = response.data.filter(dt => dt.state.RcrtV_Verification_v1r0 === 1);
+    const getVerifiedParticipants = response.data.filter(dt => dt['821247024'] === 197316935);
     if(response.code === 200 && getVerifiedParticipants.length > 0) searchResults(getVerifiedParticipants);
     else if(response.code === 200 && getVerifiedParticipants.length === 0) showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
 }
@@ -362,7 +362,7 @@ export const removeBag = async(boxId, bags) => {
 }
 
 export const searchSpecimenInstitute = async () => {
-    //https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
+    //https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen`, {
         method: "GET",
@@ -424,7 +424,7 @@ export const searchSpecimenInstitute = async () => {
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
-    //https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
+    //https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
     let toPass = {tubeId: tubeId};
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=reportMissingSpecimen`, {

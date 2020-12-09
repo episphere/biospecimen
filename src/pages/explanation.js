@@ -15,7 +15,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
         </br>
         <div class="row">
             <div class="col">
-                <div class="row">${dt.RcrtUP_Lname_v1r0}, ${dt.RcrtUP_Fname_v1r0}</div>
+                <div class="row">${dt['996038075']}, ${dt['399159511']}</div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
             ${biospecimenData['331584571'] ? `

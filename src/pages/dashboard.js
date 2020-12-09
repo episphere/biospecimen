@@ -162,11 +162,11 @@ export const searchResults = (result) => {
         template += `
             <tr>
                 <td><input type="radio" name="selectParticipant" required data-token=${data.token} value="${data.Connect_ID}"></td>
-                <td>${data.RcrtUP_Lname_v1r0}</td>
-                <td>${data.RcrtUP_Fname_v1r0}</td>
-                <td>${data.RcrtUP_Minitial_v1r0}</td>
-                <td>${data.RcrtUP_MOB_v1r0}/${data.RcrtUP_BD_v1r0}/${data.RcrtUP_YOB_v1r0}</td>
-                <td>${data.RcrtUP_AddressLn1_v1r0} ${data.RcrtUP_AddressLn2_v1r0 ? data.RcrtUP_AddressLn2_v1r0 : ''}</br>${data.RcrtUP_City_v1r0} ${Object.keys(allStates)[Object.values(allStates).indexOf(parseInt(data.RcrtUP_State_v1r0))]} ${data.RcrtUP_Zip_v1r0}</td>
+                <td>${data['996038075']}</td>
+                <td>${data['399159511']}</td>
+                <td>${data['231676651']}</td>
+                <td>${data['564964481']}/${data['795827569']}/${data['544150384']}</td>
+                <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
                 <td>${data.Connect_ID}</td>
             </tr>
         `

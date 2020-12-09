@@ -14,7 +14,7 @@ export const checkInTemplate = (data) => {
         </br>
         <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
             <div class="row">
-                <div>${data.RcrtUP_Lname_v1r0}, ${data.RcrtUP_Fname_v1r0}</div>
+                <div>${data['996038075']}, ${data['399159511']}</div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
             <div class="row">
@@ -28,13 +28,13 @@ export const checkInTemplate = (data) => {
                     <div class="col-md-12 info-box">
                         <div class="row"><span class="full-width">Consent</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                        <div class="row"><span class="full-width">${new Date(data.RcrtCS_ConsentSumit_v1r0).toLocaleString()}</span></div>
+                        <div class="row"><span class="full-width">${new Date(data['454445267']).toLocaleString()}</span></div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="col-md-12 info-box">
                         <div class="row"><span class="full-width">Match Verification</span></div>
-                        <div class="row"><span class="full-width">${data.state.RcrtV_Verification_v1r0 === 1 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span></div>
+                        <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span></div>
                         <div class="row"></br></div>
                     </div>
                 </div>

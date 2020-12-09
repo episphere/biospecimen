@@ -81,6 +81,7 @@ export const addEventsearchSpecimen = () => {
             showNotifications({title: 'Not found', body: 'Specimen not found!'}, true)
             return
         }
+        const biospecimenData = biospecimen.data;
         let query = `connectId=${parseInt(biospecimenData.connectId)}`;
         const response = await findParticipant(query);
         hideAnimation();
@@ -2329,7 +2330,7 @@ export const addEventContactInformationModal = (data) => {
                             </button>`;
         body.innerHTML = `
             <div class="row">
-                <div class="col">${data.RcrtCS_Lname_v1r0}, ${data.RcrtCS_Fname_v1r0}</div>
+                <div class="col">${data['736251808']}, ${data['471168198']}</div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCodeModal"></svg></div>
             </div>
             <div class="row">
@@ -2340,17 +2341,17 @@ export const addEventContactInformationModal = (data) => {
             </br>
             <div class="row">
                 <div class="col">
-                    <strong>Address:</strong> ${data.RcrtUP_AddressLn1_v1r0}${data.RcrtUP_AddressLn2_v1r0 ? ` ${data.RcrtUP_AddressLn2_v1r0}`: ''} ${data.RcrtUP_City_v1r0} ${Object.keys(allStates)[Object.values(allStates).indexOf(parseInt(data.RcrtUP_State_v1r0))]} ${data.RcrtUP_Zip_v1r0}
+                    <strong>Address:</strong> ${data['521824358']}${data['442166669'] ? ` ${data['442166669']}`: ''} ${data['703385619']} ${data['634434746']} ${data['892050548']}
                 </div>
             </div>
             <div class="row">
                 <div class="col">
-                    <strong>Email(s):</strong> ${data.RcrtUP_Email1_v1r0 ? data.RcrtUP_Email1_v1r0 : ''}
+                    <strong>Email(s):</strong> ${data['869588347'] ? data['869588347'] : ''}
                 </div>
             </div>
             <div class="row">
                 <div class="col">
-                    <strong>Phone:</strong> ${data.RcrtUP_Phone1_v1r0 ? data.RcrtUP_Phone1_v1r0 : ''}
+                    <strong>Phone:</strong> ${data['388711124'] ? data['388711124'] : ''}
                 </div>
             </div>
             <div class="row">
