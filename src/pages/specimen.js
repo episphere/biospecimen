@@ -1,6 +1,6 @@
 import { addEventBarCodeScanner, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch, addEventCntdToCollectProcess } from "./../events.js";
-import { masterSpecimenIDRequirement, workflows } from "../tubeValidation.js";
+import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
 export const specimenTemplate = async (data, formData, collections) => {
     removeActiveClass('navbar-btn', 'active')
@@ -31,8 +31,9 @@ export const specimenTemplate = async (data, formData, collections) => {
                 <thead>
                     <tr>
                         <th>Collection ID</th>
+                        ${getWorflow() === 'research' ? '': '<th>Accession ID</th>'}
+                        <th>${getWorflow() === 'research' ? 'Date of Collection' : 'Date'}</th>
                         <th>Visit</th>
-                        <th>Date of Collection</th>
                         <th>Select Action</th>
                     </tr>
                 </thead>
@@ -40,9 +41,10 @@ export const specimenTemplate = async (data, formData, collections) => {
                 collections.forEach(collection => {
                     template += `<tr>
                         <td>${collection['820476880']}</td>
+                        ${getWorflow() === 'research' ? '': `<td>${collection['646899796'] ? collection['646899796'] : ''}</td>`}
+                        <td>${getWorflow() === 'research' && collection['678166505'] ? new Date(collection['678166505']).toLocaleString() : formData['915838974'] ? `${formData['915838974']}` : ''}</td>
                         <td>${collection['331584571'] ? visitType[collection['331584571']] : ''}</td>
-                        <td>${collection['678166505'] ? new Date(collection['678166505']).toLocaleString() : ''}</td>
-                        <td><button class="custom-btn continue-collect-process" data-connect-id="${data.Connect_ID}" data-collection-id="${collection['820476880']}">Continue to Collect/Process</button></td>
+                        <td><button class="custom-btn continue-collect-process" data-connect-id="${data.Connect_ID}" data-collection-id="${collection['820476880']}">${getWorflow() === 'research' ? `Continue to Collect/Process`:`Continue to Labeling and Receipt`}</button></td>
                     </tr>`
                 })
             template +=`</tbody></table>`
@@ -72,18 +74,28 @@ export const specimenTemplate = async (data, formData, collections) => {
                     })
                     template +=`</select>`
                 }
-                template +=` 
-            </div>
-            <div class="form-group row">
-                <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan Collection ID</label>
+            template +=`</div>`
+            if(workflow === 'clinical' && (siteAcronym === 'KPCO' || siteAcronym === 'KPGA' || siteAcronym === 'KPNW' || siteAcronym === 'KPHI')) {
+                template += `
+                    <div class="form-group row">
+                        <label class="col-md-4 col-form-label" for="accessionID1">Scan in Accession ID:</label>
+                        <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type in Accession ID from Tube" id="accessionID1"/>
+                        <button class="barcode-btn-outside" type="button" id="scanAccessionIDBarCodeBtn" data-barcode-input="accessionID1" data-clear-btn="clearScanAccessionID"><i class="fas fa-barcode"></i></button>
+                        <button class="barcode-input-clear" hidden="true" type="button" id="clearScanAccessionID" title="Clear scanned barcode" data-enable-input="accessionID2" data-barcode-input="accessionID1"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="form-group row">
+                        <input autocomplete="off" type="text" class="form-control col-md-5 offset-4" placeholder="Re-Type in Accession ID from Tube" id="accessionID2"/>
+                    </div>
+                    </br>
+                `
+            }
+            template += `<div class="form-group row">
+                <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan Collection ID from Label Sheet Label</label>
                 <input autocomplete="off" type="text" class="form-control col-md-5 disabled" disabled placeholder="Scan in Collection ID from Label Sheet Label" id="scanSpecimenID"/> 
                 <button class="barcode-btn-outside" type="button" id="scanSpecimenIDBarCodeBtn" data-barcode-input="scanSpecimenID"><i class="fas fa-barcode"></i></button>
-                <button class="barcode-input-clear" hidden="true" type="button" id="clearScanSpecimenID" title="Clear scanned barcode" data-barcode-input="scanSpecimenID"><i class="fas fa-times"></i></button>
+                <button class="barcode-input-clear" hidden="true" type="button" id="clearScanSpecimenID" title="Clear scanned barcode" data-enable-input="enterSpecimenID1,enterSpecimenID2" data-barcode-input="scanSpecimenID"><i class="fas fa-times"></i></button>
             </div>
             </br>
-            <div class="form-group row">
-                If it can't be scanned:
-            </div>
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="enterSpecimenID1">Manually Enter Collection ID</label>
                 <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Manually Enter in Collection ID from Label Sheet Label" id="enterSpecimenID1"/>
@@ -113,6 +125,7 @@ export const specimenTemplate = async (data, formData, collections) => {
     document.getElementById('contentBody').innerHTML = template;
     document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
     addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, masterSpecimenIDRequirement.length);
+    if(document.getElementById('scanAccessionIDBarCodeBtn')) addEventBarCodeScanner('scanAccessionIDBarCodeBtn');
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventCntdToCollectProcess();
     addEventSpecimenLinkForm(formData);
