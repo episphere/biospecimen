@@ -51,7 +51,7 @@ export const startShipping = async (userName) => {
     let hiddenJSON = {};
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
-        hiddenJSON[box['boxId']] = box['bags']
+        hiddenJSON[box['132929440']] = box['bags']
     }
 
     response = await  getAllBoxes();
@@ -59,7 +59,7 @@ export const startShipping = async (userName) => {
     let hiddenJSON1 = {};
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
-        hiddenJSON1[box['boxId']] = box['bags']
+        hiddenJSON1[box['132929440']] = box['bags']
     }
     
     console.log('pwnjefbpoewkinbpoefibnepobinoieoiboribvr' + JSON.stringify(boxJSONS))
@@ -225,7 +225,7 @@ export const startShipping = async (userName) => {
     let hiddenJSONLocation = {};
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
-        hiddenJSONLocation[box['boxId']] = box['bags']
+        hiddenJSONLocation[box['132929440']] = box['bags']
     }
     await populateBoxSelectList(hiddenJSONLocation,userName);
     await populateTempNotification();
@@ -253,10 +253,10 @@ export const boxManifest = async (boxId, userName) => {
     let hiddenJSON = {};
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
-        if(box['boxId'] == boxId){
+        if(box['132929440'] == boxId){
             currBox = box;
         }
-        hiddenJSON[box['boxId']] = box['bags']
+        hiddenJSON[box['132929440']] = box['bags']
     }
     let currInstitute = currBox.institute;
     let currLocation = currBox.location;
@@ -266,7 +266,7 @@ export const boxManifest = async (boxId, userName) => {
     console.log(boxIds);    
     for(let i = 0; i < boxIds.length; i++){
         let toPass = {};
-        toPass['boxId'] = boxIds[i];
+        toPass['132929440'] = boxIds[i];
         toPass['bags'] = hiddenJSON[boxIds[i]]
         storeBox(toPass);
     }
@@ -349,8 +349,8 @@ export const shippingManifest = async (boxesToShip, userName) => {
     let site = '';
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
-        hiddenJSON[box['boxId']] = box['bags']
-        locations[box['boxId']] = box['location'];
+        hiddenJSON[box['132929440']] = box['bags']
+        locations[box['132929440']] = box['560975149'];
         site = box['institute'];
     }
 

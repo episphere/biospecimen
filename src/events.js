@@ -227,7 +227,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     console.log(boxJSONS)
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
-        hiddenJSON[box['boxId']] = box['bags']
+        hiddenJSON[box['132929440']] = box['bags']
     }
 
     let tubeTable = document.getElementById("shippingModalTable")
@@ -362,8 +362,8 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         console.log(boxJSONS)
         for(let i = 0; i < boxJSONS.length; i++){
             let box = boxJSONS[i]
-            hiddenJSON[box['boxId']] = box['bags']
-            locations[box['boxId']] = box['location'];
+            hiddenJSON[box['132929440']] = box['bags']
+            locations[box['132929440']] = box['560975149'];
         }
         let nextBoxNum = Object.keys(hiddenJSON).length + 1;
 
@@ -443,7 +443,7 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
                 }
 
                 if(found == false){
-                    toPass['dateCreated'] = currTime.toString();
+                    toPass['672863981'] = currTime.toString();
                 }
                 
                 toPass['132929440'] = boxIds[i];
@@ -459,7 +459,7 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         hiddenJSON = {};
         for(let i = 0; i < boxJSONS.length; i++){
             let box = boxJSONS[i]
-            hiddenJSON[box['boxId']] = box['bags']
+            hiddenJSON[box['132929440']] = box['bags']
         }
         
             
@@ -467,9 +467,9 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         await populateSpecimensList(hiddenJSON);
         hiddenJSON = {};
         for(let i = 0; i < boxJSONS.length; i++){
-            if(!boxJSONS[i].hasOwnProperty('shipped') || boxJSONS[i]['shipped'] != true){
+            if(!boxJSONS[i].hasOwnProperty('145971562') || boxJSONS[i]['145971562'] != '353358909'){
                 let box = boxJSONS[i]
-                hiddenJSON[box['boxId']] = box['bags']
+                hiddenJSON[box['132929440']] = box['bags']
             }
            
         }
@@ -553,8 +553,8 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 console.log(conversion[currKey])
                 //get number of the tube
                 //let tubeNum = currKey.substring(4, currKey.indexOf("Id"));
-                let shippedKey = 'conceptId of shipped'
-                let missingKey = 'conceptId of missing'
+                let shippedKey = '353358909'
+                let missingKey = '258745303'
                 let currJSON = specimenData[i][currKey];
                 console.log(JSON.stringify(currJSON))
                 if(currJSON.hasOwnProperty(shippedKey)){
@@ -781,7 +781,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
                 let hiddenJSON = {};
                 for(let i = 0; i < boxJSONS.length; i++){
                     let box = boxJSONS[i]
-                    hiddenJSON[box['boxId']] = box['bags']
+                    hiddenJSON[box['132929440']] = box['bags']
                 }
 
                 await populateSpecimensList(hiddenJSON);
@@ -814,7 +814,7 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
 
     let currJSON = {};
     for(let i =0;i < hiddenJSON.length; i++){
-        if(hiddenJSON[i]['boxId'] == boxId){
+        if(hiddenJSON[i]['132929440'] == boxId){
             console.log('91283ghr9iubgv0987g23bfouwegvo87weub')
             currJSON = hiddenJSON[i]
         }
@@ -826,8 +826,8 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
     document.getElementById('boxManifestCol1').appendChild(newP);
 
     let toInsertDate = ''
-    if(currJSON.hasOwnProperty('dateCreated')){
-        let dateStarted = Date.parse(currJSON['dateCreated'])
+    if(currJSON.hasOwnProperty('672863981')){
+        let dateStarted = Date.parse(currJSON['672863981'])
         
         let currentdate = new Date(dateStarted); 
         console.log('oaliwjbdvlicakjbdvoilasudvb ' + JSON.stringify(hiddenJSON))
@@ -841,8 +841,8 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
 
     }
     let toInsertDate2 = ''
-    if(currJSON.hasOwnProperty('lastUpdatedTiime')){
-        let dateStarted = Date.parse(currJSON['lastUpdatedTiime'])
+    if(currJSON.hasOwnProperty('555611076')){
+        let dateStarted = Date.parse(currJSON['555611076'])
         
         let currentdate = new Date(dateStarted); 
         console.log('oaliwjbdvlicakjbdvoilasudvb ' + JSON.stringify(hiddenJSON))
@@ -926,31 +926,31 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
             let thisLocation = '';
 
             for(let j = 0; j < boxJSONS.length; j++){
-                console.log('BWVIBLOISD BGV LOIVBGWEOLVI WBGEVOLWIBVGDV' + boxJSONS[j].boxId)
-                if(boxJSONS[j].boxId == boxes[i]){
-                    if(boxJSONS[j].hasOwnProperty('dateCreated')){
-                        let timestamp = Date.parse(boxJSONS[j]['dateCreated']);
+                console.log('BWVIBLOISD BGV LOIVBGWEOLVI WBGEVOLWIBVGDV' + boxJSONS[j]['132929440'])
+                if(boxJSONS[j]['132929440'] == boxes[i]){
+                    if(boxJSONS[j].hasOwnProperty('672863981')){
+                        let timestamp = Date.parse(boxJSONS[j]['672863981']);
                         let newDate = new Date(timestamp);
                         let am = 'AM'
                         if(newDate.getHours() >= 12){
                             am = 'PM'
                         }
                         dateStarted = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() - 11)%12 + 1) + ':' + newDate.getMinutes() + ' ' + am;
-                        //dateStarted = boxJSONS[j]['dateCreated'];
+                        //dateStarted = boxJSONS[j]['672863981'];
                     }
-                    if(boxJSONS[j].hasOwnProperty('lastUpdatedTiime')){
-                        let timestamp = Date.parse(boxJSONS[j]['lastUpdatedTiime']);
+                    if(boxJSONS[j].hasOwnProperty('555611076')){
+                        let timestamp = Date.parse(boxJSONS[j]['555611076']);
                         let newDate = new Date(timestamp);
                         let am = 'AM'
                         if(newDate.getHours() >= 12){
                             am = 'PM'
                         }
                         lastModified = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11)%12 + 1)  + ':' + newDate.getMinutes() + ' ' + am;
-                        //lastModified = boxJSONS[j]['lastUpdatedTiime']
+                        //lastModified = boxJSONS[j]['555611076']
 
                     }
-                    if(boxJSONS[j].hasOwnProperty('location')){
-                        thisLocation = boxJSONS[j]['location'];
+                    if(boxJSONS[j].hasOwnProperty('560975149')){
+                        thisLocation = boxJSONS[j]['560975149'];
                     }
                 }
             }
@@ -992,7 +992,8 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
 
 export const populateTempNotification = async () => {
     
-    let checkDate = await getNextTempCheck();
+    let checkDate = false;
+    //let checkDate = await getNextTempCheck();
     let toToggle = document.getElementById('tempTubeReminder');
     if(checkDate == true){
         toToggle.style.display='block';
@@ -1003,7 +1004,8 @@ export const populateTempNotification = async () => {
 }
 
 export const populateTempCheck = async () => {
-    let checkDate = await getNextTempCheck();
+    let checkDate = false;
+    //let checkDate = await getNextTempCheck();
     let toToggle = document.getElementById('checkForTemp');
     if(checkDate == true){
         toToggle.style.display='block';
@@ -1243,15 +1245,15 @@ export const populateBoxSelectList = async (hiddenJSON, userName) => {
                         let hiddenJSON = {};
                         for(let i = 0; i < boxJSONS.length; i++){
                             let box = boxJSONS[i]
-                            hiddenJSON[box['boxId']] = box['bags']
+                            hiddenJSON[box['132929440']] = box['bags']
                         }
 
                         await populateSpecimensList(hiddenJSON);
                         hiddenJSON = {};
                         for(let i = 0; i < boxJSONS.length; i++){
-                            if(!boxJSONS[i].hasOwnProperty('shipped') || boxJSONS[i]['shipped'] != true){
+                            if(!boxJSONS[i].hasOwnProperty('145971562') || boxJSONS[i]['145971562'] != '353358909'){
                                 let box = boxJSONS[i]
-                                hiddenJSON[box['boxId']] = box['bags']
+                                hiddenJSON[box['132929440']] = box['bags']
                             }
                         
                         }
@@ -1280,8 +1282,8 @@ const addNewBox = async  (userName) => {
     let largestLocationIndex = -1;
     let pageLocation = document.getElementById('selectLocationList').value;
     for(let i = 0; i < hiddenJSON.length; i++){
-        let curr = parseInt(hiddenJSON[i]['boxId'].substring(3))
-        let currLocation = hiddenJSON[i]['location']
+        let curr = parseInt(hiddenJSON[i]['132929440'].substring(3))
+        let currLocation = hiddenJSON[i]['560975149']
 
         if(curr > largestOverall){
             largestOverall = curr;
@@ -1294,7 +1296,7 @@ const addNewBox = async  (userName) => {
         
     }
     if(largestLocationIndex != -1){
-        let lastBox = hiddenJSON[largeIndex]['boxId']
+        let lastBox = hiddenJSON[largeIndex]['132929440']
         if(Object.keys(hiddenJSON[largestLocationIndex]['bags']).length != 0){
             //add a new Box
             //create new Box Id
@@ -1313,22 +1315,53 @@ const addNewBox = async  (userName) => {
 
             for(let i = 0; i < boxJSONS.length; i++){
                 let box = boxJSONS[i]
-                if(box['location'] == pageLocation){
-                    hiddenJSON[box['boxId']] = box['bags']
+                if(box['560975149'] == pageLocation){
+                    hiddenJSON[box['132929440']] = box['bags']
                 }
             }
-            await populateBoxSelectList(hiddenJSO, userName)
+            await populateBoxSelectList(hiddenJSON, userName)
         }
         else{
             //error (ask them to put something in the previous box first)
         }
     }
+    else{
+        //add a new Box
+        //create new Box Id
+        let lastBox = '1'
+        if(largeIndex != -1){
+            lastBox = hiddenJSON[largeIndex]['132929440']
+        }
+        let newBoxNum = parseInt(lastBox.substring(3)) + 1;
+        console.log('xd')
+        let newBoxId = 'Box' + newBoxNum.toString();
+        let toPass = {};
+        toPass['132929440'] = newBoxId;
+        toPass['bags'] = {};
+        toPass['560975149'] = pageLocation;
+        await storeBox(toPass);
+
+        hiddenJSON.push({boxId:newBoxId, bags:{}, location:pageLocation})
+        let boxJSONS = hiddenJSON;
+        
+        hiddenJSON = {};
+
+        for(let i = 0; i < boxJSONS.length; i++){
+            let box = boxJSONS[i]
+            if(box['560975149'] == pageLocation){
+                hiddenJSON[box['132929440']] = box['bags']
+            }
+        }
+        await populateBoxSelectList(hiddenJSON, userName)
+        
+    }
+
 }
 
 export const addEventAddBox = (userName) => {
     let boxButton = document.getElementById('addBoxButton');
     boxButton.addEventListener('click', async () => {
-        addNewBox(userName);
+        await addNewBox(userName);
     })
    
 
@@ -1338,7 +1371,7 @@ export const addEventModalAddBox = (userName) => {
     let boxButton = document.getElementById('modalAddBoxButton');
     
     boxButton.addEventListener('click', async () => {
-        addNewBox(userName);
+        await addNewBox(userName);
     })
    
 
@@ -1353,7 +1386,7 @@ export const populateTubeInBoxList = async (userName) => {
     let currBox = {};
     for(let i = 0; i < hiddenJSON.length; i++){
         let currJSON = hiddenJSON[i];
-        if(currJSON.boxId == currBoxId){
+        if(currJSON['132929440'] == currBoxId){
             currBox = currJSON.bags;
         }
     }
@@ -1457,15 +1490,15 @@ export const populateTubeInBoxList = async (userName) => {
                         let hiddenJSON = {};
                         for(let i = 0; i < boxJSONS.length; i++){
                             let box = boxJSONS[i]
-                            hiddenJSON[box['boxId']] = box['bags']
+                            hiddenJSON[box['132929440']] = box['bags']
                         }
 
                         await populateSpecimensList(hiddenJSON);
                         hiddenJSON = {};
                         for(let i = 0; i < boxJSONS.length; i++){
-                            if(!boxJSONS[i].hasOwnProperty('shipped') || boxJSONS[i]['shipped'] != true){
+                            if(!boxJSONS[i].hasOwnProperty('145971562') || boxJSONS[i]['145971562'] != '353358909'){
                                 let box = boxJSONS[i]
-                                hiddenJSON[box['boxId']] = box['bags']
+                                hiddenJSON[box['132929440']] = box['bags']
                             }
                         
                         }
@@ -1497,14 +1530,14 @@ export const addEventChangeLocationSelect = (userName) => {
         let currLocation = selectBoxList.value;
         let boxJSONS = (await getBoxesByLocation(currLocation)).data;
         /*for(let i = 0; i < boxdata.length; i++){
-            console.log(boxdata[i]['location'])
+            console.log(boxdata[i]['560975149'])
         }*/
         //let boxJSONS = response.data;
         let hiddenJSON = {};
         console.log(boxJSONS)
         for(let i = 0; i < boxJSONS.length; i++){
             let box = boxJSONS[i]
-            hiddenJSON[box['boxId']] = box['bags']
+            hiddenJSON[box['132929440']] = box['bags']
         }
         await populateBoxSelectList(hiddenJSON, userName)
         //console.log(JSON.stringify(boxdata))
