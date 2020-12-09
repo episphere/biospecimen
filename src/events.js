@@ -431,13 +431,13 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
             let found = false;
             if(boxIds[i] == boxId){
                 for(let j = 0; j < boxJSONS.length; j++){
-                    if(boxJSONS[j]['boxId'] == boxIds[i]){
-                        if(boxJSONS[j].hasOwnProperty('dateCreated')){
-                            toPass['dateCreated'] = boxJSONS[j]['dateCreated'];
+                    if(boxJSONS[j]['132929440'] == boxIds[i]){
+                        if(boxJSONS[j].hasOwnProperty('672863981')){
+                            toPass['672863981'] = boxJSONS[j]['672863981'];
                             found = true;
                         }
-                        if(boxJSONS[j].hasOwnProperty('lastUpdatedTiime')){
-                            toPass['lastUpdatedTiime'] = boxJSONS[j]['lastUpdatedTiime'];
+                        if(boxJSONS[j].hasOwnProperty('555611076')){
+                            toPass['555611076'] = boxJSONS[j]['555611076'];
                         }
                     }
                 }
@@ -446,10 +446,10 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
                     toPass['dateCreated'] = currTime.toString();
                 }
                 
-                toPass['boxId'] = boxIds[i];
+                toPass['132929440'] = boxIds[i];
                 toPass['bags'] = hiddenJSON[boxIds[i]]
-                toPass['location'] = locations[boxIds[i]]
-                toPass['lastUpdatedTiime'] = currTime.toString();
+                toPass['560975149'] = locations[boxIds[i]]
+                toPass['555611076'] = currTime.toString();
                 await storeBox(toPass);
             }
         }
@@ -481,6 +481,26 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
 
 export const getInstituteSpecimensList = async(hiddenJSON) => {
     //const response = await searchSpecimenInstitute();
+    const conversion = {
+        "299553921":"0001",
+        "703954371":"0002",
+        "838567176":"0003",
+        "454453939":"0004",
+        "652357376":"0005",
+        "973670172":"0006",
+        "143615646":"0007",
+        "787237543":"0008",
+        "223999569":"0009",
+        "376960806":"0011",
+        "232343615":"0012",
+        "589588440":"0021",
+        "746999767":"0022",
+        "857757831":"0031",
+        "654812257":"0032",
+        "958646668":"0013",
+        "677469051":"0014",
+        "683613884":"0024"
+    }
     let specimenData = await searchSpecimenInstitute();
     console.log('waoikebnp;oisdgbvspoiduvbgaoiwluejfbolafiujbf');
     console.log(JSON.stringify(specimenData));
@@ -529,62 +549,81 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
         for(let j = 0; j < keys.length; j++){
             
             let currKey = keys[j];
-            if(currKey.match(/tube[0-9]*Id/) != null){
+            if(conversion.hasOwnProperty(currKey)){
+                console.log(conversion[currKey])
                 //get number of the tube
-                let tubeNum = currKey.substring(4, currKey.indexOf("Id"));
-                let shippedKey = keys.indexOf('tube'+tubeNum+'Shipped')
-                let missingKey = keys.indexOf('tube'+tubeNum+'Missing')
-                if(shippedKey != -1){
-                    if(specimenData[i][keys[shippedKey]] == false){
-                        if(missingKey != -1){
-                            if(specimenData[i][keys[missingKey]] == false){
-                                if(specimenData[i][currKey] != '0007'){
+                //let tubeNum = currKey.substring(4, currKey.indexOf("Id"));
+                let shippedKey = 'conceptId of shipped'
+                let missingKey = 'conceptId of missing'
+                let currJSON = specimenData[i][currKey];
+                console.log(JSON.stringify(currJSON))
+                if(currJSON.hasOwnProperty(shippedKey)){
+                    if(currJSON[shippedKey] == false){
+                        if(currJSON.hasOwnProperty(missingKey)){
+                            if(currJSON[missingKey] == false){
+                                if(conversion[currKey] != '0007'){
                                     
-                                    if(toExclude8.indexOf(specimenData[i][currKey]) == -1){
-                                        list8.push(specimenData[i][currKey]);
+                                    if(toExclude8.indexOf(conversion[currKey]) == -1){
+                                        list8.push(conversion[currKey]);
                                     }
                                 }
                                 else{
-                                    if(toExclude9.indexOf(specimenData[i][currKey]) == -1){
-                                        list9.push(specimenData[i][currKey]);
+                                    if(toExclude9.indexOf(conversion[currKey]) == -1){
+                                        list9.push(conversion[currKey]);
                                     }
                                 }
                             }
                         }
                         else{
-                            if(specimenData[i][currKey] != '0007'){
+                            if(conversion[currKey] != '0007'){
                                 
-                                if(toExclude8.indexOf(specimenData[i][currKey]) == -1){
-                                    list8.push(specimenData[i][currKey])
+                                if(toExclude8.indexOf(conversion[currKey]) == -1){
+                                    list8.push(conversion[currKey])
                                 }
                             }
                             else{
-                                if(toExclude9.indexOf(specimenData[i][currKey]) == -1){
-                                    list9.push(specimenData[i][currKey]);
+                                if(toExclude9.indexOf(conversion[currKey]) == -1){
+                                    list9.push(conversion[currKey]);
                                 }
                             }
                         }
                     }
                 }
-                if(missingKey != -1){
-                    if(specimenData[i][keys[missingKey]] == false){
-                        if(specimenData[i][currKey] != '0007'){
-                            
-                            if(toExclude8.indexOf(specimenData[i][currKey]) == -1){
-                                list8.push(specimenData[i][currKey])
+                else{
+                    if(currJSON.hasOwnProperty(missingKey)){
+                        if(currJSON[missingKey] == false){
+                            if(conversion[currKey] != '0007'){
+                                
+                                if(toExclude8.indexOf(conversion[currKey]) == -1){
+                                    list8.push(conversion[currKey])
+                                }
+                            }
+                            else{
+                                if(toExclude9.indexOf(conversion[currKey]) == -1){
+                                    list9.push(conversion[currKey]);
+                                }
+                            }
+                        }
+                    }
+                    else{
+                        if(conversion[currKey] != '0007'){
+                                    
+                            if(toExclude8.indexOf(conversion[currKey]) == -1){
+                                list8.push(conversion[currKey]);
                             }
                         }
                         else{
-                            if(toExclude9.indexOf(specimenData[i][currKey]) == -1){
-                                list9.push(specimenData[i][currKey]);
+                            if(toExclude9.indexOf(conversion[currKey]) == -1){
+                                list9.push(conversion[currKey]);
                             }
                         }
                     }
                 }
             }
         }
-        console.log(JSON.stringify(toReturn))
-        if(toExclude8.length > 0 && list8.length > 0 && specimenData[i].hasOwnProperty('masterSpecimenId')){
+        console.log(JSON.stringify(list8))
+        console.log(JSON.stringify(list9))
+        if(toExclude8.length > 0 && list8.length > 0 && specimenData[i].hasOwnProperty('820476880')){
             //add orphan tubes
             
             //toInsert[specimenData[i]['masterSpecimenId'] + ' 0008'] = list8
@@ -597,12 +636,12 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 console.log(list8[j]);
                 console.log(JSON.stringify(toExcludeOrphans))
                 if(!toExcludeOrphans.includes(list8[j])){
-                    toReturn['orphans'].push(specimenData[i]['masterSpecimenId'] + ' ' + list8[j])
+                    toReturn['orphans'].push(specimenData[i]['820476880'] + ' ' + list8[j])
                 }
             }
 
         }
-        if(toExclude9.length > 0 && list9.length > 0 && specimenData[i].hasOwnProperty('masterSpecimenId')){
+        if(toExclude9.length > 0 && list9.length > 0 && specimenData[i].hasOwnProperty('820476880')){
             
             if(!toReturn.hasOwnProperty('orphans')){
                 //console.log(JSON.stringify(toReturn))
@@ -610,21 +649,22 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
             }
             for(let j = 0; j < list9.length; j++){
                 console.log('oipuwqabe vloi;uajgbdsvolisadujbvsaloidvubasdliuasdvb1')
-                console.log(specimenData[i]['masterSpecimenId'] + ' ' + list9[j]);
+                console.log(specimenData[i]['820476880'] + ' ' + list9[j]);
                 if(!toExcludeOrphans.includes(list9[j])){
-                    toReturn['orphans'].push(specimenData[i]['masterSpecimenId'] + ' ' + list9[j])
+                    toReturn['orphans'].push(specimenData[i]['820476880'] + ' ' + list9[j])
                 }
             }
 
         }
-        if(toExclude8.length == 0 && list8.length > 0 && specimenData[i].hasOwnProperty('masterSpecimenId')){
-            toReturn[specimenData[i]['masterSpecimenId'] + ' 0008'] = list8;
+        if(toExclude8.length == 0 && list8.length > 0 && specimenData[i].hasOwnProperty('820476880')){
+            toReturn[specimenData[i]['820476880'] + ' 0008'] = list8;
         }
-        if(toExclude9.length == 0 && list9.length > 0 && specimenData[i].hasOwnProperty('masterSpecimenId')){
-            toReturn[specimenData[i]['masterSpecimenId'] + ' 0009'] = list9;
+        if(toExclude9.length == 0 && list9.length > 0 && specimenData[i].hasOwnProperty('820476880')){
+            toReturn[specimenData[i]['820476880'] + ' 0009'] = list9;
         }
     }
     
+    console.log('THIS IS THE TORETURN: ' + JSON.stringify(toReturn))
     return toReturn;
 }
 
@@ -1261,9 +1301,9 @@ const addNewBox = async  (userName) => {
             let newBoxNum = parseInt(lastBox.substring(3)) + 1;
             let newBoxId = 'Box' + newBoxNum.toString();
             let toPass = {};
-            toPass['boxId'] = newBoxId;
+            toPass['132929440'] = newBoxId;
             toPass['bags'] = {};
-            toPass['location'] = pageLocation;
+            toPass['560975149'] = pageLocation;
             await storeBox(toPass);
 
             hiddenJSON.push({boxId:newBoxId, bags:{}, location:pageLocation})

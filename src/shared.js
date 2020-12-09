@@ -410,38 +410,16 @@ export const searchSpecimenInstitute = async () => {
         }
     */
     
-    let idKeys = Object.keys(conversion);
-    let toReturn = []
     for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
-        let keys = Object.keys(currJSON);
-
-        let listOfTubes = {};
-
-        listOfTubes['masterSpecimenId'] = currJSON['820476880'];
-        console.log(JSON.stringify(listOfTubes))
-        for(let j = 0; j < keys.length; j++){
-            if(idKeys.includes(keys[j])){
-                if(conversion[keys[j]] != '0008' && !conversion[keys[j]] != '0009'){
-                    listOfTubes[conversion[keys[j]]] = currJSON[keys[j]];
-                }
-            }
-            //console.log(JSON.stringify(listOfTubes))
-            /*if(keys[j].match(/tube[0-9]*Id/) != null){
-                if(currJSON[keys[j]] == '0008' || currJSON[keys[j]] == '0009'){
-                    delete currJSON[keys[j]]
-                }
-            }*/
-            
+        if(currJSON.hasOwnProperty('787237543')){
+            delete currJSON['787237543']
         }
-        toReturn.push(listOfTubes);
-        
+        if(currJSON.hasOwnProperty('223999569')){
+            delete currJSON['223999569']
+        }
     }
-    //for ()
-    console.log('oiwge98go98vg23okblkjvci7sudgvcq23oi')
-        console.log(JSON.stringify(toReturn));
-
-    return toReturn;
+    return data;
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
@@ -473,7 +451,7 @@ export const getLocationsInstitute = async () => {
     console.log('LOCATIONSTUFFF 0.0 : ' + JSON.stringify(arr));
     for(let i = 0; i < arr.length; i++){
         let currJSON = arr[i];
-        locations = locations.concat(currJSON.Locations);
+        locations = locations.concat(currJSON['560975149']);
     }
     return locations;
 }
