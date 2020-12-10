@@ -569,17 +569,17 @@ export const addEventBarCodeScanner = (id, start, end) => {
                     document.getElementById(elementID).value = result.codeResult.code;
                     Quagga.stop();
                     document.querySelector('[data-dismiss="modal"]').click();
-                }
+                };
                 if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,masterSpecimenIDRequirement.length))) return;
                 if(!elementID) return;
                 if(elementID === 'scanSpecimenID') {
                     disableInput('enterSpecimenID1', true);
                     disableInput('enterSpecimenID2', true);
                     addEventClearScannedBarcode('clearScanSpecimenID');
-                    document.getElementById(elementID).value = start && end ? result.codeResult.code.substr(start, end) : result.codeResult.code;
-                    Quagga.stop();
-                    document.querySelector('[data-dismiss="modal"]').click();
                 }
+                document.getElementById(elementID).value = start && end ? result.codeResult.code.substr(start, end) : result.codeResult.code;
+                Quagga.stop();
+                document.querySelector('[data-dismiss="modal"]').click();
             }
             else {
                 disableInput('enterSpecimenID1', false);
