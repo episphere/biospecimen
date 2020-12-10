@@ -306,3 +306,7 @@ canvas.drawing, canvas.drawingBuffer {
 .active {
     background-color: #bbcffc85 !important;
 }
+
+.inherit-width {
+    width: 100%;
+}
