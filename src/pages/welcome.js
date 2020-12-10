@@ -21,10 +21,10 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             <div class="col">WELCOME</div>
         </div>
         <div class="row welcome-screen-div">
-            <div class="col">Clinical Research Associate: ${name}</div>
+            <div class="col">User: ${name}</div>
         </div>
         <div class="row welcome-screen-div">
-            <div class="col">IHCS: ${siteFullNames[data.siteAcronym]}</div>
+            <div class="col">Site: ${siteFullNames[data.siteAcronym]}</div>
         </div>
         <div class="row welcome-screen-div">
             <div class="col">
