@@ -30,7 +30,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             <div class="col">
                 <label for="dashboardSelection" class="col-form-label">Select dashboard to use </label>
                 <select required class="col form-control" id="dashboardSelection">
-                    <option value="">-- Select dashbaord --</option>
+                    <option value="">-- Select dashboard --</option>
                     <option value="clinical">Clinical Dashboard</option>
                     <option value="research">Research Dashboard</option>
                 </select>
