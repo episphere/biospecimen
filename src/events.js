@@ -1725,27 +1725,28 @@ export const addEventCheckInCompleteForm = () => {
     })
 };
 
-export const addEventSpecimenLinkForm = (formData) => {
+export const addEventSpecimenLinkForm = formData => {
+    const specimenSaveExit = document.getElementById('specimenSaveExit');
+    const specimenContinue = document.getElementById('specimenContinue');
+    const connectId = specimenSaveExit.dataset.connectId || specimenContinue.dataset.connectId;
+    if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
+    specimenSaveExit.addEventListener('click', () => {
+        btnsClicked(connectId, formData)
+    });
+}
+
+export const addEventSpecimenLinkFormCntd = (formData) => {
     const form = document.getElementById('specimenLinkForm');
     const specimenSaveExit = document.getElementById('specimenSaveExit');
     const specimenContinue = document.getElementById('specimenContinue');
     const connectId = specimenSaveExit.dataset.connectId || specimenContinue.dataset.connectId;
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
-    const reEnterSpecimen = document.getElementById('reEnterSpecimen');
+    
     form.addEventListener('submit', e => {
         e.preventDefault();
+        btnsClicked(connectId, formData, true);
     });
-    specimenSaveExit.addEventListener('click', () => {
-        btnsClicked(connectId, formData)
-    });
-    specimenContinue.addEventListener('click', () => {
-        btnsClicked(connectId, formData, true)
-    });
-    reEnterSpecimen.addEventListener('click', () => {
-        removeAllErrors();
-        form.reset();
-    })
-}
+};
 
 const btnsClicked = async (connectId, formData, cont) => {
     removeAllErrors();
