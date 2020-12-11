@@ -21,16 +21,16 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             <div class="col">WELCOME</div>
         </div>
         <div class="row welcome-screen-div">
-            <div class="col">Clinical Research Associate: ${name}</div>
+            <div class="col">User: ${name}</div>
         </div>
         <div class="row welcome-screen-div">
-            <div class="col">IHCS: ${siteFullNames[data.siteAcronym]}</div>
+            <div class="col">Site: ${siteFullNames[data.siteAcronym]}</div>
         </div>
         <div class="row welcome-screen-div">
             <div class="col">
                 <label for="dashboardSelection" class="col-form-label">Select dashboard to use </label>
                 <select required class="col form-control" id="dashboardSelection">
-                    <option value="">-- Select dashbaord --</option>
+                    <option value="">-- Select dashboard --</option>
                     <option value="clinical">Clinical Dashboard</option>
                     <option value="research">Research Dashboard</option>
                 </select>

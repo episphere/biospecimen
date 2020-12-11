@@ -1792,7 +1792,10 @@ const btnsClicked = async (connectId, formData, cont) => {
     if(hasError) return;
 
     if(document.getElementById('collectionLocation')) formData[getWorflow() === 'research' ? '951355211' : '525480516'] = parseInt(document.getElementById('collectionLocation').value);
-    formData['820476880'] = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
+    const collectionID = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
+    const r = confirm(`Is the Collection ID - ${collectionID} correct for the participant?`);
+    if(!r) return;
+    formData['820476880'] = collectionID;
     if(enterSpecimenID1) formData['387108065'] = 353358909
     else formData['387108065'] = 104430631;
     if(accessionID1 && accessionID1.value) {
