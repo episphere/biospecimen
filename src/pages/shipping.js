@@ -1,6 +1,6 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking} from "./../events.js";
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 const conversion = {
@@ -178,7 +178,7 @@ export const startShipping = async (userName) => {
                 <tr>
                     <th>To Ship</th>
                     <th>Started</th>
-                    <th>Last Saved</th>
+                    <th>Last Modified</th>
                     <th>Box Number</th>
                     <th>Contents</th>
                     <th>View/Print Box Manifest</th>
@@ -209,7 +209,7 @@ export const startShipping = async (userName) => {
     
     
     removeActiveClass('navbar-btn', 'active')
-    document.getElementById('contentHeader').innerHTML = shippingNavBar();
+    document.getElementById('contentHeader').innerHTML = `<h2>Connect for Cancer Prevention Study</h2></br>` + shippingNavBar();
     const navBarBtn = document.getElementById('navBarShippingDash');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
@@ -230,7 +230,7 @@ export const startShipping = async (userName) => {
     await populateBoxSelectList(hiddenJSONLocation,userName);
     await populateTempNotification();
     addEventNavBarShipment("navBarShippingDash", userName);
-    addEventNavBarShippingManifest(userName);
+    addEventNavBarShippingManifest(userName, document.getElementById('tempMonitorChecked').checked);
     addEventAddBox(userName);
     addEventBoxSelectListChanged();
     addEventNavBarBoxManifest("navBarBoxManifest", userName)
@@ -336,10 +336,10 @@ export const boxManifest = async (boxId, userName) => {
 
 
 
-export const shippingManifest = async (boxesToShip, userName) => {    
+export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) => {    
 
 
-    let tempMonitorThere = document.getElementById('tempMonitorChecked').checked;
+    //let tempMonitorThere = document.getElementById('tempMonitorChecked').checked;
     
 
     let response = await  getBoxes();
@@ -439,6 +439,7 @@ export const shippingManifest = async (boxesToShip, userName) => {
     
     populateShippingManifestHeader(toDisplayJSON, userName, location, site);
     populateShippingManifestBody(toDisplayJSON);
+    addEventNavBarShipment("navBarShippingDash", userName);
     await populateTempCheck();
     const btn = document.getElementById('completePackaging');
     document.getElementById('printBox').addEventListener('click', e => {
@@ -499,10 +500,10 @@ export const shipmentTracking = (hiddenJSON, userName, tempCheckChecked) => {
         </div>
         <div class="row" style="margin-top:100px">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Home</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToShipping">Back To Shipping Dashboard</button>
             </div>
             <div style="float: left;width: 33%;">
-                
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Home</button>
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="completeTracking">Continue</button>
@@ -517,7 +518,7 @@ export const shipmentTracking = (hiddenJSON, userName, tempCheckChecked) => {
     
     
     removeActiveClass('navbar-btn', 'active')
-    document.getElementById('contentHeader').innerHTML = shippingNavBar();
+    document.getElementById('contentHeader').innerHTML = `<h2>Connect for Cancer Prevention Study</h2></br>` + shippingNavBar();
     const navBarBtn = document.getElementById('navBarShipmentTracking');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
@@ -526,6 +527,9 @@ export const shipmentTracking = (hiddenJSON, userName, tempCheckChecked) => {
     if(Object.keys(hiddenJSON).length > 0){
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
     }
+    addEventReturnToShippingManifest('returnToShipping', hiddenJSON, userName)
+    addEventNavBarShipment("navBarShippingDash", userName);
+    addEventReturnToShippingManifest('navBarShippingManifest', hiddenJSON, userName)
     populateTrackingQuery(hiddenJSON);
     addEventCompleteButton(hiddenJSON, userName, tempCheckChecked);
     //addEventCompleteShippingButton(hiddenJSON);
@@ -613,17 +617,20 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
     
     
     removeActiveClass('navbar-btn', 'active')
-    document.getElementById('contentHeader').innerHTML = shippingNavBar();
+    document.getElementById('contentHeader').innerHTML = `<h2 >Connect for Cancer Prevention Study</h2></br>` + shippingNavBar();
     const navBarBtn = document.getElementById('navBarSummaryAndReview');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
     
     addEventNavBarShipment("returnToPackaging", userName);
+    addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarTracking("returnToTracking", userName, hiddenJSON, tempChecked)
+    addEventNavBarTracking("navBarSummaryAndReview", userName, hiddenJSON, tempChecked)
     if(Object.keys(hiddenJSON).length > 0){
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
     }
     populateFinalCheck(hiddenJSON);
+    addEventReturnToShippingManifest('navBarShippingManifest', hiddenJSON, userName)
     addEventCompleteShippingButton(hiddenJSON, userName, tempChecked);;
     addEventBackToSearch('navBarShippingDash');
     //addEventBackToSearch('navBarShippingDash');
