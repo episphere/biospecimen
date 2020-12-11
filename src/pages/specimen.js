@@ -75,11 +75,11 @@ export const specimenTemplate = async (data, formData, collections) => {
                     template +=`</select>`
                 }
             template +=`</div>`
-            if(workflow === 'clinical' && (siteAcronym === 'KPCO' || siteAcronym === 'KPGA' || siteAcronym === 'KPNW' || siteAcronym === 'KPHI')) {
+            if(workflow === 'clinical') {
                 template += `
                     <div class="form-group row">
                         <label class="col-md-4 col-form-label" for="accessionID1">Scan in Accession ID:</label>
-                        <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type in Accession ID from Tube" id="accessionID1"/>
+                        <input autocomplete="off" type="text" class="form-control col-md-5" ${siteAcronym === 'KPCO' || siteAcronym === 'KPGA' || siteAcronym === 'KPNW' || siteAcronym === 'KPHI' ? 'required': ''} placeholder="Scan/Type in Accession ID from Tube" id="accessionID1"/>
                         <button class="barcode-btn-outside" type="button" id="scanAccessionIDBarCodeBtn" data-barcode-input="accessionID1" data-clear-btn="clearScanAccessionID"><i class="fas fa-barcode"></i></button>
                         <button class="barcode-input-clear" hidden="true" type="button" id="clearScanAccessionID" title="Clear scanned barcode" data-enable-input="accessionID2" data-barcode-input="accessionID1"><i class="fas fa-times"></i></button>
                     </div>
