@@ -183,5 +183,8 @@ export const shippingNavBar = () => {
             <li class="nav-item col-auto">
                 <button class="nav-link navbar-btn" id="navBarShipmentTracking">Shipment Tracking Information</button>
             </li>
+            <li class="nav-item col-auto">
+                <button class="nav-link navbar-btn" id="navBarSummaryAndReview">Summary and Review</button>
+            </li>
         </ul>`
 }

@@ -1,6 +1,6 @@
 import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
-import { startShipping, boxManifest, shippingManifest, finalShipmentTracking} from './pages/shipping.js';
+import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking} from './pages/shipping.js';
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
@@ -554,62 +554,45 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 console.log(conversion[currKey])
                 //get number of the tube
                 //let tubeNum = currKey.substring(4, currKey.indexOf("Id"));
-                let shippedKey = '353358909'
+                let shippedKey = '145971562'
                 let missingKey = '258745303'
                 let currJSON = specimenData[i][currKey];
-                console.log(JSON.stringify(currJSON))
-                if(currJSON.hasOwnProperty(shippedKey)){
-                    if(currJSON[shippedKey] == false){
-                        if(currJSON.hasOwnProperty(missingKey)){
-                            if(currJSON[missingKey] == false){
-                                if(conversion[currKey] != '0007'){
-                                    
-                                    if(toExclude8.indexOf(conversion[currKey]) == -1){
-                                        list8.push(conversion[currKey]);
-                                    }
-                                }
-                                else{
-                                    if(toExclude9.indexOf(conversion[currKey]) == -1){
-                                        list9.push(conversion[currKey]);
-                                    }
-                                }
-                            }
+                console.log('euiusvdisudvbgosidbvosidv '  + JSON.stringify(currJSON))
+
+                if(currJSON.hasOwnProperty(shippedKey) && currJSON[shippedKey] == '353358909'){
+                    if(conversion[currKey] != '0007'){
+                        if(toExclude8.indexOf(conversion[currKey]) == -1){
+                            console.log('here1')
+                            list8.push(conversion[currKey]);
                         }
-                        else{
-                            if(conversion[currKey] != '0007'){
-                                
-                                if(toExclude8.indexOf(conversion[currKey]) == -1){
-                                    list8.push(conversion[currKey])
-                                }
-                            }
-                            else{
-                                if(toExclude9.indexOf(conversion[currKey]) == -1){
-                                    list9.push(conversion[currKey]);
-                                }
-                            }
+                    }
+                    else{
+                        if(toExclude9.indexOf(conversion[currKey]) == -1){
+                            list9.push(conversion[currKey]);
                         }
                     }
                 }
                 else{
-                    if(currJSON.hasOwnProperty(missingKey)){
-                        if(currJSON[missingKey] == false){
-                            if(conversion[currKey] != '0007'){
-                                
-                                if(toExclude8.indexOf(conversion[currKey]) == -1){
-                                    list8.push(conversion[currKey])
-                                }
+                    if(currJSON.hasOwnProperty(missingKey) && currJSON[missingKey] == '353358909'){
+                        if(conversion[currKey] != '0007'){
+                            if(toExclude8.indexOf(conversion[currKey]) == -1){
+                                toExclude8.push(conversion[currKey])
                             }
-                            else{
-                                if(toExclude9.indexOf(conversion[currKey]) == -1){
-                                    list9.push(conversion[currKey]);
-                                }
+                        }
+                        else{
+                            if(toExclude9.indexOf(conversion[currKey]) == -1){
+                                toExclude9.push(conversion[currKey])
                             }
                         }
                     }
                     else{
                         if(conversion[currKey] != '0007'){
-                                    
+                            console.log('woiujebgisdubvgsdoiv: ' + conversion[currKey]);
+                            console.log(JSON.stringify(currJSON))
+                            console.log(currJSON[missingKey])
+                            console.log(currJSON[shippedKey])
                             if(toExclude8.indexOf(conversion[currKey]) == -1){
+                                console.log('here1')
                                 list8.push(conversion[currKey]);
                             }
                         }
@@ -622,8 +605,11 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 }
             }
         }
+        console.log('toInclude/exclude' + specimenData[i]['820476880'])
         console.log(JSON.stringify(list8))
         console.log(JSON.stringify(list9))
+        console.log(JSON.stringify(toExclude8))
+        console.log(JSON.stringify(toExclude9))
         if(toExclude8.length > 0 && list8.length > 0 && specimenData[i].hasOwnProperty('820476880')){
             //add orphan tubes
             
@@ -765,6 +751,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
                     }
                 }*/
                 table.deleteRow(index);
+                console.log(currTubeId + 'foianbeoivbeoib')
                 let result = await removeMissingSpecimen(currTubeId);
                 console.log(result)
                 //let result = await removeBag(boxList.value, [currBagId])
@@ -1133,6 +1120,7 @@ export const populateBoxSelectList = async (hiddenJSON, userName) => {
     let boxList = document.getElementById('selectBoxList');
     let selectBoxList = document.getElementById('selectBoxList');
     let list = ''
+    console.log('iewjudbvoiduvb' + JSON.stringify(hiddenJSON));
     let keys = Object.keys(hiddenJSON).sort(compareBoxIds);
     for(let i = 0; i < keys.length; i++){
         list += '<option>' + keys[i] + '</option>';
@@ -1362,7 +1350,18 @@ const addNewBox = async  (userName) => {
 export const addEventAddBox = (userName) => {
     let boxButton = document.getElementById('addBoxButton');
     boxButton.addEventListener('click', async () => {
+        showAnimation();
         await addNewBox(userName);
+        let currLocation = document.getElementById('selectLocationList').value;
+        let response = await getBoxesByLocation(currLocation);
+        let boxJSONS = response.data;
+        let hiddenJSONLocation = {};
+        for(let i = 0; i < boxJSONS.length; i++){
+            let box = boxJSONS[i]
+            hiddenJSONLocation[box['132929440']] = box['bags']
+        }
+        await populateBoxSelectList(hiddenJSONLocation,userName);
+        hideAnimation()
     })
    
 
@@ -1372,7 +1371,18 @@ export const addEventModalAddBox = (userName) => {
     let boxButton = document.getElementById('modalAddBoxButton');
     
     boxButton.addEventListener('click', async () => {
+        showAnimation();
         await addNewBox(userName);
+        let currLocation = document.getElementById('selectLocationList').value;
+        let response = await getBoxesByLocation(currLocation);
+        let boxJSONS = response.data;
+        let hiddenJSONLocation = {};
+        for(let i = 0; i < boxJSONS.length; i++){
+            let box = boxJSONS[i]
+            hiddenJSONLocation[box['132929440']] = box['bags']
+        }
+        await populateBoxSelectList(hiddenJSONLocation,userName);
+        hideAnimation()
     })
    
 
@@ -2146,6 +2156,19 @@ export const addEventNavBarShippingManifest = (userName) => {
         console.log(boxesToShip)
         //return box 1 info
         await shippingManifest(boxesToShip, userName);
+    });
+}
+export const addEventNavBarTracking = (element, userName, hiddenJSON, tempChecked) => {
+    let btn = document.getElementById('navBarShipmentTracking');
+    document.getElementById(element).addEventListener('click', async e => {
+        e.stopPropagation();
+        if(btn.classList.contains('active')) return;
+        let keys = Object.keys(hiddenJSON)
+        for(let i = 0; i < keys.length; i++){
+            hiddenJSON[keys[i]] = hiddenJSON[keys[i]]['specimens']
+        }
+        //return box 1 info
+        shipmentTracking(hiddenJSON, userName, tempChecked);
     });
 }
 export const populateSelectLocationList = async () => {

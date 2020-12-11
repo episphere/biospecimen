@@ -1,6 +1,6 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect} from "./../events.js";
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 const conversion = {
@@ -258,8 +258,8 @@ export const boxManifest = async (boxId, userName) => {
         }
         hiddenJSON[box['132929440']] = box['bags']
     }
-    let currInstitute = currBox.institute;
-    let currLocation = currBox.location;
+    let currInstitute = currBox.siteAcronym;
+    let currLocation = currBox['560975149'];
 
     /*
     let boxIds = Object.keys(hiddenJSON);
@@ -351,7 +351,7 @@ export const shippingManifest = async (boxesToShip, userName) => {
         let box = boxJSONS[i]
         hiddenJSON[box['132929440']] = box['bags']
         locations[box['132929440']] = box['560975149'];
-        site = box['institute'];
+        site = box['siteAcronym'];
     }
 
     let toDisplayJSON = {};
@@ -462,6 +462,8 @@ export const shippingManifest = async (boxesToShip, userName) => {
 
 
 export const shipmentTracking = (hiddenJSON, userName, tempCheckChecked) => {
+    console.log('efg' + JSON.stringify(hiddenJSON))
+
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     //store a secret json that has all of the packed ones in it
     //{"Box1":{specimenId:[allTubes], specimenId:[allTubes]}}
@@ -533,6 +535,7 @@ export const shipmentTracking = (hiddenJSON, userName, tempCheckChecked) => {
 }
 
 export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
+    console.log('abc' + JSON.stringify(hiddenJSON))
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     console.log(userName)
     //store a secret json that has all of the packed ones in it
@@ -564,9 +567,10 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
         
         <div class="row" style="margin-top:100px">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Home</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToTracking">Back to Tracking</button>
             </div>
             <div style="float: left;width: 33%;">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Home</button>
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
                 <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#finalizeModal" id="completeShippingButton">Finalize</button>
@@ -578,7 +582,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content sub-div-shadow">
                     <div class="modal-header" id="finalizeModalHeader">
-                        Thie will finalize the shipment
+                        This will finalize the shipment
                     </div>
                     <div class="modal-body" id="finalizeModalBody">
                         
@@ -610,12 +614,12 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
     
     removeActiveClass('navbar-btn', 'active')
     document.getElementById('contentHeader').innerHTML = shippingNavBar();
-    const navBarBtn = document.getElementById('navBarShipmentTracking');
+    const navBarBtn = document.getElementById('navBarSummaryAndReview');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
     
     addEventNavBarShipment("returnToPackaging", userName);
-    
+    addEventNavBarTracking("returnToTracking", userName, hiddenJSON, tempChecked)
     if(Object.keys(hiddenJSON).length > 0){
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
     }
