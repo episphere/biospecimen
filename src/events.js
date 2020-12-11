@@ -378,7 +378,7 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         boxId = document.getElementById('shippingModalChooseBox').value;
 
         if(isOrphan){
-            bagid = 'orphans'
+            bagid = 'unlabelled'
         }
 
         let toDelete = [];
@@ -532,10 +532,10 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
 
                 }
                 if(checkedOrphans == false){
-                    if(specimens.includes('orphans')){
+                    if(specimens.includes('unlabelled')){
                         console.log('ipouaqwjehbdsfnvlkasjdbvloiaksudjvbgoivu')
-                        console.log(JSON.stringify( hiddenJSON[boxes[j]]['orphans']['arrElements']))
-                        let currList =  hiddenJSON[boxes[j]]['orphans']['arrElements']
+                        console.log(JSON.stringify( hiddenJSON[boxes[j]]['unlabelled']['arrElements']))
+                        let currList =  hiddenJSON[boxes[j]]['unlabelled']['arrElements']
                         for(let k = 0; k < currList.length; k++){
                             toExcludeOrphans.push(currList[k].split(/\s+/)[1]);
                         }
@@ -614,31 +614,31 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
             //add orphan tubes
             
             //toInsert[specimenData[i]['masterSpecimenId'] + ' 0008'] = list8
-            if(!toReturn.hasOwnProperty('orphans')){
+            if(!toReturn.hasOwnProperty('unlabelled')){
                 //console.log(JSON.stringify(toReturn))
-                toReturn['orphans'] = []
+                toReturn['unlabelled'] = []
             }
             for(let j = 0; j < list8.length; j++){
                 console.log('oipuwqabe vloi;uajgbdsvolisadujbvsaloidvubasdliuasdvb')
                 console.log(list8[j]);
                 console.log(JSON.stringify(toExcludeOrphans))
                 if(!toExcludeOrphans.includes(list8[j])){
-                    toReturn['orphans'].push(specimenData[i]['820476880'] + ' ' + list8[j])
+                    toReturn['unlabelled'].push(specimenData[i]['820476880'] + ' ' + list8[j])
                 }
             }
 
         }
         if(toExclude9.length > 0 && list9.length > 0 && specimenData[i].hasOwnProperty('820476880')){
             
-            if(!toReturn.hasOwnProperty('orphans')){
+            if(!toReturn.hasOwnProperty('unlabelled')){
                 //console.log(JSON.stringify(toReturn))
-                toReturn['orphans'] = []
+                toReturn['unlabelled'] = []
             }
             for(let j = 0; j < list9.length; j++){
                 console.log('oipuwqabe vloi;uajgbdsvolisadujbvsaloidvubasdliuasdvb1')
                 console.log(specimenData[i]['820476880'] + ' ' + list9[j]);
                 if(!toExcludeOrphans.includes(list9[j])){
-                    toReturn['orphans'].push(specimenData[i]['820476880'] + ' ' + list9[j])
+                    toReturn['unlabelled'].push(specimenData[i]['820476880'] + ' ' + list9[j])
                 }
             }
 
@@ -681,7 +681,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
     
    
     for(let i = 0; i < list.length; i++){
-        if(list[i] != "orphans"){
+        if(list[i] != "unlabelled"){
             var rowCount = specimenList.rows.length;
             var row = specimenList.insertRow(rowCount);           
             row.insertCell(0).innerHTML= list[i];
@@ -705,12 +705,12 @@ export const populateSpecimensList = async (hiddenJSON) => {
     let specimenPanel = document.getElementById('specimenPanel')
     orphanTable.innerHTML = '';
 
-    if(orphansIndex != -1 && specimenObject['orphans'].length > 0){
+    if(orphansIndex != -1 && specimenObject['unlabelled'].length > 0){
 
         orphanPanel.style.display = 'block'
         specimenPanel.style.height = '400px'
         
-        let toInsert = specimenObject['orphans'];
+        let toInsert = specimenObject['unlabelled'];
         console.log('ORPHANS: ' + JSON.stringify(toInsert))
         var rowCount = orphanTable.rows.length;
         var row = orphanTable.insertRow(rowCount); 
@@ -891,11 +891,11 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
     table.innerHTML = `<tr>
                         <th>To Ship</th>
                         <th>Started</th>
-                        <th>Last Saved</th>
+                        <th>Last Modified</th>
                         <th>Box Number</th>
                         <th>Location</th>
                         <th>Contents</th>
-                        <th>Box Manifest</th>
+                        <th>View/Print Box Manifest</th>
                     </tr>`
     console.log(table.innerHTML)
     let count = 0;
@@ -923,7 +923,11 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                         if(newDate.getHours() >= 12){
                             am = 'PM'
                         }
-                        dateStarted = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() - 11)%12 + 1) + ':' + newDate.getMinutes() + ' ' + am;
+                        let minutesTag = newDate.getMinutes();
+                        if(minutesTag < 10){
+                            minutesTag = '0' + minutesTag;
+                        }
+                        dateStarted = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11)%12 + 1) + ':' + minutesTag + ' ' + am;
                         //dateStarted = boxJSONS[j]['672863981'];
                     }
                     if(boxJSONS[j].hasOwnProperty('555611076')){
@@ -933,7 +937,11 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                         if(newDate.getHours() >= 12){
                             am = 'PM'
                         }
-                        lastModified = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11)%12 + 1)  + ':' + newDate.getMinutes() + ' ' + am;
+                        let minutesTag = newDate.getMinutes();
+                        if(minutesTag < 10){
+                            minutesTag = '0' + minutesTag;
+                        }
+                        lastModified = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11)%12 + 1)  + ':' + minutesTag + ' ' + am;
                         //lastModified = boxJSONS[j]['555611076']
 
                     }
@@ -2138,7 +2146,7 @@ export const addEventNavBarBoxManifest = (id, userName) => {
     });
 }
 
-export const addEventNavBarShippingManifest = (userName) => {
+export const addEventNavBarShippingManifest = (userName, tempChecked) => {
     const btn = document.getElementById('completePackaging');
     document.getElementById('completePackaging').addEventListener('click', async e => {
         e.stopPropagation();
@@ -2158,9 +2166,19 @@ export const addEventNavBarShippingManifest = (userName) => {
         }
         console.log(boxesToShip)
         //return box 1 info
-        await shippingManifest(boxesToShip, userName);
+        await shippingManifest(boxesToShip, userName, tempChecked);
     });
 }
+
+export const addEventReturnToShippingManifest = (element, hiddenJSON, userName, tempChecked) => {
+    const btn = document.getElementById(element);
+    document.getElementById(element).addEventListener('click', async e => {
+        let boxesToShip = Object.keys(hiddenJSON)
+        //return box 1 info
+        await shippingManifest(boxesToShip, userName, tempChecked);
+    });
+}
+
 export const addEventNavBarTracking = (element, userName, hiddenJSON, tempChecked) => {
     let btn = document.getElementById('navBarShipmentTracking');
     document.getElementById(element).addEventListener('click', async e => {
