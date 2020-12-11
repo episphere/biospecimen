@@ -563,7 +563,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
             }
         });
         
-        Quagga.onDetected(result => {	
+        Quagga.onDetected(result => {
             if (result.codeResult.code){
                 const barcode = result.codeResult.code;
                 const elementID = document.activeElement.dataset.barcodeInput;
@@ -596,6 +596,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                 if (Quagga){
                     Quagga.stop();
                 }
+                document.querySelector('[data-dismiss="modal"]').click();
             })
         });
     });
