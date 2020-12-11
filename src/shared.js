@@ -581,7 +581,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                     disableInput('enterSpecimenID2', true);
                     addEventClearScannedBarcode('clearScanSpecimenID');
                 }
-                document.getElementById(elementID).value = start && end ? result.codeResult.code.substr(start, end) : result.codeResult.code;
+                document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end) : result.codeResult.code;
                 Quagga.stop();
                 document.querySelector('[data-dismiss="modal"]').click();
             }
