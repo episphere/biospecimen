@@ -82,7 +82,7 @@ export const addEventsearchSpecimen = () => {
             return
         }
         const biospecimenData = biospecimen.data;
-        let query = `connectId=${parseInt(biospecimenData.connectId)}`;
+        let query = `connectId=${parseInt(biospecimenData.Connect_ID)}`;
         const response = await findParticipant(query);
         hideAnimation();
         const data = response.data[0];
@@ -1670,7 +1670,7 @@ export const addEventSelectParticipantForm = (skipCheckIn) => {
             if(radio.checked) {
                 const connectId = parseInt(radio.value);
                 let formData = {};
-                formData['connectId'] = connectId;
+                formData['Connect_ID'] = connectId;
                 formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
                 formData['token'] = radio.dataset.token;
                 let query = `connectId=${parseInt(connectId)}`;
@@ -1793,7 +1793,7 @@ const btnsClicked = async (connectId, formData, cont) => {
         formData['148996099'] = 353358909;
     }
     if(select) formData['331584571'] = parseInt(select.value);
-    formData['connectId'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
+    formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
     formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
     let query = `connectId=${parseInt(connectId)}`;
     showAnimation();
@@ -1801,7 +1801,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     const data = response.data[0];
     const specimenData = (await searchSpecimen(formData['820476880'])).data;
     hideAnimation();
-    if(specimenData && specimenData.connectId && parseInt(specimenData.connectId) !== data.Connect_ID) {
+    if(specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID) {
         showNotifications({title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.'}, true)
         return;
     }
@@ -2051,7 +2051,7 @@ const finalizeHandler = async (biospecimenData, cntd) => {
         await storeSpecimen([biospecimenData]);
         showNotifications({title: 'Specimen Finalized', body: 'Collection Finalized Successfully!'});
         const specimenData = (await searchSpecimen(masterSpecimenId)).data;
-        let query = `connectId=${parseInt(specimenData.connectId)}`;
+        let query = `connectId=${parseInt(specimenData.Connect_ID)}`;
         const response = await findParticipant(query);
         const participantData = response.data[0];
         hideAnimation();
