@@ -45,7 +45,7 @@ export const signIn = () => {
         firebase.auth().signInWithPopup(saml)
             .then((result) => {
                 console.log(result);
-                validateUser();
+                // validateUser();
             })
             .catch((error) => {
                 console.log(error)
