@@ -105,7 +105,11 @@ export const addEventAddSpecimenToBox = (userName) => {
     const form = document.getElementById('addSpecimenForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        
+        document.getElementById('submitMasterSpecimenId').click(); 
+    });
+    const submitButtonSpecimen = document.getElementById('submitMasterSpecimenId');
+    submitButtonSpecimen.addEventListener('click', async e => {
+        e.preventDefault();
         showAnimation();
         //getCurrBoxNumber
 
