@@ -95,7 +95,7 @@ export const startShipping = async (userName) => {
                             <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="btn btn-outline-primary" data-toggle="modal" data-target="#shippingModal" data-backdrop="static" style = "display:none;">Add specimen to box</button>
+                            <button id="submitMasterSpecimenId" type="submit" class="btn btn-outline-primary" data-toggle="modal" data-target="#shippingModal" data-backdrop="static" style = "display:none;">Add specimen to box</button>
                         </div>
                     </form>
                 </div>
@@ -236,7 +236,7 @@ export const startShipping = async (userName) => {
     addEventNavBarBoxManifest("navBarBoxManifest", userName)
     addEventChangeLocationSelect(userName);
     addEventAddSpecimenToBox(userName);
-    addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
+    addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 14, 0);
     addEventModalAddBox(userName);
     hideAnimation();
     //addEventSubmitAddBag();
@@ -592,7 +592,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
                         
                     </div>
                     <div class="modal-body"> 
-                        <h4>Please type in "` + userName + `" to confirm: <h4>
+                        <h4>Please enter your name here to indicate this shipment is finalized. Once signed, no changes can be made to the shipment details.<h4>
                         <input type="text" id="finalizeSignInput">
                         </input>
                         <p id="finalizeModalError" style="color:red;display:none;">
