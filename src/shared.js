@@ -574,13 +574,15 @@ export const addEventBarCodeScanner = (id, start, end) => {
                     document.getElementById(elementID).value = result.codeResult.code;
                     Quagga.stop();
                     document.querySelector('[data-dismiss="modal"]').click();
+                    return
                 };
                 if(elementID === 'masterSpecimenId') {
                     disableInput('masterSpecimenId', true);
-                    document.getElementById(elementID).value = result.codeResult.code;
+                    document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end) : result.codeResult.code;
                     Quagga.stop();
                     document.getElementById('closeBarCodeScanner').click();
                     document.getElementById('submitMasterSpecimenId').click();
+                    document.querySelector('[data-dismiss="modal"]').click();
                     return;
                 };
                 console.log('barcode: ' + barcode)
