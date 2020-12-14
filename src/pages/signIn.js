@@ -1,3 +1,4 @@
+import { validateUser } from "../shared.js";
 import { homeNavBar } from "./../navbar.js";
 
 export const signIn = () => {
@@ -44,6 +45,7 @@ export const signIn = () => {
         firebase.auth().signInWithPopup(saml)
             .then((result) => {
                 console.log(result);
+                validateUser();
             })
             .catch((error) => {
                 console.log(error)
