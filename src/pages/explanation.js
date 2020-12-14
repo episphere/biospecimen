@@ -92,7 +92,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
                 </br>
                 <div class="form-group row">
                     <div class="col-auto">
-                        <button class="btn btn-outline-danger" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['820476880']}" id="returnToCollectProcess">Return to Collect/Process</button>
+                        <button class="btn btn-outline-danger" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['820476880']}" id="returnToCollectProcess">${getWorflow() === 'research' ? 'Return to Collect/Process' : 'Return to Labeling and Receipt'}</button>
                     </div>
                     <div class="ml-auto">
                         <button class="btn btn-outline-warning" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['820476880']}" type="button" id="explanationSaveExit">Save and Exit</button>
