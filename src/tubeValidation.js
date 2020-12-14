@@ -253,7 +253,7 @@ const tube0007 = {
 };
 
 const tube0008 = {
-    'specimenType': 'Biohazard bag',
+    'specimenType': 'Biohazard bag blood/urine',
     'tubeType': 'Biohazard bag for blood',
     'readableValue': 'Biohazard bag - blood',
     'image': '',
@@ -265,7 +265,7 @@ const tube0008 = {
 };
 
 const tube0009 = {
-    'specimenType': 'Biohazard bag',
+    'specimenType': 'Biohazard bag mouthwash',
     'tubeType': 'Biohazard bag for mouthwash',
     'readableValue': 'Biohazard bag - mouthwash',
     'name': 'tube9',

@@ -1,5 +1,5 @@
 import { addEventBarCodeScanner, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType } from "./../shared.js";
-import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch, addEventCntdToCollectProcess } from "./../events.js";
+import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch, addEventCntdToCollectProcess, addEventSpecimenLinkFormCntd } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
 export const specimenTemplate = async (data, formData, collections) => {
@@ -75,11 +75,11 @@ export const specimenTemplate = async (data, formData, collections) => {
                     template +=`</select>`
                 }
             template +=`</div>`
-            if(workflow === 'clinical' && (siteAcronym === 'KPCO' || siteAcronym === 'KPGA' || siteAcronym === 'KPNW' || siteAcronym === 'KPHI')) {
+            if(workflow === 'clinical') {
                 template += `
                     <div class="form-group row">
                         <label class="col-md-4 col-form-label" for="accessionID1">Scan in Accession ID:</label>
-                        <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type in Accession ID from Tube" id="accessionID1"/>
+                        <input autocomplete="off" type="text" class="form-control col-md-5" ${siteAcronym === 'KPCO' || siteAcronym === 'KPGA' || siteAcronym === 'KPNW' || siteAcronym === 'KPHI' ? 'required': ''} placeholder="Scan/Type in Accession ID from Tube" id="accessionID1"/>
                         <button class="barcode-btn-outside" type="button" id="scanAccessionIDBarCodeBtn" data-barcode-input="accessionID1" data-clear-btn="clearScanAccessionID"><i class="fas fa-barcode"></i></button>
                         <button class="barcode-input-clear" hidden="true" type="button" id="clearScanAccessionID" title="Clear scanned barcode" data-enable-input="accessionID2" data-barcode-input="accessionID1"><i class="fas fa-times"></i></button>
                     </div>
@@ -110,10 +110,10 @@ export const specimenTemplate = async (data, formData, collections) => {
             </div>
             <div class="form-group row">
                 <div class="col-auto">
-                    <button class="btn btn-outline-danger" type="button" id="reEnterSpecimen">No: Re-enter Collection ID</button>
+                    <button class="btn btn-outline-danger" type="reset" id="reEnterSpecimen">No: Re-enter Collection ID</button>
                 </div>
                 <div class="ml-auto">
-                    <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="submit" id="specimenSaveExit">Yes: Save and Exit</button>
+                    <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="button" id="specimenSaveExit">Yes: Save and Exit</button>
                 </div>
                 <div class="col-auto">
                     <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Yes: Continue</button>
@@ -129,6 +129,7 @@ export const specimenTemplate = async (data, formData, collections) => {
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventCntdToCollectProcess();
     addEventSpecimenLinkForm(formData);
+    addEventSpecimenLinkFormCntd(formData);
     addEventBackToSearch('navBarSearch');
     addEventNavBarParticipantCheckIn();
 }
