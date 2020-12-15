@@ -423,6 +423,15 @@ export const searchSpecimenInstitute = async () => {
         if(currJSON.hasOwnProperty('223999569')){
             delete currJSON['223999569']
         }
+        let keys = Object.keys(currJSON);
+        for(let i = 0; i < keys.length; i++){
+            if(conversion.hasOwnProperty(keys[i])){
+                let iterateJSON = currJSON[keys[i]];
+                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631'){
+                    delete currJSON[keys[i]]
+                }
+            }
+        }
     }
     return data;
 }
