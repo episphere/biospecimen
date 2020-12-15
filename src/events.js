@@ -1700,8 +1700,8 @@ export const addEventSelectParticipantForm = (skipCheckIn) => {
                 const response = await findParticipant(query);
                 const data = response.data[0];
                 if(skipCheckIn) {
-                    // const collections = (await getParticipantCollections(data.token)).data;
-                    specimenTemplate(data, formData);
+                    const collections = (await getParticipantCollections(data.token)).data;
+                    specimenTemplate(data, formData, collections);
                 }
                 else checkInTemplate(data);
                 hideAnimation();
@@ -1718,7 +1718,6 @@ export const addEventCheckInCompleteForm = () => {
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['962267121'] = new Date().toISOString();
         formData['135591601'] = 353358909;
-        formData['650516960'] = getWorflow() === 'research' ? 534621077 : 664882224;
         let query = `connectId=${parseInt(form.dataset.connectId)}`;
         showAnimation();
         const response = await findParticipant(query);
@@ -1809,6 +1808,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     const r = confirm(`Is the Collection ID - ${collectionID} correct for the participant?`);
     if(!r) return;
     formData['820476880'] = collectionID;
+    formData['650516960'] = getWorflow() === 'research' ? 534621077 : 664882224;
     if(enterSpecimenID1) formData['387108065'] = 353358909
     else formData['387108065'] = 104430631;
     if(accessionID1 && accessionID1.value) {

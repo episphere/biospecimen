@@ -1,4 +1,4 @@
-import { addEventBarCodeScanner, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType } from "./../shared.js";
+import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch, addEventCntdToCollectProcess, addEventSpecimenLinkFormCntd } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
@@ -31,9 +31,11 @@ export const specimenTemplate = async (data, formData, collections) => {
                 <thead>
                     <tr>
                         <th>Collection ID</th>
-                        ${getWorflow() === 'research' ? '': '<th>Accession ID</th>'}
-                        <th>${getWorflow() === 'research' ? 'Date of Collection' : 'Date'}</th>
+                        <th>Accession ID</th>
+                        <th>Date of Collection</th>
+                        <th>Date scanned at Regional Lab</th>
                         <th>Visit</th>
+                        <th>Collection settings</th>
                         <th>Select Action</th>
                     </tr>
                 </thead>
@@ -41,9 +43,11 @@ export const specimenTemplate = async (data, formData, collections) => {
                 collections.forEach(collection => {
                     template += `<tr>
                         <td>${collection['820476880']}</td>
-                        ${getWorflow() === 'research' ? '': `<td>${collection['646899796'] ? collection['646899796'] : ''}</td>`}
-                        <td>${getWorflow() === 'research' && collection['678166505'] ? new Date(collection['678166505']).toLocaleString() : formData['915838974'] ? `${formData['915838974']}` : ''}</td>
+                        <td>${collection['646899796'] ? collection['646899796'] : ''}</td>
+                        <td>${collection['678166505'] ? new Date(collection['678166505']).toLocaleString() : ''}</td>
+                        <td>${collection['915838974'] ? new Date(collection['915838974']).toLocaleString() : ''}</td>
                         <td>${collection['331584571'] ? visitType[collection['331584571']] : ''}</td>
+                        <td>${collection['650516960'] ? collectionSettings[collection['650516960']] : ''}</td>
                         <td><button class="custom-btn continue-collect-process" data-connect-id="${data.Connect_ID}" data-collection-id="${collection['820476880']}">${getWorflow() === 'research' ? `Continue to Collect/Process`:`Continue to Labeling and Receipt`}</button></td>
                     </tr>`
                 })
@@ -53,15 +57,14 @@ export const specimenTemplate = async (data, formData, collections) => {
         template += `</br><div class="row"><h4>Start a new Collection</h4></div>
         <form id="specimenLinkForm" method="POST" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">
             
-            ${getWorflow() === 'research' ? `
-                <div class="form-group row">
-                    <label class="col-md-4 col-form-label" for="biospecimenVisitType">Select visit</label>
-                    <select class="form-control col-md-5" required id="biospecimenVisitType">
-                        <option value=""> -- Select Visit -- </option>
-                        <option selected value="153098257">Baseline</option>
-                    </select>
-                </div>
-            `:``}
+            
+            <div class="form-group row">
+                <label class="col-md-4 col-form-label" for="biospecimenVisitType">Select visit</label>
+                <select class="form-control col-md-5" required id="biospecimenVisitType">
+                    <option value=""> -- Select Visit -- </option>
+                    <option selected value="153098257">Baseline</option>
+                </select>
+            </div>
             
             <div class="form-group row">`
                 const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
