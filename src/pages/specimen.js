@@ -109,9 +109,6 @@ export const specimenTemplate = async (data, formData, collections) => {
             </div>
 
             <div class="form-group row">
-                Is the Collection ID correct for the participant?
-            </div>
-            <div class="form-group row">
                 <div class="col-auto">
                     <button class="btn btn-outline-danger" type="reset" id="reEnterSpecimen">No: Re-enter Collection ID</button>
                 </div>
