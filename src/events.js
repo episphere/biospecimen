@@ -1272,7 +1272,7 @@ export const populateBoxSelectList = async (hiddenJSON, userName) => {
 }
 
 const addNewBox = async  (userName) => {
-    let response = await  getBoxes();
+    let response = await  getAllBoxes();
     let hiddenJSON = response.data;
     let locations = {};
     let keys = [];
