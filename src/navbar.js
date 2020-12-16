@@ -85,6 +85,21 @@ export const nonUserNavBar = (name) => {
     `;
 }
 
+export const unAuthorizedUser = () => {
+    return `
+        <div class="navbar-nav current-page">
+            <li class="nav-item">
+                <a class="nav-link" href="#welcome" id="welcome" title="Home"><i class="fas fa-home"></i> Home</a>
+            </li>
+        </div>
+        <div class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="#sign_out" id="signOut" title="Sign Out"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
+            </li>
+        </div>
+    `;
+}
+
 export const adminNavBar = (name) => {
     return `
         <div class="navbar-nav">
