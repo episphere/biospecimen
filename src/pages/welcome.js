@@ -1,7 +1,7 @@
 import { validateUser, siteFullNames, showAnimation, hideAnimation, errorMessage, removeAllErrors } from "./../shared.js";
 import { userDashboard } from "./dashboard.js";
 import { shippingDashboard } from "./shipping.js";
-import { nonUserNavBar } from './../navbar.js'
+import { nonUserNavBar, unAuthorizedUser } from './../navbar.js'
 
 export const welcomeScreen = async (auth, route) => {
     const user = auth.currentUser;
@@ -10,7 +10,11 @@ export const welcomeScreen = async (auth, route) => {
     showAnimation();
     const response = await validateUser();
     hideAnimation();
-    if(response.code !== 200) return;
+    if(response.code !== 200) {
+        document.getElementById('contentBody').innerHTML = 'Authorization failed you lack permissions to use this dashboard!';
+        document.getElementById('navbarNavAltMarkup').innerHTML = unAuthorizedUser();
+        return;
+    }
     welcomeScreenTemplate(name, response.data, auth, route);
 }
 
