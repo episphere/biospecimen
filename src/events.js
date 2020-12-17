@@ -2078,7 +2078,7 @@ const finalizeHandler = async (biospecimenData, cntd) => {
         const response = await findParticipant(query);
         const participantData = response.data[0];
         hideAnimation();
-        if(!document.getElementById('participantCheckOut')) location.hash = '#welcome'
+        if(!document.getElementById('participantCheckOut')) searchTemplate();
         else checkOutScreen(participantData, specimenData);
     }
     else {
