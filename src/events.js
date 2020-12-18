@@ -472,7 +472,7 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
             shippingTable.rows[tableIndex].cells[2].innerText = JSON.stringify(currArr);
             shippingTable.rows[tableIndex].cells[1].innerText = currArr.length;
         }
-        let boxIds = Object.keys(hiddenJSON);
+        let boxIds = Object.keys(hiddenJSON).sort(compareBoxIds);
 
         console.log(boxIds);    
         for(let i = 0; i < boxIds.length; i++){
@@ -563,7 +563,7 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
         let toExclude9 = [];
         let toExcludeOrphans = [];
         if(specimenData[i].hasOwnProperty('820476880')){
-            let boxes = Object.keys(hiddenJSON);
+            let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
             for(let j = 0; j < boxes.length; j++){
                 let specimens = Object.keys(hiddenJSON[boxes[j]]);
                 console.log(JSON.stringify(hiddenJSON[boxes[j]]));
@@ -948,7 +948,7 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                     </tr>`
     console.log(table.innerHTML)
     let count = 0;
-    let boxes = Object.keys(hiddenJSON)
+    let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     for(let i = 0; i < boxes.length; i++){
         if(Object.keys(hiddenJSON[boxes[i]]).length > 0 ){
             let currRow = table.insertRow(count+1);
@@ -1105,7 +1105,7 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
 
 export const populateShippingManifestBody = (hiddenJSON) =>{
     let table = document.getElementById("shippingManifestTable");
-    let boxes = Object.keys(hiddenJSON);
+    let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     let currRowIndex = 1;
     let greyIndex = 0;
     for(let i = 0; i < boxes.length; i++){
@@ -2223,7 +2223,7 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
 export const addEventReturnToShippingManifest = (element, hiddenJSON, userName, tempChecked) => {
     const btn = document.getElementById(element);
     document.getElementById(element).addEventListener('click', async e => {
-        let boxesToShip = Object.keys(hiddenJSON)
+        let boxesToShip = Object.keys(hiddenJSON).sort(compareBoxIds)
         //return box 1 info
         await shippingManifest(boxesToShip, userName, tempChecked);
     });
@@ -2234,7 +2234,7 @@ export const addEventNavBarTracking = (element, userName, hiddenJSON, tempChecke
     document.getElementById(element).addEventListener('click', async e => {
         e.stopPropagation();
         if(btn.classList.contains('active')) return;
-        let keys = Object.keys(hiddenJSON)
+        let keys = Object.keys(hiddenJSON).sort(compareBoxIds)
         for(let i = 0; i < keys.length; i++){
             hiddenJSON[keys[i]] = hiddenJSON[keys[i]]['specimens']
         }
@@ -2321,7 +2321,7 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
 }
 
 export const populateTrackingQuery = (hiddenJSON) => {
-    let boxes = Object.keys(hiddenJSON);
+    let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     let toBeInnerHTML = ""
     for(let i = 0; i < boxes.length; i++){
         toBeInnerHTML +=`
@@ -2353,7 +2353,7 @@ export const populateTrackingQuery = (hiddenJSON) => {
 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
     document.getElementById('completeTracking').addEventListener('click', () =>{
-        let boxes = Object.keys(hiddenJSON);
+        let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         let emptyField= false;
         for(let i = 0; i < boxes.length; i++){
             let boxi = document.getElementById(boxes[i] + "trackingId").value;
@@ -2378,7 +2378,7 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         let finalizeTextField = document.getElementById('finalizeSignInput');
 
         if(finalizeTextField.value === userName){
-            let boxes = Object.keys(hiddenJSON);
+            let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
             console.log(JSON.stringify(boxes));
             await ship(boxes);
             document.getElementById('finalizeModalCancel').click();
@@ -2396,7 +2396,7 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
 
 export const populateFinalCheck = (hiddenJSON) => {
     let table = document.getElementById('finalCheckTable');
-    let boxes = Object.keys(hiddenJSON);
+    let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     for(let i = 0; i < boxes.length; i++){
         let currBox = boxes[i]
         let currShippingNumber = hiddenJSON[boxes[i]]['trackingId']
