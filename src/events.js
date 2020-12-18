@@ -279,7 +279,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                         toAddType = translateNumToType[thisId];
                     }
                     row.insertCell(1).innerHTML= toAddType;
-                    row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Missing">';
+                    row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
 
                     let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
                     currDeleteButton.addEventListener("click", async e => {
@@ -305,7 +305,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                         toAddType = translateNumToType[thisId];
                     }
                     row.insertCell(1).innerHTML= toAddType;
-                    row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Missing">';
+                    row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
 
                     let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
                     currDeleteButton.addEventListener("click", async e => {
@@ -331,7 +331,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                 toAddType = translateNumToType[thisId];
             }
             row.insertCell(1).innerHTML= toAddType;
-            row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Missing">';
+            row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
 
             let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
             currDeleteButton.addEventListener("click", async e => {
