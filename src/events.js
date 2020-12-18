@@ -105,7 +105,52 @@ export const addEventAddSpecimenToBox = (userName) => {
     const form = document.getElementById('addSpecimenForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        document.getElementById('submitMasterSpecimenId').click(); 
+        const masterSpecimenId = document.getElementById('masterSpecimenId').value;
+        if(masterSpecimenId == ''){
+            showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+            return
+        }
+        let masterIdSplit = masterSpecimenId.split(/\s+/);
+        let foundInOrphan = false;
+        //get all ids from the hidden
+        let shippingTable = document.getElementById('specimenList')
+        let orphanTable = document.getElementById('orphansList')
+        let biospecimensList = []
+        let tableIndex = -1;
+        let foundInShipping = false;
+        for(let i = 1; i < shippingTable.rows.length; i++){
+            let currRow = shippingTable.rows[i];
+            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
+                console.log(currRow.cells[2].innerText)
+                tableIndex = i;
+                biospecimensList = JSON.parse(currRow.cells[2].innerText)
+                foundInShipping = true;
+                console.log('owikebnvolekidbnvpowivbhnwspolivkbnh')
+                console.log(JSON.stringify(biospecimensList))
+            }
+            
+        }
+        
+       for(let i = 1; i < orphanTable.rows.length; i++){
+            let currRow = orphanTable.rows[i];
+            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
+                //console.log(currRow.cells[2].innerText)
+                tableIndex = i;
+                let currTubeNum = currRow.cells[0].innerText.split(' ')[1];
+                console.log(currTubeNum)
+                biospecimensList = [currTubeNum];
+                foundInOrphan = true;
+            }
+            
+        }
+
+        if(biospecimensList.length == 0){
+            showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+            return
+        }
+        else{
+            document.getElementById('submitMasterSpecimenId').click(); 
+        }
     });
     const submitButtonSpecimen = document.getElementById('submitMasterSpecimenId');
     submitButtonSpecimen.addEventListener('click', async e => {
@@ -679,7 +724,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
     let numRows = 1;
     specimenList.innerHTML = `<tr>
                                 <th>Specimen Bag ID</th>
-                                <th># Specimens</th>
+                                <th># Specimens in Bag</th>
                             </th>`;
     let orphansIndex = -1;
     
