@@ -96,6 +96,7 @@ export const startShipping = async (userName) => {
                         </div>
                     </form>
                     <button href="#" id="submitMasterSpecimenId" type="submit" class="btn btn-outline-primary" data-toggle="modal" data-target="#shippingModal" data-backdrop="static" style = "display:none">Add specimen to box</button>
+                    <button href="#" id="submitSpecimenIdProxyButton" type="submit" class="btn btn-outline-primary" data-toggle="modal" data-target="#shippingModal" data-backdrop="static" style = "display:none">Add specimen to box</button>
                 </div>
             </div>
         </div>
@@ -108,7 +109,7 @@ export const startShipping = async (userName) => {
             <table class = "table" style="width: 100%;margin-bottom:0px;" id="specimenList" >
                 <tr>
                     <th>Specimen Bag ID</th>
-                    <th># Specimens</th>
+                    <th># Specimens in Bag</th>
                 </tr>
             </table>
     </div>

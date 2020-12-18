@@ -161,7 +161,7 @@ export const searchResults = (result) => {
     result.forEach(data => {
         template += `
             <tr>
-                <td><input type="radio" name="selectParticipant" required data-token=${data.token} value="${data.Connect_ID}"></td>
+                <td><input type="radio" name="selectParticipantRadio" required data-token=${data.token} value="${data.Connect_ID}"></td>
                 <td>${data['996038075']}</td>
                 <td>${data['399159511']}</td>
                 <td>${data['231676651']}</td>
@@ -174,7 +174,7 @@ export const searchResults = (result) => {
     template += `</tbody></table>
         <div class="row remove-margin">
             <div>
-                <button class="btn btn-outline-dark" id="backToSearch"><i class="fas fa-arrow-left"></i> Return to search</button>
+                <button type="button" class="btn btn-outline-dark" id="backToSearch"><i class="fas fa-arrow-left"></i> Return to search</button>
             </div>
             <div class="ml-auto">
                 <button type="Submit" class="btn btn-outline-primary">${getWorflow() === 'clinical' ? `Go to Specimen Link`:`Go to participant check-in`}</button>

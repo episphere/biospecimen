@@ -78,7 +78,7 @@ export const collectProcessTemplate = (data, formData) => {
             </br>
             <div class="row">
                 <div class="col-auto">
-                    <button class="btn btn-outline-danger" id="backToTubeCollection">Back to tube collection</button>
+                    <button class="btn btn-outline-danger" type="button" id="backToTubeCollection">Back to tube collection</button>
                 </div>
                 <div class="ml-auto">
                     <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="button" id="collectionSaveExit">Save and Exit</button>

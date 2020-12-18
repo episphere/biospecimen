@@ -35,7 +35,7 @@ export const specimenTemplate = async (data, formData, collections) => {
                         <th>Date of Collection</th>
                         <th>Date scanned at Regional Lab</th>
                         <th>Visit</th>
-                        <th>Collection settings</th>
+                        <th>Collection Setting</th>
                         <th>Select Action</th>
                     </tr>
                 </thead>
