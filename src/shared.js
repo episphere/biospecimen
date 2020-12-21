@@ -470,6 +470,26 @@ export const getLocationsInstitute = async () => {
     return locations;
 }
 
+export const getSiteCouriers = async () => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=getLocations`, {
+        method: "GET",
+        headers: {
+            Authorization:"Bearer "+idToken
+        }
+    });
+    let res = await response.json();
+    let arr = res.response;
+    let locations = [];
+    let siteCouriers = arr[0]['666553960'];
+    let conversion = {
+        '712278213': 'FedEx',
+        '149772928': 'World Courier'
+    }
+    siteCouriers = siteCouriers.map(id => conversion[id]);
+    return siteCouriers;
+}
+
 export const getNextTempCheck = async () => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getLocations`, {

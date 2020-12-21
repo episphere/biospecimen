@@ -1,6 +1,6 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest} from "./../events.js";
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 const conversion = {
@@ -461,7 +461,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
 }
 
 
-export const shipmentTracking = (hiddenJSON, userName, tempCheckChecked) => {
+export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) => {
     console.log('efg' + JSON.stringify(hiddenJSON))
 
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
@@ -485,7 +485,8 @@ export const shipmentTracking = (hiddenJSON, userName, tempCheckChecked) => {
             <div class="col-lg">
                 Shipment Courier
                 </br>
-                <button type="submit" class="btn btn-outline-primary" id="chooseCourier">FedEx</button>
+                <select name="courier" id="courierSelect">
+                </select>
             </div>
         </div>
         <div class="row" style="margin-top:40px">
@@ -521,7 +522,7 @@ export const shipmentTracking = (hiddenJSON, userName, tempCheckChecked) => {
     const navBarBtn = document.getElementById('navBarShipmentTracking');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
-    
+    await populateCourierBox();
     addEventNavBarShipment("returnToPackaging", userName);
     if(Object.keys(hiddenJSON).length > 0){
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
