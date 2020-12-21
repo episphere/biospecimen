@@ -949,13 +949,13 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
     console.log(table.innerHTML)
     let count = 0;
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+    console.log('peiohowieboidsbvsdv: ' + JSON.stringify(boxes))
     for(let i = 0; i < boxes.length; i++){
         if(Object.keys(hiddenJSON[boxes[i]]).length > 0 ){
             let currRow = table.insertRow(count+1);
             if(count % 2 == 1){
                 currRow.style['background-color'] = 'lightgrey'
             }
-            currRow.style.
             count += 1;
             currRow.insertCell(0).innerHTML=`<input type="checkbox" class="markForShipping" style="transform: scale(1.5);">`
             let dateStarted = '';
@@ -1106,6 +1106,7 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
 export const populateShippingManifestBody = (hiddenJSON) =>{
     let table = document.getElementById("shippingManifestTable");
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+    console.log('boxSorted: ' + JSON.stringify(boxes))
     let currRowIndex = 1;
     let greyIndex = 0;
     for(let i = 0; i < boxes.length; i++){
@@ -2403,6 +2404,7 @@ export const populateFinalCheck = (hiddenJSON) => {
         let specimenObj = hiddenJSON[boxes[i]]['specimens'];
         let keys = Object.keys(specimenObj);
         let numTubes = 0;
+        let numBags = specimenObj.hasOwnProperty('orphans') ? keys.length-1 : keys.length;
         for(let j = 0; j < keys.length; j++){
             numTubes += specimenObj[keys[j]]['arrElements'].length;
         }
@@ -2410,6 +2412,7 @@ export const populateFinalCheck = (hiddenJSON) => {
         row.insertCell(0).innerHTML= currBox;
         row.insertCell(1).innerHTML= currShippingNumber;
         row.insertCell(2).innerHTML= numTubes;
+        row.insertCell(3).innerHTML= numBags;
     }
 }
 

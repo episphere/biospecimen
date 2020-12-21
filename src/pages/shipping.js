@@ -564,6 +564,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
                     <th>Box</th>
                     <th>Tracking Number</th>
                     <th>Number of tubes in shipment</th>
+                    <th>Number of bags in shipment</th>
                 </tr>
             </table>
         </div>
