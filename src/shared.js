@@ -223,7 +223,7 @@ export const errorMessage = (id, msg, focus, offset) => {
         div.classList = ['error-text'];
         const span = document.createElement('span');
         span.classList = ['form-error']
-        span.classList.add('offset-4');
+        if(offset) span.classList.add('offset-4');
         span.innerHTML = msg;
         div.append(span);
         parentElement.appendChild(div);
