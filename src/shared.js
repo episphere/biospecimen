@@ -169,22 +169,49 @@ export const performSearch = async (query) => {
 }
 
 export const showNotifications = (data, error) => {
-    const div = document.createElement('div');
-    div.classList = ["notification"];
-    div.innerHTML = `
-        <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <strong class="mr-auto ${error ? 'error-heading': ''}">${data.title}</strong>
-                <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">&times;</button>
-            </div>
-            <div class="toast-body">
+    const button = document.createElement('button');
+    button.dataset.target = '#biospecimenModal';
+    button.dataset.toggle = 'modal';
+
+    document.getElementById('root').appendChild(button);
+    button.click();
+    document.getElementById('root').removeChild(button);
+    const header = document.getElementById('biospecimenModalHeader');
+    const body = document.getElementById('biospecimenModalBody');
+    header.innerHTML = `<h5 class="modal-title">${data.title}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>`;
+    body.innerHTML = `
+        <div class="row">
+            <div class="col">
                 ${data.body}
             </div>
         </div>
-    `
-    document.getElementById('showNotification').appendChild(div);
-    document.getElementsByClassName('container')[0].scrollIntoView(true);
-    addEventHideNotification(div);
+        </br></br>
+        <div class="row">
+            <div class="ml-auto" style="margin-right: 1rem;">
+                <button type="button" class="btn btn-outline-dark" data-dismiss="modal" aria-label="Close">Close</button>
+            </div>
+        </div>
+`;
+
+    // const div = document.createElement('div');
+    // div.classList = ["notification"];
+    // div.innerHTML = `
+    //     <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
+    //         <div class="toast-header">
+    //             <strong class="mr-auto ${error ? 'error-heading': ''}">${data.title}</strong>
+    //             <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">&times;</button>
+    //         </div>
+    //         <div class="toast-body">
+    //             ${data.body}
+    //         </div>
+    //     </div>
+    // `
+    // document.getElementById('showNotification').appendChild(div);
+    // document.getElementsByClassName('container')[0].scrollIntoView(true);
+    // addEventHideNotification(div);
 }
 
 export const errorMessage = (id, msg, focus, offset) => {
