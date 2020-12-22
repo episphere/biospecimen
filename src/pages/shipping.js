@@ -463,6 +463,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
 
 export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) => {
     console.log('efg' + JSON.stringify(hiddenJSON))
+    showAnimation();
 
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     //store a secret json that has all of the packed ones in it
@@ -483,7 +484,7 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
         </div>
         <div class="row" style="margin-top:40px">
             <div class="col-lg">
-                Shipment Courier
+                Choose Shipment Courier
                 </br>
                 <select name="courier" id="courierSelect">
                 </select>
@@ -535,13 +536,18 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
     //addEventCompleteShippingButton(hiddenJSON);
     //addEventBackToSearch('navBarShippingDash');
     addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
+    hideAnimation();
     //addEventSubmitAddBag();
 }
 
-export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
+export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmentCourier) => {
     console.log('abc' + JSON.stringify(hiddenJSON))
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     console.log(userName)
+    let conversion = {
+        '712278213': 'FedEx',
+        '149772928': 'World Courier'
+    }
     //store a secret json that has all of the packed ones in it
     //{"Box1":{specimenId:[allTubes], specimenId:[allTubes]}}
     let template = `
@@ -553,7 +559,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked) => {
             </div>
         </div>
         <div class="row" style="margin-top:50px">
-            <p>Shipment Courier: FedEx</p>
+            <p>Shipment Courier: ` + shipmentCourier + `</p>
         </div>
         <div class="row" style="margin-top:10px">
             

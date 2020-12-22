@@ -763,7 +763,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
         console.log('ORPHANS: ' + JSON.stringify(toInsert))
         var rowCount = orphanTable.rows.length;
         var row = orphanTable.insertRow(rowCount); 
-        row.insertCell(0).innerHTML= 'Orphan tubes';
+        row.insertCell(0).innerHTML= 'Stray tubes';
         row.insertCell(1).innerHTML = toInsert.length;
         let hiddenChannel = row.insertCell(2)
         hiddenChannel.innerHTML = JSON.stringify(toInsert);
@@ -2368,20 +2368,29 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
         if(emptyField == false){
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
             console.log('done')
-            finalShipmentTracking(hiddenJSON, userName, tempChecked);
+            let shipmentCourier = document.getElementById('courierSelect').value;
+            finalShipmentTracking(hiddenJSON, userName, tempChecked, shipmentCourier);
         }
     })
     
 }
 
-export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked) => {
+export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked, shipmentCourier) => {
     document.getElementById('finalizeModalSign').addEventListener('click', async () =>{
         let finalizeTextField = document.getElementById('finalizeSignInput');
-
+        let conversion = {
+            "FedEx":"712278213",
+            "World Courier": "149772928"
+        }
+        let tempCheckedId = "104430631"
+        if(tempChecked == true){
+            tempCheckedId = "353358909"
+        }
+        let shippingData = {"666553960" :conversion[shipmentCourier], "105891443":tempCheckedId}
         if(finalizeTextField.value === userName){
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
             console.log(JSON.stringify(boxes));
-            await ship(boxes);
+            await ship(boxes, shippingData);
             document.getElementById('finalizeModalCancel').click();
             if(tempChecked){
                 updateNewTempDate();
