@@ -1954,7 +1954,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         
         if(input.required && value.length !== totalCollectionIDLength) {
             hasError = true;
-            errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long.`, focus);
+            errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`, focus);
             focus = false;
         }
         else if(input.required && masterID !== biospecimenData['820476880']) {
