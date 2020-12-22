@@ -33,6 +33,11 @@ export const collectProcessTemplate = (data, formData) => {
                     
                     const siteTubesList = getSiteTubesLists(formData);
                     siteTubesList.forEach((obj, index) => {
+                        let required = false;
+                        if(formData[obj.concept] && formData[obj.concept]['593843561'] !== 104430631) {
+                            required = true;
+                            if(obj.concept === '223999569' && formData['143615646']['593843561'] === 104430631) required = false;
+                        }
                         template += `
                             <tr>
                                 <td>(${index+1}) ${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
@@ -44,7 +49,7 @@ export const collectProcessTemplate = (data, formData) => {
                                         id="${obj.concept}Id" 
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['825582494'] ? `value='${formData[`${obj.concept}`]['825582494']}'`: ``}
                                         class="form-control ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} input-barcode-id" 
-                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': 'required'} 
+                                        ${required ? 'required' : 'disabled'} 
                                         placeholder="Scan/Type in Full Specimen ID"
                                     >
                                     ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? `<button class="barcode-btn-collect-process" type="button" id="${obj.concept}IdBarCodeBtn" data-barcode-input="${obj.concept}Id"><i class="fas fa-barcode"></i></button>`: ''}
