@@ -285,7 +285,7 @@ export const updateNewTempDate = async () =>{
     return response.json();
 }
 
-export const ship = async (boxes) => {
+export const ship = async (boxes, shippingData) => {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -293,7 +293,7 @@ export const ship = async (boxes) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(boxes)
+        body: JSON.stringify({"boxes": boxes, "shippingData": shippingData})
     }
     const response = await fetch(`${api}api=ship`, requestObj);
     console.log(response)
