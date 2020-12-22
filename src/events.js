@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking} from './pages/shipping.js';
 import { userListTemplate } from './pages/users.js';
@@ -105,7 +105,52 @@ export const addEventAddSpecimenToBox = (userName) => {
     const form = document.getElementById('addSpecimenForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        document.getElementById('submitMasterSpecimenId').click(); 
+        const masterSpecimenId = document.getElementById('masterSpecimenId').value;
+        if(masterSpecimenId == ''){
+            showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+            return
+        }
+        let masterIdSplit = masterSpecimenId.split(/\s+/);
+        let foundInOrphan = false;
+        //get all ids from the hidden
+        let shippingTable = document.getElementById('specimenList')
+        let orphanTable = document.getElementById('orphansList')
+        let biospecimensList = []
+        let tableIndex = -1;
+        let foundInShipping = false;
+        for(let i = 1; i < shippingTable.rows.length; i++){
+            let currRow = shippingTable.rows[i];
+            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
+                console.log(currRow.cells[2].innerText)
+                tableIndex = i;
+                biospecimensList = JSON.parse(currRow.cells[2].innerText)
+                foundInShipping = true;
+                console.log('owikebnvolekidbnvpowivbhnwspolivkbnh')
+                console.log(JSON.stringify(biospecimensList))
+            }
+            
+        }
+        
+       for(let i = 1; i < orphanTable.rows.length; i++){
+            let currRow = orphanTable.rows[i];
+            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
+                //console.log(currRow.cells[2].innerText)
+                tableIndex = i;
+                let currTubeNum = currRow.cells[0].innerText.split(' ')[1];
+                console.log(currTubeNum)
+                biospecimensList = [currTubeNum];
+                foundInOrphan = true;
+            }
+            
+        }
+
+        if(biospecimensList.length == 0){
+            showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+            return
+        }
+        else{
+            document.getElementById('submitMasterSpecimenId').click(); 
+        }
     });
     const submitButtonSpecimen = document.getElementById('submitMasterSpecimenId');
     submitButtonSpecimen.addEventListener('click', async e => {
@@ -279,7 +324,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                         toAddType = translateNumToType[thisId];
                     }
                     row.insertCell(1).innerHTML= toAddType;
-                    row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Missing">';
+                    row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
 
                     let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
                     currDeleteButton.addEventListener("click", async e => {
@@ -305,7 +350,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                         toAddType = translateNumToType[thisId];
                     }
                     row.insertCell(1).innerHTML= toAddType;
-                    row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Missing">';
+                    row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
 
                     let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
                     currDeleteButton.addEventListener("click", async e => {
@@ -331,7 +376,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                 toAddType = translateNumToType[thisId];
             }
             row.insertCell(1).innerHTML= toAddType;
-            row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Missing">';
+            row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
 
             let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
             currDeleteButton.addEventListener("click", async e => {
@@ -427,7 +472,7 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
             shippingTable.rows[tableIndex].cells[2].innerText = JSON.stringify(currArr);
             shippingTable.rows[tableIndex].cells[1].innerText = currArr.length;
         }
-        let boxIds = Object.keys(hiddenJSON);
+        let boxIds = Object.keys(hiddenJSON).sort(compareBoxIds);
 
         console.log(boxIds);    
         for(let i = 0; i < boxIds.length; i++){
@@ -518,7 +563,7 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
         let toExclude9 = [];
         let toExcludeOrphans = [];
         if(specimenData[i].hasOwnProperty('820476880')){
-            let boxes = Object.keys(hiddenJSON);
+            let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
             for(let j = 0; j < boxes.length; j++){
                 let specimens = Object.keys(hiddenJSON[boxes[j]]);
                 console.log(JSON.stringify(hiddenJSON[boxes[j]]));
@@ -679,7 +724,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
     let numRows = 1;
     specimenList.innerHTML = `<tr>
                                 <th>Specimen Bag ID</th>
-                                <th># Specimens</th>
+                                <th># Specimens in Bag</th>
                             </th>`;
     let orphansIndex = -1;
     
@@ -903,14 +948,14 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                     </tr>`
     console.log(table.innerHTML)
     let count = 0;
-    let boxes = Object.keys(hiddenJSON)
+    let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+    console.log('peiohowieboidsbvsdv: ' + JSON.stringify(boxes))
     for(let i = 0; i < boxes.length; i++){
         if(Object.keys(hiddenJSON[boxes[i]]).length > 0 ){
             let currRow = table.insertRow(count+1);
             if(count % 2 == 1){
                 currRow.style['background-color'] = 'lightgrey'
             }
-            currRow.style.
             count += 1;
             currRow.insertCell(0).innerHTML=`<input type="checkbox" class="markForShipping" style="transform: scale(1.5);">`
             let dateStarted = '';
@@ -1060,7 +1105,8 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
 
 export const populateShippingManifestBody = (hiddenJSON) =>{
     let table = document.getElementById("shippingManifestTable");
-    let boxes = Object.keys(hiddenJSON);
+    let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+    console.log('boxSorted: ' + JSON.stringify(boxes))
     let currRowIndex = 1;
     let greyIndex = 0;
     for(let i = 0; i < boxes.length; i++){
@@ -2178,7 +2224,7 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
 export const addEventReturnToShippingManifest = (element, hiddenJSON, userName, tempChecked) => {
     const btn = document.getElementById(element);
     document.getElementById(element).addEventListener('click', async e => {
-        let boxesToShip = Object.keys(hiddenJSON)
+        let boxesToShip = Object.keys(hiddenJSON).sort(compareBoxIds)
         //return box 1 info
         await shippingManifest(boxesToShip, userName, tempChecked);
     });
@@ -2189,7 +2235,7 @@ export const addEventNavBarTracking = (element, userName, hiddenJSON, tempChecke
     document.getElementById(element).addEventListener('click', async e => {
         e.stopPropagation();
         if(btn.classList.contains('active')) return;
-        let keys = Object.keys(hiddenJSON)
+        let keys = Object.keys(hiddenJSON).sort(compareBoxIds)
         for(let i = 0; i < keys.length; i++){
             hiddenJSON[keys[i]] = hiddenJSON[keys[i]]['specimens']
         }
@@ -2276,7 +2322,7 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
 }
 
 export const populateTrackingQuery = (hiddenJSON) => {
-    let boxes = Object.keys(hiddenJSON);
+    let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     let toBeInnerHTML = ""
     for(let i = 0; i < boxes.length; i++){
         toBeInnerHTML +=`
@@ -2308,7 +2354,7 @@ export const populateTrackingQuery = (hiddenJSON) => {
 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
     document.getElementById('completeTracking').addEventListener('click', () =>{
-        let boxes = Object.keys(hiddenJSON);
+        let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         let emptyField= false;
         for(let i = 0; i < boxes.length; i++){
             let boxi = document.getElementById(boxes[i] + "trackingId").value;
@@ -2333,7 +2379,7 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         let finalizeTextField = document.getElementById('finalizeSignInput');
 
         if(finalizeTextField.value === userName){
-            let boxes = Object.keys(hiddenJSON);
+            let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
             console.log(JSON.stringify(boxes));
             await ship(boxes);
             document.getElementById('finalizeModalCancel').click();
@@ -2351,13 +2397,14 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
 
 export const populateFinalCheck = (hiddenJSON) => {
     let table = document.getElementById('finalCheckTable');
-    let boxes = Object.keys(hiddenJSON);
+    let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     for(let i = 0; i < boxes.length; i++){
         let currBox = boxes[i]
         let currShippingNumber = hiddenJSON[boxes[i]]['trackingId']
         let specimenObj = hiddenJSON[boxes[i]]['specimens'];
         let keys = Object.keys(specimenObj);
         let numTubes = 0;
+        let numBags = specimenObj.hasOwnProperty('orphans') ? keys.length-1 : keys.length;
         for(let j = 0; j < keys.length; j++){
             numTubes += specimenObj[keys[j]]['arrElements'].length;
         }
@@ -2365,6 +2412,7 @@ export const populateFinalCheck = (hiddenJSON) => {
         row.insertCell(0).innerHTML= currBox;
         row.insertCell(1).innerHTML= currShippingNumber;
         row.insertCell(2).innerHTML= numTubes;
+        row.insertCell(3).innerHTML= numBags;
     }
 }
 
@@ -2471,4 +2519,15 @@ export const addEventCntdToCollectProcess = () => {
             tubeCollectedTemplate(data, specimenData);
         });
     })
+}
+
+export const populateCourierBox = async () => {
+    let couriers =await getSiteCouriers();
+    let selectBox = document.getElementById('courierSelect');
+    for(let i = 0; i < couriers.length; i++){
+        let currElement = document.createElement('option');
+        currElement.textContent = couriers[i];
+        selectBox.appendChild(currElement);
+    }
+
 }
