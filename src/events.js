@@ -107,7 +107,7 @@ export const addEventAddSpecimenToBox = (userName) => {
         e.preventDefault();
         const masterSpecimenId = document.getElementById('masterSpecimenId').value;
         if(masterSpecimenId == ''){
-            showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+            showNotifications({title: 'Not found', body: 'The submited bag or tube could not be found!'}, true)
             return
         }
         let masterIdSplit = masterSpecimenId.split(/\s+/);
@@ -921,10 +921,13 @@ export const populateModalSelect = (hiddenJSON) => {
 export const populateTempSelect = (boxes) => {
     let boxDiv = document.getElementById("tempCheckList");
     boxDiv.style.display = "block";
-    boxDiv.innerHTML = `<p>Select the box that contains the temp monitor</p>
-    <select name="tempBox" id="tempBox">`;
+    boxDiv.innerHTML = `<p>Select the box that contains the temperature monitor</p>
+    <select name="tempBox" id="tempBox">
+    <option disabled selected value> -- select a box -- </option>
+    </select>`;
 
     let toPopulate = document.getElementById('tempBox')
+    
     for(let i = 0; i<  boxes.length; i++){
         var opt = document.createElement("option");
         opt.value= boxes[i];
@@ -2216,6 +2219,9 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
             
         }
         console.log(boxesToShip)
+        if(document.getElementById('tempMonitorChecked')){
+            tempChecked = document.getElementById('tempMonitorChecked').checked
+        }
         //return box 1 info
         await shippingManifest(boxesToShip, userName, tempChecked);
     });
@@ -2226,6 +2232,9 @@ export const addEventReturnToShippingManifest = (element, hiddenJSON, userName, 
     document.getElementById(element).addEventListener('click', async e => {
         let boxesToShip = Object.keys(hiddenJSON).sort(compareBoxIds)
         //return box 1 info
+        if(tempChecked != false){
+            tempChecked = true;
+        }
         await shippingManifest(boxesToShip, userName, tempChecked);
     });
 }
