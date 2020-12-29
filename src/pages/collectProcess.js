@@ -52,7 +52,7 @@ export const collectProcessTemplate = (data, formData) => {
                                         ${required ? 'required' : 'disabled'} 
                                         placeholder="Scan/Type in Full Specimen ID"
                                     >
-                                    ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? `<button class="barcode-btn-collect-process" type="button" id="${obj.concept}IdBarCodeBtn" data-barcode-input="${obj.concept}Id"><i class="fas fa-barcode"></i></button>`: ''}
+                                    ${required ? `<button class="barcode-btn-collect-process" type="button" id="${obj.concept}IdBarCodeBtn" data-barcode-input="${obj.concept}Id"><i class="fas fa-barcode"></i></button>`: ''}
                                 </td>
                                 <td>${obj.deviationChkBox === true ? `
                                     <input 
