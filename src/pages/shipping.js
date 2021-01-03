@@ -1,5 +1,5 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications} from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage} from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
@@ -61,7 +61,9 @@ export const startShipping = async (userName) => {
         let box = boxJSONS[i]
         hiddenJSON1[box['132929440']] = box['bags']
     }
-    
+
+    let pageStuff = await getPage(2, 5, '555611076')
+    console.log(JSON.stringify(pageStuff))
     console.log('pwnjefbpoewkinbpoefibnepobinoieoiboribvr' + JSON.stringify(boxJSONS))
     
     /*
@@ -537,9 +539,9 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
     if(Object.keys(hiddenJSON).length > 0){
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
     }
-    addEventReturnToShippingManifest('returnToShipping', hiddenJSON, userName)
+    addEventReturnToShippingManifest('returnToShipping', hiddenJSON, userName, tempCheckChecked)
     addEventNavBarShipment("navBarShippingDash", userName);
-    addEventReturnToShippingManifest('navBarShippingManifest', hiddenJSON, userName)
+    addEventReturnToShippingManifest('navBarShippingManifest', hiddenJSON, userName, tempCheckChecked)
     populateTrackingQuery(hiddenJSON);
     addEventCompleteButton(hiddenJSON, userName, tempCheckChecked);
     //addEventCompleteShippingButton(hiddenJSON);
@@ -647,6 +649,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
     }
     populateFinalCheck(hiddenJSON);
     addEventReturnToShippingManifest('navBarShippingManifest', hiddenJSON, userName)
+    console.log('hiddenJSONStuff!!!!: ' + JSON.stringify(hiddenJSON))
     addEventCompleteShippingButton(hiddenJSON, userName, tempChecked);
     addEventBackToSearch('navBarShippingDash');
     //addEventBackToSearch('navBarShippingDash');

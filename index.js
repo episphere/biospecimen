@@ -2,6 +2,7 @@ import { firebaseConfig } from "./src/config.js";
 import { manageUsers } from "./src/pages/users.js";
 import { userDashboard } from "./src/pages/dashboard.js";
 import { shippingDashboard } from "./src/pages/shipping.js"
+import {reportsQuery } from "./src/pages/reportsQuery.js"
 import { signIn, signOut } from "./src/pages/signIn.js";
 import { welcomeScreen } from "./src/pages/welcome.js";
 
@@ -35,6 +36,7 @@ const manageRoutes = async () => {
         else if (route === '#welcome') welcomeScreen(auth, route);
         else if (route === '#manage_users') manageUsers(auth, route);
         else if (route === '#sign_out') signOut();
+        else if (route === '#reports') reportsQuery(auth, route);
         else window.location.hash = '#welcome';
     }else{
         if(route === '#') signIn();

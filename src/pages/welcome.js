@@ -44,6 +44,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             <div class="col"><button class="btn btn-outline-primary" id="btnParticipantSearch">Participant Search</button></div>
             <div class="col"><button class="btn btn-outline-secondary" id="btnSpecimenSearch">Specimen Search</button></div>
             <div class="col"><button class="btn btn-outline-warning" id="btnShipping">Shipping</button></div>
+            <div class="col"><button class="btn btn-outline-warning" id="btnReports">Reports</button></div>
         </div>
     `;
     document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
@@ -76,6 +77,12 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     document.getElementById('btnShipping').addEventListener('click',  async () => {
         //window.history.replaceState({},'', './#shipping');
         location.hash = '#shipping';
+        //console.log('LMAO')
+        //shippingDashboard(auth, route, true);
+    });
+    document.getElementById('btnReports').addEventListener('click',  async () => {
+        //window.history.replaceState({},'', './#shipping');
+        location.hash = '#reports';
         //console.log('LMAO')
         //shippingDashboard(auth, route, true);
     });

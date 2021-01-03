@@ -2,6 +2,7 @@ import { userNavBar, adminNavBar, nonUserNavBar } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
+import { collectProcessTemplate } from "./pages/collectProcess.js";
 
 
 const conversion = {
@@ -285,7 +286,7 @@ export const updateNewTempDate = async () =>{
     return response.json();
 }
 
-export const ship = async (boxes, shippingData) => {
+export const ship = async (boxes, shippingData, trackingNumbers) => {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -293,12 +294,29 @@ export const ship = async (boxes, shippingData) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({"boxes": boxes, "shippingData": shippingData})
+        body: JSON.stringify({"boxes": boxes, "shippingData": shippingData, "trackingNumbers":trackingNumbers})
     }
     const response = await fetch(`${api}api=ship`, requestObj);
     console.log(response)
     return response.json();
 }
+
+export const getPage = async (pageNumber, numElementsOnPage, orderBy) => {
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy})
+    }
+    const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
+    console.log('THIS IS THE RESPONSE !@$!@$IGH!@$OIG!@E: ')
+    console.log(response)
+    return response.json();
+}
+
 
 export const getBoxes = async (box) =>{
     const idToken = await getIdToken();

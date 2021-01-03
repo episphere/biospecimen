@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking} from './pages/shipping.js';
 import { userListTemplate } from './pages/users.js';
@@ -2372,7 +2372,7 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
                 emptyField = true;
                 showNotifications({title: 'Missing Fields', body: 'Please fill out required fields!'}, true)
             }
-            hiddenJSON[boxes[i]] = {trackingId:boxi, specimens:hiddenJSON[boxes[i]]}
+            hiddenJSON[boxes[i]] = {'959708259':boxi, specimens:hiddenJSON[boxes[i]]}
         }
         if(emptyField == false){
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
@@ -2392,14 +2392,19 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
             "World Courier": "149772928"
         }
         let tempCheckedId = "104430631"
-        if(tempChecked == true){
-            tempCheckedId = "353358909"
+        if(tempChecked != false){
+            tempCheckedId = tempChecked
         }
         let shippingData = {"666553960" :conversion[shipmentCourier], "105891443":tempCheckedId}
+        let trackingNumbers = {}
+        let boxNames = Object.keys(hiddenJSON);
+        for(let i = 0; i < boxNames.length; i++){
+            trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
+        }
         if(finalizeTextField.value === userName){
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
             console.log(JSON.stringify(boxes));
-            await ship(boxes, shippingData);
+            await ship(boxes, shippingData, trackingNumbers);
             document.getElementById('finalizeModalCancel').click();
             if(tempChecked){
                 updateNewTempDate();
@@ -2418,7 +2423,7 @@ export const populateFinalCheck = (hiddenJSON) => {
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     for(let i = 0; i < boxes.length; i++){
         let currBox = boxes[i]
-        let currShippingNumber = hiddenJSON[boxes[i]]['trackingId']
+        let currShippingNumber = hiddenJSON[boxes[i]]['959708259']
         let specimenObj = hiddenJSON[boxes[i]]['specimens'];
         let keys = Object.keys(specimenObj);
         let numTubes = 0;
@@ -2546,6 +2551,47 @@ export const populateCourierBox = async () => {
         let currElement = document.createElement('option');
         currElement.textContent = couriers[i];
         selectBox.appendChild(currElement);
+    }
+
+}
+
+export const populateBoxTable = async () => {
+    let pageStuff = await getPage(1, 5, '555611076')
+    let currTable = document.getElementById('boxTable')
+    
+    var rowCount = currTable.rows.length;
+    let currRow = currTable.insertRow(rowCount);
+    currRow.insertCell(0).innerHTML = "Tracking Number";
+    currRow.insertCell(1).innerHTML = "Courier";
+    currRow.insertCell(2).innerHTML = "Date Shipped";
+    currRow.insertCell(3).innerHTML = "Shipping Location";
+    currRow.insertCell(4).innerHTML = "Box Id";
+    currRow.insertCell(5).innerHTML = "Number of Tubes";
+    currRow.insertCell(6).innerHTML = "View Manifest";
+    currRow.insertCell(7).innerHTML = "Status";
+    currRow.insertCell(8).innerHTML = "Date Received";
+    currRow.insertCell(9).innerHTML = "# Tubes Received";
+    currRow.insertCell(10).innerHTML = "Condition";
+    let conversion = {
+        "712278213":"FedEx",
+        "149772928":"World Courier"
+    }
+    for(let i = 0; i < pageStuff.data.length; i++){
+        rowCount = currTable.rows.length;
+        currRow = currTable.insertRow(rowCount);
+        let currPage = pageStuff.data[i];
+        console.log('currPageStuff: ' + JSON.stringify(currPage))
+        currRow.insertCell(0).innerHTML = currPage.hasOwnProperty('959708259') ? currPage['959708259'] : '';
+        currRow.insertCell(1).innerHTML = currPage.hasOwnProperty('666553960') ? conversion[currPage['666553960']] : '';
+        currRow.insertCell(2).innerHTML = currPage.hasOwnProperty('656548982') ? (new Date(currPage['656548982'])).toString() : '';
+        currRow.insertCell(3).innerHTML = currPage['560975149'];
+        currRow.insertCell(4).innerHTML = currPage['132929440'];
+        currRow.insertCell(5).innerHTML = Object.keys(currPage['bags']).length;
+        currRow.insertCell(6).innerHTML = 'Button to view manifest';
+        currRow.insertCell(7).innerHTML = '';
+        currRow.insertCell(8).innerHTML = '';
+        currRow.insertCell(9).innerHTML = '';
+        currRow.insertCell(10).innerHTML = '';
     }
 
 }
