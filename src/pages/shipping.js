@@ -650,7 +650,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
     populateFinalCheck(hiddenJSON);
     addEventReturnToShippingManifest('navBarShippingManifest', hiddenJSON, userName)
     console.log('hiddenJSONStuff!!!!: ' + JSON.stringify(hiddenJSON))
-    addEventCompleteShippingButton(hiddenJSON, userName, tempChecked);
+    addEventCompleteShippingButton(hiddenJSON, userName, tempChecked, shipmentCourier);
     addEventBackToSearch('navBarShippingDash');
     //addEventBackToSearch('navBarShippingDash');
     //addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);

@@ -1,7 +1,8 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications} from "./../shared.js"
-import { populateBoxTable} from "./../events.js";
+import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
+
 
 export const reportsQuery = (auth, route) => {
     
@@ -43,5 +44,51 @@ export const startReport = async () => {
     hideAnimation();
     
     //addEventSubmitAddBag();
+    
+}
+
+export const showReportsManifest = async (currPage) => {
+    let template = `
+        <div class="row">
+            <div style="float: left;width: 33%;" id="boxManifestCol1">
+            </div>
+            <div style="float: left;width: 33%;"></div>
+            <div style="float:left;width: 33%;" id="boxManifestCol3">
+                <p>Site: ` + currPage['siteAcronym'] + `</p>
+                <p>Location: ` + currPage['560975149'] + `</p>
+            </div>
+        </div>
+        <div class="row">
+            <table id="boxManifestTable" style="width: 100%;">
+                <tr>
+                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Specimen Bag ID</th>
+                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Full Specimen ID</th>
+                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Type/Color</th>
+                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Scanned By</th>
+                </tr>
+            </table>
+        </div>
+        <div class="row" style="margin-top:100px">
+            <div style="float: left;width: 33%;" id="boxManifestCol1">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToReports">Return to Reports</button>
+            </div>
+            <div style="float: left;width: 33%;">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="printBox">Print Box Manifest</button>
+            </div>
+            <div style="float:left;width: 33%;" id="boxManifestCol3">
+            </div>
+        </div>
+        `;
+        document.getElementById('contentBody').innerHTML = template;
+        removeActiveClass('navbar-btn', 'active')
+        populateReportManifestHeader(currPage)
+        populateReportManifestTable(currPage)
+        document.getElementById('printBox').addEventListener('click', e => {
+            window.print();
+        });
+        document.getElementById('returnToReports').addEventListener('click', e => {
+            startReport();
+        })
+        hideAnimation();
     
 }

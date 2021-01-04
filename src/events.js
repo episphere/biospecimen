@@ -1,5 +1,6 @@
 import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
+import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking} from './pages/shipping.js';
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
@@ -2395,7 +2396,9 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         if(tempChecked != false){
             tempCheckedId = tempChecked
         }
-        let shippingData = {"666553960" :conversion[shipmentCourier], "105891443":tempCheckedId}
+        let shippingData = {}
+        shippingData["666553960"] = conversion[shipmentCourier]
+        shippingData["105891443"] = tempCheckedId;
         let trackingNumbers = {}
         let boxNames = Object.keys(hiddenJSON);
         for(let i = 0; i < boxNames.length; i++){
@@ -2404,6 +2407,7 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         if(finalizeTextField.value === userName){
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
             console.log(JSON.stringify(boxes));
+            console.log('shipping JSON Can be found here: ' + JSON.stringify(shippingData))
             await ship(boxes, shippingData, trackingNumbers);
             document.getElementById('finalizeModalCancel').click();
             if(tempChecked){
@@ -2580,18 +2584,153 @@ export const populateBoxTable = async () => {
         rowCount = currTable.rows.length;
         currRow = currTable.insertRow(rowCount);
         let currPage = pageStuff.data[i];
+        let numTubes = 0;
+        let keys = Object.keys(currPage['bags']);
+        for(let j = 0; j < keys.length; j++){
+            numTubes += currPage['bags'][keys[j]]['arrElements'].length;
+        }
+        let shippedDate = ''
+        if(currPage.hasOwnProperty('656548982')){
+            let currentdate = new Date(currPage['656548982']); 
+            let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
+            let hour = parseInt(currentdate.getHours())%12;
+            shippedDate =  (currentdate.getMonth()+1) + "/"
+                            + currentdate.getDate()  + "/" 
+                            + currentdate.getFullYear() + " "  
+                            + hour.toString()+ ":"  
+                            + currentdate.getMinutes() + ampm;
+
+        }
         console.log('currPageStuff: ' + JSON.stringify(currPage))
         currRow.insertCell(0).innerHTML = currPage.hasOwnProperty('959708259') ? currPage['959708259'] : '';
         currRow.insertCell(1).innerHTML = currPage.hasOwnProperty('666553960') ? conversion[currPage['666553960']] : '';
-        currRow.insertCell(2).innerHTML = currPage.hasOwnProperty('656548982') ? (new Date(currPage['656548982'])).toString() : '';
+        currRow.insertCell(2).innerHTML = shippedDate;
         currRow.insertCell(3).innerHTML = currPage['560975149'];
         currRow.insertCell(4).innerHTML = currPage['132929440'];
-        currRow.insertCell(5).innerHTML = Object.keys(currPage['bags']).length;
-        currRow.insertCell(6).innerHTML = 'Button to view manifest';
+        currRow.insertCell(5).innerHTML = numTubes;
+        currRow.insertCell(6).innerHTML = '<button type="button" class="button" id="reportsViewManifest' + i + '">View manifest</button>';
         currRow.insertCell(7).innerHTML = '';
         currRow.insertCell(8).innerHTML = '';
-        currRow.insertCell(9).innerHTML = '';
+        currRow.insertCell(9).innerHTML = currPage.hasOwnProperty('') ? currPage[''] : '';
         currRow.insertCell(10).innerHTML = '';
+        addEventViewManifestButton('reportsViewManifest' + i, currPage);
     }
 
+}
+
+export const addEventViewManifestButton = (buttonId, currPage) => {
+    let button = document.getElementById(buttonId);
+    button.addEventListener('click', () => {
+        showReportsManifest(currPage);
+    });
+}
+
+
+export const populateReportManifestHeader= (currPage) => {
+    let column1 = document.getElementById("boxManifestCol1")
+    let column2 = document.getElementById("boxManifestCol3")
+
+  
+    let newP = document.createElement("p");
+    newP.innerHTML = currPage['132929440'] + " Manifest";
+    document.getElementById('boxManifestCol1').appendChild(newP);
+
+    let toInsertDate = ''
+    if(currPage.hasOwnProperty('672863981')){
+        let dateStarted = Date.parse(currPage['672863981'])
+        
+        let currentdate = new Date(dateStarted); 
+        let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
+        let hour = parseInt(currentdate.getHours())%12;
+        toInsertDate =  (currentdate.getMonth()+1) + "/"
+                        + currentdate.getDate()  + "/" 
+                        + currentdate.getFullYear() + " "  
+                        + hour.toString()+ ":"  
+                        + currentdate.getMinutes() + ampm;
+
+    }
+    let toInsertDate2 = ''
+    if(currPage.hasOwnProperty('656548982')){
+        let dateStarted = currPage['656548982']
+        
+        let currentdate = new Date(dateStarted); 
+        let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
+        let hour = parseInt(currentdate.getHours())%12;
+        toInsertDate2 =  (currentdate.getMonth()+1) + "/"
+                        + currentdate.getDate()  + "/" 
+                        + currentdate.getFullYear() + " "  
+                        + hour.toString()+ ":"  
+                        + currentdate.getMinutes() + ampm;
+
+    }
+    newP = document.createElement("p");
+    newP.innerHTML = "Date Started: " + toInsertDate;
+    document.getElementById('boxManifestCol1').appendChild(newP);
+    newP = document.createElement("p");
+    newP.innerHTML = "Date Shipped: " + toInsertDate2;
+    document.getElementById('boxManifestCol1').appendChild(newP);
+     
+
+}
+
+export const populateReportManifestTable = (currPage) => {
+    let currTable = document.getElementById('boxManifestTable');
+    
+    let bags = Object.keys(currPage['bags']);
+    let rowCount = 1;
+    let translateNumToType = {
+        "0001":"SST/Gold",
+        "0002":"SST/Gold",
+        "0003":"Heparin/Green",
+        "0004":"EDTA/Lavender",
+        "0005":"ACD/Yellow",
+        "0006":"Urine/Yellow",
+        "0007":"Mouthwash Container",
+        "0011":"SST/Gold",
+        "0012":"SST/Gold",
+        "0013":"Heparin/Green",
+        "0014":"EDTA/Lavender",
+        "0016":"Urine Cup",
+        "0021":"SST/Gold",
+        "0022":"SST/Gold",
+        "0031":"SST/Gold",
+        "0032":"SST/Gold",
+        "0024":"EDTA/Lavender",
+        "0050":"NA",
+        "0051":"NA",
+        "0052":"NA",
+        "0053":"NA",
+        "0054":"NA"
+    };
+    for(let i = 0; i < bags.length; i++){
+        let tubes = currPage['bags'][bags[i]]['arrElements'];
+        for(let j = 0; j < tubes.length; j++){
+            let currRow = currTable.insertRow(rowCount);
+            if(j == 0){
+                currRow.insertCell(0).innerHTML = bags[i];
+            }
+            else{
+                currRow.insertCell(0).innerHTML = '';
+            }
+            currRow.insertCell(1).innerHTML = tubes[j]
+            let thisId = tubes[j].split(' ');
+            let toAddType = 'N/A'
+            if(translateNumToType.hasOwnProperty(thisId[1])){
+                toAddType = translateNumToType[thisId[1]];
+            }
+            currRow.insertCell(2).innerHTML = toAddType
+            if(currPage['bags'][bags[i]].hasOwnProperty('scanner') && j == 0){
+                currRow.insertCell(3).innerHTML = currBox[bags[i]]['scanner'];
+            }
+            else{
+                currRow.insertCell(3).innerHTML = '';
+            }
+            if(i % 2 == 0){
+                currRow.style['background-color'] = "lightgrey";
+            }
+            rowCount += 1;
+
+        }
+    }
+    
 }
