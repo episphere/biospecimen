@@ -1,6 +1,6 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications} from "./../shared.js"
-import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable} from "./../events.js";
+import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 
@@ -32,6 +32,15 @@ export const startReport = async () => {
                 </table>
             </div>
         </div>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item" id="firstPage"><button class="page-link" >First</button></li>
+                <li class="page-item" id="previousPage"><button class="page-link" >Previous</button></li>
+                <li class="page-item" id="thisPage"><a class="page-link"  id = "middlePage">1</a></li>
+                <li class="page-item" id="nextPage"><button class="page-link">Next</button></li>
+                <li class="page-item" id="lastPage"><button class="page-link">Last</button></li>
+            </ul>
+            </nav>
     `;
     /*var x = document.getElementById("specimenList");
     var option = document.createElement("option");
@@ -40,7 +49,8 @@ export const startReport = async () => {
     
     document.getElementById('contentBody').innerHTML = template;
     removeActiveClass('navbar-btn', 'active')
-    populateBoxTable();
+    populateBoxTable(0);
+    addPaginationFunctionality();
     hideAnimation();
     
     //addEventSubmitAddBag();

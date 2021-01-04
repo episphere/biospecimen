@@ -2559,10 +2559,10 @@ export const populateCourierBox = async () => {
 
 }
 
-export const populateBoxTable = async () => {
-    let pageStuff = await getPage(1, 5, '555611076')
+export const populateBoxTable = async (page) => {
+    let pageStuff = await getPage(page, 5, '555611076')
     let currTable = document.getElementById('boxTable')
-    
+    currTable.innerHTML = ''
     var rowCount = currTable.rows.length;
     let currRow = currTable.insertRow(rowCount);
     currRow.insertCell(0).innerHTML = "Tracking Number";
@@ -2733,4 +2733,31 @@ export const populateReportManifestTable = (currPage) => {
         }
     }
     
+}
+
+export const addPaginationFunctionality = () => {
+    let first = document.getElementById('firstPage');
+    let previous = document.getElementById('previousPage');
+    let current = document.getElementById('thisPage');
+    let next = document.getElementById('nextPage');
+    let final = document.getElementById('lastPage');
+    let middleNumber = document.getElementById('middlePage');
+
+    first.addEventListener('click', () => {
+        middleNumber.innerHTML = '1'        
+    })
+    
+    previous.addEventListener('click', () => {
+        
+    
+        middleNumber.innerHTML = middleNumber.innerHTML == '1' ? '1' : parseInt(middleNumber.innerHTML) - 1;
+        populateBoxTable(parseInt(middleNumber.innerHTML) - 1)
+    })
+
+    next.addEventListener('click', () => {
+        middleNumber.innerHTML = parseInt(middleNumber.innerHTML) + 1;
+        populateBoxTable(parseInt(middleNumber.innerHTML) - 1)
+    })
+
+
 }
