@@ -2560,6 +2560,7 @@ export const populateCourierBox = async () => {
 }
 
 export const populateBoxTable = async (page) => {
+    showAnimation();
     let pageStuff = await getPage(page, 5, '555611076')
     let currTable = document.getElementById('boxTable')
     currTable.innerHTML = ''
@@ -2596,10 +2597,11 @@ export const populateBoxTable = async (page) => {
             let hour = parseInt(currentdate.getHours())%12;
             shippedDate =  (currentdate.getMonth()+1) + "/"
                             + currentdate.getDate()  + "/" 
-                            + currentdate.getFullYear() + " "  
+                            + currentdate.getFullYear() 
+                            /*+ " "  
                             + hour.toString()+ ":"  
                             + currentdate.getMinutes() + ampm;
-
+*/
         }
         console.log('currPageStuff: ' + JSON.stringify(currPage))
         currRow.insertCell(0).innerHTML = currPage.hasOwnProperty('959708259') ? currPage['959708259'] : '';
@@ -2614,6 +2616,7 @@ export const populateBoxTable = async (page) => {
         currRow.insertCell(9).innerHTML = currPage.hasOwnProperty('') ? currPage[''] : '';
         currRow.insertCell(10).innerHTML = '';
         addEventViewManifestButton('reportsViewManifest' + i, currPage);
+        hideAnimation();
     }
 
 }
@@ -2644,10 +2647,11 @@ export const populateReportManifestHeader= (currPage) => {
         let hour = parseInt(currentdate.getHours())%12;
         toInsertDate =  (currentdate.getMonth()+1) + "/"
                         + currentdate.getDate()  + "/" 
-                        + currentdate.getFullYear() + " "  
+                        + currentdate.getFullYear() 
+                        /*+ " "  
                         + hour.toString()+ ":"  
                         + currentdate.getMinutes() + ampm;
-
+*/
     }
     let toInsertDate2 = ''
     if(currPage.hasOwnProperty('656548982')){
@@ -2658,10 +2662,11 @@ export const populateReportManifestHeader= (currPage) => {
         let hour = parseInt(currentdate.getHours())%12;
         toInsertDate2 =  (currentdate.getMonth()+1) + "/"
                         + currentdate.getDate()  + "/" 
-                        + currentdate.getFullYear() + " "  
+                        + currentdate.getFullYear() 
+                        /*+ " "  
                         + hour.toString()+ ":"  
                         + currentdate.getMinutes() + ampm;
-
+*/
     }
     newP = document.createElement("p");
     newP.innerHTML = "Date Started: " + toInsertDate;
@@ -2735,7 +2740,7 @@ export const populateReportManifestTable = (currPage) => {
     
 }
 
-export const addPaginationFunctionality = () => {
+export const addPaginationFunctionality = (lastPage) => {
     let first = document.getElementById('firstPage');
     let previous = document.getElementById('previousPage');
     let current = document.getElementById('thisPage');
@@ -2744,19 +2749,23 @@ export const addPaginationFunctionality = () => {
     let middleNumber = document.getElementById('middlePage');
 
     first.addEventListener('click', () => {
-        middleNumber.innerHTML = '1'        
+        middleNumber.innerHTML = '1'
+        populateBoxTable(0)
     })
     
     previous.addEventListener('click', () => {
-        
-    
         middleNumber.innerHTML = middleNumber.innerHTML == '1' ? '1' : parseInt(middleNumber.innerHTML) - 1;
         populateBoxTable(parseInt(middleNumber.innerHTML) - 1)
     })
 
     next.addEventListener('click', () => {
-        middleNumber.innerHTML = parseInt(middleNumber.innerHTML) + 1;
+        middleNumber.innerHTML = middleNumber.innerHTML == lastPage.toString() ? lastPage.toString() : parseInt(middleNumber.innerHTML) + 1;
         populateBoxTable(parseInt(middleNumber.innerHTML) - 1)
+    })
+
+    final.addEventListener('click', () => {
+        middleNumber.innerHTML = lastPage;
+        populateBoxTable(lastPage - 1)
     })
 
 

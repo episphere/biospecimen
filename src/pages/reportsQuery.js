@@ -1,5 +1,5 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications} from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getNumPages} from "./../shared.js"
 import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
@@ -46,11 +46,12 @@ export const startReport = async () => {
     var option = document.createElement("option");
     option.text = "Kiwi";
     x.add(option);*/
-    
+    let numPages = await getNumPages(5);
     document.getElementById('contentBody').innerHTML = template;
     removeActiveClass('navbar-btn', 'active')
     populateBoxTable(0);
-    addPaginationFunctionality();
+    addPaginationFunctionality(numPages);
+    
     hideAnimation();
     
     //addEventSubmitAddBag();

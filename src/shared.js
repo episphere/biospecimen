@@ -515,6 +515,19 @@ export const getLocationsInstitute = async () => {
     return locations;
 }
 
+export const getNumPages = async (numPerPage) => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=getNumBoxesShipped`, {
+        method: "GET",
+        headers: {
+            Authorization:"Bearer "+idToken
+        }
+    });
+    let res = await response.json();
+    let numBoxes = res.response;
+    return Math.ceil(numBoxes/numPerPage)
+}
+
 export const getSiteCouriers = async () => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getLocations`, {
