@@ -61,9 +61,6 @@ export const startShipping = async (userName) => {
         let box = boxJSONS[i]
         hiddenJSON1[box['132929440']] = box['bags']
     }
-
-    let pageStuff = await getPage(2, 5, '555611076')
-    console.log(JSON.stringify(pageStuff))
     console.log('pwnjefbpoewkinbpoefibnepobinoieoiboribvr' + JSON.stringify(boxJSONS))
     
     /*

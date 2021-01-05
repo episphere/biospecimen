@@ -1,6 +1,6 @@
 import { allStates } from 'https://episphere.github.io/connectApp/js/shared.js';
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getNumPages} from "./../shared.js"
-import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality} from "./../events.js";
+import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality, addEventNavBarShipment, addEventFilter} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 
@@ -27,12 +27,28 @@ export const startReport = async () => {
     
     let template = `
         <div class="row">
+            <div class="col-lg" style="margin-bottom:20px">
+                <h2>Filters:</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg" style="margin-bottom:20px">
+                <label for="trackingIdInput">Tracking ID: </label>
+                <input type="text" id="trackingIdInput" style="margin-right:30px" placeholder="Tracking ID"></input>
+                <label for="startDate">Start Date: </label>
+                <input type="date" id="startDate"  style="margin-right:30px"></input>
+                <label for="endDate">End Date: </label>
+                <input type="date" id="endDate" style="margin-right:30px"></input>
+                <button id="submitFilter">Filter!</button>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-lg">
                 <table id="boxTable" class="table table-bordered">
                 </table>
             </div>
         </div>
-        <nav aria-label="Page navigation example">
+        <nav aria-label="Page navigation" id="paginationButtons">
             <ul class="pagination">
                 <li class="page-item" id="firstPage"><button class="page-link" >First</button></li>
                 <li class="page-item" id="previousPage"><button class="page-link" >Previous</button></li>
@@ -40,17 +56,18 @@ export const startReport = async () => {
                 <li class="page-item" id="nextPage"><button class="page-link">Next</button></li>
                 <li class="page-item" id="lastPage"><button class="page-link">Last</button></li>
             </ul>
-            </nav>
+        </nav>
     `;
     /*var x = document.getElementById("specimenList");
     var option = document.createElement("option");
     option.text = "Kiwi";
     x.add(option);*/
-    let numPages = await getNumPages(5);
+    let numPages = await getNumPages(5, {});
     document.getElementById('contentBody').innerHTML = template;
     removeActiveClass('navbar-btn', 'active')
-    populateBoxTable(0);
-    addPaginationFunctionality(numPages);
+    addEventFilter();
+    populateBoxTable(0, {});
+    addPaginationFunctionality(numPages, {});
     
     hideAnimation();
     

@@ -301,7 +301,7 @@ export const ship = async (boxes, shippingData, trackingNumbers) => {
     return response.json();
 }
 
-export const getPage = async (pageNumber, numElementsOnPage, orderBy) => {
+export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) => {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -309,7 +309,7 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy})
+        body: JSON.stringify({"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy, "filters":filters})
     }
     const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
     console.log('THIS IS THE RESPONSE !@$!@$IGH!@$OIG!@E: ')
@@ -515,17 +515,22 @@ export const getLocationsInstitute = async () => {
     return locations;
 }
 
-export const getNumPages = async (numPerPage) => {
+export const getNumPages = async (numPerPage, filter) => {
+    
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getNumBoxesShipped`, {
-        method: "GET",
+        method: "POST",
         headers: {
-            Authorization:"Bearer "+idToken
-        }
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(filter)
     });
     let res = await response.json();
-    let numBoxes = res.response;
-    return Math.ceil(numBoxes/numPerPage)
+    let numBoxes = res.data;
+    console.log('numBoxes: ' + numBoxes)
+    return Math.ceil(numBoxes/numPerPage);
+    return 3;
 }
 
 export const getSiteCouriers = async () => {

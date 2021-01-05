@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking} from './pages/shipping.js';
@@ -2559,9 +2559,10 @@ export const populateCourierBox = async () => {
 
 }
 
-export const populateBoxTable = async (page) => {
+export const populateBoxTable = async (page, filter) => {
     showAnimation();
-    let pageStuff = await getPage(page, 5, '555611076')
+    let pageStuff = await getPage(page, 5, '656548982', filter)
+    console.log(JSON.stringify(pageStuff))
     let currTable = document.getElementById('boxTable')
     currTable.innerHTML = ''
     var rowCount = currTable.rows.length;
@@ -2616,8 +2617,9 @@ export const populateBoxTable = async (page) => {
         currRow.insertCell(9).innerHTML = currPage.hasOwnProperty('') ? currPage[''] : '';
         currRow.insertCell(10).innerHTML = '';
         addEventViewManifestButton('reportsViewManifest' + i, currPage);
-        hideAnimation();
+        
     }
+    hideAnimation();
 
 }
 
@@ -2740,7 +2742,15 @@ export const populateReportManifestTable = (currPage) => {
     
 }
 
-export const addPaginationFunctionality = (lastPage) => {
+export const addPaginationFunctionality = (lastPage, filter) => {
+    let paginationButtons = document.getElementById('paginationButtons');
+    paginationButtons.innerHTML = ` <ul class="pagination">
+                                        <li class="page-item" id="firstPage"><button class="page-link" >First</button></li>
+                                        <li class="page-item" id="previousPage"><button class="page-link" >Previous</button></li>
+                                        <li class="page-item" id="thisPage"><a class="page-link"  id = "middlePage">1</a></li>
+                                        <li class="page-item" id="nextPage"><button class="page-link">Next</button></li>
+                                        <li class="page-item" id="lastPage"><button class="page-link">Last</button></li>
+                                    </ul>`
     let first = document.getElementById('firstPage');
     let previous = document.getElementById('previousPage');
     let current = document.getElementById('thisPage');
@@ -2750,23 +2760,48 @@ export const addPaginationFunctionality = (lastPage) => {
 
     first.addEventListener('click', () => {
         middleNumber.innerHTML = '1'
-        populateBoxTable(0)
+        populateBoxTable(0, filter)
     })
     
     previous.addEventListener('click', () => {
         middleNumber.innerHTML = middleNumber.innerHTML == '1' ? '1' : parseInt(middleNumber.innerHTML) - 1;
-        populateBoxTable(parseInt(middleNumber.innerHTML) - 1)
+        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter)
     })
 
     next.addEventListener('click', () => {
         middleNumber.innerHTML = middleNumber.innerHTML == lastPage.toString() ? lastPage.toString() : parseInt(middleNumber.innerHTML) + 1;
-        populateBoxTable(parseInt(middleNumber.innerHTML) - 1)
+        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter)
     })
 
     final.addEventListener('click', () => {
         middleNumber.innerHTML = lastPage;
-        populateBoxTable(lastPage - 1)
+        populateBoxTable(lastPage - 1, filter)
     })
 
+
+}
+
+export const addEventFilter = () => {
+    
+    let filterButton = document.getElementById('submitFilter');
+    filterButton.addEventListener('click', async () => {
+        let trackingId = document.getElementById('trackingIdInput').value.trim();
+        let startDate = document.getElementById('startDate').value;
+        let endDate = document.getElementById('endDate').value;
+        let filter = {};
+        if(trackingId !== ""){
+            filter['trackingId'] = trackingId;
+        }
+        if(startDate !== ""){
+            filter['startDate'] = Date.parse(startDate);
+        }
+        if(endDate !== ""){
+            filter['endDate'] = Date.parse(endDate);
+        }
+        populateBoxTable(0, filter);
+        let numPages = await getNumPages(5, filter);
+        addPaginationFunctionality(numPages);
+
+    })
 
 }
