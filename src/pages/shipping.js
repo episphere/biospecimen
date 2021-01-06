@@ -24,14 +24,12 @@ const conversion = {
     "683613884":"0024",
 }
 
-export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
-    
+export const shippingDashboard = (auth, route, goToSpecimenSearch) => {  
     auth.onAuthStateChanged(async user => {
         if(user){
-            const role = await userAuthorization(route, user.displayName);
+            const role = await userAuthorization(route, user.displayName ? user.displayName : user.email);
             if(!role) return;
-            console.log(user.displayName)
-            startShipping(user.displayName);
+            startShipping(user.displayName ? user.displayName : user.email);
         }
         else {
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();

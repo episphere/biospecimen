@@ -1,12 +1,11 @@
 import { validateUser, siteFullNames, showAnimation, hideAnimation, errorMessage, removeAllErrors } from "./../shared.js";
 import { userDashboard } from "./dashboard.js";
-import { shippingDashboard } from "./shipping.js";
 import { nonUserNavBar, unAuthorizedUser } from './../navbar.js'
 
 export const welcomeScreen = async (auth, route) => {
     const user = auth.currentUser;
     if(!user) return;
-    const name = user.displayName;
+    const name = user.displayName ? user.displayName : user.email;
     showAnimation();
     const response = await validateUser();
     hideAnimation();

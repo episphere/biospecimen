@@ -6,7 +6,7 @@ import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 export const userDashboard = (auth, route, goToSpecimenSearch) => {
     auth.onAuthStateChanged(async user => {
         if(user){
-            const role = await userAuthorization(route, user.displayName);
+            const role = await userAuthorization(route, user.displayName ? user.displayName : user.email);
             if(!role) return;
             searchTemplate(goToSpecimenSearch);
         }

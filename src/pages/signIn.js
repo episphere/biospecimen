@@ -46,6 +46,7 @@ export const signIn = () => {
             .then(async (result) => {
                 console.log(result)
                 console.log(await getIdToken());
+                location.hash = '#welcome'
             })
             .catch((error) => {
                 console.log(error)

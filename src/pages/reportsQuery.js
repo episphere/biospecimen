@@ -5,12 +5,10 @@ import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 
 export const reportsQuery = (auth, route) => {
-    
     auth.onAuthStateChanged(async user => {
         if(user){
-            const role = await userAuthorization(route, user.displayName);
+            const role = await userAuthorization(route, user.displayName ? user.displayName : user.email);
             if(!role) return;
-            console.log(user.displayName)
             startReport();
         }
         else {
