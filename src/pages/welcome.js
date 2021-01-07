@@ -45,7 +45,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
                     <div class="col"><button class="btn btn-outline-secondary" id="btnSpecimenSearch">Specimen Search</button></div>
                 </div>
             </div>
-            <div class="col div-border">
+            <div class="col div-border align-center">
             </br>
             </br>
                 <div class="row">
