@@ -2743,6 +2743,7 @@ export const populateReportManifestTable = (currPage) => {
 }
 
 export const addPaginationFunctionality = (lastPage, filter) => {
+    console.log("last Page: " + lastPage)
     let paginationButtons = document.getElementById('paginationButtons');
     paginationButtons.innerHTML = ` <ul class="pagination">
                                         <li class="page-item" id="firstPage"><button class="page-link" >First</button></li>
@@ -2769,13 +2770,13 @@ export const addPaginationFunctionality = (lastPage, filter) => {
     })
 
     next.addEventListener('click', () => {
-        middleNumber.innerHTML = middleNumber.innerHTML == lastPage.toString() ? lastPage.toString() : parseInt(middleNumber.innerHTML) + 1;
+        middleNumber.innerHTML = parseInt(middleNumber.innerHTML) >= lastPage ? (lastPage == 0 ? 1 : lastPage.toString()) : parseInt(middleNumber.innerHTML) + 1;
         populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter)
     })
 
     final.addEventListener('click', () => {
-        middleNumber.innerHTML = lastPage;
-        populateBoxTable(lastPage - 1, filter)
+        middleNumber.innerHTML = lastPage == 0 ? 1 : lastPage;
+        populateBoxTable(lastPage == 0 ? 0 : lastPage - 1, filter)
     })
 
 
@@ -2793,10 +2794,17 @@ export const addEventFilter = () => {
             filter['trackingId'] = trackingId;
         }
         if(startDate !== ""){
-            filter['startDate'] = Date.parse(startDate);
+            filter['startDate'] = Date.parse(startDate + ' 12:00 am');
         }
         if(endDate !== ""){
-            filter['endDate'] = Date.parse(endDate);
+            filter['endDate'] = Date.parse(endDate + ' 11:59 pm');
+            if(startDate !== ""){
+                if(filter['endDate'] <= filter['startDate']){
+                    //throw error
+                    return;
+                }
+            }
+            
         }
         populateBoxTable(0, filter);
         let numPages = await getNumPages(5, filter);
