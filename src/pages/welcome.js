@@ -30,20 +30,29 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             <div class="col">Site: ${siteFullNames[data.siteAcronym]}</div>
         </div>
         <div class="row welcome-screen-div">
-            <div class="col">
-                <label for="dashboardSelection" class="col-form-label">Select dashboard to use </label>
-                <select required class="col form-control" id="dashboardSelection">
-                    <option value="">-- Select dashboard --</option>
-                    <option value="clinical">Clinical Dashboard</option>
-                    <option value="research">Research Dashboard</option>
-                </select>
+            <div class="col div-border" style="margin-right: 1rem;padding-bottom: 1rem;">
+                <div>
+                    <label for="dashboardSelection" class="col-form-label">Select dashboard to use </label>
+                    <select required class="col form-control" id="dashboardSelection">
+                        <option value="">-- Select dashboard --</option>
+                        <option value="clinical">Clinical Dashboard</option>
+                        <option value="research">Research Dashboard</option>
+                    </select>
+                </div>
+                </br>
+                <div class="row">
+                    <div class="col"><button class="btn btn-outline-primary" id="btnParticipantSearch">Participant Search</button></div>
+                    <div class="col"><button class="btn btn-outline-secondary" id="btnSpecimenSearch">Specimen Search</button></div>
+                </div>
             </div>
-        </div>
-        <div class="row welcome-screen-btn-div">
-            <div class="col"><button class="btn btn-outline-primary" id="btnParticipantSearch">Participant Search</button></div>
-            <div class="col"><button class="btn btn-outline-secondary" id="btnSpecimenSearch">Specimen Search</button></div>
-            <div class="col"><button class="btn btn-outline-warning" id="btnShipping">Shipping</button></div>
-            <div class="col"><button class="btn btn-outline-warning" id="btnReports">Reports</button></div>
+            <div class="col div-border">
+            </br>
+            </br>
+                <div class="row">
+                    <div class="col"><button class="btn btn-outline-warning" id="btnShipping">Shipping</button></div>
+                    <div class="col"><button class="btn btn-outline-warning" id="btnReports">Reports</button></div>
+                </div>
+            </div>
         </div>
     `;
     document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
