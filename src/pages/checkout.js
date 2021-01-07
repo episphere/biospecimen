@@ -21,7 +21,7 @@ export const checkOutScreen = (data, specimenData) => {
         </br>
         <div class="row">
             <div class="col">
-                <strong>Status of biospecimen questionnaires.</strong> If a questionnaire has not been completed, click on the QR code.
+                <strong>Status of biospecimen questionnaires.</strong>
             </div>
         </div>
         </br>

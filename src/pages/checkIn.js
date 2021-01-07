@@ -98,7 +98,7 @@ export const checkInTemplate = (data) => {
                     <button class="btn btn-outline-dark" id="checkInExit"><i class="fas fa-arrow-left"></i> Exit</button>
                 </div>
                 <div class="ml-auto">
-                    <button class="btn btn-outline-primary" type="submit" id="checkInComplete">Check-In complete</button>
+                    <button class="btn btn-outline-primary" type="submit" id="checkInComplete">Check-In and Continue</button>
                 </div>
             </div>
         </form>

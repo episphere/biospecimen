@@ -1,4 +1,4 @@
-import { validateUser } from "../shared.js";
+import { getIdToken } from "../shared.js";
 import { homeNavBar } from "./../navbar.js";
 
 export const signIn = () => {
@@ -43,9 +43,10 @@ export const signIn = () => {
         const saml = new firebase.auth.SAMLAuthProvider(provider);
         firebase.auth().tenantId = tenantID;
         firebase.auth().signInWithPopup(saml)
-            .then((result) => {
-                console.log(result);
-                // validateUser();
+            .then(async (result) => {
+                console.log(result)
+                console.log(await getIdToken());
+                location.hash = '#welcome'
             })
             .catch((error) => {
                 console.log(error)

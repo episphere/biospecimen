@@ -5,7 +5,7 @@ import { addEventModalBtn, addEventRemoveUser } from "../events.js";
 export const manageUsers = (auth, route) => {
     auth.onAuthStateChanged(async user => {
         if(user){
-            const role = await userAuthorization(route, user.displayName);
+            const role = await userAuthorization(route, user.displayName ? user.displayName : user.email);
             if(!role) return;
             if(role === "user") window.location.hash = '#dashboard';
             document.getElementById('contentBody').innerHTML = '';
