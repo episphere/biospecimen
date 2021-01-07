@@ -425,6 +425,9 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         let numRows = tubeTable.rows.length;
         let bagSplit = bagid.split(/\s+/);
         let boxId = ""
+        let nameSplit = userName.split(' ');
+        let firstName = nameSplit[0] ? nameSplit[0] : '';
+        let lastName = nameSplit[1] ? nameSplit[1] : '';
         boxId = document.getElementById('shippingModalChooseBox').value;
 
         if(isOrphan){
@@ -444,12 +447,12 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
                     arr.push(toAddId);
                 }
                 else{
-                    hiddenJSON[boxId][bagid] = {'isBlood':isBlood,'arrElements':[toAddId]};
+                    hiddenJSON[boxId][bagid] = {'isBlood':isBlood,'arrElements':[toAddId], '469819603': firstName, '618036638': lastName};
                 }
             }
             else{
                 hiddenJSON[boxId] = {}
-                hiddenJSON[boxId][bagid] = {'isBlood':isBlood,'arrElements':[toAddId]};
+                hiddenJSON[boxId][bagid] = {'isBlood':isBlood,'arrElements':[toAddId], '469819603': firstName, '618036638': lastName};
             }
 
         }
@@ -2315,12 +2318,16 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
             }
             currRow.insertCell(2).innerHTML = toAddType
             console.log('wpoeifhn;posdiuvgbhnasloidkvubnaslikovuhbasnvo ' + JSON.stringify(currBox[bags[i]]))
-            if(currBox[bags[i]].hasOwnProperty('scanner') && j == 0){
-                currRow.insertCell(3).innerHTML = currBox[bags[i]]['scanner'];
+            let fullScannerName = ''
+
+            if(currBox[bags[i]].hasOwnProperty('469819603') && j == 0){
+                fullScannerName += currBox[bags[i]]['469819603'] + ' ';
             }
-            else{
-                currRow.insertCell(3).innerHTML = '';
+            if(currBox[bags[i]].hasOwnProperty('618036638') && j == 0){
+                fullScannerName += currBox[bags[i]]['618036638'];
             }
+            currRow.insertCell(3).innerHTML = fullScannerName;
+
             if(i % 2 == 0){
                 currRow.style['background-color'] = "lightgrey";
             }
@@ -2726,6 +2733,15 @@ export const populateReportManifestTable = (currPage) => {
                 toAddType = translateNumToType[thisId[1]];
             }
             currRow.insertCell(2).innerHTML = toAddType
+            let fullScannerName = ''
+            let currBox = currPage['bags'];
+            if(currBox[bags[i]].hasOwnProperty('469819603') && j == 0){
+                fullScannerName += currBox[bags[i]]['469819603'] + ' ';
+            }
+            if(currBox[bags[i]].hasOwnProperty('618036638') && j == 0){
+                fullScannerName += currBox[bags[i]]['618036638'];
+            }
+            currRow.insertCell(3).innerHTML = fullScannerName;
             if(currPage['bags'][bags[i]].hasOwnProperty('scanner') && j == 0){
                 currRow.insertCell(3).innerHTML = currBox[bags[i]]['scanner'];
             }
