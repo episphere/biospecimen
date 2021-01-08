@@ -860,6 +860,12 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
             currJSON = hiddenJSON[i]
         }
     }
+    let currJSONKeys = Object.keys(currJSON['bags'])
+    let numBags = currJSONKeys.length;
+    let numTubes = 0;
+    for(let i = 0; i < currJSONKeys.length; i++){
+        numTubes += currJSON['bags'][currJSONKeys[i]]['arrElements'].length;
+    }
     console.log(JSON.stringify(currJSON))
 
     let newP = document.createElement("p");
@@ -902,6 +908,12 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
     newP = document.createElement("p");
     newP.innerHTML = "Last Modified: " + toInsertDate2;
     document.getElementById('boxManifestCol1').appendChild(newP);
+    newP = document.createElement("p");
+    newP.innerHTML = "Number of Bags " + numBags;
+    document.getElementById('boxManifestCol3').appendChild(newP);
+    newP = document.createElement("p");
+    newP.innerHTML = "Number of Tubes:  " + numTubes;
+    document.getElementById('boxManifestCol3').appendChild(newP);
      
 
 }
@@ -2761,7 +2773,8 @@ export const populateReportManifestTable = (currPage) => {
 export const addPaginationFunctionality = (lastPage, filter) => {
     console.log("last Page: " + lastPage)
     let paginationButtons = document.getElementById('paginationButtons');
-    paginationButtons.innerHTML = ` <ul class="pagination">
+    paginationButtons.innterHTML = ""
+    paginationButtons.innerHTML = `<ul class="pagination">
                                         <li class="page-item" id="firstPage"><button class="page-link" >First</button></li>
                                         <li class="page-item" id="previousPage"><button class="page-link" >Previous</button></li>
                                         <li class="page-item" id="thisPage"><a class="page-link"  id = "middlePage">1</a></li>
@@ -2776,6 +2789,8 @@ export const addPaginationFunctionality = (lastPage, filter) => {
     let middleNumber = document.getElementById('middlePage');
 
     first.addEventListener('click', () => {
+        console.log('this is the filter')
+        console.log(filter);
         middleNumber.innerHTML = '1'
         populateBoxTable(0, filter)
     })
@@ -2824,7 +2839,7 @@ export const addEventFilter = () => {
         }
         populateBoxTable(0, filter);
         let numPages = await getNumPages(5, filter);
-        addPaginationFunctionality(numPages);
+        addPaginationFunctionality(numPages, filter);
 
     })
 
