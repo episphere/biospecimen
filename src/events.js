@@ -2818,17 +2818,19 @@ export const addEventFilter = () => {
     let filterButton = document.getElementById('submitFilter');
     filterButton.addEventListener('click', async () => {
         let trackingId = document.getElementById('trackingIdInput').value.trim();
+        
         let startDate = document.getElementById('startDate').value;
         let endDate = document.getElementById('endDate').value;
+        console.log(startDate)
         let filter = {};
         if(trackingId !== ""){
             filter['trackingId'] = trackingId;
         }
         if(startDate !== ""){
-            filter['startDate'] = Date.parse(startDate + ' 12:00 am');
+            filter['startDate'] = Date.parse(startDate + ' 00:00');
         }
         if(endDate !== ""){
-            filter['endDate'] = Date.parse(endDate + ' 11:59 pm');
+            filter['endDate'] = Date.parse(endDate + ' 23:59');
             if(startDate !== ""){
                 if(filter['endDate'] <= filter['startDate']){
                     //throw error
