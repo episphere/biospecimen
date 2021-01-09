@@ -1469,6 +1469,7 @@ export const addEventModalAddBox = (userName) => {
             let box = boxJSONS[i]
             hiddenJSONLocation[box['132929440']] = box['bags']
         }
+        await populateModalSelect(hiddenJSONLocation)
         await populateBoxSelectList(hiddenJSONLocation,userName);
         hideAnimation()
     })
