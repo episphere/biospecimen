@@ -1194,6 +1194,7 @@ const compareBoxIds = (a,b) => {
 }
 
 export const populateBoxSelectList = async (hiddenJSON, userName) => {
+    console.log('Here Number of times count !!!')
     let boxList = document.getElementById('selectBoxList');
     let selectBoxList = document.getElementById('selectBoxList');
     let list = ''
@@ -1347,6 +1348,7 @@ const addNewBox = async  (userName) => {
     let largestLocation = 0;
     let largestLocationIndex = -1;
     let pageLocation = document.getElementById('selectLocationList').value;
+    console.log('This is the empty? ' + JSON.stringify(hiddenJSON))
     for(let i = 0; i < hiddenJSON.length; i++){
         let curr = parseInt(hiddenJSON[i]['132929440'].substring(3))
         let currLocation = hiddenJSON[i]['560975149']
@@ -1367,6 +1369,9 @@ const addNewBox = async  (userName) => {
             //add a new Box
             //create new Box Id
             let newBoxNum = parseInt(lastBox.substring(3)) + 1;
+            if(newBoxNum === undefined){
+                newBoxNum = 1;
+            }
             let newBoxId = 'Box' + newBoxNum.toString();
             let toPass = {};
             toPass['132929440'] = newBoxId;
@@ -1374,7 +1379,7 @@ const addNewBox = async  (userName) => {
             toPass['560975149'] = pageLocation;
             await storeBox(toPass);
 
-            hiddenJSON.push({boxId:newBoxId, bags:{}, location:pageLocation})
+            hiddenJSON.push({'132929440':newBoxId, bags:{}, '560975149':pageLocation})
             let boxJSONS = hiddenJSON;
             
             hiddenJSON = {};
@@ -1382,7 +1387,9 @@ const addNewBox = async  (userName) => {
             for(let i = 0; i < boxJSONS.length; i++){
                 let box = boxJSONS[i]
                 if(box['560975149'] == pageLocation){
-                    hiddenJSON[box['132929440']] = box['bags']
+                    if(!box.hasOwnProperty('145971562') || box['145971562'] !== '353358909'){
+                        hiddenJSON[box['132929440']] = box['bags']
+                    }
                 }
             }
             await populateBoxSelectList(hiddenJSON, userName)
@@ -1394,12 +1401,11 @@ const addNewBox = async  (userName) => {
     else{
         //add a new Box
         //create new Box Id
-        let lastBox = '1'
+        let lastBox = 'Box0'
         if(largeIndex != -1){
             lastBox = hiddenJSON[largeIndex]['132929440']
         }
         let newBoxNum = parseInt(lastBox.substring(3)) + 1;
-        console.log('xd')
         let newBoxId = 'Box' + newBoxNum.toString();
         let toPass = {};
         toPass['132929440'] = newBoxId;
@@ -1407,17 +1413,22 @@ const addNewBox = async  (userName) => {
         toPass['560975149'] = pageLocation;
         await storeBox(toPass);
 
-        hiddenJSON.push({boxId:newBoxId, bags:{}, location:pageLocation})
+        hiddenJSON.push({'132929440':newBoxId, bags:{}, '560975149':pageLocation})
         let boxJSONS = hiddenJSON;
         
         hiddenJSON = {};
-
+        console.log('boxJSON here; ' + JSON.stringify(boxJSONS))
         for(let i = 0; i < boxJSONS.length; i++){
             let box = boxJSONS[i]
+            console.log(pageLocation)
+            console.log(JSON.stringify(box))
             if(box['560975149'] == pageLocation){
-                hiddenJSON[box['132929440']] = box['bags']
+                if(!box.hasOwnProperty('145971562') || box['145971562'] !== '353358909'){
+                    hiddenJSON[box['132929440']] = box['bags']
+                }
             }
         }
+        console.log("HiddenJSON can be found here: " + JSON.stringify(hiddenJSON))
         await populateBoxSelectList(hiddenJSON, userName)
         
     }
