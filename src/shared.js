@@ -130,7 +130,7 @@ export const userAuthorization = async (route, name) => {
 
 
 export const toggleCurrentPage = async (route) => {
-    const IDs = ['dashboard', 'manageUsers', 'shipping'];
+    const IDs = ['dashboard', 'manageUsers', 'shipping', 'reports'];
     IDs.forEach(id => {
         const element = document.getElementById(id);
         if(!element) return;
@@ -144,6 +144,7 @@ export const toggleCurrentPage = async (route) => {
     if(route === '#dashboard') document.getElementById('dashboard') ? document.getElementById('dashboard').click() : '';
     else if(route === '#manage_users') document.getElementById('manageUsers') ? document.getElementById('manageUsers').click() : '';
     else if(route === '#shipping') document.getElementById('shipping') ? document.getElementById('shipping').click() : '';
+    else  if(route === '#reports') document.getElementById('reports') ? document.getElementById('reports').click() : '';
 }
 
 export const removeActiveClass = (className, activeClass) => {

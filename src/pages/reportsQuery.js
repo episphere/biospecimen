@@ -26,11 +26,13 @@ export const startReport = async () => {
     let template = `
         <div class="row">
             <div class="col-lg" style="margin-bottom:20px">
-                <h2>Filters:</h2>
+                <h2>Shipping Reports</h2>
             </div>
         </div>
         <div class="row">
+            
             <div class="col-lg" style="margin-bottom:20px">
+                <h5>Filters</h5>
                 <label for="trackingIdInput">Tracking ID: </label>
                 <input type="text" id="trackingIdInput" style="margin-right:30px" placeholder="Tracking ID"></input>
                 <label for="startDate">Start Date: </label>
