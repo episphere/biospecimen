@@ -39,6 +39,16 @@ export const userNavBar = (name) => {
         </div>
         <div class="navbar-nav">
             <li class="nav-item">
+                <a class="nav-link" href="#shipping" id="shipping" title="Shipping"><i class="fas fa-shipping-fast"></i> Shipping</a>
+            </li>
+        </div>
+        <div class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="#reports" id="reports" title="Reports"><i class="fa fa-table"></i> Reports</a>
+            </li>
+        </div>
+        <div class="navbar-nav">
+            <li class="nav-item">
                 <a target="_blank" class="nav-link" href="https://github.com/episphere/connect/issues" title="Please create an issue if you encounter any"><i class="fas fa-bug"></i> Report issue</a>
             </li>
         </div>
@@ -115,6 +125,11 @@ export const adminNavBar = (name) => {
         <div class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link" href="#shipping" id="shipping" title="Shipping"><i class="fas fa-shipping-fast"></i> Shipping</a>
+            </li>
+        </div>
+        <div class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="#reports" id="reports" title="Reports"><i class="fa fa-table"></i> Reports</a>
             </li>
         </div>
         <div class="navbar-nav">
