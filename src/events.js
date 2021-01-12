@@ -875,8 +875,9 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
     let toInsertDate = ''
     if(currJSON.hasOwnProperty('672863981')){
         let dateStarted = Date.parse(currJSON['672863981'])
-        
         let currentdate = new Date(dateStarted); 
+        console.group(currentdate.getMinutes())
+        let currMins = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes():currentdate.getMinutes();
         console.log('oaliwjbdvlicakjbdvoilasudvb ' + JSON.stringify(hiddenJSON))
         let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
         let hour = parseInt(currentdate.getHours())%12;
@@ -884,7 +885,7 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
                         + currentdate.getDate()  + "/" 
                         + currentdate.getFullYear() + " "  
                         + hour.toString()+ ":"  
-                        + currentdate.getMinutes() + ampm;
+                        + currMins + ampm;
 
     }
     let toInsertDate2 = ''
@@ -892,6 +893,7 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
         let dateStarted = Date.parse(currJSON['555611076'])
         
         let currentdate = new Date(dateStarted); 
+        let currMins = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes():currentdate.getMinutes();
         console.log('oaliwjbdvlicakjbdvoilasudvb ' + JSON.stringify(hiddenJSON))
         let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
         let hour = parseInt(currentdate.getHours())%12;
@@ -899,7 +901,7 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
                         + currentdate.getDate()  + "/" 
                         + currentdate.getFullYear() + " "  
                         + hour.toString()+ ":"  
-                        + currentdate.getMinutes() + ampm;
+                        + currMins+ ampm;
 
     }
     newP = document.createElement("p");
@@ -1095,7 +1097,8 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
     let currentdate = new Date(); 
     let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
     let hour = (currentdate.getHours() - 1 + 12)%12 + 1;
-    let minutes = currentdate.getMinutes();
+    let minutes = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes():currentdate.getMinutes();
+
     if(minutes < 10){
         minutes = "0" + minutes;
     }
