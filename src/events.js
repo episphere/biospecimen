@@ -122,12 +122,9 @@ export const addEventAddSpecimenToBox = (userName) => {
         for(let i = 1; i < shippingTable.rows.length; i++){
             let currRow = shippingTable.rows[i];
             if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
-                console.log(currRow.cells[2].innerText)
                 tableIndex = i;
                 biospecimensList = JSON.parse(currRow.cells[2].innerText)
                 foundInShipping = true;
-                console.log('owikebnvolekidbnvpowivbhnwspolivkbnh')
-                console.log(JSON.stringify(biospecimensList))
             }
             
         }
@@ -135,10 +132,8 @@ export const addEventAddSpecimenToBox = (userName) => {
        for(let i = 1; i < orphanTable.rows.length; i++){
             let currRow = orphanTable.rows[i];
             if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
-                //console.log(currRow.cells[2].innerText)
                 tableIndex = i;
                 let currTubeNum = currRow.cells[0].innerText.split(' ')[1];
-                console.log(currTubeNum)
                 biospecimensList = [currTubeNum];
                 foundInOrphan = true;
             }
@@ -192,12 +187,9 @@ export const addEventAddSpecimenToBox = (userName) => {
         for(let i = 1; i < shippingTable.rows.length; i++){
             let currRow = shippingTable.rows[i];
             if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
-                console.log(currRow.cells[2].innerText)
                 tableIndex = i;
                 biospecimensList = JSON.parse(currRow.cells[2].innerText)
                 foundInShipping = true;
-                console.log('owikebnvolekidbnvpowivbhnwspolivkbnh')
-                console.log(JSON.stringify(biospecimensList))
             }
             
         }
@@ -205,10 +197,8 @@ export const addEventAddSpecimenToBox = (userName) => {
        for(let i = 1; i < orphanTable.rows.length; i++){
             let currRow = orphanTable.rows[i];
             if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
-                //console.log(currRow.cells[2].innerText)
                 tableIndex = i;
                 let currTubeNum = currRow.cells[0].innerText.split(' ')[1];
-                console.log(currTubeNum)
                 biospecimensList = [currTubeNum];
                 foundInOrphan = true;
             }
@@ -275,7 +265,6 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let response = await getBoxesByLocation(currLocation);
     let boxJSONS = response.data;
     let hiddenJSON = {};
-    console.log(boxJSONS)
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
         hiddenJSON[box['132929440']] = box['bags']
@@ -410,7 +399,6 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         let response = await  getBoxes();
         let boxJSONS = response.data;
         let locations = {};
-        console.log(boxJSONS)
         for(let i = 0; i < boxJSONS.length; i++){
             let box = boxJSONS[i]
             hiddenJSON[box['132929440']] = box['bags']
@@ -418,7 +406,6 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         }
         let nextBoxNum = Object.keys(hiddenJSON).length + 1;
 
-        console.log('trigger')
         //push the things into the right box
         //first get all elements still left
         let tubeTable = document.getElementById("shippingModalTable");
@@ -478,7 +465,6 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         }
         let boxIds = Object.keys(hiddenJSON).sort(compareBoxIds);
 
-        console.log(boxIds);    
         for(let i = 0; i < boxIds.length; i++){
             let currTime = new Date();
             let toPass = {};
@@ -556,8 +542,6 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
         "683613884":"0024"
     }
     let specimenData = await searchSpecimenInstitute();
-    console.log('waoikebnp;oisdgbvspoiduvbgaoiwluejfbolafiujbf');
-    console.log(JSON.stringify(specimenData));
     //let specimenData = response.data;
     let toReturn = {};
     let checkedOrphans = false;
@@ -570,7 +554,6 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
             for(let j = 0; j < boxes.length; j++){
                 let specimens = Object.keys(hiddenJSON[boxes[j]]);
-                console.log(JSON.stringify(hiddenJSON[boxes[j]]));
                 if(specimens.includes(specimenData[i]['820476880'] + ' 0008')){
                     let currList =  hiddenJSON[boxes[j]][specimens[specimens.indexOf(specimenData[i]['820476880'] + ' 0008')]]['arrElements']
                     for(let k = 0; k < currList.length; k++){
@@ -586,8 +569,6 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 }
                 if(checkedOrphans == false){
                     if(specimens.includes('unlabelled')){
-                        console.log('ipouaqwjehbdsfnvlkasjdbvloiaksudjvbgoivu')
-                        console.log(JSON.stringify( hiddenJSON[boxes[j]]['unlabelled']['arrElements']))
                         let currList =  hiddenJSON[boxes[j]]['unlabelled']['arrElements']
                         for(let k = 0; k < currList.length; k++){
                             toExcludeOrphans.push(currList[k].split(/\s+/)[1]);
@@ -604,18 +585,15 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
             
             let currKey = keys[j];
             if(conversion.hasOwnProperty(currKey)){
-                console.log(conversion[currKey])
                 //get number of the tube
                 //let tubeNum = currKey.substring(4, currKey.indexOf("Id"));
                 let shippedKey = '145971562'
                 let missingKey = '258745303'
                 let currJSON = specimenData[i][currKey];
-                console.log('euiusvdisudvbgosidbvosidv '  + JSON.stringify(currJSON))
 
                 if(currJSON.hasOwnProperty(shippedKey) && currJSON[shippedKey] == '353358909'){
                     if(conversion[currKey] != '0007'){
                         if(toExclude8.indexOf(conversion[currKey]) == -1){
-                            console.log('here1')
                             list8.push(conversion[currKey]);
                         }
                     }
@@ -640,12 +618,7 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                     }
                     else{
                         if(conversion[currKey] != '0007'){
-                            console.log('woiujebgisdubvgsdoiv: ' + conversion[currKey]);
-                            console.log(JSON.stringify(currJSON))
-                            console.log(currJSON[missingKey])
-                            console.log(currJSON[shippedKey])
                             if(toExclude8.indexOf(conversion[currKey]) == -1){
-                                console.log('here1')
                                 list8.push(conversion[currKey]);
                             }
                         }
@@ -658,23 +631,14 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 }
             }
         }
-        console.log('toInclude/exclude' + specimenData[i]['820476880'])
-        console.log(JSON.stringify(list8))
-        console.log(JSON.stringify(list9))
-        console.log(JSON.stringify(toExclude8))
-        console.log(JSON.stringify(toExclude9))
         if(toExclude8.length > 0 && list8.length > 0 && specimenData[i].hasOwnProperty('820476880')){
             //add orphan tubes
             
             //toInsert[specimenData[i]['masterSpecimenId'] + ' 0008'] = list8
             if(!toReturn.hasOwnProperty('unlabelled')){
-                //console.log(JSON.stringify(toReturn))
                 toReturn['unlabelled'] = []
             }
             for(let j = 0; j < list8.length; j++){
-                console.log('oipuwqabe vloi;uajgbdsvolisadujbvsaloidvubasdliuasdvb')
-                console.log(list8[j]);
-                console.log(JSON.stringify(toExcludeOrphans))
                 if(!toExcludeOrphans.includes(list8[j])){
                     toReturn['unlabelled'].push(specimenData[i]['820476880'] + ' ' + list8[j])
                 }
@@ -684,12 +648,9 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
         if(toExclude9.length > 0 && list9.length > 0 && specimenData[i].hasOwnProperty('820476880')){
             
             if(!toReturn.hasOwnProperty('unlabelled')){
-                //console.log(JSON.stringify(toReturn))
                 toReturn['unlabelled'] = []
             }
             for(let j = 0; j < list9.length; j++){
-                console.log('oipuwqabe vloi;uajgbdsvolisadujbvsaloidvubasdliuasdvb1')
-                console.log(specimenData[i]['820476880'] + ' ' + list9[j]);
                 if(!toExcludeOrphans.includes(list9[j])){
                     toReturn['unlabelled'].push(specimenData[i]['820476880'] + ' ' + list9[j])
                 }
@@ -704,7 +665,6 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
         }
     }
     
-    console.log('THIS IS THE TORETURN: ' + JSON.stringify(toReturn))
     return toReturn;
 }
 
@@ -712,16 +672,11 @@ export const populateSpecimensList = async (hiddenJSON) => {
     let specimenObject = await getInstituteSpecimensList(hiddenJSON);
     let specimenData = await searchSpecimenInstitute();
     //let specimenData = response.data
-    console.log("SpecimenData!!: " + JSON.stringify(specimenData))
-    console.log(JSON.stringify(specimenObject))
     for(let i = 0; i < specimenData.length; i++){
         //let specimenData = 
         
     }
     let list = Object.keys(specimenObject);
-    console.log(list)
-    //console.log(JSON.stringify(curr));
-    //let list = ["KW123456 0008", "KW123456 0009"]
     list.sort();
     
     var specimenList = document.getElementById("specimenList");
@@ -764,7 +719,6 @@ export const populateSpecimensList = async (hiddenJSON) => {
         specimenPanel.style.height = '400px'
         
         let toInsert = specimenObject['unlabelled'];
-        console.log('ORPHANS: ' + JSON.stringify(toInsert))
         var rowCount = orphanTable.rows.length;
         var row = orphanTable.insertRow(rowCount); 
         row.insertCell(0).innerHTML= 'Stray tubes';
@@ -778,7 +732,6 @@ export const populateSpecimensList = async (hiddenJSON) => {
             if(rowCount % 2  == 0){
                 row.style['background-color'] = 'lightgrey'
             }
-            console.log(toInsert[i])
             row.insertCell(0).innerHTML= toInsert[i];
             row.insertCell(1).innerHTML ='<input type="button" class="delButton" value = "Report as Missing"/>';
         
@@ -795,23 +748,12 @@ export const populateSpecimensList = async (hiddenJSON) => {
                 
                 let currRow = table.rows[index];
                 let currTubeId = table.rows[index].cells[0].innerText;
-                console.log(currTubeId);
-                /*if(currRow.cells[0].innerText != ""){
-                    if(index < table.rows.length-1){
-                        if(table.rows[index + 1].cells[0].innerText ==""){
-                            table.rows[index+1].cells[0].innerText = currRow.cells[0].innerText;
-                        }
-                    }
-                }*/
+
                 table.deleteRow(index);
-                console.log(currTubeId + 'foianbeoivbeoib')
                 let result = await removeMissingSpecimen(currTubeId);
-                console.log(result)
-                //let result = await removeBag(boxList.value, [currBagId])
-                //console.log(JSON.stringify(result))
+
                 currRow = table.rows[index];
                 while(currRow != undefined && currRow.cells[0].innerText ==""){
-                    console.log(currRow.cells)
                     table.deleteRow(index);
                     currRow = table.rows[index];
                 }
@@ -856,7 +798,6 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
     let currJSON = {};
     for(let i =0;i < hiddenJSON.length; i++){
         if(hiddenJSON[i]['132929440'] == boxId){
-            console.log('91283ghr9iubgv0987g23bfouwegvo87weub')
             currJSON = hiddenJSON[i]
         }
     }
@@ -866,7 +807,6 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
     for(let i = 0; i < currJSONKeys.length; i++){
         numTubes += currJSON['bags'][currJSONKeys[i]]['arrElements'].length;
     }
-    console.log(JSON.stringify(currJSON))
 
     let newP = document.createElement("p");
     newP.innerHTML = boxId + " Manifest";
@@ -878,7 +818,6 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
         let currentdate = new Date(dateStarted); 
         console.group(currentdate.getMinutes())
         let currMins = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes():currentdate.getMinutes();
-        console.log('oaliwjbdvlicakjbdvoilasudvb ' + JSON.stringify(hiddenJSON))
         let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
         let hour = parseInt(currentdate.getHours())%12;
         toInsertDate =  (currentdate.getMonth()+1) + "/"
@@ -894,7 +833,6 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
         
         let currentdate = new Date(dateStarted); 
         let currMins = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes():currentdate.getMinutes();
-        console.log('oaliwjbdvlicakjbdvoilasudvb ' + JSON.stringify(hiddenJSON))
         let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
         let hour = parseInt(currentdate.getHours())%12;
         toInsertDate2 =  (currentdate.getMonth()+1) + "/"
@@ -967,10 +905,8 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                         <th>Contents</th>
                         <th>View/Print Box Manifest</th>
                     </tr>`
-    console.log(table.innerHTML)
     let count = 0;
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
-    console.log('peiohowieboidsbvsdv: ' + JSON.stringify(boxes))
     for(let i = 0; i < boxes.length; i++){
         if(Object.keys(hiddenJSON[boxes[i]]).length > 0 ){
             let currRow = table.insertRow(count+1);
@@ -984,7 +920,6 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
             let thisLocation = '';
 
             for(let j = 0; j < boxJSONS.length; j++){
-                console.log('BWVIBLOISD BGV LOIVBGWEOLVI WBGEVOLWIBVGDV' + boxJSONS[j]['132929440'])
                 if(boxJSONS[j]['132929440'] == boxes[i]){
                     if(boxJSONS[j].hasOwnProperty('672863981')){
                         let timestamp = Date.parse(boxJSONS[j]['672863981']);
@@ -1052,8 +987,6 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
             })
         }    
     }
-    console.log('I was found here this many times!')
-    console.log(table.innerHTML)
 }
 
 export const populateTempNotification = async () => {
@@ -1085,10 +1018,6 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
 
-    console.log('weoibnsoidvbsodlvibaoiwbgeoiv')
-    console.log(JSON.stringify(hiddenJSON))
-
-    console.log(JSON.stringify(hiddenJSON))
     let newP = document.createElement("p");
     newP.innerHTML = "Shipment Manifest";
     document.getElementById('boxManifestCol1').appendChild(newP);
@@ -1128,7 +1057,6 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
 export const populateShippingManifestBody = (hiddenJSON) =>{
     let table = document.getElementById("shippingManifestTable");
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
-    console.log('boxSorted: ' + JSON.stringify(boxes))
     let currRowIndex = 1;
     let greyIndex = 0;
     for(let i = 0; i < boxes.length; i++){
@@ -1197,11 +1125,9 @@ const compareBoxIds = (a,b) => {
 }
 
 export const populateBoxSelectList = async (hiddenJSON, userName) => {
-    console.log('Here Number of times count !!!')
     let boxList = document.getElementById('selectBoxList');
     let selectBoxList = document.getElementById('selectBoxList');
     let list = ''
-    console.log('iewjudbvoiduvb' + JSON.stringify(hiddenJSON));
     let keys = Object.keys(hiddenJSON).sort(compareBoxIds);
     for(let i = 0; i < keys.length; i++){
         list += '<option>' + keys[i] + '</option>';
@@ -1351,7 +1277,6 @@ const addNewBox = async  (userName) => {
     let largestLocation = 0;
     let largestLocationIndex = -1;
     let pageLocation = document.getElementById('selectLocationList').value;
-    console.log('This is the empty? ' + JSON.stringify(hiddenJSON))
     for(let i = 0; i < hiddenJSON.length; i++){
         let curr = parseInt(hiddenJSON[i]['132929440'].substring(3))
         let currLocation = hiddenJSON[i]['560975149']
@@ -1420,18 +1345,14 @@ const addNewBox = async  (userName) => {
         let boxJSONS = hiddenJSON;
         
         hiddenJSON = {};
-        console.log('boxJSON here; ' + JSON.stringify(boxJSONS))
         for(let i = 0; i < boxJSONS.length; i++){
             let box = boxJSONS[i]
-            console.log(pageLocation)
-            console.log(JSON.stringify(box))
             if(box['560975149'] == pageLocation){
                 if(!box.hasOwnProperty('145971562') || box['145971562'] !== '353358909'){
                     hiddenJSON[box['132929440']] = box['bags']
                 }
             }
         }
-        console.log("HiddenJSON can be found here: " + JSON.stringify(hiddenJSON))
         await populateBoxSelectList(hiddenJSON, userName)
         
     }
@@ -1632,18 +1553,13 @@ export const addEventChangeLocationSelect = (userName) => {
         showAnimation();
         let currLocation = selectBoxList.value;
         let boxJSONS = (await getBoxesByLocation(currLocation)).data;
-        /*for(let i = 0; i < boxdata.length; i++){
-            console.log(boxdata[i]['560975149'])
-        }*/
-        //let boxJSONS = response.data;
+
         let hiddenJSON = {};
-        console.log(boxJSONS)
         for(let i = 0; i < boxJSONS.length; i++){
             let box = boxJSONS[i]
             hiddenJSON[box['132929440']] = box['bags']
         }
         await populateBoxSelectList(hiddenJSON, userName)
-        //console.log(JSON.stringify(boxdata))
         hideAnimation();
     })
 }
@@ -2242,14 +2158,12 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
         for (var r = 1; r < currTable.rows.length; r++) {            
             
             let currCheck = currTable.rows[r].cells[0]
-            console.log(currCheck.childNodes[0])
             if(currCheck.childNodes[0].checked){
                 let currBoxId = currTable.rows[r].cells[3].innerText;
                 boxesToShip.push(currBoxId)
             }
             
         }
-        console.log(boxesToShip)
         if(document.getElementById('tempMonitorChecked')){
             tempChecked = document.getElementById('tempMonitorChecked').checked
         }
@@ -2286,7 +2200,6 @@ export const addEventNavBarTracking = (element, userName, hiddenJSON, tempChecke
 export const populateSelectLocationList = async () => {
     let currSelect = document.getElementById('selectLocationList')
     let response = await getLocationsInstitute();
-    console.log(response);
     let list = ''
     for(let i = 0; i < response.length; i++){
         list += '<option>' + response[i] + '</option>';
@@ -2344,7 +2257,6 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
                 toAddType = translateNumToType[thisId[1]];
             }
             currRow.insertCell(2).innerHTML = toAddType
-            console.log('wpoeifhn;posdiuvgbhnasloidkvubnaslikovuhbasnvo ' + JSON.stringify(currBox[bags[i]]))
             let fullScannerName = ''
 
             if(currBox[bags[i]].hasOwnProperty('469819603') && j == 0){
@@ -2402,7 +2314,6 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
         let emptyField= false;
         for(let i = 0; i < boxes.length; i++){
             let boxi = document.getElementById(boxes[i] + "trackingId").value;
-            console.log(boxi)
             if(boxi == ''){
                 emptyField = true;
                 showNotifications({title: 'Missing Fields', body: 'Please fill out required fields!'}, true)
@@ -2411,7 +2322,6 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
         }
         if(emptyField == false){
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
-            console.log('done')
             let shipmentCourier = document.getElementById('courierSelect').value;
             finalShipmentTracking(hiddenJSON, userName, tempChecked, shipmentCourier);
         }
@@ -2440,8 +2350,6 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         }
         if(finalizeTextField.value === userName){
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
-            console.log(JSON.stringify(boxes));
-            console.log('shipping JSON Can be found here: ' + JSON.stringify(shippingData))
             await ship(boxes, shippingData, trackingNumbers);
             document.getElementById('finalizeModalCancel').click();
             if(tempChecked){
@@ -2596,7 +2504,6 @@ export const populateCourierBox = async () => {
 export const populateBoxTable = async (page, filter) => {
     showAnimation();
     let pageStuff = await getPage(page, 5, '656548982', filter)
-    console.log(JSON.stringify(pageStuff))
     let currTable = document.getElementById('boxTable')
     currTable.innerHTML = ''
     var rowCount = currTable.rows.length;
@@ -2638,7 +2545,6 @@ export const populateBoxTable = async (page, filter) => {
                             + currentdate.getMinutes() + ampm;
 */
         }
-        console.log('currPageStuff: ' + JSON.stringify(currPage))
         currRow.insertCell(0).innerHTML = currPage.hasOwnProperty('959708259') ? currPage['959708259'] : '';
         currRow.insertCell(1).innerHTML = currPage.hasOwnProperty('666553960') ? conversion[currPage['666553960']] : '';
         currRow.insertCell(2).innerHTML = shippedDate;
@@ -2786,7 +2692,6 @@ export const populateReportManifestTable = (currPage) => {
 }
 
 export const addPaginationFunctionality = (lastPage, filter) => {
-    console.log("last Page: " + lastPage)
     let paginationButtons = document.getElementById('paginationButtons');
     paginationButtons.innterHTML = ""
     paginationButtons.innerHTML = `<ul class="pagination">
@@ -2804,8 +2709,6 @@ export const addPaginationFunctionality = (lastPage, filter) => {
     let middleNumber = document.getElementById('middlePage');
 
     first.addEventListener('click', () => {
-        console.log('this is the filter')
-        console.log(filter);
         middleNumber.innerHTML = '1'
         populateBoxTable(0, filter)
     })
@@ -2836,7 +2739,6 @@ export const addEventFilter = () => {
         
         let startDate = document.getElementById('startDate').value;
         let endDate = document.getElementById('endDate').value;
-        console.log(startDate)
         let filter = {};
         if(trackingId !== ""){
             filter['trackingId'] = trackingId;
