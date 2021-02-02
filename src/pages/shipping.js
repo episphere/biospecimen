@@ -59,7 +59,6 @@ export const startShipping = async (userName) => {
         let box = boxJSONS[i]
         hiddenJSON1[box['132929440']] = box['bags']
     }
-    console.log('pwnjefbpoewkinbpoefibnepobinoieoiboribvr' + JSON.stringify(boxJSONS))
     
     /*
     if(document.getElementById('shippingHiddenTable') != null){
@@ -244,7 +243,6 @@ export const boxManifest = async (boxId, userName) => {
     let response = await  getBoxes();
     let boxJSONS = response.data;
 
-    console.log('abc:' + JSON.stringify(boxJSONS))
     let currBox = {}
     let hiddenJSON = {};
     for(let i = 0; i < boxJSONS.length; i++){
@@ -256,17 +254,6 @@ export const boxManifest = async (boxId, userName) => {
     }
     let currInstitute = currBox.siteAcronym;
     let currLocation = currBox['560975149'];
-
-    /*
-    let boxIds = Object.keys(hiddenJSON);
-    console.log(boxIds);    
-    for(let i = 0; i < boxIds.length; i++){
-        let toPass = {};
-        toPass['132929440'] = boxIds[i];
-        toPass['bags'] = hiddenJSON[boxIds[i]]
-        storeBox(toPass);
-    }
-    */
    
 
     let template = `
@@ -352,8 +339,6 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
 
     let toDisplayJSON = {};
     let location = ''
-    console.log('wojebviowueviduvbsiduviuvb');
-    console.log(JSON.stringify(hiddenJSON))
     for(let i = 0; i < boxesToShip.length; i++){
         let currBox = boxesToShip[i];
         toDisplayJSON[currBox] = hiddenJSON[currBox];
@@ -423,7 +408,6 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
     const navBarBtn = document.getElementById('navBarShippingManifest');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
-    console.log('owikbvlovboweigbvwe: ' + tempMonitorThere)
     if(tempMonitorThere){
         populateTempSelect(boxesToShip);
     }
@@ -448,7 +432,6 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
     document.getElementById('completePackaging').addEventListener('click', e => {
         e.stopPropagation();
         if(btn.classList.contains('active')) return;
-        console.log(document.getElementById('tempBox').value)
         if(tempMonitorThere && document.getElementById('tempBox').value == '') {
             showNotifications({title: 'Missing field!', body: 'Please enter the box where the temperature monitor is being stored.'}, true)
             return;
@@ -468,7 +451,6 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
 
 
 export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) => {
-    console.log('efg' + JSON.stringify(hiddenJSON))
     showAnimation();
 
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
@@ -547,9 +529,7 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
 }
 
 export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmentCourier) => {
-    console.log('abc' + JSON.stringify(hiddenJSON))
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
-    console.log(userName)
     let conversion = {
         '712278213': 'FedEx',
         '149772928': 'World Courier'
@@ -644,7 +624,6 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
     }
     populateFinalCheck(hiddenJSON);
     addEventReturnToShippingManifest('navBarShippingManifest', hiddenJSON, userName)
-    console.log('hiddenJSONStuff!!!!: ' + JSON.stringify(hiddenJSON))
     addEventCompleteShippingButton(hiddenJSON, userName, tempChecked, shipmentCourier);
     addEventBackToSearch('navBarShippingDash');
     //addEventBackToSearch('navBarShippingDash');

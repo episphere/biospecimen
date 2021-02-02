@@ -130,7 +130,7 @@ export const userAuthorization = async (route, name) => {
 
 
 export const toggleCurrentPage = async (route) => {
-    const IDs = ['dashboard', 'manageUsers', 'shipping'];
+    const IDs = ['dashboard', 'manageUsers', 'shipping', 'reports'];
     IDs.forEach(id => {
         const element = document.getElementById(id);
         if(!element) return;
@@ -144,6 +144,7 @@ export const toggleCurrentPage = async (route) => {
     if(route === '#dashboard') document.getElementById('dashboard') ? document.getElementById('dashboard').click() : '';
     else if(route === '#manage_users') document.getElementById('manageUsers') ? document.getElementById('manageUsers').click() : '';
     else if(route === '#shipping') document.getElementById('shipping') ? document.getElementById('shipping').click() : '';
+    else  if(route === '#reports') document.getElementById('reports') ? document.getElementById('reports').click() : '';
 }
 
 export const removeActiveClass = (className, activeClass) => {
@@ -271,7 +272,6 @@ export const storeBox = async (box) =>{
         body: JSON.stringify(box)
     }
     const response = await fetch(`${api}api=addBox`, requestObj);
-    console.log(response)
     return response.json();
 }
 
@@ -297,7 +297,6 @@ export const ship = async (boxes, shippingData, trackingNumbers) => {
         body: JSON.stringify({"boxes": boxes, "shippingData": shippingData, "trackingNumbers":trackingNumbers})
     }
     const response = await fetch(`${api}api=ship`, requestObj);
-    console.log(response)
     return response.json();
 }
 
@@ -312,8 +311,6 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) =
         body: JSON.stringify({"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy, "filters":filters})
     }
     const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
-    console.log('THIS IS THE RESPONSE !@$!@$IGH!@$OIG!@E: ')
-    console.log(response)
     return response.json();
 }
 
@@ -330,18 +327,13 @@ export const getBoxes = async (box) =>{
     let toReturn  = {};
     toReturn["data"] = [];
     let data = res.data;
-    console.log("DATA!: " + JSON.stringify(data))
     for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
 
         if(!currJSON.hasOwnProperty("145971562") || currJSON["145971562"] != '353358909'){
-            console.log('weoiubvoisdbvosidvb')
-            console.log(JSON.stringify(currJSON))
-            console.log(currJSON['145971562'])
             toReturn["data"].push(currJSON);
         }
     }
-    console.log(JSON.stringify(res.data))
     return toReturn;
 }
 
@@ -423,7 +415,6 @@ export const searchSpecimenInstitute = async () => {
     let a = await response.json();
 
     let data = a.data;    
-    console.log(';wopiebnvopdivbloisadijvchboiauwehcl;kdscnsoiudchsoefdcivnew: ' + JSON.stringify(data))
 
     const conversion = {
         "299553921":"0001",
@@ -507,7 +498,6 @@ export const getLocationsInstitute = async () => {
     let res = await response.json();
     let arr = res.response;
     let locations = [];
-    console.log('LOCATIONSTUFFF 0.0 : ' + JSON.stringify(arr));
     for(let i = 0; i < arr.length; i++){
         let currJSON = arr[i];
         locations = locations.concat(currJSON['560975149']);
@@ -528,7 +518,6 @@ export const getNumPages = async (numPerPage, filter) => {
     });
     let res = await response.json();
     let numBoxes = res.data;
-    console.log('numBoxes: ' + numBoxes)
     return Math.ceil(numBoxes/numPerPage);
     return 3;
 }
@@ -568,8 +557,6 @@ export const getNextTempCheck = async () => {
     let nextDate = currJSON['nextTempMonitor']
     let todaysDate = new Date();
     let tempDate = new Date(Date.parse(nextDate))
-    console.log('DATEweopibvwoidvbsdv: ' + tempDate.toString())
-    console.log(todaysDate.toString())
     if(todaysDate >= tempDate){
         return true;
     }
@@ -659,7 +646,6 @@ export const addEventBarCodeScanner = (id, start, end) => {
             if (result.codeResult.code){
                 const barcode = result.codeResult.code;
                 const elementID = document.activeElement.dataset.barcodeInput;
-                console.log(elementID)
                 if(elementID === 'accessionID1') {
                     disableInput('accessionID2', true);
                     addEventClearScannedBarcode('clearScanAccessionID');
@@ -689,12 +675,9 @@ export const addEventBarCodeScanner = (id, start, end) => {
                     for(let i = 1; i < shippingTable.rows.length; i++){
                         let currRow = shippingTable.rows[i];
                         if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
-                            console.log(currRow.cells[2].innerText)
                             tableIndex = i;
                             biospecimensList = JSON.parse(currRow.cells[2].innerText)
                             foundInShipping = true;
-                            console.log('owikebnvolekidbnvpowivbhnwspolivkbnh')
-                            console.log(JSON.stringify(biospecimensList))
                         }
                         
                     }
@@ -702,10 +685,8 @@ export const addEventBarCodeScanner = (id, start, end) => {
                 for(let i = 1; i < orphanTable.rows.length; i++){
                         let currRow = orphanTable.rows[i];
                         if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
-                            //console.log(currRow.cells[2].innerText)
                             tableIndex = i;
                             let currTubeNum = currRow.cells[0].innerText.split(' ')[1];
-                            console.log(currTubeNum)
                             biospecimensList = [currTubeNum];
                             foundInOrphan = true;
                         }
@@ -722,7 +703,6 @@ export const addEventBarCodeScanner = (id, start, end) => {
                     document.querySelector('[data-dismiss="modal"]').click();
                     return;
                 };
-                console.log('barcode: ' + barcode)
                 if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,masterSpecimenIDRequirement.length))) return;
                 if(!elementID) return;
                 if(elementID === 'scanSpecimenID') {
