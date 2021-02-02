@@ -1744,6 +1744,7 @@ export const addEventSelectParticipantForm = (skipCheckIn) => {
                 let formData = {};
                 formData['Connect_ID'] = connectId;
                 formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
+                formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
                 formData['token'] = radio.dataset.token;
                 let query = `connectId=${parseInt(connectId)}`;
                 showAnimation();
@@ -1766,6 +1767,7 @@ export const addEventCheckInCompleteForm = () => {
         e.preventDefault();
         let formData = {};
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
+        formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
         formData['962267121'] = new Date().toISOString();
         formData['135591601'] = 353358909;
         let query = `connectId=${parseInt(form.dataset.connectId)}`;

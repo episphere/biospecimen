@@ -58,6 +58,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
     document.getElementById('contentBody').innerHTML = template;
     document.getElementById('contentBody').dataset.siteAcronym = data.siteAcronym;
+    document.getElementById('contentBody').dataset.siteCode = data.siteCode;
     document.getElementById('contentHeader').innerHTML = '';
 
     document.getElementById('btnParticipantSearch').addEventListener('click', () => {
