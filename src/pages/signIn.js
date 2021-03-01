@@ -44,6 +44,10 @@ export const signIn = () => {
             tenantID = 'HFHS-SSO-ay0iz';
             provider = 'saml.connect-hfhs';
         };
+        if(/sanfordhealth.org/i.test(inputValue)) {
+            tenantID = 'SFH-SSO-cgzpj';
+            provider = 'saml.connect-sanford';
+        };
         const saml = new firebase.auth.SAMLAuthProvider(provider);
         firebase.auth().tenantId = tenantID;
         firebase.auth().signInWithPopup(saml)
