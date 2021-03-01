@@ -40,6 +40,10 @@ export const signIn = () => {
             tenantID = 'HP-SSO-wb1zb';
             provider = 'saml.healthpartner';
         };
+        if(/hfhs.org/i.test(inputValue)) {
+            tenantID = 'HFHS-SSO-ay0iz';
+            provider = 'saml.connect-hfhs';
+        };
         const saml = new firebase.auth.SAMLAuthProvider(provider);
         firebase.auth().tenantId = tenantID;
         firebase.auth().signInWithPopup(saml)
