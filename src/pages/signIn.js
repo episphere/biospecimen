@@ -48,6 +48,10 @@ export const signIn = () => {
             tenantID = 'SFH-SSO-cgzpj';
             provider = 'saml.connect-sanford';
         };
+        if(/uchicago.edu/i.test(inputValue)) {
+            tenantID = 'UCM-SSO-tovai';
+            provider = 'saml.connect-uchicago';
+        };
         const saml = new firebase.auth.SAMLAuthProvider(provider);
         firebase.auth().tenantId = tenantID;
         firebase.auth().signInWithPopup(saml)
