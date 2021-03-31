@@ -52,6 +52,10 @@ export const signIn = () => {
             tenantID = 'UCM-SSO-tovai';
             provider = 'saml.connect-uchicago';
         };
+        if(/norc.org/i.test(inputValue)) {
+            tenantID = 'NORC-SSO-dilvf';
+            provider = 'saml.connect-norc';
+        };
         const saml = new firebase.auth.SAMLAuthProvider(provider);
         firebase.auth().tenantId = tenantID;
         firebase.auth().signInWithPopup(saml)
