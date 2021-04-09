@@ -70,7 +70,7 @@ export const addEventsearchSpecimen = () => {
     form.addEventListener('submit', async e => {
         e.preventDefault();
         removeAllErrors();
-        const masterSpecimenId = document.getElementById('masterSpecimenId').value;
+        const masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase();
         if(!masterSpecimenIDRequirement.regExp.test(masterSpecimenId) || masterSpecimenId.length !== masterSpecimenIDRequirement.length) {
             errorMessage('masterSpecimenId', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, true);
             return;
@@ -1752,8 +1752,8 @@ export const addEventSpecimenLinkFormCntd = (formData) => {
 const btnsClicked = async (connectId, formData, cont) => {
     removeAllErrors();
     const scanSpecimenID = document.getElementById('scanSpecimenID').value;
-    const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value;
-    const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value;
+    const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value.toUpperCase();
+    const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value.toUpperCase();
     const accessionID1 = document.getElementById('accessionID1');
     const accessionID2 = document.getElementById('accessionID2');
     const select = document.getElementById('biospecimenVisitType');
@@ -1900,7 +1900,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         const siteTubesList = getSiteTubesLists(biospecimenData)
         const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
         
-        let value = getValue(`${input.id}`);
+        let value = getValue(`${input.id}`).toUpperCase();
         const masterID = value.substr(0, masterSpecimenIDRequirement.length);
         const tubeID = value.substr(masterSpecimenIDRequirement.length + 1, totalCollectionIDLength);
         
