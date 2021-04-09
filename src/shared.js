@@ -648,7 +648,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                 const elementID = document.activeElement.dataset.barcodeInput;
                 if(elementID === 'accessionID1') {
                     disableInput('accessionID2', true);
-                    addEventClearScannedBarcode('clearScanAccessionID');
+                    // addEventClearScannedBarcode('clearScanAccessionID');
                     document.getElementById(elementID).value = result.codeResult.code;
                     Quagga.stop();
                     document.querySelector('[data-dismiss="modal"]').click();
@@ -708,7 +708,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                 if(elementID === 'scanSpecimenID') {
                     disableInput('enterSpecimenID1', true);
                     disableInput('enterSpecimenID2', true);
-                    addEventClearScannedBarcode('clearScanSpecimenID');
+                    // addEventClearScannedBarcode('clearScanSpecimenID');
                 }
                 document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end) : result.codeResult.code;
                 Quagga.stop();

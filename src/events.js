@@ -2288,24 +2288,11 @@ export const populateTrackingQuery = (hiddenJSON) => {
                             <div class="form-group" style="margin-top:30px">
                                 <label style="float:left;margin-top:5px">`+ boxes[i] +`</label>
                                 <div style="float:left;margin-left:30px">
-                                    <input class="form-control" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
+                                    <input class="form-control" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number"/>
                                 </div>
                             </div>
                         </div>
                         <br>`
-                        /* `
-                        <div class = "row">
-                            <div class="form-group" style="margin-top:30px">
-                                <label style="float:left;margin-top:5px">`+ boxes[i] +`</label>
-                                <div style="float:left;margin-left:30px">
-                                    <input class="form-control" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <br>`*/
-
-                        
-                            
     }
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
 }

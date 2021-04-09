@@ -52,7 +52,6 @@ export const collectProcessTemplate = (data, formData) => {
                                         ${required ? 'required' : 'disabled'} 
                                         placeholder="Scan/Type in Full Specimen ID"
                                     >
-                                    ${required ? `<button class="barcode-btn-collect-process" type="button" id="${obj.concept}IdBarCodeBtn" data-barcode-input="${obj.concept}Id"><i class="fas fa-barcode"></i></button>`: ''}
                                 </td>
                                 <td>${obj.deviationChkBox === true ? `
                                     <input 
@@ -104,10 +103,10 @@ export const collectProcessTemplate = (data, formData) => {
     addEventBackToTubeCollection(data, formData['820476880']);
     addEventBiospecimenCollectionForm(data, formData);
     addEventBiospecimenCollectionFormCntd(data, formData);
-    const barCodeBtns = Array.from(document.getElementsByClassName('barcode-btn-collect-process'));
-    barCodeBtns.forEach(btn => {
-        addEventBarCodeScanner(btn.id, 0, totalCollectionIDLength);
-    });
+//     const barCodeBtns = Array.from(document.getElementsByClassName('barcode-btn-collect-process'));
+//     barCodeBtns.forEach(btn => {
+//         addEventBarCodeScanner(btn.id, 0, totalCollectionIDLength);
+//     });
 }
 
 export const tubeCollectedTemplate = (data, formData) => {

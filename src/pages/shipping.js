@@ -87,7 +87,7 @@ export const startShipping = async (userName) => {
                 <div class="row form-row">
                     <form id="addSpecimenForm" method="POST" style="width:100%;">
                         <div class="form-group">
-                            <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan"/> <button class="barcode-btn" type="button" id="masterSpecimenIdBarCodeBtn" data-barcode-input="masterSpecimenId"><i class="fas fa-barcode"></i></button>
+                            <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan"/>
                         </div>
                     </form>
                     <button href="#" id="submitMasterSpecimenId" type="submit" class="btn btn-outline-primary" data-toggle="modal" data-target="#shippingModal" data-backdrop="static" style = "display:none">Add specimen to box</button>
@@ -230,7 +230,7 @@ export const startShipping = async (userName) => {
     addEventNavBarBoxManifest("navBarBoxManifest", userName)
     addEventChangeLocationSelect(userName);
     addEventAddSpecimenToBox(userName);
-    addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 14, 0);
+    // addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 14, 0);
     addEventModalAddBox(userName);
     hideAnimation();
     //addEventSubmitAddBag();
@@ -522,7 +522,7 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
     addEventCompleteButton(hiddenJSON, userName, tempCheckChecked);
     //addEventCompleteShippingButton(hiddenJSON);
     //addEventBackToSearch('navBarShippingDash');
-    addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
+    // addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
     hideAnimation();
     //addEventSubmitAddBag();
 }

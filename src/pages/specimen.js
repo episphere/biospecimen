@@ -83,7 +83,7 @@ export const specimenTemplate = async (data, formData, collections) => {
                     <div class="form-group row">
                         <label class="col-md-4 col-form-label" for="accessionID1">Scan in Accession ID:</label>
                         <input autocomplete="off" type="text" class="form-control col-md-5" ${siteAcronym === 'KPCO' || siteAcronym === 'KPGA' || siteAcronym === 'KPNW' || siteAcronym === 'KPHI' ? 'required': ''} placeholder="Scan/Type in Accession ID from Tube" id="accessionID1"/>
-                        <button class="barcode-btn-outside" type="button" id="scanAccessionIDBarCodeBtn" data-barcode-input="accessionID1" data-clear-btn="clearScanAccessionID"><i class="fas fa-barcode"></i></button>
+                        
                         <button class="barcode-input-clear" hidden="true" type="button" id="clearScanAccessionID" title="Clear scanned barcode" data-enable-input="accessionID2" data-barcode-input="accessionID1"><i class="fas fa-times"></i></button>
                     </div>
                     <div class="form-group row">
@@ -95,8 +95,6 @@ export const specimenTemplate = async (data, formData, collections) => {
             template += `<div class="form-group row">
                 <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan Collection ID from Label Sheet Label</label>
                 <input autocomplete="off" type="text" class="form-control col-md-5 disabled" disabled placeholder="Scan in Collection ID from Label Sheet Label" id="scanSpecimenID"/> 
-                <button class="barcode-btn-outside" type="button" id="scanSpecimenIDBarCodeBtn" data-barcode-input="scanSpecimenID"><i class="fas fa-barcode"></i></button>
-                <button class="barcode-input-clear" hidden="true" type="button" id="clearScanSpecimenID" title="Clear scanned barcode" data-enable-input="enterSpecimenID1,enterSpecimenID2" data-barcode-input="scanSpecimenID"><i class="fas fa-times"></i></button>
             </div>
             </br>
             <div class="form-group row">
@@ -124,8 +122,8 @@ export const specimenTemplate = async (data, formData, collections) => {
     `;
     document.getElementById('contentBody').innerHTML = template;
     document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
-    addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, masterSpecimenIDRequirement.length);
-    if(document.getElementById('scanAccessionIDBarCodeBtn')) addEventBarCodeScanner('scanAccessionIDBarCodeBtn');
+    // addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, masterSpecimenIDRequirement.length);
+    // if(document.getElementById('scanAccessionIDBarCodeBtn')) addEventBarCodeScanner('scanAccessionIDBarCodeBtn');
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventCntdToCollectProcess();
     addEventSpecimenLinkForm(formData);
