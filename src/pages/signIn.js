@@ -1,4 +1,4 @@
-import { getIdToken } from "../shared.js";
+import { getIdToken, SSOConfig } from "../shared.js";
 import { homeNavBar } from "./../navbar.js";
 
 export const signIn = () => {
@@ -30,32 +30,9 @@ export const signIn = () => {
     document.getElementById('signInForm').addEventListener('submit', e => {
         e.preventDefault();
         const inputValue = document.getElementById('signInEmail').value;
-        let tenantID = '', provider = '';
         
-        if(/nih.gov/i.test(inputValue)) {
-            tenantID = 'NIH-SSO-qfszp';
-            provider = 'saml.nih-sso';
-        };
-        if(/healthpartners.com/i.test(inputValue)) {
-            tenantID = 'HP-SSO-wb1zb';
-            provider = 'saml.healthpartner';
-        };
-        if(/hfhs.org/i.test(inputValue)) {
-            tenantID = 'HFHS-SSO-ay0iz';
-            provider = 'saml.connect-hfhs';
-        };
-        if(/sanfordhealth.org/i.test(inputValue)) {
-            tenantID = 'SFH-SSO-cgzpj';
-            provider = 'saml.connect-sanford';
-        };
-        if(/uchicago.edu/i.test(inputValue)) {
-            tenantID = 'UCM-SSO-tovai';
-            provider = 'saml.connect-uchicago';
-        };
-        if(/norc.org/i.test(inputValue)) {
-            tenantID = 'NORC-SSO-dilvf';
-            provider = 'saml.connect-norc';
-        };
+        const { tenantID, provider } = SSOConfig(inputValue);
+        
         const saml = new firebase.auth.SAMLAuthProvider(provider);
         firebase.auth().tenantId = tenantID;
         firebase.auth().signInWithPopup(saml)
