@@ -852,5 +852,9 @@ export const SSOConfig = (inputValue) => {
         tenantID = 'NORC-SSO-dilvf';
         provider = 'saml.connect-norc';
     };
+    if(/kp.org/i.test(inputValue)) {
+        tenantID = 'KP-SSO-wulix';
+        provider = 'saml.connect-kp';
+    };
     return {tenantID, provider}
 }
