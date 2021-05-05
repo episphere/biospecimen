@@ -30,6 +30,7 @@ const api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/bio
 
 export const validateUser = async () => {
     const idToken = await getIdToken();
+    console.log(idToken);
     const response = await fetch(`${api}api=validateUsers`, {
         method: "GET",
         headers: {
