@@ -134,7 +134,7 @@ export const adminNavBar = (name) => {
         </div>
         <div class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link" href="#manage_users" id="manageUsers" title="Manage users"><i class="fas fa-users"></i> Manager users</a>
+                <a class="nav-link" href="#manage_users" id="manageUsers" title="Manage users"><i class="fas fa-users"></i> Manage users</a>
             </li>
         </div>
         <div class="navbar-nav">
