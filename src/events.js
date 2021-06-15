@@ -1891,11 +1891,13 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
 }
 
 const collectionSubmission = async (dt, biospecimenData, cntd) => {
+    console.log(biospecimenData)
     const data = biospecimenData;
     removeAllErrors();
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
     let hasError = false;
     let focus = true;
+    let hasCntdError = false;
     inputFields.forEach(input => {
         const siteTubesList = getSiteTubesLists(biospecimenData)
         const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
@@ -1906,29 +1908,37 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         
         if(input.required && value.length !== totalCollectionIDLength) {
             hasError = true;
-            errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`, focus);
+            if(value.length > 0){
+                hasCntdError = true;
+            }
+            if(cntd || value.length > 0){
+                errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`, focus);
+            }
             focus = false;
         }
         else if(input.required && masterID !== biospecimenData['820476880']) {
             hasError = true;
+            hasCntdError = true;
             errorMessage(input.id, 'Invalid Collection ID.', focus);
             focus = false;
         }
         else if(input.required && tubes.length === 0) {
             hasError = true;
+            hasCntdError = true;
             errorMessage(input.id, 'Invalid Full Specimen ID.', focus);
             focus = false;
         }
         else if(input.required && (tubes[0].id !== tubeID && !additionalTubeIDRequirement.regExp.test(tubeID))) {
             hasError = true;
+            hasCntdError = true;
             errorMessage(input.id, 'Invalid Full Specimen ID.', focus);
             focus = false;
         }
         if(additionalTubeIDRequirement.regExp.test(tubeID))  data[`${input.id.replace('Id', '')}`]['226562200'] = 353358909;
         
-        if(input.required) data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`;
+        if(input.required) data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim();
     });
-    if(hasError) return;
+    if((hasError && cntd == true) || hasCntdError) return;
     data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
     Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[dt.id.replace('Deviated', '')]['678857215'] = dt.checked ? 353358909 : 104430631)
     
@@ -2407,11 +2417,6 @@ export const addEventContactInformationModal = (data) => {
             <div class="row">
                 <div class="col">
                     <strong>Phone:</strong> ${data['388711124'] ? data['388711124'] : ''}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <strong>Preferred contact method: </strong>
                 </div>
             </div>
             </br>

@@ -3,6 +3,7 @@ import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, 
 import { totalCollectionIDLength } from '../tubeValidation.js';
 
 export const collectProcessTemplate = (data, formData) => {
+    console.log(formData);
     let template = `
         </br>
         <div class="row">
