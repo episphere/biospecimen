@@ -5,7 +5,8 @@ import { shippingDashboard } from "./src/pages/shipping.js"
 import {reportsQuery } from "./src/pages/reportsQuery.js"
 import { signIn, signOut } from "./src/pages/signIn.js";
 import { welcomeScreen } from "./src/pages/welcome.js";
-
+import { bptlScreen } from "./src/pages/bptl.js";
+import { kitAssemblyScreen } from "./src/pages/homeCollection/kitAssembly.js";
 let auth = '';
 
 window.onload = () => {
@@ -30,10 +31,11 @@ window.onhashchange = () => {
 const manageRoutes = async () => {
     const route =  window.location.hash || '#';
     if(await userLoggedIn()){
-        console.log('route: ' + route)
         if (route === '#dashboard') userDashboard(auth, route);
         else if(route === "#shipping") shippingDashboard(auth,route);
         else if (route === '#welcome') welcomeScreen(auth, route);
+        else if (route === '#bptl') bptlScreen(auth, route);
+        else if (route === '#kitassembly') kitAssemblyScreen(auth, route);
         else if (route === '#manage_users') manageUsers(auth, route);
         else if (route === '#sign_out') signOut();
         else if (route === '#reports') reportsQuery(auth, route);
