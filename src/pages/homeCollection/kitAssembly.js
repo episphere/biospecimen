@@ -1,5 +1,11 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { userDashboard } from "../dashboard.js";
+import { biospecimenUsers,getIdToken } from "../../shared.js";
+
+
+// REMOVE & REFACTOR FOR LATER***
+const api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?'; 
+
 
 export const kitAssemblyScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -9,7 +15,34 @@ export const kitAssemblyScreen = async (auth, route) => {
   kitAssemblyTemplate(auth, route);
 };
 
-const kitAssemblyTemplate = (auth, route) => {
+// REMOVE & REFACTOR FOR LATER, ADD TO SHARED.JS FILE?***
+const getKitData = async () => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=getKitData`,{
+        method:"GET",
+        headers: {
+            Authorization:"Bearer"+idToken
+        }
+    })
+
+    const kitData = await response.json()
+
+    // TODO - ERROR HANDLING, MAYBE TRY/CATCH BLOCK?
+    // if(kitData.data.length < 1) {
+    //     return console.log('No data')
+    // }
+    // else {
+    //     console.log(kitData)
+    //     return kitData
+    // }
+    
+    return kitData
+}
+
+const kitAssemblyTemplate = async (auth, route) => {
+  const kitData = await getKitData().then(res => res.data)
+
+  await console.log(kitData)
   let template = ``;
   template += homeCollectionNavbar();
   template += `
@@ -43,22 +76,3 @@ const kitAssemblyTemplate = (auth, route) => {
             </table>`;
   document.getElementById("contentBody").innerHTML = template;
 };
-
-
-/* 
-
-KIT ASSEMBLY TABLE HEADERS 
-
-1. Line Item - NUMERIC
-2. Specify Kit USPS Tracking Number - NUMBER
-NOTE: USPS has 22 numbers long and Arranged in groups of 4 digits
-EXAMPLE: 9400 1234 5678 9999 8765 00 
-3. Supply Kit ID - ALPHA NUMERIC
-EXAMPLE(?) - JKL123422
-4. Specimen Kit ID - ALPHA NUMERIC
-EXAMPLE(?) - GHI123422
-5. Collection Cup ID - ALPHA NUMERIC
-EXAMPLE(?) - DEF123422
-6. Collection Card ID - ALPHA NUMERIC
-EXAMPLE(?) - ABC123422 
-*/

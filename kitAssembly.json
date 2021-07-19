@@ -1,8 +1,8 @@
 {
-    "lineItem": "d",
-    "uspsTrackingNumber":"9400 1234 5678 9999 8765 00",
-    "supplyKitId":"JKL123422",
-    "specimenKitId":"GHI123422",
-    "collectionCupId":"DEF123422",
-    "collectionCardId":"ABC123422"
+  "lineItem": "1",
+  "uspsTrackingNumber": "9400 1234 5678 9999 8765 00",
+  "supplyKitId": "JKL123422",
+  "specimenKitId": "GHI123422",
+  "collectionCupId": "DEF123422",
+  "collectionCardId": "ABC123422"
 }
