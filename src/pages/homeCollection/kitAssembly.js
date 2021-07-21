@@ -17,6 +17,7 @@ export const kitAssemblyScreen = async (auth, route) => {
   const kitData = await getKitData().then(res => res.data)
   const tableBody = document.getElementById("kit-assembly-table-body")
   populateKitTable(tableBody,kitData)
+  kitAssemblyPageButtons()
 };
 
 // REMOVE & REFACTOR FOR LATER, ADD TO SHARED.JS FILE?***
@@ -31,7 +32,7 @@ const getKitData = async () => {
 
     const kitData = await response.json()
 
-    // TODO - ERROR HANDLING, MAYBE TRY/CATCH BLOCK?
+    // TODO: ERROR HANDLING, MAYBE TRY/CATCH BLOCK?
     // if(kitData.data.length < 1) {
     //     return console.log('No data')
     // }
@@ -55,7 +56,7 @@ const kitAssemblyTemplate = async (auth, route) => {
                 </div>  `;
 
   template += `
-        <table id="kit-assembly-table" class="table   table-bordered">
+        <table id="kit-assembly-table" class="table table-bordered">
                 <thead>
                     <tr>
                         <th scope="col">Line Item</th>
@@ -76,20 +77,11 @@ const kitAssemblyTemplate = async (auth, route) => {
 
 
 const populateKitTable = (tableBody, kitData) => {
-    // tableBody - targetstable body element, use when inserting an element when looping
+    // tableBody - targetable body element, use when inserting an element when looping
     let tableRow = ''
 
     // TODO = Make the number dynamic and editable
-    let extraRow = `
-        <tr>
-            <th scope="row">.</th>
-            <td>.</td>
-            <td>.</td>
-            <td>.</td>
-            <td>.</td>
-            <td>.</td>
-        </tr>
-        `
+    let extraRow = ''
     console.log(kitData)
     // Create loop 
     for(let i = 0; i < kitData.length; i++) {
@@ -106,12 +98,44 @@ const populateKitTable = (tableBody, kitData) => {
         
         // If the current iteration is the last item, add an extra row
         if(i === kitData.length-1){
+            // Add two to current i value to displayy correct line item number
+            extraRow = `        
+            <tr>
+                <th scope="row">${i+2}</th>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>
+            `
             tableRow += extraRow
         }
         tableBody.innerHTML = tableRow
     }
 }
 
+const kitAssemblyPageButtons = () => {
+    const contentBody = document.getElementById("contentBody")
+    let buttonContainerTemplate = ""
+
+    console.log(contentBody)
+    
+    buttonContainerTemplate += `
+        <div class="kit-assembly-button-container">
+            <button type="button" class="btn btn-outline-primary">Add</button>
+            <button type="button" class="btn btn-outline-success">Save</button>
+            <button type="button" class="btn btn-outline-info">Print Address</button>
+        </div> 
+    `
+    contentBody.innerHTML += buttonContainerTemplate
+}
+
+// ADD finished button template
+// contentBody.innerHTML += `
+    //     <h1>Testing</h1>
+
+    // `
 
 /*
 TODO STEPS:
@@ -121,6 +145,10 @@ TODO STEPS:
 3. Create a function to create a new row and iterate through list of items
     NOTE: Insert an extra row
 4. Make extra row editable
-
+    TODO: Fix resizing issue - make content fit within container and not change width
+5. Create Buttons (Add, Save, Link to another page)
+    - Add: Create a new editable row for table
+    - Save: Makes a POST request to add a new item to the dataset
+    - Link: To another Web page
 
 */
