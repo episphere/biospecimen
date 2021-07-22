@@ -17,31 +17,45 @@ export const kitAssemblyScreen = async (auth, route) => {
   const kitData = await getKitData().then(res => res.data)
   const tableBody = document.getElementById("kit-assembly-table-body")
   populateKitTable(tableBody,kitData)
+
+  // Render Page Buttons
   kitAssemblyPageButtons()
+
+  // Invoke function to add event listener when clicked
+  // saveItemModal()
 };
 
 // REMOVE & REFACTOR FOR LATER, ADD TO SHARED.JS FILE?***
+// GET METHOD REQUEST
 const getKitData = async () => {
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=getKitData`,{
-        method:"GET",
-        headers: {
-            Authorization:"Bearer"+idToken
-        }
-    })
+  const idToken = await getIdToken();
+  const response = await fetch(`${api}api=getKitData`, {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer" + idToken,
+    },
+  });
 
-    const kitData = await response.json()
+  try {
+    if (response.status === 200) {
+      const kitData = await response.json();
+      if (kitData.data.length) {
+        // debugger;
+        return kitData;
+      }
+      throw new Error("No Kit Assembly data!");
+    } else {
+      throw new Error("Status Code is not 200!");
+    }
+  } catch (e) {
+    console.log(e);
+  }
+};
 
-    // TODO: ERROR HANDLING, MAYBE TRY/CATCH BLOCK?
-    // if(kitData.data.length < 1) {
-    //     return console.log('No data')
-    // }
-    // else {
-    //     console.log(kitData)
-    //     return kitData
-    // }
-    
-    return kitData
+// REMOVE & REFACTOR FOR LATER, ADD TO SHARED.JS FILE?***
+// POST METHOD REQUEST
+const addKitData = () => {
+
 }
 
 const kitAssemblyTemplate = async (auth, route) => {
@@ -56,21 +70,24 @@ const kitAssemblyTemplate = async (auth, route) => {
                 </div>  `;
 
   template += `
-        <table id="kit-assembly-table" class="table table-bordered">
+        <div style="overflow:auto; height:400px">
+            <table id="kit-assembly-table" class="table table-bordered" style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
                 <thead>
-                    <tr>
-                        <th scope="col">Line Item</th>
-                        <th scope="col">Specify Kit USPS Tracking Number</th>
-                        <th scope="col">Supply Kit ID</th>
-                        <th scope="col">Specimen Kit ID</th>
-                        <th scope="col">Collection Cup ID</th>
-                        <th scope="col">Collection Card ID</th>
+                    <tr style="top: 0;
+                    position: sticky;">
+                        <th scope="col" style="background-color: #f7f7f7;">Line Item</th>
+                        <th scope="col" style="background-color: #f7f7f7;">Specify Kit USPS Tracking Number</th>
+                        <th scope="col" style="background-color: #f7f7f7;">Supply Kit ID</th>
+                        <th scope="col" style="background-color: #f7f7f7;">Specimen Kit ID</th>
+                        <th scope="col" style="background-color: #f7f7f7;">Collection Cup ID</th>
+                        <th scope="col" style="background-color: #f7f7f7;">Collection Card ID</th>
                     </tr>
                 </thead>
                 
                 <tbody id="kit-assembly-table-body">
                 </tbody>
-            </table>`;
+            </table>
+        </div>`;
 
   document.getElementById("contentBody").innerHTML = template;
 };
@@ -98,9 +115,9 @@ const populateKitTable = (tableBody, kitData) => {
         
         // If the current iteration is the last item, add an extra row
         if(i === kitData.length-1){
-            // Add two to current i value to displayy correct line item number
+            // Add two to current i value to display correct line item number
             extraRow = `        
-            <tr>
+            <tr class="new-row">
                 <th scope="row">${i+2}</th>
                 <td contenteditable="true"></td>
                 <td contenteditable="true"></td>
@@ -122,20 +139,15 @@ const kitAssemblyPageButtons = () => {
     console.log(contentBody)
     
     buttonContainerTemplate += `
-        <div class="kit-assembly-button-container">
-            <button type="button" class="btn btn-outline-primary">Add</button>
-            <button type="button" class="btn btn-outline-success">Save</button>
-            <button type="button" class="btn btn-outline-info">Print Address</button>
+        <div class="kit-assembly-button-container d-flex justify-content-around" style="margin: 8rem;">
+            <button id="kit-assembly-add-button" type="button" class="btn btn-outline-primary">Add</button>
+            <button id="kit-assembly-save-button" type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#saveModal">Save</button>
+            <button type="button" class="btn btn-outline-info">Continue to Print Addresses</button>
         </div> 
     `
     contentBody.innerHTML += buttonContainerTemplate
 }
 
-// ADD finished button template
-// contentBody.innerHTML += `
-    //     <h1>Testing</h1>
-
-    // `
 
 /*
 TODO STEPS:
@@ -150,5 +162,12 @@ TODO STEPS:
     - Add: Create a new editable row for table
     - Save: Makes a POST request to add a new item to the dataset
     - Link: To another Web page
-
+6. Prioritize Save button POST request 
+    - TEST POST Request first on POSTMAN *
+    - Create a Modal for Save Button with Two Buttons (IGNORE FOR MVP)
+        - Confirm
+        - Cancel
+    - Make save button make a post request and have a popup saying success
+7. Have an Add button create a new line to table
+8. Handle acceptable POST request on the client side
 */
