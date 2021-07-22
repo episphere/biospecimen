@@ -140,9 +140,8 @@ const kitAssemblyPageButtons = () => {
     
     buttonContainerTemplate += `
         <div class="kit-assembly-button-container d-flex justify-content-around" style="margin: 8rem;">
-            <button id="kit-assembly-add-button" type="button" class="btn btn-outline-primary">Add</button>
-            <button id="kit-assembly-save-button" type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#saveModal">Save</button>
-            <button type="button" class="btn btn-outline-info">Continue to Print Addresses</button>
+            <button id="kit-assembly-save-button" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#saveModal">Save</button>
+            <button type="button" class="btn btn-success">Continue to Print Addresses</button>
         </div> 
     `
     contentBody.innerHTML += buttonContainerTemplate
