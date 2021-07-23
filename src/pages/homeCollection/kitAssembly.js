@@ -2,7 +2,6 @@ import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { userDashboard } from "../dashboard.js";
 import { getIdToken } from "../../shared.js";
 
-// TODO: REMOVE & REFACTOR FOR LATER***
 const api =
   "https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?";
 
@@ -34,6 +33,10 @@ export const kitAssemblyScreen = async (auth, route) => {
     inputCollectionCup,
     inputCollectionCard
   );
+
+  const inputElements = {inputUsps,inputSupplyKit,inputSpecimenKit,inputCollectionCard,inputCollectionCup}
+
+  await clearAllInputs(inputElements) 
 
   // Invoke function to add event listener when clicked
   await saveItem(
@@ -190,8 +193,9 @@ const kitAssemblyPageButtons = () => {
 
   buttonContainerTemplate += `
         <div class="kit-assembly-button-container d-flex justify-content-center" style="margin: 8rem;">
-          <button id="kit-assembly-cancel-button " type="button" class="btn btn-outline-secondary btn-lg" style="margin-right:10%">Cancel</button>
-          <button id="kit-assembly-save-button" type="submit" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#saveModal">Save</button>
+          <button id="kit-assembly-cancel-button" type="button" class="btn btn-outline-secondary btn-lg" style="margin-right:10%">Cancel</button>
+
+          <button id="kit-assembly-save-button" type="submit" class="btn btn-primary btn-lg">Save</button>
         </div> 
     `;
   contentBody.innerHTML += buttonContainerTemplate;
@@ -209,6 +213,7 @@ const saveItem = async (
   saveButton.addEventListener("click", (e) => {
     console.log("save button clicked");
     console.log(tableBody);
+    e.preventDefault()
     // Target Last row and the last row's children elements
 
     // console.log(tableBody.lastElementChild.children);
@@ -275,9 +280,27 @@ const jsonSaveBody = {
   uspsTrackingNumber: "",
 };
 
+
+// Cancel Button Clear Inputs Function
+
+const clearAllInputs = (inputElements) => {
+  const cancelButton = document.getElementById("kit-assembly-cancel-button")
+  
+  console.log(inputElements)
+  cancelButton.addEventListener("click",(e)=> {
+    e.preventDefault() 
+    // for in to loop over all property keys
+    for(let property in inputElements) {
+      inputElements[property].value = ""
+    }
+  })
+}
+
 // Create extra table row
 
-const addTableRow = () => {};
+const addTableRow = () => {
+  
+};
 
 /*
 TODO STEPS:
