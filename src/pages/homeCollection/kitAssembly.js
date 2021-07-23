@@ -15,6 +15,7 @@ export const kitAssemblyScreen = async (auth, route) => {
 
   const kitData = await getKitData().then((res) => res.data);
   const tableBody = document.getElementById("kit-assembly-table-body");
+
   populateKitTable(tableBody, kitData);
   // Render Page Buttons
   kitAssemblyPageButtons();
@@ -24,45 +25,27 @@ export const kitAssemblyScreen = async (auth, route) => {
   let inputSpecimenKit = document.getElementById("input-specimen-kit");
   let inputCollectionCup = document.getElementById("input-collection-cup");
   let inputCollectionCard = document.getElementById("input-collection-card");
-  
-  inputUsps.addEventListener("input", (e) => {
-    
-    // console.log(e.target)
-    inputUsps.value = e.target.value
-    console.log(inputUsps.value)
-  })
 
-  inputSupplyKit.addEventListener("input", (e) => {
-    inputSupplyKit.value = e.target.value
-    console.log(inputSupplyKit.value)
-  })
-
-  inputSpecimenKit.addEventListener("input", (e) => {
-    inputSpecimenKit.value = e.target.value
-    console.log(inputSpecimenKit)
-    console.log(inputSpecimenKit.value)
-  })
-
-  inputCollectionCup.addEventListener("input", (e)=> {
-    inputCollectionCup.value = e.target.value
-    console.log(inputCollectionCup)
-  })
-
-  inputCollectionCard.addEventListener("input", (e) => {
-    inputCollectionCard.value = e.target.value
-    console.log(inputCollectionCard)
-    console.log(e.target.value)
-
-    // debugger;
-  })
+  //Event Listener for Table Inputs
+  await userInputHandler(
+    inputUsps,
+    inputSupplyKit,
+    inputSpecimenKit,
+    inputCollectionCup,
+    inputCollectionCard
+  );
 
   // Invoke function to add event listener when clicked
-  saveItem(tableBody,inputUsps,inputSupplyKit,inputSpecimenKit,inputCollectionCup,inputCollectionCard);
+  await saveItem(
+    tableBody,
+    inputUsps,
+    inputSupplyKit,
+    inputSpecimenKit,
+    inputCollectionCup,
+    inputCollectionCard
+  );
 };
 
-
-
-// TODO: REMOVE & REFACTOR FOR LATER, ADD TO SHARED.JS FILE?***
 // GET METHOD REQUEST
 const getKitData = async () => {
   const idToken = await getIdToken();
@@ -80,7 +63,7 @@ const getKitData = async () => {
         // debugger;
         return kitData;
       }
-      // TODO: ADD a row where a user is able to enter into speecfic table cells
+      // TODO: ADD a row where a user is able to enter into specfic table cells
       throw new Error("No Kit Assembly data!");
     } else {
       throw new Error("Status Code is not 200!");
@@ -90,21 +73,20 @@ const getKitData = async () => {
   }
 };
 
-// TODO: REMOVE & REFACTOR FOR LATER, ADD TO SHARED.JS FILE?***
 // POST METHOD REQUEST
 const addKitData = async (jsonSaveBody) => {
   const idToken = await getIdToken();
-  const response = await fetch(`${api}api=addKitData`,{
-    method:"POST",
+  const response = await fetch(`${api}api=addKitData`, {
+    method: "POST",
     headers: {
       Authorization: "Bearer" + idToken,
     },
-    body: JSON.stringify(jsonSaveBody)
-  })
-  const addKit = await response.clone().json()
-  console.log(addKit)
-  return addKit
-  debugger;
+    body: JSON.stringify(jsonSaveBody),
+  });
+  const addKit = await response.json();
+  // console.log(addKit);
+  return addKit;
+  // debugger;
 };
 
 const kitAssemblyTemplate = async (auth, route) => {
@@ -163,34 +145,33 @@ const populateKitTable = (tableBody, kitData) => {
 
     // If the current iteration is the last item, add an extra row
     if (i === kitData.length - 1) {
-      // Add two to current i value to display correct line item number
-      // Note: cannot add event listeners to td elements
+      // Add two to current i value to display correct line item number increment
       extraRow = `        
             <tr class="new-row">
                 <th scope="row">${i + 2}</th>
                 <td>
                   
-                    <input id="input-usps" type="string" value="" style="width:80%"/>
+                    <input id="input-usps" type="string" autocomplete="off" style="width:80%"/>
                   
                 </td>
                 <td>
                   
-                    <input id="input-supply-kit" type="string" value="" style="width:80%"/>
+                    <input id="input-supply-kit" type="string" autocomplete="off" style="width:80%"/>
                   
                 </td>
                 <td>
                   
-                    <input id="input-specimen-kit" type="string" value="" style="width:80%"/>
+                    <input id="input-specimen-kit" type="string" autocomplete="off" style="width:80%"/>
                   
                 </td>
                 <td>
                   
-                    <input id="input-collection-cup" type="string" value="" style="width:80%"/>
+                    <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%"/>
                   
                 </td>
                 <td>
                   
-                    <input id="input-collection-card" type="string" value="" style="width:80%"/>
+                    <input id="input-collection-card" type="string" autocomplete="off" style="width:80%"/>
                   
                 </td>
             </tr>
@@ -209,14 +190,21 @@ const kitAssemblyPageButtons = () => {
 
   buttonContainerTemplate += `
         <div class="kit-assembly-button-container d-flex justify-content-center" style="margin: 8rem;">
-          <button id="kit-assembly-cancel-button" type="button" class="btn btn-outline-secondary" style="margin-right:10%">Cancel</button>
-          <button id="kit-assembly-save-button" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#saveModal">Save</button>
+          <button id="kit-assembly-cancel-button " type="button" class="btn btn-outline-secondary btn-lg" style="margin-right:10%">Cancel</button>
+          <button id="kit-assembly-save-button" type="submit" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#saveModal">Save</button>
         </div> 
     `;
   contentBody.innerHTML += buttonContainerTemplate;
 };
 
-const saveItem = async (tableBody,inputUsps,inputSupplyKit,inputSpecimenKit,inputCollectionCup,inputCollectionCard) => {
+const saveItem = async (
+  tableBody,
+  inputUsps,
+  inputSupplyKit,
+  inputSpecimenKit,
+  inputCollectionCup,
+  inputCollectionCard
+) => {
   const saveButton = document.getElementById("kit-assembly-save-button");
   saveButton.addEventListener("click", (e) => {
     console.log("save button clicked");
@@ -226,13 +214,55 @@ const saveItem = async (tableBody,inputUsps,inputSupplyKit,inputSpecimenKit,inpu
     // console.log(tableBody.lastElementChild.children);
     // const lastRowElements = tableBody.lastElementChild.children;
     // for (let i = 1; i < lastRowElements.length; i++) {}
-    jsonSaveBody.collectionCardId = inputCollectionCard.value
-    jsonSaveBody.supplyKitId = inputSupplyKit.value
-    jsonSaveBody.collectionCupId = inputCollectionCup.value
-    jsonSaveBody.specimenKitId = inputSpecimenKit.value
-    jsonSaveBody.uspsTrackingNumber = inputUsps.value
-    
-    return addKitData(jsonSaveBody).then(res => console.log(res))
+    jsonSaveBody.collectionCardId = inputCollectionCard.value;
+    jsonSaveBody.supplyKitId = inputSupplyKit.value;
+    jsonSaveBody.collectionCupId = inputCollectionCup.value;
+    jsonSaveBody.specimenKitId = inputSpecimenKit.value;
+    jsonSaveBody.uspsTrackingNumber = inputUsps.value;
+
+    // return addKitData(jsonSaveBody).then(res => console.log(res))
+    return addKitData(jsonSaveBody);
+  });
+};
+
+// User input handler
+
+const userInputHandler = async (
+  inputUsps,
+  inputSupplyKit,
+  inputSpecimenKit,
+  inputCollectionCup,
+  inputCollectionCard
+) => {
+  // Event Handlers for input fields
+  await inputUsps.addEventListener("input", (e) => {
+    // console.log(e.target)
+    inputUsps.value = e.target.value;
+    console.log(inputUsps.value);
+  });
+
+  await inputSupplyKit.addEventListener("input", (e) => {
+    inputSupplyKit.value = e.target.value;
+    console.log(inputSupplyKit.value);
+  });
+
+  await inputSpecimenKit.addEventListener("input", (e) => {
+    inputSpecimenKit.value = e.target.value;
+    console.log(inputSpecimenKit);
+    console.log(inputSpecimenKit.value);
+  });
+
+  await inputCollectionCup.addEventListener("input", (e) => {
+    inputCollectionCup.value = e.target.value;
+    console.log(inputCollectionCup);
+  });
+
+  await inputCollectionCard.addEventListener("input", (e) => {
+    inputCollectionCard.value = e.target.value;
+    console.log(inputCollectionCard);
+    console.log(e.target.value);
+
+    // debugger;
   });
 };
 
@@ -244,6 +274,10 @@ const jsonSaveBody = {
   specimenKitId: "",
   uspsTrackingNumber: "",
 };
+
+// Create extra table row
+
+const addTableRow = () => {};
 
 /*
 TODO STEPS:
