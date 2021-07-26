@@ -79,18 +79,18 @@ const getKitData = async () => {
 // POST METHOD REQUEST
 const addKitData = async (jsonSaveBody) => {
   const idToken = await getIdToken();
-  const response = await fetch(`${api}api=addKitData`, {
+  const response = await (await fetch(`${api}api=addKitData`, {
     method: "POST",
-    headers: {
-      Authorization: "Bearer" + idToken,
-    },
     body: JSON.stringify(jsonSaveBody),
-  });
-  const addKit = await response.json();
-  console.log(jsonSaveBody);
-  console.log(addKit);
-  debugger;
-  return addKit;
+    headers: {
+      Authorization: "Bearer " + idToken,
+      "Content-Type": "application/json"
+    },
+    
+  }));
+  if (response.status === 200) {
+    console.log('hello')
+  }
   
 };
 
