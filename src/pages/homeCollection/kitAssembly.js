@@ -5,6 +5,9 @@ import { getIdToken } from "../../shared.js";
 const api =
   "https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?";
 
+// Track the last row number
+let lastRowNumber = ""
+
 export const kitAssemblyScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
@@ -35,7 +38,8 @@ export const kitAssemblyScreen = async (auth, route) => {
     inputCollectionCup,
     inputCollectionCard
   );
-
+  
+  // Remove all current input fields on row
   clearAllInputs(inputElements) 
 
   // Invoke function to add event listener when clicked
@@ -135,7 +139,7 @@ const populateKitTable = (tableBody, kitData) => {
   // TODO = Make the number dynamic and editable
   let extraRow = "";
   console.log(kitData);
-  // Create loop
+  // Create loop and iterate all array items
   for (let i = 0; i < kitData.length; i++) {
     // Append a row with data cells and corresponding data from fetch
     tableRow += `
@@ -147,42 +151,46 @@ const populateKitTable = (tableBody, kitData) => {
             <td>${kitData[i].collectionCupId}</td>
             <td>${kitData[i].collectionCardId}</td>
         </tr>`;
-
-    // If the current iteration is the last item, add an extra row
-    if (i === kitData.length - 1) {
-      // Add two to current i value to display correct line item number increment
-      extraRow = `        
-            <tr class="new-row">
-                <th scope="row">${i + 2}</th>
-                <td>
-                  
-                    <input id="input-usps" type="string" autocomplete="off" style="width:80%"/>
-                  
-                </td>
-                <td>
-                  
-                    <input id="input-supply-kit" type="string" autocomplete="off" style="width:80%"/>
-                  
-                </td>
-                <td>
-                  
-                    <input id="input-specimen-kit" type="string" autocomplete="off" style="width:80%"/>
-                  
-                </td>
-                <td>
-                  
-                    <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%"/>
-                  
-                </td>
-                <td>
-                  
-                    <input id="input-collection-card" type="string" autocomplete="off" style="width:80%"/>
-                  
-                </td>
-            </tr>
-            `;
-      tableRow += extraRow;
+    
+    // Update the last row number
+    lastRowNumber = i+1
+    console.log(lastRowNumber)
+    // // If the current iteration is the last item and matches length of last row variable, add an extra row
+    if(lastRowNumber === kitData.length) {
+      console.log(lastRowNumber,kitData.length)
+      extraRow =`        
+      <tr class="new-row">
+          <th scope="row">${i + 2}</th>
+          <td>
+            
+              <input id="input-usps" type="string" autocomplete="off" style="width:80%"/>
+            
+          </td>
+          <td>
+            
+              <input id="input-supply-kit" type="string" autocomplete="off" style="width:80%"/>
+            
+          </td>
+          <td>
+            
+              <input id="input-specimen-kit" type="string" autocomplete="off" style="width:80%"/>
+            
+          </td>
+          <td>
+            
+              <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%"/>
+            
+          </td>
+          <td>
+            
+              <input id="input-collection-card" type="string" autocomplete="off" style="width:80%"/>
+            
+          </td>
+      </tr>
+      `;
+      tableRow += extraRow
     }
+
     tableBody.innerHTML = tableRow;
   }
 };
@@ -301,7 +309,9 @@ const clearAllInputs = (inputElements) => {
 // Create extra table row
 
 const addTableRow = () => {
-  
+  // Take all inputs from current row and create a new row with blank inputs
+  // - Note: Make Sure to toggle id off and add back on later
+  // - Note: Increment row correctly
 };
 
 /*
