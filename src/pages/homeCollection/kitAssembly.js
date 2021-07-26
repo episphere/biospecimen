@@ -87,9 +87,11 @@ const addKitData = async (jsonSaveBody) => {
     body: JSON.stringify(jsonSaveBody),
   });
   const addKit = await response.json();
-  // console.log(addKit);
+  console.log(jsonSaveBody);
+  console.log(addKit);
+  debugger;
   return addKit;
-  // debugger;
+  
 };
 
 const kitAssemblyTemplate = async (auth, route) => {
