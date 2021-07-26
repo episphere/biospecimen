@@ -25,6 +25,8 @@ export const kitAssemblyScreen = async (auth, route) => {
   let inputCollectionCup = document.getElementById("input-collection-cup");
   let inputCollectionCard = document.getElementById("input-collection-card");
 
+  const inputElements = {inputUsps,inputSupplyKit,inputSpecimenKit,inputCollectionCard,inputCollectionCup}
+
   //Event Listener for Table Inputs
   await userInputHandler(
     inputUsps,
@@ -34,9 +36,7 @@ export const kitAssemblyScreen = async (auth, route) => {
     inputCollectionCard
   );
 
-  const inputElements = {inputUsps,inputSupplyKit,inputSpecimenKit,inputCollectionCard,inputCollectionCup}
-
-  await clearAllInputs(inputElements) 
+  clearAllInputs(inputElements) 
 
   // Invoke function to add event listener when clicked
   await saveItem(
@@ -192,10 +192,10 @@ const kitAssemblyPageButtons = () => {
   console.log(contentBody);
 
   buttonContainerTemplate += `
-        <div class="kit-assembly-button-container d-flex justify-content-center" style="margin: 8rem;">
-          <button id="kit-assembly-cancel-button" type="button" class="btn btn-outline-secondary btn-lg" style="margin-right:10%">Cancel</button>
+        <div class="kit-assembly-button-container d-flex justify-content-around" style="margin:8rem 0;">
+          <button id="kit-assembly-cancel-button" type="button" class="btn btn-outline-secondary" style=" width:13rem; height:3rem; border-radius:15px">Cancel</button>
 
-          <button id="kit-assembly-save-button" type="submit" class="btn btn-primary btn-lg">Save</button>
+          <button id="kit-assembly-save-button" type="submit" class="btn btn-success" style="width:13rem;height:3rem; border-radius:15px">Save</button>
         </div> 
     `;
   contentBody.innerHTML += buttonContainerTemplate;
