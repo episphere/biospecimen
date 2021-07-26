@@ -29,7 +29,7 @@ const bptlScreenTemplate = (name, data, auth, route) => {
                 <div class="col">
                     <h4>Home Collection</h4>
                     <div class="p-3 border bg-light"><button type="button" href="#kitassembly" class="btn btn-primary btn-lg" id="kitAssembly">Kit Assembly</button></div>
-                    <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg">Print Adresses</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#printaddresses" class="btn btn-primary btn-lg" id="printAddresses">Print Addresses</button></div>
                     <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg">Participant Selection</button></div>
                     <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg">Participant Assignment</button></div>
                     <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg">Kit Shipment</button></div>
@@ -64,5 +64,9 @@ const redirectPageToLocation = (name, auth, route) => {
     const a = document.getElementById('kitAssembly');
     a && a.addEventListener('click',  async () => {
         location.hash = '#kitassembly';
+    })
+    const b = document.getElementById('printAddresses');
+    b && b.addEventListener('click',  async () => {
+        location.hash = '#printaddresses';
     })
 }
