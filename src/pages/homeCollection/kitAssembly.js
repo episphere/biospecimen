@@ -6,7 +6,7 @@ const api =
   "https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?";
 
 // Track the last row number
-let lastRowNumber = ""
+let lastRowNumber = "";
 
 export const kitAssemblyScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -28,7 +28,13 @@ export const kitAssemblyScreen = async (auth, route) => {
   let inputCollectionCup = document.getElementById("input-collection-cup");
   let inputCollectionCard = document.getElementById("input-collection-card");
 
-  const inputElements = {inputUsps,inputSupplyKit,inputSpecimenKit,inputCollectionCard,inputCollectionCup}
+  const inputElements = {
+    inputUsps,
+    inputSupplyKit,
+    inputSpecimenKit,
+    inputCollectionCard,
+    inputCollectionCup,
+  };
 
   //Event Listener for Table Inputs
   await userInputHandler(
@@ -38,9 +44,9 @@ export const kitAssemblyScreen = async (auth, route) => {
     inputCollectionCup,
     inputCollectionCard
   );
-  
+
   // Remove all current input fields on row
-  clearAllInputs(inputElements) 
+  clearAllInputs(inputElements);
 
   // Invoke function to add event listener when clicked
   await saveItem(
@@ -83,19 +89,21 @@ const getKitData = async () => {
 // POST METHOD REQUEST
 const addKitData = async (jsonSaveBody) => {
   const idToken = await getIdToken();
-  const response = await (await fetch(`${api}api=addKitData`, {
+  const response = await await fetch(`${api}api=addKitData`, {
     method: "POST",
     body: JSON.stringify(jsonSaveBody),
     headers: {
       Authorization: "Bearer " + idToken,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    
-  }));
+  });
   if (response.status === 200) {
-    console.log('hello')
+    console.log("Successfully saved!");
+    window.alert("Successfully saved!");
+  } else {
+    console.log("Error did not save!");
+    window.alert("Error on Save!");
   }
-  
 };
 
 const kitAssemblyTemplate = async (auth, route) => {
@@ -151,16 +159,16 @@ const populateKitTable = (tableBody, kitData) => {
             <td>${kitData[i].collectionCupId}</td>
             <td>${kitData[i].collectionCardId}</td>
         </tr>`;
-    
+
     // Update the last row number
-    lastRowNumber = i+1
-    console.log(lastRowNumber)
+    lastRowNumber = i + 1;
+    console.log(lastRowNumber);
     // // If the current iteration is the last item and matches length of last row variable, add an extra row
-    if(lastRowNumber === kitData.length) {
-      console.log(lastRowNumber,kitData.length)
-      extraRow =`        
-      <tr class="new-row">
-          <th scope="row">${i + 2}</th>
+    if (lastRowNumber === kitData.length) {
+      console.log(lastRowNumber, kitData.length);
+      extraRow = `
+        <tr class="new-row">      
+          <th scope="row">${lastRowNumber + 1}</th>
           <td>
             
               <input id="input-usps" type="string" autocomplete="off" style="width:80%"/>
@@ -188,7 +196,7 @@ const populateKitTable = (tableBody, kitData) => {
           </td>
       </tr>
       `;
-      tableRow += extraRow
+      tableRow += extraRow;
     }
 
     tableBody.innerHTML = tableRow;
@@ -222,8 +230,8 @@ const saveItem = async (
   const saveButton = document.getElementById("kit-assembly-save-button");
   saveButton.addEventListener("click", (e) => {
     console.log("save button clicked");
-    console.log(tableBody);
-    e.preventDefault()
+    // console.log(tableBody);
+    e.preventDefault();
     // Target Last row and the last row's children elements
 
     // console.log(tableBody.lastElementChild.children);
@@ -235,8 +243,69 @@ const saveItem = async (
     jsonSaveBody.specimenKitId = inputSpecimenKit.value;
     jsonSaveBody.uspsTrackingNumber = inputUsps.value;
 
-    // return addKitData(jsonSaveBody).then(res => console.log(res))
-    return addKitData(jsonSaveBody);
+    // // ADD DATA to TABLE
+    // function addRow(tableId) {
+    //   let rowCount = tableBody.rows.length;
+    //   // console.log(rowCount)
+
+    //   let row = tableBody.insertRow(rowCount);
+    //   let colCount = tableBody.rows[0].cells.length;
+
+    //   console.log(rowCount, row, colCount);
+
+    //   // loop using row columns
+    //   for( let i =0; i<colCount;i++){
+    //     // add new cell
+    //     let newcell = row.insertCell(i)
+    //     newcell.innerHTML = tableBody.rows[i].cells[i].innerHTML;
+    //     console.log(newcell)
+    //     if(newCell.childNodes[0].type){}
+    //   }
+
+    //   // return addKitData(jsonSaveBody).then(res => console.log(res))
+    //   // return addKitData(jsonSaveBody);
+    // };
+
+    // addRow(tableBody);
+    addEndRow();
+    function addEndRow() {
+      let newRowEl = document.querySelector(".new-row");
+      // let rowCount = 0;
+      // rowCount += tableBody.rows.length + 1;
+      let rowCount = tableBody.rows.length;
+      rowCount+=1
+      newRowEl.insertAdjacentHTML(
+        "afterend",
+        `<tr>
+    <th scope="row">${rowCount}</th>
+    <td>
+      
+        <input id="input-usps" type="string" autocomplete="off" style="width:80%"/>
+      
+    </td>
+    <td>
+      
+        <input id="input-supply-kit" type="string" autocomplete="off" style="width:80%"/>
+      
+    </td>
+    <td>
+      
+        <input id="input-specimen-kit" type="string" autocomplete="off" style="width:80%"/>
+      
+    </td>
+    <td>
+      
+        <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%"/>
+      
+    </td>
+    <td>
+      
+        <input id="input-collection-card" type="string" autocomplete="off" style="width:80%"/>
+      
+    </td>
+</tr>`
+      );
+    }
   });
 };
 
@@ -290,29 +359,29 @@ const jsonSaveBody = {
   uspsTrackingNumber: "",
 };
 
-
 // Cancel Button Clear Inputs Function
 
 const clearAllInputs = (inputElements) => {
-  const cancelButton = document.getElementById("kit-assembly-cancel-button")
-  
-  console.log(inputElements)
-  cancelButton.addEventListener("click",(e)=> {
-    e.preventDefault() 
-    // for in to loop over all property keys
-    for(let property in inputElements) {
-      inputElements[property].value = ""
-    }
-  })
-}
+  const cancelButton = document.getElementById("kit-assembly-cancel-button");
 
+  console.log(inputElements);
+  cancelButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    // for in to loop over all property keys
+    for (let property in inputElements) {
+      inputElements[property].value = "";
+    }
+  });
+};
+
+const renderSaveRowItems = () => {};
 // Create extra table row
 
-const addTableRow = () => {
-  // Take all inputs from current row and create a new row with blank inputs
-  // - Note: Make Sure to toggle id off and add back on later
-  // - Note: Increment row correctly
-};
+// const addTableRow = () => {
+//   // Take all inputs from current row and create a new row with blank inputs
+//   // - Note: Make Sure to toggle id off and add back on later
+//   // - Note: Increment row correctly
+// };
 
 /*
 TODO STEPS:
