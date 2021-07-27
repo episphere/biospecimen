@@ -198,7 +198,7 @@ const populateKitTable = (tableBody, kitData) => {
       `;
       tableRow += extraRow;
     }
-
+    
     tableBody.innerHTML = tableRow;
   }
 };
@@ -228,7 +228,9 @@ const saveItem = async (
   inputCollectionCard
 ) => {
   const saveButton = document.getElementById("kit-assembly-save-button");
+  let tableNumRows = tableBody.rows.length
   saveButton.addEventListener("click", (e) => {
+    tableNumRows++
     console.log("save button clicked");
     // console.log(tableBody);
     e.preventDefault();
@@ -265,43 +267,46 @@ const saveItem = async (
     //   // return addKitData(jsonSaveBody).then(res => console.log(res))
     //   // return addKitData(jsonSaveBody);
     // };
-
+    
     // addRow(tableBody);
-    addEndRow();
-    function addEndRow() {
+    addEndRow(jsonSaveBody);
+    function addEndRow(jsonSaveBody) {
       let newRowEl = document.querySelector(".new-row");
+      console.log(newRowEl.firstChild)
+      // console.log(newRowEl.firstChild)
       // let rowCount = 0;
       // rowCount += tableBody.rows.length + 1;
-      let rowCount = tableBody.rows.length;
-      rowCount+=1
+      // let rowCount = tableBody.rows.length;
+      // rowCount+=1
+      console.log(jsonSaveBody)
       newRowEl.insertAdjacentHTML(
-        "afterend",
+        "beforebegin",
         `<tr>
-    <th scope="row">${rowCount}</th>
+    <th scope="row">${tableNumRows}</th>
     <td>
       
-        <input id="input-usps" type="string" autocomplete="off" style="width:80%"/>
-      
+        
+        ${jsonSaveBody.uspsTrackingNumber}
     </td>
     <td>
       
-        <input id="input-supply-kit" type="string" autocomplete="off" style="width:80%"/>
-      
+        
+        ${jsonSaveBody.supplyKitId}
     </td>
     <td>
       
-        <input id="input-specimen-kit" type="string" autocomplete="off" style="width:80%"/>
-      
+        
+        ${jsonSaveBody.specimenKitId}
     </td>
     <td>
       
-        <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%"/>
-      
+        
+        ${jsonSaveBody.collectionCupId}
     </td>
     <td>
       
-        <input id="input-collection-card" type="string" autocomplete="off" style="width:80%"/>
-      
+        
+        ${jsonSaveBody.collectionCardId}
     </td>
 </tr>`
       );
