@@ -55,7 +55,8 @@ export const kitAssemblyScreen = async (auth, route) => {
     inputSupplyKit,
     inputSpecimenKit,
     inputCollectionCup,
-    inputCollectionCard
+    inputCollectionCard,
+    inputElements
   );
 };
 
@@ -225,7 +226,8 @@ const saveItem = async (
   inputSupplyKit,
   inputSpecimenKit,
   inputCollectionCup,
-  inputCollectionCard
+  inputCollectionCard,
+  inputElements
 ) => {
   const saveButton = document.getElementById("kit-assembly-save-button");
   let tableNumRows = tableBody.rows.length
@@ -273,7 +275,8 @@ const saveItem = async (
     function addEndRow(jsonSaveBody) {
       let newRowEl = document.querySelector(".new-row");
       console.log(newRowEl.firstChild)
-      // console.log(newRowEl.firstChild)
+      // Target Line Item Number
+      newRowEl.firstChild.nextSibling.innerHTML = tableNumRows
       // let rowCount = 0;
       // rowCount += tableBody.rows.length + 1;
       // let rowCount = tableBody.rows.length;
@@ -282,7 +285,7 @@ const saveItem = async (
       newRowEl.insertAdjacentHTML(
         "beforebegin",
         `<tr>
-    <th scope="row">${tableNumRows}</th>
+    <th scope="row">${tableNumRows-1}</th>
     <td>
       
         
@@ -310,7 +313,13 @@ const saveItem = async (
     </td>
 </tr>`
       );
+      console.log(inputElements)
     }
+    clearRowInputs()
+    function clearRowInputs(){for (let property in inputElements) {
+      inputElements[property].value = "";
+    }}
+    // return addKitData(jsonSaveBody);
   });
 };
 
