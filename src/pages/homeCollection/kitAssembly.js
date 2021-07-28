@@ -15,9 +15,11 @@ export const kitAssemblyScreen = async (auth, route) => {
   //showAnimation();
   await kitAssemblyTemplate(auth, route);
 
+  // Fetch data using GET request
   const kitData = await getKitData().then((res) => res.data);
   const tableBody = document.getElementById("kit-assembly-table-body");
 
+  // Render Table Data
   populateKitTable(tableBody, kitData);
   // Render Page Buttons
   kitAssemblyPageButtons();
@@ -48,7 +50,7 @@ export const kitAssemblyScreen = async (auth, route) => {
   // Remove all current input fields on row
   clearAllInputs(inputElements);
 
-  // Invoke function to add event listener when clicked
+  // Invoke function to add item to table and send a POST request
   await saveItem(
     tableBody,
     inputUsps,
@@ -60,7 +62,11 @@ export const kitAssemblyScreen = async (auth, route) => {
   );
 };
 
-// GET METHOD REQUEST
+/*
+==================================================
+GET METHOD REQUEST - Retrieve all Kits
+==================================================
+*/
 const getKitData = async () => {
   const idToken = await getIdToken();
   const response = await fetch(`${api}api=getKitData`, {
@@ -74,10 +80,9 @@ const getKitData = async () => {
     if (response.status === 200) {
       const kitData = await response.json();
       if (kitData.data.length) {
-        // debugger;
         return kitData;
       }
-      // TODO: ADD a row where a user is able to enter into specfic table cells
+      // TODO: ADD a row where a user can enter data, handle when there is no data from GET request
       throw new Error("No Kit Assembly data!");
     } else {
       throw new Error("Status Code is not 200!");
@@ -87,7 +92,11 @@ const getKitData = async () => {
   }
 };
 
-// POST METHOD REQUEST
+/*
+==================================================
+POST METHOD REQUEST - Add a Kit
+==================================================
+*/
 const addKitData = async (jsonSaveBody) => {
   const idToken = await getIdToken();
   const response = await await fetch(`${api}api=addKitData`, {
@@ -98,19 +107,31 @@ const addKitData = async (jsonSaveBody) => {
       "Content-Type": "application/json",
     },
   });
+
+  // TODO: Make into separate Function call
+  let contentBody = document.getElementById("contentBody");
+  let alert = "";
+
   if (response.status === 200) {
-    console.log("Successfully saved!");
-    window.alert("Successfully saved!");
+    alert += `
+    <div class="alert alert-success alert-dismissible fade show" role="alert" position="relative" style="top:50%">
+      <strong>Kit was saved successfully!</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`;
+    contentBody.insertAdjacentHTML("afterbegin", alert);
   } else {
-    console.log("Error did not save!");
-    window.alert("Error on Save!");
+    alert += `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Kit was not saved successfully!</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`;
   }
 };
 
 const kitAssemblyTemplate = async (auth, route) => {
-  //   const kitData = await getKitData().then(res => res.data)
-
-  //   console.log(kitData)
   let template = ``;
   template += homeCollectionNavbar();
   template += `
@@ -147,7 +168,6 @@ const populateKitTable = (tableBody, kitData) => {
 
   // TODO = Make the number dynamic and editable
   let extraRow = "";
-  console.log(kitData);
   // Create loop and iterate all array items
   for (let i = 0; i < kitData.length; i++) {
     // Append a row with data cells and corresponding data from fetch
@@ -163,43 +183,31 @@ const populateKitTable = (tableBody, kitData) => {
 
     // Update the last row number
     lastRowNumber = i + 1;
-    console.log(lastRowNumber);
     // // If the current iteration is the last item and matches length of last row variable, add an extra row
     if (lastRowNumber === kitData.length) {
-      console.log(lastRowNumber, kitData.length);
       extraRow = `
         <tr class="new-row">      
           <th scope="row">${lastRowNumber + 1}</th>
           <td>
-            
               <input id="input-usps" type="string" autocomplete="off" style="width:80%"/>
-            
           </td>
           <td>
-            
               <input id="input-supply-kit" type="string" autocomplete="off" style="width:80%"/>
-            
           </td>
           <td>
-            
               <input id="input-specimen-kit" type="string" autocomplete="off" style="width:80%"/>
-            
           </td>
           <td>
-            
               <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%"/>
-            
           </td>
           <td>
-            
               <input id="input-collection-card" type="string" autocomplete="off" style="width:80%"/>
-            
           </td>
       </tr>
       `;
       tableRow += extraRow;
     }
-    
+
     tableBody.innerHTML = tableRow;
   }
 };
@@ -207,8 +215,6 @@ const populateKitTable = (tableBody, kitData) => {
 const kitAssemblyPageButtons = () => {
   const contentBody = document.getElementById("contentBody");
   let buttonContainerTemplate = "";
-
-  console.log(contentBody);
 
   buttonContainerTemplate += `
         <div class="kit-assembly-button-container d-flex justify-content-around" style="margin:8rem 0;">
@@ -230,96 +236,63 @@ const saveItem = async (
   inputElements
 ) => {
   const saveButton = document.getElementById("kit-assembly-save-button");
-  let tableNumRows = tableBody.rows.length
+  let tableNumRows = tableBody.rows.length;
   saveButton.addEventListener("click", (e) => {
-    tableNumRows++
-    console.log("save button clicked");
-    // console.log(tableBody);
+    tableNumRows++;
+
     e.preventDefault();
+
     // Target Last row and the last row's children elements
+    // Remove whitespace if any on input fields
+    jsonSaveBody.collectionCardId = inputCollectionCard.value.trim();
+    jsonSaveBody.supplyKitId = inputSupplyKit.value.trim();
+    jsonSaveBody.collectionCupId = inputCollectionCup.value.trim();
+    jsonSaveBody.specimenKitId = inputSpecimenKit.value.trim();
+    jsonSaveBody.uspsTrackingNumber = inputUsps.value.trim();
 
-    // console.log(tableBody.lastElementChild.children);
-    // const lastRowElements = tableBody.lastElementChild.children;
-    // for (let i = 1; i < lastRowElements.length; i++) {}
-    jsonSaveBody.collectionCardId = inputCollectionCard.value;
-    jsonSaveBody.supplyKitId = inputSupplyKit.value;
-    jsonSaveBody.collectionCupId = inputCollectionCup.value;
-    jsonSaveBody.specimenKitId = inputSpecimenKit.value;
-    jsonSaveBody.uspsTrackingNumber = inputUsps.value;
+    // PREVENTS USER FROM SUBMITTING INCOMPLETE INPUT FIELD ROW
+    for (const key in jsonSaveBody) {
+      if (!jsonSaveBody[key]) {
+        alert("One or more inputs are empty!");
+        return;
+      }
+    }
 
-    // // ADD DATA to TABLE
-    // function addRow(tableId) {
-    //   let rowCount = tableBody.rows.length;
-    //   // console.log(rowCount)
-
-    //   let row = tableBody.insertRow(rowCount);
-    //   let colCount = tableBody.rows[0].cells.length;
-
-    //   console.log(rowCount, row, colCount);
-
-    //   // loop using row columns
-    //   for( let i =0; i<colCount;i++){
-    //     // add new cell
-    //     let newcell = row.insertCell(i)
-    //     newcell.innerHTML = tableBody.rows[i].cells[i].innerHTML;
-    //     console.log(newcell)
-    //     if(newCell.childNodes[0].type){}
-    //   }
-
-    //   // return addKitData(jsonSaveBody).then(res => console.log(res))
-    //   // return addKitData(jsonSaveBody);
-    // };
-    
-    // addRow(tableBody);
-    addEndRow(jsonSaveBody);
-    function addEndRow(jsonSaveBody) {
-      let newRowEl = document.querySelector(".new-row");
-      console.log(newRowEl.firstChild)
+    // ADD DATA to TABLE
+    addRow(jsonSaveBody);
+    function addRow(jsonSaveBody) {
       // Target Line Item Number
-      newRowEl.firstChild.nextSibling.innerHTML = tableNumRows
-      // let rowCount = 0;
-      // rowCount += tableBody.rows.length + 1;
-      // let rowCount = tableBody.rows.length;
-      // rowCount+=1
-      console.log(jsonSaveBody)
+      let newRowEl = document.querySelector(".new-row");
+      newRowEl.firstChild.nextSibling.innerHTML = tableNumRows;
       newRowEl.insertAdjacentHTML(
         "beforebegin",
         `<tr>
-    <th scope="row">${tableNumRows-1}</th>
+    <th scope="row">${tableNumRows - 1}</th>
     <td>
-      
-        
         ${jsonSaveBody.uspsTrackingNumber}
     </td>
     <td>
-      
-        
         ${jsonSaveBody.supplyKitId}
     </td>
     <td>
-      
-        
         ${jsonSaveBody.specimenKitId}
     </td>
     <td>
-      
-        
         ${jsonSaveBody.collectionCupId}
     </td>
     <td>
-      
-        
         ${jsonSaveBody.collectionCardId}
     </td>
 </tr>`
       );
-      console.log(inputElements)
     }
-    clearRowInputs()
-    function clearRowInputs(){for (let property in inputElements) {
-      inputElements[property].value = "";
-    }}
-    // return addKitData(jsonSaveBody);
+    clearRowInputs();
+    function clearRowInputs() {
+      for (let property in inputElements) {
+        inputElements[property].value = "";
+      }
+    }
+    return addKitData(jsonSaveBody);
   });
 };
 
@@ -334,32 +307,23 @@ const userInputHandler = async (
 ) => {
   // Event Handlers for input fields
   await inputUsps.addEventListener("input", (e) => {
-    // console.log(e.target)
     inputUsps.value = e.target.value;
-    console.log(inputUsps.value);
   });
 
   await inputSupplyKit.addEventListener("input", (e) => {
     inputSupplyKit.value = e.target.value;
-    console.log(inputSupplyKit.value);
   });
 
   await inputSpecimenKit.addEventListener("input", (e) => {
     inputSpecimenKit.value = e.target.value;
-    console.log(inputSpecimenKit);
-    console.log(inputSpecimenKit.value);
   });
 
   await inputCollectionCup.addEventListener("input", (e) => {
     inputCollectionCup.value = e.target.value;
-    console.log(inputCollectionCup);
   });
 
   await inputCollectionCard.addEventListener("input", (e) => {
     inputCollectionCard.value = e.target.value;
-    console.log(inputCollectionCard);
-    console.log(e.target.value);
-
     // debugger;
   });
 };
@@ -378,7 +342,6 @@ const jsonSaveBody = {
 const clearAllInputs = (inputElements) => {
   const cancelButton = document.getElementById("kit-assembly-cancel-button");
 
-  console.log(inputElements);
   cancelButton.addEventListener("click", (e) => {
     e.preventDefault();
     // for in to loop over all property keys
@@ -387,15 +350,6 @@ const clearAllInputs = (inputElements) => {
     }
   });
 };
-
-const renderSaveRowItems = () => {};
-// Create extra table row
-
-// const addTableRow = () => {
-//   // Take all inputs from current row and create a new row with blank inputs
-//   // - Note: Make Sure to toggle id off and add back on later
-//   // - Note: Increment row correctly
-// };
 
 /*
 TODO STEPS:
@@ -406,10 +360,10 @@ TODO STEPS:
     NOTE: Insert an extra row
 4. Make extra row editable
     TODO: Fix resizing issue - make content fit within container and not change width
-5. Create Buttons (Add, Save, Link to another page)
-    - Add: Create a new editable row for table
+5. Create Buttons (Add, Cancel)
+    - Cancel: Clear inputs on last table row 
     - Save: Makes a POST request to add a new item to the dataset
-    - Link: To another Web page
+  
 6. Prioritize Save button POST request 
     - TEST POST Request first on POSTMAN *
     - Create a Modal for Save Button with Two Buttons (IGNORE FOR MVP)
@@ -420,7 +374,18 @@ TODO STEPS:
 8. Handle acceptable POST request on the client side
 
 
-BONUS:
+UPCOMING FEATURES
 
-SORT Kits from Oldest to Newest
+1. USER VALIDATION CHECKS - 
+    - Input checks for Column 2 and 3 (Match) / Modals? 
+    - Input checks for Column 4 and 5 (Match) / Modals?
+    - USPS unique numeric check / Modals?
+    - Modal Warning when user is moving away from page or accidentally hit close button
+
+2. ALERT FADE OUT
+    - HAVE ALERT FADE OUT WHEN CERTAIN TIME PASSES
+
+
+BONUS:
+SORT FUNCTION Kits from Oldest to Newest
 */
