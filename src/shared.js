@@ -25,8 +25,9 @@ const conversion = {
     "677469051":"0014",
     "683613884":"0024"
 }
-const api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
-// const api = 'http://localhost:8010/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
+ const api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
+// const api = 'http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
+
 
 export const validateUser = async () => {
     const idToken = await getIdToken();
@@ -519,7 +520,6 @@ export const getNumPages = async (numPerPage, filter) => {
     let res = await response.json();
     let numBoxes = res.data;
     return Math.ceil(numBoxes/numPerPage);
-    return 3;
 }
 
 export const getSiteCouriers = async () => {
