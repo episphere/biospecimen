@@ -2,25 +2,21 @@ import { getIdToken, findParticipant, showAnimation, hideAnimation } from "../..
 import fieldMapping from "../../fieldToConceptIdMapping.js";
 import { humanReadableFromISO } from "../../utils.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { renderKitStatusList, renderParticipantScreen } from "./participantSelectionHeaders.js";
+import { renderParticipanSelectionHeader } from "./participantSelectionHeaders.js";
 
 export const printAddressesScreen = async (auth, route) => {
     const user = auth.currentUser;
     if(!user) return;
     const username = user.displayName ? user.displayName : user.email;
     printaddressesTemplate(auth, route);
-  
-  
 }             
 
 const printaddressesTemplate = async (auth, route) => {
     showAnimation();
     const response = await findParticipant('firstName=Deanna');
     hideAnimation()
-    console.log('participantsList', response.data)
     let template = ``;
-    template += renderParticipantScreen();
-   // template += renderKitStatusList();
+    template += renderParticipanSelectionHeader();
     template += ` <div class="container-fluid">
                     <div id="root root-margin">
                         <div class="table-responsive">
@@ -66,10 +62,15 @@ const  redirectDropdownScreen = () => {
     const a = document.getElementById('btnParticipantSearch');
     a.addEventListener('click', () => {
         const selection = document.getElementById('paticipantSelection');
-        if (selection.value === 'addressPrinted') {
+        if (selection.value === 'pending') {
+            location.hash = '#participantselection';
+        }
+        else if (selection.value === 'addressPrinted') {
             location.hash = '#addressPrinted';
         }
-        console.log('SE', selection.value)
+        else if (selection.value === 'assigned') {
+            location.hash = '#assigned';
+        }
     })
 }
 
