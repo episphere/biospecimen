@@ -1,23 +1,19 @@
-import { showAnimation, hideAnimation } from "../../shared.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { printAddressesScreen } from "./printAddresses.js";
 
 export const participantSelection = async (auth, route) => {
     const user = auth.currentUser;
     if(!user) return;
     const username = user.displayName ? user.displayName : user.email;
-    renderParticipantScreen(auth, route);
-    redirectDropdownScreen();
-  
+    renderParticipanSelectionHeader(auth, route);  
 }             
 
-export const renderParticipantScreen = () => {
+export const renderParticipanSelectionHeader = () => {
     let template = ``;
     template += homeCollectionNavbar();
     template += renderKitStatusList();
     return template;
-   // document.getElementById('contentBody').innerHTML = template;
 }
+
 export const renderKitStatusList = () => {
     let template = ``;
     template += ` 
@@ -41,11 +37,4 @@ export const renderKitStatusList = () => {
                 </div>
             </div> `
     return template;
-}
-
-const  redirectDropdownScreen = () => {
-    document.getElementById('btnParticipantSearch').addEventListener('click', () => {
-        const selection = document.getElementById('dashboardSelection');
-        console.log('SE', selection.value)
-    })
 }
