@@ -91,7 +91,6 @@ const getKitData = async () => {
     console.log(e);
   }
 };
-
 /*
 ==================================================
 POST METHOD REQUEST - Add a Kit
@@ -114,7 +113,7 @@ const addKitData = async (jsonSaveBody) => {
 
   if (response.status === 200) {
     alert += `
-    <div class="alert alert-success alert-dismissible fade show" role="alert" position="relative" style="top:50%">
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
       <strong>Kit was saved successfully!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
@@ -238,8 +237,6 @@ const saveItem = async (
   const saveButton = document.getElementById("kit-assembly-save-button");
   let tableNumRows = tableBody.rows.length;
   saveButton.addEventListener("click", (e) => {
-    tableNumRows++;
-
     e.preventDefault();
 
     // Target Last row and the last row's children elements
@@ -258,40 +255,14 @@ const saveItem = async (
       }
     }
 
+    // Increment with all filled input fields
+    tableNumRows++;
+
     // ADD DATA to TABLE
-    addRow(jsonSaveBody);
-    function addRow(jsonSaveBody) {
-      // Target Line Item Number
-      let newRowEl = document.querySelector(".new-row");
-      newRowEl.firstChild.nextSibling.innerHTML = tableNumRows;
-      newRowEl.insertAdjacentHTML(
-        "beforebegin",
-        `<tr>
-    <th scope="row">${tableNumRows - 1}</th>
-    <td>
-        ${jsonSaveBody.uspsTrackingNumber}
-    </td>
-    <td>
-        ${jsonSaveBody.supplyKitId}
-    </td>
-    <td>
-        ${jsonSaveBody.specimenKitId}
-    </td>
-    <td>
-        ${jsonSaveBody.collectionCupId}
-    </td>
-    <td>
-        ${jsonSaveBody.collectionCardId}
-    </td>
-</tr>`
-      );
-    }
-    clearRowInputs();
-    function clearRowInputs() {
-      for (let property in inputElements) {
-        inputElements[property].value = "";
-      }
-    }
+    addRow(jsonSaveBody, tableNumRows);
+
+    clearRowInputs(inputElements);
+
     return addKitData(jsonSaveBody);
   });
 };
@@ -336,6 +307,41 @@ const jsonSaveBody = {
   specimenKitId: "",
   uspsTrackingNumber: "",
 };
+
+// Add New row with inputs
+function addRow(jsonSaveBody, tableNumRows) {
+  // Target Line Item Number
+  let newRowEl = document.querySelector(".new-row");
+  newRowEl.firstChild.nextSibling.innerHTML = tableNumRows;
+  newRowEl.insertAdjacentHTML(
+    "beforebegin",
+    `<tr>
+<th scope="row">${tableNumRows - 1}</th>
+<td>
+    ${jsonSaveBody.uspsTrackingNumber}
+</td>
+<td>
+    ${jsonSaveBody.supplyKitId}
+</td>
+<td>
+    ${jsonSaveBody.specimenKitId}
+</td>
+<td>
+    ${jsonSaveBody.collectionCupId}
+</td>
+<td>
+    ${jsonSaveBody.collectionCardId}
+</td>
+</tr>`
+  );
+}
+
+// Clear the row of existing user inputs
+function clearRowInputs(inputElements) {
+  for (let property in inputElements) {
+    inputElements[property].value = "";
+  }
+}
 
 // Cancel Button Clear Inputs Function
 
