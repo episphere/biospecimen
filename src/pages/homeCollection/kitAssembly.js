@@ -259,11 +259,11 @@ const saveItem = async (
     tableNumRows++;
 
     // ADD DATA to TABLE
+    addKitData(jsonSaveBody);
+
     addRow(jsonSaveBody, tableNumRows);
 
     clearRowInputs(inputElements);
-
-    return addKitData(jsonSaveBody);
   });
 };
 
