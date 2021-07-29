@@ -37,7 +37,7 @@ export const renderKitStatusList = () => {
                 </div>
                 </br>
                 <div class="row">
-                    <div class="col"><button class="btn btn-outline-primary" id="btnParticipantSearch">Participant Search</button></div>
+                    <div class="col"><button class="btn btn-outline-primary" id="btnParticipantSearch">Show Participants</button></div>
                 </div>
             </div> `
     return template;
