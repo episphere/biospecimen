@@ -38,7 +38,7 @@ const manageRoutes = async () => {
         else if (route === '#welcome') welcomeScreen(auth, route);
         else if (route === '#bptl') bptlScreen(auth, route);
         else if (route === '#kitassembly') kitAssemblyScreen(auth, route);
-        else if (route === '#printaddresses') printAddressesScreen(auth, route);
+        else if (route === '#participantselection') printAddressesScreen(auth, route);
         else if (route === '#manage_users') manageUsers(auth, route);
         else if (route === '#sign_out') signOut();
         else if (route === '#reports') reportsQuery(auth, route);

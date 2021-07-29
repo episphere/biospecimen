@@ -61,8 +61,8 @@ const createParticipantRows = (participantRows) => {
     let template = ``;
     participantRows.forEach(i => {
     template += `
-                <tr class="row-color-enrollment-dark">
-                    <td> <input type="checkbox" id="scales" name="scales"></td>
+                <tr class="row-color-enrollment-dark participantRow">
+                    <td> <input type="checkbox" class="ptSelection" data-participantHolder = ${storeParticipantInfo(i)} name="ptSelection"></td>
                     <td>${i[fieldMapping.fName] && i[fieldMapping.fName]}</td>
                     <td>${i[fieldMapping.lName] && i[fieldMapping.lName]}</td>
                     <td>${i.Connect_ID && i.Connect_ID}</td>
@@ -75,19 +75,38 @@ const createParticipantRows = (participantRows) => {
                     <td>${i[fieldMapping.verficationDate] && humanReadableFromISO(i[fieldMapping.verficationDate])}</td>
                 </tr>`
             });
+    
     return template;
 }
 
+const storeParticipantInfo = (i) => {
+    let participantHolder = {};
+    participantHolder['firstName'] = i[fieldMapping.fName] && i[fieldMapping.fName];
+    participantHolder = JSON.stringify(participantHolder)
+    return participantHolder;
+}
+
 const generateParticipantCsvGetter = () => {
+    // const participantRow = Array.from(document.getElementsByClassName('participantRow'));
+    // if (participantRow) {
+    //     participantRow.forEach(element => {
+    //     const checkboxPt = element.getElementsByClassName('ptSelection')[0];
+    //     checkboxPt.addEventListener('change', function() {
+    //         console.log('r')
+    //         if (checkboxPt.checked) {
+    //         console.log("Checkbox is checked..", checkboxPt.dataset.participantholder);
+    //         } else {
+    //         console.log("Checkbox is not checked..");
+    //         }
+    //     });
+    // })}
     const a = document.getElementById('generateCsv');
-    console.log('1', a)
     if (a) {
         a.addEventListener('click',  () => {
         generateParticipantCsv('participantData');
         console.log('2')
     })
-}
-}
+}}
 
 const generateParticipantCsv = ( table_id, separator = ',' ) => {
     console.log('3')
@@ -95,7 +114,7 @@ const generateParticipantCsv = ( table_id, separator = ',' ) => {
         var rows = document.querySelectorAll('table#' + table_id + ' tr');
         // Construct csv
         var csv = [];
-        for (var i = 0; i < rows.length; i++) {
+        for (var i = 0; i < rows.length; i++) { 
             var row = [], cols = rows[i].querySelectorAll('td, th');
             for (var j = 0; j < cols.length; j++) {
                 // Clean innertext to remove multiple spaces and jumpline (break csv)
@@ -119,3 +138,17 @@ const generateParticipantCsv = ( table_id, separator = ',' ) => {
         link.click();
         document.body.removeChild(link);
     }
+
+
+    const getDataAttributes = (el) => {
+        let data = {};
+        [].forEach.call(el.attributes, function(attr) {
+            if (/^data-/.test(attr.name)) {
+                var camelCaseName = attr.name.substr(5).replace(/-(.)/g, function ($0, $1) {
+                    return $1.toUpperCase();
+                });
+                data[camelCaseName] = attr.value;
+            }
+        });
+        return data;
+      }
