@@ -8,6 +8,9 @@ import { welcomeScreen } from "./src/pages/welcome.js";
 import { bptlScreen } from "./src/pages/bptl.js";
 import { kitAssemblyScreen } from "./src/pages/homeCollection/kitAssembly.js";
 import { printAddressesScreen } from "./src/pages/homeCollection/printAddresses.js";
+import { participantSelection } from "./src/pages/homeCollection/participantSelectionHeaders.js";
+import { addressesPrintedScreen } from "./src/pages/homeCollection/addressPrinted.js";
+
 
 let auth = '';
 
@@ -39,6 +42,7 @@ const manageRoutes = async () => {
         else if (route === '#bptl') bptlScreen(auth, route);
         else if (route === '#kitassembly') kitAssemblyScreen(auth, route);
         else if (route === '#participantselection') printAddressesScreen(auth, route);
+        else if (route === '#addressPrinted') addressesPrintedScreen(auth, route);
         else if (route === '#manage_users') manageUsers(auth, route);
         else if (route === '#sign_out') signOut();
         else if (route === '#reports') reportsQuery(auth, route);

@@ -2,12 +2,14 @@ import { getIdToken, findParticipant, showAnimation, hideAnimation } from "../..
 import fieldMapping from "../../fieldToConceptIdMapping.js";
 import { humanReadableFromISO } from "../../utils.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
+import { renderKitStatusList, renderParticipantScreen } from "./participantSelectionHeaders.js";
 
 export const printAddressesScreen = async (auth, route) => {
     const user = auth.currentUser;
     if(!user) return;
     const username = user.displayName ? user.displayName : user.email;
     printaddressesTemplate(auth, route);
+  
   
 }             
 
@@ -17,26 +19,28 @@ const printaddressesTemplate = async (auth, route) => {
     hideAnimation()
     console.log('participantsList', response.data)
     let template = ``;
-    template += homeCollectionNavbar();
+    template += renderParticipantScreen();
+   // template += renderKitStatusList();
     template += ` <div class="container-fluid">
                     <div id="root root-margin">
                         <div class="table-responsive">
-                        <span> <h4 style="text-align: center;">Print Addresses </h4> </span>
-                        <div class="sticky-header">
-                                <table class="table table-striped" id="participantData">
-                                    <thead class="thead-dark sticky-row"> 
-                                        <tr>
-                                            <th class="sticky-row" scope="col">Select to print address</th>
-                                            <th class="sticky-row" scope="col">First Name</th>
-                                            <th class="sticky-row" scope="col">Last Name</th>
-                                            <th class="sticky-row" scope="col">Connect ID</th>
-                                            <th class="sticky-row" scope="col">Kit Status</th>
-                                            <th class="sticky-row" scope="col">Street</th>
-                                            <th class="sticky-row" scope="col">Address 2</th>
-                                            <th class="sticky-row" scope="col">City</th>
-                                            <th class="sticky-row" scope="col">State</th>
-                                            <th class="sticky-row" scope="col">Zip Code</th>
-                                            <th class="sticky-row" scope="col">Date Requested</th>
+                        <span> <h3 style="text-align: center;">Print Addresses </h3> </span>
+                        <div class="sticky-header" style="overflow:auto;">
+                                <table class="table table-bordered" id="participantData" 
+                                    style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
+                                    <thead> 
+                                        <tr style="top: 0; position: sticky;">
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Select to print address</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">First Name</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Last Name</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Connect ID</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Kit Status</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Address 1</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Address 2</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">City</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">State</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Zip Code</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Date Requested</th>
                                         </tr>
                                     </thead>   
                                     <tbody>
@@ -53,7 +57,20 @@ const printaddressesTemplate = async (auth, route) => {
                 <button type="button" class="btn btn-primary btn-lg" style="float: right;">Continue to Participant Selection</button>
                 </div>`
     document.getElementById('contentBody').innerHTML = template;
+
     generateParticipantCsvGetter();
+    redirectDropdownScreen();
+}
+
+const  redirectDropdownScreen = () => {
+    const a = document.getElementById('btnParticipantSearch');
+    a.addEventListener('click', () => {
+        const selection = document.getElementById('paticipantSelection');
+        if (selection.value === 'addressPrinted') {
+            location.hash = '#addressPrinted';
+        }
+        console.log('SE', selection.value)
+    })
 }
 
 
@@ -66,7 +83,7 @@ const createParticipantRows = (participantRows) => {
                     <td>${i[fieldMapping.fName] && i[fieldMapping.fName]}</td>
                     <td>${i[fieldMapping.lName] && i[fieldMapping.lName]}</td>
                     <td>${i.Connect_ID && i.Connect_ID}</td>
-                    <td>N/A</td>
+                    <td>Pending</td>
                     <td>${i[fieldMapping.address1] && i[fieldMapping.address1]}</td>
                     <td>${i[fieldMapping.address2] != undefined ? i[fieldMapping.address2] : ``}</td>
                     <td>${i[fieldMapping.city] && i[fieldMapping.city]}</td>
