@@ -145,7 +145,7 @@ const kitAssemblyTemplate = async (auth, route) => {
                     <tr style="top: 0;
                     position: sticky;">
                         <th scope="col" style="background-color: #f7f7f7;">Line Item</th>
-                        <th scope="col" style="background-color: #f7f7f7;">Specify Kit USPS Tracking Number</th>
+                        <th scope="col" style="background-color: #f7f7f7;">Specimen Kit USPS Tracking Number</th>
                         <th scope="col" style="background-color: #f7f7f7;">Supply Kit ID</th>
                         <th scope="col" style="background-color: #f7f7f7;">Specimen Kit ID</th>
                         <th scope="col" style="background-color: #f7f7f7;">Collection Cup ID</th>
