@@ -1,6 +1,6 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { userDashboard } from "../dashboard.js";
-import { getIdToken } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation } from "../../shared.js";
 
 const api =
   "https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?";
@@ -12,7 +12,7 @@ export const kitAssemblyScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  //showAnimation();
+  showAnimation();
   await kitAssemblyTemplate(auth, route);
 
   // Fetch data using GET request
@@ -46,6 +46,7 @@ export const kitAssemblyScreen = async (auth, route) => {
     inputCollectionCup,
     inputCollectionCard
   );
+  hideAnimation();
 
   // Remove all current input fields on row
   clearAllInputs(inputElements);
