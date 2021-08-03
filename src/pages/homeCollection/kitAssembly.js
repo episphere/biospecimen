@@ -19,8 +19,13 @@ export const kitAssemblyScreen = async (auth, route) => {
   const kitData = await getKitData().then((res) => res.data);
   const tableBody = document.getElementById("kit-assembly-table-body");
 
+  // Sort Function from Oldest to Newest
+  const sortData = kitData.sort((a, b) =>
+    a.timeStamp < b.timeStamp ? -1 : a.timeStamp > b.timeStamp ? 1 : 0
+  );
+
   // Render Table Data
-  populateKitTable(tableBody, kitData);
+  populateKitTable(tableBody, sortData);
   // Render Page Buttons
   kitAssemblyPageButtons();
 
@@ -46,6 +51,9 @@ export const kitAssemblyScreen = async (auth, route) => {
     inputCollectionCup,
     inputCollectionCard
   );
+
+  // Add autofocus on first input cell
+  inputUsps.focus();
   hideAnimation();
 
   // Remove all current input fields on row
@@ -218,7 +226,7 @@ const kitAssemblyPageButtons = () => {
 
   buttonContainerTemplate += `
         <div class="kit-assembly-button-container d-flex justify-content-around" style="margin:8rem 0;">
-          <button id="kit-assembly-cancel-button" type="button" class="btn btn-outline-secondary" style=" width:13rem; height:3rem; border-radius:15px">Cancel</button>
+          <button id="kit-assembly-clear-button" type="button" class="btn btn-outline-secondary" style=" width:13rem; height:3rem; border-radius:15px">Clear</button>
 
           <button id="kit-assembly-save-button" type="submit" class="btn btn-success" style="width:13rem;height:3rem; border-radius:15px">Save</button>
         </div> 
@@ -343,12 +351,12 @@ function clearRowInputs(inputElements) {
   }
 }
 
-// Cancel Button Clear Inputs Function
+// clear Button Clear Inputs Function
 
 const clearAllInputs = (inputElements) => {
-  const cancelButton = document.getElementById("kit-assembly-cancel-button");
+  const clearButton = document.getElementById("kit-assembly-clear-button");
 
-  cancelButton.addEventListener("click", (e) => {
+  clearButton.addEventListener("click", (e) => {
     e.preventDefault();
     // for in to loop over all property keys
     for (let property in inputElements) {
@@ -366,15 +374,15 @@ TODO STEPS:
     NOTE: Insert an extra row
 4. Make extra row editable
     TODO: Fix resizing issue - make content fit within container and not change width
-5. Create Buttons (Add, Cancel)
-    - Cancel: Clear inputs on last table row 
+5. Create Buttons (Add, Clear)
+    - Clear: Clear inputs on last table row 
     - Save: Makes a POST request to add a new item to the dataset
   
 6. Prioritize Save button POST request 
     - TEST POST Request first on POSTMAN *
     - Create a Modal for Save Button with Two Buttons (IGNORE FOR MVP)
         - Confirm
-        - Cancel
+        - Clear
     - Make save button make a post request and have a popup saying success
 7. Have an Add button create a new line to table
 8. Handle acceptable POST request on the client side
