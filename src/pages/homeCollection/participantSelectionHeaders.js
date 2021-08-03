@@ -1,22 +1,22 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 
 export const participantSelection = async (auth, route) => {
-    const user = auth.currentUser;
-    if(!user) return;
-    const username = user.displayName ? user.displayName : user.email;
-    renderParticipanSelectionHeader(auth, route);  
-}             
+  const user = auth.currentUser;
+  if (!user) return;
+  const username = user.displayName ? user.displayName : user.email;
+  renderParticipantSelectionHeader(auth, route);
+};
 
-export const renderParticipanSelectionHeader = () => {
-    let template = ``;
-    template += homeCollectionNavbar();
-    template += renderKitStatusList();
-    return template;
-}
+export const renderParticipantSelectionHeader = () => {
+  let template = ``;
+  template += homeCollectionNavbar();
+  template += renderKitStatusList();
+  return template;
+};
 
 export const renderKitStatusList = () => {
-    let template = ``;
-    template += ` 
+  let template = ``;
+  template += ` 
 
             <div style="margin-top:10px; padding:15px;">
                 <div>
@@ -35,6 +35,7 @@ export const renderKitStatusList = () => {
                 <div class="row">
                     <div class="col"><button class="btn btn-outline-primary" id="btnParticipantSearch">Show Participants</button></div>
                 </div>
-            </div> `
-    return template;
-}
+            </div> `;
+
+  return template;
+};

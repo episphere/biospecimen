@@ -1,17 +1,22 @@
-import { getIdToken, findParticipant, showAnimation, hideAnimation } from "../../shared.js";
-import { renderParticipanSelectionHeader } from "./participantSelectionHeaders.js";
+import {
+  getIdToken,
+  findParticipant,
+  showAnimation,
+  hideAnimation,
+} from "../../shared.js";
+import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 
 export const assignedScreen = async (auth, route) => {
-    const user = auth.currentUser;
-    if(!user) return;
-    const username = user.displayName ? user.displayName : user.email;
-    aassignedTemplate(auth, route);
-}             
+  const user = auth.currentUser;
+  if (!user) return;
+  const username = user.displayName ? user.displayName : user.email;
+  aassignedTemplate(auth, route);
+};
 
 const aassignedTemplate = async (auth, route) => {
-    let template = ``;
-    template += renderParticipanSelectionHeader();
-    template += ` <div class="container-fluid">
+  let template = ``;
+  template += renderParticipantSelectionHeader();
+  template += ` <div class="container-fluid">
                     <div id="root root-margin">
                         <div class="table-responsive">
                         <span> <h3 style="text-align: center;">Assigned</h3> </span>
@@ -37,25 +42,22 @@ const aassignedTemplate = async (auth, route) => {
                               </table>
                         </div>
                     </div> 
-                </div>`
-    document.getElementById('contentBody').innerHTML = template;
+                </div>`;
+  document.getElementById("contentBody").innerHTML = template;
 
-    redirectDropdownScreen();
-}
+  redirectDropdownScreen();
+};
 
-
-const  redirectDropdownScreen = () => {
-    const a = document.getElementById('btnParticipantSearch');
-    a.addEventListener('click', () => {
-        const selection = document.getElementById('paticipantSelection');
-        if (selection.value === 'pending') {
-            location.hash = '#participantselection';
-        }
-        else if (selection.value === 'addressPrinted') {
-            location.hash = '#addressPrinted';
-        }
-        else if (selection.value === 'assigned') {
-            location.hash = '#assigned';
-        }
-    })
-}
+const redirectDropdownScreen = () => {
+  const a = document.getElementById("btnParticipantSearch");
+  a.addEventListener("click", () => {
+    const selection = document.getElementById("paticipantSelection");
+    if (selection.value === "pending") {
+      location.hash = "#participantselection";
+    } else if (selection.value === "addressPrinted") {
+      location.hash = "#addressPrinted";
+    } else if (selection.value === "assigned") {
+      location.hash = "#assigned";
+    }
+  });
+};

@@ -296,7 +296,6 @@ const userInputHandler = async (
 
   await inputCollectionCard.addEventListener("input", (e) => {
     inputCollectionCard.value = e.target.value;
-    // debugger;
   });
 };
 
