@@ -21,6 +21,8 @@ export const printAddressesScreen = async (auth, route) => {
 // Stringify array of objects and parse fake participants Data
 const fakeParticipantsData = JSON.parse(JSON.stringify(fakeParticipants));
 
+export const fakeParticipantsState = [...fakeParticipantsData];
+
 const printaddressesTemplate = async (auth, route) => {
   showAnimation();
   const response = await findParticipant("firstName=Deanna");

@@ -5,6 +5,7 @@ import {
   hideAnimation,
 } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
+import { fakeParticipantsState } from "./printAddresses.js";
 
 export const addressesPrintedScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -16,7 +17,7 @@ export const addressesPrintedScreen = async (auth, route) => {
 const addressesPrintedTemplate = async (auth, route) => {
   let template = ``;
   template += renderParticipantSelectionHeader();
-  template += ` <div class="container-fluid">
+  template += `<div class="container-fluid">
                     <div id="root root-margin">
                         <div class="table-responsive">
                         <span> <h3 style="text-align: center;">Print Addresses </h3> </span>
@@ -35,7 +36,9 @@ const addressesPrintedTemplate = async (auth, route) => {
                                         </tr>
                                     </thead>   
                                     <tbody>
-                                       
+                                        ${createAddressPrintedRows(
+                                          fakeParticipantsState
+                                        )}
                                     </tbody>
                               </table>
                         </div>
@@ -59,3 +62,24 @@ const redirectDropdownScreen = () => {
     }
   });
 };
+
+const createAddressPrintedRows = (participantRows) => {
+  let template = ``;
+  participantRows.forEach((i) => {
+    template += `
+                    <tr class="row-color-enrollment-dark participantRow">
+                        <td> <input type="button" class="assign-kit" data-uspsTrackingNumber = ${i.usps_tracking_number}} data-kitID= ${i.kit_id}
+                        value="Assign Kit"></td>
+                        <td>${i.first_name}</td>
+                        <td>${i.last_name}</td>
+                        <td>${i.connect_id}</td>
+                        <td>${i.kit_status}</td>
+                        <td>${i.study_site}</td>
+                        <td>${i.date_requested}</td>
+                    </tr>`;
+  });
+
+  return template;
+};
+
+console.log(fakeParticipantsState);
