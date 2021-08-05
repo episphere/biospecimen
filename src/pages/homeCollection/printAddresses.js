@@ -18,6 +18,8 @@ export const printAddressesScreen = async (auth, route) => {
   printaddressesTemplate(auth, route);
 };
 
+const fakeParticipantsData = JSON.parse(JSON.stringify(fakeParticipants));
+
 const printaddressesTemplate = async (auth, route) => {
   showAnimation();
   const response = await findParticipant("firstName=Deanna");
@@ -48,7 +50,9 @@ const printaddressesTemplate = async (auth, route) => {
                                         </tr>
                                     </thead>   
                                     <tbody>
-                                        ${createParticipantRows(response.data)}
+                                        ${createParticipantRows(
+                                          fakeParticipantsData
+                                        )}
                                     </tbody>
                               </table>
                         </div>
@@ -80,34 +84,82 @@ const redirectDropdownScreen = () => {
   });
 };
 
+// TODO: Add this back to <tbody> element ${createParticipantRows(response.data)} å***
+// const createParticipantRows = (participantRows) => {
+//   let template = ``;
+//   participantRows.forEach((i) => {
+//     template += `
+//                 <tr class="row-color-enrollment-dark participantRow">
+//                     <td> <input type="checkbox" class="ptSelection" data-participantHolder = ${storeParticipantInfo(
+//                       i
+//                     )} name="ptSelection"></td>
+//                     <td>${i[fieldMapping.fName] && i[fieldMapping.fName]}</td>
+//                     <td>${i[fieldMapping.lName] && i[fieldMapping.lName]}</td>
+//                     <td>${i.Connect_ID && i.Connect_ID}</td>
+//                     <td>Pending</td>
+//                     <td>${
+//                       i[fieldMapping.address1] && i[fieldMapping.address1]
+//                     }</td>
+//                     <td>${
+//                       i[fieldMapping.address2] != undefined
+//                         ? i[fieldMapping.address2]
+//                         : ``
+//                     }</td>
+//                     <td>${i[fieldMapping.city] && i[fieldMapping.city]}</td>
+//                     <td>${i[fieldMapping.state] && i[fieldMapping.state]}</td>
+//                     <td>${i[fieldMapping.zip] && i[fieldMapping.zip]}</td>
+//                     <td>${
+//                       i[fieldMapping.verficationDate] &&
+//                       humanReadableFromISO(i[fieldMapping.verficationDate])
+//                     }</td>
+//                 </tr>`;
+//   });
+
 const createParticipantRows = (participantRows) => {
   let template = ``;
   participantRows.forEach((i) => {
+    // TODO: ADD BACK LATER WHEN REAL DATA IS USED
+    //   template += `
+    //                 <tr class="row-color-enrollment-dark participantRow">
+    //                     <td> <input type="checkbox" class="ptSelection" data-participantHolder = ${storeParticipantInfo(
+    //                       i
+    //                     )} name="ptSelection"></td>
+    //                     <td>${i[fieldMapping.fName] && i[fieldMapping.fName]}</td>
+    //                     <td>${i[fieldMapping.lName] && i[fieldMapping.lName]}</td>
+    //                     <td>${i.Connect_ID && i.Connect_ID}</td>
+    //                     <td>Pending</td>
+    //                     <td>${
+    //                       i[fieldMapping.address1] && i[fieldMapping.address1]
+    //                     }</td>
+    //                     <td>${
+    //                       i[fieldMapping.address2] != undefined
+    //                         ? i[fieldMapping.address2]
+    //                         : ``
+    //                     }</td>
+    //                     <td>${i[fieldMapping.city] && i[fieldMapping.city]}</td>
+    //                     <td>${i[fieldMapping.state] && i[fieldMapping.state]}</td>
+    //                     <td>${i[fieldMapping.zip] && i[fieldMapping.zip]}</td>
+    //                     <td>${
+    //                       i[fieldMapping.verficationDate] &&
+    //                       humanReadableFromISO(i[fieldMapping.verficationDate])
+    //                     }</td>
+    //                 </tr>`;
     template += `
-                <tr class="row-color-enrollment-dark participantRow">
-                    <td> <input type="checkbox" class="ptSelection" data-participantHolder = ${storeParticipantInfo(
-                      i
-                    )} name="ptSelection"></td>
-                    <td>${i[fieldMapping.fName] && i[fieldMapping.fName]}</td>
-                    <td>${i[fieldMapping.lName] && i[fieldMapping.lName]}</td>
-                    <td>${i.Connect_ID && i.Connect_ID}</td>
-                    <td>Pending</td>
-                    <td>${
-                      i[fieldMapping.address1] && i[fieldMapping.address1]
-                    }</td>
-                    <td>${
-                      i[fieldMapping.address2] != undefined
-                        ? i[fieldMapping.address2]
-                        : ``
-                    }</td>
-                    <td>${i[fieldMapping.city] && i[fieldMapping.city]}</td>
-                    <td>${i[fieldMapping.state] && i[fieldMapping.state]}</td>
-                    <td>${i[fieldMapping.zip] && i[fieldMapping.zip]}</td>
-                    <td>${
-                      i[fieldMapping.verficationDate] &&
-                      humanReadableFromISO(i[fieldMapping.verficationDate])
-                    }</td>
-                </tr>`;
+                    <tr class="row-color-enrollment-dark participantRow">
+                        <td> <input type="checkbox" class="ptSelection" data-participantHolder = ${storeParticipantInfo(
+                          i
+                        )} name="ptSelection"></td>
+                        <td>${i.first_name}</td>
+                        <td>${i.last_name}</td>
+                        <td>${i.connect_id}</td>
+                        <td>${i.kit_status}</td>
+                        <td>${i.address_1}</td>
+                        <td>${i.address_2}</td>
+                        <td>${i.city}</td>
+                        <td>${i.state}</td>
+                        <td>${i.zip_code}</td>
+                        <td>${i.date_requested}</td>
+                    </tr>`;
   });
 
   return template;
@@ -182,4 +234,4 @@ const generateParticipantCsv = (table_id, separator = ",") => {
   document.body.removeChild(link);
 };
 
-console.log(JSON.stringify(fakeParticipants));
+console.log(JSON.parse(JSON.stringify(fakeParticipants)));

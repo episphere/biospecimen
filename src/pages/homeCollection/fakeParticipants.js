@@ -2,7 +2,7 @@ export const fakeParticipants = [
   {
     first_name: "Joseph",
     last_name: "Joestar",
-    connectID: "2583977369",
+    connect_id: "2583977369",
     kit_status: "Pending",
     address_1: "3157 Blaine Trail",
     address_2: null,
@@ -17,7 +17,7 @@ export const fakeParticipants = [
   {
     first_name: "Osamu",
     last_name: "Dazai",
-    connectID: "6022359597",
+    connect_id: "6022359597",
     kit_status: "Pending",
     address_1: "57 Prairieview Plaza",
     address_2: null,
@@ -32,7 +32,7 @@ export const fakeParticipants = [
   {
     first_name: "Noelle",
     last_name: "Silva",
-    connectID: "3451058235",
+    connect_id: "3451058235",
     kit_status: "Pending‫",
     address_1: "60 Pennsylvania Road",
     address_2: null,
@@ -47,7 +47,7 @@ export const fakeParticipants = [
   {
     first_name: "Mikasa",
     last_name: "Ackerman",
-    connectID: "7761634106",
+    connect_id: "7761634106",
     kit_status: "Pending",
     address_1: "31 Kedzie Junction",
     address_2: null,
@@ -62,7 +62,7 @@ export const fakeParticipants = [
   {
     first_name: "Subaru",
     last_name: "Natsuki",
-    connectID: "6983906128",
+    connect_id: "6983906128",
     kit_status: "Pending",
     address_1: "6 Rutledge Circle",
     address_2: null,
