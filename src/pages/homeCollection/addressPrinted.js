@@ -42,7 +42,9 @@ const addressesPrintedTemplate = async (auth, route) => {
                                     </tbody>
                               </table>
                         </div>
-                    </div> 
+                    </div>
+                    <div class="container-search-connect-id" style="margin:2rem .8rem">
+                        <label for="search-connect-Id">Search for a Connect ID: <input type="search" id="search-connect-id"/></label>
                 </div>`;
   document.getElementById("contentBody").innerHTML = template;
 
@@ -68,7 +70,7 @@ const createAddressPrintedRows = (participantRows) => {
   participantRows.forEach((i) => {
     template += `
                     <tr class="row-color-enrollment-dark participantRow">
-                        <td> <input type="button" class="assign-kit" data-uspsTrackingNumber = ${i.usps_tracking_number}} data-kitID= ${i.kit_id}
+                        <td style="display:flex; height:100%;align-items:center; justify-content:center"; border:0;"><input type="button" class="assign-kit" data-uspsTrackingNumber = ${i.usps_tracking_number}} data-kitID= ${i.kit_id}
                         value="Assign Kit"></td>
                         <td>${i.first_name}</td>
                         <td>${i.last_name}</td>
