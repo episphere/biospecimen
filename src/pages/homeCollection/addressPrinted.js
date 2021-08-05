@@ -48,7 +48,7 @@ const addressesPrintedTemplate = async (auth, route) => {
                     <div class="container-search-connect-id" style="margin:2rem .8rem">
                         <label for="search-connect-Id">Search for a Connect ID: <input type="search" id="search-connect-id"/></label>
                 </div>`;
-  template += modalAssignedInfo(kitAssignmentInfoText);
+  template += modalAssignedInfo();
   document.getElementById("contentBody").innerHTML = template;
 
   assignKitButton();
@@ -91,7 +91,19 @@ const assignKitButton = () => {
         "kit Assignment Info",
         e.target.getAttribute("data-kitAssignmentInfo")
       );
+
       kitAssignmentInfoText = e.target.getAttribute("data-kitAssignmentInfo");
+      console.log(kitAssignmentInfoText);
+      let modalBody = document.querySelector(".modal-body");
+      modalBody.innerHTML = `<div style="display:flex;flex-direction:column;justify-content:center;align-items:center; flex-wrap:wrap; padding:0 2.5rem">
+              <label for="search-scan-kit-Id" style="flex-flow:wrap;align-self:flex-start"><strong>Scan Kit ID</strong>: <input type="search" id="search-scan-kit-Id" value=${e.target.getAttribute(
+                "data-kitID"
+              )}></label>
+              <p style="display:block; align-self:flex-start">${kitAssignmentInfoText}</p>
+              <label for="search-scan-usps-tracking" style="flex-flow:wrap; align-self:flex-start;display:flex;">Scan USPS Tracking Number on Supply Kit: <input id="search-scan-usps-tracking" type="search" value="${e.target.getAttribute(
+                "data-uspsTrackingNumber"
+              )}"/></label>
+          </div>`;
     });
   });
 };
@@ -109,7 +121,7 @@ const createAddressPrintedRows = (participantRows) => {
                             data-city= '${i.city}'
                             data-state= '${i.state}'
                             data-zipCode= '${i.zip_code}'
-                            data-kitAssignmentInfo = '${i.first_name} ${i.last_name},\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code}'
+                            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code}'
                             value="Assign Kit" >
                         </td>
                         <td>${i.first_name}</td>
@@ -123,22 +135,22 @@ const createAddressPrintedRows = (participantRows) => {
   return template;
 };
 
-const modalAssignedInfo = (kitAssigmentInfoText) => {
+// KIT ASSIGNMENT MODAL
+const modalAssignedInfo = () => {
   let template = ``;
   template += `<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="max-width: 70%">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <div class="modal-header" style="border:0">
+          <button type="button" class="close" style="font-size:40px" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-          ${kitAssigmentInfoText}
+        <div class="modal-body" style="white-space: pre">
+          
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
+          <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Cancel</button>
           <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm Assignment</button>
         </div>
       </div>
