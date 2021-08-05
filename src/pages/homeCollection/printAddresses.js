@@ -9,6 +9,8 @@ import { humanReadableFromISO } from "../../utils.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 
+import { fakeParticipants } from "./fakeParticipants.js";
+
 export const printAddressesScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
@@ -20,6 +22,7 @@ const printaddressesTemplate = async (auth, route) => {
   showAnimation();
   const response = await findParticipant("firstName=Deanna");
   hideAnimation();
+  //   console.log(response);
   let template = ``;
   template += renderParticipantSelectionHeader();
   template += ` <div class="container-fluid">
@@ -178,3 +181,5 @@ const generateParticipantCsv = (table_id, separator = ",") => {
   link.click();
   document.body.removeChild(link);
 };
+
+console.log(JSON.stringify(fakeParticipants));
