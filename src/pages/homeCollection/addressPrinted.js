@@ -128,8 +128,8 @@ const assignKitButton = (confirmAssignment) => {
                 } has been saved and can be found on Assigned!</p>
               </div>
               <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
-                <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal">Confirm Assignment</button>
+                <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal">Show Assigned Table</button>
             </div>`;
       });
     });
