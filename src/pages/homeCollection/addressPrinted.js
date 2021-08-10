@@ -94,6 +94,7 @@ const redirectDropdownScreen = () => {
   });
 };
 
+// TODO: FIX ERROR WITH NAMING CONVENTION F BUTTON
 const assignKitButton = () => {
   // Target All buttons with assign-kit-button class
   const allAssignKitButtons = document.querySelectorAll(".assign-kit-button");
@@ -153,7 +154,7 @@ const assignKitButton = () => {
               </div>
               <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
                 <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal"" data-dismiss="modal">Show Assigned Table</button>
+                <button type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal" data-dismiss="modal">Show Assigned Table</button>
             </div>`;
       });
     });
@@ -215,35 +216,4 @@ const modalAssignedInfo = (confirmAssignment) => {
   return template;
 };
 
-// NOT NEEDED UNTIL REFACTOR?
-// function confirmAssignment() {
-//   // const confirmButton = document.querySelector(".confirm-assignment");
-//   confirmButton.addEventListener("click", (e) => {
-//     console.log("Za Warudo!");
-//     let modalContent = document.querySelector(".modal-content");
-//     console.log(modalContent);
-//     console.log(kitAssignmentInfoText);
-//     modalContent.innerHTML = "";
-//     modalContent.innerHTML = `
-//     <div class="modal-header" style="border:0">
-//         <button type="button" class="close" style="font-size:40px" data-dismiss="modal" aria-label="Close">
-//           <span aria-hidden="true">&times;</span>
-//         </button>
-//       </div>
-//       <div class="modal-body" style="white-space: pre">
-//         <p>Hello World!</p>
-//       </div>
-//       <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
-//         <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
-//         <button type="button" class="btn btn-primary show-Assigned-Table" data-dismiss="modal">Show Assigned Table</button>
-//     </div>`;
-//   });
-// }
-
 console.log(fakeParticipantsState);
-
-/*
-NOTES:
-1. Add a function to clear current modal template
-2. Open up new template with success
-*/
