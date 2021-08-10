@@ -15,8 +15,8 @@ export const fakeParticipants = [
     study_site: "KP TX",
   },
   {
-    first_name: "Osamu",
-    last_name: "Dazai",
+    first_name: "Frederica",
+    last_name: "Bernkastel",
     connect_id: "6022359597",
     kit_status: "Address Printed",
     address_1: "57 Prairieview Plaza",

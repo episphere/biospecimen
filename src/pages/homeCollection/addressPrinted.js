@@ -169,7 +169,10 @@ const modalAssignedInfo = (confirmAssignment) => {
   template += `<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="max-width: 70%">
       <div class="modal-content">
-        <div class="modal-header" style="border:0">
+        <div class="modal-header" style="border:0; position:relative;">
+        <h3 style="top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);position:absolute; margin: .5rem 0 0 0">Assign Kit to Participant?</h2>
           <button type="button" class="close" style="font-size:40px" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -207,8 +210,8 @@ function confirmAssignment() {
         <p>Hello World!</p>
       </div>
       <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
-        <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal">Confirm Assignment</button>
+        <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal">Show Assigned Table</button>
     </div>`;
   });
 }
