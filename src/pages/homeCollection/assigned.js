@@ -6,6 +6,43 @@ import {
 } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 
+const placeholderAssignedData = [
+  {
+    first_name: "Jolyene",
+    last_name: "Cujoh",
+    connect_id: "7756917180",
+    kit_status: "Status",
+    address_1: "34442 Steve Hunt Road",
+    address_2: null,
+    city: "Miami",
+    state: "FL",
+    zip_code: 33131,
+    date_requested: "08/04/2021",
+    usps_tracking_number: 26091708560117153712,
+    kit_id: "JSO784103",
+    study_site: "KP FL",
+  },
+  {
+    first_name: "Arcueid",
+    last_name: "Brunestud",
+    connect_id: "1753927180",
+    kit_status: "Assigned",
+    address_1: "1171 Doe Meadow Drive",
+    address_2: null,
+    city: "Maryland",
+    state: "MD",
+    zip_code: 20014,
+    date_requested: "08/04/2021",
+    usps_tracking_number: 42551059936003641131,
+    kit_id: "FGO444100",
+    study_site: "KP MD",
+  },
+];
+
+const assignedParticipants = JSON.parse(
+  JSON.stringify([...placeholderAssignedData])
+);
+
 export const assignedScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
@@ -46,21 +83,7 @@ const aassignedTemplate = async (auth, route) => {
   document.getElementById("contentBody").innerHTML = template;
 
   participantSelectionDropdown();
-  redirectDropdownScreen();
-};
-
-const redirectDropdownScreen = () => {
-  const a = document.getElementById("btnParticipantSearch");
-  a.addEventListener("click", () => {
-    const selection = document.getElementById("paticipantSelection");
-    if (selection.value === "pending") {
-      location.hash = "#participantselection";
-    } else if (selection.value === "addressPrinted") {
-      location.hash = "#addressPrinted";
-    } else if (selection.value === "assigned") {
-      location.hash = "#assigned";
-    }
-  });
+  console.log(assignedParticipants);
 };
 
 // Refactor

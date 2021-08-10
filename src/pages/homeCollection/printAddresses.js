@@ -69,7 +69,7 @@ const printaddressesTemplate = async (auth, route) => {
 
   generateParticipantCsvGetter();
   participantSelectionDropdown();
-  redirectDropdownScreen();
+  // redirectDropdownScreen();
 };
 
 // Refactor

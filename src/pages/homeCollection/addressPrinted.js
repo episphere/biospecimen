@@ -55,7 +55,7 @@ const addressesPrintedTemplate = async (auth, route) => {
 
   assignKitButton();
   participantSelectionDropdown();
-  redirectDropdownScreen();
+  // redirectDropdownScreen();
 };
 
 const assignedTableButton = () => {
@@ -122,13 +122,21 @@ const assignKitButton = () => {
       console.log(kitAssignmentInfoText);
       let confirmButton = document.querySelector(".confirm-assignment");
       let modalBody = document.querySelector(".modal-body");
+      let modalContent = document.querySelector(".modal-content");
+      console.log(modalContent);
       console.log(confirmButton);
       modalBody.innerHTML = `<div style="display:flex;flex-direction:column;justify-content:center;align-items:center; flex-wrap:wrap; padding:1rem 2.5rem">
               <label for="search-scan-kit-Id" style="flex-flow:wrap;align-self:flex-start"><strong>Scan Kit ID</strong>: <input type="search" id="search-scan-kit-Id" value=${e.target.getAttribute(
                 "data-kitID"
               )}></label>
-              <p style="display:block; align-self:flex-start">${kitAssignmentInfoText}</p>
-              <label for="search-scan-usps-tracking" style="flex-flow:wrap; align-self:flex-start;display:flex;">Scan USPS Tracking Number on Supply Kit: <input id="search-scan-usps-tracking" type="search" value="${e.target.getAttribute(
+              <p style="display:block; align-self:flex-start; width: 100%"><strong>Full Name:</strong> ${
+                kitAssignmentInfoText.split("\n")[0]
+              }</p>
+              <p style="display:block; align-self:flex-start; width: 100%"><strong>Address:</strong> ${kitAssignmentInfoText
+                .split("\n")
+                .splice(1)
+                .join(" ")}</p>
+              <label for="search-scan-usps-tracking" style="flex-flow:wrap; align-self:flex-start;display:flex;"><strong>Scan USPS Tracking Number on Supply Kit: </strong><input id="search-scan-usps-tracking" type="search" value="${e.target.getAttribute(
                 "data-uspsTrackingNumber"
               )}"/></label>
           </div>`;
@@ -141,14 +149,18 @@ const assignKitButton = () => {
         console.log(kitAssignmentInfoText);
         modalContent.innerHTML = "";
         console.log(kitAssignmentInfoText.split("\n")[0]);
+        console.log(kitAssignmentInfoText.split(" "));
         modalContent.innerHTML = `
             <div class="modal-header" style="border:0">
                 <button type="button" class="close" style="font-size:40px" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div class="modal-body" style="white-space: pre">
-                <p style="text-align:center">${
+              <div class="modal-body" style="white-space: pre; display:flex; flex-direction:column; justify-content:center;
+              align-items:center;">
+                <object data="../../../static/images/modals/check-circle-solid.svg" width="200" height="200"></object>
+                <h1 class="text-success" style:"margin-bottom:2rem;">Success!</h1>
+                <p>${
                   kitAssignmentInfoText.split("\n")[0]
                 } has been saved and can be found on Assigned!</p>
               </div>
@@ -195,7 +207,7 @@ const modalAssignedInfo = (confirmAssignment) => {
     <div class="modal-dialog" style="max-width: 70%">
       <div class="modal-content">
         <div class="modal-header" style="border:0; position:relative;">
-        <h3 style="top: 50%;
+        <h2 style="top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);position:absolute; margin: .5rem 0 0 0">Assign Kit to Participant?</h2>
           <button type="button" class="close" style="font-size:40px" data-dismiss="modal" aria-label="Close">
