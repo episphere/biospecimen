@@ -68,7 +68,26 @@ const printaddressesTemplate = async (auth, route) => {
   document.getElementById("contentBody").innerHTML = template;
 
   generateParticipantCsvGetter();
+  participantSelectionDropdown();
   redirectDropdownScreen();
+};
+
+// Refactor
+const participantSelectionDropdown = () => {
+  console.log("test");
+  const participantDropdown = document.querySelector(
+    ".participantSelectionDropdown"
+  );
+  participantDropdown.addEventListener("change", (e) => {
+    let selection = e.target.value;
+    if (selection === "pending") {
+      location.hash = "#participantselection";
+    } else if (selection === "addressPrinted") {
+      location.hash = "#addressPrinted";
+    } else if (selection === "assigned") {
+      location.hash = "#assigned";
+    } else return;
+  });
 };
 
 const redirectDropdownScreen = () => {
@@ -193,6 +212,7 @@ const generateParticipantCsvGetter = () => {
   //         }
   //     });
   // })}
+
   const a = document.getElementById("generateCsv");
   if (a) {
     a.addEventListener("click", () => {

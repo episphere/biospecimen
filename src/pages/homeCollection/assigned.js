@@ -45,6 +45,7 @@ const aassignedTemplate = async (auth, route) => {
                 </div>`;
   document.getElementById("contentBody").innerHTML = template;
 
+  participantSelectionDropdown();
   redirectDropdownScreen();
 };
 
@@ -59,5 +60,22 @@ const redirectDropdownScreen = () => {
     } else if (selection.value === "assigned") {
       location.hash = "#assigned";
     }
+  });
+};
+
+// Refactor
+const participantSelectionDropdown = () => {
+  const participantDropdown = document.querySelector(
+    ".participantSelectionDropdown"
+  );
+  participantDropdown.addEventListener("change", (e) => {
+    let selection = e.target.value;
+    if (selection === "pending") {
+      location.hash = "#participantselection";
+    } else if (selection === "addressPrinted") {
+      location.hash = "#addressPrinted";
+    } else if (selection === "assigned") {
+      location.hash = "#assigned";
+    } else return;
   });
 };

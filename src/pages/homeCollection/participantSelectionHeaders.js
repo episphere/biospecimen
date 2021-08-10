@@ -21,7 +21,7 @@ export const renderKitStatusList = () => {
             <div style="margin-top:10px; padding:15px;">
                 <div>
                     <label for="paticipantSelection" class="col-form-label">Participant Selection</label>
-                    <select required class="col form-control" id="paticipantSelection">
+                    <select required class="col form-control participantSelectionDropdown" id="paticipantSelection">
                         <option value="">-- Select dashboard --</option>
                         <option value="all">All</option>
                         <option value="pending">Pending</option>

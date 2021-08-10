@@ -52,8 +52,32 @@ const addressesPrintedTemplate = async (auth, route) => {
   document.getElementById("contentBody").innerHTML = template;
 
   // confirmAssignment();
-  assignKitButton(confirmAssignment);
+
+  assignKitButton();
+  participantSelectionDropdown();
   redirectDropdownScreen();
+};
+
+const assignedTableButton = () => {
+  let test = document.querySelector(".show-Assigned-Table");
+  console.log(test);
+};
+
+// Refactor
+const participantSelectionDropdown = () => {
+  const participantDropdown = document.querySelector(
+    ".participantSelectionDropdown"
+  );
+  participantDropdown.addEventListener("change", (e) => {
+    let selection = e.target.value;
+    if (selection === "pending") {
+      location.hash = "#participantselection";
+    } else if (selection === "addressPrinted") {
+      location.hash = "#addressPrinted";
+    } else if (selection === "assigned") {
+      location.hash = "#assigned";
+    } else return;
+  });
 };
 
 const redirectDropdownScreen = () => {
@@ -70,7 +94,7 @@ const redirectDropdownScreen = () => {
   });
 };
 
-const assignKitButton = (confirmAssignment) => {
+const assignKitButton = () => {
   // Target All buttons with assign-kit-button class
   const allAssignKitButtons = document.querySelectorAll(".assign-kit-button");
   console.log(allAssignKitButtons);
@@ -98,7 +122,7 @@ const assignKitButton = (confirmAssignment) => {
       let confirmButton = document.querySelector(".confirm-assignment");
       let modalBody = document.querySelector(".modal-body");
       console.log(confirmButton);
-      modalBody.innerHTML = `<div style="display:flex;flex-direction:column;justify-content:center;align-items:center; flex-wrap:wrap; padding:0 2.5rem">
+      modalBody.innerHTML = `<div style="display:flex;flex-direction:column;justify-content:center;align-items:center; flex-wrap:wrap; padding:1rem 2.5rem">
               <label for="search-scan-kit-Id" style="flex-flow:wrap;align-self:flex-start"><strong>Scan Kit ID</strong>: <input type="search" id="search-scan-kit-Id" value=${e.target.getAttribute(
                 "data-kitID"
               )}></label>
@@ -123,13 +147,13 @@ const assignKitButton = (confirmAssignment) => {
                 </button>
               </div>
               <div class="modal-body" style="white-space: pre">
-                <p>${
+                <p style="text-align:center">${
                   kitAssignmentInfoText.split("\n")[0]
                 } has been saved and can be found on Assigned!</p>
               </div>
               <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
                 <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal">Show Assigned Table</button>
+                <button type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal"" data-dismiss="modal">Show Assigned Table</button>
             </div>`;
       });
     });
@@ -192,29 +216,29 @@ const modalAssignedInfo = (confirmAssignment) => {
 };
 
 // NOT NEEDED UNTIL REFACTOR?
-function confirmAssignment() {
-  // const confirmButton = document.querySelector(".confirm-assignment");
-  confirmButton.addEventListener("click", (e) => {
-    console.log("Za Warudo!");
-    let modalContent = document.querySelector(".modal-content");
-    console.log(modalContent);
-    console.log(kitAssignmentInfoText);
-    modalContent.innerHTML = "";
-    modalContent.innerHTML = `
-    <div class="modal-header" style="border:0">
-        <button type="button" class="close" style="font-size:40px" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body" style="white-space: pre">
-        <p>Hello World!</p>
-      </div>
-      <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
-        <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal">Show Assigned Table</button>
-    </div>`;
-  });
-}
+// function confirmAssignment() {
+//   // const confirmButton = document.querySelector(".confirm-assignment");
+//   confirmButton.addEventListener("click", (e) => {
+//     console.log("Za Warudo!");
+//     let modalContent = document.querySelector(".modal-content");
+//     console.log(modalContent);
+//     console.log(kitAssignmentInfoText);
+//     modalContent.innerHTML = "";
+//     modalContent.innerHTML = `
+//     <div class="modal-header" style="border:0">
+//         <button type="button" class="close" style="font-size:40px" data-dismiss="modal" aria-label="Close">
+//           <span aria-hidden="true">&times;</span>
+//         </button>
+//       </div>
+//       <div class="modal-body" style="white-space: pre">
+//         <p>Hello World!</p>
+//       </div>
+//       <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
+//         <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
+//         <button type="button" class="btn btn-primary show-Assigned-Table" data-dismiss="modal">Show Assigned Table</button>
+//     </div>`;
+//   });
+// }
 
 console.log(fakeParticipantsState);
 
