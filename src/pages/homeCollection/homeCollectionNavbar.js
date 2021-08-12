@@ -1,6 +1,6 @@
 export const homeCollectionNavbar = () => {
-    let template = ``;
-    template += `
+  let template = ``;
+  template += `
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
                         <a class="nav-link" aria-current="page" href="#bptl" id="bptl">Home</a>
@@ -14,6 +14,6 @@ export const homeCollectionNavbar = () => {
                     <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="#kitshipment" id="kitShipment">Kit Shipment</a>
                     </li>
-                </ul>`
-    return template;
-}
+                </ul>`;
+  return template;
+};

@@ -1,6 +1,6 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { userDashboard } from "../dashboard.js";
-import { getIdToken } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation } from "../../shared.js";
 
 const api =
   "https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?";
@@ -12,15 +12,20 @@ export const kitAssemblyScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  //showAnimation();
+  showAnimation();
   await kitAssemblyTemplate(auth, route);
 
   // Fetch data using GET request
   const kitData = await getKitData().then((res) => res.data);
   const tableBody = document.getElementById("kit-assembly-table-body");
 
+  // Sort Function from Oldest to Newest
+  const sortData = kitData.sort((a, b) =>
+    a.timeStamp < b.timeStamp ? -1 : a.timeStamp > b.timeStamp ? 1 : 0
+  );
+
   // Render Table Data
-  populateKitTable(tableBody, kitData);
+  populateKitTable(tableBody, sortData);
   // Render Page Buttons
   kitAssemblyPageButtons();
 
@@ -46,6 +51,10 @@ export const kitAssemblyScreen = async (auth, route) => {
     inputCollectionCup,
     inputCollectionCard
   );
+
+  // Add autofocus on first input cell
+  inputUsps.focus();
+  hideAnimation();
 
   // Remove all current input fields on row
   clearAllInputs(inputElements);
@@ -135,17 +144,17 @@ const kitAssemblyTemplate = async (auth, route) => {
   template += homeCollectionNavbar();
   template += `
                 <div class="row align-center welcome-screen-div">
-                        <div class="col"><h3>Kit Assembly</h3></div>
-                </div>  `;
+                        <div class="col"><h3 style="margin:1rem 0 1.5rem;">Kit Assembly</h3></div>
+                </div>`;
 
   template += `
-        <div style="overflow:auto; height:400px">
+        <div style="overflow:auto; height:45vh">
             <table id="kit-assembly-table" class="table table-bordered" style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
                 <thead>
                     <tr style="top: 0;
                     position: sticky;">
                         <th scope="col" style="background-color: #f7f7f7;">Line Item</th>
-                        <th scope="col" style="background-color: #f7f7f7;">Specify Kit USPS Tracking Number</th>
+                        <th scope="col" style="background-color: #f7f7f7;">Specimen Kit USPS Tracking Number</th>
                         <th scope="col" style="background-color: #f7f7f7;">Supply Kit ID</th>
                         <th scope="col" style="background-color: #f7f7f7;">Specimen Kit ID</th>
                         <th scope="col" style="background-color: #f7f7f7;">Collection Cup ID</th>
@@ -216,8 +225,8 @@ const kitAssemblyPageButtons = () => {
   let buttonContainerTemplate = "";
 
   buttonContainerTemplate += `
-        <div class="kit-assembly-button-container d-flex justify-content-around" style="margin:8rem 0;">
-          <button id="kit-assembly-cancel-button" type="button" class="btn btn-outline-secondary" style=" width:13rem; height:3rem; border-radius:15px">Cancel</button>
+        <div class="kit-assembly-button-container d-flex justify-content-around" style="margin: 4rem 0 1.5rem 0;">
+          <button id="kit-assembly-clear-button" type="button" class="btn btn-outline-secondary" style=" width:13rem; height:3rem; border-radius:15px">Clear</button>
 
           <button id="kit-assembly-save-button" type="submit" class="btn btn-success" style="width:13rem;height:3rem; border-radius:15px">Save</button>
         </div> 
@@ -295,7 +304,6 @@ const userInputHandler = async (
 
   await inputCollectionCard.addEventListener("input", (e) => {
     inputCollectionCard.value = e.target.value;
-    // debugger;
   });
 };
 
@@ -343,12 +351,12 @@ function clearRowInputs(inputElements) {
   }
 }
 
-// Cancel Button Clear Inputs Function
+// clear Button Clear Inputs Function
 
 const clearAllInputs = (inputElements) => {
-  const cancelButton = document.getElementById("kit-assembly-cancel-button");
+  const clearButton = document.getElementById("kit-assembly-clear-button");
 
-  cancelButton.addEventListener("click", (e) => {
+  clearButton.addEventListener("click", (e) => {
     e.preventDefault();
     // for in to loop over all property keys
     for (let property in inputElements) {
@@ -366,15 +374,15 @@ TODO STEPS:
     NOTE: Insert an extra row
 4. Make extra row editable
     TODO: Fix resizing issue - make content fit within container and not change width
-5. Create Buttons (Add, Cancel)
-    - Cancel: Clear inputs on last table row 
+5. Create Buttons (Add, Clear)
+    - Clear: Clear inputs on last table row 
     - Save: Makes a POST request to add a new item to the dataset
   
 6. Prioritize Save button POST request 
     - TEST POST Request first on POSTMAN *
     - Create a Modal for Save Button with Two Buttons (IGNORE FOR MVP)
         - Confirm
-        - Cancel
+        - Clear
     - Make save button make a post request and have a popup saying success
 7. Have an Add button create a new line to table
 8. Handle acceptable POST request on the client side
