@@ -133,8 +133,13 @@ const assignKitButton = () => {
               </div>
               <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
                 <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal" data-dismiss="modal" style="margin-left:5%">Show Assigned Table</button>
+                <button id="assigned-table" type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal" data-dismiss="modal" style="margin-left:5%">Show Assigned Table</button>
             </div>`;
+        // console.log(document.getElementById("assigned-table"));
+        let moveToAssigned = document.getElementById("assigned-table");
+        moveToAssigned.addEventListener("click", (e) => {
+          location.hash = "#assigned";
+        });
       });
     });
   });
@@ -181,7 +186,7 @@ const modalAssignedInfo = (confirmAssignment) => {
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body" style="white-space: pre">
+        <div class="modal-body">
           
         </div>
         <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
