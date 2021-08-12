@@ -195,4 +195,4 @@ const modalAssignedInfo = (confirmAssignment) => {
   return template;
 };
 
-console.log(fakeParticipantsState);
+// console.log(fakeParticipantsState);

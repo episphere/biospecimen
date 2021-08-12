@@ -71,8 +71,7 @@ const aassignedTemplate = async (auth, route) => {
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Date Requested</th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit ID</th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">USPS Tracking Number</th>
-                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Edit</th>
-                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Save</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Edit / Save</th>
                                         </tr>
                                     </thead>   
                                     <tbody>
@@ -87,42 +86,114 @@ const aassignedTemplate = async (auth, route) => {
   document.getElementById("contentBody").innerHTML = template;
   participantSelectionDropdown();
   console.log(assignedParticipants);
+
+  for (let i = 0; i < assignedParticipants.length; i++) {
+    console.log(i);
+    editAssignedRow(i);
+    saveAssignedRow(i);
+  }
 };
 
 const createAssignedParticipantRows = (assignedParticipantsRows) => {
   let template = ``;
-  assignedParticipantsRows.forEach((i) => {
+  // Use for loop on fake assigned data array, --> i is current object, index is current object number in array
+  assignedParticipantsRows.forEach((i, index) => {
     template += `
-      <tr class="row-color-enrollment-dark participantRow">
+      <tr id=row-${index} class="row-color-enrollment-dark participantRow">
         <td style="padding:1rem">${i.first_name}</td>
         <td style="padding:1rem">${i.last_name}</td>
         <td style="padding:1rem">${i.connect_id}</td>
         <td style="padding:1rem">${i.kit_status}</td>
         <td style="padding:1rem">${i.study_site}</td>
         <td style="padding:1rem">${i.date_requested}</td>
-        <td style="padding:1rem">${i.kit_id}</td>
-        <td style="padding:1rem">${i.usps_tracking_number}</td>
-        <td style="height:100%; padding:1rem;" >
-            <input type="button" class="edit-assign-button""
-            data-uspsTrackingNumber = ${i.usps_tracking_number} data-kitID= ${i.kit_id} data-firstName= '${i.first_name}' data-lastName= '${i.last_name}'
+        <td id=kit-id-${index} style="padding:1rem">${i.kit_id}</td>
+        <td id=usps-${index} style="padding:1rem">${i.usps_tracking_number}</td>
+
+      <td style="height:100%; padding:1rem;" >
+        <input type="button" id="edit-assign-button-${JSON.stringify(index)}"
+          class="edit-assign-button"
+            data-uspsTrackingNumber = ${i.usps_tracking_number} data-kitID= ${
+      i.kit_id
+    } data-firstName= '${i.first_name}' data-lastName= '${i.last_name}'
             data-address1= '${i.address_1}'
             data-city= '${i.city}'
             data-state= '${i.state}'
             data-zipCode= '${i.zip_code}'
-            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code}'
+            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${
+      i.address_1
+    },\n${i.city}, ${i.state} ${i.zip_code}'
             value="Edit" >
-        </td>
-        <td style="height:100%; padding:1rem;" >
-            <input type="button" class="save-assign-button""
-            data-uspsTrackingNumber = ${i.usps_tracking_number} data-kitID= ${i.kit_id} data-firstName= '${i.first_name}' data-lastName= '${i.last_name}'
+
+        <input type="button" id="save-assign-button-${JSON.stringify(index)}"
+       style="display:none;"
+            data-uspsTrackingNumber= ${i.usps_tracking_number} data-kitID= ${
+      i.kit_id
+    } data-firstName= '${i.first_name}' data-lastName= '${i.last_name}'
             data-address1= '${i.address_1}'
             data-city= '${i.city}'
             data-state= '${i.state}'
             data-zipCode= '${i.zip_code}'
-            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code}'
+            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${
+      i.address_1
+    },\n${i.city}, ${i.state} ${i.zip_code}'
             value="Save" >
         </td>
       </tr>`;
   });
+
   return template;
+};
+
+const editAssignedRow = (i) => {
+  let editButton = document.getElementById(`edit-assign-button-${i}`);
+  let saveButton = document.getElementById(`save-assign-button-${i}`);
+
+  editButton.addEventListener("click", (e) => {
+    console.log("edit button clicked!");
+    editButton.style.display = "none";
+    saveButton.style.display = "block";
+
+    // edit and target supply kit id and usps tracking number
+
+    let supplyKitId = document.getElementById(`kit-id-${i}`);
+    let uspsTrackingNumber = document.getElementById("usps-" + i);
+
+    // console.log(supplyKitId);
+    console.log(uspsTrackingNumber);
+
+    // Target the values in the innerHTML
+    let supplyKitIdData = supplyKitId.innerHTML;
+    let uspsTrackingNumberData = uspsTrackingNumber.innerHTML;
+    // console.log(supplyKitIdData, uspsTrackingNumberData);
+
+    // Change innerHTML with input element with original values from text inside
+    supplyKitId.innerHTML = `<input type="text" id="supply-kit-id-text-${i}" value=${supplyKitIdData}></input>`;
+
+    // uspsTrackingNumber.innnerHTML = `<input type="text" id="usps-number-text-${i}" value=${uspsTrackingNumberData}></input>`;
+    uspsTrackingNumber.innerHTML = `<input type="text" id="usps-number-text-${i}" value=${uspsTrackingNumberData}></input>`;
+  });
+};
+
+const saveAssignedRow = (i) => {
+  let saveButton = document.getElementById(`save-assign-button-${i}`);
+  let editButton = document.getElementById(`edit-assign-button-${i}`);
+
+  saveButton.addEventListener("click", (e) => {
+    console.log("save button clicked!");
+    let supplyKitIdValue = document.getElementById(
+      `supply-kit-id-text-${i}`
+    ).value;
+    let uspsNumberValue = document.getElementById(
+      `usps-number-text-${i}`
+    ).value;
+
+    document.getElementById("kit-id-" + i).innerHTML = supplyKitIdValue;
+    document.getElementById("usps-" + i).innerHTML = uspsNumberValue;
+
+    console.log(supplyKitIdValue);
+
+    saveButton.style.display = "none";
+    editButton.style.display = "block";
+    window.alert("Save Success!");
+  });
 };

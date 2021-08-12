@@ -275,7 +275,7 @@ const generateParticipantCsv = (table_id, separator = ",") => {
   document.body.removeChild(link);
 };
 
-console.log(JSON.parse(JSON.stringify(fakeParticipants)));
+// console.log(JSON.parse(JSON.stringify(fakeParticipants)));
 
 /*
 [{
