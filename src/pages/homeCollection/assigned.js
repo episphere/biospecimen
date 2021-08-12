@@ -83,6 +83,24 @@ const aassignedTemplate = async (auth, route) => {
                         </div>
                     </div> 
                 </div>`;
+  template += `<div class="modal fade" id="editSuccessModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" style="padding:1rem">
+    <div class="modal-header" style="border:0">
+    <button type="button" class="close" style="font-size:40px" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body" style="display:flex; flex-direction:column; justify-content:center;align-items:center">
+          <object data="../../../static/images/modals/check-circle-solid.svg" width="200" height="150px"></object>
+          <h1 class="text-success" style:"margin:1.5rem 0 2rem 0;">Success!</h1>
+          <p style="text-align:center; margin:1.5rem 0 2rem 0;">The participant's Supply Kit ID and USPS Tracking Number were successfully edited and saved!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>`;
+
   document.getElementById("contentBody").innerHTML = template;
   participantSelectionDropdown();
   console.log(assignedParticipants);
@@ -136,7 +154,7 @@ const createAssignedParticipantRows = (assignedParticipantsRows) => {
             data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${
       i.address_1
     },\n${i.city}, ${i.state} ${i.zip_code}'
-            value="Save" >
+            value="Save" data-toggle="modal" data-target="#editSuccessModal">
         </td>
       </tr>`;
   });
@@ -144,6 +162,7 @@ const createAssignedParticipantRows = (assignedParticipantsRows) => {
   return template;
 };
 
+// TODO: Add error handling and trim() to value inputs
 const editAssignedRow = (i) => {
   let editButton = document.getElementById(`edit-assign-button-${i}`);
   let saveButton = document.getElementById(`save-assign-button-${i}`);
@@ -180,6 +199,9 @@ const saveAssignedRow = (i) => {
 
   saveButton.addEventListener("click", (e) => {
     console.log("save button clicked!");
+    if (false) {
+      return;
+    }
     let supplyKitIdValue = document.getElementById(
       `supply-kit-id-text-${i}`
     ).value;
@@ -194,6 +216,5 @@ const saveAssignedRow = (i) => {
 
     saveButton.style.display = "none";
     editButton.style.display = "block";
-    window.alert("Save Success!");
   });
 };

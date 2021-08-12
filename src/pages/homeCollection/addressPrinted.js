@@ -125,7 +125,7 @@ const assignKitButton = () => {
                   <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body" style="white-space: pre; display:flex; flex-direction:column; justify-content:center;
+            <div class="modal-body" style="display:flex; flex-direction:column; justify-content:center;
               align-items:center;">
                 <object data="../../../static/images/modals/check-circle-solid.svg" width="200" height="200"></object>
                 <h1 class="text-success" style:"margin-bottom:2rem;">Success!</h1>
@@ -133,7 +133,7 @@ const assignKitButton = () => {
               </div>
               <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
                 <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal" data-dismiss="modal">Show Assigned Table</button>
+                <button type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal" data-dismiss="modal" style="margin-left:5%">Show Assigned Table</button>
             </div>`;
       });
     });
@@ -186,7 +186,7 @@ const modalAssignedInfo = (confirmAssignment) => {
         </div>
         <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
           <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary confirm-assignment">Confirm Assignment</button>
+          <button type="button" class="btn btn-primary confirm-assignment" style="margin-left:5%">Confirm Assignment</button>
         </div>
       </div>
     </div>
