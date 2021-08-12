@@ -56,12 +56,8 @@ const addressesPrintedTemplate = async (auth, route) => {
   participantSelectionDropdown();
 };
 
-const assignedTableButton = () => {
-  let test = document.querySelector(".show-Assigned-Table");
-  console.log(test);
-};
-
-// TODO: FIX ERROR WITH NAMING CONVENTION F BUTTON
+// TODO: FIX ERROR WITH NAMING CONVENTION FOR BUTTON, BUTTON CHANGES TO UNEXPECTED NAME
+// KEEP CONSOLE LOGS, WORK IN PROGRESS IN DEBUGGING FOR ADDRESS PRINTED.JS FILE
 const assignKitButton = () => {
   // Target All buttons with assign-kit-button class
   const allAssignKitButtons = document.querySelectorAll(".assign-kit-button");
@@ -110,13 +106,9 @@ const assignKitButton = () => {
 
       // Event Handler
       confirmButton.addEventListener("click", (e) => {
-        console.log("Za Warudo!");
         let modalContent = document.querySelector(".modal-content");
-        console.log(modalContent);
-        console.log(kitAssignmentInfoText);
+
         modalContent.innerHTML = "";
-        console.log(kitAssignmentInfoText.split("\n")[0]);
-        console.log(kitAssignmentInfoText.split(" "));
         modalContent.innerHTML = `
             <div class="modal-header" style="border:0">
                 <button type="button" class="close" style="font-size:40px" data-dismiss="modal" aria-label="Close">
@@ -171,7 +163,7 @@ const createAddressPrintedRows = (participantRows) => {
 };
 
 // KIT ASSIGNMENT MODAL
-const modalAssignedInfo = (confirmAssignment) => {
+const modalAssignedInfo = () => {
   let template = ``;
   template += `<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 70%">
@@ -197,5 +189,3 @@ const modalAssignedInfo = (confirmAssignment) => {
 
   return template;
 };
-
-// console.log(fakeParticipantsState);

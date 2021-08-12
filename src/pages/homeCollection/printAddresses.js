@@ -27,7 +27,6 @@ const printaddressesTemplate = async (auth, route) => {
   showAnimation();
   const response = await findParticipant("firstName=Deanna");
   hideAnimation();
-  //   console.log(response);
   let template = ``;
   template += renderParticipantSelectionHeader();
   template += ` <div class="container-fluid">
@@ -71,7 +70,7 @@ const printaddressesTemplate = async (auth, route) => {
   participantSelectionDropdown();
 };
 
-// Refactor
+// REFACTOR
 export const participantSelectionDropdown = () => {
   const participantDropdown = document.querySelector(
     ".participantSelectionDropdown"
@@ -97,12 +96,11 @@ export const participantSelectionDropdown = () => {
   participantDropdown.addEventListener("change", (e) => {
     // Clear selected attribute from each child node
     for (let i = 0; i < participantDropdown.children.length; i++) {
-      console.log(participantDropdown.children[i]);
       participantDropdown.children[i].removeAttribute("selected");
     }
 
+    // TODO: ADD MORE BASED ON UPCOMING DIFFERENT URL ROUTES
     let selection = e.target.value;
-    console.log(selection);
     if (selection === "pending") {
       location.hash = "#participantselection";
       return;
@@ -111,7 +109,6 @@ export const participantSelectionDropdown = () => {
       return;
     } else if (selection === "assigned") {
       location.hash = "#assigned";
-      console.log(document.getElementById("select-assigned"));
       return;
     } else {
       return;
@@ -119,7 +116,7 @@ export const participantSelectionDropdown = () => {
   });
 };
 
-// TODO: Add this back to <tbody> element ${createParticipantRows(response.data)} ***
+// TODO: Add this "${createParticipantRows(response.data)}" back to <tbody> element  ***
 const createParticipantRows = (participantRows) => {
   let template = ``;
   participantRows.forEach((i) => {
@@ -151,59 +148,6 @@ const createParticipantRows = (participantRows) => {
   });
   return template;
 };
-
-/*
-tbody tag - ${createParticipantRows(fakeParticipantsData)}
-*/
-// const createParticipantRows = (participantRows) => {
-//   let template = ``;
-//   participantRows.forEach((i) => {
-//     // TODO: ADD BACK LATER WHEN REAL DATA IS USED
-//     //   template += `
-//     //                 <tr class="row-color-enrollment-dark participantRow">
-//     //                     <td> <input type="checkbox" class="ptSelection" data-participantHolder = ${storeParticipantInfo(
-//     //                       i
-//     //                     )} name="ptSelection"></td>
-//     //                     <td>${i[fieldMapping.fName] && i[fieldMapping.fName]}</td>
-//     //                     <td>${i[fieldMapping.lName] && i[fieldMapping.lName]}</td>
-//     //                     <td>${i.Connect_ID && i.Connect_ID}</td>
-//     //                     <td>Pending</td>
-//     //                     <td>${
-//     //                       i[fieldMapping.address1] && i[fieldMapping.address1]
-//     //                     }</td>
-//     //                     <td>${
-//     //                       i[fieldMapping.address2] != undefined
-//     //                         ? i[fieldMapping.address2]
-//     //                         : ``
-//     //                     }</td>
-//     //                     <td>${i[fieldMapping.city] && i[fieldMapping.city]}</td>
-//     //                     <td>${i[fieldMapping.state] && i[fieldMapping.state]}</td>
-//     //                     <td>${i[fieldMapping.zip] && i[fieldMapping.zip]}</td>
-//     //                     <td>${
-//     //                       i[fieldMapping.verficationDate] &&
-//     //                       humanReadableFromISO(i[fieldMapping.verficationDate])
-//     //                     }</td>
-//     //                 </tr>`;
-//     template += `
-//                     <tr class="row-color-enrollment-dark participantRow">
-//                         <td> <input type="checkbox" class="ptSelection" data-participantHolder = ${storeParticipantInfo(
-//                           i
-//                         )} name="ptSelection"></td>
-//                         <td>${i.first_name}</td>
-//                         <td>${i.last_name}</td>
-//                         <td>${i.connect_id}</td>
-//                         <td>${i.kit_status}</td>
-//                         <td>${i.address_1}</td>
-//                         <td>${i.address_2}</td>
-//                         <td>${i.city}</td>
-//                         <td>${i.state}</td>
-//                         <td>${i.zip_code}</td>
-//                         <td>${i.date_requested}</td>
-//                     </tr>`;
-//   });
-
-//   return template;
-// };
 
 const storeParticipantInfo = (i) => {
   let participantHolder = {};
@@ -275,9 +219,8 @@ const generateParticipantCsv = (table_id, separator = ",") => {
   document.body.removeChild(link);
 };
 
-// console.log(JSON.parse(JSON.stringify(fakeParticipants)));
-
 /*
+FAKE PENDING DATA***
 [{
   "first_name": "David",
   "last_name": "Eagle",

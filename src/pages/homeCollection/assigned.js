@@ -177,13 +177,9 @@ const editAssignedRow = (i) => {
     let supplyKitId = document.getElementById(`kit-id-${i}`);
     let uspsTrackingNumber = document.getElementById("usps-" + i);
 
-    // console.log(supplyKitId);
-    console.log(uspsTrackingNumber);
-
     // Target the values in the innerHTML
     let supplyKitIdData = supplyKitId.innerHTML;
     let uspsTrackingNumberData = uspsTrackingNumber.innerHTML;
-    // console.log(supplyKitIdData, uspsTrackingNumberData);
 
     // Change innerHTML with input element with original values from text inside
     supplyKitId.innerHTML = `<input type="text" id="supply-kit-id-text-${i}" value=${supplyKitIdData}></input>`;
@@ -199,7 +195,9 @@ const saveAssignedRow = (i) => {
 
   saveButton.addEventListener("click", (e) => {
     console.log("save button clicked!");
+    // TODO: Add if else condtional checks in regards to successful inputs(Erro Handling)
     if (false) {
+      // TODO : Make Modal for an error?
       return;
     }
     let supplyKitIdValue = document.getElementById(
@@ -211,8 +209,6 @@ const saveAssignedRow = (i) => {
 
     document.getElementById("kit-id-" + i).innerHTML = supplyKitIdValue;
     document.getElementById("usps-" + i).innerHTML = uspsNumberValue;
-
-    console.log(supplyKitIdValue);
 
     saveButton.style.display = "none";
     editButton.style.display = "block";
