@@ -72,20 +72,50 @@ const printaddressesTemplate = async (auth, route) => {
 };
 
 // Refactor
-const participantSelectionDropdown = () => {
-  console.log("test");
+export const participantSelectionDropdown = () => {
   const participantDropdown = document.querySelector(
     ".participantSelectionDropdown"
   );
+  // CHECKS THE CURRENT HASH AFTER ON LOAD AND SETS OPTION TO SELECTED
+  // TODO: Refactor into switch statement?
+  if (location.hash === "#participantselection") {
+    document
+      .getElementById("select-pending")
+      .setAttribute("selected", "selected");
+  }
+  if (location.hash === "#addressPrinted") {
+    document
+      .getElementById("select-address-printed")
+      .setAttribute("selected", "selected");
+  }
+  if (location.hash === "#assigned") {
+    document
+      .getElementById("select-assigned")
+      .setAttribute("selected", "selected");
+  }
+
   participantDropdown.addEventListener("change", (e) => {
+    // Clear selected attribute from each child node
+    for (let i = 0; i < participantDropdown.children.length; i++) {
+      console.log(participantDropdown.children[i]);
+      participantDropdown.children[i].removeAttribute("selected");
+    }
+
     let selection = e.target.value;
+    console.log(selection);
     if (selection === "pending") {
       location.hash = "#participantselection";
+      return;
     } else if (selection === "addressPrinted") {
       location.hash = "#addressPrinted";
+      return;
     } else if (selection === "assigned") {
       location.hash = "#assigned";
-    } else return;
+      console.log(document.getElementById("select-assigned"));
+      return;
+    } else {
+      return;
+    }
   });
 };
 

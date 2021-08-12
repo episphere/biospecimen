@@ -5,6 +5,7 @@ import {
   hideAnimation,
 } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
+import { participantSelectionDropdown } from "./printAddresses.js";
 
 const placeholderAssignedData = [
   {
@@ -127,19 +128,19 @@ const createAssignedParticipantRows = (assignedParticipantsRows) => {
 };
 
 // Refactor
-const participantSelectionDropdown = () => {
-  const participantDropdown = document.querySelector(
-    ".participantSelectionDropdown"
-  );
-  console.log(participantDropdown);
-  participantDropdown.addEventListener("change", (e) => {
-    let selection = e.target.value;
-    if (selection === "pending") {
-      location.hash = "#participantselection";
-    } else if (selection === "addressPrinted") {
-      location.hash = "#addressPrinted";
-    } else if (selection === "assigned") {
-      location.hash = "#assigned";
-    } else return;
-  });
-};
+// const participantSelectionDropdown = () => {
+//   const participantDropdown = document.querySelector(
+//     ".participantSelectionDropdown"
+//   );
+//   console.log(participantDropdown);
+//   participantDropdown.addEventListener("change", (e) => {
+//     let selection = e.target.value;
+//     if (selection === "pending") {
+//       location.hash = "#participantselection";
+//     } else if (selection === "addressPrinted") {
+//       location.hash = "#addressPrinted";
+//     } else if (selection === "assigned") {
+//       location.hash = "#assigned";
+//     } else return;
+//   });
+// };

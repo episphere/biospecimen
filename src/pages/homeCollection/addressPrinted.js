@@ -6,6 +6,7 @@ import {
 } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { fakeParticipantsState } from "./printAddresses.js";
+import { participantSelectionDropdown } from "./printAddresses.js";
 
 export const addressesPrintedScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -63,21 +64,21 @@ const assignedTableButton = () => {
 };
 
 // Refactor
-const participantSelectionDropdown = () => {
-  const participantDropdown = document.querySelector(
-    ".participantSelectionDropdown"
-  );
-  participantDropdown.addEventListener("change", (e) => {
-    let selection = e.target.value;
-    if (selection === "pending") {
-      location.hash = "#participantselection";
-    } else if (selection === "addressPrinted") {
-      location.hash = "#addressPrinted";
-    } else if (selection === "assigned") {
-      location.hash = "#assigned";
-    } else return;
-  });
-};
+// const participantSelectionDropdown = () => {
+//   const participantDropdown = document.querySelector(
+//     ".participantSelectionDropdown"
+//   );
+//   participantDropdown.addEventListener("change", (e) => {
+//     let selection = e.target.value;
+//     if (selection === "pending") {
+//       location.hash = "#participantselection";
+//     } else if (selection === "addressPrinted") {
+//       location.hash = "#addressPrinted";
+//     } else if (selection === "assigned") {
+//       location.hash = "#assigned";
+//     } else return;
+//   });
+// };
 
 // TODO: FIX ERROR WITH NAMING CONVENTION F BUTTON
 const assignKitButton = () => {
@@ -140,8 +141,8 @@ const assignKitButton = () => {
                 <button type="button" class="close" style="font-size:40px" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
-              </div>
-              <div class="modal-body" style="white-space: pre; display:flex; flex-direction:column; justify-content:center;
+            </div>
+            <div class="modal-body" style="white-space: pre; display:flex; flex-direction:column; justify-content:center;
               align-items:center;">
                 <object data="../../../static/images/modals/check-circle-solid.svg" width="200" height="200"></object>
                 <h1 class="text-success" style:"margin-bottom:2rem;">Success!</h1>
@@ -187,7 +188,7 @@ const createAddressPrintedRows = (participantRows) => {
 const modalAssignedInfo = (confirmAssignment) => {
   let template = ``;
   template += `<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="max-width: 70%">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 70%">
       <div class="modal-content">
         <div class="modal-header" style="border:0; position:relative;">
         <h2 style="top: 50%;

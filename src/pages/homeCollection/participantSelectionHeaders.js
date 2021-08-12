@@ -22,13 +22,13 @@ export const renderKitStatusList = () => {
                 <div>
                     <label for="paticipantSelection" class="col-form-label">Participant Selection</label>
                     <select required class="col form-control participantSelectionDropdown" id="paticipantSelection">
-                        <option value="">-- Select dashboard --</option>
-                        <option value="all">All</option>
-                        <option value="pending" selected="selected">Pending</option>
-                        <option value="addressPrinted">Address Printed</option>
-                        <option value="assigned">Assigned</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="received">Received</option>
+                        <option id="select-dashboard" value="">-- Select dashboard --</option>
+                        <option id="select-all" value="all">All</option>
+                        <option id="select-pending" value="pending">Pending</option>
+                        <option id="select-address-printed" value="addressPrinted">Address Printed</option>
+                        <option id="select-assigned" value="assigned">Assigned</option>
+                        <option id="select-shipped" value="shipped">Shipped</option>
+                        <option id="select-received" value="received">Received</option>
                     </select>
                 </div>
                 </br>
