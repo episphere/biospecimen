@@ -63,23 +63,6 @@ const assignedTableButton = () => {
   console.log(test);
 };
 
-// Refactor
-// const participantSelectionDropdown = () => {
-//   const participantDropdown = document.querySelector(
-//     ".participantSelectionDropdown"
-//   );
-//   participantDropdown.addEventListener("change", (e) => {
-//     let selection = e.target.value;
-//     if (selection === "pending") {
-//       location.hash = "#participantselection";
-//     } else if (selection === "addressPrinted") {
-//       location.hash = "#addressPrinted";
-//     } else if (selection === "assigned") {
-//       location.hash = "#assigned";
-//     } else return;
-//   });
-// };
-
 // TODO: FIX ERROR WITH NAMING CONVENTION F BUTTON
 const assignKitButton = () => {
   // Target All buttons with assign-kit-button class

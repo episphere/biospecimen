@@ -36,10 +36,3 @@ export const renderKitStatusList = () => {
 
   return template;
 };
-
-// TODO: FULLY REMOVE
-{
-  /* <div class="row">
-<div class="col"><button class="btn btn-outline-primary" id="btnParticipantSearch">Show Participants</button></div>
-</div> */
-}
