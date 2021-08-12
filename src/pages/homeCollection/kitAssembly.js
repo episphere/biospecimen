@@ -144,8 +144,8 @@ const kitAssemblyTemplate = async (auth, route) => {
   template += homeCollectionNavbar();
   template += `
                 <div class="row align-center welcome-screen-div">
-                        <div class="col"><h3>Kit Assembly</h3></div>
-                </div>  `;
+                        <div class="col"><h3 style="margin:1rem 0 1.5rem;">Kit Assembly</h3></div>
+                </div>`;
 
   template += `
         <div style="overflow:auto; height:45vh">
@@ -225,7 +225,7 @@ const kitAssemblyPageButtons = () => {
   let buttonContainerTemplate = "";
 
   buttonContainerTemplate += `
-        <div class="kit-assembly-button-container d-flex justify-content-around" style="margin:1.5rem 0;">
+        <div class="kit-assembly-button-container d-flex justify-content-around" style="margin: 4rem 0 1.5rem 0;">
           <button id="kit-assembly-clear-button" type="button" class="btn btn-outline-secondary" style=" width:13rem; height:3rem; border-radius:15px">Clear</button>
 
           <button id="kit-assembly-save-button" type="submit" class="btn btn-success" style="width:13rem;height:3rem; border-radius:15px">Save</button>

@@ -23,13 +23,13 @@ const addressesPrintedTemplate = async (auth, route) => {
   template += `<div class="container-fluid">
                     <div id="root root-margin">
                         <div class="table-responsive">
-                        <span> <h3 style="text-align: center;">Assign Kits </h3> </span>
+                        <span> <h3 style="text-align: center; margin: 0 0 1rem;">Assign Kits </h3> </span>
                         <div class="sticky-header" style="overflow:auto;">
                                 <table class="table table-bordered" id="participantData" 
                                     style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
                                     <thead> 
                                         <tr style="top: 0; position: sticky;">
-                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Select one to assign kit</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Select One to Assign Kit</th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">First Name</th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Last Name</th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Connect ID</th>
@@ -51,8 +51,6 @@ const addressesPrintedTemplate = async (auth, route) => {
                 </div>`;
   template += modalAssignedInfo();
   document.getElementById("contentBody").innerHTML = template;
-
-  // confirmAssignment();
 
   assignKitButton();
   participantSelectionDropdown();
@@ -128,10 +126,10 @@ const assignKitButton = () => {
             <div class="modal-body" style="display:flex; flex-direction:column; justify-content:center;
               align-items:center;">
                 <object data="../../../static/images/modals/check-circle-solid.svg" width="200" height="200"></object>
-                <h1 class="text-success" style:"margin-bottom:2rem;">Success!</h1>
-                <p>The participant has been saved and can be found on Assigned!</p>
+                <h1 class="text-success" style:"margin-bottom:1.5rem;">Success!</h1>
+                <p style="font-weight:600;margin:0;">The participant has been saved and can be found on Assigned!</p>
               </div>
-              <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
+              <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem 1rem;">
                 <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
                 <button id="assigned-table" type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal" data-dismiss="modal" style="margin-left:5%">Show Assigned Table</button>
             </div>`;

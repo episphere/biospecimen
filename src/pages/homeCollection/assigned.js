@@ -57,7 +57,7 @@ const aassignedTemplate = async (auth, route) => {
   template += ` <div class="container-fluid">
                     <div id="root root-margin">
                         <div class="table-responsive">
-                        <span> <h3 style="text-align: center;">Assigned</h3> </span>
+                        <span> <h3 style="text-align: center; margin: 0 0 1rem;">Assigned</h3> </span>
                             <div class="sticky-header" style="overflow:auto;">
                                 <table class="table table-bordered" id="participantData" 
                                     style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
@@ -94,7 +94,7 @@ const aassignedTemplate = async (auth, route) => {
     <div class="modal-body" style="display:flex; flex-direction:column; justify-content:center;align-items:center">
           <object data="../../../static/images/modals/check-circle-solid.svg" width="200" height="150px"></object>
           <h1 class="text-success" style:"margin:1.5rem 0 2rem 0;">Success!</h1>
-          <p style="text-align:center; margin:1.5rem 0 2rem 0;">The participant's Supply Kit ID and USPS Tracking Number were successfully edited and saved!</p>
+          <p style="text-align:center; margin:1.5rem 0 2rem 0; font-weight:600">The participant's Supply Kit ID and USPS Tracking Number were successfully edited and saved!</p>
         </div>
       </div>
     </div>

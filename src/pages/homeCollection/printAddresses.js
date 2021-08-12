@@ -33,7 +33,7 @@ const printaddressesTemplate = async (auth, route) => {
   template += ` <div class="container-fluid">
                     <div id="root root-margin">
                         <div class="table-responsive">
-                        <span> <h3 style="text-align: center;">Print Addresses </h3> </span>
+                        <span> <h3 style="text-align: center; margin: 0 0 1rem;">Print Addresses </h3> </span>
                         <div class="sticky-header" style="overflow:auto;">
                                 <table class="table table-bordered" id="participantData" 
                                     style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
