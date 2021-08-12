@@ -32,7 +32,7 @@ const addressesPrintedTemplate = async (auth, route) => {
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">First Name</th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Last Name</th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Connect ID</th>
-                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Kit Status</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit Status</th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Study Site </th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Date Requested</th>
                                         </tr>
@@ -55,7 +55,6 @@ const addressesPrintedTemplate = async (auth, route) => {
 
   assignKitButton();
   participantSelectionDropdown();
-  // redirectDropdownScreen();
 };
 
 const assignedTableButton = () => {
@@ -77,20 +76,6 @@ const participantSelectionDropdown = () => {
     } else if (selection === "assigned") {
       location.hash = "#assigned";
     } else return;
-  });
-};
-
-const redirectDropdownScreen = () => {
-  const a = document.getElementById("btnParticipantSearch");
-  a.addEventListener("click", () => {
-    const selection = document.getElementById("paticipantSelection");
-    if (selection.value === "pending") {
-      location.hash = "#participantselection";
-    } else if (selection.value === "addressPrinted") {
-      location.hash = "#addressPrinted";
-    } else if (selection.value === "assigned") {
-      location.hash = "#assigned";
-    }
   });
 };
 
@@ -126,7 +111,7 @@ const assignKitButton = () => {
       console.log(modalContent);
       console.log(confirmButton);
       modalBody.innerHTML = `<div style="display:flex;flex-direction:column;justify-content:center;align-items:center; flex-wrap:wrap; padding:1rem 2.5rem">
-              <label for="search-scan-kit-Id" style="flex-flow:wrap;align-self:flex-start"><strong>Scan Kit ID</strong>: <input type="search" id="search-scan-kit-Id" value=${e.target.getAttribute(
+              <label for="search-scan-kit-Id" style="flex-flow:wrap;align-self:flex-start"><strong>Scan Supply Kit ID</strong>: <input type="search" id="search-scan-kit-Id" value=${e.target.getAttribute(
                 "data-kitID"
               )}></label>
               <p style="display:block; align-self:flex-start; width: 100%"><strong>Full Name:</strong> ${
@@ -160,9 +145,7 @@ const assignKitButton = () => {
               align-items:center;">
                 <object data="../../../static/images/modals/check-circle-solid.svg" width="200" height="200"></object>
                 <h1 class="text-success" style:"margin-bottom:2rem;">Success!</h1>
-                <p>${
-                  kitAssignmentInfoText.split("\n")[0]
-                } has been saved and can be found on Assigned!</p>
+                <p>The participant has been saved and can be found on Assigned!</p>
               </div>
               <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem;">
                 <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
@@ -178,7 +161,7 @@ const createAddressPrintedRows = (participantRows) => {
   participantRows.forEach((i) => {
     template += `
                     <tr class="row-color-enrollment-dark participantRow">
-                        <td style="display:flex; height:100%;align-items:center; justify-content:center;" >
+                        <td style="display:flex; height:100%;align-items:center; justify-content:center; padding" >
                             <input type="button" class="assign-kit-button"
                             data-toggle="modal" data-target="#exampleModal"
                             data-uspsTrackingNumber = ${i.usps_tracking_number} data-kitID= ${i.kit_id} data-firstName= '${i.first_name}' data-lastName= '${i.last_name}'

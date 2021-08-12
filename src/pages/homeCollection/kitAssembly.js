@@ -148,7 +148,7 @@ const kitAssemblyTemplate = async (auth, route) => {
                 </div>  `;
 
   template += `
-        <div style="overflow:auto; height:400px">
+        <div style="overflow:auto; height:45vh">
             <table id="kit-assembly-table" class="table table-bordered" style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
                 <thead>
                     <tr style="top: 0;
@@ -225,7 +225,7 @@ const kitAssemblyPageButtons = () => {
   let buttonContainerTemplate = "";
 
   buttonContainerTemplate += `
-        <div class="kit-assembly-button-container d-flex justify-content-around" style="margin:8rem 0;">
+        <div class="kit-assembly-button-container d-flex justify-content-around" style="margin:1.5rem 0;">
           <button id="kit-assembly-clear-button" type="button" class="btn btn-outline-secondary" style=" width:13rem; height:3rem; border-radius:15px">Clear</button>
 
           <button id="kit-assembly-save-button" type="submit" class="btn btn-success" style="width:13rem;height:3rem; border-radius:15px">Save</button>

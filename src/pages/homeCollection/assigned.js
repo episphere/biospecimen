@@ -11,7 +11,7 @@ const placeholderAssignedData = [
     first_name: "Jolyene",
     last_name: "Cujoh",
     connect_id: "7756917180",
-    kit_status: "Status",
+    kit_status: "Assigned",
     address_1: "34442 Steve Hunt Road",
     address_2: null,
     city: "Miami",
@@ -65,25 +65,65 @@ const aassignedTemplate = async (auth, route) => {
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">First Name</th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Last Name</th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Connect ID</th>
-                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Kit Status</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit Status</th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Study Site </th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Date Requested</th>
-                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Kit ID</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit ID</th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">USPS Tracking Number</th>
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Edit</th>
+                                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Save</th>
                                         </tr>
                                     </thead>   
                                     <tbody>
-                                       
+                                       ${createAssignedParticipantRows(
+                                         assignedParticipants
+                                       )}
                                     </tbody>
                               </table>
                         </div>
                     </div> 
                 </div>`;
   document.getElementById("contentBody").innerHTML = template;
-
   participantSelectionDropdown();
   console.log(assignedParticipants);
+};
+
+const createAssignedParticipantRows = (assignedParticipantsRows) => {
+  let template = ``;
+  assignedParticipantsRows.forEach((i) => {
+    template += `
+      <tr class="row-color-enrollment-dark participantRow">
+        <td style="padding:1rem">${i.first_name}</td>
+        <td style="padding:1rem">${i.last_name}</td>
+        <td style="padding:1rem">${i.connect_id}</td>
+        <td style="padding:1rem">${i.kit_status}</td>
+        <td style="padding:1rem">${i.study_site}</td>
+        <td style="padding:1rem">${i.date_requested}</td>
+        <td style="padding:1rem">${i.kit_id}</td>
+        <td style="padding:1rem">${i.usps_tracking_number}</td>
+        <td style="height:100%; padding:1rem;" >
+            <input type="button" class="edit-assign-button""
+            data-uspsTrackingNumber = ${i.usps_tracking_number} data-kitID= ${i.kit_id} data-firstName= '${i.first_name}' data-lastName= '${i.last_name}'
+            data-address1= '${i.address_1}'
+            data-city= '${i.city}'
+            data-state= '${i.state}'
+            data-zipCode= '${i.zip_code}'
+            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code}'
+            value="Edit" >
+        </td>
+        <td style="height:100%; padding:1rem;" >
+            <input type="button" class="save-assign-button""
+            data-uspsTrackingNumber = ${i.usps_tracking_number} data-kitID= ${i.kit_id} data-firstName= '${i.first_name}' data-lastName= '${i.last_name}'
+            data-address1= '${i.address_1}'
+            data-city= '${i.city}'
+            data-state= '${i.state}'
+            data-zipCode= '${i.zip_code}'
+            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code}'
+            value="Save" >
+        </td>
+      </tr>`;
+  });
+  return template;
 };
 
 // Refactor
@@ -91,6 +131,7 @@ const participantSelectionDropdown = () => {
   const participantDropdown = document.querySelector(
     ".participantSelectionDropdown"
   );
+  console.log(participantDropdown);
   participantDropdown.addEventListener("change", (e) => {
     let selection = e.target.value;
     if (selection === "pending") {
