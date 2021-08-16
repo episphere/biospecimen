@@ -1,31 +1,25 @@
-import {
-  getIdToken,
-  findParticipant,
-  showAnimation,
-  hideAnimation,
-} from "../../shared.js";
+import { getIdToken, findParticipant, showAnimation, hideAnimation } from "../../shared.js";
 import fieldMapping from "../../fieldToConceptIdMapping.js";
-import { humanReadableFromISO } from "../../utils.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
+import { nonUserNavBar, unAuthorizedUser } from './../../navbar.js'
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
+import { fakeParticipants, printAddressesParticipants } from "./fakeParticipants.js";
 
-import { fakeParticipants } from "./fakeParticipants.js";
+// Stringify array of objects and parse fake participants Data
+const fakeParticipantsData = JSON.parse(JSON.stringify(fakeParticipants));
+export const fakeParticipantsState = [...fakeParticipantsData];
 
 export const printAddressesScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  printaddressesTemplate(auth, route);
+  printaddressesTemplate(username, auth, route, printAddressesParticipants);
 };
 
-// Stringify array of objects and parse fake participants Data
-const fakeParticipantsData = JSON.parse(JSON.stringify(fakeParticipants));
 
-export const fakeParticipantsState = [...fakeParticipantsData];
-
-const printaddressesTemplate = async (auth, route) => {
+const printaddressesTemplate = async (name, auth, route, printAddressesParticipants) => {
   showAnimation();
-  const response = await findParticipant("firstName=Deanna");
+ // const response = await findParticipant("firstName=Deanna"); 
   hideAnimation();
   let template = ``;
   template += renderParticipantSelectionHeader();
@@ -52,7 +46,7 @@ const printaddressesTemplate = async (auth, route) => {
                                         </tr>
                                     </thead>   
                                     <tbody>
-                                      ${createParticipantRows(response.data)}
+                                      ${createParticipantRows(printAddressesParticipants)}
                                     </tbody>
                               </table>
                         </div>
@@ -65,7 +59,7 @@ const printaddressesTemplate = async (auth, route) => {
                 <button type="button" class="btn btn-primary btn-lg" style="float: right;">Continue to Participant Selection</button>
                 </div>`;
   document.getElementById("contentBody").innerHTML = template;
-
+  document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
   generateParticipantCsvGetter();
   participantSelectionDropdown();
 };
@@ -122,28 +116,17 @@ const createParticipantRows = (participantRows) => {
   participantRows.forEach((i) => {
     template += `
                 <tr class="row-color-enrollment-dark participantRow">
-                    <td> <input type="checkbox" class="ptSelection" data-participantHolder = ${storeParticipantInfo(
-                      i
-                    )} name="ptSelection"></td>
-                    <td>${i[fieldMapping.fName] && i[fieldMapping.fName]}</td>
-                    <td>${i[fieldMapping.lName] && i[fieldMapping.lName]}</td>
-                    <td>${i.Connect_ID && i.Connect_ID}</td>
+                    <td> <input type="checkbox" class="ptSelection" data-participantHolder = ${storeParticipantInfo(i)} name="ptSelection"></td>
+                    <td>${i.first_name && i.first_name}</td>
+                    <td>${i.last_name && i.last_name}</td>
+                    <td>${i.connect_id && i.connect_id}</td>
                     <td>Pending</td>
-                    <td>${
-                      i[fieldMapping.address1] && i[fieldMapping.address1]
-                    }</td>
-                    <td>${
-                      i[fieldMapping.address2] != undefined
-                        ? i[fieldMapping.address2]
-                        : ``
-                    }</td>
-                    <td>${i[fieldMapping.city] && i[fieldMapping.city]}</td>
-                    <td>${i[fieldMapping.state] && i[fieldMapping.state]}</td>
-                    <td>${i[fieldMapping.zip] && i[fieldMapping.zip]}</td>
-                    <td>${
-                      i[fieldMapping.verficationDate] &&
-                      humanReadableFromISO(i[fieldMapping.verficationDate])
-                    }</td>
+                    <td>${ i.address_1 && i.address_1 }</td>
+                    <td>${ i.address_2 != undefined  ? i.address_2   : `` }</td>
+                    <td>${i.city && i.city}</td>
+                    <td>${i.state && i.state}</td>
+                    <td>${i.zip_code && i.zip_code}</td>
+                    <td>${i.date_requested && i.date_requested }</td>
                 </tr>`;
   });
   return template;
@@ -151,35 +134,59 @@ const createParticipantRows = (participantRows) => {
 
 const storeParticipantInfo = (i) => {
   let participantHolder = {};
-  participantHolder["firstName"] =
-    i[fieldMapping.fName] && i[fieldMapping.fName];
-  participantHolder = JSON.stringify(participantHolder);
-  return participantHolder;
+  participantHolder["firstName"] = i.first_name && i.first_name;
+  participantHolder["lastName"] = i.last_name && i.last_name;
+  participantHolder["connectId"] = i.connect_id && i.connect_id;
+  participantHolder["kitStatus"] = "addressPrinted";
+  participantHolder["address1"] = String(i.address_1 && i.address_1);
+  participantHolder["address2"] = i.address_2 != undefined  ? i.address_2   : ``;
+  participantHolder["city"] =  i.city && i.city;
+  participantHolder["state"] = i.state && i.state;
+  participantHolder["zipCode"] = i.zip_code && i.zip_code;
+  participantHolder["dateRequested"] = i.date_requested && i.date_requested;
+ // participantHolder = JSON.stringify(participantHolder);
+ let schemaInfo = escape(JSON.stringify(participantHolder))
+  return schemaInfo;
 };
 
 const generateParticipantCsvGetter = () => {
-  // const participantRow = Array.from(document.getElementsByClassName('participantRow'));
-  // if (participantRow) {
-  //     participantRow.forEach(element => {
-  //     const checkboxPt = element.getElementsByClassName('ptSelection')[0];
-  //     checkboxPt.addEventListener('change', function() {
-  //         console.log('r')
-  //         if (checkboxPt.checked) {
-  //         console.log("Checkbox is checked..", checkboxPt.dataset.participantholder);
-  //         } else {
-  //         console.log("Checkbox is not checked..");
-  //         }
-  //     });
-  // })}
-
   const a = document.getElementById("generateCsv");
+  let holdParticipantResponse = [];
   if (a) {
     a.addEventListener("click", () => {
-      generateParticipantCsv("participantData");
-      console.log("2");
-    });
+     console.log('generateParticipantCsv("participantData");')
+    const participantRow = Array.from(document.getElementsByClassName('participantRow'));
+    if (participantRow) {
+        participantRow.forEach(element => {
+        const checkboxPt = element.getElementsByClassName('ptSelection')[0];
+        checkboxPt.checked ? holdParticipantResponse.push(JSON.parse(unescape(checkboxPt.dataset.participantholder))) : ``
+    })}
+    const response = setParticipantResponses(holdParticipantResponse);
+    if (response) { console.log(true) }
+   });
+    
   }
+  
 };
+
+const setParticipantResponses = async (holdParticipantResponse) => {
+console.log('holdParticipantResponse', holdParticipantResponse)
+  const idToken = await getIdToken();
+  const response = await await fetch(`http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=printAddresses`, {
+    method: "POST",
+    body: JSON.stringify(holdParticipantResponse),
+    headers: {
+      Authorization: "Bearer " + idToken,
+      "Content-Type": "application/json",
+    },
+  });
+    if (response.status === 200) {
+      return true
+    }
+    else { 
+      (alert('Error'))
+  }
+}
 
 const generateParticipantCsv = (table_id, separator = ",") => {
   console.log("3");

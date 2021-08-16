@@ -90,3 +90,78 @@ export const fakeParticipants = [
     study_site: "KP CA",
   },
 ];
+
+export const printAddressesParticipants = [
+  {
+    first_name: "Jolyene",
+    last_name: "Cujoh",
+    connect_id: "7756917180",
+    kit_status: "Address Printed",
+    address_1: "34442 Steve Hunt Road",
+    address_2: null,
+    city: "Miami",
+    state: "FL",
+    zip_code: 33131,
+    date_requested: "08/04/2021"
+  },
+  {
+    first_name: "Joseph",
+    last_name: "Joestar",
+    connect_id: "2583977369",
+    kit_status: "Address Printed",
+    address_1: "3157 Blaine Trail",
+    address_2: null,
+    city: "Houston",
+    state: "TX",
+    zip_code: 43098,
+    date_requested: "08/04/2021"
+  },
+  {
+    first_name: "Frederica",
+    last_name: "Bernkastel",
+    connect_id: "6022359597",
+    kit_status: "Address Printed",
+    address_1: "57 Prairieview Plaza",
+    address_2: null,
+    city: "Baton Rouge",
+    state: "LA",
+    zip_code: 36151,
+    date_requested: "08/04/2021"
+  },
+  {
+    first_name: "Noelle",
+    last_name: "Silva",
+    connect_id: "3451058235",
+    kit_status: "Address Printed‫",
+    address_1: "60 Pennsylvania Road",
+    address_2: null,
+    city: "Pittsburgh",
+    state: "PA",
+    zip_code: 34094,
+    date_requested: "08/04/2021"
+  },
+  {
+    first_name: "Mikasa",
+    last_name: "Ackerman",
+    connect_id: "7761634106",
+    kit_status: "Address Printed",
+    address_1: "31 Kedzie Junction",
+    address_2: null,
+    city: "Raleigh",
+    state: "NC",
+    zip_code: 82621,
+    date_requested: "08/04/2021"
+  },
+  {
+    first_name: "Subaru",
+    last_name: "Natsuki",
+    connect_id: "6983906128",
+    kit_status: "Address Printed",
+    address_1: "6 Rutledge Circle",
+    address_2: null,
+    city: "Sacramento",
+    state: "CA",
+    zip_code: 23334,
+    date_requested: "08/04/2021"
+  },
+];
