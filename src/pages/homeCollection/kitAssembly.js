@@ -13,10 +13,13 @@ export const kitAssemblyScreen = async (auth, route) => {
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
   showAnimation();
-  await kitAssemblyTemplate(auth, route);
+  const kitData = await getKitData().then((res) => res.data);
+  hideAnimation();
+
+  kitAssemblyTemplate(auth, route);
 
   // Fetch data using GET request
-  const kitData = await getKitData().then((res) => res.data);
+
   const tableBody = document.getElementById("kit-assembly-table-body");
 
   // Sort Function from Oldest to Newest
@@ -54,7 +57,6 @@ export const kitAssemblyScreen = async (auth, route) => {
 
   // Add autofocus on first input cell
   inputUsps.focus();
-  hideAnimation();
 
   // Remove all current input fields on row
   clearAllInputs(inputElements);
