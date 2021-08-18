@@ -282,34 +282,34 @@ const saveItem = async (
       }
     }
 
-    if (jsonSaveBody.uspsTrackingNumber.length !== 20) {
-      console.log(jsonSaveBody.uspsTrackingNumber.length);
-      debugger;
-      return alert("uspsTrackingNumber length must be 20 characters");
-    }
-    if (jsonSaveBody.supplyKitId.length !== 9) {
-      console.log(jsonSaveBody.supplyKitId.length);
-      debugger;
-      return alert("supply kit id must be 9 characters");
-    }
+    // if (jsonSaveBody.uspsTrackingNumber.length !== 20) {
+    //   console.log(jsonSaveBody.uspsTrackingNumber.length);
+    //   debugger;
+    //   return alert("uspsTrackingNumber length must be 20 characters");
+    // }
+    // if (jsonSaveBody.supplyKitId.length !== 9) {
+    //   console.log(jsonSaveBody.supplyKitId.length);
+    //   debugger;
+    //   return alert("supply kit id must be 9 characters");
+    // }
 
-    if (jsonSaveBody.specimenKitId.length !== 9) {
-      console.log(jsonSaveBody.specimenKitId.length);
-      debugger;
-      return alert("specimen kit id must be 9 characters");
-    }
+    // if (jsonSaveBody.specimenKitId.length !== 9) {
+    //   console.log(jsonSaveBody.specimenKitId.length);
+    //   debugger;
+    //   return alert("specimen kit id must be 9 characters");
+    // }
 
-    if (jsonSaveBody.collectionCupId.length !== 14) {
-      console.log(jsonSaveBody.collectionCupId.length);
-      debugger;
-      return alert("collection cup id must be 14 characters");
-    }
+    // if (jsonSaveBody.collectionCupId.length !== 14) {
+    //   console.log(jsonSaveBody.collectionCupId.length);
+    //   debugger;
+    //   return alert("collection cup id must be 14 characters");
+    // }
 
-    if (jsonSaveBody.collectionCardId.length !== 14) {
-      console.log(jsonSaveBody.collectionCardId.length);
-      debugger;
-      return alert("collection card id must be 14 characters");
-    }
+    // if (jsonSaveBody.collectionCardId.length !== 14) {
+    //   console.log(jsonSaveBody.collectionCardId.length);
+    //   debugger;
+    //   return alert("collection card id must be 14 characters");
+    // }
 
     // Increment with all filled input fields
     tableNumRows++;
@@ -366,7 +366,7 @@ const jsonSaveBody = {
 // Add New row with inputs
 function addRow(jsonSaveBody, tableNumRows) {
   // Convert to integer num value
-  let uspsTrackingNumber = parseInt(jsonSaveBody.uspsTrackingNumber);
+  let uspsTrackingNumber = jsonSaveBody.uspsTrackingNumber;
   console.log(uspsTrackingNumber);
 
   // Target Line Item Number
@@ -374,25 +374,19 @@ function addRow(jsonSaveBody, tableNumRows) {
 
   // Early Exit for number checker
   // If trackingNumber is data type of number
-  if (
-    typeof uspsTrackingNumber === "number" &&
-    isNaN(uspsTrackingNumber) === false
-  ) {
+  // CALL isNumeric function to check if input is a valid number
+  if (isNumeric(uspsTrackingNumber)) {
     console.log(typeof uspsTrackingNumber === "number");
     console.log(uspsTrackingNumber);
     // ADD UI MODAL
     alert("Number Value");
   } else {
-    // if a number value
-    // uspsTrackingNumber = jsonSaveBody.uspsTrackingNumber;
-    console.log(uspsTrackingNumber);
-    // ADD UI MODAL
-    alert("Not a Number Value! or Does not Match USPS 20 characters");
-    // debugger;
+    alert("Invalid USPS number data type, Not a number value");
+    debugger;
     return;
   }
 
-  uspsHolder.push(uspsTrackingNumber);
+  uspsHolder.push(parseInt(uspsTrackingNumber));
   newRowEl.firstChild.nextSibling.innerHTML = tableNumRows;
   newRowEl.insertAdjacentHTML(
     "beforebegin",
@@ -437,6 +431,14 @@ const clearAllInputs = (inputElements) => {
     }
   });
 };
+
+/*
+CHECK IF STRING OR NUM VALUE IS A REAL NUMBER  
+https://stackoverflow.com/questions/9716468/pure-javascript-a-function-like-jquerys-isnumeric
+*/
+function isNumeric(num) {
+  return !isNaN(parseFloat(num)) && isFinite(num);
+}
 
 /*
 TODO STEPS:
