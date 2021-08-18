@@ -7,6 +7,7 @@ const api =
 
 // Track the last row number
 let lastRowNumber = "";
+let uspsHolder = [];
 
 export const kitAssemblyScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -22,7 +23,7 @@ export const kitAssemblyScreen = async (auth, route) => {
 
   const tableBody = document.getElementById("kit-assembly-table-body");
 
-  // Sort Function from Oldest to Newest
+  // Sort Function from Oldest to Newest (REFACTOR FOR MULTIPLE USE)
   const sortData = kitData.sort((a, b) =>
     a.timeStamp < b.timeStamp ? -1 : a.timeStamp > b.timeStamp ? 1 : 0
   );
@@ -178,8 +179,15 @@ const populateKitTable = (tableBody, kitData) => {
 
   // TODO = Make the number dynamic and editable
   let extraRow = "";
+
   // Create loop and iterate all array items
   for (let i = 0; i < kitData.length; i++) {
+    /*
+    PSEUDOCODE - 
+    -> initalize an array callit uspsholder = [] (Outer Scope) 
+    -> add uspstracking number on each loop 
+    -> uspsHolder.push(i.usps)
+    */
     // Append a row with data cells and corresponding data from fetch
     tableRow += `
         <tr>
@@ -404,4 +412,13 @@ UPCOMING FEATURES
 
 BONUS:
 SORT FUNCTION Kits from Oldest to Newest
+*/
+
+/*
+
+Initial Load Fetch Data - GET Request
+
+Submit Button - POST Request 
+
+
 */
