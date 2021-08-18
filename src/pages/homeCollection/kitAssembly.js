@@ -28,6 +28,7 @@ export const kitAssemblyScreen = async (auth, route) => {
     a.timeStamp < b.timeStamp ? -1 : a.timeStamp > b.timeStamp ? 1 : 0
   );
 
+  console.log(sortData);
   // Render Table Data
   populateKitTable(tableBody, sortData);
   // Render Page Buttons
@@ -188,6 +189,11 @@ const populateKitTable = (tableBody, kitData) => {
     -> add uspstracking number on each loop 
     -> uspsHolder.push(i.usps)
     */
+
+    // Append usps track number to uspsHolder
+    uspsHolder.push(kitData[i].uspsTrackingNumber);
+    // console.log(uspsHolder);
+
     // Append a row with data cells and corresponding data from fetch
     tableRow += `
         <tr>
@@ -207,7 +213,7 @@ const populateKitTable = (tableBody, kitData) => {
         <tr class="new-row">      
           <th scope="row">${lastRowNumber + 1}</th>
           <td>
-              <input id="input-usps" type="string" autocomplete="off" style="width:80%"/>
+              <input id="input-usps" autocomplete="off" style="width:80%"/>
           </td>
           <td>
               <input id="input-supply-kit" type="string" autocomplete="off" style="width:80%"/>
@@ -264,24 +270,55 @@ const saveItem = async (
     jsonSaveBody.supplyKitId = inputSupplyKit.value.trim();
     jsonSaveBody.collectionCupId = inputCollectionCup.value.trim();
     jsonSaveBody.specimenKitId = inputSpecimenKit.value.trim();
+    // Convert string to number data type
     jsonSaveBody.uspsTrackingNumber = inputUsps.value.trim();
 
     // PREVENTS USER FROM SUBMITTING INCOMPLETE INPUT FIELD ROW
     for (const key in jsonSaveBody) {
       if (!jsonSaveBody[key]) {
+        // Modal Dialog Warning!
         alert("One or more inputs are empty!");
         return;
       }
+    }
+
+    if (jsonSaveBody.uspsTrackingNumber.length !== 20) {
+      console.log(jsonSaveBody.uspsTrackingNumber.length);
+      debugger;
+      return alert("uspsTrackingNumber length must be 20 characters");
+    }
+    if (jsonSaveBody.supplyKitId.length !== 9) {
+      console.log(jsonSaveBody.supplyKitId.length);
+      debugger;
+      return alert("supply kit id must be 9 characters");
+    }
+
+    if (jsonSaveBody.specimenKitId.length !== 9) {
+      console.log(jsonSaveBody.specimenKitId.length);
+      debugger;
+      return alert("specimen kit id must be 9 characters");
+    }
+
+    if (jsonSaveBody.collectionCupId.length !== 14) {
+      console.log(jsonSaveBody.collectionCupId.length);
+      debugger;
+      return alert("collection cup id must be 14 characters");
+    }
+
+    if (jsonSaveBody.collectionCardId.length !== 14) {
+      console.log(jsonSaveBody.collectionCardId.length);
+      debugger;
+      return alert("collection card id must be 14 characters");
     }
 
     // Increment with all filled input fields
     tableNumRows++;
 
     // ADD DATA to TABLE
-    addKitData(jsonSaveBody);
+    // addKitData(jsonSaveBody);
 
     addRow(jsonSaveBody, tableNumRows);
-
+    console.log(uspsHolder);
     clearRowInputs(inputElements);
   });
 };
@@ -328,8 +365,34 @@ const jsonSaveBody = {
 
 // Add New row with inputs
 function addRow(jsonSaveBody, tableNumRows) {
+  // Convert to integer num value
+  let uspsTrackingNumber = parseInt(jsonSaveBody.uspsTrackingNumber);
+  console.log(uspsTrackingNumber);
+
   // Target Line Item Number
   let newRowEl = document.querySelector(".new-row");
+
+  // Early Exit for number checker
+  // If trackingNumber is data type of number
+  if (
+    typeof uspsTrackingNumber === "number" &&
+    isNaN(uspsTrackingNumber) === false
+  ) {
+    console.log(typeof uspsTrackingNumber === "number");
+    console.log(uspsTrackingNumber);
+    // ADD UI MODAL
+    alert("Number Value");
+  } else {
+    // if a number value
+    // uspsTrackingNumber = jsonSaveBody.uspsTrackingNumber;
+    console.log(uspsTrackingNumber);
+    // ADD UI MODAL
+    alert("Not a Number Value! or Does not Match USPS 20 characters");
+    // debugger;
+    return;
+  }
+
+  uspsHolder.push(uspsTrackingNumber);
   newRowEl.firstChild.nextSibling.innerHTML = tableNumRows;
   newRowEl.insertAdjacentHTML(
     "beforebegin",
@@ -412,13 +475,4 @@ UPCOMING FEATURES
 
 BONUS:
 SORT FUNCTION Kits from Oldest to Newest
-*/
-
-/*
-
-Initial Load Fetch Data - GET Request
-
-Submit Button - POST Request 
-
-
 */
