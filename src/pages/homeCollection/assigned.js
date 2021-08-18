@@ -232,7 +232,7 @@ const saveAssignedRow = (i) => {
 
 const updateInputFields = async (jsonObj) => {
   const idToken = await getIdToken();
-  const response = await await fetch(`http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=assignKit`, {
+  const response = await await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=assignKit`, {
     method: "POST",
     body: JSON.stringify(jsonObj),
     headers: {

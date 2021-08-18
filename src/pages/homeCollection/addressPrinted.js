@@ -82,7 +82,7 @@ const assignKitButton = () => {
       // );
 
       kitAssignmentInfoText = e.target.getAttribute("data-kitAssignmentInfo");
-      const userId = e.target.getAttribute("data-id");
+      const userId = e.target.getAttribute("data-id"); // grabs the pt user id 
       let confirmButton = document.querySelector(".confirm-assignment");
       let modalBody = document.querySelector(".modal-body");
       let modalContent = document.querySelector(".modal-content");
@@ -102,7 +102,7 @@ const assignKitButton = () => {
         const supplyKitId = document.getElementById("search-scan-kit-Id").value;
         const uspsTrackingNumber = document.getElementById("search-scan-kit-Id").value;
     
-        setRequiredFields(userId, supplyKitId, uspsTrackingNumber);
+        setRequiredFields(userId, supplyKitId, uspsTrackingNumber); // stores responsea
         let modalContent = document.querySelector(".modal-content");
 
         modalContent.innerHTML = "";
@@ -195,8 +195,9 @@ const setRequiredFields = async (userId, supplyKitId, uspsTrackingNumber) => {
     "usps_trackingNum" : uspsTrackingNumber,
     "supply_kitId": supplyKitId
   }
-  const idToken = await getIdToken();
-  const response = await await fetch(`http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=assignKit`, {
+  const idToken = await getIdToken(); // replace with https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?
+
+  const response = await await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=assignKit`, {
     method: "POST",
     body: JSON.stringify(jsonObj),
     headers: {
@@ -205,7 +206,7 @@ const setRequiredFields = async (userId, supplyKitId, uspsTrackingNumber) => {
     },
   });
     if (response.status === 200) {
-      return true
+      return true // return success modal screen
     }
     else { 
       (alert('Error'))

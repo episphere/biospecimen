@@ -162,7 +162,7 @@ const generateParticipantCsvGetter = () => {
         checkboxPt.checked ? holdParticipantResponse.push(JSON.parse(unescape(checkboxPt.dataset.participantholder))) : ``
     })}
     const response = setParticipantResponses(holdParticipantResponse);
-    if (response) { console.log(true) }
+    if (response) {  generateParticipantCsv('participantData') }
    });
     
   }
@@ -172,7 +172,7 @@ const generateParticipantCsvGetter = () => {
 const setParticipantResponses = async (holdParticipantResponse) => {
 console.log('holdParticipantResponse', holdParticipantResponse)
   const idToken = await getIdToken();
-  const response = await await fetch(`http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=printAddresses`, {
+  const response = await await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=printAddresses`, {
     method: "POST",
     body: JSON.stringify(holdParticipantResponse),
     headers: {
@@ -190,6 +190,7 @@ console.log('holdParticipantResponse', holdParticipantResponse)
 
 const generateParticipantCsv = (table_id, separator = ",") => {
   console.log("3");
+  // succeess alert
   // Select rows from table_id
   var rows = document.querySelectorAll("table#" + table_id + " tr");
   // Construct csv
