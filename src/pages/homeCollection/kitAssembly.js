@@ -183,13 +183,6 @@ const populateKitTable = (tableBody, kitData) => {
 
   // Create loop and iterate all array items
   for (let i = 0; i < kitData.length; i++) {
-    /*
-    PSEUDOCODE - 
-    -> initalize an array callit uspsholder = [] (Outer Scope) 
-    -> add uspstracking number on each loop 
-    -> uspsHolder.push(i.usps)
-    */
-
     // Append usps track number to uspsHolder
     uspsHolder.push(kitData[i].uspsTrackingNumber);
     // console.log(uspsHolder);
@@ -281,7 +274,7 @@ const saveItem = async (
         return;
       }
     }
-
+    let duplicateInput = "";
     // if (jsonSaveBody.uspsTrackingNumber.length !== 20) {
     //   console.log(jsonSaveBody.uspsTrackingNumber.length);
     //   debugger;
@@ -313,6 +306,21 @@ const saveItem = async (
 
     // Increment with all filled input fields
     tableNumRows++;
+
+    // Check and change data type to number before sending POST request
+    if (isNumeric(jsonSaveBody.uspsTrackingNumber)) {
+      jsonSaveBody.uspsTrackingNumber = parseInt(inputUsps.value.trim());
+      console.log(jsonSaveBody);
+    }
+
+    // Checks array if input usps tracking number exists in usps placeholder array
+    // exits outer function if duplicate
+    if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
+      debugger;
+      alert("Duplicate usps tracking number!");
+      clearRowInputs(inputElements);
+      return;
+    }
 
     // ADD DATA to TABLE
     // addKitData(jsonSaveBody);
@@ -438,6 +446,14 @@ https://stackoverflow.com/questions/9716468/pure-javascript-a-function-like-jque
 */
 function isNumeric(num) {
   return !isNaN(parseFloat(num)) && isFinite(num);
+}
+
+// Prevents POST request and Add to line if duplicate is found
+function checkDuplicate(uspsHolder, number) {
+  let found = uspsHolder.indexOf(number);
+  if (found !== -1) {
+    return true;
+  }
 }
 
 /*
