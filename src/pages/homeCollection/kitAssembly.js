@@ -274,33 +274,35 @@ const saveItem = async (
         return;
       }
     }
-    let duplicateInput = "";
+    /* 
+      INPUT CHARACTER LENGTH CHECK
+    */
     // if (jsonSaveBody.uspsTrackingNumber.length !== 20) {
     //   console.log(jsonSaveBody.uspsTrackingNumber.length);
-    //   debugger;
+
     //   return alert("uspsTrackingNumber length must be 20 characters");
     // }
     // if (jsonSaveBody.supplyKitId.length !== 9) {
     //   console.log(jsonSaveBody.supplyKitId.length);
-    //   debugger;
+
     //   return alert("supply kit id must be 9 characters");
     // }
 
     // if (jsonSaveBody.specimenKitId.length !== 9) {
     //   console.log(jsonSaveBody.specimenKitId.length);
-    //   debugger;
+
     //   return alert("specimen kit id must be 9 characters");
     // }
 
     // if (jsonSaveBody.collectionCupId.length !== 14) {
     //   console.log(jsonSaveBody.collectionCupId.length);
-    //   debugger;
+
     //   return alert("collection cup id must be 14 characters");
     // }
 
     // if (jsonSaveBody.collectionCardId.length !== 14) {
     //   console.log(jsonSaveBody.collectionCardId.length);
-    //   debugger;
+
     //   return alert("collection card id must be 14 characters");
     // }
 
@@ -449,6 +451,7 @@ function isNumeric(num) {
 }
 
 // Prevents POST request and Add to line if duplicate is found
+// Used as a conditional in if statement above
 function checkDuplicate(uspsHolder, number) {
   let found = uspsHolder.indexOf(number);
   if (found !== -1) {
@@ -457,28 +460,6 @@ function checkDuplicate(uspsHolder, number) {
 }
 
 /*
-TODO STEPS:
-
-1. Fetch data using GET request
-2. Target table body
-3. Create a function to create a new row and iterate through list of items
-    NOTE: Insert an extra row
-4. Make extra row editable
-    TODO: Fix resizing issue - make content fit within container and not change width
-5. Create Buttons (Add, Clear)
-    - Clear: Clear inputs on last table row 
-    - Save: Makes a POST request to add a new item to the dataset
-  
-6. Prioritize Save button POST request 
-    - TEST POST Request first on POSTMAN *
-    - Create a Modal for Save Button with Two Buttons (IGNORE FOR MVP)
-        - Confirm
-        - Clear
-    - Make save button make a post request and have a popup saying success
-7. Have an Add button create a new line to table
-8. Handle acceptable POST request on the client side
-
-
 UPCOMING FEATURES
 
 1. USER VALIDATION CHECKS - 
@@ -487,10 +468,22 @@ UPCOMING FEATURES
     - USPS unique numeric check / Modals?
     - Modal Warning when user is moving away from page or accidentally hit close button
 
-2. ALERT FADE OUT
+2. ALERT USER WHEN THEY NAVIGATE AWAY FROM PAGE OR EXIT WINDOW  - 
+    https://stackoverflow.com/questions/7317273/warn-user-before-leaving-web-page-with-unsaved-changes
+
+Extra- ALERT FADE OUT
     - HAVE ALERT FADE OUT WHEN CERTAIN TIME PASSES
 
 
-BONUS:
-SORT FUNCTION Kits from Oldest to Newest
+/*
+
+API INTEGRATION
+
+url with - https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/
+
+http://{URL}/biospecimen?api=printAddresses returns success upon adding participant data to Participant Selection collection
+
+http://{URL}/biospecimen?api=getParticipantSelection&type=${filter} returns participant data with kit status set as per filter
+
+http://{URL}/biospecimen?api=assignKit updates participant data with kit status, usps tracking number & supply kit id
 */
