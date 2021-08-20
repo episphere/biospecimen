@@ -52,7 +52,7 @@ const bptlScreenTemplate = (name, data, auth, route) => {
             </div>
         </div>
         `
-       // document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
+        document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
         document.getElementById('contentBody').innerHTML = template;
 }
 

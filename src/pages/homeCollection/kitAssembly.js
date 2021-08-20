@@ -1,6 +1,7 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { userDashboard } from "../dashboard.js";
 import { getIdToken, showAnimation, hideAnimation } from "../../shared.js";
+import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
 
 const api =
   "https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?";
@@ -13,6 +14,8 @@ export const kitAssemblyScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
+  showAnimation();
+  await kitAssemblyTemplate(username, auth, route);
 
   window.addEventListener("beforeunload", function (e) {
     var confirmationMessage =
@@ -37,7 +40,6 @@ export const kitAssemblyScreen = async (auth, route) => {
     a.timeStamp < b.timeStamp ? -1 : a.timeStamp > b.timeStamp ? 1 : 0
   );
 
-  console.log(sortData);
   // Render Table Data
   populateKitTable(tableBody, sortData);
   // Render Page Buttons
@@ -152,7 +154,7 @@ const addKitData = async (jsonSaveBody) => {
   }
 };
 
-const kitAssemblyTemplate = async (auth, route) => {
+const kitAssemblyTemplate = async (name, auth, route) => {
   let template = ``;
   template += homeCollectionNavbar();
   template += `
@@ -180,6 +182,7 @@ const kitAssemblyTemplate = async (auth, route) => {
             </table>
         </div>`;
 
+  document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   document.getElementById("contentBody").innerHTML = template;
 };
 

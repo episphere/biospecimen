@@ -25,7 +25,8 @@ window.onload = () => {
     };
     !firebase.apps.length ? firebase.initializeApp(firebaseConfig()) : firebase.app();
     auth = firebase.auth();
-    location.hash = '#welcome';
+    console.log('hellllo')
+   // location.hash = '#welcome';
     manageRoutes();
 }
 
