@@ -19,6 +19,7 @@ export const kitAssemblyScreen = async (auth, route) => {
   hideAnimation();
   await kitAssemblyTemplate(user, name, auth, route);
 
+  // TODO: UNSAVED AND NAVIGATION - REFACTOR AND MAKE REUSABLE FOR OTHER PAGES
   window.addEventListener("beforeunload", function (e) {
     var confirmationMessage =
       "It looks like you have been editing something. " +
@@ -83,6 +84,7 @@ export const kitAssemblyScreen = async (auth, route) => {
     inputCollectionCard,
     inputElements
   );
+  console.log(uspsHolder);
 };
 
 /*
@@ -288,34 +290,34 @@ const saveItem = async (
     /* 
       INPUT CHARACTER LENGTH CHECK
     */
-    // if (jsonSaveBody.uspsTrackingNumber.length !== 20) {
-    //   console.log(jsonSaveBody.uspsTrackingNumber.length);
+    if (jsonSaveBody.uspsTrackingNumber.length !== 20) {
+      console.log(jsonSaveBody.uspsTrackingNumber.length);
 
-    //   return alert("uspsTrackingNumber length must be 20 characters");
-    // }
-    // if (jsonSaveBody.supplyKitId.length !== 9) {
-    //   console.log(jsonSaveBody.supplyKitId.length);
+      return alert("uspsTrackingNumber length must be 20 characters");
+    }
+    if (jsonSaveBody.supplyKitId.length !== 9) {
+      console.log(jsonSaveBody.supplyKitId.length);
 
-    //   return alert("supply kit id must be 9 characters");
-    // }
+      return alert("supply kit id must be 9 characters");
+    }
 
-    // if (jsonSaveBody.specimenKitId.length !== 9) {
-    //   console.log(jsonSaveBody.specimenKitId.length);
+    if (jsonSaveBody.specimenKitId.length !== 9) {
+      console.log(jsonSaveBody.specimenKitId.length);
 
-    //   return alert("specimen kit id must be 9 characters");
-    // }
+      return alert("specimen kit id must be 9 characters");
+    }
 
-    // if (jsonSaveBody.collectionCupId.length !== 14) {
-    //   console.log(jsonSaveBody.collectionCupId.length);
+    if (jsonSaveBody.collectionCupId.length !== 14) {
+      console.log(jsonSaveBody.collectionCupId.length);
 
-    //   return alert("collection cup id must be 14 characters");
-    // }
+      return alert("collection cup id must be 14 characters");
+    }
 
-    // if (jsonSaveBody.collectionCardId.length !== 14) {
-    //   console.log(jsonSaveBody.collectionCardId.length);
+    if (jsonSaveBody.collectionCardId.length !== 14) {
+      console.log(jsonSaveBody.collectionCardId.length);
 
-    //   return alert("collection card id must be 14 characters");
-    // }
+      return alert("collection card id must be 14 characters");
+    }
 
     // Increment with all filled input fields
     tableNumRows++;
@@ -458,6 +460,8 @@ CHECK IF STRING OR NUM VALUE IS A REAL NUMBER
 https://stackoverflow.com/questions/9716468/pure-javascript-a-function-like-jquerys-isnumeric
 */
 function isNumeric(num) {
+  // parseFloat - converts to string if needed, and then returns a floating point number
+  // isFinite - false if the argument is (or will be coerced to) positive or negative Infinity or NaN or undefined
   return !isNaN(parseFloat(num)) && isFinite(num);
 }
 

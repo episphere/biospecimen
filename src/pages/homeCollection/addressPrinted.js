@@ -190,6 +190,7 @@ const modalAssignedInfo = () => {
   return template;
 };
 
+// Kit Assignment Info to change status???
 const setRequiredFields = async (userId, supplyKitId, uspsTrackingNumber) => {
   let jsonObj = {
     id: userId,

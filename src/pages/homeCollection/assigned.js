@@ -203,7 +203,7 @@ const saveAssignedRow = (i) => {
 
   saveButton.addEventListener("click", (e) => {
     console.log("save button clicked!");
-    // TODO: Add if else condtional checks in regards to successful inputs(Erro Handling)
+    // TODO: Add if else condtional checks in regards to successful inputs(Error Handling)
     if (false) {
       // TODO : Make Modal for an error?
       return;
@@ -236,6 +236,11 @@ const saveAssignedRow = (i) => {
   });
 };
 
+/*
+==================================
+POST REQUEST - Updates participant data with kit status, usps tracking number supply kit id
+==================================
+*/
 const updateInputFields = async (jsonObj) => {
   const idToken = await getIdToken();
   const response = await await fetch(
