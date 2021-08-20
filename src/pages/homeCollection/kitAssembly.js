@@ -1,25 +1,41 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { userDashboard } from "../dashboard.js";
 import { getIdToken, showAnimation, hideAnimation } from "../../shared.js";
+import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
 
 const api =
   "https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?";
 
 // Track the last row number
 let lastRowNumber = "";
+let uspsHolder = [];
 
 export const kitAssemblyScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
-  const username = user.displayName ? user.displayName : user.email;
+  const name = user.displayName ? user.displayName : user.email;
   showAnimation();
-  await kitAssemblyTemplate(auth, route);
+  const kitData = await getKitData().then((res) => res.data);
+  hideAnimation();
+  await kitAssemblyTemplate(user, name, auth, route);
+
+  // TODO: UNSAVED AND NAVIGATION - REFACTOR AND MAKE REUSABLE FOR OTHER PAGES
+  window.addEventListener("beforeunload", function (e) {
+    var confirmationMessage =
+      "It looks like you have been editing something. " +
+      "If you leave before saving, your changes will be lost.";
+
+    (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+    return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+  });
+
+  kitAssemblyTemplate(name, auth, route);
 
   // Fetch data using GET request
-  const kitData = await getKitData().then((res) => res.data);
+
   const tableBody = document.getElementById("kit-assembly-table-body");
 
-  // Sort Function from Oldest to Newest
+  // Sort Function from Oldest to Newest (REFACTOR FOR MULTIPLE USE)
   const sortData = kitData.sort((a, b) =>
     a.timeStamp < b.timeStamp ? -1 : a.timeStamp > b.timeStamp ? 1 : 0
   );
@@ -54,7 +70,6 @@ export const kitAssemblyScreen = async (auth, route) => {
 
   // Add autofocus on first input cell
   inputUsps.focus();
-  hideAnimation();
 
   // Remove all current input fields on row
   clearAllInputs(inputElements);
@@ -69,6 +84,7 @@ export const kitAssemblyScreen = async (auth, route) => {
     inputCollectionCard,
     inputElements
   );
+  console.log(uspsHolder);
 };
 
 /*
@@ -139,7 +155,7 @@ const addKitData = async (jsonSaveBody) => {
   }
 };
 
-const kitAssemblyTemplate = async (auth, route) => {
+const kitAssemblyTemplate = async (name, auth, route) => {
   let template = ``;
   template += homeCollectionNavbar();
   template += `
@@ -167,6 +183,7 @@ const kitAssemblyTemplate = async (auth, route) => {
             </table>
         </div>`;
 
+  document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   document.getElementById("contentBody").innerHTML = template;
 };
 
@@ -176,8 +193,13 @@ const populateKitTable = (tableBody, kitData) => {
 
   // TODO = Make the number dynamic and editable
   let extraRow = "";
+
   // Create loop and iterate all array items
   for (let i = 0; i < kitData.length; i++) {
+    // Append usps track number to uspsHolder
+    uspsHolder.push(kitData[i].uspsTrackingNumber);
+    // console.log(uspsHolder);
+
     // Append a row with data cells and corresponding data from fetch
     tableRow += `
         <tr>
@@ -197,7 +219,7 @@ const populateKitTable = (tableBody, kitData) => {
         <tr class="new-row">      
           <th scope="row">${lastRowNumber + 1}</th>
           <td>
-              <input id="input-usps" type="string" autocomplete="off" style="width:80%"/>
+              <input id="input-usps" autocomplete="off" style="width:80%"/>
           </td>
           <td>
               <input id="input-supply-kit" type="string" autocomplete="off" style="width:80%"/>
@@ -254,24 +276,72 @@ const saveItem = async (
     jsonSaveBody.supplyKitId = inputSupplyKit.value.trim();
     jsonSaveBody.collectionCupId = inputCollectionCup.value.trim();
     jsonSaveBody.specimenKitId = inputSpecimenKit.value.trim();
+    // Convert string to number data type
     jsonSaveBody.uspsTrackingNumber = inputUsps.value.trim();
 
     // PREVENTS USER FROM SUBMITTING INCOMPLETE INPUT FIELD ROW
     for (const key in jsonSaveBody) {
       if (!jsonSaveBody[key]) {
+        // Modal Dialog Warning!
         alert("One or more inputs are empty!");
         return;
       }
+    }
+    /* 
+      INPUT CHARACTER LENGTH CHECK
+    */
+    if (jsonSaveBody.uspsTrackingNumber.length !== 20) {
+      console.log(jsonSaveBody.uspsTrackingNumber.length);
+
+      return alert("uspsTrackingNumber length must be 20 characters");
+    }
+    if (jsonSaveBody.supplyKitId.length !== 9) {
+      console.log(jsonSaveBody.supplyKitId.length);
+
+      return alert("supply kit id must be 9 characters");
+    }
+
+    if (jsonSaveBody.specimenKitId.length !== 9) {
+      console.log(jsonSaveBody.specimenKitId.length);
+
+      return alert("specimen kit id must be 9 characters");
+    }
+
+    if (jsonSaveBody.collectionCupId.length !== 14) {
+      console.log(jsonSaveBody.collectionCupId.length);
+
+      return alert("collection cup id must be 14 characters");
+    }
+
+    if (jsonSaveBody.collectionCardId.length !== 14) {
+      console.log(jsonSaveBody.collectionCardId.length);
+
+      return alert("collection card id must be 14 characters");
     }
 
     // Increment with all filled input fields
     tableNumRows++;
 
+    // Check and change data type to number before sending POST request
+    if (isNumeric(jsonSaveBody.uspsTrackingNumber)) {
+      jsonSaveBody.uspsTrackingNumber = parseInt(inputUsps.value.trim());
+      console.log(jsonSaveBody);
+    }
+
+    // Checks array if input usps tracking number exists in usps placeholder array
+    // exits outer function if duplicate
+    if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
+      debugger;
+      alert("Duplicate usps tracking number!");
+      clearRowInputs(inputElements);
+      return;
+    }
+
     // ADD DATA to TABLE
-    addKitData(jsonSaveBody);
+    // addKitData(jsonSaveBody);
 
     addRow(jsonSaveBody, tableNumRows);
-
+    console.log(uspsHolder);
     clearRowInputs(inputElements);
   });
 };
@@ -318,8 +388,28 @@ const jsonSaveBody = {
 
 // Add New row with inputs
 function addRow(jsonSaveBody, tableNumRows) {
+  // Convert to integer num value
+  let uspsTrackingNumber = jsonSaveBody.uspsTrackingNumber;
+  console.log(uspsTrackingNumber);
+
   // Target Line Item Number
   let newRowEl = document.querySelector(".new-row");
+
+  // Early Exit for number checker
+  // If trackingNumber is data type of number
+  // CALL isNumeric function to check if input is a valid number
+  if (isNumeric(uspsTrackingNumber)) {
+    console.log(typeof uspsTrackingNumber === "number");
+    console.log(uspsTrackingNumber);
+    // ADD UI MODAL
+    alert("Number Value");
+  } else {
+    alert("Invalid USPS number data type, Not a number value");
+    debugger;
+    return;
+  }
+
+  uspsHolder.push(parseInt(uspsTrackingNumber));
   newRowEl.firstChild.nextSibling.innerHTML = tableNumRows;
   newRowEl.insertAdjacentHTML(
     "beforebegin",
@@ -366,28 +456,25 @@ const clearAllInputs = (inputElements) => {
 };
 
 /*
-TODO STEPS:
+CHECK IF STRING OR NUM VALUE IS A REAL NUMBER  
+https://stackoverflow.com/questions/9716468/pure-javascript-a-function-like-jquerys-isnumeric
+*/
+function isNumeric(num) {
+  // parseFloat - converts to string if needed, and then returns a floating point number
+  // isFinite - false if the argument is (or will be coerced to) positive or negative Infinity or NaN or undefined
+  return !isNaN(parseFloat(num)) && isFinite(num);
+}
 
-1. Fetch data using GET request
-2. Target table body
-3. Create a function to create a new row and iterate through list of items
-    NOTE: Insert an extra row
-4. Make extra row editable
-    TODO: Fix resizing issue - make content fit within container and not change width
-5. Create Buttons (Add, Clear)
-    - Clear: Clear inputs on last table row 
-    - Save: Makes a POST request to add a new item to the dataset
-  
-6. Prioritize Save button POST request 
-    - TEST POST Request first on POSTMAN *
-    - Create a Modal for Save Button with Two Buttons (IGNORE FOR MVP)
-        - Confirm
-        - Clear
-    - Make save button make a post request and have a popup saying success
-7. Have an Add button create a new line to table
-8. Handle acceptable POST request on the client side
+// Prevents POST request and Add to line if duplicate is found
+// Used as a conditional in if statement above
+function checkDuplicate(uspsHolder, number) {
+  let found = uspsHolder.indexOf(number);
+  if (found !== -1) {
+    return true;
+  }
+}
 
-
+/*
 UPCOMING FEATURES
 
 1. USER VALIDATION CHECKS - 
@@ -396,10 +483,22 @@ UPCOMING FEATURES
     - USPS unique numeric check / Modals?
     - Modal Warning when user is moving away from page or accidentally hit close button
 
-2. ALERT FADE OUT
+2. ALERT USER WHEN THEY NAVIGATE AWAY FROM PAGE OR EXIT WINDOW  - 
+    https://stackoverflow.com/questions/7317273/warn-user-before-leaving-web-page-with-unsaved-changes
+
+Extra- ALERT FADE OUT
     - HAVE ALERT FADE OUT WHEN CERTAIN TIME PASSES
 
 
-BONUS:
-SORT FUNCTION Kits from Oldest to Newest
+/*
+
+API INTEGRATION
+
+url with - https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/
+
+http://{URL}/biospecimen?api=printAddresses returns success upon adding participant data to Participant Selection collection
+
+http://{URL}/biospecimen?api=getParticipantSelection&type=${filter} returns participant data with kit status set as per filter
+
+http://{URL}/biospecimen?api=assignKit updates participant data with kit status, usps tracking number & supply kit id
 */

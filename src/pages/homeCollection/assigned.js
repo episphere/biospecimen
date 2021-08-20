@@ -6,13 +6,15 @@ import {
 } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
+import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
+import { getParticipantSelection } from "../../utils.js";
 
 const placeholderAssignedData = [
   {
     first_name: "Jolyene",
     last_name: "Cujoh",
     connect_id: "7756917180",
-    kit_status: "Assigned",
+    kit_status: "assigned",
     address_1: "34442 Steve Hunt Road",
     address_2: null,
     city: "Miami",
@@ -27,7 +29,7 @@ const placeholderAssignedData = [
     first_name: "Arcueid",
     last_name: "Brunestud",
     connect_id: "1753927180",
-    kit_status: "Assigned",
+    kit_status: "assigned",
     address_1: "1171 Doe Meadow Drive",
     address_2: null,
     city: "Maryland",
@@ -48,10 +50,13 @@ export const assignedScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  aassignedTemplate(auth, route);
+  aassignedTemplate(username, auth, route);
 };
 
-const aassignedTemplate = async (auth, route) => {
+const aassignedTemplate = async (name, auth, route) => {
+  showAnimation();
+  const response = await getParticipantSelection("assigned");
+  hideAnimation();
   let template = ``;
   template += renderParticipantSelectionHeader();
   template += ` <div class="container-fluid">
@@ -76,7 +81,7 @@ const aassignedTemplate = async (auth, route) => {
                                     </thead>   
                                     <tbody>
                                        ${createAssignedParticipantRows(
-                                         assignedParticipants
+                                         response.data
                                        )}
                                     </tbody>
                               </table>
@@ -102,6 +107,7 @@ const aassignedTemplate = async (auth, route) => {
 </div>`;
 
   document.getElementById("contentBody").innerHTML = template;
+  document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   participantSelectionDropdown();
   console.log(assignedParticipants);
 
@@ -124,36 +130,38 @@ const createAssignedParticipantRows = (assignedParticipantsRows) => {
         <td style="padding:1rem">${i.kit_status}</td>
         <td style="padding:1rem">${i.study_site}</td>
         <td style="padding:1rem">${i.date_requested}</td>
-        <td id=kit-id-${index} style="padding:1rem">${i.kit_id}</td>
-        <td id=usps-${index} style="padding:1rem">${i.usps_tracking_number}</td>
+        <td id=kit-id-${index} style="padding:1rem">${i.supply_kitId}</td>
+        <td id=usps-${index} style="padding:1rem">${i.usps_trackingNum}</td>
 
       <td style="height:100%; padding:1rem;" >
         <input type="button" id="edit-assign-button-${JSON.stringify(index)}"
           class="edit-assign-button"
-            data-uspsTrackingNumber = ${i.usps_tracking_number} data-kitID= ${
-      i.kit_id
+            data-uspsTrackingNumber = ${i.usps_trackingNum} data-kitID= ${
+      i.supply_kitId
     } data-firstName= '${i.first_name}' data-lastName= '${i.last_name}'
             data-address1= '${i.address_1}'
             data-city= '${i.city}'
             data-state= '${i.state}'
             data-zipCode= '${i.zip_code}'
+            data-id='${i.id}'
             data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${
       i.address_1
-    },\n${i.city}, ${i.state} ${i.zip_code}'
+    },\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
             value="Edit" >
 
         <input type="button" id="save-assign-button-${JSON.stringify(index)}"
        style="display:none;"
-            data-uspsTrackingNumber= ${i.usps_tracking_number} data-kitID= ${
-      i.kit_id
+            data-uspsTrackingNumber= ${i.usps_trackingNum} data-kitID= ${
+      i.supply_kitId
     } data-firstName= '${i.first_name}' data-lastName= '${i.last_name}'
             data-address1= '${i.address_1}'
             data-city= '${i.city}'
             data-state= '${i.state}'
             data-zipCode= '${i.zip_code}'
+            data-id='${i.id}'
             data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${
       i.address_1
-    },\n${i.city}, ${i.state} ${i.zip_code}'
+    },\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
             value="Save" data-toggle="modal" data-target="#editSuccessModal">
         </td>
       </tr>`;
@@ -195,22 +203,60 @@ const saveAssignedRow = (i) => {
 
   saveButton.addEventListener("click", (e) => {
     console.log("save button clicked!");
-    // TODO: Add if else condtional checks in regards to successful inputs(Erro Handling)
+    // TODO: Add if else condtional checks in regards to successful inputs(Error Handling)
     if (false) {
       // TODO : Make Modal for an error?
       return;
     }
+    console.log("test", editButton.dataset.id);
+
     let supplyKitIdValue = document.getElementById(
       `supply-kit-id-text-${i}`
     ).value;
     let uspsNumberValue = document.getElementById(
       `usps-number-text-${i}`
     ).value;
-
+    console.log(
+      "save...",
+      supplyKitIdValue,
+      uspsNumberValue,
+      editButton.dataset.id
+    );
+    let jsonObj = {
+      id: editButton.dataset.id,
+      usps_trackingNum: uspsNumberValue,
+      supply_kitId: supplyKitIdValue,
+    };
+    updateInputFields(jsonObj);
     document.getElementById("kit-id-" + i).innerHTML = supplyKitIdValue;
     document.getElementById("usps-" + i).innerHTML = uspsNumberValue;
 
     saveButton.style.display = "none";
     editButton.style.display = "block";
   });
+};
+
+/*
+==================================
+POST REQUEST - Updates participant data with kit status, usps tracking number supply kit id
+==================================
+*/
+const updateInputFields = async (jsonObj) => {
+  const idToken = await getIdToken();
+  const response = await await fetch(
+    `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=assignKit`,
+    {
+      method: "POST",
+      body: JSON.stringify(jsonObj),
+      headers: {
+        Authorization: "Bearer " + idToken,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (response.status === 200) {
+    return true;
+  } else {
+    alert("Error");
+  }
 };
