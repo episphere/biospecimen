@@ -8,6 +8,7 @@ import fieldMapping from "../../fieldToConceptIdMapping.js";
 import { humanReadableFromISO } from "../../utils.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
+import { nonUserNavBar, unAuthorizedUser } from './../../navbar.js';
 
 import { fakeParticipants } from "./fakeParticipants.js";
 
@@ -15,7 +16,7 @@ export const printAddressesScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  printaddressesTemplate(auth, route);
+  printaddressesTemplate(username, auth, route);
 };
 
 // Stringify array of objects and parse fake participants Data
@@ -23,7 +24,7 @@ const fakeParticipantsData = JSON.parse(JSON.stringify(fakeParticipants));
 
 export const fakeParticipantsState = [...fakeParticipantsData];
 
-const printaddressesTemplate = async (auth, route) => {
+const printaddressesTemplate = async (name, auth, route) => {
   showAnimation();
   const response = await findParticipant("firstName=Deanna");
   hideAnimation();
@@ -65,6 +66,7 @@ const printaddressesTemplate = async (auth, route) => {
                 <button type="button" class="btn btn-primary btn-lg" style="float: right;">Continue to Participant Selection</button>
                 </div>`;
   document.getElementById("contentBody").innerHTML = template;
+  document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
 
   generateParticipantCsvGetter();
   participantSelectionDropdown();

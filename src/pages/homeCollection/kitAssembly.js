@@ -1,6 +1,7 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { userDashboard } from "../dashboard.js";
 import { getIdToken, showAnimation, hideAnimation } from "../../shared.js";
+import { nonUserNavBar, unAuthorizedUser } from './../../navbar.js';
 
 const api =
   "https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?";
@@ -13,7 +14,7 @@ export const kitAssemblyScreen = async (auth, route) => {
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
   showAnimation();
-  await kitAssemblyTemplate(auth, route);
+  await kitAssemblyTemplate(username, auth, route);
 
   // Fetch data using GET request
   const kitData = await getKitData().then((res) => res.data);
@@ -139,7 +140,7 @@ const addKitData = async (jsonSaveBody) => {
   }
 };
 
-const kitAssemblyTemplate = async (auth, route) => {
+const kitAssemblyTemplate = async (name, auth, route) => {
   let template = ``;
   template += homeCollectionNavbar();
   template += `
@@ -168,6 +169,7 @@ const kitAssemblyTemplate = async (auth, route) => {
         </div>`;
 
   document.getElementById("contentBody").innerHTML = template;
+  document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
 };
 
 const populateKitTable = (tableBody, kitData) => {

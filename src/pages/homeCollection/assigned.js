@@ -6,6 +6,7 @@ import {
 } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
+import { nonUserNavBar, unAuthorizedUser } from './../../navbar.js'
 
 const placeholderAssignedData = [
   {
@@ -48,10 +49,10 @@ export const assignedScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  aassignedTemplate(auth, route);
+  aassignedTemplate(username, auth, route);
 };
 
-const aassignedTemplate = async (auth, route) => {
+const aassignedTemplate = async (name, auth, route) => {
   let template = ``;
   template += renderParticipantSelectionHeader();
   template += ` <div class="container-fluid">
@@ -82,6 +83,10 @@ const aassignedTemplate = async (auth, route) => {
                               </table>
                         </div>
                     </div> 
+                </div>
+                <br />
+                <button type="button" class="btn btn-primary btn-lg" style="float: right; margin: 0 0 1rem;"">Continue to Kit Shippment</button>
+                <br />
                 </div>`;
   template += `<div class="modal fade" id="editSuccessModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -102,6 +107,7 @@ const aassignedTemplate = async (auth, route) => {
 </div>`;
 
   document.getElementById("contentBody").innerHTML = template;
+  document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
   participantSelectionDropdown();
   console.log(assignedParticipants);
 

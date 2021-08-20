@@ -10,7 +10,7 @@ import { kitAssemblyScreen } from "./src/pages/homeCollection/kitAssembly.js";
 import { printAddressesScreen } from "./src/pages/homeCollection/printAddresses.js";
 import { assignedScreen } from "./src/pages/homeCollection/assigned.js";
 import { addressesPrintedScreen } from "./src/pages/homeCollection/addressPrinted.js";
-
+import { kitShipmentScreen } from "./src/pages/homeCollection/kitShipment.js";
 
 let auth = '';
 
@@ -25,7 +25,7 @@ window.onload = () => {
     };
     !firebase.apps.length ? firebase.initializeApp(firebaseConfig()) : firebase.app();
     auth = firebase.auth();
-    location.hash = '#welcome';
+    //location.hash = '#welcome';
     manageRoutes();
 }
 
@@ -44,6 +44,7 @@ const manageRoutes = async () => {
         else if (route === '#participantselection') printAddressesScreen(auth, route);
         else if (route === '#addressPrinted') addressesPrintedScreen(auth, route);
         else if (route === '#assigned') assignedScreen(auth, route);
+        else if (route === '#kitshipment') kitShipmentScreen(auth, route);
         else if (route === '#manage_users') manageUsers(auth, route);
         else if (route === '#sign_out') signOut();
         else if (route === '#reports') reportsQuery(auth, route);

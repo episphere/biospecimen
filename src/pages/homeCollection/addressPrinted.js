@@ -7,17 +7,18 @@ import {
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { fakeParticipantsState } from "./printAddresses.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
+import { nonUserNavBar, unAuthorizedUser } from './../../navbar.js'
 
 export const addressesPrintedScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  addressesPrintedTemplate(auth, route);
+  addressesPrintedTemplate(username, auth, route);
 };
 
 let kitAssignmentInfoText = "";
 
-const addressesPrintedTemplate = async (auth, route) => {
+const addressesPrintedTemplate = async (name, auth, route) => {
   let template = ``;
   template += renderParticipantSelectionHeader();
   template += `<div class="container-fluid">
@@ -51,6 +52,7 @@ const addressesPrintedTemplate = async (auth, route) => {
                 </div>`;
   template += modalAssignedInfo();
   document.getElementById("contentBody").innerHTML = template;
+  document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
 
   assignKitButton();
   participantSelectionDropdown();
