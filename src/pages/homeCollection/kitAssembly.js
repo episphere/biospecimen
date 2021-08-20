@@ -13,9 +13,11 @@ let uspsHolder = [];
 export const kitAssemblyScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
-  const username = user.displayName ? user.displayName : user.email;
+  const name = user.displayName ? user.displayName : user.email;
   showAnimation();
-  await kitAssemblyTemplate(username, auth, route);
+  const kitData = await getKitData().then((res) => res.data);
+  hideAnimation();
+  await kitAssemblyTemplate(user, name, auth, route);
 
   window.addEventListener("beforeunload", function (e) {
     var confirmationMessage =
@@ -25,11 +27,8 @@ export const kitAssemblyScreen = async (auth, route) => {
     (e || window.event).returnValue = confirmationMessage; //Gecko + IE
     return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
   });
-  showAnimation();
-  const kitData = await getKitData().then((res) => res.data);
-  hideAnimation();
 
-  kitAssemblyTemplate(auth, route);
+  kitAssemblyTemplate(name, auth, route);
 
   // Fetch data using GET request
 
