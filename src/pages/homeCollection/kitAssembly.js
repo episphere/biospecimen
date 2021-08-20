@@ -13,6 +13,15 @@ export const kitAssemblyScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
+
+  window.addEventListener("beforeunload", function (e) {
+    var confirmationMessage =
+      "It looks like you have been editing something. " +
+      "If you leave before saving, your changes will be lost.";
+
+    (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+    return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+  });
   showAnimation();
   const kitData = await getKitData().then((res) => res.data);
   hideAnimation();
