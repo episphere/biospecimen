@@ -1,13 +1,9 @@
-import {
-  getIdToken,
-  findParticipant,
-  showAnimation,
-  hideAnimation,
-} from "../../shared.js";
+import { showAnimation, hideAnimation } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { fakeParticipantsState } from "./printAddresses.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
-import { nonUserNavBar, unAuthorizedUser } from './../../navbar.js'
+import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
+import { getParticipantSelection } from "../../utils.js";
 
 export const addressesPrintedScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -19,6 +15,10 @@ export const addressesPrintedScreen = async (auth, route) => {
 let kitAssignmentInfoText = "";
 
 const addressesPrintedTemplate = async (name, auth, route) => {
+  showAnimation();
+  const response = await getParticipantSelection("addressPrinted");
+  console.log("res", response);
+  hideAnimation();
   let template = ``;
   template += renderParticipantSelectionHeader();
   template += `<div class="container-fluid">
@@ -41,7 +41,7 @@ const addressesPrintedTemplate = async (name, auth, route) => {
                                     </thead>   
                                     <tbody id="contentBodyAddress">
                                         ${createAddressPrintedRows(
-                                          fakeParticipantsState
+                                          response.data
                                         )}
                                     </tbody>
                               </table>
@@ -52,8 +52,7 @@ const addressesPrintedTemplate = async (name, auth, route) => {
                 </div>`;
   template += modalAssignedInfo();
   document.getElementById("contentBody").innerHTML = template;
-  document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
-
+  document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   assignKitButton();
   participantSelectionDropdown();
 };
@@ -63,37 +62,33 @@ const addressesPrintedTemplate = async (name, auth, route) => {
 const assignKitButton = () => {
   // Target All buttons with assign-kit-button class
   const allAssignKitButtons = document.querySelectorAll(".assign-kit-button");
-  console.log(allAssignKitButtons);
+  //  console.log(allAssignKitButtons);
   // Loop over list of buttons and assign a click event listener
   allAssignKitButtons.forEach((button) => {
     button.addEventListener("click", (e) => {
-      console.log(
-        "usps track number",
-        e.target.getAttribute("data-uspsTrackingNumber")
-      );
-      console.log("data kit", e.target.getAttribute("data-kitID"));
-      console.log("first_name", e.target.getAttribute("data-firstName"));
-      console.log("last_name", e.target.getAttribute("data-lastName"));
-      console.log("address_1", e.target.getAttribute("data-address1"));
-      console.log("city", e.target.getAttribute("data-city"));
-      console.log("state", e.target.getAttribute("data-state"));
-      console.log("zip code", e.target.getAttribute("data-zipCode"));
-      console.log(
-        "kit Assignment Info",
-        e.target.getAttribute("data-kitAssignmentInfo")
-      );
+      // console.log(
+      //   "usps track number",
+      //   e.target.getAttribute("data-uspsTrackingNumber")
+      // );
+      // console.log("data kit", e.target.getAttribute("data-kitID"));
+      // console.log("first_name", e.target.getAttribute("data-firstName"));
+      // console.log("last_name", e.target.getAttribute("data-lastName"));
+      // console.log("address_1", e.target.getAttribute("data-address1"));
+      // console.log("city", e.target.getAttribute("data-city"));
+      // console.log("state", e.target.getAttribute("data-state"));
+      // console.log("zip code", e.target.getAttribute("data-zipCode"));
+      // console.log(
+      //   "kit Assignment Info",
+      //   e.target.getAttribute("data-kitAssignmentInfo")
+      // );
 
       kitAssignmentInfoText = e.target.getAttribute("data-kitAssignmentInfo");
-      console.log(kitAssignmentInfoText);
+      const userId = e.target.getAttribute("data-id"); // grabs the pt user id
       let confirmButton = document.querySelector(".confirm-assignment");
       let modalBody = document.querySelector(".modal-body");
       let modalContent = document.querySelector(".modal-content");
-      console.log(modalContent);
-      console.log(confirmButton);
       modalBody.innerHTML = `<div style="display:flex;flex-direction:column;justify-content:center;align-items:center; flex-wrap:wrap; padding:1rem 2.5rem">
-              <label for="search-scan-kit-Id" style="flex-flow:wrap;align-self:flex-start"><strong>Scan Supply Kit ID</strong>: <input type="search" id="search-scan-kit-Id" value=${e.target.getAttribute(
-                "data-kitID"
-              )}></label>
+              <label for="search-scan-kit-Id" style="flex-flow:wrap;align-self:flex-start"><strong>Scan Supply Kit ID</strong>: <input type="text" id="search-scan-kit-Id" /></label>
               <p style="display:block; align-self:flex-start; width: 100%"><strong>Full Name:</strong> ${
                 kitAssignmentInfoText.split("\n")[0]
               }</p>
@@ -101,13 +96,15 @@ const assignKitButton = () => {
                 .split("\n")
                 .splice(1)
                 .join(" ")}</p>
-              <label for="search-scan-usps-tracking" style="flex-flow:wrap; align-self:flex-start;display:flex;"><strong>Scan USPS Tracking Number on Supply Kit: </strong><input id="search-scan-usps-tracking" type="search" value="${e.target.getAttribute(
-                "data-uspsTrackingNumber"
-              )}"/></label>
+              <label for="search-scan-usps-tracking" style="flex-flow:wrap; align-self:flex-start;display:flex;"><strong>Scan USPS Tracking Number on Supply Kit: </strong> <input id="search-scan-usps-tracking" type="search" /></label>
           </div>`;
-
       // Event Handler
       confirmButton.addEventListener("click", (e) => {
+        const supplyKitId = document.getElementById("search-scan-kit-Id").value;
+        const uspsTrackingNumber =
+          document.getElementById("search-scan-kit-Id").value;
+
+        setRequiredFields(userId, supplyKitId, uspsTrackingNumber); // stores responsea
         let modalContent = document.querySelector(".modal-content");
 
         modalContent.innerHTML = "";
@@ -127,7 +124,6 @@ const assignKitButton = () => {
                 <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
                 <button id="assigned-table" type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal" data-dismiss="modal" style="margin-left:5%">Show Assigned Table</button>
             </div>`;
-        // console.log(document.getElementById("assigned-table"));
         let moveToAssigned = document.getElementById("assigned-table");
         moveToAssigned.addEventListener("click", (e) => {
           location.hash = "#assigned";
@@ -135,6 +131,7 @@ const assignKitButton = () => {
       });
     });
   });
+  return kitAssignmentInfoText;
 };
 
 const createAddressPrintedRows = (participantRows) => {
@@ -145,12 +142,13 @@ const createAddressPrintedRows = (participantRows) => {
                         <td style="display:flex; height:100%;align-items:center; justify-content:center; padding" >
                             <input type="button" class="assign-kit-button"
                             data-toggle="modal" data-target="#exampleModal"
-                            data-uspsTrackingNumber = ${i.usps_tracking_number} data-kitID= ${i.kit_id} data-firstName= '${i.first_name}' data-lastName= '${i.last_name}'
+                            data-firstName= '${i.first_name}' data-lastName= '${i.last_name}'
                             data-address1= '${i.address_1}'
                             data-city= '${i.city}'
                             data-state= '${i.state}'
                             data-zipCode= '${i.zip_code}'
-                            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code}'
+                            data-id = '${i.id}
+                            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
                             value="Assign Kit" >
                         </td>
                         <td>${i.first_name}</td>
@@ -190,4 +188,31 @@ const modalAssignedInfo = () => {
   </div>`;
 
   return template;
+};
+
+// Kit Assignment Info to change status???
+const setRequiredFields = async (userId, supplyKitId, uspsTrackingNumber) => {
+  let jsonObj = {
+    id: userId,
+    usps_trackingNum: uspsTrackingNumber,
+    supply_kitId: supplyKitId,
+  };
+  const idToken = await getIdToken(); // replace with https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?
+
+  const response = await await fetch(
+    `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=assignKit`,
+    {
+      method: "POST",
+      body: JSON.stringify(jsonObj),
+      headers: {
+        Authorization: "Bearer " + idToken,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (response.status === 200) {
+    return true; // return success modal screen
+  } else {
+    alert("Error");
+  }
 };
