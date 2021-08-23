@@ -62,16 +62,15 @@ const printaddressesTemplate = async (
                                         printAddressesParticipants
                                       )}
                                     </tbody>
-                              </table>
-                        </div>
+                                  </table>
+                            </div>
                     </div> 
                 </div>
-                <br />
-                <span><h6>Search for a Connect ID:</h6> </span>
-                <br />
-                <button type="button" id='generateCsv' class="btn btn-success btn-lg">Generate Address File</button>
-                <button type="button" class="btn btn-primary btn-lg" style="float: right;">Continue to Participant Selection</button>
-                </div>`;
+                <div style="margin: 1.5rem 0;">
+                  <button type="button" id='generateCsv' class="btn btn-success btn-lg">Generate Address File</button>
+                  <button type="button" class="btn btn-primary btn-lg" style="float: right;">Continue to Participant Selection</button>
+                </div>
+              </div>`;
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   generateParticipantCsvGetter();
@@ -89,6 +88,9 @@ export const participantSelectionDropdown = () => {
     document
       .getElementById("select-pending")
       .setAttribute("selected", "selected");
+  }
+  if (location.hash === "#allParticipants") {
+    document.getElementById("select-all").setAttribute("selected", "selected");
   }
   if (location.hash === "#addressPrinted") {
     document
@@ -117,6 +119,9 @@ export const participantSelectionDropdown = () => {
       return;
     } else if (selection === "assigned") {
       location.hash = "#assigned";
+      return;
+    } else if (selection === "all") {
+      location.hash = "#allParticipants";
       return;
     } else {
       return;
