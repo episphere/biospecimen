@@ -37,7 +37,7 @@ import { showAnimation, hideAnimation, getIdToken, getParticipantSelection } fro
   
  const verifyScannedCode = async (uspsHit) => {
      const a = document.getElementById('scannedCode');
-     const response = await getParticipantSelection("assigned");
+     const response = await getParticipantSelection("all");
      const assignedParticipants = response.data
 
      if (a) {
