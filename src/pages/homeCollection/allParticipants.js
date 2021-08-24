@@ -1,6 +1,6 @@
 import { showAnimation, hideAnimation } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
-import { fakeParticipantsState } from "./printAddresses.js";
+import { getParticipantSelection } from "../../utils.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
 
@@ -12,6 +12,9 @@ export const allParticipantsScreen = async (auth, route) => {
 };
 
 const allParticipantsTemplate = async (name, auth, route) => {
+  showAnimation();
+  const response = await getParticipantSelection("all");
+  hideAnimation();
   let template = ``;
   template += renderParticipantSelectionHeader();
   template += `<div class="container-fluid">
@@ -27,15 +30,14 @@ const allParticipantsTemplate = async (name, auth, route) => {
                           <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Last Name</th>
                           <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Connect ID</th>
                           <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit Status</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Address 1</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Address 2</th>
+                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Study Site</th>
                           <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">City</th>
                           <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">State</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Zip Code</th>
                           <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Date Requested</th>
                       </tr>
                   </thead>   
                   <tbody>
+                        ${createShippedRows(response.data)}
                   </tbody>
                 </table>
           </div>
@@ -45,4 +47,23 @@ const allParticipantsTemplate = async (name, auth, route) => {
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   participantSelectionDropdown();
+};
+
+
+const createShippedRows = (participantRows) => {
+  let template = ``;
+  participantRows.forEach((i) => {
+    template += `
+                      <tr class="row-color-enrollment-dark participantRow">
+                          <td>${i.first_name}</td>
+                          <td>${i.last_name}</td>
+                          <td>${i.connect_id}</td>
+                          <td>${i.kit_status}</td>
+                          <td>${i.study_site}</td>
+                          <td>${i.city}</td>
+                          <td>${i.state}</td>
+                          <td>${i.date_requested}</td>
+                      </tr>`;
+  });
+  return template;
 };
