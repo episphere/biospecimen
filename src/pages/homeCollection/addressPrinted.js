@@ -43,8 +43,7 @@ const addressesPrintedTemplate = async (name, auth, route) => {
                                     </tbody>
                               </table>
                         </div>
-                    </div>
-                    `;
+                    </div>`;
   template += modalAssignedInfo();
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
@@ -70,19 +69,19 @@ const assignKitButton = () => {
       // console.log("last_name", e.target.getAttribute("data-lastName"));
       // console.log("address_1", e.target.getAttribute("data-address1"));
       // console.log("city", e.target.getAttribute("data-city"));
-      // console.log("state", e.target.getAttribute("data-state"));
+      // console.log("state", e.target.getAttribuste("data-state"));
       // console.log("zip code", e.target.getAttribute("data-zipCode"));
       // console.log(
       //   "kit Assignment Info",
       //   e.target.getAttribute("data-kitAssignmentInfo")
       // );
-
+      console.log(e.target);
       kitAssignmentInfoText = e.target.getAttribute("data-kitAssignmentInfo");
       const userId = e.target.getAttribute("data-id"); // grabs the pt user id
       let confirmButton = document.querySelector(".confirm-assignment");
       let modalBody = document.querySelector(".modal-body");
       let modalContent = document.querySelector(".modal-content");
-      console.log('kitAssignmentInfoText', kitAssignmentInfoText)
+      console.log(kitAssignmentInfoText);
       modalBody.innerHTML = `<div style="display:flex;flex-direction:column;justify-content:center;align-items:center; flex-wrap:wrap; padding:1rem 2.5rem">
               <label for="search-scan-kit-Id" style="flex-flow:wrap;align-self:flex-start"><strong>Scan Supply Kit ID</strong>: <input type="text" id="search-scan-kit-Id" /></label>
               <p style="display:block; align-self:flex-start; width: 100%"><strong>Full Name:</strong> ${
@@ -144,7 +143,7 @@ const createAddressPrintedRows = (participantRows) => {
                             data-state= '${i.state}'
                             data-zipCode= '${i.zip_code}'
                             data-id = '${i.id}'
-                            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
+                            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code}'
                             value="Assign Kit" >
                         </td>
                         <td>${i.first_name}</td>

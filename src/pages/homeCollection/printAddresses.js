@@ -60,8 +60,8 @@ const printaddressesTemplate = async (
                                     <tbody>
                                       ${createParticipantRows(printAddressesParticipants)}
                                     </tbody>
-                              </table>
-                        </div>
+                                  </table>
+                            </div>
                     </div> 
                 </div>
                 <br />
@@ -85,6 +85,9 @@ export const participantSelectionDropdown = () => {
       .getElementById("select-pending")
       .setAttribute("selected", "selected");
   }
+  if (location.hash === "#allParticipants") {
+    document.getElementById("select-all").setAttribute("selected", "selected");
+  }
   if (location.hash === "#addressPrinted") {
     document
       .getElementById("select-address-printed")
@@ -93,6 +96,12 @@ export const participantSelectionDropdown = () => {
   if (location.hash === "#assigned") {
     document
       .getElementById("select-assigned")
+      .setAttribute("selected", "selected");
+  }
+
+  if (location.hash === "#shipped") {
+    document
+      .getElementById("select-shipped")
       .setAttribute("selected", "selected");
   }
 
@@ -113,6 +122,11 @@ export const participantSelectionDropdown = () => {
     } else if (selection === "assigned") {
       location.hash = "#assigned";
       return;
+    } else if (selection === "all") {
+      location.hash = "#allParticipants";
+      return;
+    } else if (selection === "shipped") {
+      location.hash = "#shipped";
     } else {
       return;
     }
