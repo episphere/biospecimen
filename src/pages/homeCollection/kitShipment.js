@@ -39,10 +39,9 @@ import { showAnimation, hideAnimation, getIdToken, getParticipantSelection } fro
      const a = document.getElementById('scannedCode');
      const response = await getParticipantSelection("all");
      const assignedParticipants = response.data
-
      if (a) {
          a.addEventListener('change', () => {
-          uspsHit = assignedParticipants.filter( el => (parseInt(el.usps_trackingNum) === parseInt(a.value)) )
+          uspsHit = assignedParticipants.filter( i => (parseInt(i.usps_trackingNum) === parseInt(a.value) && (i.kit_status != "shipped")) )
           uspsHit.length != 0 ? confirmPickupTemplate(uspsHit) : tryAgainTemplate();
          })
      }
