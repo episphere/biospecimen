@@ -1,9 +1,8 @@
-import { showAnimation, hideAnimation } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, getParticipantSelection } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { fakeParticipantsState } from "./printAddresses.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-import { getParticipantSelection } from "../../utils.js";
 
 export const addressesPrintedScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -17,7 +16,6 @@ let kitAssignmentInfoText = "";
 const addressesPrintedTemplate = async (name, auth, route) => {
   showAnimation();
   const response = await getParticipantSelection("addressPrinted");
-  console.log("res", response);
   hideAnimation();
   let template = ``;
   template += renderParticipantSelectionHeader();
@@ -40,9 +38,7 @@ const addressesPrintedTemplate = async (name, auth, route) => {
                                         </tr>
                                     </thead>   
                                     <tbody id="contentBodyAddress">
-                                        ${createAddressPrintedRows(
-                                          response.data
-                                        )}
+                                        ${createAddressPrintedRows(response.data)}
                                     </tbody>
                               </table>
                         </div>
@@ -100,7 +96,7 @@ const assignKitButton = () => {
       confirmButton.addEventListener("click", (e) => {
         const supplyKitId = document.getElementById("search-scan-kit-Id").value;
         const uspsTrackingNumber =
-          document.getElementById("search-scan-kit-Id").value;
+          document.getElementById("search-scan-usps-tracking").value;
 
         setRequiredFields(userId, supplyKitId, uspsTrackingNumber); // stores responsea
         let modalContent = document.querySelector(".modal-content");
@@ -195,8 +191,7 @@ const setRequiredFields = async (userId, supplyKitId, uspsTrackingNumber) => {
     usps_trackingNum: uspsTrackingNumber,
     supply_kitId: supplyKitId,
   };
-  const idToken = await getIdToken(); // replace with https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?
-
+  const idToken = await getIdToken(); 
   const response = await await fetch(
     `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=assignKit`,
     {

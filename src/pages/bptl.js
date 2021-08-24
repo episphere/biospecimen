@@ -15,7 +15,7 @@ export const bptlScreen = async (auth, route) => {
         return;
     }
     bptlScreenTemplate(name, response.data, auth, route);
-    redirectPageToLocation(name, auth, route);
+    redirectPageToLocation();
 }
 
 const bptlScreenTemplate = (name, data, auth, route) => {
@@ -30,7 +30,7 @@ const bptlScreenTemplate = (name, data, auth, route) => {
                     <h4>Home Collection</h4>
                     <div class="p-3 border bg-light"><button type="button" href="#kitassembly" class="btn btn-primary btn-lg" id="kitAssembly">Kit Assembly</button></div>
                     <div class="p-3 border bg-light"><button type="button" href="#participantselection" class="btn btn-primary btn-lg" id="participantSelection">Participant Selection</button></div>
-                    <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg">Kit Shipment</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#kitshipment" class="btn btn-primary btn-lg" id="kitShipment">Kit Shipment</button></div>
                 </div>
                 <div class="col">
                     <h4>Supplies</h4>
@@ -56,15 +56,17 @@ const bptlScreenTemplate = (name, data, auth, route) => {
         document.getElementById('contentBody').innerHTML = template;
 }
 
-
-
-const redirectPageToLocation = (name, auth, route) => {
-    const a = document.getElementById('kitAssembly');
-    a && a.addEventListener('click',  async () => {
+const redirectPageToLocation = () => {
+    const kitAssemblyRedirection = document.getElementById('kitAssembly');
+    kitAssemblyRedirection && kitAssemblyRedirection.addEventListener('click',  async () => {
         location.hash = '#kitassembly';
     })
-    const b = document.getElementById('participantSelection');
-    b && b.addEventListener('click',  async () => {
+    const participantSelectionRedirection = document.getElementById('participantSelection');
+    participantSelectionRedirection && participantSelectionRedirection.addEventListener('click',  async () => {
         location.hash = '#participantselection';
+    })
+    const kitShipmentRedirection = document.getElementById('kitShipment');
+    kitShipmentRedirection && kitShipmentRedirection.addEventListener('click',  async () => {
+        location.hash = '#kitshipment';
     })
 }

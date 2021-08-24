@@ -1,122 +1,128 @@
-import { showAnimation, hideAnimation } from "../../shared.js";
-import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
-import { fakeParticipantsState } from "./printAddresses.js";
-import { participantSelectionDropdown } from "./printAddresses.js";
-import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
+import { nonUserNavBar, unAuthorizedUser } from './../../navbar.js';
+import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
+import { showAnimation, hideAnimation, getIdToken, getParticipantSelection } from "../../shared.js";
 
-/*
-Fake Placeholder shipped
-*/
-const fakeShippedParticipants = [
-  {
-    first_name: "David",
-    last_name: "Eagle",
-    connect_id: "2424953481",
-    kit_status: "shipped",
-    address_1: "058 Thackeray Street",
-    address_2: null,
-    city: "Iowa City",
-    state: "Iowa",
-    zip_code: 51381,
-    date_requested: "08/06/2021",
-    usps_trackingNum: 23209824123582591335,
-    supply_kitId: "HNI252688",
-    study_site: "KP IA",
-  },
-  {
-    first_name: "Leorio",
-    last_name: "Paradinight",
-    connect_id: "0563027029",
-    kit_status: "shipped",
-    address_1: "36866 Marquette Plaza",
-    address_2: null,
-    city: "Aurora",
-    state: "Colorado",
-    zip_code: 85341,
-    date_requested: "07/30/2021",
-    usps_trackingNum: 78306541752888337496,
-    supply_kitId: "HXH738238",
-    study_site: "KP CO",
-  },
-  {
-    first_name: "Charlotte",
-    last_name: "Roselei",
-    connect_id: "6107920005",
-    kit_status: "shipped",
-    address_1: "3 Merchant Street",
-    address_2: null,
-    city: "Hartford",
-    state: "Connecticut",
-    zip_code: 17195,
-    date_requested: "07/12/2021",
-    usps_trackingNum: 95776810780292207849,
-    supply_kitId: "BLC014082",
-    study_site: "KP CT",
-  },
-];
+  
+  export const kitShipmentScreen = async (auth, route) => {
+    const user = auth.currentUser;
+    let uspsHit = ``;
+    if (!user) return;
+    const username = user.displayName ? user.displayName : user.email;
+    kitShipmentTemplate(username, auth, route);
+    verifyScannedCode(uspsHit);
+  };
+  
+  
+  const kitShipmentTemplate = async (name, auth, route) => {
+    let template = ``;
+    template += homeCollectionNavbar();
+    template += ` 
+                      <div id="root root-margin" style="padding-top: 25px;">
+                      <div id="alert_placeholder"></div>
+                      <span> <h3 style="text-align: center; margin: 0 0 1rem;">Kit Shippment</h3> </span>
+                      <div class="container-fluid" style="padding-top: 50px;">     
+                          <div class="card">
+                          <div class="card-body">
+                          <span> <h3 style="text-align: center; margin: 0 0 1rem;">Scan USPS tracking number</h3> </span>
+                            <div style="text-align: center;  padding-bottom: 25px; "> 
+                              <span id="fieldModified"> Scan Barcode</span>  : <input required type="text" name="scannedCode" id="scannedCode"  /> </div>
+                              <div class="card text-center" id="cardBody" style="width: 40%; margin-left: 30%; margin-right: 30%;"> </div>
+                          </div>
+                        </div>
+                  </div>
+             </div>`;
+    document.getElementById("contentBody").innerHTML = template;
+    document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
+  };
+  
+ const verifyScannedCode = async (uspsHit) => {
+     const a = document.getElementById('scannedCode');
+     const response = await getParticipantSelection("assigned");
+     const assignedParticipants = response.data
 
-export const shippedScreen = async (auth, route) => {
-  const user = auth.currentUser;
-  if (!user) return;
-  const username = user.displayName ? user.displayName : user.email;
-  shippedTemplate(username, auth, route);
-};
+     if (a) {
+         a.addEventListener('change', () => {
+          uspsHit = assignedParticipants.filter( el => (parseInt(el.usps_trackingNum) === parseInt(a.value)) )
+          uspsHit.length != 0 ? confirmPickupTemplate(uspsHit) : tryAgainTemplate();
+         })
+     }
+ }
 
-const shippedTemplate = async (name, auth, route) => {
-  let template = ``;
-  template += renderParticipantSelectionHeader();
-  template += ` <div class="container-fluid">
-  <div id="root root-margin">
-      <div class="table-responsive">
-      <span> <h3 style="text-align: center; margin: 0 0 1rem;">Shipped</h3> </span>
-          <div class="sticky-header" style="overflow:auto;">
-              <table class="table table-bordered" id="participantData" 
-                  style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
-                  <thead> 
-                      <tr style="top: 0; position: sticky;">
-                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">First Name</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Last Name</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit Status</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Study Site </th>
-                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Date Requested</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit ID</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">USPS Tracking Number</th>
-                      </tr>
-                  </thead>   
-                  <tbody>
-                    ${createShippedRows(fakeShippedParticipants)}
-                  </tbody>
-            </table>
-      </div>
-  </div> 
-</div>`;
-  template += `<div class="modal fade" id="editSuccessModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-<div class="modal-dialog">
-<div class="modal-content" style="padding:1rem">
-<div class="modal-header" style="border:0">
-<button type="button" class="close" style="font-size:40px" data-dismiss="modal" aria-label="Close">
-<span aria-hidden="true">&times;</span>
-</button>
-</div>`;
+  const confirmPickupTemplate = (uspsHit) => {
+    const a = document.getElementById('cardBody');
+    let template = ``
+    template += `        
+                  <div class="card-body">
+                      <span id="pickupDate"> Pickup Date </span>  : <input required type="text" name="inputDate" id="inputDate"  />
+                        <br />
+                        <div class="form-check" style="padding-top: 20px;">
+                            <input class="form-check-input" name="options" type="checkbox" id="defaultCheck" checked>
+                            <label class="form-check-label" for="defaultCheck3">Confirm Pickup </label> 
+                        </div>
+                      </div>
+                      <div style="display:inline-block; padding: 10px 10px;">
+                        <button type="submit" class="btn btn-danger">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="saveResponse">Save</button>
+                      </div>`
+    a.innerHTML = template;
+    saveResponse(uspsHit);
+  }
 
-  document.getElementById("contentBody").innerHTML = template;
-  document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
-  participantSelectionDropdown();
-};
+  const tryAgainTemplate = () => {
+    const a = document.getElementById('cardBody');
+    let template = ``
+    template += `        
+                <div class="card-body">
+                    <span> Couldn't find USPS Tracking Number </span>
+                    <br />
+                </div>`
+    a.innerHTML = template;
+  }
 
-const createShippedRows = (participantRows) => {
-  let template = ``;
-  participantRows.forEach((i) => {
-    template += `
-                      <tr class="row-color-enrollment-dark participantRow">
-                          <td>${i.first_name}</td>
-                          <td>${i.last_name}</td>
-                          <td>${i.kit_status}</td>
-                          <td>${i.study_site}</td>
-                          <td>${i.date_requested}</td>
-                          <td>${i.supply_kitId}</td>
-                          <td>${i.usps_trackingNum}</td>
-                      </tr>`;
-  });
-  return template;
-};
+
+  const saveResponse = (uspsHit) => {
+    const a = document.getElementById('saveResponse');
+    let data = {} 
+    data.id = uspsHit && uspsHit[0].id
+    if(a){
+      a.addEventListener("click", (e) => {
+        data.pickup_date = document.getElementById('inputDate').value;
+        data.confirm_pickup = document.getElementById('defaultCheck').checked;
+        setShippedResponse(data);
+      })
+    }
+  }
+
+  const setShippedResponse = async (data) => {
+    showAnimation();
+    const idToken = await getIdToken(); 
+    const response = await await fetch(
+      `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=shipped`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          Authorization: "Bearer " + idToken,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    hideAnimation();
+    if (response.status === 200) {
+      let alertList = document.getElementById('alert_placeholder');
+      let template = ``
+      template += `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  Response saved!
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>`
+      alertList.innerHTML = template;
+      document.getElementById('scannedCode').value = ``;
+      document.getElementById('cardBody').innerHTML = ``;
+      return true; // return success modal screen
+    } else {
+      alert("Error");
+    }
+  }

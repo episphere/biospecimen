@@ -20,14 +20,14 @@ export const kitAssemblyScreen = async (auth, route) => {
   await kitAssemblyTemplate(user, name, auth, route);
 
   // TODO: UNSAVED AND NAVIGATION - REFACTOR AND MAKE REUSABLE FOR OTHER PAGES
-  window.addEventListener("beforeunload", function (e) {
-    var confirmationMessage =
-      "It looks like you have been editing something. " +
-      "If you leave before saving, your changes will be lost.";
+  // window.addEventListener("beforeunload", function (e) {
+  //   var confirmationMessage =
+  //     "It looks like you have been editing something. " +
+  //     "If you leave before saving, your changes will be lost.";
 
-    (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-    return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
-  });
+  //   (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+  //   return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+  // });
 
   kitAssemblyTemplate(name, auth, route);
 
@@ -185,6 +185,7 @@ const kitAssemblyTemplate = async (name, auth, route) => {
 
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   document.getElementById("contentBody").innerHTML = template;
+  document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
 };
 
 const populateKitTable = (tableBody, kitData) => {
