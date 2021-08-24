@@ -11,6 +11,7 @@ import { printAddressesScreen } from "./src/pages/homeCollection/printAddresses.
 import { assignedScreen } from "./src/pages/homeCollection/assigned.js";
 import { addressesPrintedScreen } from "./src/pages/homeCollection/addressPrinted.js";
 import { allParticipantsScreen } from "./src/pages/homeCollection/allParticipants.js";
+import { shippedScreen } from "./src/pages/homeCollection/kitShipment.js";
 
 let auth = "";
 
@@ -48,6 +49,7 @@ const manageRoutes = async () => {
     else if (route === "#allParticipants") allParticipantsScreen(auth, route);
     else if (route === "#addressPrinted") addressesPrintedScreen(auth, route);
     else if (route === "#assigned") assignedScreen(auth, route);
+    else if (route === "#shipped") shippedScreen(auth, route);
     else if (route === "#manage_users") manageUsers(auth, route);
     else if (route === "#sign_out") signOut();
     else if (route === "#reports") reportsQuery(auth, route);

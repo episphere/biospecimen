@@ -103,6 +103,12 @@ export const participantSelectionDropdown = () => {
       .setAttribute("selected", "selected");
   }
 
+  if (location.hash === "#shipped") {
+    document
+      .getElementById("select-shipped")
+      .setAttribute("selected", "selected");
+  }
+
   participantDropdown.addEventListener("change", (e) => {
     // Clear selected attribute from each child node
     for (let i = 0; i < participantDropdown.children.length; i++) {
@@ -123,6 +129,8 @@ export const participantSelectionDropdown = () => {
     } else if (selection === "all") {
       location.hash = "#allParticipants";
       return;
+    } else if (selection === "shipped") {
+      location.hash = "#shipped";
     } else {
       return;
     }
