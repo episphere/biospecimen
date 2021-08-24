@@ -60,7 +60,7 @@ const confirmPickupTemplate = (uspsHit) => {
   let template = ``;
   template += `        
                   <div class="card-body">
-                      <span id="pickupDate"> Pickup Date </span>  : <input required type="text" name="inputDate" id="inputDate" style="text-align:center" value = ${date} />
+                      <span id="pickupDate"> Pickup Date </span>  : <input required type="text" name="inputDate" id="inputDate" value = ${date} />
                         <br />
                         <div class="form-check" style="padding-top: 20px;">
                             <input class="form-check-input" name="options" type="checkbox" id="defaultCheck" checked>
