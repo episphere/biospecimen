@@ -39,7 +39,6 @@ import { showAnimation, hideAnimation, getIdToken, getParticipantSelection } fro
      const a = document.getElementById('scannedCode');
      const response = await getParticipantSelection("all");
      const assignedParticipants = response.data
-      console.log('assignedParticipants', assignedParticipants)
      if (a) {
          a.addEventListener('change', () => {
           uspsHit = assignedParticipants.filter( i => (parseInt(i.usps_trackingNum) === parseInt(a.value) && (i.kit_status != "shipped")) )
