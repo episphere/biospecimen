@@ -9,51 +9,16 @@ import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
 import { getParticipantSelection } from "../../utils.js";
 
-const placeholderAssignedData = [
-  {
-    first_name: "Jolyene",
-    last_name: "Cujoh",
-    connect_id: "7756917180",
-    kit_status: "assigned",
-    address_1: "34442 Steve Hunt Road",
-    address_2: null,
-    city: "Miami",
-    state: "FL",
-    zip_code: 33131,
-    date_requested: "08/04/2021",
-    usps_tracking_number: 26091708560117153712,
-    kit_id: "JSO784103",
-    study_site: "KP FL",
-  },
-  {
-    first_name: "Arcueid",
-    last_name: "Brunestud",
-    connect_id: "1753927180",
-    kit_status: "assigned",
-    address_1: "1171 Doe Meadow Drive",
-    address_2: null,
-    city: "Maryland",
-    state: "MD",
-    zip_code: 20014,
-    date_requested: "08/04/2021",
-    usps_tracking_number: 42551059936003641131,
-    kit_id: "FGO444100",
-    study_site: "KP MD",
-  },
-];
-
-const assignedParticipants = JSON.parse(
-  JSON.stringify([...placeholderAssignedData])
-);
 
 export const assignedScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  aassignedTemplate(username, auth, route);
+  assignedTemplate(username, auth, route);
+
 };
 
-const aassignedTemplate = async (name, auth, route) => {
+const assignedTemplate = async (name, auth, route) => {
   showAnimation();
   const response = await getParticipantSelection("assigned");
   hideAnimation();
@@ -80,16 +45,14 @@ const aassignedTemplate = async (name, auth, route) => {
                                         </tr>
                                     </thead>   
                                     <tbody>
-                                       ${createAssignedParticipantRows(
-                                         response.data
-                                       )}
+                                       ${createAssignedParticipantRows(response.data)}
                                     </tbody>
                               </table>
                         </div>
                     </div> 
                 </div>
                 <br />
-                <button type="button" class="btn btn-primary btn-lg" style="float: right; margin: 0 0 1rem;"">Continue to Kit Shippment</button>
+                <button type="button" class="btn btn-primary btn-lg" style="float: right; margin: 0 0 1rem;" id="kitShipmentBtn">Continue to Kit Shipment</button>
                 <br />
                 </div>`;
   template += `<div class="modal fade" id="editSuccessModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -109,23 +72,24 @@ const aassignedTemplate = async (name, auth, route) => {
     </div>
   </div>
 </div>`;
-
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   participantSelectionDropdown();
-  console.log(assignedParticipants);
 
-  for (let i = 0; i < assignedParticipants.length; i++) {
-    console.log(i);
+  redirectToKitShipment();
+  for (let i = 0; i < (response.data).length; i++) {
     editAssignedRow(i);
     saveAssignedRow(i);
   }
 };
 
 const createAssignedParticipantRows = (assignedParticipantsRows) => {
+
   let template = ``;
   // Use for loop on fake assigned data array, --> i is current object, index is current object number in array
+  let uspsTrackingHolder = [];
   assignedParticipantsRows.forEach((i, index) => {
+    uspsTrackingHolder.push(i.usps_trackingNum)
     template += `
       <tr id=row-${index} class="row-color-enrollment-dark participantRow">
         <td style="padding:1rem">${i.first_name}</td>
@@ -170,7 +134,6 @@ const createAssignedParticipantRows = (assignedParticipantsRows) => {
         </td>
       </tr>`;
   });
-
   return template;
 };
 
@@ -180,7 +143,6 @@ const editAssignedRow = (i) => {
   let saveButton = document.getElementById(`save-assign-button-${i}`);
 
   editButton.addEventListener("click", (e) => {
-    console.log("edit button clicked!");
     editButton.style.display = "none";
     saveButton.style.display = "block";
 
@@ -206,7 +168,6 @@ const saveAssignedRow = (i) => {
   let editButton = document.getElementById(`edit-assign-button-${i}`);
 
   saveButton.addEventListener("click", (e) => {
-    console.log("save button clicked!");
     // TODO: Add if else condtional checks in regards to successful inputs(Error Handling)
     if (false) {
       // TODO : Make Modal for an error?
@@ -264,3 +225,12 @@ const updateInputFields = async (jsonObj) => {
     alert("Error");
   }
 };
+
+
+const redirectToKitShipment = () => {
+  const kitShipmentRedirection = document.getElementById('kitShipmentBtn');
+  if(kitShipmentRedirection) {
+   kitShipmentRedirection.addEventListener('click',  () => {
+      location.hash = '#kitshipment';
+  })
+}}

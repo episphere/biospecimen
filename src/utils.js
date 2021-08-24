@@ -8,10 +8,12 @@ import { getIdToken } from "./shared.js";
 
 export const getParticipantSelection = async (filter) => {
   const idToken = await getIdToken();
-  const response = await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=getParticipantSelection&type=${filter}`, {
+  const response = await fetch(`
+     https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=getParticipantSelection&type=${filter}`, 
+  {
     method: "GET",
     headers: {
-      Authorization: "Bearer" + idToken,
+      Authorization: "Bearer " + idToken,
     },
   });
   return response.json();

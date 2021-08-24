@@ -21,7 +21,7 @@ export const printAddressesScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  printaddressesTemplate(username, auth, route, printAddressesParticipants);
+  printaddressesTemplate(username, auth, route, fakeParticipantsData);
 };
 
 const printaddressesTemplate = async (
@@ -58,19 +58,14 @@ const printaddressesTemplate = async (
                                         </tr>
                                     </thead>   
                                     <tbody>
-                                      ${createParticipantRows(
-                                        printAddressesParticipants
-                                      )}
+                                      ${createParticipantRows(printAddressesParticipants)}
                                     </tbody>
                               </table>
                         </div>
                     </div> 
                 </div>
                 <br />
-                <span><h6>Search for a Connect ID:</h6> </span>
-                <br />
                 <button type="button" id='generateCsv' class="btn btn-success btn-lg">Generate Address File</button>
-                <button type="button" class="btn btn-primary btn-lg" style="float: right;">Continue to Participant Selection</button>
                 </div>`;
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
@@ -150,16 +145,17 @@ const createParticipantRows = (participantRows) => {
 
 const storeParticipantInfo = (i) => {
   let participantHolder = {};
-  participantHolder["firstName"] = i.first_name && i.first_name;
-  participantHolder["lastName"] = i.last_name && i.last_name;
-  participantHolder["connectId"] = i.connect_id && i.connect_id;
-  participantHolder["kitStatus"] = "addressPrinted";
-  participantHolder["address1"] = String(i.address_1 && i.address_1);
-  participantHolder["address2"] = i.address_2 != undefined ? i.address_2 : ``;
+  participantHolder["first_name"] = i.first_name && i.first_name;
+  participantHolder["last_name"] = i.last_name && i.last_name;
+  participantHolder["connect_id"] = i.connect_id && i.connect_id;
+  participantHolder["kit_status"] = "addressPrinted";
+  participantHolder["address_1"] = String(i.address_1 && i.address_1);
+  participantHolder["address_2"] = i.address_2 != undefined ? i.address_2 : ``;
   participantHolder["city"] = i.city && i.city;
   participantHolder["state"] = i.state && i.state;
-  participantHolder["zipCode"] = i.zip_code && i.zip_code;
-  participantHolder["dateRequested"] = i.date_requested && i.date_requested;
+  participantHolder["zip_code"] = i.zip_code && i.zip_code;
+  participantHolder["study_site"] = i.study_site && i.study_site;
+  participantHolder["date_requested"] = i.date_requested && i.date_requested;
   // participantHolder = JSON.stringify(participantHolder);
   let schemaInfo = escape(JSON.stringify(participantHolder));
   return schemaInfo;
@@ -170,7 +166,6 @@ const generateParticipantCsvGetter = () => {
   let holdParticipantResponse = [];
   if (a) {
     a.addEventListener("click", () => {
-      console.log('generateParticipantCsv("participantData");');
       const participantRow = Array.from(
         document.getElementsByClassName("participantRow")
       );
@@ -186,17 +181,16 @@ const generateParticipantCsvGetter = () => {
       }
       const response = setParticipantResponses(holdParticipantResponse);
       if (response) {
-        generateParticipantCsv("participantData");
+       // generateParticipantCsv("participantData");
       }
     });
   }
 };
 
 const setParticipantResponses = async (holdParticipantResponse) => {
-  console.log("holdParticipantResponse", holdParticipantResponse);
   const idToken = await getIdToken();
   const response = await await fetch(
-    `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=printAddresses`,
+     `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=printAddresses`,
     {
       method: "POST",
       body: JSON.stringify(holdParticipantResponse),

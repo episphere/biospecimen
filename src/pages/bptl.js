@@ -15,7 +15,7 @@ export const bptlScreen = async (auth, route) => {
         return;
     }
     bptlScreenTemplate(name, response.data, auth, route);
-    redirectPageToLocation(name, auth, route);
+    redirectPageToLocation();
 }
 
 const bptlScreenTemplate = (name, data, auth, route) => {
@@ -56,9 +56,7 @@ const bptlScreenTemplate = (name, data, auth, route) => {
         document.getElementById('contentBody').innerHTML = template;
 }
 
-
-
-const redirectPageToLocation = (name, auth, route) => {
+const redirectPageToLocation = () => {
     const kitAssemblyRedirection = document.getElementById('kitAssembly');
     kitAssemblyRedirection && kitAssemblyRedirection.addEventListener('click',  async () => {
         location.hash = '#kitassembly';

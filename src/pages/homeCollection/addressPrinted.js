@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { fakeParticipantsState } from "./printAddresses.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
@@ -17,7 +17,6 @@ let kitAssignmentInfoText = "";
 const addressesPrintedTemplate = async (name, auth, route) => {
   showAnimation();
   const response = await getParticipantSelection("addressPrinted");
-  console.log("res", response);
   hideAnimation();
   let template = ``;
   template += renderParticipantSelectionHeader();
@@ -40,16 +39,12 @@ const addressesPrintedTemplate = async (name, auth, route) => {
                                         </tr>
                                     </thead>   
                                     <tbody id="contentBodyAddress">
-                                        ${createAddressPrintedRows(
-                                          response.data
-                                        )}
+                                        ${createAddressPrintedRows(response.data)}
                                     </tbody>
                               </table>
                         </div>
                     </div>
-                    <div class="container-search-connect-id" style="margin:2rem .8rem">
-                        <label for="search-connect-Id">Search for a Connect ID: <input type="search" id="search-connect-id"/></label>
-                </div>`;
+                    `;
   template += modalAssignedInfo();
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
@@ -87,6 +82,7 @@ const assignKitButton = () => {
       let confirmButton = document.querySelector(".confirm-assignment");
       let modalBody = document.querySelector(".modal-body");
       let modalContent = document.querySelector(".modal-content");
+      console.log('kitAssignmentInfoText', kitAssignmentInfoText)
       modalBody.innerHTML = `<div style="display:flex;flex-direction:column;justify-content:center;align-items:center; flex-wrap:wrap; padding:1rem 2.5rem">
               <label for="search-scan-kit-Id" style="flex-flow:wrap;align-self:flex-start"><strong>Scan Supply Kit ID</strong>: <input type="text" id="search-scan-kit-Id" /></label>
               <p style="display:block; align-self:flex-start; width: 100%"><strong>Full Name:</strong> ${
@@ -102,7 +98,7 @@ const assignKitButton = () => {
       confirmButton.addEventListener("click", (e) => {
         const supplyKitId = document.getElementById("search-scan-kit-Id").value;
         const uspsTrackingNumber =
-          document.getElementById("search-scan-kit-Id").value;
+          document.getElementById("search-scan-usps-tracking").value;
 
         setRequiredFields(userId, supplyKitId, uspsTrackingNumber); // stores responsea
         let modalContent = document.querySelector(".modal-content");
@@ -147,7 +143,7 @@ const createAddressPrintedRows = (participantRows) => {
                             data-city= '${i.city}'
                             data-state= '${i.state}'
                             data-zipCode= '${i.zip_code}'
-                            data-id = '${i.id}
+                            data-id = '${i.id}'
                             data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
                             value="Assign Kit" >
                         </td>
@@ -197,8 +193,7 @@ const setRequiredFields = async (userId, supplyKitId, uspsTrackingNumber) => {
     usps_trackingNum: uspsTrackingNumber,
     supply_kitId: supplyKitId,
   };
-  const idToken = await getIdToken(); // replace with https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?
-
+  const idToken = await getIdToken(); 
   const response = await await fetch(
     `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=assignKit`,
     {
