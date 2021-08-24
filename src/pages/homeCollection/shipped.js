@@ -1,8 +1,7 @@
-import { showAnimation, hideAnimation } from "../../shared.js";
+import { showAnimation, hideAnimation, getParticipantSelection } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-import { getParticipantSelection } from "../../utils.js";
 
 
 export const shippedScreen = async (auth, route) => {

@@ -1,7 +1,6 @@
 import { nonUserNavBar, unAuthorizedUser } from './../../navbar.js';
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getParticipantSelection } from "../../utils.js";
-import { showAnimation, hideAnimation, getIdToken } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, getParticipantSelection } from "../../shared.js";
 
   
   export const kitShipmentScreen = async (auth, route) => {

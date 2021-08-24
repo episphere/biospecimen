@@ -1,9 +1,8 @@
-import { showAnimation, hideAnimation, getIdToken } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, getParticipantSelection } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { fakeParticipantsState } from "./printAddresses.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-import { getParticipantSelection } from "../../utils.js";
 
 export const addressesPrintedScreen = async (auth, route) => {
   const user = auth.currentUser;

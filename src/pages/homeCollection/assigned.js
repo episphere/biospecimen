@@ -3,11 +3,11 @@ import {
   findParticipant,
   showAnimation,
   hideAnimation,
+  getParticipantSelection
 } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-import { getParticipantSelection } from "../../utils.js";
 
 
 export const assignedScreen = async (auth, route) => {
