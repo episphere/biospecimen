@@ -42,12 +42,12 @@ const verifyScannedCode = async (uspsHit) => {
   const a = document.getElementById("scannedCode");
   const response = await getParticipantSelection("all");
   const assignedParticipants = response.data;
-
-  console.log(assignedParticipants);
   if (a) {
     a.addEventListener("change", () => {
       uspsHit = assignedParticipants.filter(
-        (el) => parseInt(el.usps_trackingNum) === parseInt(a.value)
+        (i) =>
+          parseInt(i.usps_trackingNum) === parseInt(a.value) &&
+          i.kit_status != "shipped"
       );
       uspsHit.length != 0 ? confirmPickupTemplate(uspsHit) : tryAgainTemplate();
     });
