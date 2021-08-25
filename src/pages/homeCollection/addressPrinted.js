@@ -118,7 +118,7 @@ const assignKitButton = () => {
             </div>
             <div class="modal-body" style="display:flex; flex-direction:column; justify-content:center;
               align-items:center;">
-                <img src="./static/images/modals/check-circle-solid.svg" alt="green-check-icon" height="200" width="200" style="display:block;"/>
+                <img src="./static/images/modals/check-circle-solid.svg" alt="green-check-icon" height="150" width="200" style="display:block;"/>
                 <h1 class="text-success" style:"margin-bottom:1.5rem;">Success!</h1>
                 <p style="font-weight:600;margin:0;">The participant has been saved and can be found on Assigned!</p>
               </div>
