@@ -13,6 +13,7 @@ import { addressesPrintedScreen } from "./src/pages/homeCollection/addressPrinte
 import { allParticipantsScreen } from "./src/pages/homeCollection/allParticipants.js";
 import { kitShipmentScreen } from "./src/pages/homeCollection/kitShipment.js";
 import { shippedScreen } from "./src/pages/homeCollection/shipped.js";
+import { packagesInTransitFromSitesScreen } from "./src/pages/receipts/packagesInTransitScreen.js";
 
 let auth = "";
 
@@ -44,7 +45,8 @@ const manageRoutes = async () => {
     else if (route === "#welcome") welcomeScreen(auth, route);
     else if (route === "#bptl") bptlScreen(auth, route);
     else if (route === "#kitassembly") kitAssemblyScreen(auth, route);
-    else if (route === "#participantselection")printAddressesScreen(auth, route);
+    else if (route === "#participantselection")
+      printAddressesScreen(auth, route);
     else if (route === "#allParticipants") allParticipantsScreen(auth, route);
     else if (route === "#addressPrinted") addressesPrintedScreen(auth, route);
     else if (route === "#assigned") assignedScreen(auth, route);
@@ -53,6 +55,8 @@ const manageRoutes = async () => {
     else if (route === "#manage_users") manageUsers(auth, route);
     else if (route === "#sign_out") signOut();
     else if (route === "#reports") reportsQuery(auth, route);
+    else if (route === "#packagesInTransitfromSites")
+      packagesInTransitFromSitesScreen(auth, route);
     else window.location.hash = "#welcome";
   } else {
     if (route === "#") signIn();
