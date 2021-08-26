@@ -3,19 +3,17 @@ import {
   findParticipant,
   showAnimation,
   hideAnimation,
-  getParticipantSelection
+  getParticipantSelection,
 } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-
 
 export const assignedScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
   assignedTemplate(username, auth, route);
-
 };
 
 const assignedTemplate = async (name, auth, route) => {
@@ -45,7 +43,9 @@ const assignedTemplate = async (name, auth, route) => {
                                         </tr>
                                     </thead>   
                                     <tbody>
-                                       ${createAssignedParticipantRows(response.data)}
+                                       ${createAssignedParticipantRows(
+                                         response.data
+                                       )}
                                     </tbody>
                               </table>
                         </div>
@@ -64,7 +64,7 @@ const assignedTemplate = async (name, auth, route) => {
     </button>
     </div>
     <div class="modal-body" style="display:flex; flex-direction:column; justify-content:center;align-items:center">
-          <object data="../../../static/images/modals/check-circle-solid.svg" width="200" height="150px"></object>
+          <img src="./static/images/modals/check-circle-solid.svg" alt="green-check-icon" height="150" width="200" style="display:block;"/>
           <h1 class="text-success" style:"margin:1.5rem 0 2rem 0;">Success!</h1>
           <p style="text-align:center; margin:1.5rem 0 2rem 0; font-weight:600">The participant's Supply Kit ID and USPS Tracking Number were successfully edited and saved!</p>
         </div>
@@ -77,19 +77,18 @@ const assignedTemplate = async (name, auth, route) => {
   participantSelectionDropdown();
 
   redirectToKitShipment();
-  for (let i = 0; i < (response.data).length; i++) {
+  for (let i = 0; i < response.data.length; i++) {
     editAssignedRow(i);
     saveAssignedRow(i);
   }
 };
 
 const createAssignedParticipantRows = (assignedParticipantsRows) => {
-
   let template = ``;
   // Use for loop on fake assigned data array, --> i is current object, index is current object number in array
   let uspsTrackingHolder = [];
   assignedParticipantsRows.forEach((i, index) => {
-    uspsTrackingHolder.push(i.usps_trackingNum)
+    uspsTrackingHolder.push(i.usps_trackingNum);
     template += `
       <tr id=row-${index} class="row-color-enrollment-dark participantRow">
         <td style="padding:1rem">${i.first_name}</td>
@@ -226,11 +225,11 @@ const updateInputFields = async (jsonObj) => {
   }
 };
 
-
 const redirectToKitShipment = () => {
-  const kitShipmentRedirection = document.getElementById('kitShipmentBtn');
-  if(kitShipmentRedirection) {
-   kitShipmentRedirection.addEventListener('click',  () => {
-      location.hash = '#kitshipment';
-  })
-}}
+  const kitShipmentRedirection = document.getElementById("kitShipmentBtn");
+  if (kitShipmentRedirection) {
+    kitShipmentRedirection.addEventListener("click", () => {
+      location.hash = "#kitshipment";
+    });
+  }
+};
