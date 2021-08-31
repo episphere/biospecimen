@@ -58,7 +58,9 @@ const printaddressesTemplate = async (
                                         </tr>
                                     </thead>   
                                     <tbody>
-                                      ${createParticipantRows(printAddressesParticipants)}
+                                      ${createParticipantRows(
+                                        printAddressesParticipants
+                                      )}
                                     </tbody>
                                   </table>
                             </div>
@@ -195,7 +197,7 @@ const generateParticipantCsvGetter = () => {
       }
       const response = setParticipantResponses(holdParticipantResponse);
       if (response) {
-       // generateParticipantCsv("participantData");
+        // generateParticipantCsv("participantData");
       }
     });
   }
@@ -204,7 +206,7 @@ const generateParticipantCsvGetter = () => {
 const setParticipantResponses = async (holdParticipantResponse) => {
   const idToken = await getIdToken();
   const response = await await fetch(
-     `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=printAddresses`,
+    `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=printAddresses`,
     {
       method: "POST",
       body: JSON.stringify(holdParticipantResponse),

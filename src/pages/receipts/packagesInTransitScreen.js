@@ -103,9 +103,24 @@ const createPackagesInTransitRows = (response) => {
                       <td><button class="manifest-button" data-toggle="modal" data-target="#manifestModal">Manifest</button></td>
                       </tr>`;
       });
+      manifestButton();
       return template;
     }
   } catch (e) {
     console.log(e);
   }
 };
+
+const manifestButton = () => {
+  let buttons = document.getElementsByClassName("manifest-button");
+};
+// buttons.forEach((i) => console.log(i));
+
+/* 
+STEPS FOR MANIFEST MODAL
+1. Add event listener to every manifest button
+    - Iterate over getElementsByClassName --> HTMLCollection
+2. Pass correct conceptId and values to be rendered on the manifest modal
+
+
+*/
