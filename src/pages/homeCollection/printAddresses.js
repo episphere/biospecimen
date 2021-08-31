@@ -24,19 +24,15 @@ export const printAddressesScreen = async (auth, route) => {
   printaddressesTemplate(username, auth, route, fakeParticipantsData);
 };
 
-const printaddressesTemplate = async (
-  name,
-  auth,
-  route,
-  printAddressesParticipants
-) => {
+const printaddressesTemplate = async (name, auth, route, printAddressesParticipants) => {
   showAnimation();
-  // const response = await findParticipant("firstName=Deanna");
+  // const response = await findParticipant("first");
   hideAnimation();
   let template = ``;
   template += renderParticipantSelectionHeader();
   template += ` <div class="container-fluid">
                     <div id="root root-margin">
+                      <div id="alert_placeholder"></div>
                         <div class="table-responsive">
                         <span> <h3 style="text-align: center; margin: 0 0 1rem;">Print Addresses </h3> </span>
                         <div class="sticky-header" style="overflow:auto;">
@@ -139,9 +135,7 @@ const createParticipantRows = (participantRows) => {
   participantRows.forEach((i) => {
     template += `
                 <tr class="row-color-enrollment-dark participantRow">
-                    <td> <input type="checkbox" class="ptSelection" data-participantHolder = ${storeParticipantInfo(
-                      i
-                    )} name="ptSelection"></td>
+                    <td> <input type="checkbox" class="ptSelection" data-participantHolder = ${storeParticipantInfo(i)} name="ptSelection"></td>
                     <td>${i.first_name && i.first_name}</td>
                     <td>${i.last_name && i.last_name}</td>
                     <td>${i.connect_id && i.connect_id}</td>
@@ -161,7 +155,7 @@ const storeParticipantInfo = (i) => {
   let participantHolder = {};
   participantHolder["first_name"] = i.first_name && i.first_name;
   participantHolder["last_name"] = i.last_name && i.last_name;
-  participantHolder["connect_id"] = i.connect_id && i.connect_id;
+  participantHolder["connect_id"] = i.connect_id && i.connect_id;;
   participantHolder["kit_status"] = "addressPrinted";
   participantHolder["address_1"] = String(i.address_1 && i.address_1);
   participantHolder["address_2"] = i.address_2 != undefined ? i.address_2 : ``;
@@ -195,11 +189,46 @@ const generateParticipantCsvGetter = () => {
       }
       const response = setParticipantResponses(holdParticipantResponse);
       if (response) {
-       // generateParticipantCsv("participantData");
+       generateParticipantCsv(holdParticipantResponse);
       }
     });
   }
 };
+
+
+const generateParticipantCsv = (items) => {
+  let csv = ``;
+  csv += `first_name, last_name, kit_status, address_1, address_2, city, state, zip_code, study_site, date_requsted, \r\n`
+  for (let row = 0; row < (items.length); row++) {
+    let keysAmount = Object.keys(items[row]).length
+    let keysCounter = 0
+    for(let key in items[row]) {
+      if (key !== 'connect_id') { 
+        csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') }
+      keysCounter++
+    }
+    keysCounter = 0
+  }
+  let link = document.createElement('a');
+  link.id = 'download-csv';
+  link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
+  link.setAttribute('download', `${new Date().toLocaleDateString()}-participant-address-export.csv`);
+  document.body.appendChild(link);
+  document.querySelector('#download-csv').click();
+  document.body.removeChild(link);
+  let alertList = document.getElementById('alert_placeholder');
+  let template = ``
+  template += `
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              Success!
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+            </div>`
+  alertList.innerHTML = template;
+}
+
+  
 
 const setParticipantResponses = async (holdParticipantResponse) => {
   const idToken = await getIdToken();
@@ -221,116 +250,3 @@ const setParticipantResponses = async (holdParticipantResponse) => {
   }
 };
 
-const generateParticipantCsv = (table_id, separator = ",") => {
-  console.log("3");
-  // succeess alert
-  // Select rows from table_id
-  var rows = document.querySelectorAll("table#" + table_id + " tr");
-  // Construct csv
-  var csv = [];
-  for (var i = 0; i < rows.length; i++) {
-    var row = [],
-      cols = rows[i].querySelectorAll("td, th");
-    for (var j = 0; j < cols.length; j++) {
-      // Clean innertext to remove multiple spaces and jumpline (break csv)
-      var data = cols[j].innerText
-        .replace(/(\r\n|\n|\r)/gm, "")
-        .replace(/(\s\s)/gm, " ");
-      // Escape double-quote with double-double-quote (see https://stackoverflow.com/questions/17808511/properly-escape-a-double-quote-in-csv)
-      data = data.replace(/"/g, '""');
-      // Push escaped string
-      row.push('"' + data + '"');
-    }
-    csv.push(row.join(separator));
-  }
-  var csv_string = csv.join("\n");
-  // Download it
-  var filename =
-    "export_" + table_id + "_" + new Date().toLocaleDateString() + ".csv";
-  var link = document.createElement("a");
-  link.style.display = "none";
-  link.setAttribute("target", "_blank");
-  link.setAttribute(
-    "href",
-    "data:text/csv;charset=utf-8," + encodeURIComponent(csv_string)
-  );
-  link.setAttribute("download", filename);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
-
-/*
-FAKE PENDING DATA***
-[{
-  "first_name": "David",
-  "last_name": "Eagle",
-  "connect_id": "2424953481",
-  "kit_status": "Pending",
-  "address_1": "058 Thackeray Street",
-  "address_2": null,
-  "city": "Iowa City",
-  "state": "Iowa",
-  "zip_code": 51381,
-  "date_requested": "08/06/2021",
-  "usps_tracking_number": 23209824123582591335,
-  "kit_id": "HNI252688",
-  "study_site": "KP IA"
-}, {
-  "first_name": "Leorio",
-  "last_name": "Paradinight",
-  "connect_id": "0563027029",
-  "kit_status": "Pending",
-  "address_1": "36866 Marquette Plaza",
-  "address_2": null,
-  "city": "Aurora",
-  "state": "Colorado",
-  "zip_code": 85341,
-  "date_requested": "07/30/2021",
-  "usps_tracking_number": 78306541752888337496,
-  "kit_id": "HXH738238",
-  "study_site": "KP CO"
-}, {
-  "first_name": "Ichigo",
-  "last_name": "Kurosaki",
-  "connect_id": "7091247876",
-  "kit_status": "Pending",
-  "address_1": "1439 Linden Drive",
-  "address_2": null,
-  "city": "Washington",
-  "state": "District of Columbia",
-  "zip_code": 99498,
-  "date_requested": "07/31/2021",
-  "usps_tracking_number": 25721624043598064554,
-  "kit_id": "BLE433998",
-  "study_site": "KP DC"
-}, {
-  "first_name": "Annie",
-  "last_name": "Leonhart",
-  "connect_id": "4602900054",
-  "kit_status": "Pending",
-  "address_1": "4076 Dexter Crossing",
-  "address_2": null,
-  "city": "Mobile",
-  "state": "Alabama",
-  "zip_code": 11107,
-  "date_requested": "07/17/2021",
-  "usps_tracking_number": 02003930129859401458,
-  "kit_id": "AOT370580",
-  "study_site": "KP AL"
-}, {
-  "first_name": "Charlotte",
-  "last_name": "Roselei",
-  "connect_id": "6107920005",
-  "kit_status": "Pending",
-  "address_1": "3 Merchant Street",
-  "address_2": null,
-  "city": "Hartford",
-  "state": "Connecticut",
-  "zip_code": 17195,
-  "date_requested": "07/12/2021",
-  "usps_tracking_number": 95776810780292207849,
-  "kit_id": "BLC014082",
-  "study_site": "KP CT"
-}]
-*/
