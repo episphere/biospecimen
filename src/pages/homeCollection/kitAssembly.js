@@ -185,7 +185,7 @@ const kitAssemblyTemplate = async (name, auth, route) => {
 
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   document.getElementById("contentBody").innerHTML = template;
-  document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
+  document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
 };
 
 const populateKitTable = (tableBody, kitData) => {
@@ -339,7 +339,7 @@ const saveItem = async (
     }
 
     // ADD DATA to TABLE
-    // addKitData(jsonSaveBody);
+    addKitData(jsonSaveBody);
 
     addRow(jsonSaveBody, tableNumRows);
     console.log(uspsHolder);

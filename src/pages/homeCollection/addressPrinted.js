@@ -1,4 +1,9 @@
-import { showAnimation, hideAnimation, getIdToken, getParticipantSelection } from "../../shared.js";
+import {
+  showAnimation,
+  hideAnimation,
+  getIdToken,
+  getParticipantSelection,
+} from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { fakeParticipantsState } from "./printAddresses.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
@@ -38,7 +43,9 @@ const addressesPrintedTemplate = async (name, auth, route) => {
                                         </tr>
                                     </thead>   
                                     <tbody id="contentBodyAddress">
-                                        ${createAddressPrintedRows(response.data)}
+                                        ${createAddressPrintedRows(
+                                          response.data
+                                        )}
                                     </tbody>
                               </table>
                         </div>
@@ -90,13 +97,14 @@ const assignKitButton = () => {
                 .split("\n")
                 .splice(1)
                 .join(" ")}</p>
-              <label for="search-scan-usps-tracking" style="flex-flow:wrap; align-self:flex-start;display:flex;"><strong>Scan USPS Tracking Number on Supply Kit: </strong> <input id="search-scan-usps-tracking" type="search" /></label>
+              <label for="search-scan-usps-tracking" style="flex-flow:wrap; align-self:flex-start; display:flex; height:32px;"><strong style="margin-right: .5rem;">Scan USPS Tracking Number on Supply Kit: </strong> <input id="search-scan-usps-tracking" type="search" style="appearance:auto;"/></label>
           </div>`;
       // Event Handler
       confirmButton.addEventListener("click", (e) => {
         const supplyKitId = document.getElementById("search-scan-kit-Id").value;
-        const uspsTrackingNumber =
-          document.getElementById("search-scan-usps-tracking").value;
+        const uspsTrackingNumber = document.getElementById(
+          "search-scan-usps-tracking"
+        ).value;
 
         setRequiredFields(userId, supplyKitId, uspsTrackingNumber); // stores responsea
         let modalContent = document.querySelector(".modal-content");
@@ -110,7 +118,7 @@ const assignKitButton = () => {
             </div>
             <div class="modal-body" style="display:flex; flex-direction:column; justify-content:center;
               align-items:center;">
-                <object data="../../../static/images/modals/check-circle-solid.svg" width="200" height="200"></object>
+                <img src="./static/images/modals/check-circle-solid.svg" alt="green-check-icon" height="150" width="200" style="display:block;"/>
                 <h1 class="text-success" style:"margin-bottom:1.5rem;">Success!</h1>
                 <p style="font-weight:600;margin:0;">The participant has been saved and can be found on Assigned!</p>
               </div>
@@ -191,7 +199,7 @@ const setRequiredFields = async (userId, supplyKitId, uspsTrackingNumber) => {
     usps_trackingNum: uspsTrackingNumber,
     supply_kitId: supplyKitId,
   };
-  const idToken = await getIdToken(); 
+  const idToken = await getIdToken();
   const response = await await fetch(
     `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=assignKit`,
     {
