@@ -220,19 +220,28 @@ const populateKitTable = (tableBody, kitData) => {
         <tr class="new-row">      
           <th scope="row">${lastRowNumber + 1}</th>
           <td>
-              <input id="input-usps" autocomplete="off" style="width:80%"/>
+            <input id="input-usps" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="21168034670515269250"/>
+            <label for ="input-usps" style="font-size:.8rem;">Ex. 21168034670515269250</label>
           </td>
           <td>
-              <input id="input-supply-kit" type="string" autocomplete="off" style="width:80%"/>
+              <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:80%" placeholder="CXA261331"/>
+              <label for ="input-supply-kit" style="font-size:.8rem;">Ex. CXA261331</label>
           </td>
           <td>
-              <input id="input-specimen-kit" type="string" autocomplete="off" style="width:80%"/>
+              <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:80%" name="input-specimen-kit" placeholder="CXA261331"/>
+              <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CXA261331</label>
           </td>
           <td>
-              <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%"/>
+              <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%; text-overflow: ellipsis;" placeholder="QBC436604 0002
+              " name"input-collection-cup"/>
+              <label for ="input-collection-cup" style="font-size:.8rem;">Ex. QBC436604 0002
+              </label>
           </td>
           <td>
-              <input id="input-collection-card" type="string" autocomplete="off" style="width:80%"/>
+              <input id="input-collection-card" type="string" autocomplete="off" style="width:80%" placeholder="QBC436604 0002
+              " name="input-collection-card"/>
+              <label for ="input-collection-card" style="font-size:.8rem;">Ex. QBC436604 0002
+              </label>
           </td>
       </tr>
       `;
@@ -296,6 +305,7 @@ const saveItem = async (
 
       return alert("uspsTrackingNumber length must be 20 characters");
     }
+
     if (jsonSaveBody.supplyKitId.length !== 9) {
       console.log(jsonSaveBody.supplyKitId.length);
 
@@ -324,19 +334,18 @@ const saveItem = async (
     tableNumRows++;
 
     // Check and change data type to number before sending POST request
-    if (isNumeric(jsonSaveBody.uspsTrackingNumber)) {
-      jsonSaveBody.uspsTrackingNumber = parseInt(inputUsps.value.trim());
-      console.log(jsonSaveBody);
-    }
+    // if (isNumeric(jsonSaveBody.uspsTrackingNumber)) {
+    //   jsonSaveBody.uspsTrackingNumber = parseInt(inputUsps.value.trim());
+    //   console.log(jsonSaveBody);
+    // }
 
     // Checks array if input usps tracking number exists in usps placeholder array
     // exits outer function if duplicate
-    if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
-      debugger;
-      alert("Duplicate usps tracking number!");
-      clearRowInputs(inputElements);
-      return;
-    }
+    // if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
+    //   debugger;
+    //   alert("Duplicate usps tracking number!");
+    //   return;
+    // }
 
     // ADD DATA to TABLE
     addKitData(jsonSaveBody);
@@ -403,14 +412,14 @@ function addRow(jsonSaveBody, tableNumRows) {
     console.log(typeof uspsTrackingNumber === "number");
     console.log(uspsTrackingNumber);
     // ADD UI MODAL
-    alert("Number Value");
+    // alert("Number Value");
   } else {
     alert("Invalid USPS number data type, Not a number value");
     debugger;
     return;
   }
 
-  uspsHolder.push(parseInt(uspsTrackingNumber));
+  uspsHolder.push(uspsTrackingNumber);
   newRowEl.firstChild.nextSibling.innerHTML = tableNumRows;
   newRowEl.insertAdjacentHTML(
     "beforebegin",
