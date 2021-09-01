@@ -57,20 +57,21 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                         <p>Shipping Manifest</p>
                     </div>
                     <div class="col-md-4 ml-auto">
-                        <p>Site: Placeholder Here</p>
+                        <p>Site: NCI </p>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <p>Current Date/Time: PLaceholder Time Here</p>
+                        <p>Current Date/Time: 6/17/2021, 02:23 PM
+                        </p>
                     </div>
                     <div class="col-md-4 ml-auto">
-                        <p>Location: Place PLaceholder Here</p>
+                        <p>Location: Main Campus</p>
                     </div>
                 </div>
                 <div class="row">
                   <div class="col-md-4">
-                    <p>Sender: Sender Placeholder</p>
+                    <p>Sender: </p>
                   </div>
                 </div>
 
@@ -88,33 +89,17 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                     <tbody>
                         <tr>
                             <td style="text-align:center">
-                              <p>Box 3 PLaceholder</p>
+                              <p>Box3</p>
                             </td>
                             <td style="text-align:center">
-                              <p>Specimen Placeholder</p>
+                              <p>CXA111111 0008</p>
                             </td>
                             <td style="text-align:center">
-                                <p>123</p>
-                                <p>456</p>
-                                <p>567</p>
-                                <p>899</p>
-                            </td>
-                            <td style="text-align:center">
-                              <p></p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:center">
-                              <p>Box 3 PLaceholder</p>
-                            </td>
-                            <td style="text-align:center">
-                              <p>Specimen Placeholder</p>
-                            </td>
-                            <td style="text-align:center">
-                                <p>123</p>
-                                <p>456</p>
-                                <p>567</p>
-                                <p>899</p>
+                                <p>CXA111111 0001</p>
+                                <p>CXA111111 0002
+                                </p>
+                                <p>CXA111111 0003</p>
+                                <p>CXA111111 0006</p>
                             </td>
                             <td style="text-align:center">
                               <p></p>
@@ -122,33 +107,17 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                         </tr>
                         <tr>
                             <td style="text-align:center">
-                              <p>Box 3 PLaceholder</p>
+                              <p>Box3 </p>
                             </td>
                             <td style="text-align:center">
-                              <p>Specimen Placeholder</p>
+                              <p>CXA111111 0008</p>
                             </td>
                             <td style="text-align:center">
-                                <p>123</p>
-                                <p>456</p>
-                                <p>567</p>
-                                <p>899</p>
-                            </td>
-                            <td style="text-align:center">
-                              <p></p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:center">
-                              <p>Box 3 PLaceholder</p>
-                            </td>
-                            <td style="text-align:center">
-                              <p>Specimen Placeholder</p>
-                            </td>
-                            <td style="text-align:center">
-                                <p>123</p>
-                                <p>456</p>
-                                <p>567</p>
-                                <p>899</p>
+                                <p>CXA111111 0001</p>
+                                <p>CXA111111 0002
+                                </p>
+                                <p>CXA111111 0003</p>
+                                <p>CXA111111 0006</p>
                             </td>
                             <td style="text-align:center">
                               <p></p>
@@ -191,6 +160,7 @@ const createPackagesInTransitRows = (response) => {
         // console.log(i.bags);
         // // returns an array of a given object's own enumerable property names
         // console.log(Object.keys(i.bags).length);
+        // 3rd td - Object.keys(i.bags).length
         template += `
                       <tr class="packageInTransitRow">
                       <td style="text-align:center;">${
@@ -210,9 +180,7 @@ const createPackagesInTransitRows = (response) => {
                           ? i[fieldToConceptIdMapping.shippingSite]
                           : "N/A"
                       }</td>
-                      <td style="text-align:center;">${
-                        Object.keys(i.bags).length
-                      }</td>
+                      <td style="text-align:center;">${""}</td>
                       <td>
                         <button class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
                             Manifest
@@ -235,8 +203,8 @@ const manifestButton = (data) => {
   // let boxNumber = "";
   // let specimenBagId = "";
   // let fullSpecimenId = "";
-  let firstName = "";
-  let lastName = "";
+  // let firstName = "";
+  // let lastName = "";
   Array.from(buttons).forEach((button, index) => {
     // Use fieldToConceptIdMapping to grab correct conceptIds
     button.dataset.site = data[index].siteAcronym;
@@ -245,11 +213,10 @@ const manifestButton = (data) => {
     );
     button.dataset.location = data[index][fieldToConceptIdMapping.shippingSite];
 
-    // button.dataset.fName = firstNameMapping(
+    // button.dataset.firstName =
     //   data[index].bags[Object.keys(data[index].bags)][
     //     fieldToConceptIdMapping.shippingFirstName
-    //   ]
-    // );
+    //   ];
 
     // button.dataset.lName = data[index].bags[Object.keys(data[index].bags)];
     // button.dataset.sender = data[index]
@@ -262,7 +229,7 @@ const manifestButton = (data) => {
       data[index].bags[Object.keys(data[index].bags)] ??
         data[index].bags[Object.keys(data[index].bags)]
     );
-    console.log(index, button.dataset.lName);
+    // console.log(index, button.dataset.lastName);
     console.log(index, data[index].bags[Object.keys(data[index].bags)]);
 
     // data.forEach((i, index) => {
