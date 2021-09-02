@@ -301,11 +301,7 @@ const saveItem = async (
     /* 
       INPUT CHARACTER LENGTH CHECK
     */
-    console.log(
-      jsonSaveBody.uspsTrackingNumber.length,
-      jsonSaveBody.uspsTrackingNumber.length < 20,
-      jsonSaveBody.uspsTrackingNumber > 22
-    );
+
     if (
       jsonSaveBody.uspsTrackingNumber.length < 20 ||
       jsonSaveBody.uspsTrackingNumber.length > 22
@@ -316,7 +312,6 @@ const saveItem = async (
     }
 
     if (jsonSaveBody.supplyKitId.length !== 9) {
-      debugger;
       return alert("supply kit id must be 9 characters");
     }
 
