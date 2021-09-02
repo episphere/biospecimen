@@ -221,27 +221,27 @@ const populateKitTable = (tableBody, kitData) => {
         <tr class="new-row">      
           <th scope="row">${lastRowNumber + 1}</th>
           <td>
-            <input id="input-usps" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="21168034670515269250" />
-            <label for ="input-usps" style="font-size:.8rem;">Ex. 21168034670515269250</label>
+            <input id="input-usps" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="3374889321009425653720" />
+            <label for ="input-usps" style="font-size:.8rem;">Ex. 3374889321009425653720</label>
           </td>
           <td>
-              <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:80%" placeholder="CXA261331"/>
-              <label for ="input-supply-kit" style="font-size:.8rem;">Ex. CXA261331</label>
+              <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:80%" placeholder="CON000007"/>
+              <label for ="input-supply-kit" style="font-size:.8rem;">Ex. CON000007</label>
           </td>
           <td>
-              <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:80%" name="input-specimen-kit" placeholder="CXA261331"/>
-              <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CXA261331</label>
+              <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:80%" name="input-specimen-kit" placeholder="CON000007"/>
+              <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CON000007</label>
           </td>
           <td>
-              <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%; text-overflow: ellipsis;" placeholder="QBC436604 0002
+              <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%; text-overflow: ellipsis;" placeholder="CXA123460 0009
               " name"input-collection-cup"/>
-              <label for ="input-collection-cup" style="font-size:.8rem;">Ex. QBC436604 0002
+              <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
               </label>
           </td>
           <td>
-              <input id="input-collection-card" type="string" autocomplete="off" style="width:80%" placeholder="QBC436604 0002
+              <input id="input-collection-card" type="string" autocomplete="off" style="width:80%" placeholder="CXA123460 0009
               " name="input-collection-card"/>
-              <label for ="input-collection-card" style="font-size:.8rem;">Ex. QBC436604 0002
+              <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0009
               </label>
           </td>
       </tr>
@@ -301,16 +301,22 @@ const saveItem = async (
     /* 
       INPUT CHARACTER LENGTH CHECK
     */
+    console.log(
+      jsonSaveBody.uspsTrackingNumber.length,
+      jsonSaveBody.uspsTrackingNumber.length < 20,
+      jsonSaveBody.uspsTrackingNumber > 22
+    );
     if (
-      jsonSaveBody.uspsTrackingNumber.length <= 20 &&
-      jsonSaveBody.uspsTrackingNumber.length >= 22
+      jsonSaveBody.uspsTrackingNumber.length < 20 ||
+      jsonSaveBody.uspsTrackingNumber.length > 22
     ) {
       return alert(
-        "uspsTrackingNumber length must be within the range of 20 to 22 characters"
+        "USPS tracking number length must be within the range of 20 to 22 characters"
       );
     }
 
     if (jsonSaveBody.supplyKitId.length !== 9) {
+      debugger;
       return alert("supply kit id must be 9 characters");
     }
 
