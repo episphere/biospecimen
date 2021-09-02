@@ -84,7 +84,6 @@ export const kitAssemblyScreen = async (auth, route) => {
     inputCollectionCard,
     inputElements
   );
-  console.log(uspsHolder);
 };
 
 /*
@@ -138,20 +137,22 @@ const addKitData = async (jsonSaveBody) => {
 
   if (response.status === 200) {
     alert += `
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div id="alert-success" class="alert alert-success alert-dismissible fade show" role="alert">
       <strong>Kit was saved successfully!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>`;
     contentBody.insertAdjacentHTML("afterbegin", alert);
+    closeAlert("success");
   } else {
-    alert += `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    alert += `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
       <strong>Kit was not saved successfully!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>`;
+    closeAlert("warn");
   }
 };
 
@@ -220,7 +221,7 @@ const populateKitTable = (tableBody, kitData) => {
         <tr class="new-row">      
           <th scope="row">${lastRowNumber + 1}</th>
           <td>
-            <input id="input-usps" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="21168034670515269250"/>
+            <input id="input-usps" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="21168034670515269250" />
             <label for ="input-usps" style="font-size:.8rem;">Ex. 21168034670515269250</label>
           </td>
           <td>
@@ -300,33 +301,28 @@ const saveItem = async (
     /* 
       INPUT CHARACTER LENGTH CHECK
     */
-    if (jsonSaveBody.uspsTrackingNumber.length !== 20) {
-      console.log(jsonSaveBody.uspsTrackingNumber.length);
-
-      return alert("uspsTrackingNumber length must be 20 characters");
+    if (
+      jsonSaveBody.uspsTrackingNumber.length <= 20 &&
+      jsonSaveBody.uspsTrackingNumber.length >= 22
+    ) {
+      return alert(
+        "uspsTrackingNumber length must be within the range of 20 to 22 characters"
+      );
     }
 
     if (jsonSaveBody.supplyKitId.length !== 9) {
-      console.log(jsonSaveBody.supplyKitId.length);
-
       return alert("supply kit id must be 9 characters");
     }
 
     if (jsonSaveBody.specimenKitId.length !== 9) {
-      console.log(jsonSaveBody.specimenKitId.length);
-
       return alert("specimen kit id must be 9 characters");
     }
 
     if (jsonSaveBody.collectionCupId.length !== 14) {
-      console.log(jsonSaveBody.collectionCupId.length);
-
       return alert("collection cup id must be 14 characters");
     }
 
     if (jsonSaveBody.collectionCardId.length !== 14) {
-      console.log(jsonSaveBody.collectionCardId.length);
-
       return alert("collection card id must be 14 characters");
     }
 
@@ -341,17 +337,16 @@ const saveItem = async (
 
     // Checks array if input usps tracking number exists in usps placeholder array
     // exits outer function if duplicate
-    // if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
-    //   debugger;
-    //   alert("Duplicate usps tracking number!");
-    //   return;
-    // }
+    if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
+      alert("Duplicate usps tracking number!");
+      return;
+    }
 
     // ADD DATA to TABLE
     addKitData(jsonSaveBody);
 
     addRow(jsonSaveBody, tableNumRows);
-    console.log(uspsHolder);
+
     clearRowInputs(inputElements);
   });
 };
@@ -366,7 +361,13 @@ const userInputHandler = async (
   inputCollectionCard
 ) => {
   // Event Handlers for input fields
-  await inputUsps.addEventListener("input", (e) => {
+  await inputUsps.addEventListener("blur", (e) => {
+    let usps = e.target.value;
+    console.log(usps.length);
+    if (usps.length >= 30 && usps.length <= 32) {
+      console.log(usps.length, usps);
+      e.target.value = usps.split("").splice(8).join("");
+    }
     inputUsps.value = e.target.value;
   });
 
@@ -415,7 +416,6 @@ function addRow(jsonSaveBody, tableNumRows) {
     // alert("Number Value");
   } else {
     alert("Invalid USPS number data type, Not a number value");
-    debugger;
     return;
   }
 
@@ -478,10 +478,28 @@ function isNumeric(num) {
 // Prevents POST request and Add to line if duplicate is found
 // Used as a conditional in if statement above
 function checkDuplicate(uspsHolder, number) {
-  let found = uspsHolder.indexOf(number);
+  let unique = [...new Set(uspsHolder)];
+  let found = unique.indexOf(number);
   if (found !== -1) {
     return true;
   }
+}
+
+// Manually close alert
+function closeAlert(status) {
+  if (status === "success") {
+    const alertSuccess = document.getElementById("alert-success");
+    alertSuccess.style.display = "block";
+    setTimeout(function () {
+      alertSuccess.style.display = "none";
+    }, 3000);
+  } else if (status === "warn") {
+    const alertWarning = document.getElementById("alert-warning");
+    alertWarning.style.display = "block";
+    setTimeout(function () {
+      alertWarning.style.display = "none";
+    }, 3000);
+  } else return;
 }
 
 /*
@@ -498,17 +516,4 @@ UPCOMING FEATURES
 
 Extra- ALERT FADE OUT
     - HAVE ALERT FADE OUT WHEN CERTAIN TIME PASSES
-
-
-/*
-
-API INTEGRATION
-
-url with - https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/
-
-http://{URL}/biospecimen?api=printAddresses returns success upon adding participant data to Participant Selection collection
-
-http://{URL}/biospecimen?api=getParticipantSelection&type=${filter} returns participant data with kit status set as per filter
-
-http://{URL}/biospecimen?api=assignKit updates participant data with kit status, usps tracking number & supply kit id
 */
