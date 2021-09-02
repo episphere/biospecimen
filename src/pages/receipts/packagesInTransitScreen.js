@@ -213,10 +213,15 @@ const manifestButton = (data) => {
     );
     button.dataset.location = data[index][fieldToConceptIdMapping.shippingSite];
 
-    // button.dataset.firstName =
-    //   data[index].bags[Object.keys(data[index].bags)][
-    //     fieldToConceptIdMapping.shippingFirstName
-    //   ];
+    /*
+    Add for loop/ for Each
+    if (JSON.stringify(refusalObj) === '{}')
+    Condition - If bag is empty skip
+    */
+    button.dataset.firstName =
+      data[index].bags[Object.keys(data[index].bags)][
+        fieldToConceptIdMapping.shippingFirstName
+      ];
 
     // button.dataset.lName = data[index].bags[Object.keys(data[index].bags)];
     // button.dataset.sender = data[index]
