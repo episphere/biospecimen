@@ -8,7 +8,13 @@ const api =
 
 // Track the last row number
 let lastRowNumber = "";
+
+// Holders to add unique values and test against duplicates
 let uspsHolder = [];
+let supplyKitHolder = [];
+let specimenKitHolder = [];
+let collectionCupHolder = [];
+let collectionCardHolder = [];
 
 export const kitAssemblyScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -38,6 +44,9 @@ export const kitAssemblyScreen = async (auth, route) => {
   // Render Page Buttons
   kitAssemblyPageButtons();
 
+  /*
+    IMPORTANT - declare inside this function scope and in this order, populateKitTable will need to render input elements before they can be targetted via DOM
+  */
   let inputUsps = document.getElementById("input-usps");
   let inputSupplyKit = document.getElementById("input-supply-kit");
   let inputSpecimenKit = document.getElementById("input-specimen-kit");
@@ -98,7 +107,6 @@ const getKitData = async () => {
       const kitData = await response.json();
       if (kitData.data.length) {
         // Sort Function from Oldest to Newest
-        console.log(kitData.data, "first path ");
         const sortData = [...kitData.data].sort((a, b) =>
           a.timeStamp < b.timeStamp ? -1 : a.timeStamp > b.timeStamp ? 1 : 0
         );
@@ -195,15 +203,12 @@ const populateKitTable = (tableBody, kitData) => {
   // TODO = Make the number dynamic and editable
   let extraRow = "";
 
-  console.log(kitData);
-
   // Early exit if KitData is undefined
   if (!kitData || !kitData.length) {
     console.log("kitdata is undefined! or has length of 0");
     for (let i = 0; i < 1; i++) {
-      // Update the last row number
+      // Update the last row number outer scope variable
       lastRowNumber = i + 1;
-      // // If the current iteration is the last item and matches length of last row variable, add an extra row
       if (lastRowNumber === 1) {
         extraRow = `
       <tr class="new-row">      
@@ -250,8 +255,13 @@ const populateKitTable = (tableBody, kitData) => {
 
   // Create loop and iterate all array items
   for (let i = 0; i < kitData.length; i++) {
+    // Populate column array holders with data to check against duplicates later
     // Append usps track number to uspsHolder
     uspsHolder.push(kitData[i].uspsTrackingNumber);
+    supplyKitHolder.push(kitData[i].supplyKitId);
+    specimenKitHolder.push(kitData[i].specimenKitId);
+    collectionCupHolder.push(kitData[i].collectionCupId);
+    collectionCardHolder.push(kitData[i].collectionCardId);
     // console.log(uspsHolder);
 
     // Append a row with data cells and corresponding data from fetch
@@ -307,6 +317,13 @@ const populateKitTable = (tableBody, kitData) => {
 
     tableBody.innerHTML = tableRow;
   }
+
+  // REMOVE - Check to see if data was added to holders on kitTable render
+  // console.log(uspsHolder);
+  // console.log(supplyKitHolder);
+  // console.log(specimenKitHolder);
+  // console.log(collectionCupHolder);
+  // console.log(collectionCardHolder);
 };
 
 const kitAssemblyPageButtons = () => {
@@ -346,52 +363,81 @@ const saveItem = async (
     // Convert string to number data type
     jsonSaveBody.uspsTrackingNumber = inputUsps.value.trim();
 
-    // PREVENTS USER FROM SUBMITTING INCOMPLETE INPUT FIELD ROW
-    for (const key in jsonSaveBody) {
-      if (!jsonSaveBody[key]) {
-        // Modal Dialog Warning!
-        alert("One or more inputs are empty!");
-        return;
-      }
-    }
-    /* 
-      INPUT CHARACTER LENGTH CHECK
-    */
+    // PREVENTS USER FROM SUBMITTING INCOMPLETE INPUT FIELD ROW ***
+    // for (const key in jsonSaveBody) {
+    //   if (!jsonSaveBody[key]) {
+    //     // Modal Dialog Warning!
+    //     alert("One or more inputs are empty!");
+    //     return;
+    //   }
+    // }
+    // /*
+    //   INPUT CHARACTER LENGTH CHECK
+    // */
 
-    if (
-      jsonSaveBody.uspsTrackingNumber.length < 20 ||
-      jsonSaveBody.uspsTrackingNumber.length > 22
-    ) {
-      return alert(
-        "USPS tracking number length must be within the range of 20 to 22 characters"
-      );
-    }
+    // if (
+    //   jsonSaveBody.uspsTrackingNumber.length < 20 ||
+    //   jsonSaveBody.uspsTrackingNumber.length > 22
+    // ) {
+    //   return alert(
+    //     "USPS tracking number length must be within the range of 20 to 22 characters"
+    //   );
+    // }
 
-    if (jsonSaveBody.supplyKitId.length !== 9) {
-      return alert("supply kit id must be 9 characters");
-    }
+    // if (jsonSaveBody.supplyKitId.length !== 9) {
+    //   return alert("supply kit id must be 9 characters");
+    // }
 
-    if (jsonSaveBody.specimenKitId.length !== 9) {
-      return alert("specimen kit id must be 9 characters");
-    }
+    // if (jsonSaveBody.specimenKitId.length !== 9) {
+    //   return alert("specimen kit id must be 9 characters");
+    // }
 
-    if (jsonSaveBody.collectionCupId.length !== 14) {
-      return alert("collection cup id must be 14 characters");
-    }
+    // if (jsonSaveBody.collectionCupId.length !== 14) {
+    //   return alert("collection cup id must be 14 characters");
+    // }
 
-    if (jsonSaveBody.collectionCardId.length !== 14) {
-      return alert("collection card id must be 14 characters");
-    }
+    // if (jsonSaveBody.collectionCardId.length !== 14) {
+    //   return alert("collection card id must be 14 characters");
+    // }
 
-    // Checks array if input usps tracking number exists in usps placeholder array
-    // exits outer function if duplicate
-    if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
-      alert("Duplicate usps tracking number!");
+    if (jsonSaveBody.supplyKitId !== jsonSaveBody.specimenKitId) {
+      console.log("supply kit id and specimen kit id inputs do not match");
       return;
     }
 
-    // Increment with all filled input fields
+    if (jsonSaveBody.collectionCupId !== jsonSaveBody.collectionCardId) {
+      console.log(
+        "collection cup id and collection card id inputs do not match"
+      );
+      return;
+    }
+
+    // // Checks array if input usps tracking number exists in usps placeholder array
+    // // exits outer function if duplicate
+    if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
+      console.log("Duplicate usps tracking number!");
+      // alert("Duplicate usps tracking number!");
+      return;
+    }
+
+    if (checkDuplicate(supplyKitHolder, jsonSaveBody.supplyKitId)) {
+      console.log("Duplicate supply kit id!");
+      return;
+    }
+
+    if (checkDuplicate(specimenKitHolder, jsonSaveBody.specimenKitId)) {
+      console.log("Duplicate specimen kit id!");
+      return;
+    }
+
+    if (checkDuplicate(collectionCupHolder, jsonSaveBody.collectionCupId)) {
+      console.log("Duplicate collection cup id!");
+      return;
+    }
+
+    // Increment with all filled input fields, add after conditional checks
     tableNumRows++;
+
     // ADD DATA to TABLE
     // addKitData(jsonSaveBody);
 
@@ -413,28 +459,32 @@ const userInputHandler = async (
   // Event Handlers for input fields
   await inputUsps.addEventListener("blur", (e) => {
     let usps = e.target.value;
+    console.log(usps);
     console.log(usps.length);
     if (usps.length >= 30 && usps.length <= 32) {
       console.log(usps.length, usps);
-      e.target.value = usps.split("").splice(8).join("");
+      usps = usps.split("").splice(8).join("").trim();
+      inputUsps.value = usps;
+      console.log(usps.length, usps);
     }
-    inputUsps.value = e.target.value;
+    inputUsps.value = e.target.value.trim();
+    console.log(inputUsps.value, usps);
   });
 
-  await inputSupplyKit.addEventListener("input", (e) => {
-    inputSupplyKit.value = e.target.value;
+  await inputSupplyKit.addEventListener("blur", (e) => {
+    inputSupplyKit.value = e.target.value.trim();
   });
 
-  await inputSpecimenKit.addEventListener("input", (e) => {
-    inputSpecimenKit.value = e.target.value;
+  await inputSpecimenKit.addEventListener("blur", (e) => {
+    inputSpecimenKit.value = e.target.value.trim();
   });
 
-  await inputCollectionCup.addEventListener("input", (e) => {
-    inputCollectionCup.value = e.target.value;
+  await inputCollectionCup.addEventListener("blur", (e) => {
+    inputCollectionCup.value = e.target.value.trim();
   });
 
-  await inputCollectionCard.addEventListener("input", (e) => {
-    inputCollectionCard.value = e.target.value;
+  await inputCollectionCard.addEventListener("blur", (e) => {
+    inputCollectionCard.value = e.target.value.trim();
   });
 };
 
@@ -450,8 +500,28 @@ const jsonSaveBody = {
 // Add New row with inputs
 const addRow = (jsonSaveBody, tableNumRows) => {
   // Convert to integer num value
-  let uspsTrackingNumber = jsonSaveBody.uspsTrackingNumber;
-  console.log(uspsTrackingNumber);
+  // let uspsTrackingNumber = jsonSaveBody.uspsTrackingNumber;
+  // let supplyKitId = jsonSaveBody.supplyKitId;
+  // let specimenKitId = jsonSaveBody.specimenKitId;
+  // let collectionCupId = jsonSaveBody.collectionCupId;
+  // let collectionCardId = jsonSaveBody.collectionCardId;
+
+  // DESTRUCTURING OBJECT AND ASSIGN TO VARIABLES OPTION
+  let {
+    uspsTrackingNumber,
+    supplyKitId,
+    specimenKitId,
+    collectionCupId,
+    collectionCardId,
+  } = jsonSaveBody;
+
+  console.log(
+    uspsTrackingNumber,
+    supplyKitId,
+    specimenKitId,
+    collectionCupId,
+    collectionCardId
+  );
 
   // Target Line Item Number
   let newRowEl = document.querySelector(".new-row");
@@ -460,6 +530,8 @@ const addRow = (jsonSaveBody, tableNumRows) => {
   // If trackingNumber is data type of number
   // CALL isNumeric function to check if input is a valid number
   if (isNumeric(uspsTrackingNumber)) {
+    // REMOVE - CONSOLE LOGS
+    // TODO - ADD EVERYTHING BELOW if else block into if code block
     console.log(typeof uspsTrackingNumber === "number");
     console.log(uspsTrackingNumber);
     // ADD UI MODAL
@@ -469,7 +541,13 @@ const addRow = (jsonSaveBody, tableNumRows) => {
     return;
   }
 
+  // Add unique usps tracking number to usps holder variable
   uspsHolder.push(uspsTrackingNumber);
+  supplyKitHolder.push(supplyKitId);
+  specimenKitHolder.push(specimenKitId);
+  collectionCupHolder.push(collectionCupId);
+  collectionCardHolder.push(collectionCardId);
+
   newRowEl.firstChild.nextSibling.innerHTML = tableNumRows;
   newRowEl.insertAdjacentHTML(
     "beforebegin",
@@ -527,8 +605,8 @@ const isNumeric = (num) => {
 
 // Prevents POST request and Add to line if duplicate is found
 // Used as a conditional in if statement above
-const checkDuplicate = (uspsHolder, number) => {
-  let unique = [...new Set(uspsHolder)];
+const checkDuplicate = (arrayHolder, number) => {
+  let unique = [...new Set(arrayHolder)];
   let found = unique.indexOf(number);
   if (found !== -1) {
     return true;
