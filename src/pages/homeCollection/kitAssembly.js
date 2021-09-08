@@ -96,7 +96,7 @@ const getKitData = async () => {
   });
 
   try {
-    if (response.status === 201) {
+    if (response.status === 200) {
       const kitData = await response.json();
       if (kitData.data.length) {
         // Sort Function from Oldest to Newest
@@ -105,12 +105,12 @@ const getKitData = async () => {
         );
         return sortData;
       }
-      // TODO: ADD a row where a user can enter data, handle when there is no data from GET request
       throw new Error("No Kit Assembly data!");
     } else {
       throw new Error("Status Code is not 200!");
     }
   } catch (e) {
+    // if error return an empty array
     console.log(e);
     return [];
   }
@@ -215,24 +215,24 @@ const populateKitTable = (tableBody, kitData) => {
           <p></p>
         </td>
         <td>
-            <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:80%" placeholder="CON000007"/>
+            <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:100%" placeholder="CON000007"/>
             <label for ="input-supply-kit" style="font-size:.8rem;">Ex. CON000007</label>
             <p></p>
         </td>
         <td>
-            <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:80%" name="input-specimen-kit" placeholder="CON000007"/>
+            <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:100%" name="input-specimen-kit" placeholder="CON000007"/>
             <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CON000007</label>
             <p></p>
         </td>
         <td class="text-wrap">
-            <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%; text-overflow: ellipsis;" placeholder="CXA123460 0009
+            <input id="input-collection-cup" type="string" autocomplete="off" style="width:100%; text-overflow: ellipsis;" placeholder="CXA123460 0009
             " name"input-collection-cup"/>
             <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
             </label>
             
         </td>
         <td>
-            <input id="input-collection-card" type="string" autocomplete="off" style="width:80%" placeholder="CXA123460 0009
+            <input id="input-collection-card" type="string" autocomplete="off" style="width:10 0%" placeholder="CXA123460 0009
             " name="input-collection-card"/>
             <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0009
             </label>
@@ -279,23 +279,23 @@ const populateKitTable = (tableBody, kitData) => {
             <p></p>
           </td>
           <td>
-            <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:80%" placeholder="CON000007"/>
+            <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:100%" placeholder="CON000007"/>
             <label for ="input-supply-kit" style="font-size:.8rem;">Ex. CON000007</label>
             <p></p>
           </td>
           <td>
-            <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:80%" name="input-specimen-kit" placeholder="CON000007"/>
+            <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:100%" name="input-specimen-kit" placeholder="CON000007"/>
             <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CON000007</label>
           </td>
           <td>
-            <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%; text-overflow: ellipsis;" placeholder="CXA123460 0009
+            <input id="input-collection-cup" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0009
             " name"input-collection-cup"/>
             <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
             </label>
             <p></p>
           </td>
           <td>
-              <input id="input-collection-card" type="string" autocomplete="off" style="width:80%" placeholder="CXA123460 0009
+              <input id="input-collection-card" type="string" autocomplete="off" style="width:100%" placeholder="CXA123460 0009
               " name="input-collection-card"/>
               <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0009
               </label>
@@ -449,7 +449,7 @@ const jsonSaveBody = {
 };
 
 // Add New row with inputs
-function addRow(jsonSaveBody, tableNumRows) {
+const addRow = (jsonSaveBody, tableNumRows) => {
   // Convert to integer num value
   let uspsTrackingNumber = jsonSaveBody.uspsTrackingNumber;
   console.log(uspsTrackingNumber);
@@ -493,14 +493,14 @@ function addRow(jsonSaveBody, tableNumRows) {
 </td>
 </tr>`
   );
-}
+};
 
 // Clear the row of existing user inputs
-function clearRowInputs(inputElements) {
+const clearRowInputs = (inputElements) => {
   for (let property in inputElements) {
     inputElements[property].value = "";
   }
-}
+};
 
 // clear Button Clear Inputs Function
 
@@ -520,24 +520,24 @@ const clearAllInputs = (inputElements) => {
 CHECK IF STRING OR NUM VALUE IS A REAL NUMBER  
 https://stackoverflow.com/questions/9716468/pure-javascript-a-function-like-jquerys-isnumeric
 */
-function isNumeric(num) {
+const isNumeric = (num) => {
   // parseFloat - converts to string if needed, and then returns a floating point number
   // isFinite - false if the argument is (or will be coerced to) positive or negative Infinity or NaN or undefined
   return !isNaN(parseFloat(num)) && isFinite(num);
-}
+};
 
 // Prevents POST request and Add to line if duplicate is found
 // Used as a conditional in if statement above
-function checkDuplicate(uspsHolder, number) {
+const checkDuplicate = (uspsHolder, number) => {
   let unique = [...new Set(uspsHolder)];
   let found = unique.indexOf(number);
   if (found !== -1) {
     return true;
   }
-}
+};
 
 // Manually close alert
-function closeAlert(status) {
+const closeAlert = (status) => {
   if (status === "success") {
     const alertSuccess = document.getElementById("alert-success");
     alertSuccess.style.display = "block";
@@ -551,4 +551,4 @@ function closeAlert(status) {
       alertWarning.style.display = "none";
     }, 3000);
   } else return;
-}
+};
