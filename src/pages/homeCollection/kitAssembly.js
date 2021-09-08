@@ -17,7 +17,7 @@ export const kitAssemblyScreen = async (auth, route) => {
   showAnimation();
   const kitData = await getKitData().then((res) => res.data);
   hideAnimation();
-  await kitAssemblyTemplate(user, name, auth, route);
+  // await kitAssemblyTemplate(user, name, auth, route);
 
   // TODO: UNSAVED AND NAVIGATION - REFACTOR AND MAKE REUSABLE FOR OTHER PAGES
   // window.addEventListener("beforeunload", function (e) {
@@ -29,19 +29,14 @@ export const kitAssemblyScreen = async (auth, route) => {
   //   return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
   // });
 
-  kitAssemblyTemplate(name, auth, route);
+  kitAssemblyTemplate(user, name, auth, route);
 
   // Fetch data using GET request
 
   const tableBody = document.getElementById("kit-assembly-table-body");
 
-  // Sort Function from Oldest to Newest (REFACTOR FOR MULTIPLE USE)
-  const sortData = kitData.sort((a, b) =>
-    a.timeStamp < b.timeStamp ? -1 : a.timeStamp > b.timeStamp ? 1 : 0
-  );
-
   // Render Table Data
-  populateKitTable(tableBody, sortData);
+  populateKitTable(tableBody, kitData);
   // Render Page Buttons
   kitAssemblyPageButtons();
 
@@ -101,10 +96,14 @@ const getKitData = async () => {
   });
 
   try {
-    if (response.status === 200) {
+    if (response.status === 201) {
       const kitData = await response.json();
       if (kitData.data.length) {
-        return kitData;
+        // Sort Function from Oldest to Newest
+        const sortData = kitData.sort((a, b) =>
+          a.timeStamp < b.timeStamp ? -1 : a.timeStamp > b.timeStamp ? 1 : 0
+        );
+        return sortData;
       }
       // TODO: ADD a row where a user can enter data, handle when there is no data from GET request
       throw new Error("No Kit Assembly data!");
@@ -113,6 +112,7 @@ const getKitData = async () => {
     }
   } catch (e) {
     console.log(e);
+    return [];
   }
 };
 /*
@@ -156,7 +156,7 @@ const addKitData = async (jsonSaveBody) => {
   }
 };
 
-const kitAssemblyTemplate = async (name, auth, route) => {
+const kitAssemblyTemplate = async (user, name, auth, route) => {
   let template = ``;
   template += homeCollectionNavbar();
   template += `
@@ -170,12 +170,12 @@ const kitAssemblyTemplate = async (name, auth, route) => {
                 <thead>
                     <tr style="top: 0;
                     position: sticky;">
-                        <th scope="col" style="background-color: #f7f7f7;">Line Item</th>
-                        <th scope="col" style="background-color: #f7f7f7;">Specimen Kit USPS Tracking Number</th>
-                        <th scope="col" style="background-color: #f7f7f7;">Supply Kit ID</th>
-                        <th scope="col" style="background-color: #f7f7f7;">Specimen Kit ID</th>
-                        <th scope="col" style="background-color: #f7f7f7;">Collection Cup ID</th>
-                        <th scope="col" style="background-color: #f7f7f7;">Collection Card ID</th>
+                        <th scope="col" style="background-color: #f7f7f7;" width="5%">Line Item</th>
+                        <th scope="col" style="background-color: #f7f7f7;" width="25%">Specimen Kit USPS Tracking Number</th>
+                        <th scope="col" style="background-color: #f7f7f7;" width="15%">Supply Kit ID</th>
+                        <th scope="col" style="background-color: #f7f7f7;" width="15%">Specimen Kit ID</th>
+                        <th scope="col" style="background-color: #f7f7f7;" width="20%">Collection Cup ID</th>
+                        <th scope="col" style="background-color: #f7f7f7;" width="20%">Collection Card ID</th>
                     </tr>
                 </thead>
                 
@@ -195,6 +195,59 @@ const populateKitTable = (tableBody, kitData) => {
 
   // TODO = Make the number dynamic and editable
   let extraRow = "";
+
+  console.log(kitData);
+
+  // Early exit if KitData is undefined
+  if (!kitData || !kitData.length) {
+    console.log("kitdata is undefined! or has length of 0");
+    for (let i = 0; i < 1; i++) {
+      // Update the last row number
+      lastRowNumber = i + 1;
+      // // If the current iteration is the last item and matches length of last row variable, add an extra row
+      if (lastRowNumber === 1) {
+        extraRow = `
+      <tr class="new-row">      
+        <th scope="row">${lastRowNumber}</th>
+        <td>
+          <input id="input-usps" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="3374889321009425653720" />
+          <label for ="input-usps" style="font-size:.8rem;">Ex. 3374889321009425653720</label>
+          <p></p>
+        </td>
+        <td>
+            <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:80%" placeholder="CON000007"/>
+            <label for ="input-supply-kit" style="font-size:.8rem;">Ex. CON000007</label>
+            <p></p>
+        </td>
+        <td>
+            <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:80%" name="input-specimen-kit" placeholder="CON000007"/>
+            <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CON000007</label>
+            <p></p>
+        </td>
+        <td class="text-wrap">
+            <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%; text-overflow: ellipsis;" placeholder="CXA123460 0009
+            " name"input-collection-cup"/>
+            <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
+            </label>
+            
+        </td>
+        <td>
+            <input id="input-collection-card" type="string" autocomplete="off" style="width:80%" placeholder="CXA123460 0009
+            " name="input-collection-card"/>
+            <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0009
+            </label>
+            <p></p>
+        </td>
+    </tr>
+    `;
+        tableRow += extraRow;
+      }
+
+      tableBody.innerHTML = tableRow;
+      debugger;
+      return;
+    }
+  }
 
   // Create loop and iterate all array items
   for (let i = 0; i < kitData.length; i++) {
@@ -223,26 +276,30 @@ const populateKitTable = (tableBody, kitData) => {
           <td>
             <input id="input-usps" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="3374889321009425653720" />
             <label for ="input-usps" style="font-size:.8rem;">Ex. 3374889321009425653720</label>
+            <p></p>
           </td>
           <td>
-              <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:80%" placeholder="CON000007"/>
-              <label for ="input-supply-kit" style="font-size:.8rem;">Ex. CON000007</label>
+            <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:80%" placeholder="CON000007"/>
+            <label for ="input-supply-kit" style="font-size:.8rem;">Ex. CON000007</label>
+            <p></p>
           </td>
           <td>
-              <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:80%" name="input-specimen-kit" placeholder="CON000007"/>
-              <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CON000007</label>
+            <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:80%" name="input-specimen-kit" placeholder="CON000007"/>
+            <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CON000007</label>
           </td>
           <td>
-              <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%; text-overflow: ellipsis;" placeholder="CXA123460 0009
-              " name"input-collection-cup"/>
-              <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
-              </label>
+            <input id="input-collection-cup" type="string" autocomplete="off" style="width:80%; text-overflow: ellipsis;" placeholder="CXA123460 0009
+            " name"input-collection-cup"/>
+            <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
+            </label>
+            <p></p>
           </td>
           <td>
               <input id="input-collection-card" type="string" autocomplete="off" style="width:80%" placeholder="CXA123460 0009
               " name="input-collection-card"/>
               <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0009
               </label>
+              <p></p>
           </td>
       </tr>
       `;
@@ -327,15 +384,6 @@ const saveItem = async (
       return alert("collection card id must be 14 characters");
     }
 
-    // Increment with all filled input fields
-    tableNumRows++;
-
-    // Check and change data type to number before sending POST request
-    // if (isNumeric(jsonSaveBody.uspsTrackingNumber)) {
-    //   jsonSaveBody.uspsTrackingNumber = parseInt(inputUsps.value.trim());
-    //   console.log(jsonSaveBody);
-    // }
-
     // Checks array if input usps tracking number exists in usps placeholder array
     // exits outer function if duplicate
     if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
@@ -343,8 +391,10 @@ const saveItem = async (
       return;
     }
 
+    // Increment with all filled input fields
+    tableNumRows++;
     // ADD DATA to TABLE
-    addKitData(jsonSaveBody);
+    // addKitData(jsonSaveBody);
 
     addRow(jsonSaveBody, tableNumRows);
 
@@ -502,19 +552,3 @@ function closeAlert(status) {
     }, 3000);
   } else return;
 }
-
-/*
-UPCOMING FEATURES
-
-1. USER VALIDATION CHECKS - 
-    - Input checks for Column 2 and 3 (Match) / Modals? 
-    - Input checks for Column 4 and 5 (Match) / Modals?
-    - USPS unique numeric check / Modals?
-    - Modal Warning when user is moving away from page or accidentally hit close button
-
-2. ALERT USER WHEN THEY NAVIGATE AWAY FROM PAGE OR EXIT WINDOW  - 
-    https://stackoverflow.com/questions/7317273/warn-user-before-leaving-web-page-with-unsaved-changes
-
-Extra- ALERT FADE OUT
-    - HAVE ALERT FADE OUT WHEN CERTAIN TIME PASSES
-*/
