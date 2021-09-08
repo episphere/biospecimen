@@ -15,9 +15,9 @@ export const kitAssemblyScreen = async (auth, route) => {
   if (!user) return;
   const name = user.displayName ? user.displayName : user.email;
   showAnimation();
-  const kitData = await getKitData().then((res) => res.data);
+  // Fetch data using GET request
+  const kitData = await getKitData();
   hideAnimation();
-  // await kitAssemblyTemplate(user, name, auth, route);
 
   // TODO: UNSAVED AND NAVIGATION - REFACTOR AND MAKE REUSABLE FOR OTHER PAGES
   // window.addEventListener("beforeunload", function (e) {
@@ -30,8 +30,6 @@ export const kitAssemblyScreen = async (auth, route) => {
   // });
 
   kitAssemblyTemplate(user, name, auth, route);
-
-  // Fetch data using GET request
 
   const tableBody = document.getElementById("kit-assembly-table-body");
 
@@ -100,7 +98,8 @@ const getKitData = async () => {
       const kitData = await response.json();
       if (kitData.data.length) {
         // Sort Function from Oldest to Newest
-        const sortData = kitData.sort((a, b) =>
+        console.log(kitData.data, "first path ");
+        const sortData = [...kitData.data].sort((a, b) =>
           a.timeStamp < b.timeStamp ? -1 : a.timeStamp > b.timeStamp ? 1 : 0
         );
         return sortData;
@@ -225,7 +224,7 @@ const populateKitTable = (tableBody, kitData) => {
             <p></p>
         </td>
         <td class="text-wrap">
-            <input id="input-collection-cup" type="string" autocomplete="off" style="width:100%; text-overflow: ellipsis;" placeholder="CXA123460 0009
+            <input id="input-collection-cup" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0009
             " name"input-collection-cup"/>
             <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
             </label>
