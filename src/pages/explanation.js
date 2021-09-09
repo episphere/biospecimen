@@ -7,6 +7,8 @@ export const explanationTemplate = (dt, biospecimenData) => {
     const notCollected = Array.from(document.getElementsByClassName('tube-collected')).filter(dt => dt.checked === false);
     const deviated = Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === true);
     const tubes = workflows[getWorflow()];
+    const includeNotCollectedFormFields = false;
+
     if(notCollected.length > 0 || deviated.length > 0) {
         let template = `</br>
         <div class="row">
@@ -28,7 +30,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
         </br>
         <form id="explanationForm" method="POST">`;
         let array = [];
-        notCollected.forEach(ele => {
+        includeNotCollectedFormFields && notCollected.forEach(ele => {
             const notCollectedOptions = tubes.filter(tube => tube.concept === ele.id)[0].tubeNotCollectedOptions
             const tubeType = ele.dataset.tubeType;
             if(array.includes(tubeType)) return
