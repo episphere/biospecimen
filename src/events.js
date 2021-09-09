@@ -1952,7 +1952,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         await storeSpecimen([data]);
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
-        explanationTemplate(dt, specimenData);
+        finalizeTemplate(dt, specimenData);
     }
     else {
         await storeSpecimen([data]);
