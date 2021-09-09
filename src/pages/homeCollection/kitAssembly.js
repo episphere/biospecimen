@@ -103,7 +103,7 @@ const getKitData = async () => {
   });
 
   try {
-    if (response.status === 200) {
+    if (response.status === 201) {
       const kitData = await response.json();
       if (kitData.data.length) {
         // Sort Function from Oldest to Newest
@@ -216,31 +216,31 @@ const populateKitTable = (tableBody, kitData) => {
         <td>
           <input id="input-usps" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="3374889321009425653720" />
           <label for ="input-usps" style="font-size:.8rem;">Ex. 3374889321009425653720</label>
-          <p></p>
+          <p id="input-usps-error-message" class="input-error-message"></p>
         </td>
         <td>
             <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:100%" placeholder="CON000007"/>
             <label for ="input-supply-kit" style="font-size:.8rem;">Ex. CON000007</label>
-            <p></p>
+            <p id="input-supply-kit-error-message" class="input-error-message"></p>
         </td>
         <td>
             <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:100%" name="input-specimen-kit" placeholder="CON000007"/>
             <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CON000007</label>
-            <p></p>
+            <p id="input-speciment-kit-error-message" class="input-error-message"></p>
         </td>
         <td class="text-wrap">
             <input id="input-collection-cup" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0009
             " name"input-collection-cup"/>
             <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
             </label>
-            
+            <p id="input-collection-cup-error-message class="input-error-message"></p>
         </td>
         <td>
             <input id="input-collection-card" type="string" autocomplete="off" style="width:10 0%" placeholder="CXA123460 0009
             " name="input-collection-card"/>
             <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0009
             </label>
-            <p></p>
+            <p id="input-collection-card-error-message" class="input-error-message"></p>
         </td>
     </tr>
     `;
@@ -285,30 +285,31 @@ const populateKitTable = (tableBody, kitData) => {
           <td>
             <input id="input-usps" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="3374889321009425653720" />
             <label for ="input-usps" style="font-size:.8rem;">Ex. 3374889321009425653720</label>
-            <p></p>
+            <p id="input-usps-error-message" class="input-error-message"></p>
           </td>
           <td>
             <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:100%" placeholder="CON000007"/>
             <label for ="input-supply-kit" style="font-size:.8rem;">Ex. CON000007</label>
-            <p></p>
+            <p id="input-supply-kit-error-message" class="input-error-message"></p>
           </td>
           <td>
             <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:100%" name="input-specimen-kit" placeholder="CON000007"/>
             <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CON000007</label>
+            <p id="input-speciment-kit-error-message" class="input-error-message"></p>
           </td>
           <td>
             <input id="input-collection-cup" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0009
             " name"input-collection-cup"/>
             <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
             </label>
-            <p></p>
+            <p id="input-collection-cup-error-message class="input-error-message"></p>
           </td>
           <td>
               <input id="input-collection-card" type="string" autocomplete="off" style="width:100%" placeholder="CXA123460 0009
               " name="input-collection-card"/>
               <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0009
               </label>
-              <p></p>
+              <p id="input-collection-card-error-message" class="input-error-message"></p>
           </td>
       </tr>
       `;
@@ -459,6 +460,8 @@ const userInputHandler = async (
   // Event Handlers for input fields
   await inputUsps.addEventListener("blur", (e) => {
     let usps = e.target.value;
+    let uspsErrorMessage = document.getElementById("input-usps-error-message");
+    let uspsInput = document.getElementById("input-usps");
     console.log(usps);
     console.log(usps.length);
     if (usps.length >= 30 && usps.length <= 32) {
@@ -466,9 +469,28 @@ const userInputHandler = async (
       usps = usps.split("").splice(8).join("").trim();
       inputUsps.value = usps;
       console.log(usps.length, usps);
+    } else {
+      inputUsps.value = e.target.value.trim();
+      console.log(inputUsps.value, usps);
+      if (inputUsps.value.length < 20 || inputUsps.value.length > 22) {
+        console.log(
+          "USPS tracking number length must be within the range of 20 to 22 characters"
+        );
+        uspsErrorMessage.setAttribute(
+          "style",
+          "color:#E00000;display:inline-block;font-size:.8rem;"
+        );
+        uspsErrorMessage.innerHTML =
+          "USPS tracking number length must be within the range of 20 to 22 characters";
+      } else {
+        if (inputUsps.value.length > 19 || inputUsps.value.length < 23) {
+          console.log("hi");
+          uspsErrorMessage.style.display = "none";
+          uspsErrorMessage.style.border = "#000";
+        }
+      }
     }
-    inputUsps.value = e.target.value.trim();
-    console.log(inputUsps.value, usps);
+    return;
   });
 
   await inputSupplyKit.addEventListener("blur", (e) => {
