@@ -480,14 +480,14 @@ const userInputHandler = async (
           "style",
           "color:#E00000;display:inline-block;font-size:.8rem;"
         );
-        uspsInput.style.border = "2px solid #E00000";
+        uspsInput.style.borderColor = "#E00000";
         uspsErrorMessage.innerHTML =
           "USPS tracking number length must be within the range of 20 to 22 characters";
       } else {
         if (inputUsps.value.length > 19 || inputUsps.value.length < 23) {
           uspsErrorMessage.style.display = "none";
-          uspsErrorMessage.style.border = "#000";
-          uspsInput.style.border = "initial";
+          // uspsErrorMessage.style.border = "#000";
+          uspsInput.style.borderColor = "";
         }
       }
     }
