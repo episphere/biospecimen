@@ -870,4 +870,36 @@ export const getParticipantSelection = async (filter) => {
     });
     return response.json();
   }
+     
+export const isDeviceiPad = /iPad|iPhone/i.test(navigator.userAgent);
+export const replaceDateInputWithMaskedInput = (dateInput) => {
+
+  if (dateInput.type !== "date") throw new Error(`${dateInput} must be a input type="date"`);
+  dateInput.type = "text";
+  dateInput.placeholder = "mm/dd/yyyy";
+  dateInput.maxLength = 10;
+  dateInput.dataset.maskedInputFormat = "mm/dd/yyyy";
+  dateInput.addEventListener("keypress", function (e) {
+    
+    if (e.keyCode < 47 || e.keyCode > 57) {
+      e.preventDefault();
+    }
+    
+    const len = dateInput.value.length;
+    
+    if (len !== 1 || len !== 3) {
+      if (e.keyCode == 47) {
+        dateInput.preventDefault();
+      }
+    }
+    
+    if (len === 2 || len === 3) {
+        dateInput.value += '/';
+    }
+
+    if (len === 5) {
+        dateInput.value += '/';
+    }
+  });
+};
   
