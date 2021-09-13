@@ -322,6 +322,7 @@ const populateKitTable = (tableBody, kitData) => {
 
   // REMOVE - Check to see if data was added to holders on kitTable render
   console.table(uspsHolder);
+  console.log(uspsHolder);
   console.table(supplyKitHolder);
   console.table(specimenKitHolder);
   console.table(collectionCupHolder);
@@ -407,36 +408,53 @@ const saveItem = async (
     ) {
       //TODO - REFACTOR INTO REUSABLE FUNCTION
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The USPS Tracking Number length must be within the range of 20 to 22 characters!</strong>
+      <strong>The Specimen Kit USPS Tracking Number length must be within the range of 20 to 22 characters!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
       </div>`;
       contentBody.insertAdjacentHTML("afterbegin", alert);
       closeAlert("warn");
-      ("USPS tracking number length must be within the range of 20 to 22 characters");
+      // ("USPS tracking number length must be within the range of 20 to 22 characters");
       return;
     }
 
-    // if (jsonSaveBody.supplyKitId.length !== 9) {
-    //   // TODO - REFACTOR INTO REUSABLE FUNCTION
-    //   // return alert("supply kit id must be 9 characters");
-    // }
+    if (jsonSaveBody.supplyKitId.length !== 9) {
+      // TODO - REFACTOR INTO REUSABLE FUNCTION
+      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>The Supply Kit ID length must be 9 characters!</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+      contentBody.insertAdjacentHTML("afterbegin", alert);
+      closeAlert("warn");
+      return;
+    }
 
-    // if (jsonSaveBody.specimenKitId.length !== 9) {
-    //   // TODO - REFACTOR INTO REUSABLE FUNCTION
-    //   // return alert("specimen kit id must be 9 characters");
-    // }
+    if (jsonSaveBody.specimenKitId.length !== 9) {
+      // TODO - REFACTOR INTO REUSABLE FUNCTION
+      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>The Supply Kit ID length must be 9 characters!</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+      contentBody.insertAdjacentHTML("afterbegin", alert);
+      closeAlert("warn");
+      return;
+      // return alert("specimen kit id must be 9 characters");
+    }
 
-    // if (jsonSaveBody.collectionCupId.length !== 14) {
-    //   // TODO - REFACTOR INTO REUSABLE FUNCTION
-    //   // return alert("collection cup id must be 14 characters");
-    // }
+    if (jsonSaveBody.collectionCupId.length !== 14) {
+      // TODO - REFACTOR INTO REUSABLE FUNCTION
+      // return alert("collection cup id must be 14 characters");
+    }
 
-    // if (jsonSaveBody.collectionCardId.length !== 14) {
-    //   // TODO - REFACTOR INTO REUSABLE FUNCTION
-    //   // return alert("collection card id must be 14 characters");
-    // }
+    if (jsonSaveBody.collectionCardId.length !== 14) {
+      // TODO - REFACTOR INTO REUSABLE FUNCTION
+      // return alert("collection card id must be 14 characters");
+    }
 
     if (jsonSaveBody.supplyKitId !== jsonSaveBody.specimenKitId) {
       // TODO - REFACTOR INTO REUSABLE FUNCTION
@@ -658,7 +676,7 @@ const userInputHandler = async (
       );
       supplyKitInput.style.borderColor = "#E00000";
       inputSupplyKitErrorMessage.innerHTML =
-        "Supply Kit ID number length must be 9 characters";
+        "Supply Kit ID length must be 9 characters";
       console.log(inputSupplyKit.value, supplyKitInput);
     }
     return;
@@ -759,6 +777,7 @@ const addRow = (jsonSaveBody, tableNumRows) => {
   // let collectionCupId = jsonSaveBody.collectionCupId;
   // let collectionCardId = jsonSaveBody.collectionCardId;
 
+  console.log(jsonSaveBody);
   // DESTRUCTURING OBJECT AND ASSIGN TO VARIABLES OPTION
   let {
     uspsTrackingNumber,
@@ -851,9 +870,14 @@ const isNumeric = (num) => {
 // Prevents POST request and Add to line if duplicate is found
 // Used as a conditional in if statement above
 const checkDuplicate = (arrayHolder, number) => {
-  let unique = [...new Set(arrayHolder)];
-  let found = unique.indexOf(number);
+  let uniqueStrArr = [];
+  // If arrayHolder has items proceed with copying arrayHolder and  converting items to string data type and pushing to uniqueStrArr
+  arrayHolder.length &&
+    [...new Set(arrayHolder)].forEach((input) => uniqueStrArr.push(`${input}`));
+  console.log(uniqueStrArr);
+  let found = uniqueStrArr.indexOf(number);
   if (found !== -1) {
+    debugger;
     return true;
   }
 };
