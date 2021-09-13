@@ -233,7 +233,7 @@ const populateKitTable = (tableBody, kitData) => {
             " name"input-collection-cup"/>
             <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
             </label>
-            <p id="input-collection-cup-error-message class="input-error-message"></p>
+            <p id="input-collection-cup-error-message" class="input-error-message"></p>
         </td>
         <td>
             <input id="input-collection-card" type="string" autocomplete="off" style="width:10 0%" placeholder="CXA123460 0009
@@ -302,7 +302,8 @@ const populateKitTable = (tableBody, kitData) => {
             " name"input-collection-cup"/>
             <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
             </label>
-            <p id="input-collection-cup-error-message class="input-error-message"></p>
+            <p id="input-collection-cup-error-message"
+            class="input-error-message"></p>
           </td>
           <td>
               <input id="input-collection-card" type="string" autocomplete="off" style="width:100%" placeholder="CXA123460 0009
@@ -495,20 +496,121 @@ const userInputHandler = async (
   });
 
   await inputSupplyKit.addEventListener("blur", (e) => {
-    inputSupplyKit.value = e.target.value.trim();
+    let supplyKitID = e.target.value;
+    let supplyKitInput = document.getElementById("input-supply-kit");
+    let inputSupplyKitErrorMessage = document.getElementById(
+      "input-supply-kit-error-message"
+    );
+    console.log(inputSupplyKitErrorMessage);
+    console.log(supplyKitInput);
+    if (supplyKitID.length === 9) {
+      console.log(jsonSaveBody.supplyKitId);
+      inputSupplyKit.value = e.target.value.trim();
+      inputSupplyKitErrorMessage.style.display = "none";
+      supplyKitInput.style.borderColor = "";
+      // return alert("supply kit id must be  9 characters");)
+      // console.log(jsonSaveBody);
+    } else {
+      inputSupplyKit.value = e.target.value.trim();
+      inputSupplyKitErrorMessage.setAttribute(
+        "style",
+        "color:#E00000;display:inline-block;font-size:.8rem;"
+      );
+      supplyKitInput.style.borderColor = "#E00000";
+      inputSupplyKitErrorMessage.innerHTML =
+        "Supply Kit ID number length must be 9 characters";
+      console.log(inputSupplyKit.value, supplyKitInput);
+    }
+
+    // debugger;
+    return;
   });
 
   await inputSpecimenKit.addEventListener("blur", (e) => {
-    inputSpecimenKit.value = e.target.value.trim();
+    let specimenKitID = e.target.value;
+    let specimenKitInput = document.getElementById("input-specimen-kit");
+    let inputSpecimenKitErrorMessage = document.getElementById(
+      "input-speciment-kit-error-message"
+    );
+    if (specimenKitID.length === 9) {
+      inputSpecimenKit.value = e.target.value.trim();
+      inputSpecimenKitErrorMessage.style.display = "none";
+      specimenKitInput.style.borderColor = "";
+    } else {
+      inputSpecimenKit.value = e.target.value.trim();
+      inputSpecimenKitErrorMessage.setAttribute(
+        "style",
+        "color:#E00000;display:inline-block;font-size:.8rem;"
+      );
+      inputSpecimenKitErrorMessage.innerHTML =
+        "Specimen Kit ID number length must be 9 characters";
+      specimenKitInput.style.borderColor = "#E00000";
+    }
+    return;
   });
 
   await inputCollectionCup.addEventListener("blur", (e) => {
-    inputCollectionCup.value = e.target.value.trim();
+    // id="input-collection-cup"
+    // id="input-collection-cup-error-message"
+    let collectionCupId = e.target.value;
+    let collectionCupInput = document.getElementById("input-collection-cup");
+    let inputCollectionCupErrorMessage = document.getElementById(
+      "input-collection-cup-error-message"
+    );
+    console.log(inputCollectionCup);
+    if (collectionCupId.length === 14) {
+      console.log(jsonSaveBody.collectionCupId);
+
+      inputCollectionCup.value = e.target.value.trim();
+      inputCollectionCupErrorMessage.style.display = "none";
+      collectionCupInput.style.borderColor = "";
+    } else {
+      inputCollectionCup.value = e.target.value.trim();
+      inputCollectionCupErrorMessage.setAttribute(
+        "style",
+        "color:#E00000;display:inline-block;font-size:.8rem;"
+      );
+      collectionCupInput.style.borderColor = "#E00000";
+      inputCollectionCupErrorMessage.innerHTML =
+        "Input Collection Cup ID number length must be 9 characters";
+    }
+    return;
   });
 
   await inputCollectionCard.addEventListener("blur", (e) => {
-    inputCollectionCard.value = e.target.value.trim();
+    // id="input-collection-cup"
+    // id="input-collection-cup-error-message"
+    let collectionCardId = e.target.value;
+    let collectionCardInput = document.getElementById("input-collection-card");
+    let inputCollectionCardErrorMessage = document.getElementById(
+      "input-collection-card-error-message"
+    );
+
+    if (collectionCardId.length === 14) {
+      console.log(jsonSaveBody.collectionCardId);
+      inputCollectionCard.value = e.target.value.trim();
+      inputCollectionCardErrorMessage.style.display = "none";
+      collectionCardInput.style.borderColor = "";
+    } else {
+      inputCollectionCard.value = e.target.value.trim();
+      inputCollectionCardErrorMessage.setAttribute(
+        "style",
+        "color:#E00000;display:inline-block;font-size:.8rem;"
+      );
+      collectionCardInput.style.borderColor = "#E00000";
+      inputCollectionCardErrorMessage.innerHTML =
+        "Collection Card ID must be 14 characters";
+    }
+    return;
   });
+
+  // if (jsonSaveBody.collectionCupId.length !== 14) {
+  //   return alert("collection cup id must be 14 characters");
+  // }
+
+  // if (jsonSaveBody.collectionCardId.length !== 14) {
+  //   return alert("collection card id must be 14 characters");
+  // }
 };
 
 // Create JSON body object to be modified
