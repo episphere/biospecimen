@@ -387,8 +387,9 @@ const saveItem = async (
         // Iterate through all elements with the input-error-message class
         // Add and change input field border style to red
         for (let box of allInputFields) {
-          console.log(allInputFields);
-          box.style.borderColor = "#e00000";
+          if (!box.value.length) {
+            box.style.borderColor = "#e00000";
+          }
         }
         return;
       }
