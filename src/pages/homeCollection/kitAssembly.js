@@ -143,7 +143,7 @@ const addKitData = async (jsonSaveBody) => {
   let alert = "";
 
   if (response.status === 200) {
-    alert += `
+    alert = `
     <div id="alert-success" class="alert alert-success alert-dismissible fade show" role="alert">
       <strong>Kit was saved successfully!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -153,7 +153,7 @@ const addKitData = async (jsonSaveBody) => {
     contentBody.insertAdjacentHTML("afterbegin", alert);
     closeAlert("success");
   } else {
-    alert += `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+    alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
       <strong>Kit was not saved successfully!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
@@ -215,7 +215,7 @@ const populateKitTable = (tableBody, kitData) => {
         <th scope="row">${lastRowNumber}</th>
         <td>
           <input id="input-usps" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="3374889321009425653720" />
-          <label for ="input-usps" style="font-size:.8rem;">Ex. 3374889321009425653720</label>
+          <label for ="input-usps" style="font-size:.8rem;">Ex. 9803095558879826901825</label>
           <p id="input-usps-error-message" class="input-error-message"></p>
         </td>
         <td>
@@ -321,11 +321,11 @@ const populateKitTable = (tableBody, kitData) => {
   }
 
   // REMOVE - Check to see if data was added to holders on kitTable render
-  // console.log(uspsHolder);
-  // console.log(supplyKitHolder);
-  // console.log(specimenKitHolder);
-  // console.log(collectionCupHolder);
-  // console.log(collectionCardHolder);
+  console.table(uspsHolder);
+  console.table(supplyKitHolder);
+  console.table(specimenKitHolder);
+  console.table(collectionCupHolder);
+  console.table(collectionCardHolder);
 };
 
 const kitAssemblyPageButtons = () => {
@@ -352,6 +352,7 @@ const saveItem = async (
   inputElements
 ) => {
   const saveButton = document.getElementById("kit-assembly-save-button");
+
   let tableNumRows = tableBody.rows.length;
   saveButton.addEventListener("click", (e) => {
     e.preventDefault();
@@ -369,73 +370,174 @@ const saveItem = async (
     // for (const key in jsonSaveBody) {
     //   if (!jsonSaveBody[key]) {
     //     // Modal Dialog Warning!
-    //     alert("One or more inputs are empty!");
+    //     // alert("One or more inputs are empty!");
+    //     // TODO - REFACTOR INTO REUSABLE FUNCTION
+    //     alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+    //       <strong>One or more inputs are empty!</strong>
+    //       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    //         <span aria-hidden="true">&times;</span>
+    //       </button>
+    //       </div>`;
+    //     contentBody.insertAdjacentHTML("afterbegin", alert);
+    //     closeAlert("warn");
     //     return;
     //   }
     // }
-    // /*
-    //   INPUT CHARACTER LENGTH CHECK
-    // */
+
+    /*
+    ==================================
+    INPUT CHARACTER LENGTH CHECK
+    ==================================
+    */
 
     // if (
     //   jsonSaveBody.uspsTrackingNumber.length < 20 ||
     //   jsonSaveBody.uspsTrackingNumber.length > 22
     // ) {
-    //   return alert(
-    //     "USPS tracking number length must be within the range of 20 to 22 characters"
-    //   );
+    //   //TODO - REFACTOR INTO REUSABLE FUNCTION
+    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+    //   <strong>The USPS Tracking Number length must be within the range of 20 to 22 characters!</strong>
+    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    //     <span aria-hidden="true">&times;</span>
+    //   </button>
+    //   </div>`;
+    //   contentBody.insertAdjacentHTML("afterbegin", alert);
+    //   closeAlert("warn");
+    //   ("USPS tracking number length must be within the range of 20 to 22 characters");
+    //   return;
     // }
 
     // if (jsonSaveBody.supplyKitId.length !== 9) {
+    // TODO - REFACTOR INTO REUSABLE FUNCTION
     //   return alert("supply kit id must be 9 characters");
     // }
 
     // if (jsonSaveBody.specimenKitId.length !== 9) {
+    // TODO - REFACTOR INTO REUSABLE FUNCTION
     //   return alert("specimen kit id must be 9 characters");
     // }
 
     // if (jsonSaveBody.collectionCupId.length !== 14) {
+    // TODO - REFACTOR INTO REUSABLE FUNCTION
     //   return alert("collection cup id must be 14 characters");
     // }
 
     // if (jsonSaveBody.collectionCardId.length !== 14) {
+    // TODO - REFACTOR INTO REUSABLE FUNCTION
     //   return alert("collection card id must be 14 characters");
     // }
 
-    if (jsonSaveBody.supplyKitId !== jsonSaveBody.specimenKitId) {
-      console.log("supply kit id and specimen kit id inputs do not match");
-      return;
-    }
+    // if (jsonSaveBody.supplyKitId !== jsonSaveBody.specimenKitId) {
+    //   // TODO - REFACTOR INTO REUSABLE FUNCTION
+    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+    //   <strong>The Supply Kit ID and Specimen Kit ID inputs do not match!</strong>
+    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    //     <span aria-hidden="true">&times;</span>
+    //   </button>
+    //   </div>`;
+    //   contentBody.insertAdjacentHTML("afterbegin", alert);
+    //   closeAlert("warn");
+    //   console.log("supply kit id and specimen kit id inputs do not match");
+    //   return;
+    // }
 
-    if (jsonSaveBody.collectionCupId !== jsonSaveBody.collectionCardId) {
-      console.log(
-        "collection cup id and collection card id inputs do not match"
-      );
-      return;
-    }
+    // if (jsonSaveBody.collectionCupId !== jsonSaveBody.collectionCardId) {
+    //   // TODO - REFACTOR INTO REUSABLE FUNCTION
+    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+    //   <strong>The Collection Cup ID and Collection Card ID inputs do not match!</strong>
+    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    //     <span aria-hidden="true">&times;</span>
+    //   </button>
+    //   </div>`;
+    //   contentBody.insertAdjacentHTML("afterbegin", alert);
+    //   closeAlert("warn");
+    //   console.log(
+    //     "collection cup id and collection card id inputs do not match"
+    //   );
+    //   return;
+    // }
 
+    /* 
+    =================================
+    DUPLICATE CONDITIONAL CHECKER
+    =================================
+    */
     // // Checks array if input usps tracking number exists in usps placeholder array
     // // exits outer function if duplicate
-    if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
-      console.log("Duplicate usps tracking number!");
-      // alert("Duplicate usps tracking number!");
-      return;
-    }
 
-    if (checkDuplicate(supplyKitHolder, jsonSaveBody.supplyKitId)) {
-      console.log("Duplicate supply kit id!");
-      return;
-    }
+    // if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
+    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+    //   <strong>The USPS Tracking Number exists, please provide an unique USPS Tracking Number!</strong>
+    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    //     <span aria-hidden="true">&times;</span>
+    //   </button>
+    //   </div>`;
+    //   contentBody.insertAdjacentHTML("afterbegin", alert);
+    //   closeAlert("warn");
+    //   console.log(
+    //     "The USPS Tracking Number exists, please provide a unique USPS Tracking Number!"
+    //   );
+    //   return;
+    // }
 
-    if (checkDuplicate(specimenKitHolder, jsonSaveBody.specimenKitId)) {
-      console.log("Duplicate specimen kit id!");
-      return;
-    }
+    // if (checkDuplicate(supplyKitHolder, jsonSaveBody.supplyKitId)) {
+    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+    //   <strong>The Supply Kit ID exists, please provide an unique Supply Kit ID!</strong>
+    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    //     <span aria-hidden="true">&times;</span>
+    //   </button>
+    //   </div>`;
+    //   contentBody.insertAdjacentHTML("afterbegin", alert);
+    //   closeAlert("warn");
+    //   console.log(
+    //     "The Supply Kit ID exists, please provide an unique Supply Kit ID!"
+    //   );
+    //   return;
+    // }
 
-    if (checkDuplicate(collectionCupHolder, jsonSaveBody.collectionCupId)) {
-      console.log("Duplicate collection cup id!");
-      return;
-    }
+    // if (checkDuplicate(specimenKitHolder, jsonSaveBody.specimenKitId)) {
+    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+    //   <strong>The Specimen Kit ID exists, please provide an unique Specimen Kit ID!</strong>
+    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    //     <span aria-hidden="true">&times;</span>
+    //   </button>
+    //   </div>`;
+    //   contentBody.insertAdjacentHTML("afterbegin", alert);
+    //   closeAlert("warn");
+    //   console.log(
+    //     "The Specimen Kit ID exists, please provide an unique Specimen Kit ID!"
+    //   );
+    //   console.log(
+    //     "The Specimen Kit ID exists, please provide an unique Specimen Kit ID!"
+    //   );
+    //   return;
+    // }
+
+    // if (checkDuplicate(collectionCupHolder, jsonSaveBody.collectionCupId)) {
+    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+    //   <strong>The Collection Cup ID exists, please provide an unique Collection Cup ID!</strong>
+    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    //     <span aria-hidden="true">&times;</span>
+    //   </button>
+    //   </div>`;
+    //   contentBody.insertAdjacentHTML("afterbegin", alert);
+    //   closeAlert("warn");
+    //   console.log("Duplicate collection cup id!");
+    //   return;
+    // }
+
+    // if (checkDuplicate(collectionCardHolder, jsonSaveBody.collectionCardId)) {
+    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+    //   <strong>The Collection Card ID exists, please provide an unique Collection Card ID!</strong>
+    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    //     <span aria-hidden="true">&times;</span>
+    //   </button>
+    //   </div>`;
+    //   contentBody.insertAdjacentHTML("afterbegin", alert);
+    //   closeAlert("warn");
+    //   console.log("Duplicate collection card id!");
+    //   return;
+    // }
 
     // Increment with all filled input fields, add after conditional checks
     tableNumRows++;
@@ -487,7 +589,6 @@ const userInputHandler = async (
       } else {
         if (inputUsps.value.length > 19 || inputUsps.value.length < 23) {
           uspsErrorMessage.style.display = "none";
-          // uspsErrorMessage.style.border = "#000";
           uspsInput.style.borderColor = "";
         }
       }
@@ -651,6 +752,7 @@ const addRow = (jsonSaveBody, tableNumRows) => {
   // Target Line Item Number
   let newRowEl = document.querySelector(".new-row");
 
+  // TODO - Comment for myself, should this go with the other conditionals before addRow is invoked/ called?
   // Early Exit for number checker
   // If trackingNumber is data type of number
   // CALL isNumeric function to check if input is a valid number
@@ -662,7 +764,15 @@ const addRow = (jsonSaveBody, tableNumRows) => {
     // ADD UI MODAL
     // alert("Number Value");
   } else {
-    alert("Invalid USPS number data type, Not a number value");
+    alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Invalid USPS tracking number, please provide a valid USPS tracking number!</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+    contentBody.insertAdjacentHTML("afterbegin", alert);
+    closeAlert("warn");
+    // alert("Invalid USPS number data type, Not a number value");
     return;
   }
 
@@ -672,6 +782,13 @@ const addRow = (jsonSaveBody, tableNumRows) => {
   specimenKitHolder.push(specimenKitId);
   collectionCupHolder.push(collectionCupId);
   collectionCardHolder.push(collectionCardId);
+
+  console.table(specimenKitId);
+  console.table(uspsHolder);
+  console.table(supplyKitHolder);
+  console.table(specimenKitHolder);
+  console.table(collectionCupHolder);
+  console.table(collectionCardHolder);
 
   newRowEl.firstChild.nextSibling.innerHTML = tableNumRows;
   newRowEl.insertAdjacentHTML(
@@ -738,19 +855,33 @@ const checkDuplicate = (arrayHolder, number) => {
   }
 };
 
-// Manually close alert
+// Automatically close alert
 const closeAlert = (status) => {
   if (status === "success") {
     const alertSuccess = document.getElementById("alert-success");
     alertSuccess.style.display = "block";
     setTimeout(function () {
       alertSuccess.style.display = "none";
-    }, 3000);
+    }, 5000);
   } else if (status === "warn") {
     const alertWarning = document.getElementById("alert-warning");
     alertWarning.style.display = "block";
     setTimeout(function () {
       alertWarning.style.display = "none";
-    }, 3000);
+    }, 5000);
   } else return;
 };
+
+// Refactor ALERT POP UP TO MAINTAIN DRY
+/*
+
+const alertTemplate = (message) => {
+alert += `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>${message}</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`;
+    closeAlert("warn");
+    }
+*/
