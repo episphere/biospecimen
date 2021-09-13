@@ -214,29 +214,29 @@ const populateKitTable = (tableBody, kitData) => {
       <tr class="new-row">      
         <th scope="row">${lastRowNumber}</th>
         <td>
-          <input id="input-usps" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="3374889321009425653720" />
+          <input id="input-usps" class="input-field" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="3374889321009425653720" />
           <label for ="input-usps" style="font-size:.8rem;">Ex. 9803095558879826901825</label>
           <p id="input-usps-error-message" class="input-error-message"></p>
         </td>
         <td>
-            <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:100%" placeholder="CON000007"/>
+            <input id="input-supply-kit" class="input-field" type="string" autocomplete="off" name="input-supply-kit" style="width:100%" placeholder="CON000007"/>
             <label for ="input-supply-kit" style="font-size:.8rem;">Ex. CON000007</label>
             <p id="input-supply-kit-error-message" class="input-error-message"></p>
         </td>
         <td>
-            <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:100%" name="input-specimen-kit" placeholder="CON000007"/>
+            <input id="input-specimen-kit" class="input-field" type="string" autocomplete="off" name="input-specimen-kit" style="width:100%" name="input-specimen-kit" placeholder="CON000007"/>
             <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CON000007</label>
             <p id="input-speciment-kit-error-message" class="input-error-message"></p>
         </td>
         <td class="text-wrap">
-            <input id="input-collection-cup" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0009
+            <input id="input-collection-cup" class="input-field" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0009
             " name"input-collection-cup"/>
             <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
             </label>
             <p id="input-collection-cup-error-message" class="input-error-message"></p>
         </td>
         <td>
-            <input id="input-collection-card" type="string" autocomplete="off" style="width:10 0%" placeholder="CXA123460 0009
+            <input id="input-collection-card" class="input-field" type="string" autocomplete="off" style="width:10 0%" placeholder="CXA123460 0009
             " name="input-collection-card"/>
             <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0009
             </label>
@@ -283,22 +283,22 @@ const populateKitTable = (tableBody, kitData) => {
         <tr class="new-row">      
           <th scope="row">${lastRowNumber + 1}</th>
           <td>
-            <input id="input-usps" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="3374889321009425653720" />
+            <input id="input-usps" class="input-field" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="3374889321009425653720" />
             <label for ="input-usps" style="font-size:.8rem;">Ex. 3374889321009425653720</label>
             <p id="input-usps-error-message" class="input-error-message"></p>
           </td>
           <td>
-            <input id="input-supply-kit" type="string" autocomplete="off" name="input-supply-kit" style="width:100%" placeholder="CON000007"/>
+            <input id="input-supply-kit" class="input-field" type="string" autocomplete="off" name="input-supply-kit" style="width:100%" placeholder="CON000007"/>
             <label for ="input-supply-kit" style="font-size:.8rem;">Ex. CON000007</label>
             <p id="input-supply-kit-error-message" class="input-error-message"></p>
           </td>
           <td>
-            <input id="input-specimen-kit" type="string" autocomplete="off" name="input-specimen-kit" style="width:100%" name="input-specimen-kit" placeholder="CON000007"/>
+            <input id="input-specimen-kit" class="input-field" type="string" autocomplete="off" name="input-specimen-kit" style="width:100%" name="input-specimen-kit" placeholder="CON000007"/>
             <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CON000007</label>
             <p id="input-speciment-kit-error-message" class="input-error-message"></p>
           </td>
           <td>
-            <input id="input-collection-cup" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0009
+            <input id="input-collection-cup" class="input-field" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0009
             " name"input-collection-cup"/>
             <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
             </label>
@@ -306,7 +306,7 @@ const populateKitTable = (tableBody, kitData) => {
             class="input-error-message"></p>
           </td>
           <td>
-              <input id="input-collection-card" type="string" autocomplete="off" style="width:100%" placeholder="CXA123460 0009
+              <input id="input-collection-card" class="input-field" type="string" autocomplete="off" style="width:100%" placeholder="CXA123460 0009
               " name="input-collection-card"/>
               <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0009
               </label>
@@ -366,23 +366,33 @@ const saveItem = async (
     // Convert string to number data type
     jsonSaveBody.uspsTrackingNumber = inputUsps.value.trim();
 
-    // PREVENTS USER FROM SUBMITTING INCOMPLETE INPUT FIELD ROW ***
-    // for (const key in jsonSaveBody) {
-    //   if (!jsonSaveBody[key]) {
-    //     // Modal Dialog Warning!
-    //     // alert("One or more inputs are empty!");
-    //     // TODO - REFACTOR INTO REUSABLE FUNCTION
-    //     alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-    //       <strong>One or more inputs are empty!</strong>
-    //       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    //         <span aria-hidden="true">&times;</span>
-    //       </button>
-    //       </div>`;
-    //     contentBody.insertAdjacentHTML("afterbegin", alert);
-    //     closeAlert("warn");
-    //     return;
-    //   }
-    // }
+    /*
+    ============================================================
+    PREVENTS USER FROM SUBMITTING INCOMPLETE INPUT FIELD ROW ***
+    ============================================================
+    */
+    for (const key in jsonSaveBody) {
+      if (!jsonSaveBody[key]) {
+        // TODO - REFACTOR INTO REUSABLE FUNCTION
+        alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>One or more inputs are empty!</strong>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          </div>`;
+        contentBody.insertAdjacentHTML("afterbegin", alert);
+        closeAlert("warn");
+        // console.log(document.getElementsByClassName("input-error-message"));
+        let allInputFields = document.getElementsByClassName("input-field");
+        // Iterate through all elements with the input-error-message class
+        // Add and change input field border style to red
+        for (let box of allInputFields) {
+          console.log(allInputFields);
+          box.style.borderColor = "#e00000";
+        }
+        return;
+      }
+    }
 
     /*
     ==================================
@@ -390,72 +400,101 @@ const saveItem = async (
     ==================================
     */
 
-    // if (
-    //   jsonSaveBody.uspsTrackingNumber.length < 20 ||
-    //   jsonSaveBody.uspsTrackingNumber.length > 22
-    // ) {
-    //   //TODO - REFACTOR INTO REUSABLE FUNCTION
-    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-    //   <strong>The USPS Tracking Number length must be within the range of 20 to 22 characters!</strong>
-    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    //     <span aria-hidden="true">&times;</span>
-    //   </button>
-    //   </div>`;
-    //   contentBody.insertAdjacentHTML("afterbegin", alert);
-    //   closeAlert("warn");
-    //   ("USPS tracking number length must be within the range of 20 to 22 characters");
-    //   return;
-    // }
+    if (
+      jsonSaveBody.uspsTrackingNumber.length < 20 ||
+      jsonSaveBody.uspsTrackingNumber.length > 22
+    ) {
+      //TODO - REFACTOR INTO REUSABLE FUNCTION
+      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>The USPS Tracking Number length must be within the range of 20 to 22 characters!</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+      contentBody.insertAdjacentHTML("afterbegin", alert);
+      closeAlert("warn");
+      ("USPS tracking number length must be within the range of 20 to 22 characters");
+      return;
+    }
 
     // if (jsonSaveBody.supplyKitId.length !== 9) {
-    // TODO - REFACTOR INTO REUSABLE FUNCTION
-    //   return alert("supply kit id must be 9 characters");
+    //   // TODO - REFACTOR INTO REUSABLE FUNCTION
+    //   // return alert("supply kit id must be 9 characters");
     // }
 
     // if (jsonSaveBody.specimenKitId.length !== 9) {
-    // TODO - REFACTOR INTO REUSABLE FUNCTION
-    //   return alert("specimen kit id must be 9 characters");
+    //   // TODO - REFACTOR INTO REUSABLE FUNCTION
+    //   // return alert("specimen kit id must be 9 characters");
     // }
 
     // if (jsonSaveBody.collectionCupId.length !== 14) {
-    // TODO - REFACTOR INTO REUSABLE FUNCTION
-    //   return alert("collection cup id must be 14 characters");
+    //   // TODO - REFACTOR INTO REUSABLE FUNCTION
+    //   // return alert("collection cup id must be 14 characters");
     // }
 
     // if (jsonSaveBody.collectionCardId.length !== 14) {
-    // TODO - REFACTOR INTO REUSABLE FUNCTION
-    //   return alert("collection card id must be 14 characters");
+    //   // TODO - REFACTOR INTO REUSABLE FUNCTION
+    //   // return alert("collection card id must be 14 characters");
     // }
 
-    // if (jsonSaveBody.supplyKitId !== jsonSaveBody.specimenKitId) {
-    //   // TODO - REFACTOR INTO REUSABLE FUNCTION
-    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-    //   <strong>The Supply Kit ID and Specimen Kit ID inputs do not match!</strong>
-    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    //     <span aria-hidden="true">&times;</span>
-    //   </button>
-    //   </div>`;
-    //   contentBody.insertAdjacentHTML("afterbegin", alert);
-    //   closeAlert("warn");
-    //   console.log("supply kit id and specimen kit id inputs do not match");
-    //   return;
-    // }
+    if (jsonSaveBody.supplyKitId !== jsonSaveBody.specimenKitId) {
+      // TODO - REFACTOR INTO REUSABLE FUNCTION
+      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>The Supply Kit ID and Specimen Kit ID must be the same. Please make the necessary changes.</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+      contentBody.insertAdjacentHTML("afterbegin", alert);
+      closeAlert("warn");
+      console.log("supply kit id and specimen kit id inputs do not match");
+      return;
+    }
 
-    // if (jsonSaveBody.collectionCupId !== jsonSaveBody.collectionCardId) {
-    //   // TODO - REFACTOR INTO REUSABLE FUNCTION
-    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-    //   <strong>The Collection Cup ID and Collection Card ID inputs do not match!</strong>
-    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    //     <span aria-hidden="true">&times;</span>
-    //   </button>
-    //   </div>`;
-    //   contentBody.insertAdjacentHTML("afterbegin", alert);
-    //   closeAlert("warn");
-    //   console.log(
-    //     "collection cup id and collection card id inputs do not match"
-    //   );
-    //   return;
-    // }
+    if (jsonSaveBody.collectionCupId !== jsonSaveBody.collectionCardId) {
+      // TODO - REFACTOR INTO REUSABLE FUNCTION
+      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>The Collection Cup ID and Collection Card ID must be the same. Please make the necessary changes.</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+      contentBody.insertAdjacentHTML("afterbegin", alert);
+      closeAlert("warn");
+      console.log(
+        "collection cup id and collection card id inputs do not match"
+      );
+      return;
+    }
+
+    /*
+    =================================
+    FORMAT CONDITIONAL CHECKER
+    =================================
+    */
+
+    // Early Exit for number checker
+    // If trackingNumber is data type of number
+    // CALL isNumeric function to check if input is a valid number
+    if (isNumeric(jsonSaveBody.uspsTrackingNumber)) {
+      // REMOVE - CONSOLE LOGS
+      // TODO - ADD EVERYTHING BELOW if else block into if code block
+      console.log(typeof jsonSaveBody.uspsTrackingNumber === "number");
+      console.log(jsonSaveBody.uspsTrackingNumber);
+      // ADD UI MODAL
+      // alert("Number Value");
+    } else {
+      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Invalid USPS tracking number! Please provide a valid USPS tracking number.</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+      contentBody.insertAdjacentHTML("afterbegin", alert);
+      closeAlert("warn");
+      // alert("Invalid USPS number data type, Not a number value");
+      return;
+    }
 
     /* 
     =================================
@@ -465,84 +504,84 @@ const saveItem = async (
     // // Checks array if input usps tracking number exists in usps placeholder array
     // // exits outer function if duplicate
 
-    // if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
-    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-    //   <strong>The USPS Tracking Number exists, please provide an unique USPS Tracking Number!</strong>
-    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    //     <span aria-hidden="true">&times;</span>
-    //   </button>
-    //   </div>`;
-    //   contentBody.insertAdjacentHTML("afterbegin", alert);
-    //   closeAlert("warn");
-    //   console.log(
-    //     "The USPS Tracking Number exists, please provide a unique USPS Tracking Number!"
-    //   );
-    //   return;
-    // }
+    if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
+      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>The USPS Tracking Number exists, please provide an unique USPS Tracking Number!</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+      contentBody.insertAdjacentHTML("afterbegin", alert);
+      closeAlert("warn");
+      console.log(
+        "The USPS Tracking Number exists, please provide a unique USPS Tracking Number!"
+      );
+      return;
+    }
 
-    // if (checkDuplicate(supplyKitHolder, jsonSaveBody.supplyKitId)) {
-    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-    //   <strong>The Supply Kit ID exists, please provide an unique Supply Kit ID!</strong>
-    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    //     <span aria-hidden="true">&times;</span>
-    //   </button>
-    //   </div>`;
-    //   contentBody.insertAdjacentHTML("afterbegin", alert);
-    //   closeAlert("warn");
-    //   console.log(
-    //     "The Supply Kit ID exists, please provide an unique Supply Kit ID!"
-    //   );
-    //   return;
-    // }
+    if (checkDuplicate(supplyKitHolder, jsonSaveBody.supplyKitId)) {
+      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>The Supply Kit ID exists, please provide an unique Supply Kit ID!</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+      contentBody.insertAdjacentHTML("afterbegin", alert);
+      closeAlert("warn");
+      console.log(
+        "The Supply Kit ID exists, please provide an unique Supply Kit ID!"
+      );
+      return;
+    }
 
-    // if (checkDuplicate(specimenKitHolder, jsonSaveBody.specimenKitId)) {
-    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-    //   <strong>The Specimen Kit ID exists, please provide an unique Specimen Kit ID!</strong>
-    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    //     <span aria-hidden="true">&times;</span>
-    //   </button>
-    //   </div>`;
-    //   contentBody.insertAdjacentHTML("afterbegin", alert);
-    //   closeAlert("warn");
-    //   console.log(
-    //     "The Specimen Kit ID exists, please provide an unique Specimen Kit ID!"
-    //   );
-    //   console.log(
-    //     "The Specimen Kit ID exists, please provide an unique Specimen Kit ID!"
-    //   );
-    //   return;
-    // }
+    if (checkDuplicate(specimenKitHolder, jsonSaveBody.specimenKitId)) {
+      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>The Specimen Kit ID exists, please provide an unique Specimen Kit ID!</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+      contentBody.insertAdjacentHTML("afterbegin", alert);
+      closeAlert("warn");
+      console.log(
+        "The Specimen Kit ID exists, please provide an unique Specimen Kit ID!"
+      );
+      console.log(
+        "The Specimen Kit ID exists, please provide an unique Specimen Kit ID!"
+      );
+      return;
+    }
 
-    // if (checkDuplicate(collectionCupHolder, jsonSaveBody.collectionCupId)) {
-    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-    //   <strong>The Collection Cup ID exists, please provide an unique Collection Cup ID!</strong>
-    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    //     <span aria-hidden="true">&times;</span>
-    //   </button>
-    //   </div>`;
-    //   contentBody.insertAdjacentHTML("afterbegin", alert);
-    //   closeAlert("warn");
-    //   console.log("Duplicate collection cup id!");
-    //   return;
-    // }
+    if (checkDuplicate(collectionCupHolder, jsonSaveBody.collectionCupId)) {
+      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>The Collection Cup ID exists, please provide an unique Collection Cup ID!</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+      contentBody.insertAdjacentHTML("afterbegin", alert);
+      closeAlert("warn");
+      console.log("Duplicate collection cup id!");
+      return;
+    }
 
-    // if (checkDuplicate(collectionCardHolder, jsonSaveBody.collectionCardId)) {
-    //   alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-    //   <strong>The Collection Card ID exists, please provide an unique Collection Card ID!</strong>
-    //   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    //     <span aria-hidden="true">&times;</span>
-    //   </button>
-    //   </div>`;
-    //   contentBody.insertAdjacentHTML("afterbegin", alert);
-    //   closeAlert("warn");
-    //   console.log("Duplicate collection card id!");
-    //   return;
-    // }
+    if (checkDuplicate(collectionCardHolder, jsonSaveBody.collectionCardId)) {
+      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>The Collection Card ID exists, please provide an unique Collection Card ID!</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+      contentBody.insertAdjacentHTML("afterbegin", alert);
+      closeAlert("warn");
+      console.log("Duplicate collection card id!");
+      return;
+    }
 
     // Increment with all filled input fields, add after conditional checks
     tableNumRows++;
 
-    // ADD DATA to TABLE
+    // ADD DATA TO TABLE
     // addKitData(jsonSaveBody);
 
     addRow(jsonSaveBody, tableNumRows);
@@ -609,7 +648,6 @@ const userInputHandler = async (
       inputSupplyKit.value = e.target.value.trim();
       inputSupplyKitErrorMessage.style.display = "none";
       supplyKitInput.style.borderColor = "";
-      // return alert("supply kit id must be  9 characters");)
       // console.log(jsonSaveBody);
     } else {
       inputSupplyKit.value = e.target.value.trim();
@@ -622,8 +660,6 @@ const userInputHandler = async (
         "Supply Kit ID number length must be 9 characters";
       console.log(inputSupplyKit.value, supplyKitInput);
     }
-
-    // debugger;
     return;
   });
 
@@ -651,8 +687,6 @@ const userInputHandler = async (
   });
 
   await inputCollectionCup.addEventListener("blur", (e) => {
-    // id="input-collection-cup"
-    // id="input-collection-cup-error-message"
     let collectionCupId = e.target.value;
     let collectionCupInput = document.getElementById("input-collection-cup");
     let inputCollectionCupErrorMessage = document.getElementById(
@@ -673,7 +707,7 @@ const userInputHandler = async (
       );
       collectionCupInput.style.borderColor = "#E00000";
       inputCollectionCupErrorMessage.innerHTML =
-        "Input Collection Cup ID number length must be 9 characters";
+        "Collection Cup ID number length must be 9 characters";
     }
     return;
   });
@@ -704,14 +738,6 @@ const userInputHandler = async (
     }
     return;
   });
-
-  // if (jsonSaveBody.collectionCupId.length !== 14) {
-  //   return alert("collection cup id must be 14 characters");
-  // }
-
-  // if (jsonSaveBody.collectionCardId.length !== 14) {
-  //   return alert("collection card id must be 14 characters");
-  // }
 };
 
 // Create JSON body object to be modified
@@ -751,30 +777,6 @@ const addRow = (jsonSaveBody, tableNumRows) => {
 
   // Target Line Item Number
   let newRowEl = document.querySelector(".new-row");
-
-  // TODO - Comment for myself, should this go with the other conditionals before addRow is invoked/ called?
-  // Early Exit for number checker
-  // If trackingNumber is data type of number
-  // CALL isNumeric function to check if input is a valid number
-  if (isNumeric(uspsTrackingNumber)) {
-    // REMOVE - CONSOLE LOGS
-    // TODO - ADD EVERYTHING BELOW if else block into if code block
-    console.log(typeof uspsTrackingNumber === "number");
-    console.log(uspsTrackingNumber);
-    // ADD UI MODAL
-    // alert("Number Value");
-  } else {
-    alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>Invalid USPS tracking number, please provide a valid USPS tracking number!</strong>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-      </div>`;
-    contentBody.insertAdjacentHTML("afterbegin", alert);
-    closeAlert("warn");
-    // alert("Invalid USPS number data type, Not a number value");
-    return;
-  }
 
   // Add unique usps tracking number to usps holder variable
   uspsHolder.push(uspsTrackingNumber);
@@ -872,7 +874,7 @@ const closeAlert = (status) => {
   } else return;
 };
 
-// Refactor ALERT POP UP TO MAINTAIN DRY
+// TODO: Refactor ALERT POP UP TO MAINTAIN DRY
 /*
 
 const alertTemplate = (message) => {
