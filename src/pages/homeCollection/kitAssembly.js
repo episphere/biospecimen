@@ -533,7 +533,7 @@ const saveItem = async (
       contentBody.insertAdjacentHTML("afterbegin", alert);
       closeAlert("warn");
       console.log(
-        "The USPS Tracking Number exists, please provide a unique USPS Tracking Number!"
+        "The USPS Tracking Number already exists, please provide a unique USPS Tracking Number!"
       );
       return;
     }
@@ -548,7 +548,7 @@ const saveItem = async (
       contentBody.insertAdjacentHTML("afterbegin", alert);
       closeAlert("warn");
       console.log(
-        "The Supply Kit ID exists, please provide an unique Supply Kit ID!"
+        "The Supply Kit ID already exists, please provide an unique Supply Kit ID!"
       );
       return;
     }
@@ -563,17 +563,17 @@ const saveItem = async (
       contentBody.insertAdjacentHTML("afterbegin", alert);
       closeAlert("warn");
       console.log(
-        "The Specimen Kit ID exists, please provide an unique Specimen Kit ID!"
+        "The Specimen Kit ID already exists, please provide an unique Specimen Kit ID!"
       );
       console.log(
-        "The Specimen Kit ID exists, please provide an unique Specimen Kit ID!"
+        "The Specimen Kit ID already exists, please provide an unique Specimen Kit ID!"
       );
       return;
     }
 
     if (checkDuplicate(collectionCupHolder, jsonSaveBody.collectionCupId)) {
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The Collection Cup ID exists, please provide an unique Collection Cup ID!</strong>
+      <strong>The Collection Cup ID already exists, please provide an unique Collection Cup ID!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -911,4 +911,31 @@ alert += `<div id="alert-warning" class="alert alert-danger alert-dismissible fa
     </div>`;
     closeAlert("warn");
     }
+*/
+
+/*
+REGEX COMMENTS
+https://regex101.com/
+*/
+/*
+FORMAT MATCH (SPECIMEN KIT ID & SUPPLY KIT ID) TEST EXAMPLE -->  CXA123460 0009
+- ^ DETERMINE LINE START
+- START WITH CXA
+- MATCH ANY NUMBERS 0 - 9 FOR THE NEXT 6 DIGITS
+- \s FOR SPACE
+- CHECK PREVIOUS DIGIT NUMBERS FROM 0 TO 9  FOUR TIMES, 
+- $ MATCH CHARACTER AT END
+
+ REGEX -  ^CXA[0-9]{6}\s[0-9]{4}$
+*/
+
+/*
+ FORMAT MATCH (COLLECTION CARD ID & COLLECTION CUP ID) TEST EXAMPLE  --> CON000007
+- ^ DETERMINE LINE START
+- START WITH CON
+- [0-9 ]MATCH ANY NUMBERS 0 - 9 
+- {6} REPEAT PREVIOUS TOKEN 6 TIMES
+- $ DETERMINE LINE END
+
+ REGEX - ^CON[0-9]{6}$
 */
