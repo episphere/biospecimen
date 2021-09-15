@@ -359,14 +359,30 @@ const saveItem = async (
   saveButton.addEventListener("click", (e) => {
     e.preventDefault();
 
+    // console.log(jsonSaveBody);
+    let {
+      uspsTrackingNumber,
+      supplyKitId,
+      specimenKitId,
+      collectionCupId,
+      collectionCardId,
+    } = jsonSaveBody;
+
+    uspsTrackingNumber = inputUsps.value;
+
+    console.log(
+      `USPS track number : ${uspsTrackingNumber}, ${
+        uspsTrackingNumber.length
+      }, ${uspsTrackingNumber.trim().length}`
+    );
     // Target Last row and the last row's children elements
     // Remove whitespace if any on input fields
-    jsonSaveBody.collectionCardId = inputCollectionCard.value.trim();
-    jsonSaveBody.supplyKitId = inputSupplyKit.value.trim();
-    jsonSaveBody.collectionCupId = inputCollectionCup.value.trim();
-    jsonSaveBody.specimenKitId = inputSpecimenKit.value.trim();
-    // Convert string to number data type
     jsonSaveBody.uspsTrackingNumber = inputUsps.value.trim();
+    jsonSaveBody.supplyKitId = inputSupplyKit.value.trim();
+    jsonSaveBody.specimenKitId = inputSpecimenKit.value.trim();
+    jsonSaveBody.collectionCupId = inputCollectionCup.value.trim();
+    jsonSaveBody.collectionCardId = inputCollectionCard.value.trim();
+    // Convert string to number data type
 
     /*
     ============================================================
@@ -920,6 +936,22 @@ const checkDuplicate = (arrayHolder, number) => {
   }
 };
 
+
+
+// TODO: Refactor ALERT POP UP TO MAINTAIN DRY
+/*
+
+const alertTemplate = (message) => {
+alert += `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>${message}</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`;
+    closeAlert("warn");
+    }
+*/
+
 // Automatically close alert
 const closeAlert = (status) => {
   if (status === "success") {
@@ -936,20 +968,6 @@ const closeAlert = (status) => {
     }, 5000);
   } else return;
 };
-
-// TODO: Refactor ALERT POP UP TO MAINTAIN DRY
-/*
-
-const alertTemplate = (message) => {
-alert += `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>${message}</strong>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>`;
-    closeAlert("warn");
-    }
-*/
 
 /*
 REGEX COMMENTS
