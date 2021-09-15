@@ -669,7 +669,7 @@ const userInputHandler = async (
       } `
     );
 
-    if (supplyKitId.length === 9) {
+    if (supplyKitId.length === 9 && regExpSearch) {
       console.log(jsonSaveBody.supplyKitId);
       inputSupplyKit.value = e.target.value.trim();
       inputSupplyKitErrorMessage.style.display = "none";
@@ -682,8 +682,7 @@ const userInputHandler = async (
         "color:#E00000;display:inline-block;font-size:.8rem;"
       );
       supplyKitInput.style.borderColor = "#E00000";
-      inputSupplyKitErrorMessage.innerHTML =
-        "Supply Kit ID length must be 9 characters";
+      inputSupplyKitErrorMessage.innerHTML = `Supply Kit ID length must be 9 characters. <br/>The format must start with an all uppercase CON, followed by 6 digits, each digit can be a number from 0 to 9.`;
     }
     // TODO: CHANGE ELSE IF TO ACCOMODATE REGEX
     return;
@@ -704,7 +703,7 @@ const userInputHandler = async (
         specimenKitId.length === 9 && regExpSearch
       } `
     );
-    if (specimenKitId.length === 9) {
+    if (specimenKitId.length === 9 && regExpSearch) {
       inputSpecimenKit.value = e.target.value.trim();
       inputSpecimenKitErrorMessage.style.display = "none";
       specimenKitInput.style.borderColor = "";
@@ -714,8 +713,7 @@ const userInputHandler = async (
         "style",
         "color:#E00000;display:inline-block;font-size:.8rem;"
       );
-      inputSpecimenKitErrorMessage.innerHTML =
-        "Specimen Kit ID length must be 9 characters";
+      inputSpecimenKitErrorMessage.innerHTML = `Specimen Kit ID length must be 9 characters.<br/>The format must start with an all uppercase CON, followed by 6 digits, each digit can be a number from 0 to 9.`;
       specimenKitInput.style.borderColor = "#E00000";
     }
     return;
@@ -738,7 +736,7 @@ const userInputHandler = async (
       } `
     );
 
-    if (collectionCupId.length === 14) {
+    if (collectionCupId.length === 14 && regExpSearch) {
       console.log(jsonSaveBody.collectionCupId);
 
       inputCollectionCup.value = e.target.value.trim();
@@ -751,8 +749,7 @@ const userInputHandler = async (
         "color:#E00000;display:inline-block;font-size:.8rem;"
       );
       collectionCupInput.style.borderColor = "#E00000";
-      inputCollectionCupErrorMessage.innerHTML =
-        "Collection Cup ID length must be 14 characters";
+      inputCollectionCupErrorMessage.innerHTML = `Collection Cup ID length must be 14 characters. <br/>The format must start with an all uppercase CXA, followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9. `;
     }
     return;
   });
@@ -774,7 +771,7 @@ const userInputHandler = async (
       } `
     );
 
-    if (collectionCardId.length === 14) {
+    if (collectionCardId.length === 14 && regExpSearch) {
       console.log(jsonSaveBody.collectionCardId);
       inputCollectionCard.value = e.target.value.trim();
       inputCollectionCardErrorMessage.style.display = "none";
@@ -786,8 +783,7 @@ const userInputHandler = async (
         "color:#E00000;display:inline-block;font-size:.8rem;"
       );
       collectionCardInput.style.borderColor = "#E00000";
-      inputCollectionCardErrorMessage.innerHTML =
-        "Collection Card ID length must be 14 characters";
+      inputCollectionCardErrorMessage.innerHTML = `Collection Card ID length must be 14 characters. <br/>The format must start with an all uppercase CXA followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9.`;
     }
     return;
   });
@@ -804,7 +800,6 @@ const jsonSaveBody = {
 
 // Add New row with inputs
 const addRow = (jsonSaveBody, tableNumRows) => {
-  // Convert to integer num value
   // let uspsTrackingNumber = jsonSaveBody.uspsTrackingNumber;
   // let supplyKitId = jsonSaveBody.supplyKitId;
   // let specimenKitId = jsonSaveBody.specimenKitId;
