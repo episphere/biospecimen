@@ -457,6 +457,11 @@ const saveItem = async (
       // return alert("collection card id must be 14 characters");
     }
 
+    /*
+    ================================
+    MATCHING SPECIFIC INPUT FIELDS
+    ================================
+    */
     if (jsonSaveBody.supplyKitId !== jsonSaveBody.specimenKitId) {
       // TODO - REFACTOR INTO REUSABLE FUNCTION
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -488,22 +493,26 @@ const saveItem = async (
     }
 
     /*
-    =================================
-    FORMAT CONDITIONAL CHECKER
-    =================================
+    ==================================================================
+    VALID NUMBER WITH STRING DATA TYPE CONDITIONAL CHECKER
+    ==================================================================
     */
 
     // Early Exit for number checker
     // If trackingNumber is data type of number
-    // CALL isNumeric function to check if input is a valid number
-    if (isNumeric(jsonSaveBody.uspsTrackingNumber)) {
+    // Note: ! operator reverses statement and exits if not a valid number with string data type
+    if (!uspsTrackingNumberRegExp(jsonSaveBody.uspsTrackingNumber)) {
       // REMOVE - CONSOLE LOGS
       // TODO - ADD EVERYTHING BELOW if else block into if code block
       console.log(typeof jsonSaveBody.uspsTrackingNumber === "number");
       console.log(jsonSaveBody.uspsTrackingNumber);
-      // ADD UI MODAL
-      // alert("Number Value");
-    } else {
+      console.log(`Element Input USPS captured ${inputUsps}`);
+      let uspsInputElement = inputUsps;
+      let uspsErrorMessage = document.getElementById(
+        "input-usps-error-message"
+      );
+      console.log(uspsInputElement, uspsErrorMessage);
+
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
       <strong>Invalid USPS tracking number! Please provide a valid USPS tracking number.</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -512,6 +521,9 @@ const saveItem = async (
       </div>`;
       contentBody.insertAdjacentHTML("afterbegin", alert);
       closeAlert("warn");
+      uspsInputElement.style.borderColor = "#E00000";
+      uspsErrorMessage.style.display = "block";
+      uspsErrorMessage.innerHTML = `Invalid USPS tracking number format. Please input a 20 to 22 digit number, each digit can be a number between 0 to 9.`;
       // alert("Invalid USPS number data type, Not a number value");
       return;
     }
@@ -541,7 +553,7 @@ const saveItem = async (
 
     if (checkDuplicate(supplyKitHolder, jsonSaveBody.supplyKitId)) {
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The Supply Kit ID exists, please provide an unique Supply Kit ID!</strong>
+      <strong>The Supply Kit ID already exists, please provide an unique Supply Kit ID!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -556,7 +568,7 @@ const saveItem = async (
 
     if (checkDuplicate(specimenKitHolder, jsonSaveBody.specimenKitId)) {
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The Specimen Kit ID exists, please provide an unique Specimen Kit ID!</strong>
+      <strong>The Specimen Kit ID already exists, please provide an unique Specimen Kit ID!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -587,7 +599,7 @@ const saveItem = async (
 
     if (checkDuplicate(collectionCardHolder, jsonSaveBody.collectionCardId)) {
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The Collection Card ID exists, please provide an unique Collection Card ID!</strong>
+      <strong>The Collection Card ID already exists, please provide an unique Collection Card ID!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -624,6 +636,9 @@ const userInputHandler = async (
     let usps = e.target.value;
     let uspsErrorMessage = document.getElementById("input-usps-error-message");
     let uspsInput = document.getElementById("input-usps");
+
+    console.log(uspsTrackingNumberRegExp(usps));
+    // 30 to 32 digit number will have first 8 characters removed
     if (usps.length >= 30 && usps.length <= 32) {
       console.log(usps.length, usps);
       usps = usps.split("").splice(8).join("").trim();
@@ -632,17 +647,20 @@ const userInputHandler = async (
     } else {
       inputUsps.value = e.target.value.trim();
       console.log(inputUsps.value, usps);
-      if (inputUsps.value.length < 20 || inputUsps.value.length > 22) {
-        console.log(
-          "USPS tracking number length must be within the range of 20 to 22 characters"
-        );
+      if (
+        (!uspsTrackingNumberRegExp(usps) && inputUsps.value.length < 20) ||
+        inputUsps.value.length > 22
+      ) {
+        // console.log(
+        //   "Invalid USPS tracking number format. <br/>Please input a 20 to 22 digit number, each digit can be a number between 0 to 9."
+        // );
         uspsErrorMessage.setAttribute(
           "style",
           "color:#E00000;display:inline-block;font-size:.8rem;"
         );
         uspsInput.style.borderColor = "#E00000";
         uspsErrorMessage.innerHTML =
-          "USPS tracking number length must be within the range of 20 to 22 characters";
+          "Invalid USPS tracking number format. <br/>Please input a 20 to 22 digit number, each digit can be a number between 0 to 9.";
       } else {
         if (inputUsps.value.length > 19 || inputUsps.value.length < 23) {
           uspsErrorMessage.style.display = "none";
@@ -887,15 +905,6 @@ const clearAllInputs = (inputElements) => {
 };
 
 /*
-CHECK IF STRING OR NUM VALUE IS A REAL NUMBER  
-https://stackoverflow.com/questions/9716468/pure-javascript-a-function-like-jquerys-isnumeric
-*/
-const isNumeric = (num) => {
-  // parseFloat - converts to string if needed, and then returns a floating point number
-  // isFinite - false if the argument is (or will be coerced to) positive or negative Infinity or NaN or undefined
-  return !isNaN(parseFloat(num)) && isFinite(num);
-};
-
 // Prevents POST request and Add to line if duplicate is found
 // Used as a conditional in if statement above
 const checkDuplicate = (arrayHolder, number) => {
@@ -948,19 +957,36 @@ https://regex101.com/
 */
 
 /*
+ FORMAT MATCH (USPS TRACKING NUMBER) TEST EXAMPLE  --> 9221690209813300440662
+- ^ DETERMINE LINE START
+- 
+- [0-9] MATCH ANY NUMBERS 0 - 9 
+- {20, 22} REPEAT PREVIOUS TOKEN 20 to 22 TIMES BASED ON LENGTH OF TOKEN (EX. LENGTH IS 20, REPEATS 20 TIMES)
+- $ DETERMINE LINE END
+ REGEX - ^[0-9]{20,22}$
+
+*/
+
+const uspsTrackingNumberRegExp = (searchStr) => {
+  console.log(typeof searchStr);
+  let regExp = /^[0-9]{20,22}$/;
+  console.log(`usps:${searchStr}, status: ${regExp.test(searchStr)}`);
+  return regExp.test(searchStr);
+};
+
+/*
  FORMAT MATCH (SPECIMEN KIT ID & SUPPLY KIT ID) TEST EXAMPLE  --> CON000007
 - ^ DETERMINE LINE START
 - START WITH CON
 - [0-9 ] MATCH ANY NUMBERS 0 - 9 
 - {6} REPEAT PREVIOUS TOKEN 6 TIMES
 - $ DETERMINE LINE END
-
  REGEX - ^CON[0-9]{6}$
 */
 
 const supplyAndSpecimenKitIdRegExp = (searchStr) => {
-  let regexExp = /^CON[0-9]{6}$/;
-  return regexExp.test(searchStr);
+  let regExp = /^CON[0-9]{6}$/;
+  return regExp.test(searchStr);
 };
 
 /*
@@ -976,6 +1002,6 @@ FORMAT MATCH (COLLECTION CARD ID & COLLECTION CUP ID) TEST EXAMPLE -->  CXA12346
 */
 
 const collectionCardAndCupIdRegExp = (searchStr) => {
-  let regexExp = /^CXA[0-9]{6}\s[0-9]{4}$/;
-  return regexExp.test(searchStr);
+  let regExp = /^CXA[0-9]{6}\s[0-9]{4}$/;
+  return regExp.test(searchStr);
 };
