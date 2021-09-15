@@ -77,6 +77,7 @@ export const kitAssemblyScreen = async (auth, route) => {
   clearAllInputs(inputElements);
 
   // Invoke function to add item to table and send a POST request
+  // Pass the Elements with the specific ID attributes
   await saveItem(
     tableBody,
     inputUsps,
@@ -321,12 +322,12 @@ const populateKitTable = (tableBody, kitData) => {
   }
 
   // REMOVE - Check to see if data was added to holders on kitTable render
-  console.table(uspsHolder);
-  console.log(uspsHolder);
-  console.table(supplyKitHolder);
-  console.table(specimenKitHolder);
-  console.table(collectionCupHolder);
-  console.table(collectionCardHolder);
+  // console.table(uspsHolder);
+  // console.log(uspsHolder);
+  // console.table(supplyKitHolder);
+  // console.table(specimenKitHolder);
+  // console.table(collectionCupHolder);
+  // console.table(collectionCardHolder);
 };
 
 const kitAssemblyPageButtons = () => {
@@ -601,7 +602,7 @@ const saveItem = async (
     tableNumRows++;
 
     // ADD DATA TO TABLE
-    addKitData(jsonSaveBody);
+    // addKitData(jsonSaveBody);
 
     addRow(jsonSaveBody, tableNumRows);
 
@@ -623,8 +624,6 @@ const userInputHandler = async (
     let usps = e.target.value;
     let uspsErrorMessage = document.getElementById("input-usps-error-message");
     let uspsInput = document.getElementById("input-usps");
-    console.log(usps);
-    console.log(usps.length);
     if (usps.length >= 30 && usps.length <= 32) {
       console.log(usps.length, usps);
       usps = usps.split("").splice(8).join("").trim();
@@ -655,14 +654,22 @@ const userInputHandler = async (
   });
 
   await inputSupplyKit.addEventListener("blur", (e) => {
-    let supplyKitID = e.target.value;
+    let supplyKitId = e.target.value;
     let supplyKitInput = document.getElementById("input-supply-kit");
     let inputSupplyKitErrorMessage = document.getElementById(
       "input-supply-kit-error-message"
     );
-    console.log(inputSupplyKitErrorMessage);
-    console.log(supplyKitInput);
-    if (supplyKitID.length === 9) {
+    let regExpSearch = supplyAndSpecimenKitIdRegExp(supplyKitId);
+    // DELETE: GET RID OF CONSOLE LOG LATER
+    console.log(
+      `Supply Kit ID --> lengthStatus: ${
+        supplyKitId.length
+      }, regExp:${regExpSearch}, PassCondition: ${
+        supplyKitId.length === 9 && regExpSearch
+      } `
+    );
+
+    if (supplyKitId.length === 9) {
       console.log(jsonSaveBody.supplyKitId);
       inputSupplyKit.value = e.target.value.trim();
       inputSupplyKitErrorMessage.style.display = "none";
@@ -677,18 +684,27 @@ const userInputHandler = async (
       supplyKitInput.style.borderColor = "#E00000";
       inputSupplyKitErrorMessage.innerHTML =
         "Supply Kit ID length must be 9 characters";
-      console.log(inputSupplyKit.value, supplyKitInput);
     }
+    // TODO: CHANGE ELSE IF TO ACCOMODATE REGEX
     return;
   });
 
   await inputSpecimenKit.addEventListener("blur", (e) => {
-    let specimenKitID = e.target.value;
+    let specimenKitId = e.target.value;
     let specimenKitInput = document.getElementById("input-specimen-kit");
     let inputSpecimenKitErrorMessage = document.getElementById(
       "input-speciment-kit-error-message"
     );
-    if (specimenKitID.length === 9) {
+    // DELETE: GET RID OF CONSOLE LOG LATER
+    let regExpSearch = supplyAndSpecimenKitIdRegExp(specimenKitId);
+    console.log(
+      `Specimen Kit ID --> lengthStatus: ${
+        specimenKitId.length
+      }, regExp:${regExpSearch}, PassCondition: ${
+        specimenKitId.length === 9 && regExpSearch
+      } `
+    );
+    if (specimenKitId.length === 9) {
       inputSpecimenKit.value = e.target.value.trim();
       inputSpecimenKitErrorMessage.style.display = "none";
       specimenKitInput.style.borderColor = "";
@@ -711,7 +727,17 @@ const userInputHandler = async (
     let inputCollectionCupErrorMessage = document.getElementById(
       "input-collection-cup-error-message"
     );
-    console.log(inputCollectionCup);
+
+    // DELETE: GET RID OF CONSOLE LOG LATER
+    let regExpSearch = collectionCardAndCupIdRegExp(collectionCupId);
+    console.log(
+      `Collection Cup Id--> lengthStatus: ${
+        collectionCupId.length
+      }, regExp:${regExpSearch}, PassCondition: ${
+        collectionCupId.length === 14 && regExpSearch
+      } `
+    );
+
     if (collectionCupId.length === 14) {
       console.log(jsonSaveBody.collectionCupId);
 
@@ -726,18 +752,26 @@ const userInputHandler = async (
       );
       collectionCupInput.style.borderColor = "#E00000";
       inputCollectionCupErrorMessage.innerHTML =
-        "Collection Cup ID length must be 9 characters";
+        "Collection Cup ID length must be 14 characters";
     }
     return;
   });
 
   await inputCollectionCard.addEventListener("blur", (e) => {
-    // id="input-collection-cup"
-    // id="input-collection-cup-error-message"
     let collectionCardId = e.target.value;
     let collectionCardInput = document.getElementById("input-collection-card");
     let inputCollectionCardErrorMessage = document.getElementById(
       "input-collection-card-error-message"
+    );
+
+    // DELETE: GET RID OF CONSOLE LOG LATER
+    let regExpSearch = collectionCardAndCupIdRegExp(collectionCardId);
+    console.log(
+      `Collection Card Id--> lengthStatus: ${
+        collectionCardId.length
+      }, regExp:${regExpSearch}, PassCondition: ${
+        collectionCardId.length === 14 && regExpSearch
+      } `
     );
 
     if (collectionCardId.length === 14) {
@@ -805,12 +839,12 @@ const addRow = (jsonSaveBody, tableNumRows) => {
   collectionCupHolder.push(collectionCupId);
   collectionCardHolder.push(collectionCardId);
 
-  console.table(specimenKitId);
-  console.table(uspsHolder);
-  console.table(supplyKitHolder);
-  console.table(specimenKitHolder);
-  console.table(collectionCupHolder);
-  console.table(collectionCardHolder);
+  // console.table(specimenKitId);
+  // console.table(uspsHolder);
+  // console.table(supplyKitHolder);
+  // console.table(specimenKitHolder);
+  // console.table(collectionCupHolder);
+  // console.table(collectionCardHolder);
 
   newRowEl.firstChild.nextSibling.innerHTML = tableNumRows;
   newRowEl.insertAdjacentHTML(
@@ -917,25 +951,36 @@ alert += `<div id="alert-warning" class="alert alert-danger alert-dismissible fa
 REGEX COMMENTS
 https://regex101.com/
 */
+
 /*
-FORMAT MATCH (SPECIMEN KIT ID & SUPPLY KIT ID) TEST EXAMPLE -->  CXA123460 0009
+ FORMAT MATCH (SPECIMEN KIT ID & SUPPLY KIT ID) TEST EXAMPLE  --> CON000007
+- ^ DETERMINE LINE START
+- START WITH CON
+- [0-9 ] MATCH ANY NUMBERS 0 - 9 
+- {6} REPEAT PREVIOUS TOKEN 6 TIMES
+- $ DETERMINE LINE END
+
+ REGEX - ^CON[0-9]{6}$
+*/
+
+const supplyAndSpecimenKitIdRegExp = (searchStr) => {
+  let regexExp = /^CON[0-9]{6}$/;
+  return regexExp.test(searchStr);
+};
+
+/*
+FORMAT MATCH (COLLECTION CARD ID & COLLECTION CUP ID) TEST EXAMPLE -->  CXA123460 0009
 - ^ DETERMINE LINE START
 - START WITH CXA
 - MATCH ANY NUMBERS 0 - 9 FOR THE NEXT 6 DIGITS
-- \s FOR SPACE
+- \s TO MATCH A SPACE 
 - CHECK PREVIOUS DIGIT NUMBERS FROM 0 TO 9  FOUR TIMES, 
 - $ MATCH CHARACTER AT END
 
  REGEX -  ^CXA[0-9]{6}\s[0-9]{4}$
 */
 
-/*
- FORMAT MATCH (COLLECTION CARD ID & COLLECTION CUP ID) TEST EXAMPLE  --> CON000007
-- ^ DETERMINE LINE START
-- START WITH CON
-- [0-9 ]MATCH ANY NUMBERS 0 - 9 
-- {6} REPEAT PREVIOUS TOKEN 6 TIMES
-- $ DETERMINE LINE END
-
- REGEX - ^CON[0-9]{6}$
-*/
+const collectionCardAndCupIdRegExp = (searchStr) => {
+  let regexExp = /^CXA[0-9]{6}\s[0-9]{4}$/;
+  return regexExp.test(searchStr);
+};
