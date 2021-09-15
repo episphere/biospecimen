@@ -214,8 +214,8 @@ const populateKitTable = (tableBody, kitData) => {
       <tr class="new-row">      
         <th scope="row">${lastRowNumber}</th>
         <td>
-          <input id="input-usps" class="input-field" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="3374889321009425653720" />
-          <label for ="input-usps" style="font-size:.8rem;">Ex. 9803095558879826901825</label>
+          <input id="input-usps" class="input-field" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="9221690209813300440662" />
+          <label for ="input-usps" style="font-size:.8rem;">Ex. 9221690209813300440662</label>
           <p id="input-usps-error-message" class="input-error-message"></p>
         </td>
         <td>
@@ -283,8 +283,8 @@ const populateKitTable = (tableBody, kitData) => {
         <tr class="new-row">      
           <th scope="row">${lastRowNumber + 1}</th>
           <td>
-            <input id="input-usps" class="input-field" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="3374889321009425653720" />
-            <label for ="input-usps" style="font-size:.8rem;">Ex. 3374889321009425653720</label>
+            <input id="input-usps" class="input-field" autocomplete="off" name="input-usps" style="width:100%;text-overflow: ellipsis;" placeholder="9221690209813300440662" />
+            <label for ="input-usps" style="font-size:.8rem;">Ex. 9221690209813300440662</label>
             <p id="input-usps-error-message" class="input-error-message"></p>
           </td>
           <td>
@@ -408,7 +408,7 @@ const saveItem = async (
     ) {
       //TODO - REFACTOR INTO REUSABLE FUNCTION
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The Specimen Kit USPS Tracking Number length must be within the range of 20 to 22 characters!</strong>
+      <strong>The Specimen Kit USPS Tracking number length must be within the range of 20 to 22 characters!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -601,7 +601,7 @@ const saveItem = async (
     tableNumRows++;
 
     // ADD DATA TO TABLE
-    // addKitData(jsonSaveBody);
+    addKitData(jsonSaveBody);
 
     addRow(jsonSaveBody, tableNumRows);
 
@@ -699,7 +699,7 @@ const userInputHandler = async (
         "color:#E00000;display:inline-block;font-size:.8rem;"
       );
       inputSpecimenKitErrorMessage.innerHTML =
-        "Specimen Kit ID number length must be 9 characters";
+        "Specimen Kit ID length must be 9 characters";
       specimenKitInput.style.borderColor = "#E00000";
     }
     return;
@@ -726,7 +726,7 @@ const userInputHandler = async (
       );
       collectionCupInput.style.borderColor = "#E00000";
       inputCollectionCupErrorMessage.innerHTML =
-        "Collection Cup ID number length must be 9 characters";
+        "Collection Cup ID length must be 9 characters";
     }
     return;
   });
@@ -753,7 +753,7 @@ const userInputHandler = async (
       );
       collectionCardInput.style.borderColor = "#E00000";
       inputCollectionCardErrorMessage.innerHTML =
-        "Collection Card ID must be 14 characters";
+        "Collection Card ID length must be 14 characters";
     }
     return;
   });
