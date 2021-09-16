@@ -18,7 +18,13 @@ export const addEventSearchForm1 = () => {
         e.preventDefault();
         const firstName = document.getElementById('firstName').value;
         const lastName = document.getElementById('lastName').value;
-        const dob = document.getElementById('dob').value;
+        const dobEl = document.getElementById('dob');
+        let dob = dobEl.value;
+
+        if(dobEl.dataset.maskedInputFormat === "mm/dd/yyyy"){
+            dob = dob.split('/').reverse().join('-');
+        }
+        
         if(!firstName && !lastName && !dob) return;
         let query = '';
         if(firstName) query += `firstName=${firstName}&`;
