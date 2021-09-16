@@ -554,7 +554,7 @@ const saveItem = async (
 
     if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The USPS Tracking Number exists, please provide an unique USPS Tracking Number!</strong>
+      <strong>The USPS Tracking Number already exists, please provide an unique USPS Tracking Number!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -659,7 +659,10 @@ const userInputHandler = async (
       console.log(usps.length, usps);
       usps = usps.split("").splice(8).join("").trim();
       inputUsps.value = usps;
+      console.log(uspsTrackingNumberRegExp(usps));
       console.log(usps.length, usps);
+      uspsErrorMessage.style.display = "none";
+      uspsInput.style.borderColor = "";
     } else {
       inputUsps.value = e.target.value.trim();
       console.log(inputUsps.value, usps);
@@ -667,9 +670,9 @@ const userInputHandler = async (
         (!uspsTrackingNumberRegExp(usps) && inputUsps.value.length < 20) ||
         inputUsps.value.length > 22
       ) {
-        // console.log(
-        //   "Invalid USPS tracking number format. <br/>Please input a 20 to 22 digit number, each digit can be a number between 0 to 9."
-        // );
+        console.log(
+          "Invalid USPS tracking number format. <br/>Please input a 20 to 22 digit number, each digit can be a number between 0 to 9."
+        );
         uspsErrorMessage.setAttribute(
           "style",
           "color:#E00000;display:inline-block;font-size:.8rem;"
@@ -678,12 +681,13 @@ const userInputHandler = async (
         uspsErrorMessage.innerHTML =
           "Invalid USPS tracking number format. <br/>Please input a 20 to 22 digit number, each digit can be a number between 0 to 9.";
       } else {
-        if (inputUsps.value.length > 19 || inputUsps.value.length < 23) {
+        if (inputUsps.value.length > 19 && inputUsps.value.length < 23) {
           uspsErrorMessage.style.display = "none";
           uspsInput.style.borderColor = "";
         }
       }
     }
+    // debugger;
     return;
   });
 
@@ -718,7 +722,6 @@ const userInputHandler = async (
       supplyKitInput.style.borderColor = "#E00000";
       inputSupplyKitErrorMessage.innerHTML = `Supply Kit ID length must be 9 characters. <br/>The format must start with an all uppercase CON, followed by 6 digits, each digit can be a number from 0 to 9.`;
     }
-    // TODO: CHANGE ELSE IF TO ACCOMODATE REGEX
     return;
   });
 
@@ -783,7 +786,7 @@ const userInputHandler = async (
         "color:#E00000;display:inline-block;font-size:.8rem;"
       );
       collectionCupInput.style.borderColor = "#E00000";
-      inputCollectionCupErrorMessage.innerHTML = `Collection Cup ID length must be 14 characters. <br/>The format must start with an all uppercase CXA, followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9. `;
+      inputCollectionCupErrorMessage.innerHTML = `Collection Cup ID length must be 14 characters. <br/>The format must start with an all uppercase CX, followed by any capital letter from A-Z, followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9. `;
     }
     return;
   });
@@ -817,7 +820,7 @@ const userInputHandler = async (
         "color:#E00000;display:inline-block;font-size:.8rem;"
       );
       collectionCardInput.style.borderColor = "#E00000";
-      inputCollectionCardErrorMessage.innerHTML = `Collection Card ID length must be 14 characters. <br/>The format must start with an all uppercase CXA followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9.`;
+      inputCollectionCardErrorMessage.innerHTML = `Collection Card ID length must be 14 characters. <br/>The format must start with an all uppercase CX, followed by any capital letter from A-Z, followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9.`;
     }
     return;
   });
@@ -921,8 +924,21 @@ const clearAllInputs = (inputElements) => {
 };
 
 /*
+// TODO: Refactor ALERT POP UP TO MAINTAIN DRY
+const alertTemplate = (message) => {
+alert += `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>${message}</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`;
+    closeAlert("warn");
+    }
+*/
+
 // Prevents POST request and Add to line if duplicate is found
 // Used as a conditional in if statement above
+
 const checkDuplicate = (arrayHolder, number) => {
   let uniqueStrArr = [];
   // If arrayHolder has items proceed with copying arrayHolder and  converting items to string data type and pushing to uniqueStrArr
@@ -935,23 +951,6 @@ const checkDuplicate = (arrayHolder, number) => {
     return true;
   }
 };
-
-
-
-// TODO: Refactor ALERT POP UP TO MAINTAIN DRY
-/*
-
-const alertTemplate = (message) => {
-alert += `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>${message}</strong>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>`;
-    closeAlert("warn");
-    }
-*/
-
 // Automatically close alert
 const closeAlert = (status) => {
   if (status === "success") {
@@ -1016,10 +1015,10 @@ FORMAT MATCH (COLLECTION CARD ID & COLLECTION CUP ID) TEST EXAMPLE -->  CXA12346
 - CHECK PREVIOUS DIGIT NUMBERS FROM 0 TO 9  FOUR TIMES, 
 - $ MATCH CHARACTER AT END
 
- REGEX -  ^CXA[0-9]{6}\s[0-9]{4}$
+ REGEX -  ^CX[A-Z]{1}[0-9]{6}\s[0-9]{4}$
 */
 
 const collectionCardAndCupIdRegExp = (searchStr) => {
-  let regExp = /^CXA[0-9]{6}\s[0-9]{4}$/;
+  let regExp = /^CX[A-Z]{1}[0-9]{6}\s[0-9]{4}$/;
   return regExp.test(searchStr);
 };
