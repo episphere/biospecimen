@@ -48,7 +48,7 @@ export const specimenTemplate = async (data, formData, collections) => {
                         <td>${collection['915838974'] ? new Date(collection['915838974']).toLocaleString() : ''}</td>
                         <td>${collection['331584571'] ? visitType[collection['331584571']] : ''}</td>
                         <td>${collection['650516960'] ? collectionSettings[collection['650516960']] : ''}</td>
-                        <td><button class="custom-btn continue-collect-process" data-connect-id="${data.Connect_ID}" data-collection-id="${collection['820476880']}">${getWorflow() === 'research' ? `Continue to Collect/Process`:`Continue to Labeling and Receipt`}</button></td>
+                        <td><button class="custom-btn continue-collect-process" data-connect-id="${data.Connect_ID}" data-collection-id="${collection['820476880']}">Add Specimens</button></td>
                     </tr>`
                 })
             template +=`</tbody></table>`
