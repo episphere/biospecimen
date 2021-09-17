@@ -249,7 +249,7 @@ const populateKitTable = (tableBody, kitData) => {
       }
 
       tableBody.innerHTML = tableRow;
-      debugger;
+      // debugger;
       return;
     }
   }
@@ -359,22 +359,6 @@ const saveItem = async (
   saveButton.addEventListener("click", (e) => {
     e.preventDefault();
 
-    // console.log(jsonSaveBody);
-    let {
-      uspsTrackingNumber,
-      supplyKitId,
-      specimenKitId,
-      collectionCupId,
-      collectionCardId,
-    } = jsonSaveBody;
-
-    uspsTrackingNumber = inputUsps.value;
-
-    console.log(
-      `USPS track number : ${uspsTrackingNumber}, ${
-        uspsTrackingNumber.length
-      }, ${uspsTrackingNumber.trim().length}`
-    );
     // Target Last row and the last row's children elements
     // Remove whitespace if any on input fields
     jsonSaveBody.uspsTrackingNumber = inputUsps.value.trim();
@@ -421,11 +405,12 @@ const saveItem = async (
 
     if (
       jsonSaveBody.uspsTrackingNumber.length < 20 ||
-      jsonSaveBody.uspsTrackingNumber.length > 22
+      (jsonSaveBody.uspsTrackingNumber.length > 22 &&
+        !uspsTrackingNumberRegExp(jsonSaveBody.uspsTrackingNumber))
     ) {
       //TODO - REFACTOR INTO REUSABLE FUNCTION
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The Specimen Kit USPS Tracking number length must be within the range of 20 to 22 characters!</strong>
+      <strong>Invalid Specimen Kit USPS tracking number format. Please input a 20 to 22 digit number, each digit can be a number between 0 to 9.</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -436,10 +421,13 @@ const saveItem = async (
       return;
     }
 
-    if (jsonSaveBody.supplyKitId.length !== 9) {
+    if (
+      jsonSaveBody.supplyKitId.length !== 9 &&
+      !supplyAndSpecimenKitIdRegExp(jsonSaveBody.supplyKitId)
+    ) {
       // TODO - REFACTOR INTO REUSABLE FUNCTION
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The Supply Kit ID length must be 9 characters!</strong>
+      <strong>The Supply Kit ID length must be 9 characters. The format must start with an all uppercase CON, followed by 6 digits, each digit can be a number from 0 to 9.</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -449,10 +437,13 @@ const saveItem = async (
       return;
     }
 
-    if (jsonSaveBody.specimenKitId.length !== 9) {
+    if (
+      jsonSaveBody.specimenKitId.length !== 9 &&
+      !supplyAndSpecimenKitIdRegExp(jsonSaveBody.specimenKitId)
+    ) {
       // TODO - REFACTOR INTO REUSABLE FUNCTION
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The Supply Kit ID length must be 9 characters!</strong>
+      <strong>The Specimen Kit ID length must be 9 characters. The format must start with an all uppercase CON, followed by 6 digits, each digit can be a number from 0 to 9.</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -463,14 +454,41 @@ const saveItem = async (
       // return alert("specimen kit id must be 9 characters");
     }
 
-    if (jsonSaveBody.collectionCupId.length !== 14) {
+    if (
+      jsonSaveBody.collectionCupId.length !== 14 &&
+      !collectionCardAndCupIdRegExp(jsonSaveBody.collectionCupId)
+    ) {
       // TODO - REFACTOR INTO REUSABLE FUNCTION
       // return alert("collection cup id must be 14 characters");
+
+      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>The Collection Cup ID length must be 14 characters.The format must start with an all uppercase CX, followed by any capital letter from A-Z, followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9.</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+      contentBody.insertAdjacentHTML("afterbegin", alert);
+      closeAlert("warn");
+      return;
     }
 
-    if (jsonSaveBody.collectionCardId.length !== 14) {
+    if (
+      jsonSaveBody.collectionCardId.length !== 14 &&
+      !collectionCardAndCupIdRegExp(jsonSaveBody.collectionCardId)
+    ) {
+      // Collection Card ID length must be 14 characters. <br/>The format must start with an all uppercase CX, followed by any capital letter from A-Z, followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9.
       // TODO - REFACTOR INTO REUSABLE FUNCTION
       // return alert("collection card id must be 14 characters");
+
+      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>The Collection Card ID length must be 14 characters.The format must start with an all uppercase CX, followed by any capital letter from A-Z, followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9.</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>`;
+      contentBody.insertAdjacentHTML("afterbegin", alert);
+      closeAlert("warn");
+      return;
     }
 
     /*
@@ -649,14 +667,14 @@ const userInputHandler = async (
 ) => {
   // Event Handlers for input fields
   await inputUsps.addEventListener("blur", (e) => {
-    let usps = e.target.value;
+    let usps = e.target.value.trim();
     let uspsErrorMessage = document.getElementById("input-usps-error-message");
     let uspsInput = document.getElementById("input-usps");
 
-    console.log(uspsTrackingNumberRegExp(usps));
+    // console.log(uspsTrackingNumberRegExp(usps));
 
     if (!isNumeric(usps)) {
-      console.log(isNumeric(usps), usps);
+      // console.log(isNumeric(usps), usps);
       inputUsps.value = e.target.value.trim();
       uspsErrorMessage.setAttribute(
         "style",
@@ -699,28 +717,27 @@ const userInputHandler = async (
         }
       }
     }
-    // debugger;
     return;
   });
 
   await inputSupplyKit.addEventListener("blur", (e) => {
-    let supplyKitId = e.target.value;
+    let supplyKitId = e.target.value.trim();
     let supplyKitInput = document.getElementById("input-supply-kit");
     let inputSupplyKitErrorMessage = document.getElementById(
       "input-supply-kit-error-message"
     );
     let regExpSearch = supplyAndSpecimenKitIdRegExp(supplyKitId);
     // DELETE: GET RID OF CONSOLE LOG LATER
-    console.log(
-      `Supply Kit ID --> lengthStatus: ${
-        supplyKitId.length
-      }, regExp:${regExpSearch}, PassCondition: ${
-        supplyKitId.length === 9 && regExpSearch
-      } `
-    );
+    // console.log(
+    //   `Supply Kit ID --> lengthStatus: ${
+    //     supplyKitId.length
+    //   }, regExp:${regExpSearch}, PassCondition: ${
+    //     supplyKitId.length === 9 && regExpSearch
+    //   } `
+    // );
 
     if (supplyKitId.length === 9 && regExpSearch) {
-      console.log(jsonSaveBody.supplyKitId);
+      // console.log(jsonSaveBody.supplyKitId);
       inputSupplyKit.value = e.target.value.trim();
       inputSupplyKitErrorMessage.style.display = "none";
       supplyKitInput.style.borderColor = "";
@@ -738,20 +755,20 @@ const userInputHandler = async (
   });
 
   await inputSpecimenKit.addEventListener("blur", (e) => {
-    let specimenKitId = e.target.value;
+    let specimenKitId = e.target.value.trim();
     let specimenKitInput = document.getElementById("input-specimen-kit");
     let inputSpecimenKitErrorMessage = document.getElementById(
       "input-speciment-kit-error-message"
     );
     // DELETE: GET RID OF CONSOLE LOG LATER
     let regExpSearch = supplyAndSpecimenKitIdRegExp(specimenKitId);
-    console.log(
-      `Specimen Kit ID --> lengthStatus: ${
-        specimenKitId.length
-      }, regExp:${regExpSearch}, PassCondition: ${
-        specimenKitId.length === 9 && regExpSearch
-      } `
-    );
+    // console.log(
+    //   `Specimen Kit ID --> lengthStatus: ${
+    //     specimenKitId.length
+    //   }, regExp:${regExpSearch}, PassCondition: ${
+    //     specimenKitId.length === 9 && regExpSearch
+    //   } `
+    // );
     if (specimenKitId.length === 9 && regExpSearch) {
       inputSpecimenKit.value = e.target.value.trim();
       inputSpecimenKitErrorMessage.style.display = "none";
@@ -769,7 +786,7 @@ const userInputHandler = async (
   });
 
   await inputCollectionCup.addEventListener("blur", (e) => {
-    let collectionCupId = e.target.value;
+    let collectionCupId = e.target.value.trim();
     let collectionCupInput = document.getElementById("input-collection-cup");
     let inputCollectionCupErrorMessage = document.getElementById(
       "input-collection-cup-error-message"
@@ -777,16 +794,16 @@ const userInputHandler = async (
 
     // DELETE: GET RID OF CONSOLE LOG LATER
     let regExpSearch = collectionCardAndCupIdRegExp(collectionCupId);
-    console.log(
-      `Collection Cup Id--> lengthStatus: ${
-        collectionCupId.length
-      }, regExp:${regExpSearch}, PassCondition: ${
-        collectionCupId.length === 14 && regExpSearch
-      } `
-    );
+    // console.log(
+    //   `Collection Cup Id--> lengthStatus: ${
+    //     collectionCupId.length
+    //   }, regExp:${regExpSearch}, PassCondition: ${
+    //     collectionCupId.length === 14 && regExpSearch
+    //   } `
+    // );
 
     if (collectionCupId.length === 14 && regExpSearch) {
-      console.log(jsonSaveBody.collectionCupId);
+      // console.log(jsonSaveBody.collectionCupId);
 
       inputCollectionCup.value = e.target.value.trim();
       inputCollectionCupErrorMessage.style.display = "none";
@@ -804,7 +821,7 @@ const userInputHandler = async (
   });
 
   await inputCollectionCard.addEventListener("blur", (e) => {
-    let collectionCardId = e.target.value;
+    let collectionCardId = e.target.value.trim();
     let collectionCardInput = document.getElementById("input-collection-card");
     let inputCollectionCardErrorMessage = document.getElementById(
       "input-collection-card-error-message"
@@ -812,16 +829,16 @@ const userInputHandler = async (
 
     // DELETE: GET RID OF CONSOLE LOG LATER
     let regExpSearch = collectionCardAndCupIdRegExp(collectionCardId);
-    console.log(
-      `Collection Card Id--> lengthStatus: ${
-        collectionCardId.length
-      }, regExp:${regExpSearch}, PassCondition: ${
-        collectionCardId.length === 14 && regExpSearch
-      } `
-    );
+    // console.log(
+    //   `Collection Card Id--> lengthStatus: ${
+    //     collectionCardId.length
+    //   }, regExp:${regExpSearch}, PassCondition: ${
+    //     collectionCardId.length === 14 && regExpSearch
+    //   } `
+    // );
 
     if (collectionCardId.length === 14 && regExpSearch) {
-      console.log(jsonSaveBody.collectionCardId);
+      // console.log(jsonSaveBody.collectionCardId);
       inputCollectionCard.value = e.target.value.trim();
       inputCollectionCardErrorMessage.style.display = "none";
       collectionCardInput.style.borderColor = "";
@@ -959,7 +976,7 @@ const checkDuplicate = (arrayHolder, number) => {
   console.log(uniqueStrArr);
   let found = uniqueStrArr.indexOf(number);
   if (found !== -1) {
-    debugger;
+    // debugger;
     return true;
   }
 };
