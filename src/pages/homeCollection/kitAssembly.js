@@ -654,25 +654,37 @@ const userInputHandler = async (
     let uspsInput = document.getElementById("input-usps");
 
     console.log(uspsTrackingNumberRegExp(usps));
+
+    if (!isNumeric(usps)) {
+      console.log(isNumeric(usps), usps);
+      inputUsps.value = e.target.value.trim();
+      uspsErrorMessage.setAttribute(
+        "style",
+        "color:#E00000;display:inline-block;font-size:.8rem;"
+      );
+      uspsInput.style.borderColor = "#E00000";
+      uspsErrorMessage.innerHTML =
+        "Invalid USPS tracking number format. <br/>Please input a 20 to 22 digit number, each digit can be a number between 0 to 9.";
+      return;
+    }
+
     // 30 to 32 digit number will have first 8 characters removed
+    // Trim and remove message if nuber is between range criteria
     if (usps.length >= 30 && usps.length <= 32) {
-      console.log(usps.length, usps);
+      // console.log(usps.length, usps);
       usps = usps.split("").splice(8).join("").trim();
       inputUsps.value = usps;
-      console.log(uspsTrackingNumberRegExp(usps));
-      console.log(usps.length, usps);
+      // console.log(uspsTrackingNumberRegExp(usps));
+      // console.log(usps.length, usps);
       uspsErrorMessage.style.display = "none";
       uspsInput.style.borderColor = "";
     } else {
       inputUsps.value = e.target.value.trim();
-      console.log(inputUsps.value, usps);
+      // console.log(inputUsps.value, usps);
       if (
         (!uspsTrackingNumberRegExp(usps) && inputUsps.value.length < 20) ||
         inputUsps.value.length > 22
       ) {
-        console.log(
-          "Invalid USPS tracking number format. <br/>Please input a 20 to 22 digit number, each digit can be a number between 0 to 9."
-        );
         uspsErrorMessage.setAttribute(
           "style",
           "color:#E00000;display:inline-block;font-size:.8rem;"
@@ -1021,4 +1033,14 @@ FORMAT MATCH (COLLECTION CARD ID & COLLECTION CUP ID) TEST EXAMPLE -->  CXA12346
 const collectionCardAndCupIdRegExp = (searchStr) => {
   let regExp = /^CX[A-Z]{1}[0-9]{6}\s[0-9]{4}$/;
   return regExp.test(searchStr);
+};
+
+/*
+CHECK IF STRING OR NUM VALUE IS A REAL NUMBER  
+https://stackoverflow.com/questions/9716468/pure-javascript-a-function-like-jquerys-isnumeric
+*/
+const isNumeric = (num) => {
+  // parseFloat - converts to string if needed, and then returns a floating point number
+  // isFinite - false if the argument is (or will be coerced to) positive or negative Infinity or NaN or undefined
+  return !isNaN(parseFloat(num)) && isFinite(num);
 };
