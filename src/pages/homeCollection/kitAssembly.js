@@ -16,6 +16,8 @@ let specimenKitHolder = [];
 let collectionCupHolder = [];
 let collectionCardHolder = [];
 
+const contentBody = document.getElementById("contentBody");
+
 export const kitAssemblyScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
@@ -140,27 +142,16 @@ const addKitData = async (jsonSaveBody) => {
   });
 
   // TODO: Make into separate Function call
-  let contentBody = document.getElementById("contentBody");
-  let alert = "";
+  //DELETE
 
   if (response.status === 200) {
-    alert = `
-    <div id="alert-success" class="alert alert-success alert-dismissible fade show" role="alert">
-      <strong>Kit was saved successfully!</strong>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>`;
-    contentBody.insertAdjacentHTML("afterbegin", alert);
-    closeAlert("success");
+    let message = `The kit was saved successfully!`;
+    let status = "success";
+    alertTemplate(message, status);
   } else {
-    alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>Kit was not saved successfully!</strong>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>`;
-    closeAlert("warn");
+    let message = "The kit was not saved successfully!";
+    let status = "warn";
+    alertTemplate(message, status);
   }
 };
 
@@ -193,7 +184,7 @@ const kitAssemblyTemplate = async (user, name, auth, route) => {
         </div>`;
 
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
-  document.getElementById("contentBody").innerHTML = template;
+  contentBody.innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
 };
 
@@ -320,18 +311,9 @@ const populateKitTable = (tableBody, kitData) => {
 
     tableBody.innerHTML = tableRow;
   }
-
-  // REMOVE - Check to see if data was added to holders on kitTable render
-  // console.table(uspsHolder);
-  // console.log(uspsHolder);
-  // console.table(supplyKitHolder);
-  // console.table(specimenKitHolder);
-  // console.table(collectionCupHolder);
-  // console.table(collectionCardHolder);
 };
 
 const kitAssemblyPageButtons = () => {
-  const contentBody = document.getElementById("contentBody");
   let buttonContainerTemplate = "";
 
   buttonContainerTemplate += `
@@ -370,21 +352,15 @@ const saveItem = async (
 
     /*
     ============================================================
-    PREVENTS USER FROM SUBMITTING INCOMPLETE INPUT FIELD ROW ***
+    QC CHECK - PREVENTS USER FROM SUBMITTING INCOMPLETE INPUT FIELD ROW 
     ============================================================
     */
     for (const key in jsonSaveBody) {
       if (!jsonSaveBody[key]) {
-        // TODO - REFACTOR INTO REUSABLE FUNCTION
-        alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-          <strong>One or more inputs are empty!</strong>
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          </div>`;
-        contentBody.insertAdjacentHTML("afterbegin", alert);
-        closeAlert("warn");
-        // console.log(document.getElementsByClassName("input-error-message"));
+        let message = `One or more inputs are empty. Please fill out all the fields.`;
+        let status = "warn";
+        // Call reusable custome alert with optional custom duration
+        alertTemplate(message, status);
         let allInputFields = document.getElementsByClassName("input-field");
         // Iterate through all elements with the input-error-message class
         // Add and change input field border style to red
@@ -399,7 +375,7 @@ const saveItem = async (
 
     /*
     ==================================
-    INPUT CHARACTER LENGTH CHECK
+    QC CHECK - INPUT CHARACTER LENGTH CHECK
     ==================================
     */
 
@@ -408,16 +384,10 @@ const saveItem = async (
       (jsonSaveBody.uspsTrackingNumber.length > 22 &&
         !uspsTrackingNumberRegExp(jsonSaveBody.uspsTrackingNumber))
     ) {
-      //TODO - REFACTOR INTO REUSABLE FUNCTION
-      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>Invalid Specimen Kit USPS tracking number format. Please input a 20 to 22 digit number, each digit can be a number between 0 to 9.</strong>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-      </div>`;
-      contentBody.insertAdjacentHTML("afterbegin", alert);
-      closeAlert("warn");
-      // ("USPS tracking number length must be within the range of 20 to 22 characters");
+      let message =
+        "Invalid Specimen Kit USPS tracking number format. Please input a 20 to 22 digit number, each digit can be a number between 0 to 9.";
+      let status = "warn";
+      alertTemplate(message, status, 6000);
       return;
     }
 
@@ -425,15 +395,9 @@ const saveItem = async (
       jsonSaveBody.supplyKitId.length !== 9 &&
       !supplyAndSpecimenKitIdRegExp(jsonSaveBody.supplyKitId)
     ) {
-      // TODO - REFACTOR INTO REUSABLE FUNCTION
-      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The Supply Kit ID length must be 9 characters. The format must start with an all uppercase CON, followed by 6 digits, each digit can be a number from 0 to 9.</strong>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-      </div>`;
-      contentBody.insertAdjacentHTML("afterbegin", alert);
-      closeAlert("warn");
+      let message = `The Supply Kit ID length must be 9 characters. The format must start with an all uppercase CON, followed by 6 digits, each digit can be a number from 0 to 9.`;
+      let status = "warn";
+      alertTemplate(message, status, 8000);
       return;
     }
 
@@ -441,34 +405,19 @@ const saveItem = async (
       jsonSaveBody.specimenKitId.length !== 9 &&
       !supplyAndSpecimenKitIdRegExp(jsonSaveBody.specimenKitId)
     ) {
-      // TODO - REFACTOR INTO REUSABLE FUNCTION
-      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The Specimen Kit ID length must be 9 characters. The format must start with an all uppercase CON, followed by 6 digits, each digit can be a number from 0 to 9.</strong>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-      </div>`;
-      contentBody.insertAdjacentHTML("afterbegin", alert);
-      closeAlert("warn");
+      let message = `The Specimen Kit ID length must be 9 characters. The format must start with an all uppercase CON, followed by 6 digits, each digit can be a number from 0 to 9.`;
+      let status = "warn";
+      alertTemplate(message, status, 8000);
       return;
-      // return alert("specimen kit id must be 9 characters");
     }
 
     if (
       jsonSaveBody.collectionCupId.length !== 14 &&
       !collectionCardAndCupIdRegExp(jsonSaveBody.collectionCupId)
     ) {
-      // TODO - REFACTOR INTO REUSABLE FUNCTION
-      // return alert("collection cup id must be 14 characters");
-
-      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The Collection Cup ID length must be 14 characters.The format must start with an all uppercase CX, followed by any capital letter from A-Z, followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9.</strong>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-      </div>`;
-      contentBody.insertAdjacentHTML("afterbegin", alert);
-      closeAlert("warn");
+      let message = `The Collection Cup ID length must be 14 characters. The format must start with an all uppercase CX, followed by any capital letter from A-Z, followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9.`;
+      let status = "warn";
+      alertTemplate(message, status, 9000);
       return;
     }
 
@@ -476,25 +425,16 @@ const saveItem = async (
       jsonSaveBody.collectionCardId.length !== 14 &&
       !collectionCardAndCupIdRegExp(jsonSaveBody.collectionCardId)
     ) {
-      // Collection Card ID length must be 14 characters. <br/>The format must start with an all uppercase CX, followed by any capital letter from A-Z, followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9.
-      // TODO - REFACTOR INTO REUSABLE FUNCTION
-      // return alert("collection card id must be 14 characters");
-
-      alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>The Collection Card ID length must be 14 characters.The format must start with an all uppercase CX, followed by any capital letter from A-Z, followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9.</strong>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-      </div>`;
-      contentBody.insertAdjacentHTML("afterbegin", alert);
-      closeAlert("warn");
+      let message = `The Collection Card ID length must be 14 characters. The format must start with an all uppercase CX, followed by any capital letter from A-Z, followed by 6 digits, each digit can be a number from 0 to 9, followed by a space, and followed by 4 digits, each digit can be a number from 0 to 9.`;
+      let status = "warn";
+      alertTemplate(message, status, 9000);
       return;
     }
 
     /*
-    ================================
-    MATCHING SPECIFIC INPUT FIELDS
-    ================================
+    ==============================================
+    QC CHECK - MATCHING SPECIFIC INPUT FIELDS
+    ==============================================
     */
     if (jsonSaveBody.supplyKitId !== jsonSaveBody.specimenKitId) {
       let supplyKitInputElement = inputSupplyKit;
@@ -537,7 +477,7 @@ const saveItem = async (
 
     /*
     ==================================================================
-    VALID NUMBER WITH STRING DATA TYPE CONDITIONAL CHECKER
+    QC CHECK - VALID NUMBER WITH STRING DATA TYPE CONDITIONAL CHECKER
     ==================================================================
     */
 
@@ -572,9 +512,9 @@ const saveItem = async (
     }
 
     /* 
-    =================================
-    DUPLICATE CONDITIONAL CHECKER
-    =================================
+    =============================================================================
+    QC CHECK - CHECK IF INPUT IS UNIQUE COMPARED TO ALL PREVIOUS ENTRIES
+    =============================================================================
     */
     // // Checks array if input usps tracking number exists in usps placeholder array
     // // exits outer function if duplicate
@@ -998,7 +938,7 @@ const clearRowInputs = (inputElements) => {
   }
 };
 
-// clear Button Clear Inputs Function
+// Clear Button Clear Inputs Function
 
 const clearAllInputs = (inputElements) => {
   const clearButton = document.getElementById("kit-assembly-clear-button");
@@ -1011,19 +951,6 @@ const clearAllInputs = (inputElements) => {
     }
   });
 };
-
-/*
-// TODO: Refactor ALERT POP UP TO MAINTAIN DRY
-const alertTemplate = (message) => {
-alert += `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>${message}</strong>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>`;
-    closeAlert("warn");
-    }
-*/
 
 // Prevents POST request and Add to line if duplicate is found
 // Used as a conditional in if statement above
@@ -1040,26 +967,41 @@ const checkDuplicate = (arrayHolder, number) => {
     return true;
   }
 };
-// Automatically close alert
-const closeAlert = (status) => {
+
+// TODO: Refactor ALERT POP UP TO MAINTAIN DRY
+const alertTemplate = (message, status = "warn", duration = 5000) => {
+  alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>${message}</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`;
+  contentBody.insertAdjacentHTML("afterbegin", alert);
+  closeAlert(status, duration);
+};
+
+// Automatically Close Alert Message
+const closeAlert = (status = "warn", duration = 5000) => {
   if (status === "success") {
     const alertSuccess = document.getElementById("alert-success");
     alertSuccess.style.display = "block";
     setTimeout(function () {
       alertSuccess.style.display = "none";
-    }, 5000);
+    }, duration);
   } else if (status === "warn") {
     const alertWarning = document.getElementById("alert-warning");
     alertWarning.style.display = "block";
     setTimeout(function () {
       alertWarning.style.display = "none";
-    }, 5000);
+    }, duration);
   } else return;
 };
 
 /*
+===============================
 REGEX COMMENTS
 https://regex101.com/
+===============================
 */
 
 /*
@@ -1113,8 +1055,10 @@ const collectionCardAndCupIdRegExp = (searchStr) => {
 };
 
 /*
+================================================================================V================
 CHECK IF STRING OR NUM VALUE IS A REAL NUMBER  
 https://stackoverflow.com/questions/9716468/pure-javascript-a-function-like-jquerys-isnumeric
+================================================================================VV===============
 */
 const isNumeric = (num) => {
   // parseFloat - converts to string if needed, and then returns a floating point number
