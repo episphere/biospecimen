@@ -227,7 +227,7 @@ const populateKitTable = (tableBody, kitData) => {
         <td>
             <input id="input-specimen-kit" class="input-field" type="string" autocomplete="off" name="input-specimen-kit" style="width:100%" name="input-specimen-kit" placeholder="CON000007"/>
             <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CON000007</label>
-            <p id="input-speciment-kit-error-message" class="input-error-message"></p>
+            <p id="input-specimen-kit-error-message" class="input-error-message"></p>
         </td>
         <td class="text-wrap">
             <input id="input-collection-cup" class="input-field" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0009
@@ -296,7 +296,7 @@ const populateKitTable = (tableBody, kitData) => {
           <td>
             <input id="input-specimen-kit" class="input-field" type="string" autocomplete="off" name="input-specimen-kit" style="width:100%" name="input-specimen-kit" placeholder="CON000007"/>
             <label for ="input-specimen-kit" style="font-size:.8rem;">Ex. CON000007</label>
-            <p id="input-speciment-kit-error-message" class="input-error-message"></p>
+            <p id="input-specimen-kit-error-message" class="input-error-message"></p>
           </td>
           <td>
             <input id="input-collection-cup" class="input-field" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0009
@@ -497,6 +497,8 @@ const saveItem = async (
     ================================
     */
     if (jsonSaveBody.supplyKitId !== jsonSaveBody.specimenKitId) {
+      let supplyKitInputElement = inputSupplyKit;
+      let specimenKitInputElement = inputSpecimenKit;
       // TODO - REFACTOR INTO REUSABLE FUNCTION
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
       <strong>The Supply Kit ID and Specimen Kit ID must be the same. Please make the necessary changes.</strong>
@@ -507,11 +509,16 @@ const saveItem = async (
       contentBody.insertAdjacentHTML("afterbegin", alert);
       closeAlert("warn");
       console.log("supply kit id and specimen kit id inputs do not match");
+      specimenKitInputElement.style.borderColor = "#E00000";
+      supplyKitInputElement.style.borderColor = "#E00000";
       return;
     }
 
     if (jsonSaveBody.collectionCupId !== jsonSaveBody.collectionCardId) {
       // TODO - REFACTOR INTO REUSABLE FUNCTION
+      let collectionCupInputElement = inputCollectionCup;
+      let collectionCardInputElement = inputCollectionCard;
+
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
       <strong>The Collection Cup ID and Collection Card ID must be the same. Please make the necessary changes.</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -520,9 +527,11 @@ const saveItem = async (
       </div>`;
       contentBody.insertAdjacentHTML("afterbegin", alert);
       closeAlert("warn");
-      console.log(
-        "collection cup id and collection card id inputs do not match"
-      );
+      // console.log(
+      //   "collection cup id and collection card id inputs do not match"
+      // );
+      collectionCupInputElement.style.borderColor = "#E00000";
+      collectionCardInputElement.style.borderColor = "#E00000";
       return;
     }
 
@@ -571,6 +580,10 @@ const saveItem = async (
     // // exits outer function if duplicate
 
     if (checkDuplicate(uspsHolder, jsonSaveBody.uspsTrackingNumber)) {
+      let uspsInputElement = inputUsps;
+      let uspsErrorMessage = document.getElementById(
+        "input-usps-error-message"
+      );
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
       <strong>The USPS Tracking Number already exists, please provide an unique USPS Tracking Number!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -579,13 +592,26 @@ const saveItem = async (
       </div>`;
       contentBody.insertAdjacentHTML("afterbegin", alert);
       closeAlert("warn");
-      console.log(
-        "The USPS Tracking Number already exists, please provide a unique USPS Tracking Number!"
-      );
+      // console.log(
+      //   "The USPS Tracking Number already exists, please provide a unique USPS Tracking Number!"
+      // );
+      uspsInputElement.style.borderColor = "#E00000";
+      uspsErrorMessage.style.display = "block";
+
       return;
     }
 
     if (checkDuplicate(supplyKitHolder, jsonSaveBody.supplyKitId)) {
+      let supplyKitInputElement = inputSupplyKit;
+      let supplyKitErrorMessage = document.getElementById(
+        "input-supply-kit-error-message"
+      );
+      let specimenKitInputElement = inputSpecimenKit;
+      let specimenKitErrorMessage = document.getElementById(
+        "input-specimen-kit-error-message"
+      );
+      // input - specimen - kit - error - message;
+      // console.log(supplyKitInputElement, supplyKitErrorMessage);
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
       <strong>The Supply Kit ID already exists, please provide an unique Supply Kit ID!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -594,13 +620,22 @@ const saveItem = async (
       </div>`;
       contentBody.insertAdjacentHTML("afterbegin", alert);
       closeAlert("warn");
-      console.log(
-        "The Supply Kit ID already exists, please provide an unique Supply Kit ID!"
-      );
+      // console.log(
+      //   "The Supply Kit ID already exists, please provide an unique Supply Kit ID!"
+      // );
+      supplyKitInputElement.style.borderColor = "#E00000";
+      supplyKitErrorMessage.style.display = "block";
+      specimenKitInputElement.style.borderColor = "#E00000";
+      specimenKitErrorMessage.style.display = "block";
       return;
     }
 
     if (checkDuplicate(specimenKitHolder, jsonSaveBody.specimenKitId)) {
+      // let specimenKitInputElement = inputSpecimenKit;
+      // let specimenKitErrorMessage = document.getElementById(
+      //   "input-specimin-kit-error-message"
+      // );
+      // console.log(specimenKitInputElement, inputSpecimenKitErrorMessage);
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
       <strong>The Specimen Kit ID already exists, please provide an unique Specimen Kit ID!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -609,16 +644,31 @@ const saveItem = async (
       </div>`;
       contentBody.insertAdjacentHTML("afterbegin", alert);
       closeAlert("warn");
-      console.log(
-        "The Specimen Kit ID already exists, please provide an unique Specimen Kit ID!"
-      );
-      console.log(
-        "The Specimen Kit ID already exists, please provide an unique Specimen Kit ID!"
-      );
+      // console.log(
+      //   "The Specimen Kit ID already exists, please provide an unique Specimen Kit ID!"
+      // );
+      // console.log(
+      //   "The Specimen Kit ID already exists, please provide an unique Specimen Kit ID!"
+      // );
+      // specimenKitInputElement.style.borderColor = "#E00000";
+      // specimenKitErrorMessage.style.display = "block";
       return;
     }
 
     if (checkDuplicate(collectionCupHolder, jsonSaveBody.collectionCupId)) {
+      let collectionCupInputElement = inputCollectionCup;
+      let collectionCupErrorMessage = document.getElementById(
+        "input-collection-cup-error-message"
+      );
+      let collectionCardInputElement = inputCollectionCard;
+      let collectionCardErrorMessage = document.getElementById(
+        "input-collection-card-error-message"
+      );
+      // input-collection-cup-error-message
+      // input-collection-card-error-message
+      // inputCollectionCup
+      // input-collection-cup
+      // input-collection-cup-error-message
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
       <strong>The Collection Cup ID already exists, please provide an unique Collection Cup ID!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -627,11 +677,20 @@ const saveItem = async (
       </div>`;
       contentBody.insertAdjacentHTML("afterbegin", alert);
       closeAlert("warn");
+      console.log(collectionCardErrorMessage, collectionCupErrorMessage);
       console.log("Duplicate collection cup id!");
+      collectionCupInputElement.style.borderColor = "#E00000";
+      collectionCupErrorMessage.style.display = "block";
+      collectionCardInputElement.style.borderColor = "#E00000";
+      collectionCardErrorMessage.style.display = "block";
       return;
     }
 
     if (checkDuplicate(collectionCardHolder, jsonSaveBody.collectionCardId)) {
+      // inputCollectionCard
+      // input-collection-card
+      // input-collection-card-error-message
+
       alert = `<div id="alert-warning" class="alert alert-danger alert-dismissible fade show" role="alert">
       <strong>The Collection Card ID already exists, please provide an unique Collection Card ID!</strong>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -641,6 +700,7 @@ const saveItem = async (
       contentBody.insertAdjacentHTML("afterbegin", alert);
       closeAlert("warn");
       console.log("Duplicate collection card id!");
+
       return;
     }
 
@@ -758,7 +818,7 @@ const userInputHandler = async (
     let specimenKitId = e.target.value.trim();
     let specimenKitInput = document.getElementById("input-specimen-kit");
     let inputSpecimenKitErrorMessage = document.getElementById(
-      "input-speciment-kit-error-message"
+      "input-specimen-kit-error-message"
     );
     // DELETE: GET RID OF CONSOLE LOG LATER
     let regExpSearch = supplyAndSpecimenKitIdRegExp(specimenKitId);
