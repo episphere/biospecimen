@@ -567,7 +567,7 @@ const saveItem = async (
     tableNumRows++;
 
     // ADD DATA TO TABLE
-    // addKitData(jsonSaveBody);
+    addKitData(jsonSaveBody);
 
     addRow(jsonSaveBody, tableNumRows);
     clearRowInputs(inputElements);
