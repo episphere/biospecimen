@@ -140,9 +140,6 @@ const formSubmit = () => {
 
     storePackageReceipt(obj);
 
-      console.log('obj', obj)
-   // e.target.reset();
-
   })
 }      
 
@@ -152,10 +149,12 @@ const formSubmit = () => {
 const cancelChanges = () => {
   const cancelChanges = document.getElementById('clearForm');
   cancelChanges.addEventListener('click', e => {
+    document.getElementById('courierType').innerHTML = ``;
     document.getElementById('scannedBarcode').value = '';
     document.getElementById('packageCondition').value = '';
     document.getElementById('receivePackageComments').value = '';
     document.getElementById('dateReceived').value = '';
+
     if(document.getElementById('collectionId').value) {
       document.getElementById('collectionId').value = '';
       document.getElementById('dateCollectionCard').value = '';
