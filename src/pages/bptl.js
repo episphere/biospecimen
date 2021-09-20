@@ -50,7 +50,7 @@ const bptlScreenTemplate = (name, data, auth, route) => {
                 <div class="col">
                     <h4>Receipts</h4>
                     <div class="p-3 border bg-light"><button type="button" href="#packagesintransit" class="btn btn-primary btn-lg" id="packagesintransit">Packages in Transit from Sites</button></div>
-                    <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg">Package Receipt</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#receivepackages" class="btn btn-primary btn-lg" id="receivepackages">Package Receipt</button></div>
                     <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg">Home Collection Data Entry</button></div>
                     <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg">Create .csv File</button></div>
                 </div>
@@ -87,7 +87,11 @@ const redirectPageToLocation = () => {
     document.getElementById("packagesintransit");
   packagesInTransitRedirection &&
     packagesInTransitRedirection.addEventListener("click", async () => {
-      console.log("packagesInTransitRedirection Clicked");
       location.hash = "#packagesintransit";
+    });
+  const packageReceiptRedirection = document.getElementById("receivepackages");
+  packageReceiptRedirection &&
+    packageReceiptRedirection.addEventListener("click", async () => {
+      location.hash = "#receivepackages";
     });
 };

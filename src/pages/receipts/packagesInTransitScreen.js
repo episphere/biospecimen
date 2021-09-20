@@ -2,6 +2,7 @@ import { showAnimation, hideAnimation, getAllBoxes } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
+import { activeReceiptsNavbar } from "./activeReceiptsNavbarItem.js";
 
 export const packagesInTransitScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -63,6 +64,8 @@ const packagesInTransitTemplate = async (username, auth, route) => {
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML =
     nonUserNavBar(username);
+  console.log("test");
+  activeReceiptsNavbar();
 };
 
 const createPackagesInTransitRows = (response) => {

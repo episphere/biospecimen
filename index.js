@@ -14,6 +14,7 @@ import { allParticipantsScreen } from "./src/pages/homeCollection/allParticipant
 import { kitShipmentScreen } from "./src/pages/homeCollection/kitShipment.js";
 import { shippedScreen } from "./src/pages/homeCollection/shipped.js";
 import { packagesInTransitScreen } from "./src/pages/receipts/packagesInTransitScreen.js";
+import { packageReceiptScreen } from "./src/pages/receipts/receivePackagesScreen.js";
 
 let auth = "";
 
@@ -57,6 +58,7 @@ const manageRoutes = async () => {
     else if (route === "#reports") reportsQuery(auth, route);
     else if (route === "#packagesintransit")
       packagesInTransitScreen(auth, route);
+    else if (route === "#receivepackages") packageReceiptScreen(auth, route);
     else window.location.hash = "#welcome";
   } else {
     if (route === "#") signIn();
