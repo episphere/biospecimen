@@ -413,7 +413,7 @@ const saveItem = async (
         "input-usps-error-message"
       );
 
-      let message = `Invalid USPS tracking number format. Please input a 20 to 22 digit number, each digit can be a number between 0 to 9.`;
+      let message = `The Specimen Kit USPS Tracking number already exists, please provide a unique entry!`;
       let status = "warn";
       alertTemplate(message, status, 6000);
 
