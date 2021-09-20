@@ -132,7 +132,7 @@ const assignKitButton = () => {
                </div>
               <div class="modal-body" style="display:flex; flex-direction:column; justify-content:center;
                 align-items:center;">
-                  <img src="./static/images/modals/check-circle-solid.svg" alt="green-check-icon" height="150" width="200" style="display:block;"/>
+                  <img src="./static/images/modals/error.svg" alt="red-cross-icon" height="150" width="200" style="display:block;"/>
                   <h1 class="text-danger" style:"margin-bottom:1.5rem;">Error!</h1>
                   <p style="font-weight:600;margin:0;">Check scanned Supply Kit ID and try again</p>
                 </div>
