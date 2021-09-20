@@ -3,14 +3,14 @@ import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
 
-export const packagesInTransitFromSitesScreen = async (auth, route) => {
+export const packagesInTransitScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  packagesInTransitFromSitesTemplate(username, auth, route);
+  packagesInTransitTemplate(username, auth, route);
 };
 
-const packagesInTransitFromSitesTemplate = async (username, auth, route) => {
+const packagesInTransitTemplate = async (username, auth, route) => {
   showAnimation();
   const response = await getAllBoxes();
   hideAnimation();

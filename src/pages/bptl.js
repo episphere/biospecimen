@@ -49,7 +49,7 @@ const bptlScreenTemplate = (name, data, auth, route) => {
                 </div>
                 <div class="col">
                     <h4>Receipts</h4>
-                    <div class="p-3 border bg-light"><button type="button" href="#packagesInTransitfromSites" class="btn btn-primary btn-lg" id="packagesInTransitFromSites">Packages in Transit from Sites</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#packagesintransit" class="btn btn-primary btn-lg" id="packagesintransit">Packages in Transit from Sites</button></div>
                     <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg">Package Receipt</button></div>
                     <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg">Home Collection Data Entry</button></div>
                     <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg">Create .csv File</button></div>
@@ -83,15 +83,11 @@ const redirectPageToLocation = () => {
     kitShipmentRedirection.addEventListener("click", async () => {
       location.hash = "#kitshipment";
     });
-  const packagesInTransitfromSitesRedirection = document.getElementById(
-    "packagesInTransitFromSites"
-  );
-  packagesInTransitfromSitesRedirection &&
-    packagesInTransitfromSitesRedirection.addEventListener(
-      "click",
-      async () => {
-        console.log("packagesInTransitfromSitesRedirection Clicked");
-        location.hash = "#packagesInTransitfromSites";
-      }
-    );
+  const packagesInTransitRedirection =
+    document.getElementById("packagesintransit");
+  packagesInTransitRedirection &&
+    packagesInTransitRedirection.addEventListener("click", async () => {
+      console.log("packagesInTransitRedirection Clicked");
+      location.hash = "#packagesintransit";
+    });
 };
