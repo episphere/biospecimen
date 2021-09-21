@@ -28,11 +28,11 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                                 style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
                                 <thead> 
                                     <tr style="top: 0; position: sticky;">
-                                        <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Ship Date</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Tracking Number</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Shipped from (Site)</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Expected # of Samples</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Manifest</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Ship Date</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Tracking Number</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipped from (Site)</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Expected # of Samples</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Manifest</th>
                                     </tr>
                                 </thead>   
                                 <tbody id="contentBodyPackagesInTransit">
@@ -43,20 +43,123 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                 </div>`;
 
   template += `<div class="modal fade" id="manifestModal" tabindex="-1" aria-labelledby="manifestModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="manifestModalLabel">Manifest Modal</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <div>
+          <button style="font-size:2.5rem;padding:1rem;" type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          ...
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4">
+                        <p>Shipping Manifest</p>
+                    </div>
+                    <div class="col-md-4 ml-auto">
+                        <p>Site: Placeholder Here</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <p>Current Date/Time: PLaceholder Time Here</p>
+                    </div>
+                    <div class="col-md-4 ml-auto">
+                        <p>Location: Place PLaceholder Here</p>
+                    </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4">
+                    <p>Sender: Sender Placeholder</p>
+                  </div>
+                </div>
+
+                <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col-">Box Number</th>
+                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Specimen Bag ID</th>
+                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Full Specimen ID</th>
+                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Scanned By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align:center">
+                              <p>Box 3 PLaceholder</p>
+                            </td>
+                            <td style="text-align:center">
+                              <p>Specimen Placeholder</p>
+                            </td>
+                            <td style="text-align:center">
+                                <p>123</p>
+                                <p>456</p>
+                                <p>567</p>
+                                <p>899</p>
+                            </td>
+                            <td style="text-align:center">
+                              <p></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">
+                              <p>Box 3 PLaceholder</p>
+                            </td>
+                            <td style="text-align:center">
+                              <p>Specimen Placeholder</p>
+                            </td>
+                            <td style="text-align:center">
+                                <p>123</p>
+                                <p>456</p>
+                                <p>567</p>
+                                <p>899</p>
+                            </td>
+                            <td style="text-align:center">
+                              <p></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">
+                              <p>Box 3 PLaceholder</p>
+                            </td>
+                            <td style="text-align:center">
+                              <p>Specimen Placeholder</p>
+                            </td>
+                            <td style="text-align:center">
+                                <p>123</p>
+                                <p>456</p>
+                                <p>567</p>
+                                <p>899</p>
+                            </td>
+                            <td style="text-align:center">
+                              <p></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">
+                              <p>Box 3 PLaceholder</p>
+                            </td>
+                            <td style="text-align:center">
+                              <p>Specimen Placeholder</p>
+                            </td>
+                            <td style="text-align:center">
+                                <p>123</p>
+                                <p>456</p>
+                                <p>567</p>
+                                <p>899</p>
+                            </td>
+                            <td style="text-align:center">
+                              <p></p>
+                            </td>
+                        </tr>
+                    </tbody>
+                  </table>
+                </div>
+                </div>
+            </div>
+        </div>  
       </div>
     </div>
   </div>`;
@@ -66,17 +169,20 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     nonUserNavBar(username);
   console.log("test");
   activeReceiptsNavbar();
+  // manifestButton();
+  console.log(response.data);
+  manifestButton(response.data);
 };
 
 const createPackagesInTransitRows = (response) => {
   let template = "";
-  let bagId = "";
 
   try {
     if (response.code !== 200) {
       throw "status code not 200!";
     } else {
       const allBoxes = response.data;
+
       allBoxes.forEach((i) => {
         // console.log(i[fieldToConceptIdMapping.shippingShipDate]);
         // console.log(i[fieldToConceptIdMapping.shippingTrackingNumber]);
@@ -87,26 +193,33 @@ const createPackagesInTransitRows = (response) => {
         // console.log(Object.keys(i.bags).length);
         template += `
                       <tr class="packageInTransitRow">
-                      <td>${
+                      <td style="text-align:center;">${
                         i[fieldToConceptIdMapping.shippingShipDate]
-                          ? i[fieldToConceptIdMapping.shippingShipDate]
+                          ? convertTime(
+                              i[fieldToConceptIdMapping.shippingShipDate]
+                            ).split(",")[0]
                           : "N/A"
                       }</td>
-                      <td>${
+                      <td style="text-align:center;">${
                         i[fieldToConceptIdMapping.shippingTrackingNumber]
                           ? i[fieldToConceptIdMapping.shippingTrackingNumber]
                           : "N/A"
                       }</td>
-                      <td>${
+                      <td style="text-align:center;">${
                         i[fieldToConceptIdMapping.shippingSite]
                           ? i[fieldToConceptIdMapping.shippingSite]
                           : "N/A"
                       }</td>
-                      <td>${Object.keys(i.bags).length}</td>
-                      <td><button class="manifest-button" data-toggle="modal" data-target="#manifestModal">Manifest</button></td>
+                      <td style="text-align:center;">${
+                        Object.keys(i.bags).length
+                      }</td>
+                      <td>
+                        <button class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
+                            Manifest
+                        </button>
+                      </td>
                       </tr>`;
       });
-      manifestButton();
       return template;
     }
   } catch (e) {
@@ -114,11 +227,70 @@ const createPackagesInTransitRows = (response) => {
   }
 };
 
-const manifestButton = () => {
-  let buttons = document.getElementsByClassName("manifest-button");
-};
-// buttons.forEach((i) => console.log(i));
+const manifestButton = (data) => {
+  const buttons = document.getElementsByClassName("manifest-button");
+  // let siteData = "";
+  // let dateData = "";
+  // let sender = "";
+  // let boxNumber = "";
+  // let specimenBagId = "";
+  // let fullSpecimenId = "";
+  let firstName = "";
+  let lastName = "";
+  Array.from(buttons).forEach((button, index) => {
+    // Use fieldToConceptIdMapping to grab correct conceptIds
+    button.dataset.site = data[index].siteAcronym;
+    button.dataset.date = convertTime(
+      data[index][fieldToConceptIdMapping.shippingShipDate]
+    );
+    button.dataset.location = data[index][fieldToConceptIdMapping.shippingSite];
 
+    // button.dataset.fName = firstNameMapping(
+    //   data[index].bags[Object.keys(data[index].bags)][
+    //     fieldToConceptIdMapping.shippingFirstName
+    //   ]
+    // );
+
+    // button.dataset.lName = data[index].bags[Object.keys(data[index].bags)];
+    // button.dataset.sender = data[index]
+    console.log(index, button.dataset.site);
+    console.log(index, button.dataset.date);
+    console.log(index, button.dataset.location);
+    // console.log(index, button.dataset.fName);
+    console.log(
+      index,
+      data[index].bags[Object.keys(data[index].bags)] ??
+        data[index].bags[Object.keys(data[index].bags)]
+    );
+    console.log(index, button.dataset.lName);
+    console.log(index, data[index].bags[Object.keys(data[index].bags)]);
+
+    // data.forEach((i, index) => {
+    //   button.dataset.siteData = i[fieldToConceptIdMapping.shippingSite];
+    //   console.log(index, i[fieldToConceptIdMapping.shippingSite]);
+    // });
+  });
+  debugger;
+  return;
+};
+
+// Convert utc in Seconds to readable Date
+const convertTime = (time) => {
+  if (!time) {
+    return "";
+  }
+  let utcSeconds = time;
+  const myDate = new Date(utcSeconds);
+  return myDate.toLocaleString("en-us", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+console.log(convertTime());
 /* 
 STEPS FOR MANIFEST MODAL
 1. Add event listener to every manifest button
@@ -127,3 +299,12 @@ STEPS FOR MANIFEST MODAL
 
 
 */
+
+// const firstNameMapping = (fName) => {
+//   try {
+//     return fName;
+//   } catch (e) {
+//     console.log(e);
+//     return "";
+//   }
+// };
