@@ -1,35 +1,35 @@
 import {
-  validateUser,
-  siteFullNames,
-  showAnimation,
-  hideAnimation,
-  errorMessage,
-  removeAllErrors,
+    validateUser,
+    siteFullNames,
+    showAnimation,
+    hideAnimation,
+    errorMessage,
+    removeAllErrors,
 } from "./../shared.js";
 import { kitAssemblyScreen } from "./homeCollection/kitAssembly.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../navbar.js";
 
 export const bptlScreen = async (auth, route) => {
-  const user = auth.currentUser;
-  if (!user) return;
-  const name = user.displayName ? user.displayName : user.email;
-  showAnimation();
-  const response = await validateUser();
-  hideAnimation();
-  if (response.code !== 200) {
-    document.getElementById("contentBody").innerHTML =
-      "Authorization failed you lack permissions to use this dashboard!";
-    document.getElementById("navbarNavAltMarkup").innerHTML =
-      unAuthorizedUser();
-    return;
-  }
-  bptlScreenTemplate(name, response.data, auth, route);
-  redirectPageToLocation();
+    const user = auth.currentUser;
+    if (!user) return;
+    const name = user.displayName ? user.displayName : user.email;
+    showAnimation();
+    const response = await validateUser();
+    hideAnimation();
+    if (response.code !== 200) {
+        document.getElementById("contentBody").innerHTML =
+            "Authorization failed you lack permissions to use this dashboard!";
+        document.getElementById("navbarNavAltMarkup").innerHTML =
+            unAuthorizedUser();
+        return;
+    }
+    bptlScreenTemplate(name, response.data, auth, route);
+    redirectPageToLocation();
 };
 
 const bptlScreenTemplate = (name, data, auth, route) => {
-  let template = "";
-  template += `
+    let template = "";
+    template += `
         <div class="row align-center welcome-screen-div">
             <div class="col"><h3>BPTL Dashboard</h3></div>
         </div>
@@ -50,8 +50,7 @@ const bptlScreenTemplate = (name, data, auth, route) => {
                 <div class="col">
                     <h4>Receipts</h4>
                     <div class="p-3 border bg-light"><button type="button" href="#packagesintransit" class="btn btn-primary btn-lg" id="packagesintransit">Packages in Transit from Sites</button></div>
-                    <div class="p-3 border bg-light"><button type="button" href="#receivepackages" class="btn btn-primary btn-lg" id="receivepackages">Package Receipt</button></div>
-                    <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg">Home Collection Data Entry</button></div>
+                    <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg" id="packageReceipt">Package Receipt</button></div>
                     <div class="p-3 border bg-light"><button type="button" class="btn btn-primary btn-lg">Create .csv File</button></div>
                 </div>
                 <div class="col">
@@ -61,37 +60,38 @@ const bptlScreenTemplate = (name, data, auth, route) => {
             </div>
         </div>
         `;
-  document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
-  document.getElementById("contentBody").innerHTML = template;
+    document.getElementById("navbarNavAltMarkup").innerHTML =
+        nonUserNavBar(name);
+    document.getElementById("contentBody").innerHTML = template;
 };
 
 const redirectPageToLocation = () => {
-  const kitAssemblyRedirection = document.getElementById("kitAssembly");
-  kitAssemblyRedirection &&
-    kitAssemblyRedirection.addEventListener("click", async () => {
-      location.hash = "#kitassembly";
-    });
-  const participantSelectionRedirection = document.getElementById(
-    "participantSelection"
-  );
-  participantSelectionRedirection &&
-    participantSelectionRedirection.addEventListener("click", async () => {
-      location.hash = "#participantselection";
-    });
-  const kitShipmentRedirection = document.getElementById("kitShipment");
-  kitShipmentRedirection &&
-    kitShipmentRedirection.addEventListener("click", async () => {
-      location.hash = "#kitshipment";
-    });
-  const packagesInTransitRedirection =
-    document.getElementById("packagesintransit");
-  packagesInTransitRedirection &&
-    packagesInTransitRedirection.addEventListener("click", async () => {
-      location.hash = "#packagesintransit";
-    });
-  const packageReceiptRedirection = document.getElementById("receivepackages");
-  packageReceiptRedirection &&
-    packageReceiptRedirection.addEventListener("click", async () => {
-      location.hash = "#receivepackages";
-    });
+    const kitAssemblyRedirection = document.getElementById("kitAssembly");
+    kitAssemblyRedirection &&
+        kitAssemblyRedirection.addEventListener("click", async () => {
+            location.hash = "#kitassembly";
+        });
+    const participantSelectionRedirection = document.getElementById(
+        "participantSelection"
+    );
+    participantSelectionRedirection &&
+        participantSelectionRedirection.addEventListener("click", async () => {
+            location.hash = "#participantselection";
+        });
+    const kitShipmentRedirection = document.getElementById("kitShipment");
+    kitShipmentRedirection &&
+        kitShipmentRedirection.addEventListener("click", async () => {
+            location.hash = "#kitshipment";
+        });
+    const packagesInTransitRedirection =
+        document.getElementById("packagesintransit");
+    packagesInTransitRedirection &&
+        packagesInTransitRedirection.addEventListener("click", async () => {
+            location.hash = "#packagesintransit";
+        });
+    const packageReceiptRedirection = document.getElementById("packageReceipt");
+    packageReceiptRedirection &&
+        packageReceiptRedirection.addEventListener("click", async () => {
+            location.hash = "#packagereceipt";
+        });
 };

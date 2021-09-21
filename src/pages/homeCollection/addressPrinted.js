@@ -43,9 +43,7 @@ const addressesPrintedTemplate = async (name, auth, route) => {
                                         </tr>
                                     </thead>   
                                     <tbody id="contentBodyAddress">
-                                        ${createAddressPrintedRows(
-                                          response.data
-                                        )}
+                                        ${createAddressPrintedRows(response.data)}
                                     </tbody>
                               </table>
                         </div>
@@ -100,16 +98,16 @@ const assignKitButton = () => {
               <label for="search-scan-usps-tracking" style="flex-flow:wrap; align-self:flex-start; display:flex; height:32px;"><strong style="margin-right: .5rem;">Scan USPS Tracking Number on Supply Kit: </strong> <input id="search-scan-usps-tracking" type="search" style="appearance:auto;"/></label>
           </div>`;
       // Event Handler
-      confirmButton.addEventListener("click", (e) => {
+      confirmButton.addEventListener("click", async (e) => {
         const supplyKitId = document.getElementById("search-scan-kit-Id").value;
         const uspsTrackingNumber = document.getElementById(
           "search-scan-usps-tracking"
         ).value;
 
-        setRequiredFields(userId, supplyKitId, uspsTrackingNumber); // stores responsea
+        const getAssignKitResponse = await setRequiredFields(userId, supplyKitId, uspsTrackingNumber); // stores responsea
         let modalContent = document.querySelector(".modal-content");
-
         modalContent.innerHTML = "";
+        getAssignKitResponse ? (
         modalContent.innerHTML = `
             <div class="modal-header" style="border:0">
                 <button type="button" class="close" style="font-size:40px" data-dismiss="modal" aria-label="Close">
@@ -125,9 +123,25 @@ const assignKitButton = () => {
               <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem 1rem;">
                 <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
                 <button id="assigned-table" type="button" class="btn btn-primary confirm-assignment" data-dismiss="modal" data-dismiss="modal" style="margin-left:5%">Show Assigned Table</button>
-            </div>`;
+            </div>` ) : 
+            (
+              modalContent.innerHTML =  `<div class="modal-header" style="border:0">
+                <button type="button" class="close" style="font-size:40px" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+               </div>
+              <div class="modal-body" style="display:flex; flex-direction:column; justify-content:center;
+                align-items:center;">
+                  <img src="./static/images/modals/error.svg" alt="red-cross-icon" height="150" width="200" style="display:block;"/>
+                  <h1 class="text-danger" style:"margin-bottom:1.5rem;">Error!</h1>
+                  <p style="font-weight:600;margin:0;">Check scanned Supply Kit ID and try again</p>
+                </div>
+                <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem 1rem;">
+                  <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
+              </div>` 
+            )
         let moveToAssigned = document.getElementById("assigned-table");
-        moveToAssigned.addEventListener("click", (e) => {
+        moveToAssigned && moveToAssigned.addEventListener("click", (e) => {
           location.hash = "#assigned";
         });
       });
@@ -192,7 +206,7 @@ const modalAssignedInfo = () => {
   return template;
 };
 
-// Kit Assignment Info to change status???
+// Kit Assignment Info to change status
 const setRequiredFields = async (userId, supplyKitId, uspsTrackingNumber) => {
   let jsonObj = {
     id: userId,
@@ -214,6 +228,6 @@ const setRequiredFields = async (userId, supplyKitId, uspsTrackingNumber) => {
   if (response.status === 200) {
     return true; // return success modal screen
   } else {
-    alert("Error");
+    return false;
   }
 };
