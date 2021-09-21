@@ -25,8 +25,8 @@ const kitReportsTemplate = async (username, auth, route) => {
   template += ` 
               <h3 style="text-align: center; margin: 1rem 0;">Reports Screen</h3>
               <div class="container-fluid">
-                <div id="tester1" style="width:50%x;height:250px;"></div>
-                <div id="tester2" style="width:50%;height:250px;"></div>
+                <div id="bptlKitPieChart"></div>
+                <div id="bptlKitBarChart"></div>
               </div>
   `;
 
@@ -47,38 +47,53 @@ const plotly = (bptlMertricsData) => {
   script.addEventListener("load", function () {
     // Plotly loaded
     console.log(Plotly);
-    testPlotly();
+    renderPlotly(bptlMertricsData);
   });
 };
 
-const testPlotly = async () => {
-  const TESTER1 = document.getElementById("tester1");
-  const TESTER2 = document.getElementById("tester2");
-  await Plotly.newPlot(
-    TESTER1,
-    [
-      {
-        x: [1, 2, 3, 4, 5],
-        y: [1, 2, 4, 8, 16],
-      },
-    ],
-    {
-      margin: { t: 0 },
-    }
-  );
-  await Plotly.newPlot(
-    TESTER2,
-    [
-      {
-        x: [1, 2, 3, 4, 5],
-        y: [1, 2, 4, 8, 16],
-      },
-    ],
-    {
-      margin: { t: 0 },
-    }
-  );
+const renderPlotly = async (bptlMertricsData) => {
+  bptlMetricsPieChart(bptlMertricsData);
 };
+
+const bptlMetricsPieChart = (bptlMetricsData) => {
+  // const bptlPieChartElement = document.getElementById("bptlKitPieChart");
+  const data = [
+    {
+      values: [],
+      labels: [],
+      type: "pie",
+    },
+  ];
+
+  for (let key in bptlMetricsData) {
+    data[0].labels.push(key);
+    data[0].values.push(bptlMetricsData[key]);
+  }
+
+  const layout = [
+    {
+      height: 1000,
+      width: 800,
+    },
+  ];
+  const config = { responsive: true, displayModeBar: false };
+  Plotly.newPlot("bptlKitPieChart", data, layout, config);
+};
+
+// const bptlMetricsBarChart = () => {
+//   const bptlBarChart = document.getElementById("bptlKitPieChart");
+//   bptlMetricsBarChart,
+//     [
+//       {
+//         x: [1, 2, 3, 4, 5],
+//         y: [1, 2, 4, 8, 16],
+//       },
+//     ],
+//     {
+//       margin: { t: 0 },
+//     };
+//   await Plotly.newPlot();
+// };
 
 /*
 ==================================================
