@@ -6,9 +6,7 @@ export const activeReceiptsNavbar = () => {
   const packageInTransitNavItem = document.getElementById(
     "receiptNavItemPackagesInTransit"
   );
-  const packageReceiptNavItem = document.getElementById(
-    "receiptNavItemPackageReceipt"
-  );
+  const packageReceiptNavItem = document.getElementById("packageReceipt");
   if (location.hash === "#packagesintransit") {
     console.log(packageInTransitNavItem);
     packageInTransitNavItem.classList.add("active");

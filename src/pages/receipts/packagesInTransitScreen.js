@@ -136,7 +136,6 @@ const packagesInTransitTemplate = async (username, auth, route) => {
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML =
     nonUserNavBar(username);
-  console.log("test");
   activeReceiptsNavbar();
   // manifestButton();
   console.log(response.data);
@@ -242,7 +241,7 @@ const manifestButton = (data) => {
     //   console.log(index, i[fieldToConceptIdMapping.shippingSite]);
     // });
   });
-  debugger;
+  // debugger;
   return;
 };
 
@@ -262,7 +261,7 @@ const convertTime = (time) => {
   });
 };
 
-console.log(convertTime());
+// console.log(convertTime());
 /* 
 STEPS FOR MANIFEST MODAL
 1. Add event listener to every manifest button

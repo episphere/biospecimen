@@ -132,7 +132,7 @@ POST METHOD REQUEST - Add a Kit
 */
 const addKitData = async (jsonSaveBody) => {
   const idToken = await getIdToken();
-  const response = await await fetch(`${api}api=addKitData`, {
+  const response = await fetch(`${api}api=addKitData`, {
     method: "POST",
     body: JSON.stringify(jsonSaveBody),
     headers: {
