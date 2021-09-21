@@ -15,6 +15,7 @@ import { kitShipmentScreen } from "./src/pages/homeCollection/kitShipment.js";
 import { shippedScreen } from "./src/pages/homeCollection/shipped.js";
 import { packagesInTransitScreen } from "./src/pages/receipts/packagesInTransitScreen.js";
 import { packageReceiptScreen } from "./src/pages/receipts/packageReceipt.js";
+import { kitReportsScreen } from "./src/pages/reports/kitReports.js";
 
 let auth = "";
 
@@ -60,6 +61,7 @@ const manageRoutes = async () => {
     else if (route === "#packagesintransit")
       packagesInTransitScreen(auth, route);
     else if (route === "#receivepackages") packageReceiptScreen(auth, route);
+    else if (route === "#kitreports") kitReportsScreen(auth, route);
     else window.location.hash = "#welcome";
   } else {
     if (route === "#") signIn();
