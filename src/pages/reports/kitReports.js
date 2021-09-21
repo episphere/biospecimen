@@ -59,9 +59,12 @@ const bptlMetricsPieChart = (bptlMetricsData) => {
   // const bptlPieChartElement = document.getElementById("bptlKitPieChart");
   const data = [
     {
+      type: "pie",
       values: [],
       labels: [],
-      type: "pie",
+      textinfo: "label+percent",
+      textposition: "outside",
+      automargin: true,
     },
   ];
 
@@ -70,12 +73,12 @@ const bptlMetricsPieChart = (bptlMetricsData) => {
     data[0].values.push(bptlMetricsData[key]);
   }
 
-  const layout = [
-    {
-      height: 1000,
-      width: 800,
-    },
-  ];
+  const layout = {
+    height: 400,
+    width: 400,
+    showlegend: false,
+  };
+
   const config = { responsive: true, displayModeBar: false };
   Plotly.newPlot("bptlKitPieChart", data, layout, config);
 };
