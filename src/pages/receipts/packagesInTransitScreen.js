@@ -2,24 +2,24 @@ import { showAnimation, hideAnimation, getAllBoxes } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-import { activeReceiptsNavbar } from "./activeReceiptsNavbarItem.js";
+import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 
 export const packagesInTransitScreen = async (auth, route) => {
-  const user = auth.currentUser;
-  if (!user) return;
-  const username = user.displayName ? user.displayName : user.email;
-  packagesInTransitTemplate(username, auth, route);
+    const user = auth.currentUser;
+    if (!user) return;
+    const username = user.displayName ? user.displayName : user.email;
+    packagesInTransitTemplate(username, auth, route);
 };
 
 const packagesInTransitTemplate = async (username, auth, route) => {
-  showAnimation();
-  const response = await getAllBoxes();
-  hideAnimation();
-  let template = "";
+    showAnimation();
+    const response = await getAllBoxes();
+    hideAnimation();
+    let template = "";
 
-  template += receiptsNavbar();
+    template += receiptsNavbar();
 
-  template += `<div class="container-fluid">
+    template += `<div class="container-fluid">
                 <div id="root root-margin">
                     <div class="table-responsive">
                     <span> <h3 style="text-align: center; margin: 1rem 0;">Packages In Transit </h3> </span>
@@ -42,7 +42,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                     </div>
                 </div>`;
 
-  template += `<div class="modal fade" id="manifestModal" tabindex="-1" aria-labelledby="manifestModalLabel" aria-hidden="true">
+    template += `<div class="modal fade" id="manifestModal" tabindex="-1" aria-labelledby="manifestModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
         <div>
@@ -133,51 +133,54 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     </div>
   </div>`;
 
-  document.getElementById("contentBody").innerHTML = template;
-  document.getElementById("navbarNavAltMarkup").innerHTML =
-    nonUserNavBar(username);
-  activeReceiptsNavbar();
-  // manifestButton();
-  console.log(response.data);
-  manifestButton(response.data);
+    document.getElementById("contentBody").innerHTML = template;
+    document.getElementById("navbarNavAltMarkup").innerHTML =
+        nonUserNavBar(username);
+    activeReceiptsNavbar();
+    // manifestButton();
+    console.log(response.data);
+    manifestButton(response.data);
 };
 
 const createPackagesInTransitRows = (response) => {
-  let template = "";
+    let template = "";
 
-  try {
-    if (response.code !== 200) {
-      throw "status code not 200!";
-    } else {
-      const allBoxes = response.data;
+    try {
+        if (response.code !== 200) {
+            throw "status code not 200!";
+        } else {
+            const allBoxes = response.data;
 
-      allBoxes.forEach((i) => {
-        // console.log(i[fieldToConceptIdMapping.shippingShipDate]);
-        // console.log(i[fieldToConceptIdMapping.shippingTrackingNumber]);
-        // console.log(i[fieldToConceptIdMapping.shippingSite]);
-        // console.log(i);
-        // console.log(i.bags);
-        // // returns an array of a given object's own enumerable property names
-        // console.log(Object.keys(i.bags).length);
-        // 3rd td - Object.keys(i.bags).length
-        template += `
+            allBoxes.forEach((i) => {
+                // console.log(i[fieldToConceptIdMapping.shippingShipDate]);
+                // console.log(i[fieldToConceptIdMapping.shippingTrackingNumber]);
+                // console.log(i[fieldToConceptIdMapping.shippingSite]);
+                // console.log(i);
+                // console.log(i.bags);
+                // // returns an array of a given object's own enumerable property names
+                // console.log(Object.keys(i.bags).length);
+                // 3rd td - Object.keys(i.bags).length
+                template += `
                       <tr class="packageInTransitRow">
                       <td style="text-align:center;">${
-                        i[fieldToConceptIdMapping.shippingShipDate]
-                          ? convertTime(
-                              i[fieldToConceptIdMapping.shippingShipDate]
-                            ).split(",")[0]
-                          : "N/A"
+                          i[fieldToConceptIdMapping.shippingShipDate]
+                              ? convertTime(
+                                    i[fieldToConceptIdMapping.shippingShipDate]
+                                ).split(",")[0]
+                              : "N/A"
                       }</td>
                       <td style="text-align:center;">${
-                        i[fieldToConceptIdMapping.shippingTrackingNumber]
-                          ? i[fieldToConceptIdMapping.shippingTrackingNumber]
-                          : "N/A"
+                          i[fieldToConceptIdMapping.shippingTrackingNumber]
+                              ? i[
+                                    fieldToConceptIdMapping
+                                        .shippingTrackingNumber
+                                ]
+                              : "N/A"
                       }</td>
                       <td style="text-align:center;">${
-                        i[fieldToConceptIdMapping.shippingSite]
-                          ? i[fieldToConceptIdMapping.shippingSite]
-                          : "N/A"
+                          i[fieldToConceptIdMapping.shippingSite]
+                              ? i[fieldToConceptIdMapping.shippingSite]
+                              : "N/A"
                       }</td>
                       <td style="text-align:center;">${""}</td>
                       <td>
@@ -186,79 +189,80 @@ const createPackagesInTransitRows = (response) => {
                         </button>
                       </td>
                       </tr>`;
-      });
-      return template;
+            });
+            return template;
+        }
+    } catch (e) {
+        console.log(e);
     }
-  } catch (e) {
-    console.log(e);
-  }
 };
 
 const manifestButton = (data) => {
-  const buttons = document.getElementsByClassName("manifest-button");
-  // let siteData = "";
-  // let dateData = "";
-  // let sender = "";
-  // let boxNumber = "";
-  // let specimenBagId = "";
-  // let fullSpecimenId = "";
-  // let firstName = "";
-  // let lastName = "";
-  Array.from(buttons).forEach((button, index) => {
-    // Use fieldToConceptIdMapping to grab correct conceptIds
-    button.dataset.site = data[index].siteAcronym;
-    button.dataset.date = convertTime(
-      data[index][fieldToConceptIdMapping.shippingShipDate]
-    );
-    button.dataset.location = data[index][fieldToConceptIdMapping.shippingSite];
+    const buttons = document.getElementsByClassName("manifest-button");
+    // let siteData = "";
+    // let dateData = "";
+    // let sender = "";
+    // let boxNumber = "";
+    // let specimenBagId = "";
+    // let fullSpecimenId = "";
+    // let firstName = "";
+    // let lastName = "";
+    Array.from(buttons).forEach((button, index) => {
+        // Use fieldToConceptIdMapping to grab correct conceptIds
+        button.dataset.site = data[index].siteAcronym;
+        button.dataset.date = convertTime(
+            data[index][fieldToConceptIdMapping.shippingShipDate]
+        );
+        button.dataset.location =
+            data[index][fieldToConceptIdMapping.shippingSite];
 
-    /*
+        /*
     Add for loop/ for Each
     if (JSON.stringify(refusalObj) === '{}')
     Condition - If bag is empty skip
     */
-    button.dataset.firstName =
-      data[index].bags[Object.keys(data[index].bags)][
-        fieldToConceptIdMapping.shippingFirstName
-      ];
+        button.dataset.firstName =
+            data[index].bags[Object.keys(data[index].bags)][
+                fieldToConceptIdMapping.shippingFirstName
+            ];
 
-    // button.dataset.lName = data[index].bags[Object.keys(data[index].bags)];
-    // button.dataset.sender = data[index]
-    console.log(index, button.dataset.site);
-    console.log(index, button.dataset.date);
-    console.log(index, button.dataset.location);
-    // console.log(index, button.dataset.fName);
-    console.log(
-      index,
-      data[index].bags[Object.keys(data[index].bags)] ??
-        data[index].bags[Object.keys(data[index].bags)]
-    );
-    // console.log(index, button.dataset.lastName);
-    console.log(index, data[index].bags[Object.keys(data[index].bags)]);
+        // button.dataset.lName = data[index].bags[Object.keys(data[index].bags)];
+        // button.dataset.sender = data[index]
+        console.log(index, button.dataset.site);
+        console.log(index, button.dataset.date);
+        console.log(index, button.dataset.location);
+        // console.log(index, button.dataset.fName);
+        console.log(
+            index,
+            data[index].bags[Object.keys(data[index].bags)] ??
+                data[index].bags[Object.keys(data[index].bags)]
+        );
+        // console.log(index, button.dataset.lastName);
+        console.log(index, data[index].bags[Object.keys(data[index].bags)]);
 
-    // data.forEach((i, index) => {
-    //   button.dataset.siteData = i[fieldToConceptIdMapping.shippingSite];
-    //   console.log(index, i[fieldToConceptIdMapping.shippingSite]);
-    // });
-  });
-  // debugger;
-  return;
+        // data.forEach((i, index) => {
+        //   button.dataset.siteData = i[fieldToConceptIdMapping.shippingSite];
+        //   console.log(index, i[fieldToConceptIdMapping.shippingSite]);
+        // });
+    });
+    // debugger;
+    return;
 };
 
 // Convert utc in Seconds to readable Date
 const convertTime = (time) => {
-  if (!time) {
-    return "";
-  }
-  let utcSeconds = time;
-  const myDate = new Date(utcSeconds);
-  return myDate.toLocaleString("en-us", {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+    if (!time) {
+        return "";
+    }
+    let utcSeconds = time;
+    const myDate = new Date(utcSeconds);
+    return myDate.toLocaleString("en-us", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
 };
 
 // console.log(convertTime());

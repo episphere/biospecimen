@@ -5,10 +5,10 @@ export const receiptsNavbar = () => {
                       <li class="nav-item">
                           <a class="nav-link" aria-current="page" href="#bptl" id="bptl">Home</a>
                       </li>
-                      <li class="nav-item">
-                      <a class="nav-link" aria-current="page"> Packages in Transit</a>
+                      <li id="packagesInTransitNavItem" class="nav-item">
+                      <a class="nav-link" aria-current="page" href="#packagesintransit" id="packagesInTransit"> Packages in Transit</a>
                       </li>
-                      <li class="nav-item">
+                      <li id="packageReceiptNavItem" class="nav-item">
                       <a class="nav-link" aria-current="page" href="#packagereceipt" id="packageReceipt">Packages Receipt</a>
                       </li>
                       <li class="nav-item">

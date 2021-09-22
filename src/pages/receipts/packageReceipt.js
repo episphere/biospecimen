@@ -1,24 +1,24 @@
-import { receiptsNavbar } from "./receiptsNavbar.js";
 import { userDashboard } from "../dashboard.js";
 import { getIdToken, showAnimation, hideAnimation } from "../../shared.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
-
+import { receiptsNavbar } from "./receiptsNavbar.js";
+import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 
 export const packageReceiptScreen = async (auth, route) => {
-  const user = auth.currentUser;
-  if (!user) return;
-  const username = user.displayName ? user.displayName : user.email;
-  packageReceiptTemplate(username, auth, route);
-  checkCourierType();
-  formSubmit();
-  cancelChanges();
-}
-
+    const user = auth.currentUser;
+    if (!user) return;
+    const username = user.displayName ? user.displayName : user.email;
+    packageReceiptTemplate(username, auth, route);
+    activeReceiptsNavbar();
+    checkCourierType();
+    formSubmit();
+    cancelChanges();
+};
 
 const packageReceiptTemplate = async (name, auth, route) => {
-  let template = ``;
-  template += receiptsNavbar();
-  template += `  <div id="root root-margin" style="padding-top: 25px;">
+    let template = ``;
+    template += receiptsNavbar();
+    template += `  <div id="root root-margin" style="padding-top: 25px;">
                       <div id="alert_placeholder"></div>
                       <span> <h3 style="text-align: center; margin: 0 0 1rem;">Package Receipt</h3> </span>
                       <form method="post" class="mt-3" id="configForm">
@@ -105,94 +105,105 @@ const packageReceiptTemplate = async (name, auth, route) => {
                     </form>
                    
                 </div>`;
-  document.getElementById("contentBody").innerHTML = template;
-  document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
+    document.getElementById("contentBody").innerHTML = template;
+    document.getElementById("navbarNavAltMarkup").innerHTML =
+        nonUserNavBar(name);
 };
 
 const checkCourierType = () => {
-  const a = document.getElementById("scannedBarcode");
-  if (a) {
-    a.addEventListener("change", () => {
-      a.value.trim().length <= 12 ? 
-            document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` :
-            document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
-    }) }
-}
+    const a = document.getElementById("scannedBarcode");
+    if (a) {
+        a.addEventListener("change", () => {
+            a.value.trim().length <= 12
+                ? (document.getElementById(
+                      "courierType"
+                  ).innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX`)
+                : (document.getElementById(
+                      "courierType"
+                  ).innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`);
+        });
+    }
+};
 
 const formSubmit = () => {
-  const form = document.getElementById('configForm');
-  form.addEventListener('submit', e => {
-      e.preventDefault();
-      const obj = {};
-      obj['scannedBarcode'] = document.getElementById('scannedBarcode').value.trim();
-      obj['packageCondition'] = document.getElementById('packageCondition').value.trim();
-      obj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
-      obj['dateReceived'] = document.getElementById('dateReceived').value;
-      if(document.getElementById('collectionId').value) {
-        obj['collectionId'] = document.getElementById('collectionId').value;
-        obj['dateCollectionCard'] = document.getElementById('dateCollectionCard').value;
-        obj['timeCollectionCard'] = document.getElementById('timeCollectionCard').value;
-        document.getElementById('collectionCheckBox').checked === true ? 
-            obj['collectionCheckBox'] = true : obj['collectionCheckBox'] = false
-        obj['collectionComments'] = document.getElementById('collectionComments').value;
-       
-      }
+    const form = document.getElementById("configForm");
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const obj = {};
+        obj["scannedBarcode"] = document
+            .getElementById("scannedBarcode")
+            .value.trim();
+        obj["packageCondition"] = document
+            .getElementById("packageCondition")
+            .value.trim();
+        obj["receivePackageComments"] = document
+            .getElementById("receivePackageComments")
+            .value.trim();
+        obj["dateReceived"] = document.getElementById("dateReceived").value;
+        if (document.getElementById("collectionId").value) {
+            obj["collectionId"] = document.getElementById("collectionId").value;
+            obj["dateCollectionCard"] =
+                document.getElementById("dateCollectionCard").value;
+            obj["timeCollectionCard"] =
+                document.getElementById("timeCollectionCard").value;
+            document.getElementById("collectionCheckBox").checked === true
+                ? (obj["collectionCheckBox"] = true)
+                : (obj["collectionCheckBox"] = false);
+            obj["collectionComments"] =
+                document.getElementById("collectionComments").value;
+        }
 
-    storePackageReceipt(obj);
-
-  })
-}      
-
-
-
+        storePackageReceipt(obj);
+    });
+};
 
 const cancelChanges = () => {
-  const cancelChanges = document.getElementById('clearForm');
-  cancelChanges.addEventListener('click', e => {
-    document.getElementById('courierType').innerHTML = ``;
-    document.getElementById('scannedBarcode').value = '';
-    document.getElementById('packageCondition').value = '';
-    document.getElementById('receivePackageComments').value = '';
-    document.getElementById('dateReceived').value = '';
+    const cancelChanges = document.getElementById("clearForm");
+    cancelChanges.addEventListener("click", (e) => {
+        document.getElementById("courierType").innerHTML = ``;
+        document.getElementById("scannedBarcode").value = "";
+        document.getElementById("packageCondition").value = "";
+        document.getElementById("receivePackageComments").value = "";
+        document.getElementById("dateReceived").value = "";
 
-    if(document.getElementById('collectionId').value) {
-      document.getElementById('collectionId').value = '';
-      document.getElementById('dateCollectionCard').value = '';
-      document.getElementById('timeCollectionCard').value = '';
-      document.getElementById('collectionCheckBox').checked = false;
-      document.getElementById('collectionComments').value = '';
-    }
-  })
-}
+        if (document.getElementById("collectionId").value) {
+            document.getElementById("collectionId").value = "";
+            document.getElementById("dateCollectionCard").value = "";
+            document.getElementById("timeCollectionCard").value = "";
+            document.getElementById("collectionCheckBox").checked = false;
+            document.getElementById("collectionComments").value = "";
+        }
+    });
+};
 
 const storePackageReceipt = async (data) => {
-  showAnimation();
-  const idToken = await getIdToken();
-  const response = await await fetch(
-    `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=storeReceipt`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        Authorization: "Bearer " + idToken,
-        "Content-Type": "application/json",
-      },
-    }
-  );
-  hideAnimation();
-  if (response.status === 200) {
-    let alertList = document.getElementById("alert_placeholder");
-    let template = ``;
-    template += `
+    showAnimation();
+    const idToken = await getIdToken();
+    const response = await await fetch(
+        `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=storeReceipt`,
+        {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                Authorization: "Bearer " + idToken,
+                "Content-Type": "application/json",
+            },
+        }
+    );
+    hideAnimation();
+    if (response.status === 200) {
+        let alertList = document.getElementById("alert_placeholder");
+        let template = ``;
+        template += `
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                   Response saved!
                   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                 </div>`;
-    alertList.innerHTML = template;
-    return true; 
-  } else {
-    alert("Error");
-  }
-}
+        alertList.innerHTML = template;
+        return true;
+    } else {
+        alert("Error");
+    }
+};
