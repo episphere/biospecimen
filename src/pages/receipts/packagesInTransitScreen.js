@@ -22,7 +22,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     template += `<div class="container-fluid">
                 <div id="root root-margin">
                     <div class="table-responsive">
-                    <span> <h3 style="text-align: center; margin: 1rem 0;">Packages In Transit </h3> </span>
+                    <span> <h3 style="text-align: center; margin: 1rem 0;">Packages In Transit</h3> </span>
                     <div class="sticky-header" style="overflow:auto;">
                             <table class="table table-bordered" id="packagesInTransitData" 
                                 style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
@@ -62,7 +62,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <p>Current Date/Time: 6/17/2021, 02:23 PM
+                        <p>Shipped Date and Time: 6/17/2021, 02:23 PM
                         </p>
                     </div>
                     <div class="col-md-4 ml-auto">
@@ -137,9 +137,9 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     document.getElementById("navbarNavAltMarkup").innerHTML =
         nonUserNavBar(username);
     activeReceiptsNavbar();
-    // manifestButton();
+    // manifestButton();fcd
     console.log(response.data);
-    manifestButton(response.data);
+    // manifestButton(response.data);
 };
 
 const createPackagesInTransitRows = (response) => {
@@ -150,8 +150,45 @@ const createPackagesInTransitRows = (response) => {
             throw "status code not 200!";
         } else {
             const allBoxes = response.data;
-
-            allBoxes.forEach((i) => {
+            console.log(response.code);
+            let numberOfSamples = [];
+            allBoxes.forEach((i, index) => {
+                // console.log(i.bags);
+                // Count the number of key properties in the bags array
+                // console.log(Object.keys(i.bags).length);
+                // console.log(Object.keys(i.bags).length !== 0);
+                // COUNT NUMBER OF SAMPLES***
+                if (Object.keys(i.bags).length !== 0) {
+                    // console.log(Object.keys(i.bags).length !== 0);
+                    console.log(i.bags);
+                    console.log(
+                        i.bags[Object.keys(i.bags)[0]].arrElements.length
+                    );
+                    numberOfSamples.push(
+                        i.bags[Object.keys(i.bags)[0]].arrElements.length
+                    );
+                    // numberOfSamples =
+                    //     i.bags[Object.keys(i.bags)[0]].arrElements.length;
+                    // console.log(i.bags[index]);
+                    // console.log(i.bags);
+                    // console.log(typeof Object.keys(i.bags)[0]);
+                    // console.log(Object.keys(i.bags)[0]);
+                    // console.log(i.bags.Object.keys(i.bags)[0]);
+                    // for (let item = 0; i < Object.keys(i.bags).length; i++) {
+                    //     console.log(Object.keys(i.base)[item]);
+                    // }
+                } else {
+                    // numberOfSamples = 0;
+                    numberOfSamples.push(0);
+                }
+                console.log(numberOfSamples);
+                // if (Object.keys(i.bags).length > 0) {
+                //     i.bags;
+                // }
+                // if (i.bags.length) {
+                //     console.log(i.bags);
+                //     console.log(Object.keys(i.bags).length);
+                // }
                 // console.log(i[fieldToConceptIdMapping.shippingShipDate]);
                 // console.log(i[fieldToConceptIdMapping.shippingTrackingNumber]);
                 // console.log(i[fieldToConceptIdMapping.shippingSite]);
