@@ -37,7 +37,7 @@ const kitReportsTemplate = async (username, auth, route) => {
         nonUserNavBar(username);
     activeKitReportsNavbar();
     // await testPlotly();
-    console.log(bptlMetricsData);
+    // console.log(bptlMetricsData);
     plotly(bptlMetricsData);
 };
 
@@ -48,13 +48,14 @@ const plotly = (bptlMertricsData) => {
 
     script.addEventListener("load", function () {
         // Plotly loaded
-        console.log(Plotly);
+        // console.log(Plotly);
         renderPlotly(bptlMertricsData);
     });
 };
 
 const renderPlotly = async (bptlMertricsData) => {
-    bptlMetricsPieChart(bptlMertricsData);
+    await bptlMetricsPieChart(bptlMertricsData);
+    await bptlMetricsBarChart(bptlMertricsData);
 };
 
 const bptlMetricsPieChart = (bptlMetricsData) => {
@@ -63,7 +64,13 @@ const bptlMetricsPieChart = (bptlMetricsData) => {
         {
             type: "pie",
             values: [],
-            labels: [],
+            labels: [
+                "Address Printed",
+                "Assigned",
+                "Pending",
+                "Received",
+                "Shipped",
+            ],
             textinfo: "label+percent",
             textposition: "outside",
             automargin: true,
@@ -71,34 +78,44 @@ const bptlMetricsPieChart = (bptlMetricsData) => {
     ];
 
     for (let key in bptlMetricsData) {
-        data[0].labels.push(key);
+        console.log(bptlMetricsData[key]);
         data[0].values.push(bptlMetricsData[key]);
     }
 
     const layout = {
         height: 400,
         width: 400,
-        showlegend: false,
+        legend: {
+            x: 1,
+            y: 250,
+        },
     };
 
     const config = { responsive: true, displayModeBar: false };
     Plotly.newPlot("bptlKitPieChart", data, layout, config);
 };
 
-// const bptlMetricsBarChart = () => {
-//   const bptlBarChart = document.getElementById("bptlKitPieChart");
-//   bptlMetricsBarChart,
-//     [
-//       {
-//         x: [1, 2, 3, 4, 5],
-//         y: [1, 2, 4, 8, 16],
-//       },
-//     ],
-//     {
-//       margin: { t: 0 },
-//     };
-//   await Plotly.newPlot();
-// };
+const bptlMetricsBarChart = () => {
+    //   const bptlBarChart = document.getElementById("bptlKitPieChart");
+    const data = [
+        {
+            type: "bar",
+            x: [1, 2, 3, 4, 5],
+            y: [1, 2, 4, 8, 16],
+            marker: {
+                color: "rgb(49,130,189)",
+                opacity: 0.7,
+            },
+        },
+    ];
+    const layout = {
+        height: 400,
+        width: 400,
+    };
+
+    const config = { responsive: true, displayModeBar: false };
+    Plotly.newPlot("bptlKitBarChart", data, layout, config);
+};
 
 /*
 ==================================================
