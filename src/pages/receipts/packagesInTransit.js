@@ -1,7 +1,7 @@
 import { showAnimation, hideAnimation, getAllBoxes } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
-import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
+import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 
 export const packagesInTransitScreen = async (auth, route) => {
