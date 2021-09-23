@@ -28,6 +28,20 @@ const kitReportsTemplate = async (username, auth, route) => {
                 <div class="container-fluid">
                   <div id="bptlKitPieChart"></div>
                   <div id="bptlKitBarChart"></div>
+                  <div class="table-responsive">
+                    <div class="sticky-header" style="overflow:auto;">
+                            <table class="table table-bordered" id="packagesInTransitData" 
+                                style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
+                                <thead> 
+                                    <tr style="top: 0; position: sticky;">
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Days Out</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Tracking Number</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Ship Date</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Participant Status</th>
+                                    </tr>
+                                </thead>   
+                                </div>
+                                </div>
                 </div>
               </div>
   `;

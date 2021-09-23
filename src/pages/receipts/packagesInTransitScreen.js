@@ -83,7 +83,6 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col-">Box Number</th>
                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Specimen Bag ID</th>
                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Full Specimen ID</th>
-                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Scanned By</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -101,9 +100,6 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                                 <p>CXA111111 0003</p>
                                 <p>CXA111111 0006</p>
                             </td>
-                            <td style="text-align:center">
-                              <p></p>
-                            </td>
                         </tr>
                         <tr>
                             <td style="text-align:center">
@@ -118,9 +114,6 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                                 </p>
                                 <p>CXA111111 0003</p>
                                 <p>CXA111111 0006</p>
-                            </td>
-                            <td style="text-align:center">
-                              <p></p>
                             </td>
                         </tr>
                     </tbody>
@@ -138,7 +131,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
         nonUserNavBar(username);
     activeReceiptsNavbar();
     // manifestButton();fcd
-    console.log(response.data);
+    // console.log(response.data);
     // manifestButton(response.data);
 };
 
@@ -150,53 +143,33 @@ const createPackagesInTransitRows = (response) => {
             throw "status code not 200!";
         } else {
             const allBoxes = response.data;
-            console.log(response.code);
+            console.log(allBoxes);
+
             let numberOfSamples = [];
             allBoxes.forEach((i, index) => {
-                // console.log(i.bags);
                 // Count the number of key properties in the bags array
-                // console.log(Object.keys(i.bags).length);
+                // DETERMINES THE # OF BAGS
+
                 // console.log(Object.keys(i.bags).length !== 0);
                 // COUNT NUMBER OF SAMPLES***
+
+                // IF NO BAGS ARE ASSOCIATED WITH AN OBJECT'S KEY SKIP AND PUSH TO NUMBEROFSAMPLES
                 if (Object.keys(i.bags).length !== 0) {
                     // console.log(Object.keys(i.bags).length !== 0);
-                    console.log(i.bags);
-                    console.log(
-                        i.bags[Object.keys(i.bags)[0]].arrElements.length
-                    );
-                    numberOfSamples.push(
-                        i.bags[Object.keys(i.bags)[0]].arrElements.length
-                    );
-                    // numberOfSamples =
-                    //     i.bags[Object.keys(i.bags)[0]].arrElements.length;
-                    // console.log(i.bags[index]);
                     // console.log(i.bags);
-                    // console.log(typeof Object.keys(i.bags)[0]);
-                    // console.log(Object.keys(i.bags)[0]);
-                    // console.log(i.bags.Object.keys(i.bags)[0]);
-                    // for (let item = 0; i < Object.keys(i.bags).length; i++) {
-                    //     console.log(Object.keys(i.base)[item]);
-                    // }
+                    // console.log(
+                    //     i.bags[Object.keys(i.bags)[0]].arrElements.length
+                    // );
+
+                    for (let j = 0; j < Object.keys(i.bags).length; j++) {
+                        console.log(j, Object.keys(i.bags).length);
+                    }
+
+                    // console.log(numberOfSamples);
                 } else {
                     // numberOfSamples = 0;
                     numberOfSamples.push(0);
                 }
-                console.log(numberOfSamples);
-                // if (Object.keys(i.bags).length > 0) {
-                //     i.bags;
-                // }
-                // if (i.bags.length) {
-                //     console.log(i.bags);
-                //     console.log(Object.keys(i.bags).length);
-                // }
-                // console.log(i[fieldToConceptIdMapping.shippingShipDate]);
-                // console.log(i[fieldToConceptIdMapping.shippingTrackingNumber]);
-                // console.log(i[fieldToConceptIdMapping.shippingSite]);
-                // console.log(i);
-                // console.log(i.bags);
-                // // returns an array of a given object's own enumerable property names
-                // console.log(Object.keys(i.bags).length);
-                // 3rd td - Object.keys(i.bags).length
                 template += `
                       <tr class="packageInTransitRow">
                       <td style="text-align:center;">${
@@ -311,12 +284,3 @@ STEPS FOR MANIFEST MODAL
 
 
 */
-
-// const firstNameMapping = (fName) => {
-//   try {
-//     return fName;
-//   } catch (e) {
-//     console.log(e);
-//     return "";
-//   }
-// };
