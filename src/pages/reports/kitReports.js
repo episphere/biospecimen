@@ -74,17 +74,18 @@ const renderPlotly = async (bptlMertricsData) => {
 
 const bptlMetricsPieChart = (bptlMetricsData) => {
     // const bptlPieChartElement = document.getElementById("bptlKitPieChart");
-    const data = [
-        {
-            type: "pie",
-            values: [],
-            labels: [
-                "Address Printed",
+    /*
+    "Address Printed",
                 "Assigned",
                 "Pending",
                 "Received",
                 "Shipped",
-            ],
+    */
+    const data = [
+        {
+            type: "pie",
+            values: [],
+            labels: [],
             textinfo: "label+percent",
             textposition: "outside",
             automargin: true,
@@ -92,8 +93,9 @@ const bptlMetricsPieChart = (bptlMetricsData) => {
     ];
 
     for (let key in bptlMetricsData) {
-        console.log(bptlMetricsData[key]);
+        data[0].labels.push(`${key} - ${bptlMetricsData[key]}`);
         data[0].values.push(bptlMetricsData[key]);
+        // console.log(bptlMetricsData);
     }
 
     const layout = {
@@ -114,8 +116,8 @@ const bptlMetricsBarChart = () => {
     const data = [
         {
             type: "bar",
-            x: [1, 2, 3, 4, 5],
-            y: [1, 2, 4, 8, 16],
+            x: [0, 1, 3, 5, 7, 9, 11, 13, 15],
+            y: [60, 50, 45, 30, 40, 30, 34],
             marker: {
                 color: "rgb(49,130,189)",
                 opacity: 0.7,
@@ -125,6 +127,27 @@ const bptlMetricsBarChart = () => {
     const layout = {
         height: 400,
         width: 400,
+        title: "Number of Kits Out with Participants",
+        xaxis: {
+            title: {
+                text: "Days Out",
+                font: {
+                    family: "Courier New, monospace",
+                    size: 18,
+                    color: "#7f7f7f",
+                },
+            },
+        },
+        yaxis: {
+            title: {
+                text: "Number of Kits",
+                font: {
+                    family: "Courier New, monospace",
+                    size: 18,
+                    color: "#7f7f7f",
+                },
+            },
+        },
     };
 
     const config = { responsive: true, displayModeBar: false };
