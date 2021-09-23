@@ -40,8 +40,8 @@ const kitReportsTemplate = async (username, auth, route) => {
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Participant Status</th>
                                     </tr>
                                 </thead>   
-                                </div>
-                                </div>
+                        </div>
+                    </div>
                 </div>
               </div>
   `;

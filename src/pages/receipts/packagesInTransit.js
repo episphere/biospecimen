@@ -155,14 +155,16 @@ const createPackagesInTransitRows = (response) => {
 
                 // IF NO BAGS ARE ASSOCIATED WITH AN OBJECT'S KEY SKIP AND PUSH TO NUMBEROFSAMPLES
                 if (Object.keys(i.bags).length !== 0) {
-                    // console.log(Object.keys(i.bags).length !== 0);
                     // console.log(i.bags);
-                    // console.log(
-                    //     i.bags[Object.keys(i.bags)[0]].arrElements.length
-                    // );
 
                     for (let j = 0; j < Object.keys(i.bags).length; j++) {
-                        console.log(j, Object.keys(i.bags).length);
+                        // console.log(
+                        //     i.bags[Object.keys(i.bags)[0]].arrElements.length
+                        // );
+                        numberOfSamples.push(
+                            i.bags[Object.keys(i.bags)[j]].arrElements.length
+                        );
+                        // console.log(j, Object.keys(i.bags).length);
                     }
 
                     // console.log(numberOfSamples);
@@ -170,6 +172,8 @@ const createPackagesInTransitRows = (response) => {
                     // numberOfSamples = 0;
                     numberOfSamples.push(0);
                 }
+                // TODO - NUMBER OF SAMPLES HAS ALL LENGTHS OF SAMPLES FROM BAGS, FIND A WAY TO GROUP THE SAMPLES AND SUM THEM UP BASED ON THEIR RESPECTIVE BAGS
+                console.log(numberOfSamples);
                 template += `
                       <tr class="packageInTransitRow">
                       <td style="text-align:center;">${
