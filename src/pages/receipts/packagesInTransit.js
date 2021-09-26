@@ -31,7 +31,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Ship Date</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Tracking Number</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipped from (Site)</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Expected # of Samples</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Expected Number of Samples</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Manifest</th>
                                     </tr>
                                 </thead>   
@@ -137,7 +137,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 
 const createPackagesInTransitRows = (response) => {
     let template = "";
-
+    console.log(response);
     try {
         if (response.code !== 200) {
             throw "status code not 200!";
@@ -156,7 +156,7 @@ const createPackagesInTransitRows = (response) => {
                 // IF NO BAGS ARE ASSOCIATED WITH AN OBJECT'S KEY SKIP AND PUSH TO NUMBEROFSAMPLES
                 if (Object.keys(i.bags).length !== 0) {
                     // console.log(i.bags);
-
+                    console.log(Object.keys(i.bags).length);
                     for (let j = 0; j < Object.keys(i.bags).length; j++) {
                         // console.log(
                         //     i.bags[Object.keys(i.bags)[0]].arrElements.length
@@ -164,16 +164,19 @@ const createPackagesInTransitRows = (response) => {
                         numberOfSamples.push(
                             i.bags[Object.keys(i.bags)[j]].arrElements.length
                         );
-                        // console.log(j, Object.keys(i.bags).length);
+                        // console.log(j, Object.keys(i.bags).length)
+                        console.log(numberOfSamples);
                     }
 
                     // console.log(numberOfSamples);
                 } else {
                     // numberOfSamples = 0;
                     numberOfSamples.push(0);
+                    console.log(numberOfSamples);
                 }
+                // debugger;
+                // return;
                 // TODO - NUMBER OF SAMPLES HAS ALL LENGTHS OF SAMPLES FROM BAGS, FIND A WAY TO GROUP THE SAMPLES AND SUM THEM UP BASED ON THEIR RESPECTIVE BAGS
-                console.log(numberOfSamples);
                 template += `
                       <tr class="packageInTransitRow">
                       <td style="text-align:center;">${
@@ -204,6 +207,7 @@ const createPackagesInTransitRows = (response) => {
                       </td>
                       </tr>`;
             });
+            console.log(numberOfSamples);
             return template;
         }
     } catch (e) {
@@ -260,7 +264,7 @@ const manifestButton = (data) => {
         // });
     });
     // debugger;
-    return;
+    // return;
 };
 
 // Convert utc in Seconds to readable Date
@@ -285,6 +289,20 @@ STEPS FOR MANIFEST MODAL
 1. Add event listener to every manifest button
     - Iterate over getElementsByClassName --> HTMLCollection
 2. Pass correct conceptId and values to be rendered on the manifest modal
-
-
 */
+
+let timeArr = [
+    1623954231000,
+    1630694257000,
+    1631724080000,
+    "",
+    "",
+    1623954230000,
+];
+
+const loopTimeArr = (timeArr) => {
+    timeArr.forEach((time) => {
+        console.log(convertTime(time));
+    });
+};
+loopTimeArr(timeArr);
