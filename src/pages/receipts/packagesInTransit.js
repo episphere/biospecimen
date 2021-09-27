@@ -130,7 +130,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     document.getElementById("navbarNavAltMarkup").innerHTML =
         nonUserNavBar(username);
     activeReceiptsNavbar();
-    // manifestButton();fcd
+    // manifestButton();
     // console.log(response.data);
     // manifestButton(response.data);
 };
@@ -146,23 +146,29 @@ const createPackagesInTransitRows = (response) => {
             // console.log(allBoxes);
             /* 
             ==================================
-            INSERT OLD CODE
-            ==================================
-            */
-
-            /* 
-            ==================================
             INSERT NEW CODE - START
             ==================================
             */
 
             // Return an array of an item of grouped bags from GET request***
             const bagsArr = groupAllBags(allBoxes);
-            console.log(bagsArr);
+            console.log("bagsArr", bagsArr);
 
+            // Returns an array of summed and grouped bag samples
             const sumSamplesArr = countSamplesArr(bagsArr);
+            console.log("sumSamplesArr", sumSamplesArr);
 
-            console.log(sumSamplesArr);
+            // Returns an array --> nested array of grouped samples by index
+            const bagSamplesArr = groupSamplesArr(bagsArr);
+            console.log("bagSamplesArr", bagSamplesArr);
+
+            // Returns an array -->  nested array of grouped names by index
+            const namesArr = groupNamesArr(bagsArr, fieldToConceptIdMapping);
+            console.log("namesArr", namesArr);
+
+            // Returns an array -->  nested array of bag Ids names by index
+            const bagIdArr = groupBagIdArr(bagsArr);
+            console.log("bagIdArr", bagIdArr);
             /*
             ==================================
             INSERT NEW CODE - END
@@ -303,7 +309,7 @@ STEPS FOR MANIFEST MODAL
 // };
 // loopTimeArr(timeArr);
 
-// Return an array of an item of grouped bags from GET request
+// Return an array of an item of grouped bags from GET request***
 const groupAllBags = (allBoxes) => {
     const arrBoxes = [];
     // Object.keys --> Copies Keys and stores into array
@@ -320,40 +326,22 @@ const groupAllBags = (allBoxes) => {
 
 const countSamplesArr = (bagsArr) => {
     const arrNumSamples = [];
-    // console.log(bagsArr);
     // NOTE: index is current index of bagsArr
     bagsArr.forEach((bag, index) => {
-        // console.log(index, bag);
         //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
-        // console.log(Object.keys(bagsArr[index]));
-        // console.log(Object.keys(bagsArr[index]).length);
-
-        // console.log(Object.keys(bag).length);
-
-        //FIX LATER
         if (Object.keys(bag).length) {
             let sampleNumber = 0;
-            let sampleId = [];
             for (let j = 0; j < Object.keys(bag).length; j++) {
-                // console.log(index, Object.keys(bag)[j]);
-                // PUSH AND USE SAMPLE IDs LATER ON
-                sampleId.push(Object.keys(bag)[j]);
-                // sampleId.push()
-                // console.log(index, bag[Object.keys(bag)[j]]);
                 /*
                 IMPORTANT FOR GETTING LIST OF ALL BAG ELEMENTS LATER (REUSABILITY)
                 console.log(index, bag[Object.keys(bag)[j]].arrElements);
                 */
-                // console.log(index, bag[Object.keys(bag)[j]].arrElements);
-                console.log(index, bag[Object.keys(bag)[j]].arrElements.length);
+                // console.log(index, bag[Object.keys(bag)[j]].arrElements.length);
                 sampleNumber += bag[Object.keys(bag)[j]].arrElements.length;
 
                 if (j === Object.keys(bag).length - 1) {
                     console.log(index, sampleNumber);
                     arrNumSamples.push(sampleNumber);
-                    // RESET COUNTER
-                    sampleId = [];
-                    console.log(sampleId);
                 }
             }
         } else {
@@ -364,35 +352,100 @@ const countSamplesArr = (bagsArr) => {
     return arrNumSamples;
 };
 
-// let numberOfSamples = [];
-//             allBoxes.forEach((i, index) => {
-//                 // Count the number of key properties in the bags array
-//                 // DETERMINES THE # OF BAGS
+const groupSamplesArr = (bagsArr) => {
+    const arrSamples = [];
+    // NOTE: index is current index of bagsArr
+    bagsArr.forEach((bag, index) => {
+        //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
+        if (Object.keys(bag).length) {
+            let groupSamples = [];
+            for (let j = 0; j < Object.keys(bag).length; j++) {
+                // console.log(index, Object.keys(bag)[j]);
+                // PUSH AND USE SAMPLE IDs LATER ON
+                sampleId.push(Object.keys(bag)[j]);
+                // console.log(index, bag[Object.keys(bag)[j]]);
+                /*
+                IMPORTANT FOR GETTING LIST OF ALL BAG ELEMENTS LATER (REUSABILITY)
+                console.log(index, bag[Object.keys(bag)[j]].arrElements);
+                */
+                // console.log(index, bag[Object.keys(bag)[j]].arrElements);
+                // console.log(sampleId)
+                groupSamples.push(bag[Object.keys(bag)[j]].arrElements);
+                // console.log(index,groupSamples)
+                // console.log(index,"arrSamples",arrSamples)
 
-//                 // console.log(Object.keys(i.bags).length !== 0);
-//                 // COUNT NUMBER OF SAMPLES***
+                if (j === Object.keys(bag).length - 1) {
+                    // console.log(index, sampleNumber);
+                    // console.log(index, bag[Object.keys(bag)[j]].arrElements);
+                    // groupSamples.concat(bag[Object.keys(bag)[j]].arrElements);
+                    // console.log("concat",groupSamples)
+                    // arrSamples.push(groupSamples)
+                    groupSamples.concat(bag[Object.keys(bag)[j]].arrElements);
+                    // console.log("concat",index,groupSamples)
+                    arrSamples.push(groupSamples);
+                    // console.log(index,"arrSamples",arrSamples)
+                    sampleId = [];
+                    // groupSamples =[]
+                    // console.log(sampleId);
+                }
+            }
+        } else {
+            // console.log(index, Object.keys(bag), "empty bag");
+            arrSamples.push([]);
+        }
+    });
+    // console.log(arrSamples)
+    return arrSamples;
+};
 
-//                 // IF NO BAGS ARE ASSOCIATED WITH AN OBJECT'S KEY SKIP AND PUSH TO NUMBEROFSAMPLES
-//                 if (Object.keys(i.bags).length !== 0) {
-//                     // console.log(i.bags);
-//                     console.log(Object.keys(i.bags).length);
-//                     for (let j = 0; j < Object.keys(i.bags).length; j++) {
-//                         // console.log(
-//                         //     i.bags[Object.keys(i.bags)[0]].arrElements.length
-//                         // );
-//                         numberOfSamples.push(
-//                             i.bags[Object.keys(i.bags)[j]].arrElements.length
-//                         );
-//                         // console.log(j, Object.keys(i.bags).length)
-//                         console.log(numberOfSamples);
-//                     }
+// NESTED GROUP NAMES BY INDEX***
+const groupNamesArr = (bagsArr, fieldToConceptIdMapping) => {
+    const arrNames = [];
+    const { shippingFirstName, shippingLastName } = fieldToConceptIdMapping;
+    // NOTE: index is current index of bagsArr
+    bagsArr.forEach((bag, index) => {
+        //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
+        if (Object.keys(bag).length) {
+            let groupNames = [];
+            for (let j = 0; j < Object.keys(bag).length; j++) {
+                // console.log(index, Object.keys(bag)[j]);
 
-//                     // console.log(numberOfSamples);
-//                 } else {
-//                     // numberOfSamples = 0;
-//                     numberOfSamples.push(0);
-//                     console.log(numberOfSamples);
-//                 }
-//                 // debugger;
-//                 // return;
-//                 // TODO - NUMBER OF SAMPLES HAS ALL LENGTHS OF SAMPLES FROM BAGS, FIND A WAY TO GROUP THE SAMPLES AND SUM THEM UP BASED ON THEIR RESPECTIVE BAGS
+                // console.log(index, bag[Object.keys(bag)[j]]);
+
+                // console.log(index,bag[Object.keys(bag)[j]][shippingFirstName],bag[Object.keys(bag)[j]][shippingLastName])
+                groupNames.push([
+                    bag[Object.keys(bag)[j]][shippingFirstName] +
+                        " " +
+                        bag[Object.keys(bag)[j]][shippingLastName],
+                ]);
+
+                if (j === Object.keys(bag).length - 1) {
+                    // COMBINE TWO SEPARATE ARRAYS OF FULL NAME INTO ONE ARRAY
+                    groupNames.concat([
+                        bag[Object.keys(bag)[j]][shippingFirstName] +
+                            " " +
+                            bag[Object.keys(bag)[j]][shippingLastName],
+                    ]);
+                    arrNames.push(groupNames);
+                }
+            }
+        } else {
+            // console.log(index, Object.keys(bag), "empty bag");
+            arrNames.push([]);
+        }
+    });
+    // console.log(arrSamples)
+    return arrNames;
+};
+
+// NESTED GROUP BAGS BY INDEX***
+const groupBagIdArr = (bagsArr) => {
+    const arrBagId = [];
+
+    bagsArr.forEach((bag, index) => {
+        console.log(index, Object.keys(bag));
+        arrBagId.push(Object.keys(bag));
+    });
+    // console.log(arrSamples)
+    return arrBagId;
+};
