@@ -10,6 +10,9 @@ export const packageReceiptScreen = async (auth, route) => {
   const username = user.displayName ? user.displayName : user.email;
   packageReceiptTemplate(username, auth, route);
   checkCourierType();
+  checkCardIncluded();
+  disableCollectionCardFields();
+  enableCollectionCardFields();
   formSubmit();
   cancelChanges();
 }
@@ -70,32 +73,34 @@ const packageReceiptTemplate = async (name, auth, route) => {
                             <input autocomplete="off" required class="col-md-8 form-control" type="date" type="text" id="dateReceived">
                         </div>
 
-                        <h5 style="text-align: left;">Collection Card Data Entry</h5>
+                        <div id="collectionCard">
+                            <h5 style="text-align: left;">Collection Card Data Entry</h5>
 
-                        <div class="row form-group">
-                            <label class="col-form-label col-md-4">Collecton ID</label>
-                             <input autocomplete="off" class="col-md-8" type="text" id="collectionId">
-                        </div>
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-4">Check if card not included in assignment</label>
+                                <input type="checkbox" name="collectionCheckBox" id="collectionCheckBox">
+                            </div>
 
-                        <div class="row form-group">
-                            <label class="col-form-label col-md-4" for="dateCollectionCard">Enter Collection Date from Collection Card</label>
-                            <input autocomplete="off" class="col-md-8 form-control" type="date" id="dateCollectionCard">
-                        </div>
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-4">Collection ID</label>
+                                <input autocomplete="off" class="col-md-8" type="text" id="collectionId">
+                            </div>
 
-                        <div class="row form-group">
-                        <label class="col-form-label col-md-4" for="timeCollectionCard">Enter Collection Time from Collection Card</label>
-                        <input autocomplete="off" class="col-md-8 form-control" type="time" step="1" id="timeCollectionCard">
-                    </div>
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-4" for="dateCollectionCard">Enter Collection Date from Collection Card</label>
+                                <input autocomplete="off" class="col-md-8 form-control" type="date" id="dateCollectionCard">
+                            </div>
 
-                        <div class="row form-group">
-                            <label class="col-form-label col-md-4">Check if card not included in assignment</label>
-                            <input type="checkbox" name="collectionCheckBox" id="collectionCheckBox">
-                        </div>
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-4" for="timeCollectionCard">Enter Collection Time from Collection Card</label>
+                                <input autocomplete="off" class="col-md-8 form-control" type="time" step="1" id="timeCollectionCard">
+                            </div>
 
-                        <div class="row form-group">
-                            <label class="col-form-label col-md-4">Comments on Card Returned</label>
-                            <textarea class="col-md-8" id="collectionComments" cols="30" rows="3"></textarea>
-                        </div>
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-4">Comments on Card Returned</label>
+                                <textarea class="col-md-8" id="collectionComments" cols="30" rows="3"></textarea>
+                            </div>
+                          </div>
                         
                         <div class="mt-4 mb-4" style="display:inline-block;">
                             <button type="button" class="btn btn-danger" id="clearForm">Clear</button>
@@ -113,11 +118,39 @@ const checkCourierType = () => {
   const a = document.getElementById("scannedBarcode");
   if (a) {
     a.addEventListener("change", () => {
-      a.value.trim().length <= 12 ? 
-            document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` :
-            document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
+      if (a.value.trim().length <= 12) { 
+            document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
+            document.getElementById('collectionCheckBox').disabled = true;
+            disableCollectionCardFields();
+   
+          }
+            else {
+            document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`}
     }) }
 }
+
+const checkCardIncluded = () => {
+  const a = document.getElementById('collectionCheckBox')
+  if (a) {
+    a.addEventListener("change", () => {
+      a.checked ? disableCollectionCardFields() : enableCollectionCardFields()
+    })
+}}
+
+const disableCollectionCardFields = () => {
+  document.getElementById('collectionId').disabled = true;
+  document.getElementById('dateCollectionCard').disabled = true;
+  document.getElementById('timeCollectionCard').disabled = true;
+  document.getElementById('collectionComments').disabled = true;
+}
+
+const enableCollectionCardFields = () => {
+  document.getElementById('collectionId').disabled = false;
+  document.getElementById('dateCollectionCard').disabled = false;
+  document.getElementById('timeCollectionCard').disabled = false;
+  document.getElementById('collectionComments').disabled = false;
+}
+
 
 const formSubmit = () => {
   const form = document.getElementById('configForm');
@@ -137,14 +170,10 @@ const formSubmit = () => {
         obj['collectionComments'] = document.getElementById('collectionComments').value;
        
       }
-
     storePackageReceipt(obj);
 
   })
 }      
-
-
-
 
 const cancelChanges = () => {
   const cancelChanges = document.getElementById('clearForm');
