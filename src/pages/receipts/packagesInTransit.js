@@ -315,8 +315,6 @@ const groupAllBags = (allBoxes) => {
     // Object.keys --> Copies Keys and stores into array
     // If Key(bags) has a length push bag of objects, else an empty {}
     allBoxes.forEach((box) => {
-        // console.log(Object.keys(box.bags).length);
-        // console.log(Object.keys(box.bags));
         Object.keys(box.bags).length
             ? arrBoxes.push(box.bags)
             : arrBoxes.push(box.bags);
@@ -336,7 +334,6 @@ const countSamplesArr = (bagsArr) => {
                 IMPORTANT FOR GETTING LIST OF ALL BAG ELEMENTS LATER (REUSABILITY)
                 console.log(index, bag[Object.keys(bag)[j]].arrElements);
                 */
-                // console.log(index, bag[Object.keys(bag)[j]].arrElements.length);
                 sampleNumber += bag[Object.keys(bag)[j]].arrElements.length;
 
                 if (j === Object.keys(bag).length - 1) {
@@ -360,33 +357,17 @@ const groupSamplesArr = (bagsArr) => {
         if (Object.keys(bag).length) {
             let groupSamples = [];
             for (let j = 0; j < Object.keys(bag).length; j++) {
-                // console.log(index, Object.keys(bag)[j]);
-                // PUSH AND USE SAMPLE IDs LATER ON
-                sampleId.push(Object.keys(bag)[j]);
                 // console.log(index, bag[Object.keys(bag)[j]]);
                 /*
                 IMPORTANT FOR GETTING LIST OF ALL BAG ELEMENTS LATER (REUSABILITY)
                 console.log(index, bag[Object.keys(bag)[j]].arrElements);
                 */
                 // console.log(index, bag[Object.keys(bag)[j]].arrElements);
-                // console.log(sampleId)
                 groupSamples.push(bag[Object.keys(bag)[j]].arrElements);
-                // console.log(index,groupSamples)
-                // console.log(index,"arrSamples",arrSamples)
 
                 if (j === Object.keys(bag).length - 1) {
-                    // console.log(index, sampleNumber);
-                    // console.log(index, bag[Object.keys(bag)[j]].arrElements);
-                    // groupSamples.concat(bag[Object.keys(bag)[j]].arrElements);
-                    // console.log("concat",groupSamples)
-                    // arrSamples.push(groupSamples)
                     groupSamples.concat(bag[Object.keys(bag)[j]].arrElements);
-                    // console.log("concat",index,groupSamples)
                     arrSamples.push(groupSamples);
-                    // console.log(index,"arrSamples",arrSamples)
-                    sampleId = [];
-                    // groupSamples =[]
-                    // console.log(sampleId);
                 }
             }
         } else {
@@ -408,11 +389,6 @@ const groupNamesArr = (bagsArr, fieldToConceptIdMapping) => {
         if (Object.keys(bag).length) {
             let groupNames = [];
             for (let j = 0; j < Object.keys(bag).length; j++) {
-                // console.log(index, Object.keys(bag)[j]);
-
-                // console.log(index, bag[Object.keys(bag)[j]]);
-
-                // console.log(index,bag[Object.keys(bag)[j]][shippingFirstName],bag[Object.keys(bag)[j]][shippingLastName])
                 groupNames.push([
                     bag[Object.keys(bag)[j]][shippingFirstName] +
                         " " +
@@ -430,11 +406,9 @@ const groupNamesArr = (bagsArr, fieldToConceptIdMapping) => {
                 }
             }
         } else {
-            // console.log(index, Object.keys(bag), "empty bag");
             arrNames.push([]);
         }
     });
-    // console.log(arrSamples)
     return arrNames;
 };
 
@@ -443,7 +417,7 @@ const groupBagIdArr = (bagsArr) => {
     const arrBagId = [];
 
     bagsArr.forEach((bag, index) => {
-        console.log(index, Object.keys(bag));
+        // console.log(index, Object.keys(bag));
         arrBagId.push(Object.keys(bag));
     });
     // console.log(arrSamples)
