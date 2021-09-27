@@ -143,40 +143,34 @@ const createPackagesInTransitRows = (response) => {
             throw "status code not 200!";
         } else {
             const allBoxes = response.data;
-            console.log(allBoxes);
+            // console.log(allBoxes);
+            /* 
+            ==================================
+            INSERT OLD CODE
+            ==================================
+            */
 
-            let numberOfSamples = [];
-            allBoxes.forEach((i, index) => {
-                // Count the number of key properties in the bags array
-                // DETERMINES THE # OF BAGS
+            /* 
+            ==================================
+            INSERT NEW CODE - START
+            ==================================
+            */
 
-                // console.log(Object.keys(i.bags).length !== 0);
-                // COUNT NUMBER OF SAMPLES***
+            // Return an array of an item of grouped bags from GET request***
+            const bagsArr = groupAllBags(allBoxes);
+            console.log(bagsArr);
 
-                // IF NO BAGS ARE ASSOCIATED WITH AN OBJECT'S KEY SKIP AND PUSH TO NUMBEROFSAMPLES
-                if (Object.keys(i.bags).length !== 0) {
-                    // console.log(i.bags);
-                    console.log(Object.keys(i.bags).length);
-                    for (let j = 0; j < Object.keys(i.bags).length; j++) {
-                        // console.log(
-                        //     i.bags[Object.keys(i.bags)[0]].arrElements.length
-                        // );
-                        numberOfSamples.push(
-                            i.bags[Object.keys(i.bags)[j]].arrElements.length
-                        );
-                        // console.log(j, Object.keys(i.bags).length)
-                        console.log(numberOfSamples);
-                    }
+            countSamplesArr(bagsArr);
 
-                    // console.log(numberOfSamples);
-                } else {
-                    // numberOfSamples = 0;
-                    numberOfSamples.push(0);
-                    console.log(numberOfSamples);
-                }
-                // debugger;
-                // return;
-                // TODO - NUMBER OF SAMPLES HAS ALL LENGTHS OF SAMPLES FROM BAGS, FIND A WAY TO GROUP THE SAMPLES AND SUM THEM UP BASED ON THEIR RESPECTIVE BAGS
+            /*
+            ==================================
+            INSERT NEW CODE - END
+            ==================================
+            */
+
+            // Populate Cells with Data
+            allBoxes.forEach((i) => {
+                // console.log(bagsArr);
                 template += `
                       <tr class="packageInTransitRow">
                       <td style="text-align:center;">${
@@ -207,9 +201,9 @@ const createPackagesInTransitRows = (response) => {
                       </td>
                       </tr>`;
             });
-            console.log(numberOfSamples);
-            return template;
         }
+
+        return template;
     } catch (e) {
         console.log(e);
     }
@@ -291,18 +285,91 @@ STEPS FOR MANIFEST MODAL
 2. Pass correct conceptId and values to be rendered on the manifest modal
 */
 
-let timeArr = [
-    1623954231000,
-    1630694257000,
-    1631724080000,
-    "",
-    "",
-    1623954230000,
-];
+// let timeArr = [
+//     1623954231000,
+//     1630694257000,
+//     1631724080000,
+//     "",
+//     "",
+//     1623954230000,
+// ];
 
-const loopTimeArr = (timeArr) => {
-    timeArr.forEach((time) => {
-        console.log(convertTime(time));
+// const loopTimeArr = (timeArr) => {
+//     timeArr.forEach((time) => {
+//         console.log(convertTime(time));
+//     });
+// };
+// loopTimeArr(timeArr);
+
+// Return an array of an item of grouped bags from GET request
+const groupAllBags = (allBoxes) => {
+    const arrBoxes = [];
+    // Object.keys --> Copies Keys and stores into array
+    // If Key(bags) has a length push bag of objects, else an empty {}
+    allBoxes.forEach((box) => {
+        // console.log(Object.keys(box.bags).length);
+        // console.log(Object.keys(box.bags));
+        Object.keys(box.bags).length
+            ? arrBoxes.push(box.bags)
+            : arrBoxes.push(box.bags);
+    });
+    return arrBoxes;
+};
+
+const countSamplesArr = (bagsArr) => {
+    const arrNumSamples = [];
+    // console.log(bagsArr);
+    // NOTE: index is current index of bagsArr
+    bagsArr.forEach((bag, index) => {
+        // console.log(index, bag);
+        //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
+        // console.log(Object.keys(bagsArr[index]));
+        // console.log(Object.keys(bagsArr[index]).length);
+
+        // console.log(Object.keys(bag).length);
+
+        //FIX LATER
+        if (Object.keys(bag).length) {
+            let sampleNumber = "";
+            let sampleId = [];
+            for (let j = 0; j < Object.keys(bag).length; j++) {
+                console.log(index, Object.keys(bag)[j]);
+            }
+        } else {
+            console.log(index, "empty bag");
+        }
     });
 };
-loopTimeArr(timeArr);
+
+// let numberOfSamples = [];
+//             allBoxes.forEach((i, index) => {
+//                 // Count the number of key properties in the bags array
+//                 // DETERMINES THE # OF BAGS
+
+//                 // console.log(Object.keys(i.bags).length !== 0);
+//                 // COUNT NUMBER OF SAMPLES***
+
+//                 // IF NO BAGS ARE ASSOCIATED WITH AN OBJECT'S KEY SKIP AND PUSH TO NUMBEROFSAMPLES
+//                 if (Object.keys(i.bags).length !== 0) {
+//                     // console.log(i.bags);
+//                     console.log(Object.keys(i.bags).length);
+//                     for (let j = 0; j < Object.keys(i.bags).length; j++) {
+//                         // console.log(
+//                         //     i.bags[Object.keys(i.bags)[0]].arrElements.length
+//                         // );
+//                         numberOfSamples.push(
+//                             i.bags[Object.keys(i.bags)[j]].arrElements.length
+//                         );
+//                         // console.log(j, Object.keys(i.bags).length)
+//                         console.log(numberOfSamples);
+//                     }
+
+//                     // console.log(numberOfSamples);
+//                 } else {
+//                     // numberOfSamples = 0;
+//                     numberOfSamples.push(0);
+//                     console.log(numberOfSamples);
+//                 }
+//                 // debugger;
+//                 // return;
+//                 // TODO - NUMBER OF SAMPLES HAS ALL LENGTHS OF SAMPLES FROM BAGS, FIND A WAY TO GROUP THE SAMPLES AND SUM THEM UP BASED ON THEIR RESPECTIVE BAGS
