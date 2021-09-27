@@ -50,77 +50,8 @@ const packagesInTransitTemplate = async (username, auth, route) => {
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-4">
-                        <p>Shipping Manifest</p>
-                    </div>
-                    <div class="col-md-4 ml-auto">
-                        <p>Site: NCI </p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <p>Shipped Date and Time: 6/17/2021, 02:23 PM
-                        </p>
-                    </div>
-                    <div class="col-md-4 ml-auto">
-                        <p>Location: Main Campus</p>
-                    </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-4">
-                    <p>Sender: </p>
-                  </div>
-                </div>
-
-                <div class="row">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                        <tr>
-                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col-">Box Number</th>
-                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Specimen Bag ID</th>
-                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Full Specimen ID</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td style="text-align:center">
-                              <p>Box3</p>
-                            </td>
-                            <td style="text-align:center">
-                              <p>CXA111111 0008</p>
-                            </td>
-                            <td style="text-align:center">
-                                <p>CXA111111 0001</p>
-                                <p>CXA111111 0002
-                                </p>
-                                <p>CXA111111 0003</p>
-                                <p>CXA111111 0006</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:center">
-                              <p>Box3 </p>
-                            </td>
-                            <td style="text-align:center">
-                              <p>CXA111111 0008</p>
-                            </td>
-                            <td style="text-align:center">
-                                <p>CXA111111 0001</p>
-                                <p>CXA111111 0002
-                                </p>
-                                <p>CXA111111 0003</p>
-                                <p>CXA111111 0006</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                  </table>
-                </div>
-                </div>
-            </div>
+        <div id="manifest-modal-body" class="modal-body">
+            
         </div>  
       </div>
     </div>
@@ -130,7 +61,8 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     document.getElementById("navbarNavAltMarkup").innerHTML =
         nonUserNavBar(username);
     activeReceiptsNavbar();
-
+    const manifestModalBodyEl = document.getElementById("manifest-modal-body");
+    console.log(manifestModalBodyEl);
     // response.data ? console.log(true) : console.log(false);
     // manifestButton();
     // console.log(response.data);
@@ -164,9 +96,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
         bagIdArr,
     };
     // console.log(bagsArr);
-    manifestButton([...allBoxes], dataObj);
-    // let manifestButtonEl = document.querySelector(".manifest-button");
-    // console.log(manifestButtonEl);
+    manifestButton([...allBoxes], dataObj, manifestModalBodyEl);
 };
 
 const createPackagesInTransitRows = (response) => {
@@ -251,7 +181,7 @@ const createPackagesInTransitRows = (response) => {
     }
 };
 
-const manifestButton = (allBoxes, dataObj) => {
+const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
     const buttons = document.getElementsByClassName("manifest-button");
 
     // DESTRUCTURING dataObj and fieldToConceptIdMapping
@@ -261,65 +191,6 @@ const manifestButton = (allBoxes, dataObj) => {
     const { shippingSite, shippingShipDate, shippingLocation } =
         fieldToConceptIdMapping;
 
-    // console.log(
-    //     "shipping site",
-    //     shippingSite,
-    //     "shipping ship date",
-    //     shippingShipDate,
-    //     "shipping Location",
-    //     shippingLocation
-    // );
-    // console.log(bagsArr);
-    // let siteData = "";
-    // let dateData = "";
-    // let sender = "";
-    // let boxNumber = "";
-    // let specimenBagId = "";
-    // let fullSpecimenId = "";
-    // let firstName = "";
-    // let lastName = "";
-
-    // START-----*****
-    // Array.from(buttons).forEach((button, index) => {
-    //     // Use fieldToConceptIdMapping to grab correct conceptIds
-    //     button.dataset.site = data[index].siteAcronym;
-    //     button.dataset.date = convertTime(
-    //         data[index][fieldToConceptIdMapping.shippingShipDate]
-    //     );
-    //     button.dataset.location =
-    //         data[index][fieldToConceptIdMapping.shippingSite];
-
-    //     /*
-    // Add for loop/ for Each
-    // if (JSON.stringify(refusalObj) === '{}')
-    // Condition - If bag is empty skip
-    // */
-    //     button.dataset.firstName =
-    //         data[index].bags[Object.keys(data[index].bags)][
-    //             fieldToConceptIdMapping.shippingFirstName
-    //         ];
-
-    //     // button.dataset.lName = data[index].bags[Object.keys(data[index].bags)];
-    //     // button.dataset.sender = data[index]
-    //     console.log(index, button.dataset.site);
-    //     console.log(index, button.dataset.date);
-    //     console.log(index, button.dataset.location);
-    //     // console.log(index, button.dataset.fName);
-    //     console.log(
-    //         index,
-    //         data[index].bags[Object.keys(data[index].bags)] ??
-    //             data[index].bags[Object.keys(data[index].bags)]
-    //     );
-    //     // console.log(index, button.dataset.lastName);
-    //     console.log(index, data[index].bags[Object.keys(data[index].bags)]);
-
-    //     // data.forEach((i, index) => {
-    //     //   button.dataset.siteData = i[fieldToConceptIdMapping.shippingSite];
-    //     //   console.log(index, i[fieldToConceptIdMapping.shippingSite]);
-    //     // });
-    // });
-    // debugger;
-    // return;
     Array.from(buttons).forEach((button, index) => {
         // console.log(button);
         let modalData = {
@@ -336,8 +207,76 @@ const manifestButton = (allBoxes, dataObj) => {
         modalData.site = allBoxes[index][shippingSite];
         modalData.date = allBoxes[index][shippingShipDate];
         modalData.location = allBoxes[index][shippingLocation];
+        // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
-        console.log(JSON.parse(button.getAttribute("data-modal")));
+        button.dataset.buttonIndex = `manifest-button-${index}`;
+        // console.log(JSON.parse(button.getAttribute("data-modal")));
+        // let parsedModalData = JSON.parse(button.getAttribute("data-modal"));
+        // manifestContent(parsedModalData, manifestModalBodyEl, index);
+        button.addEventListener("click", (e) => {
+            // console.log(e.target.getAttribute("data-modal"));
+            let parsedModalData = JSON.parse(
+                e.target.getAttribute("data-modal")
+            );
+            console.log(parsedModalData);
+            let {
+                site,
+                date,
+                location,
+                namesArr,
+                sumSamplesArr,
+                bagSamplesArr,
+                bagIdArr,
+            } = parsedModalData;
+
+            // console.log(bagIdArr);
+            // console.log(index, namesArr, namesArr[index]);
+            // console.log(site);
+            let modalBody = `<div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4">
+                    <p>Shipping Manifest</p>
+                </div>
+                <div class="col-md-4 ml-auto">
+                    <p>Site: ${site ? site : "N/A"} </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <p>Shipped Date and Time: ${
+                        date ? convertTime(date) : "N/A"
+                    }
+                    </p>
+                </div>
+                <div class="col-md-4 ml-auto">
+                    <p>Location:${location ? location : "N/A"}</p>
+                </div>
+            </div>
+            <div class="row">
+            <div class="col-md-4">
+                <p>Sender: ${namesArr[index] ? namesArr[index] : "N/A"}</p>
+            </div>
+            </div>
+
+            <div class="row">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col-">Box Number</th>
+                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Specimen Bag ID</th>
+                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Full Specimen ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${addManifestTableRows(bagIdArr, sumSamplesArr, index)}
+                </tbody>
+            </table>
+            </div>
+            </div>
+        </div>`;
+            manifestModalBodyEl.innerHTML = modalBody;
+        });
     });
 };
 
@@ -471,3 +410,87 @@ const groupBagIdArr = (bagsArr) => {
     // console.log(arrSamples)
     return arrBagId;
 };
+
+const addManifestTableRows = (bagIdArr, sumSamplesArr, index) => {
+    // console.log(index, bagIdArr[index].length);
+    // console.log(bagIdArr[index].length === 0);
+    let manifestBody = ``;
+    let rows = ``;
+    if (!bagIdArr[index].length) {
+        // console.log("No bag ids", bagIdArr[index]);
+
+        return manifestBody;
+    } else {
+        console.log(bagIdArr[index].length);
+        console.log(sumSamplesArr);
+        bagIdArr[index].forEach((id, indexNum) => {
+            // If the current index of the bagIds is 0 insert # of samples
+            if (indexNum === 0) {
+                rows += `<tr>
+                <td style="text-align:center">
+                <p>${sumSamplesArr ? sumSamplesArr[index] : "N/A"}</p>
+                </td>
+                <td style="text-align:center">
+                <p>CXA111111 0008</p>
+                </td>
+                <td style="text-align:center">
+                    <p>CXA111111 0001</p>
+                    <p>CXA111111 0002
+                    </p>
+                    <p>CXA111111 0003</p>
+                    <p>CXA111111 0006</p>
+                </td>
+                </tr>`;
+            } else {
+                rows += `<tr>
+                <td style="text-align:center">
+                <p></p>
+                </td>
+                <td style="text-align:center">
+                <p>CXA111111 0008</p>
+                </td>
+                <td style="text-align:center">
+                    <p>CXA111111 0001</p>
+                    <p>CXA111111 0002
+                    </p>
+                    <p>CXA111111 0003</p>
+                    <p>CXA111111 0006</p>
+                </td>
+                </tr>`;
+            }
+        });
+        manifestBody = rows;
+        return manifestBody;
+    }
+};
+
+// <tr>
+// <td style="text-align:center">
+// <p>Box3</p>
+// </td>
+// <td style="text-align:center">
+// <p>CXA111111 0008</p>
+// </td>
+// <td style="text-align:center">
+//     <p>CXA111111 0001</p>
+//     <p>CXA111111 0002
+//     </p>
+//     <p>CXA111111 0003</p>
+//     <p>CXA111111 0006</p>
+// </td>
+// </tr>
+// <tr>
+// <td style="text-align:center">
+// <p>Box3 </p>
+// </td>
+// <td style="text-align:center">
+// <p>CXA111111 0008</p>
+// </td>
+// <td style="text-align:center">
+//     <p>CXA111111 0001</p>
+//     <p>CXA111111 0002
+//     </p>
+//     <p>CXA111111 0003</p>
+//     <p>CXA111111 0006</p>
+// </td>
+// </tr>
