@@ -160,8 +160,9 @@ const createPackagesInTransitRows = (response) => {
             const bagsArr = groupAllBags(allBoxes);
             console.log(bagsArr);
 
-            countSamplesArr(bagsArr);
+            const sumSamplesArr = countSamplesArr(bagsArr);
 
+            console.log(sumSamplesArr);
             /*
             ==================================
             INSERT NEW CODE - END
@@ -169,8 +170,7 @@ const createPackagesInTransitRows = (response) => {
             */
 
             // Populate Cells with Data
-            allBoxes.forEach((i) => {
-                // console.log(bagsArr);
+            allBoxes.forEach((i, index) => {
                 template += `
                       <tr class="packageInTransitRow">
                       <td style="text-align:center;">${
@@ -193,7 +193,9 @@ const createPackagesInTransitRows = (response) => {
                               ? i[fieldToConceptIdMapping.shippingSite]
                               : "N/A"
                       }</td>
-                      <td style="text-align:center;">${""}</td>
+                      <td style="text-align:center;">${
+                          sumSamplesArr[index]
+                      }</td>
                       <td>
                         <button class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
                             Manifest
@@ -330,15 +332,36 @@ const countSamplesArr = (bagsArr) => {
 
         //FIX LATER
         if (Object.keys(bag).length) {
-            let sampleNumber = "";
+            let sampleNumber = 0;
             let sampleId = [];
             for (let j = 0; j < Object.keys(bag).length; j++) {
-                console.log(index, Object.keys(bag)[j]);
+                // console.log(index, Object.keys(bag)[j]);
+                // PUSH AND USE SAMPLE IDs LATER ON
+                sampleId.push(Object.keys(bag)[j]);
+                // sampleId.push()
+                // console.log(index, bag[Object.keys(bag)[j]]);
+                /*
+                IMPORTANT FOR GETTING LIST OF ALL BAG ELEMENTS LATER (REUSABILITY)
+                console.log(index, bag[Object.keys(bag)[j]].arrElements);
+                */
+                // console.log(index, bag[Object.keys(bag)[j]].arrElements);
+                console.log(index, bag[Object.keys(bag)[j]].arrElements.length);
+                sampleNumber += bag[Object.keys(bag)[j]].arrElements.length;
+
+                if (j === Object.keys(bag).length - 1) {
+                    console.log(index, sampleNumber);
+                    arrNumSamples.push(sampleNumber);
+                    // RESET COUNTER
+                    sampleId = [];
+                    console.log(sampleId);
+                }
             }
         } else {
-            console.log(index, "empty bag");
+            console.log(index, Object.keys(bag), "empty bag");
+            arrNumSamples.push(0);
         }
     });
+    return arrNumSamples;
 };
 
 // let numberOfSamples = [];
