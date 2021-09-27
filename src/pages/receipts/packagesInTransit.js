@@ -130,9 +130,43 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     document.getElementById("navbarNavAltMarkup").innerHTML =
         nonUserNavBar(username);
     activeReceiptsNavbar();
+
+    // response.data ? console.log(true) : console.log(false);
     // manifestButton();
     // console.log(response.data);
-    // manifestButton(response.data);
+    const allBoxes = response.data;
+    // console.log("allBoxes", allBoxes);
+
+    // // Return an array of an item of grouped bags from GET request***
+    const bagsArr = groupAllBags(allBoxes);
+
+    // // Returns an array of summed and grouped bag samples
+    const sumSamplesArr = countSamplesArr(bagsArr);
+
+    // // Returns an array --> nested array of grouped samples by index
+    const bagSamplesArr = groupSamplesArr(bagsArr);
+    // console.log("bagSamplesArr", bagSamplesArr);
+
+    // // Returns an array -->  nested array of grouped names by index
+    const namesArr = groupNamesArr(bagsArr, fieldToConceptIdMapping);
+    // console.log("namesArr", namesArr);
+
+    // // Returns an array -->  nested array of bag Ids names by index
+    const bagIdArr = groupBagIdArr(bagsArr);
+    // console.log("bagIdArr", bagIdArr);
+
+    // Object Property Value Shorthand
+    // Example: bagsArr and bagsArr:bagsArr are equivalent
+    const dataObj = {
+        sumSamplesArr,
+        bagSamplesArr,
+        namesArr,
+        bagIdArr,
+    };
+    // console.log(bagsArr);
+    manifestButton([...allBoxes], dataObj);
+    // let manifestButtonEl = document.querySelector(".manifest-button");
+    // console.log(manifestButtonEl);
 };
 
 const createPackagesInTransitRows = (response) => {
@@ -150,25 +184,25 @@ const createPackagesInTransitRows = (response) => {
             ==================================
             */
 
-            // Return an array of an item of grouped bags from GET request***
+            // // Return an array of an item of grouped bags from GET request***
             const bagsArr = groupAllBags(allBoxes);
-            console.log("bagsArr", bagsArr);
+            // console.log("bagsArr", bagsArr);
 
-            // Returns an array of summed and grouped bag samples
+            // // Returns an array of summed and grouped bag samples
             const sumSamplesArr = countSamplesArr(bagsArr);
-            console.log("sumSamplesArr", sumSamplesArr);
+            // console.log("sumSamplesArr", sumSamplesArr);
 
-            // Returns an array --> nested array of grouped samples by index
-            const bagSamplesArr = groupSamplesArr(bagsArr);
-            console.log("bagSamplesArr", bagSamplesArr);
+            // // Returns an array --> nested array of grouped samples by index
+            // const bagSamplesArr = groupSamplesArr(bagsArr);
+            // console.log("bagSamplesArr", bagSamplesArr);
 
-            // Returns an array -->  nested array of grouped names by index
-            const namesArr = groupNamesArr(bagsArr, fieldToConceptIdMapping);
-            console.log("namesArr", namesArr);
+            // // Returns an array -->  nested array of grouped names by index
+            // const namesArr = groupNamesArr(bagsArr, fieldToConceptIdMapping);
+            // console.log("namesArr", namesArr);
 
-            // Returns an array -->  nested array of bag Ids names by index
-            const bagIdArr = groupBagIdArr(bagsArr);
-            console.log("bagIdArr", bagIdArr);
+            // // Returns an array -->  nested array of bag Ids names by index
+            // const bagIdArr = groupBagIdArr(bagsArr);
+            // console.log("bagIdArr", bagIdArr);
             /*
             ==================================
             INSERT NEW CODE - END
@@ -217,8 +251,25 @@ const createPackagesInTransitRows = (response) => {
     }
 };
 
-const manifestButton = (data) => {
+const manifestButton = (allBoxes, dataObj) => {
     const buttons = document.getElementsByClassName("manifest-button");
+
+    // DESTRUCTURING dataObj and fieldToConceptIdMapping
+
+    const { sumSamplesArr, bagSamplesArr, namesArr, bagIdArr } = dataObj;
+
+    const { shippingSite, shippingShipDate, shippingLocation } =
+        fieldToConceptIdMapping;
+
+    // console.log(
+    //     "shipping site",
+    //     shippingSite,
+    //     "shipping ship date",
+    //     shippingShipDate,
+    //     "shipping Location",
+    //     shippingLocation
+    // );
+    // console.log(bagsArr);
     // let siteData = "";
     // let dateData = "";
     // let sender = "";
@@ -227,46 +278,67 @@ const manifestButton = (data) => {
     // let fullSpecimenId = "";
     // let firstName = "";
     // let lastName = "";
-    Array.from(buttons).forEach((button, index) => {
-        // Use fieldToConceptIdMapping to grab correct conceptIds
-        button.dataset.site = data[index].siteAcronym;
-        button.dataset.date = convertTime(
-            data[index][fieldToConceptIdMapping.shippingShipDate]
-        );
-        button.dataset.location =
-            data[index][fieldToConceptIdMapping.shippingSite];
 
-        /*
-    Add for loop/ for Each
-    if (JSON.stringify(refusalObj) === '{}')
-    Condition - If bag is empty skip
-    */
-        button.dataset.firstName =
-            data[index].bags[Object.keys(data[index].bags)][
-                fieldToConceptIdMapping.shippingFirstName
-            ];
+    // START-----*****
+    // Array.from(buttons).forEach((button, index) => {
+    //     // Use fieldToConceptIdMapping to grab correct conceptIds
+    //     button.dataset.site = data[index].siteAcronym;
+    //     button.dataset.date = convertTime(
+    //         data[index][fieldToConceptIdMapping.shippingShipDate]
+    //     );
+    //     button.dataset.location =
+    //         data[index][fieldToConceptIdMapping.shippingSite];
 
-        // button.dataset.lName = data[index].bags[Object.keys(data[index].bags)];
-        // button.dataset.sender = data[index]
-        console.log(index, button.dataset.site);
-        console.log(index, button.dataset.date);
-        console.log(index, button.dataset.location);
-        // console.log(index, button.dataset.fName);
-        console.log(
-            index,
-            data[index].bags[Object.keys(data[index].bags)] ??
-                data[index].bags[Object.keys(data[index].bags)]
-        );
-        // console.log(index, button.dataset.lastName);
-        console.log(index, data[index].bags[Object.keys(data[index].bags)]);
+    //     /*
+    // Add for loop/ for Each
+    // if (JSON.stringify(refusalObj) === '{}')
+    // Condition - If bag is empty skip
+    // */
+    //     button.dataset.firstName =
+    //         data[index].bags[Object.keys(data[index].bags)][
+    //             fieldToConceptIdMapping.shippingFirstName
+    //         ];
 
-        // data.forEach((i, index) => {
-        //   button.dataset.siteData = i[fieldToConceptIdMapping.shippingSite];
-        //   console.log(index, i[fieldToConceptIdMapping.shippingSite]);
-        // });
-    });
+    //     // button.dataset.lName = data[index].bags[Object.keys(data[index].bags)];
+    //     // button.dataset.sender = data[index]
+    //     console.log(index, button.dataset.site);
+    //     console.log(index, button.dataset.date);
+    //     console.log(index, button.dataset.location);
+    //     // console.log(index, button.dataset.fName);
+    //     console.log(
+    //         index,
+    //         data[index].bags[Object.keys(data[index].bags)] ??
+    //             data[index].bags[Object.keys(data[index].bags)]
+    //     );
+    //     // console.log(index, button.dataset.lastName);
+    //     console.log(index, data[index].bags[Object.keys(data[index].bags)]);
+
+    //     // data.forEach((i, index) => {
+    //     //   button.dataset.siteData = i[fieldToConceptIdMapping.shippingSite];
+    //     //   console.log(index, i[fieldToConceptIdMapping.shippingSite]);
+    //     // });
+    // });
     // debugger;
     // return;
+    Array.from(buttons).forEach((button, index) => {
+        // console.log(button);
+        let modalData = {
+            site: "",
+            date: "",
+            location: "",
+            namesArr,
+            sumSamplesArr,
+            bagSamplesArr,
+            bagIdArr,
+        };
+
+        // console.log(modalData);
+        modalData.site = allBoxes[index][shippingSite];
+        modalData.date = allBoxes[index][shippingShipDate];
+        modalData.location = allBoxes[index][shippingLocation];
+        button.dataset.modal = JSON.stringify(modalData);
+        console.log(JSON.parse(button.getAttribute("data-modal")));
+    });
 };
 
 // Convert utc in Seconds to readable Date
@@ -284,30 +356,6 @@ const convertTime = (time) => {
         minute: "2-digit",
     });
 };
-
-// console.log(convertTime());
-/* 
-STEPS FOR MANIFEST MODAL
-1. Add event listener to every manifest button
-    - Iterate over getElementsByClassName --> HTMLCollection
-2. Pass correct conceptId and values to be rendered on the manifest modal
-*/
-
-// let timeArr = [
-//     1623954231000,
-//     1630694257000,
-//     1631724080000,
-//     "",
-//     "",
-//     1623954230000,
-// ];
-
-// const loopTimeArr = (timeArr) => {
-//     timeArr.forEach((time) => {
-//         console.log(convertTime(time));
-//     });
-// };
-// loopTimeArr(timeArr);
 
 // Return an array of an item of grouped bags from GET request***
 const groupAllBags = (allBoxes) => {
@@ -337,12 +385,12 @@ const countSamplesArr = (bagsArr) => {
                 sampleNumber += bag[Object.keys(bag)[j]].arrElements.length;
 
                 if (j === Object.keys(bag).length - 1) {
-                    console.log(index, sampleNumber);
+                    // console.log(index, sampleNumber);
                     arrNumSamples.push(sampleNumber);
                 }
             }
         } else {
-            console.log(index, Object.keys(bag), "empty bag");
+            // console.log(index, Object.keys(bag), "empty bag");
             arrNumSamples.push(0);
         }
     });
