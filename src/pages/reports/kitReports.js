@@ -22,10 +22,9 @@ const kitReportsTemplate = async (username, auth, route) => {
     hideAnimation();
 
     const sortParticipantsArr = sortAllParticipants(allParticipants);
-    console.log(allParticipants);
-    console.log(sortParticipantsArr);
+    // console.log(sortParticipantsArr);
+    const allParticipantsActiveArr = allParticipantsActive(allParticipants);
     let template = "";
-
     template += kitReportsNavbar();
     template += ` 
               <div id="root root-margin" style="padding-top: 25px;">
@@ -34,7 +33,7 @@ const kitReportsTemplate = async (username, auth, route) => {
                   <div id="bptlKitPieChart"></div>
                   <div id="bptlKitBarChart"></div>
                   <div class="table-responsive">
-                    <div class="sticky-header" style="overflow:auto;">
+                    <div class="sticky-header" style="overflow:auto;margin-bottom:1rem;">
                             <table class="table table-bordered" id="packagesInTransitData" 
                                 style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
                                 <thead> 
@@ -44,7 +43,10 @@ const kitReportsTemplate = async (username, auth, route) => {
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Ship Date</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Participant Status</th>
                                     </tr>
-                                </thead>   
+                                </thead>
+                                <tbody>
+                                    ${createKitReportRows(sortParticipantsArr)}
+                                </tbody>
                         </div>
                     </div>
                 </div>
@@ -57,10 +59,10 @@ const kitReportsTemplate = async (username, auth, route) => {
     activeKitReportsNavbar();
     // await testPlotly();
     // console.log(bptlMetricsData);
-    plotly(bptlMetricsData);
+    plotly(bptlMetricsData, allParticipantsActiveArr);
 };
 
-const plotly = (bptlMertricsData) => {
+const plotly = (bptlMertricsData, allParticipantsActiveArr) => {
     const script = document.createElement("script");
     script.setAttribute("src", "https://cdn.plot.ly/plotly-latest.min.js");
     document.body.appendChild(script);
@@ -68,13 +70,13 @@ const plotly = (bptlMertricsData) => {
     script.addEventListener("load", function () {
         // Plotly loaded
         // console.log(Plotly);
-        renderPlotly(bptlMertricsData);
+        renderPlotly(bptlMertricsData, allParticipantsActiveArr);
     });
 };
 
-const renderPlotly = async (bptlMertricsData) => {
+const renderPlotly = async (bptlMertricsData, allParticipantsActiveArr) => {
     await bptlMetricsPieChart(bptlMertricsData);
-    await bptlMetricsBarChart(bptlMertricsData);
+    await bptlMetricsBarChart(allParticipantsActiveArr);
 };
 
 const bptlMetricsPieChart = (bptlMetricsData) => {
@@ -116,19 +118,47 @@ const bptlMetricsPieChart = (bptlMetricsData) => {
     Plotly.newPlot("bptlKitPieChart", data, layout, config);
 };
 
-const bptlMetricsBarChart = () => {
+const bptlMetricsBarChart = (allParticipantsActiveArr) => {
     //   const bptlBarChart = document.getElementById("bptlKitPieChart");
     const data = [
         {
             type: "bar",
-            x: [0, 1, 3, 5, 7, 9, 11, 13, 15],
-            y: [60, 50, 45, 30, 40, 30, 34],
+            x: [],
+            y: [],
             marker: {
                 color: "rgb(49,130,189)",
                 opacity: 0.7,
             },
         },
     ];
+
+    let countUniqueValuesArr = [];
+    for (let key in uniqueDaysElapsedObj(allParticipantsActiveArr)) {
+        countUniqueValuesArr.push(
+            uniqueDaysElapsedObj(allParticipantsActiveArr)[key]
+        );
+    }
+    // console.log(countUniqueValuesArr);
+
+    countUniqueValuesArr.reverse().forEach((i) => {
+        data[0].y.push(i);
+    });
+    // data[0].y.countUniqueValuesArr.reverse();
+
+    // console.log(countUniqueValuesArr);
+
+    //Reverse array items and push to x array
+    Object.keys(uniqueDaysElapsedObj(allParticipantsActiveArr))
+        .reverse()
+        .forEach((i) => {
+            data[0].x.push(i);
+        });
+    // console.log(data);
+    // uniqueDaysElapsed(allParticipantsActiveArr);
+    // uniqueDaysElapsed(allParticipantsActiveArr).forEach((num) =>
+    //     data[0].x.push(num)
+    // );
+
     const layout = {
         height: 400,
         width: 400,
@@ -231,16 +261,76 @@ const sortAllParticipants = (allParticipants) => {
     );
 };
 
+const allParticipantsActive = (allParticipants) => {
+    const participantsActive = allParticipants.filter(
+        (element) => element["participation_status"] === "active"
+    );
+
+    const participantsActiveSortDateAsc = participantsActive.sort((a, b) =>
+        a.time_stamp < b.time_stamp ? -1 : a.time_stamp > b.time_stamp ? 1 : 0
+    );
+    return participantsActiveSortDateAsc;
+};
+
 /*
 ==================================================
 UTIL FUNCTIONS 
 ==================================================
 */
 
+const createKitReportRows = (participantRows) => {
+    let template = ``;
+    participantRows.forEach((item) => {
+        template += `
+                        <tr class="row-color-enrollment-dark participantRow">
+                            <td style="text-align:center;">${daysBetween(
+                                item.time_stamp
+                            )}</td>
+                            <td style="text-align:center;">${
+                                item.usps_trackingNum
+                            }</td>
+                            <td style="text-align:center;">${convertTime(
+                                item.time_stamp
+                            )}</td>
+                            <td style="text-align:center;">${
+                                item.participation_status
+                            }</td>
+                        </tr>`;
+    });
+    return template;
+};
+
+const uniqueDaysElapsedObj = (allParticipantsActiveArr) => {
+    let daysElapsedArr = [];
+    allParticipantsActiveArr.forEach((item) => {
+        daysElapsedArr.push(daysBetween(item.time_stamp));
+    });
+    // console.log(daysElapsedArr);
+    // return Array.from(new Set(daysElapsedArr));
+    const countObj = daysElapsedArr.reduce(
+        (acc, value) => ({
+            ...acc,
+            [value]: (acc[value] || 0) + 1,
+        }),
+        {}
+    );
+    return countObj;
+};
+
+// const counts = arr.reduce((acc, value) => ({
+//    ...acc,
+//    [value]: (acc[value] || 0) + 1
+// }), {});
+
+// console.log(counts);
+
 // Calculate Number of days between current date and date provided
-const daysBetween = (date1String) => {
-    var d1 = new Date(date1String);
-    var d2 = new Date().toISOString();
+const daysBetween = (
+    date1String,
+    date2String = new Date().toISOString().toLocaleString()
+) => {
+    const d1 = new Date(date1String);
+    const d2 = new Date(date2String);
     return Math.floor((d2 - d1) / (1000 * 3600 * 24));
 };
 
