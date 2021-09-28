@@ -218,7 +218,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
             let parsedModalData = JSON.parse(
                 e.target.getAttribute("data-modal")
             );
-            console.log(parsedModalData);
+
             let {
                 site,
                 date,
@@ -228,7 +228,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                 bagSamplesArr,
                 bagIdArr,
             } = parsedModalData;
-
+            console.log(parsedModalData);
             // console.log(bagIdArr);
             // console.log(index, namesArr, namesArr[index]);
             // console.log(site);
@@ -269,7 +269,12 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                     </tr>
                 </thead>
                 <tbody>
-                    ${addManifestTableRows(bagIdArr, sumSamplesArr, index)}
+                    ${addManifestTableRows(
+                        bagIdArr,
+                        sumSamplesArr,
+                        bagSamplesArr,
+                        index
+                    )}
                 </tbody>
             </table>
             </div>
@@ -411,7 +416,12 @@ const groupBagIdArr = (bagsArr) => {
     return arrBagId;
 };
 
-const addManifestTableRows = (bagIdArr, sumSamplesArr, index) => {
+const addManifestTableRows = (
+    bagIdArr,
+    sumSamplesArr,
+    bagSamplesArr,
+    index
+) => {
     // console.log(index, bagIdArr[index].length);
     // console.log(bagIdArr[index].length === 0);
     let manifestBody = ``;
@@ -421,24 +431,21 @@ const addManifestTableRows = (bagIdArr, sumSamplesArr, index) => {
 
         return manifestBody;
     } else {
-        console.log(bagIdArr[index].length);
-        console.log(sumSamplesArr);
+        // console.log(bagIdArr[index].length);
+        // console.log(bagIdArr);
         bagIdArr[index].forEach((id, indexNum) => {
             // If the current index of the bagIds is 0 insert # of samples
+            console.log(indexNum);
             if (indexNum === 0) {
                 rows += `<tr>
                 <td style="text-align:center">
                 <p>${sumSamplesArr ? sumSamplesArr[index] : "N/A"}</p>
                 </td>
                 <td style="text-align:center">
-                <p>CXA111111 0008</p>
+                <p>${id ? id : "N//A"}</p>
                 </td>
                 <td style="text-align:center">
-                    <p>CXA111111 0001</p>
-                    <p>CXA111111 0002
-                    </p>
-                    <p>CXA111111 0003</p>
-                    <p>CXA111111 0006</p>
+                    ${insertSamples(bagSamplesArr, indexNum)}
                 </td>
                 </tr>`;
             } else {
@@ -447,14 +454,10 @@ const addManifestTableRows = (bagIdArr, sumSamplesArr, index) => {
                 <p></p>
                 </td>
                 <td style="text-align:center">
-                <p>CXA111111 0008</p>
+                <p>${id ? id : "N/A"}</p>
                 </td>
                 <td style="text-align:center">
-                    <p>CXA111111 0001</p>
-                    <p>CXA111111 0002
-                    </p>
-                    <p>CXA111111 0003</p>
-                    <p>CXA111111 0006</p>
+                ${insertSamples(bagSamplesArr, indexNum)}
                 </td>
                 </tr>`;
             }
@@ -464,33 +467,26 @@ const addManifestTableRows = (bagIdArr, sumSamplesArr, index) => {
     }
 };
 
-// <tr>
-// <td style="text-align:center">
-// <p>Box3</p>
-// </td>
-// <td style="text-align:center">
-// <p>CXA111111 0008</p>
-// </td>
-// <td style="text-align:center">
-//     <p>CXA111111 0001</p>
-//     <p>CXA111111 0002
-//     </p>
-//     <p>CXA111111 0003</p>
-//     <p>CXA111111 0006</p>
-// </td>
-// </tr>
-// <tr>
-// <td style="text-align:center">
-// <p>Box3 </p>
-// </td>
-// <td style="text-align:center">
-// <p>CXA111111 0008</p>
-// </td>
-// <td style="text-align:center">
-//     <p>CXA111111 0001</p>
-//     <p>CXA111111 0002
-//     </p>
-//     <p>CXA111111 0003</p>
-//     <p>CXA111111 0006</p>
-// </td>
-// </tr>
+const insertSamples = (bagSamplesArr, indexNum) => {
+    let samples = ``;
+    console.log(bagSamplesArr);
+    for (let i = 0; i < bagSamplesArr.length; i++) {
+        // console.log(bagSamplesArr[i], bagSamplesArr[i].length);
+        if (bagSamplesArr[i].length === 1) {
+            bagSamplesArr[i].forEach((sample, num) => {
+                // console.log("index", num, sample[num]);
+                samples += `<p>${sample[num]}</p>`;
+            });
+            // console.log(samples);
+            return samples;
+        }
+        for (let j = 0; j < bagSamplesArr[i].length; j++) {
+            // console.log(i, j, bagSamplesArr[i][j]);
+            // bagSamplesArr[i][j].forEach((sample) => {
+            //     sample += `<p>${sample}<p>`;
+            // });
+        }
+    }
+    // console.log(samples);
+    return samples;
+};

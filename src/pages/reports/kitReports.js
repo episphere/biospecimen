@@ -18,7 +18,12 @@ export const kitReportsScreen = async (auth, route) => {
 const kitReportsTemplate = async (username, auth, route) => {
     showAnimation();
     const bptlMetricsData = await getBPTLMetrics();
+    const allParticipants = await getAllParticipants();
     hideAnimation();
+
+    const sortParticipantsArr = sortAllParticipants(allParticipants);
+    console.log(allParticipants);
+    console.log(sortParticipantsArr);
     let template = "";
 
     template += kitReportsNavbar();
@@ -172,4 +177,86 @@ const getBPTLMetrics = async () => {
 
     const responseObj = await response.json().then((data) => data);
     return responseObj.data[0];
+};
+
+const getBPTLMetricsShipped = async () => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=bptlMetricsShipped`, {
+        method: "GET",
+        headers: {
+            Authorization: "Bearer" + idToken,
+            "Content-Type": "application/json",
+        },
+    }).catch((e) => console.log(e));
+    const responseObj = await response.json().then((data) => data);
+    return responseObj.data;
+};
+
+const getAllParticipants = async () => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=getParticipantSelection&type=all`, {
+        method: "GET",
+        headers: {
+            Authorization: "Bearer" + idToken,
+            "Content-Type": "application/json",
+        },
+    }).catch((e) => console.log(e));
+    const responseObj = await response.json().then((data) => data);
+    return responseObj.data;
+};
+
+const sortAllParticipants = (allParticipants) => {
+    const participantsActive = allParticipants.filter(
+        (element) => element["participation_status"] === "active"
+    );
+    const participantsWithdrawal = allParticipants.filter(
+        (element) => element["participation_status"] === "withdraw"
+    );
+
+    const participantsActiveSortDateAsc = participantsActive.sort((a, b) =>
+        a.time_stamp < b.time_stamp ? -1 : a.time_stamp > b.time_stamp ? 1 : 0
+    );
+    const participantsWithdrawalSortDateAsc = participantsWithdrawal.sort(
+        (a, b) =>
+            a.time_stamp < b.time_stamp
+                ? -1
+                : a.time_stamp > b.time_stamp
+                ? 1
+                : 0
+    );
+
+    // MERGE BOTH ARRAYS
+    return participantsActiveSortDateAsc.concat(
+        participantsWithdrawalSortDateAsc
+    );
+};
+
+/*
+==================================================
+UTIL FUNCTIONS 
+==================================================
+*/
+
+// Calculate Number of days between current date and date provided
+const daysBetween = (date1String) => {
+    var d1 = new Date(date1String);
+    var d2 = new Date().toISOString();
+    return Math.floor((d2 - d1) / (1000 * 3600 * 24));
+};
+
+const convertTime = (time) => {
+    if (!time) {
+        return "";
+    }
+    let utcSeconds = time;
+    let myDate = new Date(utcSeconds);
+    const dateAndTime = myDate.toLocaleString("en-us", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+    const date = dateAndTime.split(",")[0];
+    return date;
 };
