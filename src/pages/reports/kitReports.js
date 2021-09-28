@@ -22,7 +22,7 @@ const kitReportsTemplate = async (username, auth, route) => {
     hideAnimation();
 
     const sortParticipantsArr = sortAllParticipants(allParticipants);
-    // console.log(sortParticipantsArr);
+    console.log(sortParticipantsArr);
     const allParticipantsActiveArr = allParticipantsActive(allParticipants);
     let template = "";
     template += kitReportsNavbar();
@@ -39,8 +39,8 @@ const kitReportsTemplate = async (username, auth, route) => {
                                 <thead> 
                                     <tr style="top: 0; position: sticky;">
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Days Out</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Tracking Number</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Ship Date</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Kit ID</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Participant Status</th>
                                     </tr>
                                 </thead>
@@ -57,8 +57,6 @@ const kitReportsTemplate = async (username, auth, route) => {
     document.getElementById("navbarNavAltMarkup").innerHTML =
         nonUserNavBar(username);
     activeKitReportsNavbar();
-    // await testPlotly();
-    // console.log(bptlMetricsData);
     plotly(bptlMetricsData, allParticipantsActiveArr);
 };
 
@@ -286,12 +284,12 @@ const createKitReportRows = (participantRows) => {
                             <td style="text-align:center;">${daysBetween(
                                 item.time_stamp
                             )}</td>
-                            <td style="text-align:center;">${
-                                item.usps_trackingNum
-                            }</td>
                             <td style="text-align:center;">${convertTime(
                                 item.time_stamp
                             )}</td>
+                            <td style="text-align:center;">${
+                                item.supply_kitId
+                            }</td>
                             <td style="text-align:center;">${
                                 item.participation_status
                             }</td>
