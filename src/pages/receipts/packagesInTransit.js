@@ -210,6 +210,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
             sumSamplesArr,
             bagSamplesArr,
             bagIdArr,
+            groupSamples: "",
         };
 
         // console.log(modalData);
@@ -217,12 +218,14 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
         modalData.date = allBoxes[index][shippingShipDate];
         modalData.location = allBoxes[index][shippingLocation];
         modalData.boxNumber = allBoxes[index][shippingBoxId];
+        modalData.groupSamples = bagSamplesArr[index];
         // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
         button.dataset.buttonIndex = `manifest-button-${index}`;
         // console.log(JSON.parse(button.getAttribute("data-modal")));
         // let parsedModalData = JSON.parse(button.getAttribute("data-modal"));
         // manifestContent(parsedModalData, manifestModalBodyEl, index);
+        console.log(modalData.groupSamples);
         button.addEventListener("click", (e) => {
             // console.log(e.target.getAttribute("data-modal"));
             let parsedModalData = JSON.parse(
@@ -238,6 +241,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                 sumSamplesArr,
                 bagSamplesArr,
                 bagIdArr,
+                groupSamples,
             } = parsedModalData;
 
             let modalBody = `<div class="container-fluid">
@@ -281,7 +285,8 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                         boxNumber,
                         bagIdArr,
                         bagSamplesArr,
-                        index
+                        index,
+                        groupSamples
                     )}
                 </tbody>
             </table>
@@ -424,7 +429,13 @@ const groupBagIdArr = (bagsArr) => {
     return arrBagId;
 };
 
-const addManifestTableRows = (boxNumber, bagIdArr, bagSamplesArr, index) => {
+const addManifestTableRows = (
+    boxNumber,
+    bagIdArr,
+    bagSamplesArr,
+    index,
+    groupSamples
+) => {
     // console.log(index, bagIdArr[index].length);
     // console.log(bagIdArr[index].length === 0);
     let manifestBody = ``;
@@ -448,7 +459,7 @@ const addManifestTableRows = (boxNumber, bagIdArr, bagSamplesArr, index) => {
                 <p>${id ? id : "N//A"}</p>
                 </td>
                 <td style="text-align:center">
-                    ${insertSamples(bagSamplesArr, indexNum, bagIdArr)}
+                    ${groupSamples[indexNum].toString().replaceAll(",", `<br>`)}
                 </td>
                 </tr>`;
             } else {
@@ -460,7 +471,7 @@ const addManifestTableRows = (boxNumber, bagIdArr, bagSamplesArr, index) => {
                 <p>${id ? id : "N/A"}</p>
                 </td>
                 <td style="text-align:center">
-                ${insertSamples(bagSamplesArr, indexNum, bagIdArr)}
+                ${groupSamples[indexNum].toString().replaceAll(",", `<br>`)}
                 </td>
                 </tr>`;
             }
@@ -495,7 +506,7 @@ const insertSamples = (bagSamplesArr, indexNum, bagIdArr) => {
                 bagSamplesArr[i][j].length
             );
             if (bagSamplesArr[i].length === 1) {
-                // console.log(bagSamplesArr[i][j].length);
+                console.log(bagSamplesArr[i][j]);
                 console.log("true 1 length");
             } else {
                 console.log("false more than 1 length");
