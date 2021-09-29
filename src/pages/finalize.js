@@ -49,7 +49,7 @@ export const finalizeTemplate = (data, specimenData) => {
                             <td>${obj.collectionChkBox === true ? `${specimenData[`${obj.concept}`]['593843561'] === 353358909 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>'}` : ``}</td>
                             <td>${specimenData[`${obj.concept}`]['593843561'] === 353358909 ? `${specimenData[`${obj.concept}`]['825582494']}` : '' }</td>
                             <td>${obj.deviationChkBox === true ? `${specimenData[`${obj.concept}`]['678857215'] === 353358909 ? 'Yes' : 'No'}`: ``}</td>
-                            <td class="deviation-comments-width">${specimenData[`${obj.concept}`]['248868659'] ? specimenData[`${obj.concept}`]['248868659'].map(concept => obj.deviationOptions.filter(dt => dt.concept === concept)[0]) : ''}</td>
+                            <td class="deviation-comments-width">${specimenData[`${obj.concept}`]['248868659'] ? specimenData[`${obj.concept}`]['248868659'].map(concept => obj.deviationOptions.filter(dt => dt.concept === concept)[0].label) : ''}</td>
                             <td class="deviation-comments-width">${specimenData[`${obj.concept}`]['248868659'] ? specimenData[`${obj.concept}`]['248868659'].map(concept => obj.deviationOptions.filter(dt => dt.concept === concept)[0].label) : ''}</td>
                         </tr>
                     `
