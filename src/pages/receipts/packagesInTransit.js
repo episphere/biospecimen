@@ -31,6 +31,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Ship Date</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Tracking Number</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipped from (Site)</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipment Submitted</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Expected Number of Samples</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Manifest</th>
                                     </tr>
@@ -160,6 +161,16 @@ const createPackagesInTransitRows = (response) => {
                       }</td>
                       <td style="text-align:center;">${
                           i.siteAcronym ? i.siteAcronym : "N/A"
+                      }</td>
+                      <td style="text-align:center;">${
+                          i[fieldToConceptIdMapping.submitShipmentFlag]
+                              ? shipmentSubmittedStatus(
+                                    i[
+                                        fieldToConceptIdMapping
+                                            .submitShipmentFlag
+                                    ]
+                                )
+                              : "N/A"
                       }</td>
                       <td style="text-align:center;">${
                           sumSamplesArr[index]
@@ -489,8 +500,21 @@ const insertSamples = (bagSamplesArr, indexNum) => {
     return samples;
 };
 
+const shipmentSubmittedStatus = (booleanValue) => {
+    let { booleanZero, booleanOne } = fieldToConceptIdMapping;
+    const convertBoolToNumType = parseInt(booleanValue);
+    if (convertBoolToNumType === booleanZero) {
+        return "No";
+    } else if (convertBoolToNumType === booleanOne) {
+        return "Yes";
+    } else {
+        return "N/A";
+    }
+};
 /*
 TODO:
 
 1. PASS BOX NUMBER INTO DATA 
+2. 
+
 */

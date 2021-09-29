@@ -11,6 +11,8 @@ export default {
     city: 703385619,
     state: 634434746,
     zip: 892050548,
+    booleanZero: 104430631,
+    booleanOne: 353358909,
     verficationDate: 914594314,
     submitShipmentFlag: 145971562,
     shippingShipDateModify: 555611076,
