@@ -1809,8 +1809,38 @@ const btnsClicked = async (connectId, formData, cont) => {
 
     if(document.getElementById('collectionLocation')) formData[getWorflow() === 'research' ? '951355211' : '525480516'] = parseInt(document.getElementById('collectionLocation').value);
     const collectionID = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
-    const r = confirm(`Is the Collection ID - ${collectionID} correct for the participant?`);
-    if(!r) return;
+    const n = document.getElementById('399159511').innerText || ""
+    const confirmVal = await swal({
+        title:"Confirm Changes", 
+        icon:"info",
+        text:`Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n || ""}`,
+         buttons: {
+             cancel: {
+                 text: "Cancel",
+                 value: "cancel",
+                 visible: true,
+                 className: "btn btn-default",
+                 closeModal: true,
+               },
+               back: {
+                 text: "Confirm and exit",
+                 value: "back",
+                 visible: true,
+                 className: "btn btn-info",
+               },
+               confirm: {
+                 text: "Confirm and continue",
+                 value: 'confirmed',
+                 visible: true,
+                 className: "",
+                 closeModal: true,
+                 className: "btn btn-success",
+               }
+           },
+       });
+ 
+    if(confirmVal === "cancel") return;
+
     formData['820476880'] = collectionID;
     formData['650516960'] = getWorflow() === 'research' ? 534621077 : 664882224;
     if(enterSpecimenID1) formData['387108065'] = 353358909
@@ -1833,7 +1863,7 @@ const btnsClicked = async (connectId, formData, cont) => {
         return;
     }
 
-    if(cont) {
+    if(cont && confirmVal == "confirmed") {
         showAnimation();
         await storeSpecimen([formData]);
         const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
