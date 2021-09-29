@@ -159,9 +159,7 @@ const createPackagesInTransitRows = (response) => {
                               : "N/A"
                       }</td>
                       <td style="text-align:center;">${
-                          i[fieldToConceptIdMapping.shippingSite]
-                              ? i[fieldToConceptIdMapping.shippingSite]
-                              : "N/A"
+                          i.siteAcronym ? i.siteAcronym : "N/A"
                       }</td>
                       <td style="text-align:center;">${
                           sumSamplesArr[index]

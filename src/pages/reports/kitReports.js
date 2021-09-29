@@ -32,6 +32,7 @@ const kitReportsTemplate = async (username, auth, route) => {
                 <div class="container-fluid">
                   <div id="bptlKitPieChart"></div>
                   <div id="bptlKitBarChart"></div>
+                  <h3 style="margin:1rem 0; text-align:center;">Outstanding Kits</h3>
                   <div class="table-responsive">
                     <div class="sticky-header" style="overflow:auto;margin-bottom:1rem;">
                             <table class="table table-bordered" id="packagesInTransitData" 
