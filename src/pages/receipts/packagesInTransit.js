@@ -30,7 +30,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                                     <tr style="top: 0; position: sticky;">
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Ship Date</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Tracking Number</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipped from (Site)</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipped from Site</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipment Submitted</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Expected Number of Samples</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Manifest</th>
@@ -63,9 +63,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
         nonUserNavBar(username);
     activeReceiptsNavbar();
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");
-    console.log(manifestModalBodyEl);
-    // response.data ? console.log(true) : console.log(false);
-    // manifestButton();
+
     // console.log(response.data);
     const allBoxes = response.data;
     // console.log("allBoxes", allBoxes);
@@ -241,11 +239,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                 bagSamplesArr,
                 bagIdArr,
             } = parsedModalData;
-            console.log(parsedModalData);
-            console.log(boxNumber);
-            // console.log(bagIdArr);
-            // console.log(index, namesArr, namesArr[index]);
-            // console.log(site);
+
             let modalBody = `<div class="container-fluid">
             <div class="row">
                 <div class="col-md-4">
@@ -441,10 +435,10 @@ const addManifestTableRows = (boxNumber, bagIdArr, bagSamplesArr, index) => {
         return manifestBody;
     } else {
         console.log(bagIdArr[index].length);
-        console.log(bagIdArr);
+        // console.log(bagIdArr);
         bagIdArr[index].forEach((id, indexNum) => {
             // If the current index of the bagIds is 0 insert # of samples
-            console.log(indexNum);
+            // console.log("index Number", indexNum);
             if (indexNum === 0) {
                 rows += `<tr>
                 <td style="text-align:center">
@@ -454,7 +448,7 @@ const addManifestTableRows = (boxNumber, bagIdArr, bagSamplesArr, index) => {
                 <p>${id ? id : "N//A"}</p>
                 </td>
                 <td style="text-align:center">
-                    ${insertSamples(bagSamplesArr, indexNum)}
+                    ${insertSamples(bagSamplesArr, indexNum, bagIdArr)}
                 </td>
                 </tr>`;
             } else {
@@ -466,7 +460,7 @@ const addManifestTableRows = (boxNumber, bagIdArr, bagSamplesArr, index) => {
                 <p>${id ? id : "N/A"}</p>
                 </td>
                 <td style="text-align:center">
-                ${insertSamples(bagSamplesArr, indexNum)}
+                ${insertSamples(bagSamplesArr, indexNum, bagIdArr)}
                 </td>
                 </tr>`;
             }
@@ -476,30 +470,47 @@ const addManifestTableRows = (boxNumber, bagIdArr, bagSamplesArr, index) => {
     }
 };
 
-const insertSamples = (bagSamplesArr, indexNum) => {
+const insertSamples = (bagSamplesArr, indexNum, bagIdArr) => {
     let samples = ``;
-    console.log(bagSamplesArr);
+    let currentArr = [];
+    console.log(bagIdArr);
+    // console.log("indexNum", indexNum);
+    // console.log(bagSamplesArr.length);
+    // console.log(bagSamplesArr[0]);
+    // console.log(bagSamplesArr[1]);
+    // console.log(bagSamplesArr[2]);
+    // console.log(bagSamplesArr[3]);
+    // console.log(bagSamplesArr[4]);
+    // console.log(bagSamplesArr[5]);
     for (let i = 0; i < bagSamplesArr.length; i++) {
-        // console.log(bagSamplesArr[i], bagSamplesArr[i].length);
-        if (bagSamplesArr[i].length === 1) {
-            bagSamplesArr[i].forEach((sample, num) => {
-                // console.log("index", num, sample[num]);
-                samples += `<p>${sample[num]}</p>`;
+        // console.log("i loop", i);
+        // console.log(bagSamplesArr[i]);
+        for (let j = 0; j < bagIdArr[i].length; j++) {
+            // console.log("j loop");
+            // console.log(bagSamplesArr[i][j]);
+            console.log(
+                "bag id limiter",
+                bagSamplesArr[i],
+                bagSamplesArr[i].length,
+                bagSamplesArr[i][j].length
+            );
+            if (bagSamplesArr[i].length === 1) {
+                // console.log(bagSamplesArr[i][j].length);
+                console.log("true 1 length");
+            } else {
+                console.log("false more than 1 length");
+            }
+            // console.log(bagSamplesArr[i][j].length);
+            bagSamplesArr[i][j].forEach((sample) => {
+                // console.log(sample);
+                // samples += `<p>${sample}</p>`;
             });
-            // console.log(samples);
-            return samples;
-        }
-        for (let j = 0; j < bagSamplesArr[i].length; j++) {
-            // console.log(i, j, bagSamplesArr[i][j]);
-            // bagSamplesArr[i][j].forEach((sample) => {
-            //     sample += `<p>${sample}<p>`;
-            // });
         }
     }
-    // console.log(samples);
     return samples;
 };
 
+// Returns Shipment Submitted Boolean Value --> Yes or No
 const shipmentSubmittedStatus = (booleanValue) => {
     let { booleanZero, booleanOne } = fieldToConceptIdMapping;
     const convertBoolToNumType = parseInt(booleanValue);
@@ -511,10 +522,48 @@ const shipmentSubmittedStatus = (booleanValue) => {
         return "N/A";
     }
 };
-/*
-TODO:
 
-1. PASS BOX NUMBER INTO DATA 
-2. 
+// // console.log("bagSamplesArr", bagSamplesArr[i]);
+// console.log("loop", i);
+// if (bagSamplesArr[i].length === 1) {
+//     // console.log("bagSamples i", bagSamplesArr[i], "indexNum", indexNum);
+//     // console.log(
+//     //     "bagSamples ii",
+//     //     bagSamplesArr[indexNum],
+//     //     "indexNum",
+//     //     indexNum
+//     // );
+//     console.log(i);
+//     // console.log(bagSamplesArr[i]);
 
-*/
+//     // bagSamplesArr[i][indexNum].forEach((sample, num) => {
+//     //     // console.log("index", num, sample);
+
+//     //     samples += `<p>${sample}</p>`;
+//     //     // console.log("sample", sample);
+//     // });
+//     // console.log(samples);
+//     // debugger;
+//     // return samples;
+// }
+// // debugger;
+
+// // console.log("bag Samples Arr", indexNum);
+// // for (let i = 0; i < bagSamplesArr.length; i++) {
+// //     // console.log(bagSamplesArr[i], bagSamplesArr[i].length);
+// //     if (bagSamplesArr[i].length === 1) {
+// //         bagSamplesArr[i].forEach((sample, num) => {
+// //             // console.log("index", num, sample[num]);
+// //             samples += `<p>${sample[num]}</p>`;
+// //         });
+// //         // console.log(samples);
+// //         return samples;
+// //     }
+// //     for (let j = 0; j < bagSamplesArr[i].length; j++) {
+// //         // console.log(i, j, bagSamplesArr[i][j]);
+// //         // bagSamplesArr[i][j].forEach((sample) => {
+// //         //     sample += `<p>${sample}<p>`;
+// //         // });
+// //     }
+// // }
+// // console.log(samples);
