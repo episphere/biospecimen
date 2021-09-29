@@ -186,9 +186,10 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
 
     const { sumSamplesArr, bagSamplesArr, namesArr, bagIdArr } = dataObj;
 
-    const { shippingSite, shippingShipDate, shippingLocation } =
+    const { shippingShipDate, shippingLocation, shippingBoxId } =
         fieldToConceptIdMapping;
 
+    console.log(allBoxes);
     Array.from(buttons).forEach((button, index) => {
         // console.log(button);
         let modalData = {
@@ -196,15 +197,17 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
             date: "",
             location: "",
             namesArr,
+            boxNumber: "",
             sumSamplesArr,
             bagSamplesArr,
             bagIdArr,
         };
 
         // console.log(modalData);
-        modalData.site = allBoxes[index][shippingSite];
+        modalData.site = allBoxes[index].siteAcronym;
         modalData.date = allBoxes[index][shippingShipDate];
         modalData.location = allBoxes[index][shippingLocation];
+        modalData.boxNumber = allBoxes[index][shippingBoxId];
         // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
         button.dataset.buttonIndex = `manifest-button-${index}`;
@@ -222,11 +225,13 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                 date,
                 location,
                 namesArr,
+                boxNumber,
                 sumSamplesArr,
                 bagSamplesArr,
                 bagIdArr,
             } = parsedModalData;
             console.log(parsedModalData);
+            console.log(boxNumber);
             // console.log(bagIdArr);
             // console.log(index, namesArr, namesArr[index]);
             // console.log(site);
@@ -247,7 +252,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                     </p>
                 </div>
                 <div class="col-md-4 ml-auto">
-                    <p>Location:${location ? location : "N/A"}</p>
+                    <p>Location: ${location ? location : "N/A"}</p>
                 </div>
             </div>
             <div class="row">
@@ -268,8 +273,8 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                 </thead>
                 <tbody>
                     ${addManifestTableRows(
+                        boxNumber,
                         bagIdArr,
-                        sumSamplesArr,
                         bagSamplesArr,
                         index
                     )}
@@ -414,12 +419,7 @@ const groupBagIdArr = (bagsArr) => {
     return arrBagId;
 };
 
-const addManifestTableRows = (
-    bagIdArr,
-    sumSamplesArr,
-    bagSamplesArr,
-    index
-) => {
+const addManifestTableRows = (boxNumber, bagIdArr, bagSamplesArr, index) => {
     // console.log(index, bagIdArr[index].length);
     // console.log(bagIdArr[index].length === 0);
     let manifestBody = ``;
@@ -429,15 +429,15 @@ const addManifestTableRows = (
 
         return manifestBody;
     } else {
-        // console.log(bagIdArr[index].length);
-        // console.log(bagIdArr);
+        console.log(bagIdArr[index].length);
+        console.log(bagIdArr);
         bagIdArr[index].forEach((id, indexNum) => {
             // If the current index of the bagIds is 0 insert # of samples
             console.log(indexNum);
             if (indexNum === 0) {
                 rows += `<tr>
                 <td style="text-align:center">
-                <p>${sumSamplesArr ? sumSamplesArr[index] : "N/A"}</p>
+                <p>${boxNumber ? boxNumber.replace("Box", "") : "N/A"}</p>
                 </td>
                 <td style="text-align:center">
                 <p>${id ? id : "N//A"}</p>
@@ -488,3 +488,9 @@ const insertSamples = (bagSamplesArr, indexNum) => {
     // console.log(samples);
     return samples;
 };
+
+/*
+TODO:
+
+1. PASS BOX NUMBER INTO DATA 
+*/
