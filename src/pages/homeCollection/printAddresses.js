@@ -12,6 +12,7 @@ import {
     fakeParticipants,
     printAddressesParticipants,
 } from "./fakeParticipants.js";
+import { activeHomeCollectionNavbar } from "./activehomeCollectionNavbar.js";
 
 // Stringify array of objects and parse fake participants Data
 const fakeParticipantsData = JSON.parse(JSON.stringify(fakeParticipants));
@@ -73,6 +74,7 @@ const printaddressesTemplate = async (
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML =
         nonUserNavBar(name);
+    activeHomeCollectionNavbar()
     generateParticipantCsvGetter();
     participantSelectionDropdown();
 };

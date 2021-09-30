@@ -22,7 +22,6 @@ const kitReportsTemplate = async (username, auth, route) => {
     hideAnimation();
 
     const sortParticipantsArr = sortAllParticipants(allParticipants);
-    console.log(sortParticipantsArr);
     const allParticipantsActiveArr = allParticipantsActive(allParticipants);
     let template = "";
     // style="display:flex; justify-content:center; align-items:center;"
@@ -92,17 +91,14 @@ const bptlMetricsPieChart = (bptlMetricsData) => {
     ];
 
     for (let key in bptlMetricsData) {
-        console.log("key",key)
-        console.log("metrics bptl",bptlMetricsData);
         
         if (key === "addressPrinted") {
             data[0].labels.push(`${key.replaceAll("addressPrinted","Address Printed")} - ${bptlMetricsData[key]}`);
         }
         else { 
-                data[0].labels.push(`${capitalizeFirstLetter(key)} - ${bptlMetricsData[key]}`);
+            data[0].labels.push(`${capitalizeFirstLetter(key)} - ${bptlMetricsData[key]}`);
         }
         data[0].values.push(bptlMetricsData[key]);
-        // console.log(bptlMetricsData);
     }
 
     const layout = {
@@ -138,14 +134,11 @@ const bptlMetricsBarChart = (allParticipantsActiveArr) => {
             uniqueDaysElapsedObj(allParticipantsActiveArr)[key]
         );
     }
-    // console.log(countUniqueValuesArr);
 
     countUniqueValuesArr.reverse().forEach((i) => {
         data[0].y.push(i);
     });
-    // data[0].y.countUniqueValuesArr.reverse();
 
-    // console.log(countUniqueValuesArr);
 
     //Reverse array items and push to x array
     Object.keys(uniqueDaysElapsedObj(allParticipantsActiveArr))
@@ -296,8 +289,7 @@ const uniqueDaysElapsedObj = (allParticipantsActiveArr) => {
     allParticipantsActiveArr.forEach((item) => {
         daysElapsedArr.push(daysBetween(item.time_stamp));
     });
-    // console.log(daysElapsedArr);
-    // return Array.from(new Set(daysElapsedArr));
+    
     const countObj = daysElapsedArr.reduce(
         (acc, value) => ({
             ...acc,
