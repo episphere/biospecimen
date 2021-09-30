@@ -8,7 +8,7 @@ import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.
 import { fakeParticipantsState } from "./printAddresses.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-import { activeHomeCollectionNavbar } from "./activehomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
 export const addressesPrintedScreen = async (auth, route) => {
   const user = auth.currentUser;
