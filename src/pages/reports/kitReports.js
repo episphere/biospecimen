@@ -25,16 +25,20 @@ const kitReportsTemplate = async (username, auth, route) => {
     console.log(sortParticipantsArr);
     const allParticipantsActiveArr = allParticipantsActive(allParticipants);
     let template = "";
+    // style="display:flex; justify-content:center; align-items:center;"
     template += kitReportsNavbar();
     template += ` 
               <div id="root root-margin" style="padding-top: 25px;">
                 <h3 style="text-align: center; margin: 1rem 0;">Reports Screen</h3>
                 <div class="container-fluid">
-                  <div id="bptlKitPieChart"></div>
-                  <div id="bptlKitBarChart"></div>
+                  <div class="d-flex flex-lg-row justify-content-lg-center align-items-lg-center flex-md-column justify-content-md-center align-items-md-center flex-sm-column justify-content-sm-center align-items-sm-center">
+                    <div id="bptlKitPieChart"></div>
+                    <div id="bptlKitBarChart"></div>
+                  </div>
+                  
                   <h3 style="margin:1rem 0; text-align:center;">Outstanding Kits</h3>
                   <div class="table-responsive">
-                    <div class="sticky-header" style="overflow:auto;margin-bottom:1rem;">
+                    <div class="sticky-header" style="overflow:auto;margin-bottom:1rem; height:45vh;">
                             <table class="table table-bordered" id="packagesInTransitData" 
                                 style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
                                 <thead> 
@@ -57,36 +61,25 @@ const kitReportsTemplate = async (username, auth, route) => {
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML =
         nonUserNavBar(username);
-    activeKitReportsNavbar();
-    plotly(bptlMetricsData, allParticipantsActiveArr);
+        activeKitReportsNavbar();
+        plotly(bptlMetricsData, allParticipantsActiveArr);
 };
 
 const plotly = (bptlMertricsData, allParticipantsActiveArr) => {
     const script = document.createElement("script");
     script.setAttribute("src", "https://cdn.plot.ly/plotly-latest.min.js");
     document.body.appendChild(script);
-
     script.addEventListener("load", function () {
-        // Plotly loaded
-        // console.log(Plotly);
         renderPlotly(bptlMertricsData, allParticipantsActiveArr);
     });
 };
 
 const renderPlotly = async (bptlMertricsData, allParticipantsActiveArr) => {
-    await bptlMetricsPieChart(bptlMertricsData);
-    await bptlMetricsBarChart(allParticipantsActiveArr);
+    bptlMetricsPieChart(bptlMertricsData);
+    bptlMetricsBarChart(allParticipantsActiveArr);
 };
 
 const bptlMetricsPieChart = (bptlMetricsData) => {
-    // const bptlPieChartElement = document.getElementById("bptlKitPieChart");
-    /*
-    "Address Printed",
-                "Assigned",
-                "Pending",
-                "Received",
-                "Shipped",
-    */
     const data = [
         {
             type: "pie",
@@ -99,14 +92,22 @@ const bptlMetricsPieChart = (bptlMetricsData) => {
     ];
 
     for (let key in bptlMetricsData) {
-        data[0].labels.push(`${key} - ${bptlMetricsData[key]}`);
+        console.log("key",key)
+        console.log("metrics bptl",bptlMetricsData);
+        
+        if (key === "addressPrinted") {
+            data[0].labels.push(`${key.replaceAll("addressPrinted","Address Printed")} - ${bptlMetricsData[key]}`);
+        }
+        else { 
+                data[0].labels.push(`${capitalizeFirstLetter(key)} - ${bptlMetricsData[key]}`);
+        }
         data[0].values.push(bptlMetricsData[key]);
         // console.log(bptlMetricsData);
     }
 
     const layout = {
         height: 400,
-        width: 400,
+        width: 600,
         legend: {
             x: 1,
             y: 250,
@@ -152,17 +153,13 @@ const bptlMetricsBarChart = (allParticipantsActiveArr) => {
         .forEach((i) => {
             data[0].x.push(i);
         });
-    // console.log(data);
-    // uniqueDaysElapsed(allParticipantsActiveArr);
-    // uniqueDaysElapsed(allParticipantsActiveArr).forEach((num) =>
-    //     data[0].x.push(num)
-    // );
 
     const layout = {
         height: 400,
-        width: 400,
+        width: 600,
         title: "Number of Kits Out with Participants",
         xaxis: {
+            dtick:2,
             title: {
                 text: "Days Out",
                 font: {
@@ -246,12 +243,7 @@ const sortAllParticipants = (allParticipants) => {
         a.time_stamp < b.time_stamp ? -1 : a.time_stamp > b.time_stamp ? 1 : 0
     );
     const participantsWithdrawalSortDateAsc = participantsWithdrawal.sort(
-        (a, b) =>
-            a.time_stamp < b.time_stamp
-                ? -1
-                : a.time_stamp > b.time_stamp
-                ? 1
-                : 0
+        (a, b) => a.time_stamp < b.time_stamp ? -1 : a.time_stamp > b.time_stamp ? 1 : 0
     );
 
     // MERGE BOTH ARRAYS
@@ -316,13 +308,6 @@ const uniqueDaysElapsedObj = (allParticipantsActiveArr) => {
     return countObj;
 };
 
-// const counts = arr.reduce((acc, value) => ({
-//    ...acc,
-//    [value]: (acc[value] || 0) + 1
-// }), {});
-
-// console.log(counts);
-
 // Calculate Number of days between current date and date provided
 const daysBetween = (
     date1String,
@@ -349,3 +334,5 @@ const convertTime = (time) => {
     const date = dateAndTime.split(",")[0];
     return date;
 };
+
+const capitalizeFirstLetter = word => word && word[0].toUpperCase() + word.slice(1)

@@ -163,8 +163,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
         modalData.location = allBoxes[index][shippingLocation];
         modalData.boxNumber = allBoxes[index][shippingBoxId];
         modalData.groupSamples = bagSamplesArr[index];
-        modalData.groupScannedBy = namesArr[index];
-        // modalData.groupScannedBy = 
+        modalData.groupScannedBy = namesArr[index]; 
         // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
         button.dataset.buttonIndex = `manifest-button-${index}`;
