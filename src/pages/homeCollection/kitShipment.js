@@ -6,7 +6,7 @@ import {
   getIdToken,
   getParticipantSelection,
 } from "../../shared.js";
-import { activeHomeCollectionNavbar } from "./activehomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
 export const kitShipmentScreen = async (auth, route) => {
   const user = auth.currentUser;

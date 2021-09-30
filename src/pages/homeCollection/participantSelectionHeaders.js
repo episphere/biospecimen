@@ -1,5 +1,4 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { activeHomeCollectionNavbar } from "./activehomeCollectionNavbar.js";
 
 export const participantSelection = async (auth, route) => {
   const user = auth.currentUser;
