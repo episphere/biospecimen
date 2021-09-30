@@ -61,9 +61,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     activeReceiptsNavbar();
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");
 
-    // console.log(response.data);
     const allBoxes = response.data;
-    // console.log("allBoxes", allBoxes);
 
     // // Return an array of an item of grouped bags from GET request***
     const bagsArr = groupAllBags(allBoxes);
@@ -73,15 +71,12 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 
     // // Returns an array --> nested array of grouped samples by index
     const bagSamplesArr = groupSamplesArr(bagsArr);
-    // console.log("bagSamplesArr", bagSamplesArr);
 
     // // Returns an array -->  nested array of grouped names by index
     const namesArr = groupNamesArr(bagsArr, fieldToConceptIdMapping);
-    // console.log("namesArr", namesArr);
 
     // // Returns an array -->  nested array of bag Ids names by index
     const bagIdArr = groupBagIdArr(bagsArr);
-    // console.log("bagIdArr", bagIdArr);
 
     // Object Property Value Shorthand
     // Example: bagsArr and bagsArr:bagsArr are equivalent
@@ -91,13 +86,11 @@ const packagesInTransitTemplate = async (username, auth, route) => {
         namesArr,
         bagIdArr,
     };
-    // console.log(bagsArr);
     manifestButton([...allBoxes], dataObj, manifestModalBodyEl);
 };
 
 const createPackagesInTransitRows = (response) => {
     let template = "";
-    console.log(response);
     try {
         if (response.code !== 200) {
             throw "status code not 200!";
@@ -151,7 +144,6 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
 
     const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
 
-    // console.log(allBoxes);
     Array.from(buttons).forEach((button, index) => {
         let modalData = {
             site: "",
@@ -166,8 +158,6 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
             groupScannedBy:"",
         };
 
-        console.log(modalData);
-        console.log("allboxes",allBoxes)
         modalData.site = allBoxes[index].siteAcronym;
         modalData.date = allBoxes[index][shippingShipDate];
         modalData.location = allBoxes[index][shippingLocation];
@@ -178,7 +168,6 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
         // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
         button.dataset.buttonIndex = `manifest-button-${index}`;
-        console.log(modalData.groupSamples);
         button.addEventListener("click", (e) => {
             let parsedModalData = JSON.parse(e.target.getAttribute("data-modal"));
             let {
@@ -347,14 +336,9 @@ const groupBagIdArr = (bagsArr) => {
 const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupScannedBy) => {
     let manifestBody = ``;
     let rows = ``;
-    console.log(index)
-    console.log("groupscannedby",groupScannedBy)
-    console.log("groupSamples",groupSamples)
-    // console.log(indexNum)
     if (!bagIdArr[index].length) {
         return manifestBody;
     } else {
-        console.log(bagIdArr[index].length);
         bagIdArr[index].forEach((id, indexNum) => {
             // If the current index of the bagIds is 0 insert # of samples
             if (indexNum === 0) {
