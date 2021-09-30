@@ -51,16 +51,13 @@ const packagesInTransitTemplate = async (username, auth, route) => {
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div id="manifest-modal-body" class="modal-body">
-            
-        </div>  
+        <div id="manifest-modal-body" class="modal-body"></div>  
       </div>
     </div>
   </div>`;
 
     document.getElementById("contentBody").innerHTML = template;
-    document.getElementById("navbarNavAltMarkup").innerHTML =
-        nonUserNavBar(username);
+    document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
     activeReceiptsNavbar();
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");
 
@@ -106,37 +103,11 @@ const createPackagesInTransitRows = (response) => {
             throw "status code not 200!";
         } else {
             const allBoxes = response.data;
-            // console.log(allBoxes);
-            /* 
-            ==================================
-            INSERT NEW CODE - START
-            ==================================
-            */
-
-            // // Return an array of an item of grouped bags from GET request***
+            // Return an array of an item of grouped bags from GET request***
             const bagsArr = groupAllBags(allBoxes);
-            // console.log("bagsArr", bagsArr);
 
-            // // Returns an array of summed and grouped bag samples
+            // Returns an array of summed and grouped bag samples
             const sumSamplesArr = countSamplesArr(bagsArr);
-            // console.log("sumSamplesArr", sumSamplesArr);
-
-            // // Returns an array --> nested array of grouped samples by index
-            // const bagSamplesArr = groupSamplesArr(bagsArr);
-            // console.log("bagSamplesArr", bagSamplesArr);
-
-            // // Returns an array -->  nested array of grouped names by index
-            // const namesArr = groupNamesArr(bagsArr, fieldToConceptIdMapping);
-            // console.log("namesArr", namesArr);
-
-            // // Returns an array -->  nested array of bag Ids names by index
-            // const bagIdArr = groupBagIdArr(bagsArr);
-            // console.log("bagIdArr", bagIdArr);
-            /*
-            ==================================
-            INSERT NEW CODE - END
-            ==================================
-            */
 
             // Populate Cells with Data
             allBoxes.forEach((i, index) => {
@@ -144,31 +115,15 @@ const createPackagesInTransitRows = (response) => {
                       <tr class="packageInTransitRow">
                       <td style="text-align:center;">${
                           i[fieldToConceptIdMapping.shippingShipDate]
-                              ? convertTime(
-                                    i[fieldToConceptIdMapping.shippingShipDate]
-                                ).split(",")[0]
-                              : "N/A"
+                              ? convertTime(i[fieldToConceptIdMapping.shippingShipDate]).split(",")[0] : "N/A"
                       }</td>
                       <td style="text-align:center;">${
-                          i[fieldToConceptIdMapping.shippingTrackingNumber]
-                              ? i[
-                                    fieldToConceptIdMapping
-                                        .shippingTrackingNumber
-                                ]
-                              : "N/A"
+                          i[fieldToConceptIdMapping.shippingTrackingNumber] ? i[ fieldToConceptIdMapping.shippingTrackingNumber] : "N/A"
                       }</td>
-                      <td style="text-align:center;">${
-                          i.siteAcronym ? i.siteAcronym : "N/A"
-                      }</td>
+                      <td style="text-align:center;">${i.siteAcronym ? i.siteAcronym : "N/A"}</td>
                       <td style="text-align:center;">${
                           i[fieldToConceptIdMapping.submitShipmentFlag]
-                              ? shipmentSubmittedStatus(
-                                    i[
-                                        fieldToConceptIdMapping
-                                            .submitShipmentFlag
-                                    ]
-                                )
-                              : "N/A"
+                              ? shipmentSubmittedStatus(i[fieldToConceptIdMapping.submitShipmentFlag]) : "N/A"
                       }</td>
                       <td style="text-align:center;">${
                           sumSamplesArr[index]
@@ -181,7 +136,6 @@ const createPackagesInTransitRows = (response) => {
                       </tr>`;
             });
         }
-
         return template;
     } catch (e) {
         console.log(e);
@@ -195,12 +149,10 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
 
     const { sumSamplesArr, bagSamplesArr, namesArr, bagIdArr } = dataObj;
 
-    const { shippingShipDate, shippingLocation, shippingBoxId } =
-        fieldToConceptIdMapping;
+    const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
 
-    console.log(allBoxes);
+    // console.log(allBoxes);
     Array.from(buttons).forEach((button, index) => {
-        // console.log(button);
         let modalData = {
             site: "",
             date: "",
@@ -211,89 +163,76 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
             bagSamplesArr,
             bagIdArr,
             groupSamples: "",
+            groupScannedBy:"",
         };
 
-        // console.log(modalData);
+        console.log(modalData);
+        console.log("allboxes",allBoxes)
         modalData.site = allBoxes[index].siteAcronym;
         modalData.date = allBoxes[index][shippingShipDate];
         modalData.location = allBoxes[index][shippingLocation];
         modalData.boxNumber = allBoxes[index][shippingBoxId];
         modalData.groupSamples = bagSamplesArr[index];
+        modalData.groupScannedBy = namesArr[index];
+        // modalData.groupScannedBy = 
         // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
         button.dataset.buttonIndex = `manifest-button-${index}`;
-        // console.log(JSON.parse(button.getAttribute("data-modal")));
-        // let parsedModalData = JSON.parse(button.getAttribute("data-modal"));
-        // manifestContent(parsedModalData, manifestModalBodyEl, index);
         console.log(modalData.groupSamples);
         button.addEventListener("click", (e) => {
-            // console.log(e.target.getAttribute("data-modal"));
-            let parsedModalData = JSON.parse(
-                e.target.getAttribute("data-modal")
-            );
-
+            let parsedModalData = JSON.parse(e.target.getAttribute("data-modal"));
             let {
                 site,
                 date,
                 location,
                 namesArr,
                 boxNumber,
-                sumSamplesArr,
-                bagSamplesArr,
                 bagIdArr,
                 groupSamples,
+                groupScannedBy
             } = parsedModalData;
 
             let modalBody = `<div class="container-fluid">
             <div class="row">
                 <div class="col-md-4">
-                    <p>Shipping Manifest</p>
+                    <p style="font-size:1.3rem;"><strong>Shipping Manifest</strong></p>
                 </div>
                 <div class="col-md-4 ml-auto">
-                    <p>Site: ${site ? site : "N/A"} </p>
+                    <p><strong>Site:</strong> ${site ? site : "N/A"} </p>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <p>Shipped Date and Time: ${
-                        date ? convertTime(date) : "N/A"
-                    }
-                    </p>
+                    <p><strong>Shipped Date and Time:</strong> ${date ? convertTime(date) : "N/A"}</p>
                 </div>
                 <div class="col-md-4 ml-auto">
-                    <p>Location: ${location ? location : "N/A"}</p>
+                    <p><strong>Location:</strong> ${location ? location : "N/A"}</p>
                 </div>
             </div>
             <div class="row">
-            <div class="col-md-4">
-                <p>Sender: ${namesArr[index] ? namesArr[index] : "N/A"}</p>
+                <div class="col-md-4">
+                    <p><strong>Sender:</strong><br/>${namesArr[index] ? namesArr[index].toString().replaceAll("," ,`<br/>`) : "N/A"}</p>
+                </div>
             </div>
-            </div>
-
             <div class="row">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col-">Box Number</th>
-                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Specimen Bag ID</th>
-                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Full Specimen ID</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${addManifestTableRows(
-                        boxNumber,
-                        bagIdArr,
-                        bagSamplesArr,
-                        index,
-                        groupSamples
-                    )}
-                </tbody>
-            </table>
-            </div>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col-">Box Number</th>
+                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Specimen Bag ID</th>
+                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Full Specimen ID</th>
+                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Scanned By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, groupScannedBy)}
+                    </tbody>
+                    </table>
+                </div>
             </div>
         </div>`;
-            manifestModalBodyEl.innerHTML = modalBody;
+        manifestModalBodyEl.innerHTML = modalBody;
         });
     });
 };
@@ -320,34 +259,24 @@ const groupAllBags = (allBoxes) => {
     // Object.keys --> Copies Keys and stores into array
     // If Key(bags) has a length push bag of objects, else an empty {}
     allBoxes.forEach((box) => {
-        Object.keys(box.bags).length
-            ? arrBoxes.push(box.bags)
-            : arrBoxes.push(box.bags);
+        Object.keys(box.bags).length ? arrBoxes.push(box.bags) : arrBoxes.push(box.bags);
     });
     return arrBoxes;
 };
 
 const countSamplesArr = (bagsArr) => {
     const arrNumSamples = [];
-    // NOTE: index is current index of bagsArr
-    bagsArr.forEach((bag, index) => {
+    bagsArr.forEach((bag) => {
         //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
         if (Object.keys(bag).length) {
             let sampleNumber = 0;
             for (let j = 0; j < Object.keys(bag).length; j++) {
-                /*
-                IMPORTANT FOR GETTING LIST OF ALL BAG ELEMENTS LATER (REUSABILITY)
-                console.log(index, bag[Object.keys(bag)[j]].arrElements);
-                */
                 sampleNumber += bag[Object.keys(bag)[j]].arrElements.length;
-
                 if (j === Object.keys(bag).length - 1) {
-                    // console.log(index, sampleNumber);
                     arrNumSamples.push(sampleNumber);
                 }
             }
         } else {
-            // console.log(index, Object.keys(bag), "empty bag");
             arrNumSamples.push(0);
         }
     });
@@ -356,31 +285,21 @@ const countSamplesArr = (bagsArr) => {
 
 const groupSamplesArr = (bagsArr) => {
     const arrSamples = [];
-    // NOTE: index is current index of bagsArr
-    bagsArr.forEach((bag, index) => {
+    bagsArr.forEach((bag) => {
         //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
         if (Object.keys(bag).length) {
             let groupSamples = [];
             for (let j = 0; j < Object.keys(bag).length; j++) {
-                // console.log(index, bag[Object.keys(bag)[j]]);
-                /*
-                IMPORTANT FOR GETTING LIST OF ALL BAG ELEMENTS LATER (REUSABILITY)
-                console.log(index, bag[Object.keys(bag)[j]].arrElements);
-                */
-                // console.log(index, bag[Object.keys(bag)[j]].arrElements);
                 groupSamples.push(bag[Object.keys(bag)[j]].arrElements);
-
                 if (j === Object.keys(bag).length - 1) {
                     groupSamples.concat(bag[Object.keys(bag)[j]].arrElements);
                     arrSamples.push(groupSamples);
                 }
             }
         } else {
-            // console.log(index, Object.keys(bag), "empty bag");
             arrSamples.push([]);
         }
     });
-    // console.log(arrSamples)
     return arrSamples;
 };
 
@@ -388,8 +307,7 @@ const groupSamplesArr = (bagsArr) => {
 const groupNamesArr = (bagsArr, fieldToConceptIdMapping) => {
     const arrNames = [];
     const { shippingFirstName, shippingLastName } = fieldToConceptIdMapping;
-    // NOTE: index is current index of bagsArr
-    bagsArr.forEach((bag, index) => {
+    bagsArr.forEach((bag) => {
         //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
         if (Object.keys(bag).length) {
             let groupNames = [];
@@ -404,8 +322,8 @@ const groupNamesArr = (bagsArr, fieldToConceptIdMapping) => {
                     // COMBINE TWO SEPARATE ARRAYS OF FULL NAME INTO ONE ARRAY
                     groupNames.concat([
                         bag[Object.keys(bag)[j]][shippingFirstName] +
-                            " " +
-                            bag[Object.keys(bag)[j]][shippingLastName],
+                        " " +
+                        bag[Object.keys(bag)[j]][shippingLastName],
                     ]);
                     arrNames.push(groupNames);
                 }
@@ -420,46 +338,38 @@ const groupNamesArr = (bagsArr, fieldToConceptIdMapping) => {
 // NESTED GROUP BAGS BY INDEX***
 const groupBagIdArr = (bagsArr) => {
     const arrBagId = [];
-
     bagsArr.forEach((bag, index) => {
-        // console.log(index, Object.keys(bag));
         arrBagId.push(Object.keys(bag));
     });
-    // console.log(arrSamples)
     return arrBagId;
 };
 
-const addManifestTableRows = (
-    boxNumber,
-    bagIdArr,
-    bagSamplesArr,
-    index,
-    groupSamples
-) => {
-    // console.log(index, bagIdArr[index].length);
-    // console.log(bagIdArr[index].length === 0);
+const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupScannedBy) => {
     let manifestBody = ``;
     let rows = ``;
+    console.log(index)
+    console.log("groupscannedby",groupScannedBy)
+    console.log("groupSamples",groupSamples)
+    // console.log(indexNum)
     if (!bagIdArr[index].length) {
-        // console.log("No bag ids", bagIdArr[index]);
-
         return manifestBody;
     } else {
         console.log(bagIdArr[index].length);
-        // console.log(bagIdArr);
         bagIdArr[index].forEach((id, indexNum) => {
             // If the current index of the bagIds is 0 insert # of samples
-            // console.log("index Number", indexNum);
             if (indexNum === 0) {
                 rows += `<tr>
                 <td style="text-align:center">
                 <p>${boxNumber ? boxNumber.replace("Box", "") : "N/A"}</p>
                 </td>
                 <td style="text-align:center">
-                <p>${id ? id : "N//A"}</p>
+                    <p>${id ? id : "N//A"}</p>
                 </td>
                 <td style="text-align:center">
                     ${groupSamples[indexNum].toString().replaceAll(",", `<br>`)}
+                </td>
+                <td style="text-align:center">
+                    ${groupScannedBy[indexNum].toString().replaceAll(",", `<br>`)}
                 </td>
                 </tr>`;
             } else {
@@ -468,10 +378,13 @@ const addManifestTableRows = (
                 <p></p>
                 </td>
                 <td style="text-align:center">
-                <p>${id ? id : "N/A"}</p>
+                    <p>${id ? id : "N/A"}</p>
                 </td>
                 <td style="text-align:center">
-                ${groupSamples[indexNum].toString().replaceAll(",", `<br>`)}
+                    ${groupSamples[indexNum].toString().replaceAll(",", `<br>`)}
+                </td>
+                <td style="text-align:center">
+                    ${groupScannedBy[indexNum].toString().replaceAll(",", `<br>`)}
                 </td>
                 </tr>`;
             }
@@ -479,46 +392,6 @@ const addManifestTableRows = (
         manifestBody = rows;
         return manifestBody;
     }
-};
-
-const insertSamples = (bagSamplesArr, indexNum, bagIdArr) => {
-    let samples = ``;
-    let currentArr = [];
-    console.log(bagIdArr);
-    // console.log("indexNum", indexNum);
-    // console.log(bagSamplesArr.length);
-    // console.log(bagSamplesArr[0]);
-    // console.log(bagSamplesArr[1]);
-    // console.log(bagSamplesArr[2]);
-    // console.log(bagSamplesArr[3]);
-    // console.log(bagSamplesArr[4]);
-    // console.log(bagSamplesArr[5]);
-    for (let i = 0; i < bagSamplesArr.length; i++) {
-        // console.log("i loop", i);
-        // console.log(bagSamplesArr[i]);
-        for (let j = 0; j < bagIdArr[i].length; j++) {
-            // console.log("j loop");
-            // console.log(bagSamplesArr[i][j]);
-            console.log(
-                "bag id limiter",
-                bagSamplesArr[i],
-                bagSamplesArr[i].length,
-                bagSamplesArr[i][j].length
-            );
-            if (bagSamplesArr[i].length === 1) {
-                console.log(bagSamplesArr[i][j]);
-                console.log("true 1 length");
-            } else {
-                console.log("false more than 1 length");
-            }
-            // console.log(bagSamplesArr[i][j].length);
-            bagSamplesArr[i][j].forEach((sample) => {
-                // console.log(sample);
-                // samples += `<p>${sample}</p>`;
-            });
-        }
-    }
-    return samples;
 };
 
 // Returns Shipment Submitted Boolean Value --> Yes or No
@@ -533,48 +406,3 @@ const shipmentSubmittedStatus = (booleanValue) => {
         return "N/A";
     }
 };
-
-// // console.log("bagSamplesArr", bagSamplesArr[i]);
-// console.log("loop", i);
-// if (bagSamplesArr[i].length === 1) {
-//     // console.log("bagSamples i", bagSamplesArr[i], "indexNum", indexNum);
-//     // console.log(
-//     //     "bagSamples ii",
-//     //     bagSamplesArr[indexNum],
-//     //     "indexNum",
-//     //     indexNum
-//     // );
-//     console.log(i);
-//     // console.log(bagSamplesArr[i]);
-
-//     // bagSamplesArr[i][indexNum].forEach((sample, num) => {
-//     //     // console.log("index", num, sample);
-
-//     //     samples += `<p>${sample}</p>`;
-//     //     // console.log("sample", sample);
-//     // });
-//     // console.log(samples);
-//     // debugger;
-//     // return samples;
-// }
-// // debugger;
-
-// // console.log("bag Samples Arr", indexNum);
-// // for (let i = 0; i < bagSamplesArr.length; i++) {
-// //     // console.log(bagSamplesArr[i], bagSamplesArr[i].length);
-// //     if (bagSamplesArr[i].length === 1) {
-// //         bagSamplesArr[i].forEach((sample, num) => {
-// //             // console.log("index", num, sample[num]);
-// //             samples += `<p>${sample[num]}</p>`;
-// //         });
-// //         // console.log(samples);
-// //         return samples;
-// //     }
-// //     for (let j = 0; j < bagSamplesArr[i].length; j++) {
-// //         // console.log(i, j, bagSamplesArr[i][j]);
-// //         // bagSamplesArr[i][j].forEach((sample) => {
-// //         //     sample += `<p>${sample}<p>`;
-// //         // });
-// //     }
-// // }
-// // console.log(samples);

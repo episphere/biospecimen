@@ -113,6 +113,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML =
         nonUserNavBar(name);
+    activeReceiptsNavbar();
 };
 
 const checkCourierType = () => {
