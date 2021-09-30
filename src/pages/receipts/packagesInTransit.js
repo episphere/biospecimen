@@ -3,6 +3,7 @@ import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
+import { convertTime } from "../../shared.js";
 
 export const packagesInTransitScreen = async (auth, route) => {
     const user = auth.currentUser;
@@ -225,29 +226,13 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
     });
 };
 
-// Convert utc in Seconds to readable Date
-const convertTime = (time) => {
-    if (!time) {
-        return "";
-    }
-    let utcSeconds = time;
-    const myDate = new Date(utcSeconds);
-    return myDate.toLocaleString("en-us", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
-};
-
 // Return an array of an item of grouped bags from GET request***
 const groupAllBags = (allBoxes) => {
     const arrBoxes = [];
     // Object.keys --> Copies Keys and stores into array
     // If Key(bags) has a length push bag of objects, else an empty {}
     allBoxes.forEach((box) => {
-        Object.keys(box.bags).length ? arrBoxes.push(box.bags) : arrBoxes.push(box.bags);
+        Object.keys(box.bags).length ? arrBoxes.push(box.bags) : arrBoxes.push(box.bags)
     });
     return arrBoxes;
 };

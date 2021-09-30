@@ -2,7 +2,7 @@ import { showAnimation, hideAnimation } from "../../shared.js";
 import { kitReportsNavbar } from "./kitReportsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { activeKitReportsNavbar } from "./activeKitReportsNavbar.js";
-import { getIdToken } from "../../shared.js";
+import { getIdToken,convertTime } from "../../shared.js";
 
 // API
 const api =
@@ -196,19 +196,6 @@ const getBPTLMetrics = async () => {
     return responseObj.data[0];
 };
 
-const getBPTLMetricsShipped = async () => {
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=bptlMetricsShipped`, {
-        method: "GET",
-        headers: {
-            Authorization: "Bearer" + idToken,
-            "Content-Type": "application/json",
-        },
-    }).catch((e) => console.log(e));
-    const responseObj = await response.json().then((data) => data);
-    return responseObj.data;
-};
-
 const getAllParticipants = async () => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getParticipantSelection&type=all`, {
@@ -254,30 +241,24 @@ const allParticipantsActive = (allParticipants) => {
     return participantsActiveSortDateAsc;
 };
 
-/*
-==================================================
-UTIL FUNCTIONS 
-==================================================
-*/
-
 const createKitReportRows = (participantRows) => {
     let template = ``;
     participantRows.forEach((item) => {
         template += `
-                        <tr class="row-color-enrollment-dark participantRow">
-                            <td style="text-align:center;">${daysBetween(
-                                item.time_stamp
-                            )}</td>
-                            <td style="text-align:center;">${convertTime(
-                                item.time_stamp
-                            )}</td>
-                            <td style="text-align:center;">${
-                                item.supply_kitId
-                            }</td>
-                            <td style="text-align:center;">${
-                                item.participation_status
-                            }</td>
-                        </tr>`;
+          <tr class="row-color-enrollment-dark participantRow">
+              <td style="text-align:center;">${daysBetween(
+                  item.time_stamp
+              )}</td>
+              <td style="text-align:center;">${convertTime(
+                  item.time_stamp
+              )}</td>
+              <td style="text-align:center;">${
+                  item.supply_kitId
+              }</td>
+              <td style="text-align:center;">${
+                  item.participation_status
+              }</td>
+          </tr>`;
     });
     return template;
 };
@@ -306,23 +287,6 @@ const daysBetween = (
     const d1 = new Date(date1String);
     const d2 = new Date(date2String);
     return Math.floor((d2 - d1) / (1000 * 3600 * 24));
-};
-
-const convertTime = (time) => {
-    if (!time) {
-        return "";
-    }
-    let utcSeconds = time;
-    let myDate = new Date(utcSeconds);
-    const dateAndTime = myDate.toLocaleString("en-us", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
-    const date = dateAndTime.split(",")[0];
-    return date;
 };
 
 const capitalizeFirstLetter = word => word && word[0].toUpperCase() + word.slice(1)
