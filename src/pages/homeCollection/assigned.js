@@ -8,6 +8,7 @@ import {
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
+import { activeHomeCollectionNavbar } from "./activehomeCollectionNavbar.js";
 
 export const assignedScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -75,7 +76,8 @@ const assignedTemplate = async (name, auth, route) => {
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   participantSelectionDropdown();
-
+  activeHomeCollectionNavbar()
+                                      
   redirectToKitShipment();
   for (let i = 0; i < response.data.length; i++) {
     editAssignedRow(i);

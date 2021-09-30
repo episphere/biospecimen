@@ -902,4 +902,19 @@ export const replaceDateInputWithMaskedInput = (dateInput) => {
     }
   });
 };
-  
+
+// Convert utc in Seconds to readable Date and Time
+export const convertTime = (time) => {
+    if (!time) {
+        return "";
+    }
+    let utcSeconds = time;
+    const myDate = new Date(utcSeconds);
+    return myDate.toLocaleString("en-us", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+};
