@@ -24,7 +24,6 @@ const kitReportsTemplate = async (username, auth, route) => {
     const sortParticipantsArr = sortAllParticipants(allParticipants);
     const allParticipantsActiveArr = allParticipantsActive(allParticipants);
     let template = "";
-    // style="display:flex; justify-content:center; align-items:center;"
     template += kitReportsNavbar();
     template += ` 
               <div id="root root-margin" style="padding-top: 25px;">
@@ -115,7 +114,6 @@ const bptlMetricsPieChart = (bptlMetricsData) => {
 };
 
 const bptlMetricsBarChart = (allParticipantsActiveArr) => {
-    //   const bptlBarChart = document.getElementById("bptlKitPieChart");
     const data = [
         {
             type: "bar",
