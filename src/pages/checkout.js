@@ -21,14 +21,14 @@ export const checkOutScreen = (data, specimenData) => {
         </br>
         <div class="row">
             <div class="col">
-                <strong>Status of biospecimen questionnaires.</strong>
+                <strong>Status of biospecimen surveys.</strong>
             </div>
         </div>
         </br>
         <div class="row info-row">
             <div class="col-md-3">
                 <div class="col-md-12 info-box">
-                    <div class="row"><span class="full-width">Blood/Urine Questionnaire</span></div>
+                    <div class="row"><span class="full-width">Blood/Urine Survey</span></div>
                     <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
                 </div>
             </div>
@@ -36,7 +36,7 @@ export const checkOutScreen = (data, specimenData) => {
         <div class="row info-row">
             <div class="col-md-3">
                 <div class="col-md-12 info-box">
-                    <div class="row"><span class="full-width">Mouthwash Questionnaire</span></div>
+                    <div class="row"><span class="full-width">Mouthwash Survey</span></div>
                     <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
                 </div>
             </div>
