@@ -1,17 +1,9 @@
-import {
-    getIdToken,
-    findParticipant,
-    showAnimation,
-    hideAnimation,
-} from "../../shared.js";
+import { getIdToken,findParticipant, showAnimation, hideAnimation} from "../../shared.js";
 import fieldMapping from "../../fieldToConceptIdMapping.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
-import {
-    fakeParticipants,
-    printAddressesParticipants,
-} from "./fakeParticipants.js";
+import { fakeParticipants, printAddressesParticipants} from "./fakeParticipants.js";
 import { activeHomeCollectionNavbar } from "./activehomeCollectionNavbar.js";
 
 // Stringify array of objects and parse fake participants Data
@@ -25,12 +17,7 @@ export const printAddressesScreen = async (auth, route) => {
     printaddressesTemplate(username, auth, route, fakeParticipantsData);
 };
 
-const printaddressesTemplate = async (
-    name,
-    auth,
-    route,
-    printAddressesParticipants
-) => {
+const printaddressesTemplate = async (name, auth, route, printAddressesParticipants) => {
     showAnimation();
     // const response = await findParticipant("first");
     hideAnimation();
@@ -41,7 +28,7 @@ const printaddressesTemplate = async (
                       <div id="alert_placeholder"></div>
                         <div class="table-responsive">
                         <span> <h3 style="text-align: center; margin: 0 0 1rem;">Print Addresses </h3> </span>
-                        <div class="sticky-header" style="overflow:auto;">
+                        <div class="sticky-header" style="overflow:auto; width:95.7%; margin:0 auto;">
                                 <table class="table table-bordered" id="participantData" 
                                     style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
                                     <thead> 
@@ -72,8 +59,7 @@ const printaddressesTemplate = async (
                 <button type="button" id='generateCsv' class="btn btn-success btn-lg">Generate Address File</button>
                 </div>`;
     document.getElementById("contentBody").innerHTML = template;
-    document.getElementById("navbarNavAltMarkup").innerHTML =
-        nonUserNavBar(name);
+    document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
     activeHomeCollectionNavbar()
     generateParticipantCsvGetter();
     participantSelectionDropdown();
@@ -87,30 +73,20 @@ export const participantSelectionDropdown = () => {
     // CHECKS THE CURRENT HASH AFTER ON LOAD AND SETS OPTION TO SELECTED
     // TODO: Refactor into switch statement?
     if (location.hash === "#participantselection") {
-        document
-            .getElementById("select-pending")
-            .setAttribute("selected", "selected");
+        document.getElementById("select-pending").setAttribute("selected", "selected");
     }
     if (location.hash === "#allParticipants") {
-        document
-            .getElementById("select-all")
-            .setAttribute("selected", "selected");
+        document.getElementById("select-all").setAttribute("selected", "selected");
     }
     if (location.hash === "#addressPrinted") {
-        document
-            .getElementById("select-address-printed")
-            .setAttribute("selected", "selected");
+        document.getElementById("select-address-printed").setAttribute("selected", "selected");
     }
     if (location.hash === "#assigned") {
-        document
-            .getElementById("select-assigned")
-            .setAttribute("selected", "selected");
+        document.getElementById("select-assigned").setAttribute("selected", "selected");
     }
 
     if (location.hash === "#shipped") {
-        document
-            .getElementById("select-shipped")
-            .setAttribute("selected", "selected");
+        document.getElementById("select-shipped").setAttribute("selected", "selected");
     }
 
     participantDropdown.addEventListener("change", (e) => {
@@ -141,7 +117,6 @@ export const participantSelectionDropdown = () => {
     });
 };
 
-// TODO: Add this "${createParticipantRows(response.data)}" back to <tbody> element  ***
 const createParticipantRows = (participantRows) => {
     let template = ``;
     participantRows.forEach((i) => {
@@ -172,14 +147,12 @@ const storeParticipantInfo = (i) => {
     participantHolder["connect_id"] = i.connect_id && i.connect_id;
     participantHolder["kit_status"] = "addressPrinted";
     participantHolder["address_1"] = String(i.address_1 && i.address_1);
-    participantHolder["address_2"] =
-        i.address_2 != undefined ? i.address_2 : ``;
+    participantHolder["address_2"] = i.address_2 != undefined ? i.address_2 : ``;
     participantHolder["city"] = i.city && i.city;
     participantHolder["state"] = i.state && i.state;
     participantHolder["zip_code"] = i.zip_code && i.zip_code;
     participantHolder["study_site"] = i.study_site && i.study_site;
     participantHolder["date_requested"] = i.date_requested && i.date_requested;
-    // participantHolder = JSON.stringify(participantHolder);
     let schemaInfo = escape(JSON.stringify(participantHolder));
     return schemaInfo;
 };
@@ -194,15 +167,8 @@ const generateParticipantCsvGetter = () => {
             );
             if (participantRow) {
                 participantRow.forEach((element) => {
-                    const checkboxPt =
-                        element.getElementsByClassName("ptSelection")[0];
-                    checkboxPt.checked
-                        ? holdParticipantResponse.push(
-                              JSON.parse(
-                                  unescape(checkboxPt.dataset.participantholder)
-                              )
-                          )
-                        : ``;
+                    const checkboxPt = element.getElementsByClassName("ptSelection")[0];
+                    checkboxPt.checked ? holdParticipantResponse.push(JSON.parse(unescape(checkboxPt.dataset.participantholder))) : ``;
                 });
             }
             const response = setParticipantResponses(holdParticipantResponse);
@@ -221,9 +187,7 @@ const generateParticipantCsv = (items) => {
         let keysCounter = 0;
         for (let key in items[row]) {
             if (key !== "connect_id") {
-                csv +=
-                    items[row][key] +
-                    (keysCounter + 1 < keysAmount ? "," : "\r\n");
+                csv += items[row][key] + (keysCounter + 1 < keysAmount ? "," : "\r\n");
             }
             keysCounter++;
         }
@@ -231,14 +195,8 @@ const generateParticipantCsv = (items) => {
     }
     let link = document.createElement("a");
     link.id = "download-csv";
-    link.setAttribute(
-        "href",
-        "data:text/plain;charset=utf-8," + encodeURIComponent(csv)
-    );
-    link.setAttribute(
-        "download",
-        `${new Date().toLocaleDateString()}-participant-address-export.csv`
-    );
+    link.setAttribute("href","data:text/plain;charset=utf-8," + encodeURIComponent(csv));
+    link.setAttribute("download",`${new Date().toLocaleDateString()}-participant-address-export.csv`);
     document.body.appendChild(link);
     document.querySelector("#download-csv").click();
     document.body.removeChild(link);

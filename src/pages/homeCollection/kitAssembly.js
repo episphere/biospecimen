@@ -165,8 +165,7 @@ const kitAssemblyTemplate = async (user, name, auth, route) => {
         <div style="overflow:auto; height:45vh">
             <table id="kit-assembly-table" class="table table-bordered" style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
                 <thead>
-                    <tr style="top: 0;
-                    position: sticky;">
+                    <tr style="top: 0; position: sticky;">
                         <th scope="col" style="background-color: #f7f7f7;" width="5%">Line Item</th>
                         <th scope="col" style="background-color: #f7f7f7;" width="25%">Specimen Kit USPS Tracking Number</th>
                         <th scope="col" style="background-color: #f7f7f7;" width="15%">Supply Kit ID</th>
