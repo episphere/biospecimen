@@ -219,15 +219,13 @@ const populateKitTable = (tableBody, kitData) => {
             <p id="input-specimen-kit-error-message" class="input-error-message"></p>
         </td>
         <td class="text-wrap">
-            <input id="input-collection-cup" class="input-field" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0007
-            " name"input-collection-cup"/>
+            <input id="input-collection-cup" class="input-field" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0007" name="input-collection-cup"/>
             <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0007
             </label>
             <p id="input-collection-cup-error-message" class="input-error-message"></p>
         </td>
         <td>
-            <input id="input-collection-card" class="input-field" type="string" autocomplete="off" style="width:10 0%" placeholder="CXA123460 0007
-            " name="input-collection-card"/>
+            <input id="input-collection-card" class="input-field" type="string" autocomplete="off" style="width:10 0%" placeholder="CXA123460 0007" name="input-collection-card"/>
             <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0007
             </label>
             <p id="input-collection-card-error-message" class="input-error-message"></p>
@@ -286,16 +284,14 @@ const populateKitTable = (tableBody, kitData) => {
             <p id="input-specimen-kit-error-message" class="input-error-message"></p>
           </td>
           <td>
-            <input id="input-collection-cup" class="input-field" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0007
-            " name"input-collection-cup"/>
+            <input id="input-collection-cup" class="input-field" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0007" name="input-collection-cup"/>
             <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0007
             </label>
             <p id="input-collection-cup-error-message"
             class="input-error-message"></p>
           </td>
           <td>
-              <input id="input-collection-card" class="input-field" type="string" autocomplete="off" style="width:100%" placeholder="CXA123460 0007
-              " name="input-collection-card"/>
+              <input id="input-collection-card" class="input-field" type="string" autocomplete="off" style="width:100%" placeholder="CXA123460 0007" name="input-collection-card"/>
               <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0007
               </label>
               <p id="input-collection-card-error-message" class="input-error-message"></p>
