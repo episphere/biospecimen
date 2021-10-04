@@ -247,7 +247,7 @@ const generateParticipantCsv = (items) => {
                     </button>
             </div>`;
     alertList.innerHTML = template;
-};
+}};
 
 const setParticipantResponses = async (holdParticipantResponse) => {
     const idToken = await getIdToken();
