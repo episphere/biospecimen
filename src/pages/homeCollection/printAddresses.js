@@ -223,7 +223,7 @@ const generateParticipantCsv = (items) => {
       if (key !== 'connect_id' && key !== 'kit_status' && key !== 'date_requested') { 
         csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') }
       keysCounter++
-    }
+    }}
     let link = document.createElement("a");
     link.id = "download-csv";
     link.setAttribute(
@@ -247,7 +247,7 @@ const generateParticipantCsv = (items) => {
                     </button>
             </div>`;
     alertList.innerHTML = template;
-}};
+};
 
 const setParticipantResponses = async (holdParticipantResponse) => {
     const idToken = await getIdToken();
