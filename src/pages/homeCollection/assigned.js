@@ -25,7 +25,7 @@ const assignedTemplate = async (name, auth, route) => {
   template += renderParticipantSelectionHeader();
   template += ` <div class="container-fluid">
                     <div id="root root-margin">
-                        <div class="table-responsive">
+                        <div class="table-responsive" >
                         <span> <h3 style="text-align: center; margin: 0 0 1rem;">Assigned</h3> </span>
                             <div class="sticky-header" style="overflow:auto;">
                                 <table class="table table-bordered" id="participantData" 
@@ -43,10 +43,8 @@ const assignedTemplate = async (name, auth, route) => {
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Edit / Save</th>
                                         </tr>
                                     </thead>   
-                                    <tbody>
-                                       ${createAssignedParticipantRows(
-                                         response.data
-                                       )}
+                                    <tbody style="font-size:.9rem;">
+                                       ${createAssignedParticipantRows(response.data)}
                                     </tbody>
                               </table>
                         </div>
