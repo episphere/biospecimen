@@ -6,6 +6,7 @@ import {
   getIdToken,
   getParticipantSelection,
 } from "../../shared.js";
+import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
 export const kitShipmentScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -36,6 +37,7 @@ const kitShipmentTemplate = async (name, auth, route) => {
              </div>`;
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
+  activeHomeCollectionNavbar()
 };
 
 const verifyScannedCode = async (uspsHit) => {

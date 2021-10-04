@@ -7,7 +7,8 @@ import {
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { fakeParticipantsState } from "./printAddresses.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
-import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
+import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
+import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
 export const addressesPrintedScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -51,8 +52,10 @@ const addressesPrintedTemplate = async (name, auth, route) => {
   template += modalAssignedInfo();
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
+  activeHomeCollectionNavbar()
   assignKitButton();
   participantSelectionDropdown();
+  
 };
 
 // TODO: FIX ERROR WITH NAMING CONVENTION FOR BUTTON, BUTTON CHANGES TO UNEXPECTED NAME

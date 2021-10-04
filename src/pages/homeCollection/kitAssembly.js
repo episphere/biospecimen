@@ -2,6 +2,7 @@ import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { userDashboard } from "../dashboard.js";
 import { getIdToken, showAnimation, hideAnimation } from "../../shared.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
+import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
 const api =
   "https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?";
@@ -132,7 +133,7 @@ POST METHOD REQUEST - Add a Kit
 */
 const addKitData = async (jsonSaveBody) => {
   const idToken = await getIdToken();
-  const response = await await fetch(`${api}api=addKitData`, {
+  const response = await fetch(`${api}api=addKitData`, {
     method: "POST",
     body: JSON.stringify(jsonSaveBody),
     headers: {
@@ -183,6 +184,7 @@ const kitAssemblyTemplate = async (user, name, auth, route) => {
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
+  activeHomeCollectionNavbar()
 };
 
 const populateKitTable = (tableBody, kitData) => {
