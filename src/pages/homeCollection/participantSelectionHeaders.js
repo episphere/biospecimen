@@ -20,7 +20,7 @@ export const renderKitStatusList = () => {
 
             <div style="margin-top:10px; padding:15px;">
                 <div>
-                    <label for="paticipantSelection" class="col-form-label">Participant Selection</label>
+                    <label for="paticipantSelection" class="col-form-label">Kit Status</label>
                     <select required class="col form-control participantSelectionDropdown" id="paticipantSelection">
                         <option id="select-dashboard" value="">-- Select dashboard --</option>
                         <option id="select-all" value="all">All</option>

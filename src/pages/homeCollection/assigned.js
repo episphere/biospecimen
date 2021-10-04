@@ -221,7 +221,7 @@ const updateInputFields = async (jsonObj) => {
   if (response.status === 200) {
     return true;
   } else {
-    alert("Error");
+    return false;
   }
 };
 

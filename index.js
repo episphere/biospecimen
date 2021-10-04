@@ -9,7 +9,7 @@ import { bptlScreen } from "./src/pages/bptl.js";
 import { kitAssemblyScreen } from "./src/pages/homeCollection/kitAssembly.js";
 import { printAddressesScreen } from "./src/pages/homeCollection/printAddresses.js";
 import { assignedScreen } from "./src/pages/homeCollection/assigned.js";
-import { addressesPrintedScreen } from "./src/pages/homeCollection/addressPrinted.js";
+import { addressesPrintedScreen } from "./src/pages/homeCollection/assignKit.js";
 import { allParticipantsScreen } from "./src/pages/homeCollection/allParticipants.js";
 import { kitShipmentScreen } from "./src/pages/homeCollection/kitShipment.js";
 import { shippedScreen } from "./src/pages/homeCollection/shipped.js";

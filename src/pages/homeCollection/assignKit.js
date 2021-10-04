@@ -7,7 +7,7 @@ import {
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { fakeParticipantsState } from "./printAddresses.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
-import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
+import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 
 export const addressesPrintedScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -227,7 +227,8 @@ const setRequiredFields = async (userId, supplyKitId, uspsTrackingNumber) => {
   );
   if (response.status === 200) {
     return true; // return success modal screen
-  } else {
+  }
+  else {
     return false;
   }
 };

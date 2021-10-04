@@ -77,7 +77,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
                             <h5 style="text-align: left;">Collection Card Data Entry</h5>
 
                             <div class="row form-group">
-                                <label class="col-form-label col-md-4">Check if card not included in assignment</label>
+                                <label class="col-form-label col-md-4">Check if card not included</label>
                                 <input type="checkbox" name="collectionCheckBox" id="collectionCheckBox">
                             </div>
 
