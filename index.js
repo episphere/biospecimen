@@ -13,64 +13,74 @@ import { addressesPrintedScreen } from "./src/pages/homeCollection/assignKit.js"
 import { allParticipantsScreen } from "./src/pages/homeCollection/allParticipants.js";
 import { kitShipmentScreen } from "./src/pages/homeCollection/kitShipment.js";
 import { shippedScreen } from "./src/pages/homeCollection/shipped.js";
+import { packagesInTransitScreen } from "./src/pages/receipts/packagesInTransit.js";
 import { packageReceiptScreen } from "./src/pages/receipts/packageReceipt.js";
+import { kitReportsScreen } from "./src/pages/reports/kitReports.js";
 
 let auth = "";
 
 window.onload = () => {
-  if ("serviceWorker" in navigator) {
-    try {
-      navigator.serviceWorker.register("./serviceWorker.js");
-    } catch (error) {
-      console.log(error);
+    if ("serviceWorker" in navigator) {
+        try {
+            navigator.serviceWorker.register("./serviceWorker.js");
+        } catch (error) {
+            console.log(error);
+        }
     }
-  }
-  !firebase.apps.length
-    ? firebase.initializeApp(firebaseConfig())
-    : firebase.app();
-  auth = firebase.auth();
-  // location.hash = '#welcome';
-  manageRoutes();
+    !firebase.apps.length
+        ? firebase.initializeApp(firebaseConfig())
+        : firebase.app();
+    auth = firebase.auth();
+    // location.hash = '#welcome';
+    manageRoutes();
 };
 
 window.onhashchange = () => {
-  manageRoutes();
+    manageRoutes();
 };
 
 const manageRoutes = async () => {
-  const route = window.location.hash || "#";
-  if (await userLoggedIn()) {
-    if (route === "#dashboard") userDashboard(auth, route);
-    else if (route === "#shipping") shippingDashboard(auth, route);
-    else if (route === "#welcome") welcomeScreen(auth, route);
-    else if (route === "#bptl") bptlScreen(auth, route);
-    else if (route === "#kitassembly") kitAssemblyScreen(auth, route);
-    else if (route === "#participantselection")printAddressesScreen(auth, route);
-    else if (route === "#allParticipants") allParticipantsScreen(auth, route);
-    else if (route === "#addressPrinted") addressesPrintedScreen(auth, route);
-    else if (route === "#assigned") assignedScreen(auth, route);
-    else if (route === "#kitshipment") kitShipmentScreen(auth, route);
-    else if (route === "#shipped") shippedScreen(auth, route);
-    else if (route === "#packagereceipt") packageReceiptScreen(auth, route);
-    else if (route === "#manage_users") manageUsers(auth, route);
-    else if (route === "#sign_out") signOut();
-    else if (route === "#reports") reportsQuery(auth, route);
-    else window.location.hash = "#welcome";
-  } else {
-    if (route === "#") signIn();
-    else window.location.hash = "#";
-  }
+    const route = window.location.hash || "#";
+    if (await userLoggedIn()) {
+        if (route === "#dashboard") userDashboard(auth, route);
+        else if (route === "#shipping") shippingDashboard(auth, route);
+        else if (route === "#welcome") welcomeScreen(auth, route);
+        else if (route === "#bptl") bptlScreen(auth, route);
+        else if (route === "#kitassembly") kitAssemblyScreen(auth, route);
+        else if (route === "#participantselection")
+            printAddressesScreen(auth, route);
+        else if (route === "#allParticipants")
+            allParticipantsScreen(auth, route);
+        else if (route === "#addressPrinted")
+            addressesPrintedScreen(auth, route);
+        else if (route === "#assigned") assignedScreen(auth, route);
+        else if (route === "#kitshipment") kitShipmentScreen(auth, route);
+        else if (route === "#shipped") shippedScreen(auth, route);
+        else if (route === "#packagereceipt") packageReceiptScreen(auth, route);
+        else if (route === "#manage_users") manageUsers(auth, route);
+        else if (route === "#sign_out") signOut();
+        else if (route === "#reports") reportsQuery(auth, route);
+        else if (route === "#packagesintransit")
+            packagesInTransitScreen(auth, route);
+        else if (route === "#receivepackages")
+            packageReceiptScreen(auth, route);
+        else if (route === "#kitreports") kitReportsScreen(auth, route);
+        else window.location.hash = "#welcome";
+    } else {
+        if (route === "#") signIn();
+        else window.location.hash = "#";
+    }
 };
 
 const userLoggedIn = () => {
-  return new Promise((resolve, reject) => {
-    const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
-      unsubscribe();
-      if (user) {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
+    return new Promise((resolve, reject) => {
+        const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+            unsubscribe();
+            if (user) {
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+        });
     });
-  });
 };

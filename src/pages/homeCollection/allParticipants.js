@@ -2,6 +2,7 @@ import { showAnimation, hideAnimation, getParticipantSelection } from "../../sha
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
+import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
 export const allParticipantsScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -45,6 +46,7 @@ const allParticipantsTemplate = async (name, auth, route) => {
 
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
+  activeHomeCollectionNavbar()
   participantSelectionDropdown();
 };
 
