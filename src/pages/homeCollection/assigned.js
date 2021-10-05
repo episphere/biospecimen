@@ -189,7 +189,6 @@ const saveAssignedRow = (i) => {
       uspsNumberValue,
       editButton.dataset.id
     );
-    console.log('uspsNumberValue', uspsNumberValue, supplyKitIdValue, typeof supplyKitIdValue, typeof uspsNumberValue)
     if (uspsNumberValue === `` || supplyKitIdValue === ``) {
       let alertList = document.getElementById("alert_placeholder");
         let template = ``;
