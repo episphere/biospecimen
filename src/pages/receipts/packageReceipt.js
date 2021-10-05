@@ -60,6 +60,8 @@ const packageReceiptTemplate = async (name, auth, route) => {
                                     <option id="select-shipmentDelay" value="shipmentDelay">Shipment Delay</option>
                                     <option id="select-noManifestProvided" value="noManifestProvided">No Manifest provided</option>
                                 </select>
+                                <br />
+                                <span><h6><i>Press command/control to make multiple selections</i></h6></span>
                            </div>
                         </div>
 
@@ -158,9 +160,13 @@ const formSubmit = () => {
   const form = document.getElementById('configForm');
   form.addEventListener('submit', e => {
       e.preventDefault();
-      const obj = {};
+      let obj = {};
+      let packageConditions = [];
       obj['scannedBarcode'] = document.getElementById('scannedBarcode').value.trim();
-      obj['packageCondition'] = document.getElementById('packageCondition').value.trim();
+      for (let option of document.getElementById('packageCondition').options) {
+        if (option.selected) {packageConditions.push(option.value)}
+      }
+      obj['packageCondition'] = packageConditions;
       obj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
       obj['dateReceived'] = document.getElementById('dateReceived').value;
       if(document.getElementById('collectionId').value) {
@@ -172,7 +178,7 @@ const formSubmit = () => {
         obj['collectionComments'] = document.getElementById('collectionComments').value;
        
       }
-    storePackageReceipt(obj);
+      storePackageReceipt(obj);
 
   })
 }      
