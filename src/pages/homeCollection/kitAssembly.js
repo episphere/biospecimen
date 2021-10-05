@@ -219,16 +219,14 @@ const populateKitTable = (tableBody, kitData) => {
             <p id="input-specimen-kit-error-message" class="input-error-message"></p>
         </td>
         <td class="text-wrap">
-            <input id="input-collection-cup" class="input-field" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0009
-            " name"input-collection-cup"/>
-            <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
+            <input id="input-collection-cup" class="input-field" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0007" name="input-collection-cup"/>
+            <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0007
             </label>
             <p id="input-collection-cup-error-message" class="input-error-message"></p>
         </td>
         <td>
-            <input id="input-collection-card" class="input-field" type="string" autocomplete="off" style="width:10 0%" placeholder="CXA123460 0009
-            " name="input-collection-card"/>
-            <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0009
+            <input id="input-collection-card" class="input-field" type="string" autocomplete="off" style="width:10 0%" placeholder="CXA123460 0007" name="input-collection-card"/>
+            <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0007
             </label>
             <p id="input-collection-card-error-message" class="input-error-message"></p>
         </td>
@@ -286,17 +284,15 @@ const populateKitTable = (tableBody, kitData) => {
             <p id="input-specimen-kit-error-message" class="input-error-message"></p>
           </td>
           <td>
-            <input id="input-collection-cup" class="input-field" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0009
-            " name"input-collection-cup"/>
-            <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0009
+            <input id="input-collection-cup" class="input-field" type="string" autocomplete="off" style="width:100%;" placeholder="CXA123460 0007" name="input-collection-cup"/>
+            <label for ="input-collection-cup" style="font-size:.8rem;">Ex. CXA123460 0007
             </label>
             <p id="input-collection-cup-error-message"
             class="input-error-message"></p>
           </td>
           <td>
-              <input id="input-collection-card" class="input-field" type="string" autocomplete="off" style="width:100%" placeholder="CXA123460 0009
-              " name="input-collection-card"/>
-              <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0009
+              <input id="input-collection-card" class="input-field" type="string" autocomplete="off" style="width:100%" placeholder="CXA123460 0007" name="input-collection-card"/>
+              <label for ="input-collection-card" style="font-size:.8rem;">Ex. CXA123460 0007
               </label>
               <p id="input-collection-card-error-message" class="input-error-message"></p>
           </td>
@@ -897,7 +893,7 @@ const supplyAndSpecimenKitIdRegExp = (searchStr) => {
 };
 
 /*
-FORMAT MATCH (COLLECTION CARD ID & COLLECTION CUP ID) TEST EXAMPLE -->  CXA123460 0009
+FORMAT MATCH (COLLECTION CARD ID & COLLECTION CUP ID) TEST EXAMPLE -->  CXA123460 0007
 - ^ DETERMINE LINE START
 - START WITH CXA
 - MATCH ANY NUMBERS 0 - 9 FOR THE NEXT 6 DIGITS
