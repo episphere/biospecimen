@@ -2,7 +2,7 @@ import { showAnimation, hideAnimation, getIdToken, getParticipantSelection} from
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-import { activeHomeCollectionNavbar } from "./activehomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
 export const addressesPrintedScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -107,7 +107,7 @@ const assignKitButton = () => {
                 align-items:center;">
                   <img src="./static/images/modals/error.svg" alt="red-cross-icon" height="150" width="200" style="display:block;"/>
                   <h1 class="text-danger" style:"margin-bottom:1.5rem;">Error!</h1>
-                  <p style="font-weight:600;margin:0;">Check scanned Supply Kit ID and try again</p>
+                  <p style="font-weight:600;margin:0;">Supply Kit ID already in use. Please assign a new Supply Kit.</p>
                 </div>
                 <div class="modal-footer" style="border:0;display:flex;justify-content:center;padding: 0.75rem 2rem 1rem;">
                   <button type="button" class="btn btn-secondary" style="padding-right:1rem;" data-dismiss="modal">Close</button>
@@ -200,7 +200,8 @@ const setRequiredFields = async (userId, supplyKitId, uspsTrackingNumber) => {
   );
   if (response.status === 200) {
     return true; // return success modal screen
-  } else {
+  }
+  else {
     return false;
   }
 };

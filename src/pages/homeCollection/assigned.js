@@ -8,7 +8,7 @@ import {
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-import { activeHomeCollectionNavbar } from "./activehomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
 export const assignedScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -25,6 +25,7 @@ const assignedTemplate = async (name, auth, route) => {
   template += renderParticipantSelectionHeader();
   template += ` <div class="container-fluid">
                     <div id="root root-margin">
+                      <div id="alert_placeholder"></div>
                         <div class="table-responsive">
                         <span> <h3 style="text-align: center; margin: 0 0 1rem;">Assigned</h3> </span>
                             <div class="sticky-header" style="overflow:auto;">
@@ -131,7 +132,7 @@ const createAssignedParticipantRows = (assignedParticipantsRows) => {
             data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${
       i.address_1
     },\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
-            value="Save" data-toggle="modal" data-target="#editSuccessModal">
+            value="Save" data-toggle="modal">
         </td>
       </tr>`;
   });
@@ -188,18 +189,41 @@ const saveAssignedRow = (i) => {
       uspsNumberValue,
       editButton.dataset.id
     );
-    let jsonObj = {
-      id: editButton.dataset.id,
-      usps_trackingNum: uspsNumberValue,
-      supply_kitId: supplyKitIdValue,
-    };
-    updateInputFields(jsonObj);
-    document.getElementById("kit-id-" + i).innerHTML = supplyKitIdValue;
-    document.getElementById("usps-" + i).innerHTML = uspsNumberValue;
+    if (uspsNumberValue === `` || supplyKitIdValue === ``) {
+      let alertList = document.getElementById("alert_placeholder");
+        let template = ``;
+        template += `
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                  One or both input responses are empty!
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>`;
+        alertList.innerHTML = template;
+    } else {
+      let jsonObj = {
+        id: editButton.dataset.id,
+        usps_trackingNum: uspsNumberValue,
+        supply_kitId: supplyKitIdValue,
+      };
+      updateInputFields(jsonObj);
+      document.getElementById("kit-id-" + i).innerHTML = supplyKitIdValue;
+      document.getElementById("usps-" + i).innerHTML = uspsNumberValue;
 
-    saveButton.style.display = "none";
-    editButton.style.display = "block";
-  });
+      saveButton.style.display = "none";
+      editButton.style.display = "block";
+      let alertList = document.getElementById("alert_placeholder");
+      let template = ``;
+      template += `
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                Response Saved!
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+              </div>`;
+      alertList.innerHTML = template;
+    }
+    });
 };
 
 /*
@@ -223,7 +247,7 @@ const updateInputFields = async (jsonObj) => {
   if (response.status === 200) {
     return true;
   } else {
-    alert("Error");
+    return false;
   }
 };
 

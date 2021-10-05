@@ -2,7 +2,7 @@ import { showAnimation, hideAnimation, getParticipantSelection } from "../../sha
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-import { activeHomeCollectionNavbar } from "./activehomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
 
 export const shippedScreen = async (auth, route) => {
@@ -31,7 +31,7 @@ const shippedTemplate = async (name, auth, route) => {
                                     <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Last Name</th>
                                     <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit Status</th>
                                     <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Study Site </th>
-                                    <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Date Requested</th>
+                                    <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Shipped Date</th>
                                     <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit ID</th>
                                     <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">USPS Tracking Number</th>
                                     <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Confirm Pickup</th>
@@ -68,7 +68,7 @@ const createShippedRows = (participantRows) => {
                           <td>${i.last_name}</td>
                           <td>${i.kit_status}</td>
                           <td>${i.study_site}</td>
-                          <td>${i.date_requested}</td>
+                          <td>${i.pickup_date}</td>
                           <td>${i.supply_kitId}</td>
                           <td>${i.usps_trackingNum}</td>
                           <td>${i.confirm_pickup}</td>

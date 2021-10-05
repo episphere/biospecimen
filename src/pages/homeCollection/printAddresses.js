@@ -180,19 +180,16 @@ const generateParticipantCsvGetter = () => {
 };
 
 const generateParticipantCsv = (items) => {
-    let csv = ``;
-    csv += `first_name, last_name, kit_status, address_1, address_2, city, state, zip_code, study_site, date_requsted, \r\n`;
-    for (let row = 0; row < items.length; row++) {
-        let keysAmount = Object.keys(items[row]).length;
-        let keysCounter = 0;
-        for (let key in items[row]) {
-            if (key !== "connect_id") {
-                csv += items[row][key] + (keysCounter + 1 < keysAmount ? "," : "\r\n");
-            }
-            keysCounter++;
-        }
-        keysCounter = 0;
-    }
+  let csv = ``;
+  csv += `first_name, last_name, address_1, address_2, city, state, zip_code, study_site, \r\n`
+  for (let row = 0; row < (items.length); row++) {
+    let keysAmount = Object.keys(items[row]).length
+    let keysCounter = 0
+    for(let key in items[row]) {
+      if (key !== 'connect_id' && key !== 'kit_status' && key !== 'date_requested') { 
+        csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') }
+      keysCounter++
+    }}
     let link = document.createElement("a");
     link.id = "download-csv";
     link.setAttribute("href","data:text/plain;charset=utf-8," + encodeURIComponent(csv));

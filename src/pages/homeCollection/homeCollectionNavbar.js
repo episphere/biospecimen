@@ -9,7 +9,7 @@ export const homeCollectionNavbar = () => {
                     <a class="nav-link" aria-current="page" href="#kitassembly" id="kitAssembly">Kit Assembly</a>
                     </li>
                     <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#participantselection" id="participantSelection">Participant Selection</a>
+                    <a class="nav-link" aria-current="page" href="#participantselection" id="participantSelection">Kit Status</a>
                     </li>
                     <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="#kitshipment" id="kitShipment">Kit Shipment</a>
