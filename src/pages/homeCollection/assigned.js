@@ -155,10 +155,10 @@ const editAssignedRow = (i) => {
     let uspsTrackingNumberData = uspsTrackingNumber.innerHTML;
 
     // Change innerHTML with input element with original values from text inside
-    supplyKitId.innerHTML = `<input type="text" id="supply-kit-id-text-${i}" value=${supplyKitIdData}></input>`;
+    supplyKitId.innerHTML = `<input type="text" id="supply-kit-id-text-${i}" value=${supplyKitIdData} style="width:95px;"></input>`;
 
     // uspsTrackingNumber.innnerHTML = `<input type="text" id="usps-number-text-${i}" value=${uspsTrackingNumberData}></input>`;
-    uspsTrackingNumber.innerHTML = `<input type="text" id="usps-number-text-${i}" value=${uspsTrackingNumberData}></input>`;
+    uspsTrackingNumber.innerHTML = `<input type="text" id="usps-number-text-${i}" value=${uspsTrackingNumberData} style="width:190px;"></input>`;
   });
 };
 
