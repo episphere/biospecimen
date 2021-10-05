@@ -26,7 +26,7 @@ export const specimenTemplate = async (data, formData, collections) => {
         </div>
         `;
         if(collections){
-            template+=`</br><div class="row"><h4>Participant Collections</h4></div>
+            template+=`</br><div class="row"><h4>Participant's Existing Collection IDs</h4></div>
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
@@ -54,7 +54,7 @@ export const specimenTemplate = async (data, formData, collections) => {
             template +=`</tbody></table>`
         }
         
-        template += `</br><div class="row"><h4>Start a new Collection</h4></div>
+        template += `</br><div class="row"><h4>Link a new Collection ID</h4></div>
         <form id="specimenLinkForm" method="POST" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">
             
             
