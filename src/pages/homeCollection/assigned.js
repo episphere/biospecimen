@@ -115,20 +115,20 @@ const createAssignedParticipantRows = (assignedParticipantsRows) => {
         </div>
         <div style="display:flex; justify-content:center;">
           <button id="cancel-assign-button-${JSON.stringify(index)}"
-          class="edit-save-button bg-light"
-          style="display:none; position:relative; width:32px; height:32px; margin-right:.5rem; border:2px solid #545454; background-color:#fff;"
-            data-uspsTrackingNumber= ${i.usps_trackingNum} 
-            data-kitID= ${i.supply_kitId} 
-            data-firstName= '${i.first_name}' 
-            data-lastName= '${i.last_name}'
-            data-address1= '${i.address_1}'
-            data-city= '${i.city}'
-            data-state= '${i.state}'
-            data-zipCode= '${i.zip_code}'
-            data-id='${i.id}'
-            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
-            value="Close"><i class="fas fa-times" style="font-size: 1.5rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color:#545454;"></i></button>
-        
+            class="edit-save-button bg-light"
+            style="display:none; position:relative; width:32px; height:32px; margin-right:.5rem; border:2px solid #545454; background-color:#fff;"
+              data-uspsTrackingNumber= ${i.usps_trackingNum} 
+              data-kitID= ${i.supply_kitId} 
+              data-firstName= '${i.first_name}' 
+              data-lastName= '${i.last_name}'
+              data-address1= '${i.address_1}'
+              data-city= '${i.city}'
+              data-state= '${i.state}'
+              data-zipCode= '${i.zip_code}'
+              data-id='${i.id}'
+              data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
+              value="Close"><i class="fas fa-times" style="font-size: 1.5rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color:#545454;"></i></button>
+
           <button id="save-assign-button-${JSON.stringify(index)}"
               class="edit-save-button bg-success"
               style="display:none; position:relative; width:32px; height:32px; background-color:#5cb85c; border:0;"
@@ -173,7 +173,6 @@ const editAssignedRow = (i) => {
     // Change innerHTML with input element with original values from text inside
     supplyKitId.innerHTML = `<input type="text" id="supply-kit-id-text-${i}" value=${supplyKitIdData} style="width:95px;"></input>`;
 
-    // uspsTrackingNumber.innnerHTML = `<input type="text" id="usps-number-text-${i}" value=${uspsTrackingNumberData}></input>`;
     uspsTrackingNumber.innerHTML = `<input type="text" id="usps-number-text-${i}" value=${uspsTrackingNumberData} style="width:190px;"></input>`;
   });
 };
@@ -182,25 +181,11 @@ const saveAssignedRow = (i) => {
   let saveButton = document.getElementById(`save-assign-button-${i}`);
   let editButton = document.getElementById(`edit-assign-button-${i}`);
   let cancelButton = document.getElementById(`cancel-assign-button-${i}`);
-  // Update value of cancel button***
-  saveButton.addEventListener("click", (e) => {
-    // TODO: Add if else condtional checks in regards to successful inputs(Error Handling)
-    if (false) {
-      // TODO : Make Modal for an error?
-      return;
-    }
-    console.log("test", editButton.dataset.id);
-    console.log("cancel button","usps tracking number",cancelButton.dataset.uspstrackingnumber)
-    console.log("cancel button","usps tracking number",cancelButton.dataset.kitid)
 
+  saveButton.addEventListener("click", (e) => {
     let supplyKitIdValue = document.getElementById(`supply-kit-id-text-${i}`).value;
     let uspsNumberValue = document.getElementById(`usps-number-text-${i}`).value;
-    console.log("save...",supplyKitIdValue,uspsNumberValue,editButton.dataset.id);
 
-    // Change edit buttons dataset attributes to maintain current state of supply kit id and usps tracking number
-    editButton.setAttribute("data-uspstrackingnumber", `${uspsNumberValue}`);
-    editButton.setAttribute("data-kitid", `${supplyKitIdValue}`); 
-    console.log(editButton)
     if (uspsNumberValue === `` || supplyKitIdValue === ``) {
       let alertList = document.getElementById("alert_placeholder");
         let template = ``;
@@ -218,7 +203,10 @@ const saveAssignedRow = (i) => {
         usps_trackingNum: uspsNumberValue,
         supply_kitId: supplyKitIdValue,
       };
-      // updateInputFields(jsonObj);
+      // Change edit buttons dataset attributes to maintain current state of supply kit id and usps tracking number after saved
+      editButton.setAttribute("data-uspstrackingnumber", `${uspsNumberValue}`);
+      editButton.setAttribute("data-kitid", `${supplyKitIdValue}`); 
+      updateInputFields(jsonObj);
       document.getElementById("kit-id-" + i).innerHTML = supplyKitIdValue;
       document.getElementById("usps-" + i).innerHTML = uspsNumberValue;
 
@@ -245,18 +233,21 @@ const cancelEdit = (i) => {
   let editButton = document.getElementById(`edit-assign-button-${i}`);
   let cancelButton = document.getElementById(`cancel-assign-button-${i}`);
   cancelButton.addEventListener("click",(e) => {
+    // Targets td cell of supply kit id and usps tracking number
     let supplyKitIdText = document.getElementById(`supply-kit-id-text-${i}`);
     let uspsNumberText = document.getElementById(`usps-number-text-${i}`);
+
+    // Target and get access to the values of the edit buttons dataset kitid and usps tracking number value
     let editButtonKitIdValue = editButton.getAttribute("data-kitid")
     let editButtonUspsNumValue = editButton.getAttribute("data-uspstrackingnumber")
-    console.log("editbutton", editButton.getAttribute("data-kitid"), editButton.getAttribute("data-uspstrackingnumber"))
-    console.log("editBTNKIT",editButtonKitIdValue)
-    console.log("editBTNUSPS",editButtonUspsNumValue)
 
+    // Updates supply kit id and usps number text from targetted input element 
     supplyKitIdText.setAttribute("data-kitid",editButtonKitIdValue)
     uspsNumberText.setAttribute("data-uspstrackingnumber",editButtonUspsNumValue)
     document.getElementById("kit-id-" + i).innerHTML = supplyKitIdText.getAttribute("data-kitid");
     document.getElementById("usps-" + i).innerHTML = uspsNumberText.getAttribute("data-uspstrackingnumber");
+
+    // Toggles appearance by hiding cancel and save button, edit becomes visible 
     saveButton.style.display = "none";
     cancelButton.style.display = "none"
     editButton.style.display = "block";
