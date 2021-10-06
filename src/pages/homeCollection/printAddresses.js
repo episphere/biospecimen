@@ -4,7 +4,7 @@ import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { fakeParticipants, printAddressesParticipants} from "./fakeParticipants.js";
-import { activeHomeCollectionNavbar } from "./activehomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
 // Stringify array of objects and parse fake participants Data
 const fakeParticipantsData = JSON.parse(JSON.stringify(fakeParticipants));
