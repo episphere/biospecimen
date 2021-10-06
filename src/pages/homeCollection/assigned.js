@@ -137,7 +137,7 @@ const createAssignedParticipantRows = (assignedParticipantsRows) => {
             data-zipCode= '${i.zip_code}'
             data-id='${i.id}'
             data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
-            value="Close"><i class="far fa-window-close" style="font-size: 1.5rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i></button>
+            value="Close"><i class="fas fa-times" style="font-size: 1.5rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i></button>
         </td>
       </tr>`;
   });
@@ -176,6 +176,7 @@ const saveAssignedRow = (i) => {
   let saveButton = document.getElementById(`save-assign-button-${i}`);
   let editButton = document.getElementById(`edit-assign-button-${i}`);
   let cancelButton = document.getElementById(`cancel-assign-button-${i}`);
+  // Update value of cancel button***
   saveButton.addEventListener("click", (e) => {
     // TODO: Add if else condtional checks in regards to successful inputs(Error Handling)
     if (false) {
@@ -183,15 +184,17 @@ const saveAssignedRow = (i) => {
       return;
     }
     console.log("test", editButton.dataset.id);
+    console.log("cancel button","usps tracking number",cancelButton.dataset.uspstrackingnumber)
+    console.log("cancel button","usps tracking number",cancelButton.dataset.kitid)
 
     let supplyKitIdValue = document.getElementById(`supply-kit-id-text-${i}`).value;
     let uspsNumberValue = document.getElementById(`usps-number-text-${i}`).value;
-    console.log(
-      "save...",
-      supplyKitIdValue,
-      uspsNumberValue,
-      editButton.dataset.id
-    );
+    console.log("save...",supplyKitIdValue,uspsNumberValue,editButton.dataset.id);
+
+    // Change edit buttons dataset attributes to maintain current state of supply kit id and usps tracking number
+    editButton.setAttribute("data-uspstrackingnumber", `${uspsNumberValue}`);
+    editButton.setAttribute("data-kitid", `${supplyKitIdValue}`); 
+    console.log(editButton)
     if (uspsNumberValue === `` || supplyKitIdValue === ``) {
       let alertList = document.getElementById("alert_placeholder");
         let template = ``;
@@ -209,7 +212,7 @@ const saveAssignedRow = (i) => {
         usps_trackingNum: uspsNumberValue,
         supply_kitId: supplyKitIdValue,
       };
-      updateInputFields(jsonObj);
+      // updateInputFields(jsonObj);
       document.getElementById("kit-id-" + i).innerHTML = supplyKitIdValue;
       document.getElementById("usps-" + i).innerHTML = uspsNumberValue;
 
@@ -236,9 +239,21 @@ const cancelEdit = (i) => {
   let editButton = document.getElementById(`edit-assign-button-${i}`);
   let cancelButton = document.getElementById(`cancel-assign-button-${i}`);
   cancelButton.addEventListener("click",(e) => {
-    let supplyKitIdValue = document.getElementById(`supply-kit-id-text-${i}`).value;
-    let uspsNumberValue = document.getElementById(`usps-number-text-${i}`).value;
-    console.log("editbutton",editButton, editButton.getAttribute("data-kitid"), editButton.getAttribute("data-uspstrackingnumber"))
+    let supplyKitIdText = document.getElementById(`supply-kit-id-text-${i}`);
+    let uspsNumberText = document.getElementById(`usps-number-text-${i}`);
+    let editButtonKitIdValue = editButton.getAttribute("data-kitid")
+    let editButtonUspsNumValue = editButton.getAttribute("data-uspstrackingnumber")
+    console.log("editbutton", editButton.getAttribute("data-kitid"), editButton.getAttribute("data-uspstrackingnumber"))
+    console.log("editBTNKIT",editButtonKitIdValue)
+    console.log("editBTNUSPS",editButtonUspsNumValue)
+
+    supplyKitIdText.setAttribute("data-kitid",editButtonKitIdValue)
+    uspsNumberText.setAttribute("data-uspstrackingnumber",editButtonUspsNumValue)
+    document.getElementById("kit-id-" + i).innerHTML = supplyKitIdText.getAttribute("data-kitid");
+    document.getElementById("usps-" + i).innerHTML = uspsNumberText.getAttribute("data-uspstrackingnumber");
+    saveButton.style.display = "none";
+    cancelButton.style.display = "none"
+    editButton.style.display = "block";
   })
 }
 
