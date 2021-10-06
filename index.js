@@ -27,9 +27,7 @@ window.onload = () => {
             console.log(error);
         }
     }
-    !firebase.apps.length
-        ? firebase.initializeApp(firebaseConfig())
-        : firebase.app();
+    !firebase.apps.length ? firebase.initializeApp(firebaseConfig()) : firebase.app();
     auth = firebase.auth();
     // location.hash = '#welcome';
     manageRoutes();
@@ -47,12 +45,9 @@ const manageRoutes = async () => {
         else if (route === "#welcome") welcomeScreen(auth, route);
         else if (route === "#bptl") bptlScreen(auth, route);
         else if (route === "#kitassembly") kitAssemblyScreen(auth, route);
-        else if (route === "#participantselection")
-            printAddressesScreen(auth, route);
-        else if (route === "#allParticipants")
-            allParticipantsScreen(auth, route);
-        else if (route === "#addressPrinted")
-            addressesPrintedScreen(auth, route);
+        else if (route === "#participantselection") printAddressesScreen(auth, route);
+        else if (route === "#allParticipants") allParticipantsScreen(auth, route);
+        else if (route === "#addressPrinted") addressesPrintedScreen(auth, route);
         else if (route === "#assigned") assignedScreen(auth, route);
         else if (route === "#kitshipment") kitShipmentScreen(auth, route);
         else if (route === "#shipped") shippedScreen(auth, route);
@@ -60,10 +55,8 @@ const manageRoutes = async () => {
         else if (route === "#manage_users") manageUsers(auth, route);
         else if (route === "#sign_out") signOut();
         else if (route === "#reports") reportsQuery(auth, route);
-        else if (route === "#packagesintransit")
-            packagesInTransitScreen(auth, route);
-        else if (route === "#receivepackages")
-            packageReceiptScreen(auth, route);
+        else if (route === "#packagesintransit") packagesInTransitScreen(auth, route);
+        else if (route === "#receivepackages") packageReceiptScreen(auth, route);
         else if (route === "#kitreports") kitReportsScreen(auth, route);
         else window.location.hash = "#welcome";
     } else {
