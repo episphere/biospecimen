@@ -1,17 +1,9 @@
-import {
-    getIdToken,
-    findParticipant,
-    showAnimation,
-    hideAnimation,
-} from "../../shared.js";
+import { getIdToken,findParticipant, showAnimation, hideAnimation } from "../../shared.js";
 import fieldMapping from "../../fieldToConceptIdMapping.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
-import {
-    fakeParticipants,
-    printAddressesParticipants,
-} from "./fakeParticipants.js";
+import { fakeParticipants, printAddressesParticipants } from "./fakeParticipants.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
 // Stringify array of objects and parse fake participants Data
@@ -25,15 +17,7 @@ export const printAddressesScreen = async (auth, route) => {
     printaddressesTemplate(username, auth, route, fakeParticipantsData);
 };
 
-const printaddressesTemplate = async (
-    name,
-    auth,
-    route,
-    printAddressesParticipants
-) => {
-    showAnimation();
-    // const response = await findParticipant("first");
-    hideAnimation();
+const printaddressesTemplate = async (name, auth, route, printAddressesParticipants) => {
     let template = ``;
     template += renderParticipantSelectionHeader();
     template += ` <div class="container-fluid">
@@ -60,9 +44,7 @@ const printaddressesTemplate = async (
                                         </tr>
                                     </thead>   
                                     <tbody>
-                                      ${createParticipantRows(
-                                          printAddressesParticipants
-                                      )}
+                                      ${createParticipantRows(printAddressesParticipants)}
                                     </tbody>
                                   </table>
                             </div>
