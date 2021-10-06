@@ -82,6 +82,7 @@ const assignedTemplate = async (name, auth, route) => {
 const createAssignedParticipantRows = (assignedParticipantsRows) => {
   let template = ``;
   // Use for loop on fake assigned data array, --> i is current object, index is current object number in array
+  
   let uspsTrackingHolder = [];
   assignedParticipantsRows.forEach((i, index) => {
     uspsTrackingHolder.push(i.usps_trackingNum);
@@ -110,9 +111,25 @@ const createAssignedParticipantRows = (assignedParticipantsRows) => {
             data-id='${i.id}'
             data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
             value="Edit" ><i class="fas fa-edit" style="font-size:1.2rem"></i></button>
+
+        <button id="cancel-assign-button-${JSON.stringify(index)}"
+          class="edit-save-button bg-light"
+          style="display:none; position:relative; width:32px; height:32px; border:0; margin-right:.5rem; border:2px solid #545454; background-color:#fff;"
+            data-uspsTrackingNumber= ${i.usps_trackingNum} 
+            data-kitID= ${i.supply_kitId} 
+            data-firstName= '${i.first_name}' 
+            data-lastName= '${i.last_name}'
+            data-address1= '${i.address_1}'
+            data-city= '${i.city}'
+            data-state= '${i.state}'
+            data-zipCode= '${i.zip_code}'
+            data-id='${i.id}'
+            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
+            value="Close"><i class="fas fa-times" style="font-size: 1.5rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color:#545454;"></i></button>
+
         <button id="save-assign-button-${JSON.stringify(index)}"
             class="edit-save-button bg-success;"
-            style="display:none; position:relative; width:32px; height:32px; border:0; background-color:#5cb85c;color:#fff; margin-right:.5rem;"
+            style="display:none; position:relative; width:32px; height:32px; border:0; background-color:#5cb85c;color:#fff;"
               data-uspsTrackingNumber= ${i.usps_trackingNum} 
               data-kitID= ${i.supply_kitId} 
               data-firstName= '${i.first_name}' 
@@ -124,20 +141,6 @@ const createAssignedParticipantRows = (assignedParticipantsRows) => {
               data-id='${i.id}'
               data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
               value="Save" data-toggle="modal"><i class="fas fa-check-square" style="font-size: 1.1rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i></button>
-        <button id="cancel-assign-button-${JSON.stringify(index)}"
-          class="edit-save-button bg-warning;"
-          style="display:none; position:relative; width:32px; height:32px; border:0; background-color:#f0f0f0;color:#000;"
-            data-uspsTrackingNumber= ${i.usps_trackingNum} 
-            data-kitID= ${i.supply_kitId} 
-            data-firstName= '${i.first_name}' 
-            data-lastName= '${i.last_name}'
-            data-address1= '${i.address_1}'
-            data-city= '${i.city}'
-            data-state= '${i.state}'
-            data-zipCode= '${i.zip_code}'
-            data-id='${i.id}'
-            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
-            value="Close"><i class="fas fa-times" style="font-size: 1.5rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i></button>
         </td>
       </tr>`;
   });
