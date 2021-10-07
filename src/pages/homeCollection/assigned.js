@@ -1,10 +1,4 @@
-import {
-  getIdToken,
-  findParticipant,
-  showAnimation,
-  hideAnimation,
-  getParticipantSelection,
-} from "../../shared.js";
+import { getIdToken, findParticipant, showAnimation, hideAnimation, getParticipantSelection} from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
@@ -44,10 +38,8 @@ const assignedTemplate = async (name, auth, route) => {
                                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Edit / Save</th>
                                         </tr>
                                     </thead>   
-                                    <tbody>
-                                       ${createAssignedParticipantRows(
-                                         response.data
-                                       )}
+                                    <tbody style="font-size:.9rem;">
+                                       ${createAssignedParticipantRows(response.data)}
                                     </tbody>
                               </table>
                         </div>
@@ -83,12 +75,14 @@ const assignedTemplate = async (name, auth, route) => {
   for (let i = 0; i < response.data.length; i++) {
     editAssignedRow(i);
     saveAssignedRow(i);
+    cancelEdit(i)
   }
 };
 
 const createAssignedParticipantRows = (assignedParticipantsRows) => {
   let template = ``;
   // Use for loop on fake assigned data array, --> i is current object, index is current object number in array
+  
   let uspsTrackingHolder = [];
   assignedParticipantsRows.forEach((i, index) => {
     uspsTrackingHolder.push(i.usps_trackingNum);
@@ -104,35 +98,52 @@ const createAssignedParticipantRows = (assignedParticipantsRows) => {
         <td id=usps-${index} style="padding:1rem">${i.usps_trackingNum}</td>
 
       <td style="height:100%; padding:1rem;" >
-        <input type="button" id="edit-assign-button-${JSON.stringify(index)}"
-          class="edit-assign-button"
-            data-uspsTrackingNumber = ${i.usps_trackingNum} data-kitID= ${
-      i.supply_kitId
-    } data-firstName= '${i.first_name}' data-lastName= '${i.last_name}'
-            data-address1= '${i.address_1}'
-            data-city= '${i.city}'
-            data-state= '${i.state}'
-            data-zipCode= '${i.zip_code}'
-            data-id='${i.id}'
-            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${
-      i.address_1
-    },\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
-            value="Edit" >
+        <div style="display:flex; justify-content:center;">
+          <button id="edit-assign-button-${JSON.stringify(index)}"
+            class="edit-assign-button bg-primary"
+            style="width:32px;height:32px; color:#fff; border:0;"
+              data-uspsTrackingNumber = ${i.usps_trackingNum} data-kitID= ${i.supply_kitId} 
+              data-firstName= '${i.first_name}' 
+              data-lastName= '${i.last_name}'
+              data-address1= '${i.address_1}'
+              data-city= '${i.city}'
+              data-state= '${i.state}'
+              data-zipCode= '${i.zip_code}'
+              data-id='${i.id}'
+              data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
+              value="Edit" ><i class="fas fa-edit" style="font-size:1.2rem"></i></button>
+        </div>
+        <div style="display:flex; justify-content:center;">
+          <button id="cancel-assign-button-${JSON.stringify(index)}"
+            class="edit-save-button bg-light"
+            style="display:none; position:relative; width:32px; height:32px; margin-right:.5rem; border:2px solid #545454; background-color:#fff;"
+              data-uspsTrackingNumber= ${i.usps_trackingNum} 
+              data-kitID= ${i.supply_kitId} 
+              data-firstName= '${i.first_name}' 
+              data-lastName= '${i.last_name}'
+              data-address1= '${i.address_1}'
+              data-city= '${i.city}'
+              data-state= '${i.state}'
+              data-zipCode= '${i.zip_code}'
+              data-id='${i.id}'
+              data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
+              value="Close"><i class="fas fa-times" style="font-size: 1.5rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color:#545454;"></i></button>
 
-        <input type="button" id="save-assign-button-${JSON.stringify(index)}"
-       style="display:none;"
-            data-uspsTrackingNumber= ${i.usps_trackingNum} data-kitID= ${
-      i.supply_kitId
-    } data-firstName= '${i.first_name}' data-lastName= '${i.last_name}'
-            data-address1= '${i.address_1}'
-            data-city= '${i.city}'
-            data-state= '${i.state}'
-            data-zipCode= '${i.zip_code}'
-            data-id='${i.id}'
-            data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${
-      i.address_1
-    },\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
-            value="Save" data-toggle="modal">
+          <button id="save-assign-button-${JSON.stringify(index)}"
+              class="edit-save-button bg-success"
+              style="display:none; position:relative; width:32px; height:32px; background-color:#5cb85c; border:0;"
+                data-uspsTrackingNumber= ${i.usps_trackingNum} 
+                data-kitID= ${i.supply_kitId} 
+                data-firstName= '${i.first_name}' 
+                data-lastName= '${i.last_name}'
+                data-address1= '${i.address_1}'
+                data-city= '${i.city}'
+                data-state= '${i.state}'
+                data-zipCode= '${i.zip_code}'
+                data-id='${i.id}'
+                data-kitAssignmentInfo = '${i.first_name} ${i.last_name}\n${i.address_1},\n${i.city}, ${i.state} ${i.zip_code} ${i.id}'
+                value="Save" data-toggle="modal"><i class="fas fa-check" style="color:#fff; font-size: 1.1rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i></button>
+          </div>
         </td>
       </tr>`;
   });
@@ -143,10 +154,12 @@ const createAssignedParticipantRows = (assignedParticipantsRows) => {
 const editAssignedRow = (i) => {
   let editButton = document.getElementById(`edit-assign-button-${i}`);
   let saveButton = document.getElementById(`save-assign-button-${i}`);
+  let cancelButton = document.getElementById(`cancel-assign-button-${i}`);
 
   editButton.addEventListener("click", (e) => {
     editButton.style.display = "none";
     saveButton.style.display = "block";
+    cancelButton.style.display = "block"
 
     // edit and target supply kit id and usps tracking number
 
@@ -158,37 +171,21 @@ const editAssignedRow = (i) => {
     let uspsTrackingNumberData = uspsTrackingNumber.innerHTML;
 
     // Change innerHTML with input element with original values from text inside
-    supplyKitId.innerHTML = `<input type="text" id="supply-kit-id-text-${i}" value=${supplyKitIdData}></input>`;
+    supplyKitId.innerHTML = `<input type="text" id="supply-kit-id-text-${i}" value=${supplyKitIdData} style="width:95px;"></input>`;
 
-    // uspsTrackingNumber.innnerHTML = `<input type="text" id="usps-number-text-${i}" value=${uspsTrackingNumberData}></input>`;
-    uspsTrackingNumber.innerHTML = `<input type="text" id="usps-number-text-${i}" value=${uspsTrackingNumberData}></input>`;
+    uspsTrackingNumber.innerHTML = `<input type="text" id="usps-number-text-${i}" value=${uspsTrackingNumberData} style="width:190px;"></input>`;
   });
 };
 
 const saveAssignedRow = (i) => {
   let saveButton = document.getElementById(`save-assign-button-${i}`);
   let editButton = document.getElementById(`edit-assign-button-${i}`);
+  let cancelButton = document.getElementById(`cancel-assign-button-${i}`);
 
   saveButton.addEventListener("click", (e) => {
-    // TODO: Add if else condtional checks in regards to successful inputs(Error Handling)
-    if (false) {
-      // TODO : Make Modal for an error?
-      return;
-    }
-    console.log("test", editButton.dataset.id);
+    let supplyKitIdValue = document.getElementById(`supply-kit-id-text-${i}`).value;
+    let uspsNumberValue = document.getElementById(`usps-number-text-${i}`).value;
 
-    let supplyKitIdValue = document.getElementById(
-      `supply-kit-id-text-${i}`
-    ).value;
-    let uspsNumberValue = document.getElementById(
-      `usps-number-text-${i}`
-    ).value;
-    console.log(
-      "save...",
-      supplyKitIdValue,
-      uspsNumberValue,
-      editButton.dataset.id
-    );
     if (uspsNumberValue === `` || supplyKitIdValue === ``) {
       let alertList = document.getElementById("alert_placeholder");
         let template = ``;
@@ -206,12 +203,17 @@ const saveAssignedRow = (i) => {
         usps_trackingNum: uspsNumberValue,
         supply_kitId: supplyKitIdValue,
       };
+      // Change edit buttons dataset attributes to maintain current state of supply kit id and usps tracking number after saved
+      editButton.setAttribute("data-uspstrackingnumber", `${uspsNumberValue}`);
+      editButton.setAttribute("data-kitid", `${supplyKitIdValue}`); 
       updateInputFields(jsonObj);
       document.getElementById("kit-id-" + i).innerHTML = supplyKitIdValue;
       document.getElementById("usps-" + i).innerHTML = uspsNumberValue;
 
       saveButton.style.display = "none";
+      cancelButton.style.display = "none"
       editButton.style.display = "block";
+
       let alertList = document.getElementById("alert_placeholder");
       let template = ``;
       template += `
@@ -225,6 +227,32 @@ const saveAssignedRow = (i) => {
     }
     });
 };
+
+const cancelEdit = (i) => {
+  let saveButton = document.getElementById(`save-assign-button-${i}`);
+  let editButton = document.getElementById(`edit-assign-button-${i}`);
+  let cancelButton = document.getElementById(`cancel-assign-button-${i}`);
+  cancelButton.addEventListener("click",(e) => {
+    // Targets td cell of supply kit id and usps tracking number
+    let supplyKitIdText = document.getElementById(`supply-kit-id-text-${i}`);
+    let uspsNumberText = document.getElementById(`usps-number-text-${i}`);
+
+    // Target and get access to the values of the edit buttons dataset kitid and usps tracking number value
+    let editButtonKitIdValue = editButton.getAttribute("data-kitid")
+    let editButtonUspsNumValue = editButton.getAttribute("data-uspstrackingnumber")
+
+    // Updates supply kit id and usps number text from targetted input element 
+    supplyKitIdText.setAttribute("data-kitid",editButtonKitIdValue)
+    uspsNumberText.setAttribute("data-uspstrackingnumber",editButtonUspsNumValue)
+    document.getElementById("kit-id-" + i).innerHTML = supplyKitIdText.getAttribute("data-kitid");
+    document.getElementById("usps-" + i).innerHTML = uspsNumberText.getAttribute("data-uspstrackingnumber");
+
+    // Toggles appearance by hiding cancel and save button, edit becomes visible 
+    saveButton.style.display = "none";
+    cancelButton.style.display = "none"
+    editButton.style.display = "block";
+  })
+}
 
 /*
 ==================================

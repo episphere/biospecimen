@@ -903,17 +903,19 @@ export const replaceDateInputWithMaskedInput = (dateInput) => {
   });
 };
 
-// Convert utc in Seconds to readable Date and Time
+// Convert ISO to Readable Date and UTC Time (UTC FORMAT TO MATCH BSI)
 export const convertTime = (time) => {
     if (!time) {
         return "";
     }
-    let utcSeconds = time;
-    const myDate = new Date(utcSeconds);
+    let formatISO = time;
+    const myDate = new Date(formatISO);
+    
     return myDate.toLocaleString("en-us", {
         year: "numeric",
         month: "numeric",
         day: "numeric",
+        hourCycle: 'h23',
         hour: "2-digit",
         minute: "2-digit",
     });

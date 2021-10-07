@@ -1,4 +1,4 @@
-import { getIdToken,findParticipant, showAnimation, hideAnimation} from "../../shared.js";
+import { getIdToken, findParticipant, showAnimation, hideAnimation} from "../../shared.js";
 import fieldMapping from "../../fieldToConceptIdMapping.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
@@ -18,9 +18,6 @@ export const printAddressesScreen = async (auth, route) => {
 };
 
 const printaddressesTemplate = async (name, auth, route, printAddressesParticipants) => {
-    showAnimation();
-    // const response = await findParticipant("first");
-    hideAnimation();
     let template = ``;
     template += renderParticipantSelectionHeader();
     template += ` <div class="container-fluid">
@@ -47,9 +44,7 @@ const printaddressesTemplate = async (name, auth, route, printAddressesParticipa
                                         </tr>
                                     </thead>   
                                     <tbody>
-                                      ${createParticipantRows(
-                                          printAddressesParticipants
-                                      )}
+                                      ${createParticipantRows(printAddressesParticipants)}
                                     </tbody>
                                   </table>
                             </div>
