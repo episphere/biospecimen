@@ -53,14 +53,14 @@ export const checkOutScreen = (data, specimenData) => {
         <div class="row info-row">
             <div class="col-md-3">
                 <div class="col-md-12 info-box">
-                    <div class="row"><span class="full-width">Baseline Module 3</span></div>
+                    <div class="row"><span class="full-width">Initial Survey - SAS</span></div>
                     <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
                     <div class="row"><span class="full-width">Not Completed</span></div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="col-md-12 info-box">
-                    <div class="row"><span class="full-width">Baseline Module 4</span></div>
+                    <div class="row"><span class="full-width">Initial Survey - LAW</span></div>
                     <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
                     <div class="row"><span class="full-width">Not Completed</span></div>
                 </div>

@@ -49,25 +49,25 @@ export const checkInTemplate = (data) => {
             <div class="row info-row">
                 <div class="col-md-3">
                     <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">Baseline module 1</span></div>
+                        <div class="row"><span class="full-width">Initial Survey - BOH</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">Baseline module 2</span></div>
+                        <div class="row"><span class="full-width">Initial Survey - MRE</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">Baseline module 3</span></div>
+                        <div class="row"><span class="full-width">Initial Survey - SAS</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">Baseline module 4</span></div>
+                        <div class="row"><span class="full-width">Initial Survey - LAW</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
                     </div>
                 </div>
