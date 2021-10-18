@@ -89,7 +89,7 @@ export const collectProcessTemplate = (data, formData) => {
                     <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="button" id="collectionSaveExit">Save and Exit</button>
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="collectionNext">Next</button>
+                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="collectionNext">Save and Continue</button>
                 </div>
             </div>
         </form>
@@ -156,7 +156,7 @@ export const tubeCollectedTemplate = (data, formData) => {
             </br>
             <div class="row">
                 <div class="ml-auto">
-                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="collectionNext">Next</button>
+                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="collectionNext">Save and Continue</button>
                 </div>
             </div>
         </form>
