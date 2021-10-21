@@ -39,9 +39,8 @@ const receivedKitsTemplate = async (name,auth,route) => {
                           <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Connect ID</th>
                           <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit Status</th>
                           <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Study Site</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">City</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">State</th>
                           <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Date Requested</th>
+                          <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Date Received</th>
                       </tr>
                   </thead>   
                   <tbody>
@@ -68,9 +67,8 @@ const createReceivedRows = (participantRows) => {
       <td>${i.connect_id}</td>
       <td>${i.kit_status}</td>
       <td>${i.study_site}</td>
-      <td>${i.city}</td>
-      <td>${i.state}</td>
       <td>${i.date_requested}</td>
+      <td>${i.date_received ?? "N/A"}</td>
     </tr>`;
   });
   return template
