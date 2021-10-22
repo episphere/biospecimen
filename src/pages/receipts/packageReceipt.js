@@ -4,6 +4,11 @@ import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 
+const inputObject = {
+  inputChange: false
+}
+
+
 export const packageReceiptScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
@@ -16,6 +21,30 @@ export const packageReceiptScreen = async (auth, route) => {
   formSubmit();
   cancelChanges();
   targetAnchorTagEl()
+
+  const scannedBarcodeInputEl = document.getElementById("scannedBarcode")
+  const packageConditionEl = document.getElementById("packageCondition")
+  scannedBarcodeInputEl.addEventListener("input",hasChanged)
+  packageConditionEl.addEventListener("change",hasChangedSelection)
+
+  
+}
+
+const hasChanged = (e) => {
+  if(e.target.value.trim() ==="") {
+    inputObject.inputChange = false
+    console.log(e.target.value,inputObject)
+  }
+  else if(e.target.value.trim() !== ""){
+    inputObject.inputChange = true
+    console.log(e.target.value,e.target,inputObject)
+    return
+  }
+  else return
+}
+
+const hasChangedSelection = (e) => {
+  console.log(e.target.value)
 }
 
 
