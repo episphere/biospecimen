@@ -66,7 +66,6 @@ export const participantSelectionDropdown = () => {
         ".participantSelectionDropdown"
     );
     // CHECKS THE CURRENT HASH AFTER ON LOAD AND SETS OPTION TO SELECTED
-    // TODO: Refactor into switch statement?
     if (location.hash === "#participantselection") {
         document.getElementById("select-pending").setAttribute("selected", "selected");
     }
@@ -79,9 +78,11 @@ export const participantSelectionDropdown = () => {
     if (location.hash === "#assigned") {
         document.getElementById("select-assigned").setAttribute("selected", "selected");
     }
-
     if (location.hash === "#shipped") {
         document.getElementById("select-shipped").setAttribute("selected", "selected");
+    }
+    if(location.hash === "#received"){
+        document.getElementById("select-received").setAttribute("selected","selected");
     }
 
     participantDropdown.addEventListener("change", (e) => {
@@ -106,9 +107,11 @@ export const participantSelectionDropdown = () => {
             return;
         } else if (selection === "shipped") {
             location.hash = "#shipped";
-        } else {
-            return;
-        }
+            return
+        } else if(selection === "received") {
+            location.hash = "#received"
+            return
+        } else return
     });
 };
 

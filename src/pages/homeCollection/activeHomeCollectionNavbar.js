@@ -11,7 +11,8 @@ export const activeHomeCollectionNavbar = () => {
            location.hash === "#allParticipants" || 
            location.hash === "#addressPrinted" || 
            location.hash === "#assigned" ||
-           location.hash === "#shipped"){
+           location.hash === "#shipped" ||
+           location.hash === "#received") {
       participantSelectionNavItem.classList.add("active");
       participantSelectionNavItem.style.backgroundColor = "#bbcffc85";
       participantSelectionNavItem.style.borderRadius = "4px 4px 0 0";

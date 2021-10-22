@@ -913,8 +913,8 @@ export const convertTime = (time) => {
     
     return myDate.toLocaleString("en-us", {
         year: "numeric",
-        month: "numeric",
-        day: "numeric",
+        month: "2-digit",
+        day: "2-digit",
         hourCycle: 'h23',
         hour: "2-digit",
         minute: "2-digit",

@@ -28,6 +28,7 @@ export const renderKitStatusList = () => {
                         <option id="select-address-printed" value="addressPrinted">Address Printed</option>
                         <option id="select-assigned" value="assigned">Assigned</option>
                         <option id="select-shipped" value="shipped">Shipped</option>
+                        <option id="select-received" value="received">Received</option>
                     </select>
                 </div>
                 </br>

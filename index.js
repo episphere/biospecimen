@@ -13,9 +13,11 @@ import { addressesPrintedScreen } from "./src/pages/homeCollection/assignKit.js"
 import { allParticipantsScreen } from "./src/pages/homeCollection/allParticipants.js";
 import { kitShipmentScreen } from "./src/pages/homeCollection/kitShipment.js";
 import { shippedScreen } from "./src/pages/homeCollection/shipped.js";
+import { receivedKitsScreen } from "./src/pages/homeCollection/receivedKits.js";
 import { packagesInTransitScreen } from "./src/pages/receipts/packagesInTransit.js";
 import { packageReceiptScreen } from "./src/pages/receipts/packageReceipt.js";
 import { kitReportsScreen } from "./src/pages/reports/kitReports.js";
+
 
 let auth = "";
 
@@ -58,6 +60,7 @@ const manageRoutes = async () => {
         else if (route === "#packagesintransit") packagesInTransitScreen(auth, route);
         else if (route === "#receivepackages") packageReceiptScreen(auth, route);
         else if (route === "#kitreports") kitReportsScreen(auth, route);
+        else if (route === "#received") receivedKitsScreen(auth,route);
         else window.location.hash = "#welcome";
     } else {
         if (route === "#") signIn();
