@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getParticipantSelection } from "../../shared.js";
+import { showAnimation, hideAnimation, getParticipantSelection, convertTime } from "../../shared.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
 import { participantSelectionDropdown } from "./printAddresses.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -13,16 +13,9 @@ export const receivedKitsScreen = async (auth,route) => {
 
 const receivedKitsTemplate = async (name,auth,route) => {
   showAnimation();
-  // Use New Endpoint once created
-  const response = await getParticipantSelection("all");
+  const response = await getParticipantSelection("received");
   hideAnimation();
   let template = ``;
-
-  // Change Kit Status of first 5 items to received
-  // console.log(response.date)
-
-  const alterData = addFirstFiveItems(response.data)
-  console.log(alterData)
 
   template += renderParticipantSelectionHeader();
   template += `<div class="container-fluid">
@@ -44,7 +37,7 @@ const receivedKitsTemplate = async (name,auth,route) => {
                       </tr>
                   </thead>   
                   <tbody>
-                        ${createReceivedRows(alterData)}
+                    ${createReceivedRows(response.data)}
                   </tbody>
                 </table>
           </div>
@@ -62,28 +55,18 @@ const createReceivedRows = (participantRows) => {
   participantRows.forEach(i => {
     template += `
     <tr class="row-color-enrollment-dark participantRow">
-      <td>${i.first_name}</td>
-      <td>${i.last_name}</td>
-      <td>${i.connect_id}</td>
-      <td>${i.kit_status}</td>
-      <td>${i.study_site}</td>
-      <td>${i.date_requested}</td>
-      <td>${i.date_received ?? "N/A"}</td>
+      <td>${i.first_name ?? "N/A"}</td>
+      <td>${i.last_name ?? "N/A"}</td>
+      <td>${i.connect_id ?? "N/A"}</td>
+      <td>${i.kit_status ?? "N/A"}</td>
+      <td>${i.study_site ?? "N/A"}</td>
+      <td>${i.date_requested ?? "N/A"}</td>
+      <td>${i.time_stamp && splitTime(convertTime(i.time_stamp)) ?? "N/A"}</td>
     </tr>`;
   });
   return template
 }
 
- const addFirstFiveItems = (data) => {
-   let arr = []
-   // Loop and push first five items to arr
-   for(let i = 0; i<5;i++) {
-     arr.push(data[i])
-   }
-   // Reassign all item object kit status values from shipped to received
-   for(let object in arr) {
-     arr[object].kit_status = "received"
-   }
-   // Return Altered array
-   return arr
- }
+const splitTime = (dateTime) => {
+  return dateTime.split(",")[0]
+}
