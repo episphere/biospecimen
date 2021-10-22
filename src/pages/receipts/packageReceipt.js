@@ -15,6 +15,7 @@ export const packageReceiptScreen = async (auth, route) => {
   enableCollectionCardFields();
   formSubmit();
   cancelChanges();
+  targetAnchorTagEl()
 }
 
 
@@ -233,3 +234,34 @@ const storePackageReceipt = async (data) => {
         alert("Error");
     }
 };
+
+
+/*
+FUNCTIONS FOR UNSAVED CHANGES
+*/
+
+// Add to shared.js later as an export function expression
+const targetAnchorTagEl = (state = false) => {
+  // Target all items with anchor tags, convert HTML Collection to a normal array of elements
+  // Filter and remove current anchor tag with the current location.hash
+  console.log(location.hash)
+  const allAnchorTags = Array.from(document.getElementsByTagName("a"));
+  const filteredAnchorTags = allAnchorTags.filter(el => el.getAttribute("href") !== location.hash)
+  
+  console.log(filteredAnchorTags)
+  
+  // if(!state) {
+  //   allAnchorTags.forEach(el => {
+  //       el.addEventListener("click", clickMe)
+  //   })
+  // }
+  // else {
+  //   allAnchorTags.forEach(el => {
+  //     el.removeEventListener("click", clickMe)
+  //   })
+  // }
+}
+
+function clickMe(e) {
+  console.log(e.target,"Clicked")
+}
