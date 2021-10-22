@@ -55,18 +55,21 @@ const createReceivedRows = (participantRows) => {
   participantRows.forEach(i => {
     template += `
     <tr class="row-color-enrollment-dark participantRow">
-      <td>${i.first_name ?? "N/A"}</td>
-      <td>${i.last_name ?? "N/A"}</td>
-      <td>${i.connect_id ?? "N/A"}</td>
-      <td>${i.kit_status ?? "N/A"}</td>
-      <td>${i.study_site ?? "N/A"}</td>
-      <td>${i.date_requested ?? "N/A"}</td>
-      <td>${i.time_stamp && splitTime(convertTime(i.time_stamp)) ?? "N/A"}</td>
+      <td>${i.first_name}</td>
+      <td>${i.last_name}</td>
+      <td>${i.connect_id}</td>
+      <td>${i.kit_status}</td>
+      <td>${i.study_site}</td>
+      <td>${i.date_requested}</td>
+      <td>${i.time_stamp && splitTime(convertTime(i.time_stamp))}</td>
     </tr>`;
   });
   return template
 }
 
 const splitTime = (dateTime) => {
+  if(!dateTime) {
+    return ""
+  }
   return dateTime.split(",")[0]
 }
