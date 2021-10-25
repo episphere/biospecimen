@@ -8,6 +8,7 @@ const inputObject = {
   inputChange: false
 }
 
+let packageConditionsArr = []
 
 export const packageReceiptScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -20,16 +21,40 @@ export const packageReceiptScreen = async (auth, route) => {
   enableCollectionCardFields();
   formSubmit();
   cancelChanges();
-  targetAnchorTagEl()
+  targetAnchorTagEl();
 
-  const scannedBarcodeInputEl = document.getElementById("scannedBarcode")
-  const packageConditionEl = document.getElementById("packageCondition")
+  // Receive Packages: barcode, packageconditions,receive package comments, date received
+  const scannedBarcodeInputEl = document.getElementById("scannedBarcode");
+  const packageConditionEl = document.getElementById("packageCondition");
+  const receivePackageCommentsEl = document.getElementById("receivePackageComments");
+  const dateReceivedEl = document.getElementById("dateReceived");
+
   scannedBarcodeInputEl.addEventListener("input",hasChanged)
-  packageConditionEl.addEventListener("change",hasChangedSelection)
+  packageConditionEl.addEventListener("change",handleChange)
+  receivePackageCommentsEl.addEventListener("input",hasChanged)
+  dateReceivedEl.addEventListener("input",hasChanged)
+
+  // Collection Card Date Entry: collectionCheckBox,collectionId, dateCollectionCard,timeCollectionCard,collectionComments
+
+  const collectionCheckBoxEl = document.getElementById("collectionCheckBox")
+  const collectionIdEl = document.getElementById("collectionId")
+  const dateCollectionCardEl = document.getElementById("dateCollectionCard")
+  const timeCollectionCardEl = document.getElementById("timeCollectionCard")
+  const collectionCommentsEl = document.getElementById("collectionComments")
+  collectionCheckBoxEl.addEventListener("change",isChecked)
+  collectionIdEl.addEventListener("input",hasChanged)
+  dateCollectionCardEl.addEventListener("change",hasChanged)
+  timeCollectionCardEl.addEventListener("input",hasChanged)
+  collectionCommentsEl.addEventListener("input",hasChanged)
 
   
 }
 
+/*
+scannedBarcodeInputEl 
+receivePackageCommentsEl
+dateReceivedEl
+*/ 
 const hasChanged = (e) => {
   if(e.target.value.trim() ==="") {
     inputObject.inputChange = false
@@ -38,13 +63,36 @@ const hasChanged = (e) => {
   else if(e.target.value.trim() !== ""){
     inputObject.inputChange = true
     console.log(e.target.value,e.target,inputObject)
+    // console.log(packageConditionsArr)
     return
   }
   else return
 }
 
-const hasChangedSelection = (e) => {
-  console.log(e.target.value)
+// collectionCheckBoxEl
+const isChecked = (e) => {
+  if(e.target.checked) {
+    inputObject.inputChange = true
+    console.log(e.target.checked)
+    console.log(e.target.value,inputObject)
+  }
+  else {
+    inputObject.inputChange = false
+    console.log(e.target.checked)
+    console.log(e.target.value,inputObject)
+  }
+}
+
+
+// packageConditionEl
+const handleChange = (e) => {
+  let arr = Array.from(e.target.selectedOptions, option => option.value);
+  console.log(arr)
+  // Removes Empty String from first option value
+  const filteredArr = arr.filter(condition => condition !== "")
+  console.log(filteredArr)
+  packageConditionsArr.length = 0
+  // return packageConditionsArr.push(value)
 }
 
 
@@ -208,7 +256,7 @@ const formSubmit = () => {
         obj['collectionComments'] = document.getElementById('collectionComments').value;
        
       }
-      storePackageReceipt(obj);
+      // storePackageReceipt(obj);
 
   })
 }      
@@ -294,3 +342,5 @@ const targetAnchorTagEl = (state = false) => {
 function clickMe(e) {
   console.log(e.target,"Clicked")
 }
+
+// document.getElementById("dateReceived").value
