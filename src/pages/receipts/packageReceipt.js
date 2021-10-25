@@ -57,11 +57,14 @@ dateReceivedEl
 const hasChanged = (e) => {
   if(e.target.value.trim() ==="") {
     inputObject.inputChange = false
-    console.log(e.target.value,inputObject)
+    targetAnchorTagEl(inputObject.inputChange)
+    // console.log(e.target.value,inputObject)
+    
   }
   else if(e.target.value.trim() !== ""){
     inputObject.inputChange = true
-    console.log(e.target.value,e.target,inputObject)
+    targetAnchorTagEl(inputObject.inputChange)
+    // console.log(e.target.value,e.target,inputObject)
     // console.log(packageConditionsArr)
     return
   }
@@ -72,11 +75,13 @@ const hasChanged = (e) => {
 const isChecked = (e) => {
   if(e.target.checked) {
     inputObject.inputChange = true
+    targetAnchorTagEl(inputObject.inputChange)
     console.log(e.target.checked)
     console.log(e.target.value,inputObject)
   }
   else {
     inputObject.inputChange = false
+    targetAnchorTagEl(inputObject.inputChange)
     console.log(e.target.checked)
     console.log(e.target.value,inputObject)
   }
@@ -274,22 +279,31 @@ const formSubmit = () => {
 
 const cancelChanges = () => {
     const cancelChanges = document.getElementById("clearForm");
-    cancelChanges.addEventListener("click", (e) => {
-        document.getElementById("courierType").innerHTML = ``;
-        document.getElementById("scannedBarcode").value = "";
-        document.getElementById("packageCondition").value = "";
-        document.getElementById("receivePackageComments").value = "";
-        document.getElementById("dateReceived").value = "";
-
-        if (document.getElementById("collectionId").value) {
-            document.getElementById("collectionId").value = "";
-            document.getElementById("dateCollectionCard").value = "";
-            document.getElementById("timeCollectionCard").value = "";
-            document.getElementById("collectionCheckBox").checked = false;
-            document.getElementById("collectionComments").value = "";
-        }
-    });
+    cancelChanges.addEventListener("click",cancelConfirm);
 };
+
+const cancelConfirm = (e) => {
+  let result = window.confirm("Changes were made and will be unsaved.")
+
+  if(result){
+    document.getElementById("courierType").innerHTML = ``;
+    document.getElementById("scannedBarcode").value = "";
+    document.getElementById("packageCondition").value = "";
+    document.getElementById("receivePackageComments").value = "";
+    document.getElementById("dateReceived").value = "";
+  
+    if (document.getElementById("collectionId").value) {
+        document.getElementById("collectionId").value = "";
+        document.getElementById("dateCollectionCard").value = "";
+        document.getElementById("timeCollectionCard").value = "";
+        document.getElementById("collectionCheckBox").checked = false;
+        document.getElementById("collectionComments").value = "";
+    }
+  }
+  else {
+    return
+  }
+}
 
 const storePackageReceipt = async (data) => {
     showAnimation();
@@ -336,7 +350,7 @@ const targetAnchorTagEl = (state = false) => {
   const allAnchorTags = Array.from(document.getElementsByTagName("a"));
   const filteredAnchorTags = allAnchorTags.filter(el => el.getAttribute("href") !== location.hash)
   
-  console.log(filteredAnchorTags)
+  // console.log(filteredAnchorTags)
   
   if(state) {
     allAnchorTags.forEach(el => {
@@ -351,6 +365,8 @@ const targetAnchorTagEl = (state = false) => {
 }
 
 function clickMe(e) {
+  // REMOVE LATER- ADDED E PREVENT DEFAULT FOR TESTING PURPOSES
+  e.preventDefault()
   console.log(e.target,"Clicked")
 }
 
