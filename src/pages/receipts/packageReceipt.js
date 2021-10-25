@@ -8,7 +8,6 @@ const inputObject = {
   inputChange: false
 }
 
-let packageConditionsArr = []
 
 export const packageReceiptScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -30,7 +29,7 @@ export const packageReceiptScreen = async (auth, route) => {
   const dateReceivedEl = document.getElementById("dateReceived");
 
   scannedBarcodeInputEl.addEventListener("input",hasChanged)
-  packageConditionEl.addEventListener("change",handleChange)
+  packageConditionEl.addEventListener("change",handleConditionChange)
   receivePackageCommentsEl.addEventListener("input",hasChanged)
   dateReceivedEl.addEventListener("input",hasChanged)
 
@@ -85,14 +84,26 @@ const isChecked = (e) => {
 
 
 // packageConditionEl
-const handleChange = (e) => {
+const handleConditionChange = (e) => {
   let arr = Array.from(e.target.selectedOptions, option => option.value);
-  console.log(arr)
   // Removes Empty String from first option value
   const filteredArr = arr.filter(condition => condition !== "")
-  console.log(filteredArr)
-  packageConditionsArr.length = 0
-  // return packageConditionsArr.push(value)
+
+  if(filteredArr.length) {
+    // filteredArr.forEach(condition => packageConditionsArr.push(condition))
+    inputObject.inputChange = true
+    // call function to add eventlistener to anchor tags
+    targetAnchorTagEl(inputObject.inputChange)
+    console.log(filteredArr)
+    console.log(inputObject)
+  }
+  else {
+    inputObject.inputChange = false
+    targetAnchorTagEl(inputObject.inputChange)
+    // call function to remove eventlistener from anchor tags
+    console.log(filteredArr)
+    console.log(inputObject)
+  }
 }
 
 
@@ -327,16 +338,16 @@ const targetAnchorTagEl = (state = false) => {
   
   console.log(filteredAnchorTags)
   
-  // if(!state) {
-  //   allAnchorTags.forEach(el => {
-  //       el.addEventListener("click", clickMe)
-  //   })
-  // }
-  // else {
-  //   allAnchorTags.forEach(el => {
-  //     el.removeEventListener("click", clickMe)
-  //   })
-  // }
+  if(state) {
+    allAnchorTags.forEach(el => {
+        el.addEventListener("click", clickMe)
+    })
+  }
+  else {
+    allAnchorTags.forEach(el => {
+      el.removeEventListener("click", clickMe)
+    })
+  }
 }
 
 function clickMe(e) {
