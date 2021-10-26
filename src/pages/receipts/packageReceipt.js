@@ -19,7 +19,7 @@ export const packageReceiptScreen = async (auth, route) => {
   disableCollectionCardFields();
   enableCollectionCardFields();
   formSubmit();
-  cancelChanges();
+  // cancelChanges();
   targetAnchorTagEl();
 
   // Receive Packages: barcode, packageconditions,receive package comments, date received
@@ -58,12 +58,14 @@ const hasChanged = (e) => {
   if(e.target.value.trim() ==="") {
     inputObject.inputChange = false
     targetAnchorTagEl(inputObject.inputChange)
+    cancelChanges(inputObject.inputChange)
     // console.log(e.target.value,inputObject)
     
   }
   else if(e.target.value.trim() !== ""){
     inputObject.inputChange = true
     targetAnchorTagEl(inputObject.inputChange)
+    cancelChanges(inputObject.inputChange)
     // console.log(e.target.value,e.target,inputObject)
     // console.log(packageConditionsArr)
     return
@@ -76,12 +78,14 @@ const isChecked = (e) => {
   if(e.target.checked) {
     inputObject.inputChange = true
     targetAnchorTagEl(inputObject.inputChange)
+    cancelChanges(inputObject.inputChange)
     console.log(e.target.checked)
     console.log(e.target.value,inputObject)
   }
   else {
     inputObject.inputChange = false
     targetAnchorTagEl(inputObject.inputChange)
+    cancelChanges(inputObject.inputChange)
     console.log(e.target.checked)
     console.log(e.target.value,inputObject)
   }
@@ -99,13 +103,15 @@ const handleConditionChange = (e) => {
     inputObject.inputChange = true
     // call function to add eventlistener to anchor tags
     targetAnchorTagEl(inputObject.inputChange)
+    cancelChanges(inputObject.inputChange)
     console.log(filteredArr)
     console.log(inputObject)
   }
   else {
     inputObject.inputChange = false
-    targetAnchorTagEl(inputObject.inputChange)
     // call function to remove eventlistener from anchor tags
+    targetAnchorTagEl(inputObject.inputChange)
+    cancelChanges(inputObject.inputChange)
     console.log(filteredArr)
     console.log(inputObject)
   }
@@ -213,6 +219,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
 };
 
 const checkCourierType = () => {
+  // TODO: Add a stricter check
   const a = document.getElementById("scannedBarcode");
   if (a) {
     a.addEventListener("change", () => {
@@ -277,32 +284,57 @@ const formSubmit = () => {
   })
 }      
 
-const cancelChanges = () => {
+// Important question: does an event listener need to be attached as soon as page loads?
+// When page loads every input is blank.
+
+// onload attach event listener
+// input changes add event listener - use click me as test
+// no input changes and not onload - remove click me as test
+
+// Add two parameters and check truthy and falsy values
+const cancelChanges = (inputChanges) => {
     const cancelChanges = document.getElementById("clearForm");
-    cancelChanges.addEventListener("click",cancelConfirm);
+    if(inputChanges) {
+      cancelChanges.addEventListener("click",cancelConfirm)
+    }
+    else {
+      cancelChanges.removeEventListener("click",cancelConfirm)
+    }
 };
 
 const cancelConfirm = (e) => {
-  let result = window.confirm("Changes were made and will be unsaved.")
+    const cancelChanges = document.getElementById("clearForm");
+    let result = confirm("Changes were made and will not be saved.")
 
-  if(result){
-    document.getElementById("courierType").innerHTML = ``;
-    document.getElementById("scannedBarcode").value = "";
-    document.getElementById("packageCondition").value = "";
-    document.getElementById("receivePackageComments").value = "";
-    document.getElementById("dateReceived").value = "";
-  
-    if (document.getElementById("collectionId").value) {
-        document.getElementById("collectionId").value = "";
-        document.getElementById("dateCollectionCard").value = "";
-        document.getElementById("timeCollectionCard").value = "";
-        document.getElementById("collectionCheckBox").checked = false;
-        document.getElementById("collectionComments").value = "";
+    if(result){
+      document.getElementById("courierType").innerHTML = ``;
+      document.getElementById("scannedBarcode").value = "";
+      document.getElementById("packageCondition").value = "";
+      document.getElementById("receivePackageComments").value = "";
+      document.getElementById("dateReceived").value = "";
+      
+      // Remove Later include with error handling for USPS and Fedex?
+      enableCollectionCardFields()
+      enableCollectionCheckBox()
+      cancelChanges.removeEventListener("click",cancelConfirm)
+
+      if (document.getElementById("collectionId").value) {
+          document.getElementById("collectionId").value = "";
+          document.getElementById("dateCollectionCard").value = "";
+          document.getElementById("timeCollectionCard").value = "";
+          document.getElementById("collectionCheckBox").checked = false;
+          document.getElementById("collectionComments").value = "";
+
+          // Remove Later include with error handling for USPS and Fedex?
+          enableCollectionCardFields()
+          enableCollectionCheckBox()
+          cancelChanges.removeEventListener("click",cancelConfirm)
+      }
     }
-  }
-  else {
-    return
-  }
+    else {
+      return 
+    }
+  
 }
 
 const storePackageReceipt = async (data) => {
@@ -371,3 +403,9 @@ function clickMe(e) {
 }
 
 // document.getElementById("dateReceived").value
+
+const enableCollectionCheckBox = () => {
+  const collectionCheckBoxEl = document.getElementById("collectionCheckBox")
+  collectionCheckBoxEl.removeAttribute("disabled")
+  collectionCheckBoxEl.checked = false
+}
