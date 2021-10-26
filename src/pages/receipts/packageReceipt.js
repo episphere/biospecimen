@@ -136,7 +136,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
                         </div>
                         
                         <div class="row form-group">
-                            <label class="col-form-label col-md-4" for="packageConditionSelection">Select Package Condition</label>
+                            <label class="col-form-label col-md-4" for="packageCondition">Select Package Condition</label>
                              <div style="display:inline-block; max-width:90%;"> 
                                 <select required class="col form-control" id="packageCondition" style="width:100%" multiple="multiple">
                                     <option id="select-dashboard" value="">-- Select Package Condition --</option>
@@ -166,7 +166,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
                         </div>
 
                         <div class="row form-group">
-                            <label class="col-form-label col-md-4">Comment</label>
+                            <label class="col-form-label col-md-4" for="receivePackageComments">Comment</label>
                             <textarea class="col-md-8" required id="receivePackageComments" cols="30" rows="3"></textarea>
                         </div>
 
@@ -179,13 +179,13 @@ const packageReceiptTemplate = async (name, auth, route) => {
                             <h5 style="text-align: left;">Collection Card Data Entry</h5>
 
                             <div class="row form-group">
-                                <label class="col-form-label col-md-4">Check if card not included</label>
+                                <label class="col-form-label col-md-4 for="collectionCheckBox">Check if card not included</label>
                                 <input type="checkbox" name="collectionCheckBox" id="collectionCheckBox">
                             </div>
 
                             <div class="row form-group">
-                                <label class="col-form-label col-md-4">Collection ID</label>
-                                <input autocomplete="off" class="col-md-8" type="text" id="collectionId">
+                                <label class="col-form-label col-md-4" for="collectionId">Collection ID</label>
+                                <input autocomplete="off" class="col-md-8 form-control" type="text" id="collectionId">
                             </div>
 
                             <div class="row form-group">
@@ -199,8 +199,8 @@ const packageReceiptTemplate = async (name, auth, route) => {
                             </div>
 
                             <div class="row form-group">
-                                <label class="col-form-label col-md-4">Comments on Card Returned</label>
-                                <textarea class="col-md-8" id="collectionComments" cols="30" rows="3"></textarea>
+                                <label class="col-form-label col-md-4" for="collectionComments">Comments on Card Returned</label>
+                                <textarea class="col-md-8 form-control" id="collectionComments" cols="30" rows="3"></textarea>
                             </div>
                           </div>
                         
