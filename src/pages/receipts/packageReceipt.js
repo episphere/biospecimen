@@ -384,25 +384,32 @@ const targetAnchorTagEl = (state = false) => {
   const allAnchorTags = Array.from(document.getElementsByTagName("a"));
   const filteredAnchorTags = allAnchorTags.filter(el => el.getAttribute("href") !== location.hash)
   
+  // console.log(allAnchorTags)
   // console.log(filteredAnchorTags)
   
   if(state) {
-    allAnchorTags.forEach(el => {
+    filteredAnchorTags.forEach(el => {
+        // el.addEventListener("click", clickMe)
         el.addEventListener("click", clickMe)
     })
   }
   else {
-    allAnchorTags.forEach(el => {
-      el.removeEventListener("click", clickMe)
+    filteredAnchorTags.forEach(el => {
+      // el.removeEventListener("click", clickMe)
+      el.removeEventListener("click", unsavedChangesRoutingMessage)
     })
   }
 }
 
-function clickMe(e) {
+const unsavedChangesRoutingMessage = (e) => {
   // REMOVE LATER- ADDED E PREVENT DEFAULT FOR TESTING PURPOSES
-  e.preventDefault()
-  console.log(e.target,"Clicked")
+
+  // e.preventDefault()
+  // console.log(e.target,"Clicked")
+  unsavedMessageConfirmation()
 }
+
+
 
 // document.getElementById("dateReceived").value
 
@@ -410,4 +417,21 @@ const enableCollectionCheckBox = () => {
   const collectionCheckBoxEl = document.getElementById("collectionCheckBox")
   collectionCheckBoxEl.removeAttribute("disabled")
   collectionCheckBoxEl.checked = false
+}
+
+
+// Reusable message alert
+const unsavedMessageConfirmation = () => {
+  const result = confirm("Any unsaved changes will be lost.\n Are you sure you want to leave the page? ")
+  if(!result) {
+    e.preventDefault()
+    return
+  }
+  else return
+}
+
+const clickMe = (e) => {
+  // REMOVE LATER- ADDED E PREVENT DEFAULT FOR TESTING PURPOSES
+  e.preventDefault()
+  console.log(e.target,"Clicked")
 }
