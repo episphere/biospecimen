@@ -19,7 +19,6 @@ export const packageReceiptScreen = async (auth, route) => {
   disableCollectionCardFields();
   enableCollectionCardFields();
   formSubmit();
-  // cancelChanges();
   targetAnchorTagEl();
 
   // Receive Packages: barcode, packageconditions,receive package comments, date received
@@ -59,6 +58,7 @@ const hasChanged = (e) => {
     inputObject.inputChange = false
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
+    unsavedMessageUnload(inputObject.inputChange)
     // console.log(e.target.value,inputObject)
     
   }
@@ -66,6 +66,7 @@ const hasChanged = (e) => {
     inputObject.inputChange = true
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
+    unsavedMessageUnload(inputObject.inputChange)
     // console.log(e.target.value,e.target,inputObject)
     // console.log(packageConditionsArr)
     return
@@ -79,6 +80,7 @@ const isChecked = (e) => {
     inputObject.inputChange = true
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
+    unsavedMessageUnload(inputObject.inputChange)
     console.log(e.target.checked)
     console.log(e.target.value,inputObject)
   }
@@ -86,6 +88,7 @@ const isChecked = (e) => {
     inputObject.inputChange = false
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
+    unsavedMessageUnload(inputObject.inputChange)
     console.log(e.target.checked)
     console.log(e.target.value,inputObject)
   }
@@ -101,17 +104,23 @@ const handleConditionChange = (e) => {
   if(filteredArr.length) {
     // filteredArr.forEach(condition => packageConditionsArr.push(condition))
     inputObject.inputChange = true
+    document.getElementById("packageCondition").setAttribute("data-selected",`${filteredArr}`)
+    console.log(document.getElementById("packageCondition").setAttribute("data-selected",`${filteredArr}`))
     // call function to add eventlistener to anchor tags
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
+    unsavedMessageUnload(inputObject.inputChange)
     console.log(filteredArr)
     console.log(inputObject)
   }
   else {
     inputObject.inputChange = false
+    // set data-selected attribute
+    document.getElementById("packageCondition").setAttribute("data-selected","")
     // call function to remove eventlistener from anchor tags
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
+    unsavedMessageUnload(inputObject.inputChange)
     console.log(filteredArr)
     console.log(inputObject)
   }
@@ -130,7 +139,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
                         <div class="row form-group">
                             <label class="col-form-label col-md-4" for="scannedBarcode">Scan FedEx/USPS Barcode</label>
                             <div style="display:inline-block;">
-                              <input autocomplete="off" required class="col-md-8" type="text" id="scannedBarcode" style="width: 600px;">
+                              <input autocomplete="off" required class="col-md-8 form-control" type="text" id="scannedBarcode" style="width: 600px;">
                               <span id='courierType' style="padding-left: 10px;"></span>
                             </div>
                         </div>
@@ -138,7 +147,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
                         <div class="row form-group">
                             <label class="col-form-label col-md-4" for="packageCondition">Select Package Condition</label>
                              <div style="display:inline-block; max-width:90%;"> 
-                                <select required class="col form-control" id="packageCondition" style="width:100%" multiple="multiple">
+                                <select required class="col form-control" id="packageCondition" style="width:100%" multiple="multiple" data-selected="">
                                     <option id="select-dashboard" value="">-- Select Package Condition --</option>
                                     <option id="select-noIcePack" value="noIcePack">No Ice Pack</option>
                                     <option id="select-warmIcePack" value="warmIcePack">Warm Ice Pack</option>
@@ -167,7 +176,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
 
                         <div class="row form-group">
                             <label class="col-form-label col-md-4" for="receivePackageComments">Comment</label>
-                            <textarea class="col-md-8" required id="receivePackageComments" cols="30" rows="3"></textarea>
+                            <textarea class="col-md-8 form-control" required id="receivePackageComments" cols="30" rows="3"></textarea>
                         </div>
 
                         <div class="row form-group">
@@ -319,18 +328,21 @@ const cancelConfirm = (e) => {
       enableCollectionCardFields()
       enableCollectionCheckBox()
       cancelChanges.removeEventListener("click",cancelConfirm)
-
+      window.removeEventListener("beforeunload",beforeUnloadMessage)
+      
       if (document.getElementById("collectionId").value) {
-          document.getElementById("collectionId").value = "";
-          document.getElementById("dateCollectionCard").value = "";
-          document.getElementById("timeCollectionCard").value = "";
-          document.getElementById("collectionCheckBox").checked = false;
-          document.getElementById("collectionComments").value = "";
+        document.getElementById("collectionId").value = "";
+        document.getElementById("dateCollectionCard").value = "";
+        document.getElementById("timeCollectionCard").value = "";
+        document.getElementById("collectionCheckBox").checked = false;
+        document.getElementById("collectionComments").value = "";
 
-          // Remove Later include with error handling for USPS and Fedex?
-          enableCollectionCardFields()
-          enableCollectionCheckBox()
-          cancelChanges.removeEventListener("click",cancelConfirm)
+        // Remove Later include with error handling for USPS and Fedex?
+        enableCollectionCardFields()
+        enableCollectionCheckBox()
+        cancelChanges.removeEventListener("click",cancelConfirm)
+        window.removeEventListener("beforeunload",beforeUnloadMessage)
+
       }
     }
     else {
@@ -377,20 +389,19 @@ FUNCTIONS FOR UNSAVED CHANGES
 */
 
 // Add to shared.js later as an export function expression
-const targetAnchorTagEl = (state = false) => {
+const targetAnchorTagEl = (inputChange = false) => {
   // Target all items with anchor tags, convert HTML Collection to a normal array of elements
   // Filter and remove current anchor tag with the current location.hash
-  console.log(location.hash)
   const allAnchorTags = Array.from(document.getElementsByTagName("a"));
   const filteredAnchorTags = allAnchorTags.filter(el => el.getAttribute("href") !== location.hash)
   
   // console.log(allAnchorTags)
   // console.log(filteredAnchorTags)
   
-  if(state) {
+  if(inputChange) {
     filteredAnchorTags.forEach(el => {
         // el.addEventListener("click", clickMe)
-        el.addEventListener("click", clickMe)
+        el.addEventListener("click", unsavedChangesRoutingMessage)
     })
   }
   else {
@@ -406,7 +417,7 @@ const unsavedChangesRoutingMessage = (e) => {
 
   // e.preventDefault()
   // console.log(e.target,"Clicked")
-  unsavedMessageConfirmation()
+  unsavedMessageConfirmation(e)
 }
 
 
@@ -421,13 +432,27 @@ const enableCollectionCheckBox = () => {
 
 
 // Reusable message alert
-const unsavedMessageConfirmation = () => {
-  const result = confirm("Any unsaved changes will be lost.\n Are you sure you want to leave the page? ")
+const unsavedMessageConfirmation = (e) => {
+  const result = confirm("Changes were made and will not be saved.\n\nAre you sure you want to leave the page? ")
   if(!result) {
     e.preventDefault()
-    return
+    return false
   }
-  else return
+  else return true
+}
+
+const unsavedMessageUnload = (inputChange) => {
+  if(inputChange) {
+    window.addEventListener("beforeunload",beforeUnloadMessage)
+  }
+  else if (!inputChange) {
+    window.removeEventListener("beforeunload",beforeUnloadMessage)
+  }
+}
+
+const beforeUnloadMessage = (e) => { 
+  e.preventDefault()
+  return
 }
 
 const clickMe = (e) => {
@@ -435,3 +460,23 @@ const clickMe = (e) => {
   e.preventDefault()
   console.log(e.target,"Clicked")
 }
+
+const checkAllInputChanges = () => {
+  
+  // Get values, data-sets, checked ---> Compare to --> empty string, data-selected not "", checkbox not checked
+  document.getElementById("scannedBarcode").value;
+  document.getElementById("packageCondition").value;
+  document.getElementById("receivePackageComments").value;
+  document.getElementById("dateReceived").value;
+
+  document.getElementById("collectionCheckBox").value;
+  document.getElementById("collectionId").value;
+  document.getElementById("dateCollectionCard").value;
+  document.getElementById("timeCollectionCard").value;
+  document.getElementById("collectionComments").value;
+
+  
+  
+}
+
+// Disable window before unload eventlistener after cancel confirm and save 
