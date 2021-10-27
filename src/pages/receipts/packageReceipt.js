@@ -288,7 +288,7 @@ const formSubmit = () => {
         obj['collectionComments'] = document.getElementById('collectionComments').value;
        
       }
-      // storePackageReceipt(obj);
+      storePackageReceipt(obj);
 
   })
 }      
@@ -463,20 +463,39 @@ const clickMe = (e) => {
 
 const checkAllInputChanges = () => {
   
-  // Get values, data-sets, checked ---> Compare to --> empty string, data-selected not "", checkbox not checked
-  document.getElementById("scannedBarcode").value;
-  document.getElementById("packageCondition").value;
-  document.getElementById("receivePackageComments").value;
-  document.getElementById("dateReceived").value;
+  /*
+  Get values, data-sets, checked ---> 
+  Compare to --> 
+  empty string, data-selected not "", checkbox not checked
+  */ 
 
-  document.getElementById("collectionCheckBox").value;
-  document.getElementById("collectionId").value;
-  document.getElementById("dateCollectionCard").value;
-  document.getElementById("timeCollectionCard").value;
-  document.getElementById("collectionComments").value;
 
-  
-  
+  const condition1 = document.getElementById("scannedBarcode").value !== "" 
+  const condition2 = document.getElementById("packageCondition").getAttribute("data-selected") !== ""
+  const condition3 = document.getElementById("receivePackageComments").value !== "";
+  const condition4 = document.getElementById("dateReceived").value !== "";
+
+  const condition5 = document.getElementById("collectionCheckBox").checked === true;
+  const condition6 = document.getElementById("collectionId").value !== "";
+  const condition7 = document.getElementById("dateCollectionCard").value !== "";
+  const condition8 = document.getElementById("timeCollectionCard").value !== "";
+  const condition9 = document.getElementById("collectionComments").value !== "";
+  const conditionsArr = [
+    condition1,
+    condition2,
+    condition3,
+    condition4,
+    condition5,
+    condition6,
+    condition7,
+    condition8,
+    condition9
+  ]
+
+  // if any items returm
+  if(conditionsArr.includes(true)) {
+    return true
+  } else return false
 }
 
-// Disable window before unload eventlistener after cancel confirm and save 
+// TODO: Disable window before unload eventlistener after cancel confirm and save 
