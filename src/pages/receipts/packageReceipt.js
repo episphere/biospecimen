@@ -314,6 +314,8 @@ const cancelConfirm = (e) => {
       document.getElementById("dateReceived").value = "";
       
       // Remove Later include with error handling for USPS and Fedex?
+      document.getElementById("collectionComments").value = "";
+      document.getElementById("collectionId").value = "";
       enableCollectionCardFields()
       enableCollectionCheckBox()
       cancelChanges.removeEventListener("click",cancelConfirm)
