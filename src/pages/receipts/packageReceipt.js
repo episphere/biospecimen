@@ -327,6 +327,7 @@ const cancelConfirm = (e) => {
       document.getElementById("collectionId").value = "";
       enableCollectionCardFields()
       enableCollectionCheckBox()
+      document.getElementById("packageCondition").setAttribute("data-selected","")
       cancelChanges.removeEventListener("click",cancelConfirm)
       window.removeEventListener("beforeunload",beforeUnloadMessage)
       
@@ -340,6 +341,7 @@ const cancelConfirm = (e) => {
         // Remove Later include with error handling for USPS and Fedex?
         enableCollectionCardFields()
         enableCollectionCheckBox()
+        document.getElementById("packageCondition").setAttribute("data-selected","")
         cancelChanges.removeEventListener("click",cancelConfirm)
         window.removeEventListener("beforeunload",beforeUnloadMessage)
 
@@ -497,5 +499,9 @@ const checkAllInputChanges = () => {
     return true
   } else return false
 }
+
+// if(empty input && checkAllInputChanges === false) -- > remove event listeners
+
+// if(empty input && checkAllinputChanges === true) --> do not remove event listeners
 
 // TODO: Disable window before unload eventlistener after cancel confirm and save 
