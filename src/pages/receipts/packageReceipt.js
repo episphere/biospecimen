@@ -86,7 +86,7 @@ const isChecked = (e) => {
   }
   // if no check and array of input has no value of true (false to true)
   else if (!e.target.checked && !checkAllInputChanges()){
-    // console.log(checkAllInputChanges())
+    console.log(checkAllInputChanges())
     inputObject.inputChange = false
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
@@ -136,6 +136,7 @@ const handleConditionChange = (e) => {
 }
 
 
+
 const packageReceiptTemplate = async (name, auth, route) => {
     let template = ``;
     template += receiptsNavbar();
@@ -145,13 +146,13 @@ const packageReceiptTemplate = async (name, auth, route) => {
                       <form method="post" class="mt-3" id="configForm">
                         <h5 style="text-align: left;">Receive Packages</h5>
 
-                        <div class="row form-group">
-                            <label class="col-form-label col-md-4" for="scannedBarcode">Scan FedEx/USPS Barcode</label>
-                            <div style="display:inline-block;">
-                              <input autocomplete="off" required class="col-md-8 form-control" type="text" id="scannedBarcode" style="width: 600px;">
-                              <span id='courierType' style="padding-left: 10px;"></span>
-                            </div>
-                        </div>
+                    <div class="row form-group">
+                      <label class="col-form-label col-md-4" for="scannedBarcode">Scan FedEx/USPS Barcode</label>
+                      <div style="display:inline-block;">
+                        <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" style="width: 600px;" placeholder="Scan a Fedex or USPS barcode">
+                        <span id="courierType" style="padding-left: 10px;"></span>
+                      </div>
+                    </div>
                         
                         <div class="row form-group">
                             <label class="col-form-label col-md-4" for="packageCondition">Select Package Condition</label>
@@ -185,7 +186,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
 
                         <div class="row form-group">
                             <label class="col-form-label col-md-4" for="receivePackageComments">Comment</label>
-                            <textarea class="col-md-8 form-control" required id="receivePackageComments" cols="30" rows="3"></textarea>
+                            <textarea class="col-md-8 form-control" required id="receivePackageComments" cols="30" rows="3" placeholder="Any comments?"></textarea>
                         </div>
 
                         <div class="row form-group">
@@ -203,7 +204,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
 
                             <div class="row form-group">
                                 <label class="col-form-label col-md-4" for="collectionId">Collection ID</label>
-                                <input autocomplete="off" class="col-md-8 form-control" type="text" id="collectionId">
+                                <input autocomplete="off" class="col-md-8 form-control" type="text" id="collectionId" placeholder="Scan or Enter a Collection ID">
                             </div>
 
                             <div class="row form-group">
@@ -218,7 +219,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
 
                             <div class="row form-group">
                                 <label class="col-form-label col-md-4" for="collectionComments">Comments on Card Returned</label>
-                                <textarea class="col-md-8 form-control" id="collectionComments" cols="30" rows="3"></textarea>
+                                <textarea class="col-md-8 form-control" id="collectionComments" cols="30" rows="3" placeholder="Comments on the card?"></textarea>
                             </div>
                           </div>
                         
@@ -237,11 +238,12 @@ const packageReceiptTemplate = async (name, auth, route) => {
 };
 
 const checkCourierType = () => {
-  // TODO: Add a stricter check
+  // if fedex remove first 8 characters
   const a = document.getElementById("scannedBarcode");
   if (a) {
-    a.addEventListener("change", () => {
-      if (a.value.trim().length <= 12) { 
+    a.addEventListener("input", () => {
+      if (a.value.trim().length <= 12) {
+        console.log(a.value)
             document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
             document.getElementById('collectionCheckBox').disabled = true;
             disableCollectionCardFields();
@@ -249,6 +251,7 @@ const checkCourierType = () => {
           }
             else {
             document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`}
+            enableCollectionCardFields()
     }) }
 }
 
@@ -451,7 +454,10 @@ const unsavedMessageConfirmation = (e) => {
     e.preventDefault()
     return false
   }
-  else return true
+  else { 
+    window.removeEventListener("beforeunload",beforeUnloadMessage)
+    return true
+  }
 }
 
 const unsavedMessageUnload = (inputChange) => {
@@ -465,6 +471,8 @@ const unsavedMessageUnload = (inputChange) => {
 
 const beforeUnloadMessage = (e) => { 
   e.preventDefault()
+  // Chrome requires returnValue to be set.
+  e.returnValue = "";
   return
 }
 
@@ -517,7 +525,7 @@ const checkAllInputChanges = () => {
 
 function parseDataSelected(value) {
   let parseData = JSON.parse(value)
-  console.log(parseData)
+  // console.log(parseData)
   if(parseData.length === 0){
     return false
   }
@@ -528,32 +536,3 @@ function parseDataSelected(value) {
   }
   return false
 }
-
-// if(empty input && checkAllInputChanges === false) -- > remove event listeners
-
-// if(empty input && checkAllinputChanges === true) --> do not remove event listeners
-
-// TODO: Disable window before unload eventlistener after cancel confirm and save 
-
-
-// condition1 = document.getElementById("scannedBarcode").value !== "" 
-// condition2 = parseDataSelected(document.getElementById("packageCondition").getAttribute("data-selected"))
-// condition3 = document.getElementById("receivePackageComments").value !== "";
-// condition4 = document.getElementById("dateReceived").value !== "";
-
-// condition5 = document.getElementById("collectionCheckBox").checked === true;
-// condition6 = document.getElementById("collectionId").value !== "";
-// condition7 = document.getElementById("dateCollectionCard").value !== "";
-// condition8 = document.getElementById("timeCollectionCard").value !== "";
-// condition9 = document.getElementById("collectionComments").value !== "";
-// conditionsArr = [
-//   condition1,
-//   condition2,
-//   condition3,
-//   condition4,
-//   condition5,
-//   condition6,
-//   condition7,
-//   condition8,
-//   condition9
-// ]
