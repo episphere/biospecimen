@@ -240,18 +240,35 @@ const packageReceiptTemplate = async (name, auth, route) => {
 const checkCourierType = () => {
   // if fedex remove first 8 characters
   const a = document.getElementById("scannedBarcode");
+  let input = ""
   if (a) {
-    a.addEventListener("input", () => {
-      if (a.value.trim().length <= 12) {
-        console.log(a.value)
+    a.addEventListener("input", (e) => {
+      input = e.target.value
+      if (input.length === 22) {
+        console.log(`${e.target.value}`)
+        console.log(input.length)
+        // console.log(e.target.value,e.target.value.length,typeof input.length)
             document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
-            document.getElementById('collectionCheckBox').disabled = true;
+            // document.getElementById('collectionCheckBox').disabled = true;
+            document.getElementById('collectionCheckBox').checked = true;
+            checkCardIncluded()
+
             disableCollectionCardFields();
-   
+            return
           }
-            else {
-            document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`}
+            else if (input.length === 30){
+            document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
+            document.getElementById('collectionCheckBox').checked = false;
             enableCollectionCardFields()
+            return
+          }
+          else {
+            document.getElementById('courierType').innerHTML = ``
+            document.getElementById('collectionCheckBox').checked = false;
+            enableCollectionCardFields()
+            return
+          }
+            // enableCollectionCardFields()
     }) }
 }
 
@@ -472,7 +489,7 @@ const unsavedMessageUnload = (inputChange) => {
 const beforeUnloadMessage = (e) => { 
   e.preventDefault()
   // Chrome requires returnValue to be set.
-  e.returnValue = "";
+  // e.returnValue = "";
   return
 }
 
