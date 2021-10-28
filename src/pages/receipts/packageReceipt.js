@@ -101,29 +101,37 @@ const handleConditionChange = (e) => {
   let arr = Array.from(e.target.selectedOptions, option => option.value);
   // Removes Empty String from first option value
   const filteredArr = arr.filter(condition => condition !== "")
+  console.log("arr", arr)
+  console.log("filteredArr", filteredArr)
 
   if(filteredArr.length) {
     // filteredArr.forEach(condition => packageConditionsArr.push(condition))
     inputObject.inputChange = true
-    document.getElementById("packageCondition").setAttribute("data-selected",`${filteredArr}`)
-    console.log(document.getElementById("packageCondition").setAttribute("data-selected",`${filteredArr}`))
-    // call function to add eventlistener to anchor tags
+    document.getElementById("packageCondition").setAttribute("data-selected",`${JSON.stringify(filteredArr)}`)
+    console.log(document.getElementById("packageCondition").getAttribute("data-selected"))
+    // call function to add eventlistener to anchor tags  
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
     unsavedMessageUnload(inputObject.inputChange)
     console.log(filteredArr)
     console.log(inputObject)
   }
-  else if(!filteredArr.length && !checkAllInputChanges()){
-    inputObject.inputChange = false
+  // if no check and array of input has no value of true (false to true)
+  else if(!filteredArr.length){
     // set data-selected attribute
-    document.getElementById("packageCondition").setAttribute("data-selected","")
-    // call function to remove eventlistener from anchor tags
-    targetAnchorTagEl(inputObject.inputChange)
-    cancelChanges(inputObject.inputChange)
-    unsavedMessageUnload(inputObject.inputChange)
-    console.log(filteredArr)
-    console.log(inputObject)
+    document.getElementById("packageCondition").setAttribute("data-selected","[]")
+    if(!checkAllInputChanges()){
+      inputObject.inputChange = false
+
+      // call function to remove eventlistener from anchor tags
+      targetAnchorTagEl(inputObject.inputChange)
+      cancelChanges(inputObject.inputChange)
+      unsavedMessageUnload(inputObject.inputChange)
+      console.log(filteredArr)
+      console.log(inputObject)
+      // debugger;
+      // return
+    }
   }
 }
 
@@ -148,7 +156,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
                         <div class="row form-group">
                             <label class="col-form-label col-md-4" for="packageCondition">Select Package Condition</label>
                              <div style="display:inline-block; max-width:90%;"> 
-                                <select required class="col form-control" id="packageCondition" style="width:100%" multiple="multiple" data-selected="">
+                                <select required class="col form-control" id="packageCondition" style="width:100%" multiple="multiple" data-selected="[]">
                                     <option id="select-dashboard" value="">-- Select Package Condition --</option>
                                     <option id="select-noIcePack" value="noIcePack">No Ice Pack</option>
                                     <option id="select-warmIcePack" value="warmIcePack">Warm Ice Pack</option>
@@ -289,13 +297,16 @@ const formSubmit = () => {
         obj['collectionComments'] = document.getElementById('collectionComments').value;
        
       }
-      storePackageReceipt(obj);
+      // document.getElementById("clearForm").removeEventListener("click",cancelConfirm);
+      window.removeEventListener("beforeunload",beforeUnloadMessage)
+      targetAnchorTagEl()
+      
+      console.log(obj)
+      // storePackageReceipt(obj);
 
   })
 }      
 
-// Important question: does an event listener need to be attached as soon as page loads?
-// When page loads every input is blank.
 
 // onload attach event listener
 // input changes add event listener - use click me as test
@@ -328,7 +339,7 @@ const cancelConfirm = (e) => {
       document.getElementById("collectionId").value = "";
       enableCollectionCardFields()
       enableCollectionCheckBox()
-      document.getElementById("packageCondition").setAttribute("data-selected","")
+      document.getElementById("packageCondition").setAttribute("data-selected","[]")
       cancelChanges.removeEventListener("click",cancelConfirm)
       window.removeEventListener("beforeunload",beforeUnloadMessage)
       
@@ -339,12 +350,11 @@ const cancelConfirm = (e) => {
         document.getElementById("collectionCheckBox").checked = false;
         document.getElementById("collectionComments").value = "";
 
-        // Remove Later include with error handling for USPS and Fedex?
-        enableCollectionCardFields()
-        enableCollectionCheckBox()
-        document.getElementById("packageCondition").setAttribute("data-selected","")
-        cancelChanges.removeEventListener("click",cancelConfirm)
-        window.removeEventListener("beforeunload",beforeUnloadMessage)
+        enableCollectionCardFields();
+        enableCollectionCheckBox();
+        document.getElementById("packageCondition").setAttribute("data-selected","[]");
+        cancelChanges.removeEventListener("click",cancelConfirm);
+        window.removeEventListener("beforeunload",beforeUnloadMessage);
 
       }
     }
@@ -470,11 +480,15 @@ const checkAllInputChanges = () => {
   Get values, data-sets, checked ---> 
   Compare to --> 
   empty string, data-selected not "", checkbox not checked
+  || document.getElementById("packageCondition").getAttribute("data-selected").length !== 0
   */ 
 
+  // condition2 problems
+
+  // Input Change made !== "" or checked === true or 
 
   const condition1 = document.getElementById("scannedBarcode").value !== "" 
-  const condition2 = document.getElementById("packageCondition").getAttribute("data-selected") !== ""
+  const condition2 = parseDataSelected(document.getElementById("packageCondition").getAttribute("data-selected"))
   const condition3 = document.getElementById("receivePackageComments").value !== "";
   const condition4 = document.getElementById("dateReceived").value !== "";
 
@@ -495,10 +509,24 @@ const checkAllInputChanges = () => {
     condition9
   ]
 
-  // if any items returm
+  // if any items returns true (Any input changes are made)
   if(conditionsArr.includes(true)) {
     return true
   } else return false
+}
+
+function parseDataSelected(value) {
+  let parseData = JSON.parse(value)
+  console.log(parseData)
+  if(parseData.length === 0){
+    return false
+  }
+  else if (parseData.length > 0) {
+    // JSON.parse(document.getElementById("packageCondition").getAttribute("data-selected")).length !== 0;
+    console.log("> 0", parseData.length)
+    return true
+  }
+  return false
 }
 
 // if(empty input && checkAllInputChanges === false) -- > remove event listeners
@@ -506,3 +534,26 @@ const checkAllInputChanges = () => {
 // if(empty input && checkAllinputChanges === true) --> do not remove event listeners
 
 // TODO: Disable window before unload eventlistener after cancel confirm and save 
+
+
+// condition1 = document.getElementById("scannedBarcode").value !== "" 
+// condition2 = parseDataSelected(document.getElementById("packageCondition").getAttribute("data-selected"))
+// condition3 = document.getElementById("receivePackageComments").value !== "";
+// condition4 = document.getElementById("dateReceived").value !== "";
+
+// condition5 = document.getElementById("collectionCheckBox").checked === true;
+// condition6 = document.getElementById("collectionId").value !== "";
+// condition7 = document.getElementById("dateCollectionCard").value !== "";
+// condition8 = document.getElementById("timeCollectionCard").value !== "";
+// condition9 = document.getElementById("collectionComments").value !== "";
+// conditionsArr = [
+//   condition1,
+//   condition2,
+//   condition3,
+//   condition4,
+//   condition5,
+//   condition6,
+//   condition7,
+//   condition8,
+//   condition9
+// ]
