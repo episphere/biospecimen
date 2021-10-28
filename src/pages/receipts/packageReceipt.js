@@ -60,16 +60,12 @@ const hasChanged = (e) => {
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
     unsavedMessageUnload(inputObject.inputChange)
-    // console.log(e.target.value,inputObject)
-    
   }
   else if(e.target.value.trim() !== ""){
     inputObject.inputChange = true
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
     unsavedMessageUnload(inputObject.inputChange)
-    // console.log(e.target.value,e.target,inputObject)
-    // console.log(packageConditionsArr)
     return
   }
 }
@@ -81,18 +77,13 @@ const isChecked = (e) => {
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
     unsavedMessageUnload(inputObject.inputChange)
-    console.log(e.target.checked)
-    console.log(e.target.value,inputObject)
   }
   // if no check and array of input has no value of true (false to true)
   else if (!e.target.checked && !checkAllInputChanges()){
-    console.log(checkAllInputChanges())
     inputObject.inputChange = false
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
     unsavedMessageUnload(inputObject.inputChange)
-    console.log(e.target.checked)
-    console.log(e.target.value,inputObject)
   }
 }
 
@@ -101,20 +92,15 @@ const handleConditionChange = (e) => {
   let arr = Array.from(e.target.selectedOptions, option => option.value);
   // Removes Empty String from first option value
   const filteredArr = arr.filter(condition => condition !== "")
-  console.log("arr", arr)
-  console.log("filteredArr", filteredArr)
 
   if(filteredArr.length) {
     // filteredArr.forEach(condition => packageConditionsArr.push(condition))
     inputObject.inputChange = true
     document.getElementById("packageCondition").setAttribute("data-selected",`${JSON.stringify(filteredArr)}`)
-    console.log(document.getElementById("packageCondition").getAttribute("data-selected"))
     // call function to add eventlistener to anchor tags  
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
     unsavedMessageUnload(inputObject.inputChange)
-    console.log(filteredArr)
-    console.log(inputObject)
   }
   // if no check and array of input has no value of true (false to true)
   else if(!filteredArr.length){
@@ -122,15 +108,10 @@ const handleConditionChange = (e) => {
     document.getElementById("packageCondition").setAttribute("data-selected","[]")
     if(!checkAllInputChanges()){
       inputObject.inputChange = false
-
       // call function to remove eventlistener from anchor tags
       targetAnchorTagEl(inputObject.inputChange)
       cancelChanges(inputObject.inputChange)
       unsavedMessageUnload(inputObject.inputChange)
-      console.log(filteredArr)
-      console.log(inputObject)
-      // debugger;
-      // return
     }
   }
 }
@@ -245,14 +226,9 @@ const checkCourierType = () => {
     a.addEventListener("input", (e) => {
       input = e.target.value
       if (input.length === 34) {
-        console.log(`${e.target.value}`)
-        console.log(input.length)
-        // console.log(e.target.value,e.target.value.length,typeof input.length)
             document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
-            // document.getElementById('collectionCheckBox').disabled = true;
             document.getElementById('collectionCheckBox').checked = true;
             checkCardIncluded()
-
             disableCollectionCardFields();
             return
           }
@@ -268,7 +244,6 @@ const checkCourierType = () => {
             enableCollectionCardFields()
             return
           }
-            // enableCollectionCardFields()
     }) }
 }
 
@@ -317,13 +292,10 @@ const formSubmit = () => {
         obj['collectionComments'] = document.getElementById('collectionComments').value;
        
       }
-      // document.getElementById("clearForm").removeEventListener("click",cancelConfirm);
+      
       window.removeEventListener("beforeunload",beforeUnloadMessage)
       targetAnchorTagEl()
-      
-      console.log(obj)
-      // storePackageReceipt(obj);
-
+      storePackageReceipt(obj);
   })
 }      
 
@@ -428,9 +400,6 @@ const targetAnchorTagEl = (inputChange = false) => {
   const allAnchorTags = Array.from(document.getElementsByTagName("a"));
   const filteredAnchorTags = allAnchorTags.filter(el => el.getAttribute("href") !== location.hash)
   
-  // console.log(allAnchorTags)
-  // console.log(filteredAnchorTags)
-  
   if(inputChange) {
     filteredAnchorTags.forEach(el => {
         // el.addEventListener("click", clickMe)
@@ -446,16 +415,8 @@ const targetAnchorTagEl = (inputChange = false) => {
 }
 
 const unsavedChangesRoutingMessage = (e) => {
-  // REMOVE LATER- ADDED E PREVENT DEFAULT FOR TESTING PURPOSES
-
-  // e.preventDefault()
-  // console.log(e.target,"Clicked")
   unsavedMessageConfirmation(e)
 }
-
-
-
-// document.getElementById("dateReceived").value
 
 const enableCollectionCheckBox = () => {
   const collectionCheckBoxEl = document.getElementById("collectionCheckBox")
@@ -493,11 +454,6 @@ const beforeUnloadMessage = (e) => {
   return
 }
 
-const clickMe = (e) => {
-  // REMOVE LATER- ADDED E PREVENT DEFAULT FOR TESTING PURPOSES
-  e.preventDefault()
-  console.log(e.target,"Clicked")
-}
 
 const checkAllInputChanges = () => {
   
@@ -507,9 +463,6 @@ const checkAllInputChanges = () => {
   empty string, data-selected not "", checkbox not checked
   || document.getElementById("packageCondition").getAttribute("data-selected").length !== 0
   */ 
-
-  // condition2 problems
-
   // Input Change made !== "" or checked === true or 
 
   const condition1 = document.getElementById("scannedBarcode").value !== "" 
@@ -542,13 +495,10 @@ const checkAllInputChanges = () => {
 
 function parseDataSelected(value) {
   let parseData = JSON.parse(value)
-  // console.log(parseData)
   if(parseData.length === 0){
     return false
   }
   else if (parseData.length > 0) {
-    // JSON.parse(document.getElementById("packageCondition").getAttribute("data-selected")).length !== 0;
-    console.log("> 0", parseData.length)
     return true
   }
   return false
