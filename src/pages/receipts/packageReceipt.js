@@ -54,7 +54,8 @@ receivePackageCommentsEl
 dateReceivedEl
 */ 
 const hasChanged = (e) => {
-  if(e.target.value.trim() ==="") {
+  // array of input has no value of true (false to true)
+  if(e.target.value.trim() ==="" && !checkAllInputChanges()) {
     inputObject.inputChange = false
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
@@ -71,7 +72,6 @@ const hasChanged = (e) => {
     // console.log(packageConditionsArr)
     return
   }
-  else return
 }
 
 // collectionCheckBoxEl
@@ -84,7 +84,9 @@ const isChecked = (e) => {
     console.log(e.target.checked)
     console.log(e.target.value,inputObject)
   }
-  else {
+  // if no check and array of input has no value of true (false to true)
+  else if (!e.target.checked && !checkAllInputChanges()){
+    // console.log(checkAllInputChanges())
     inputObject.inputChange = false
     targetAnchorTagEl(inputObject.inputChange)
     cancelChanges(inputObject.inputChange)
@@ -95,7 +97,6 @@ const isChecked = (e) => {
 }
 
 
-// packageConditionEl
 const handleConditionChange = (e) => {
   let arr = Array.from(e.target.selectedOptions, option => option.value);
   // Removes Empty String from first option value
@@ -113,7 +114,7 @@ const handleConditionChange = (e) => {
     console.log(filteredArr)
     console.log(inputObject)
   }
-  else {
+  else if(!filteredArr.length && !checkAllInputChanges()){
     inputObject.inputChange = false
     // set data-selected attribute
     document.getElementById("packageCondition").setAttribute("data-selected","")
