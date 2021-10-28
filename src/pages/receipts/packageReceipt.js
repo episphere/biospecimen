@@ -244,7 +244,7 @@ const checkCourierType = () => {
   if (a) {
     a.addEventListener("input", (e) => {
       input = e.target.value
-      if (input.length === 22) {
+      if (input.length === 34) {
         console.log(`${e.target.value}`)
         console.log(input.length)
         // console.log(e.target.value,e.target.value.length,typeof input.length)
@@ -489,7 +489,7 @@ const unsavedMessageUnload = (inputChange) => {
 const beforeUnloadMessage = (e) => { 
   e.preventDefault()
   // Chrome requires returnValue to be set.
-  // e.returnValue = "";
+  e.returnValue = "";
   return
 }
 
