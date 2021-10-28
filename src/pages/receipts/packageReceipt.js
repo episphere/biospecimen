@@ -332,6 +332,7 @@ const cancelConfirm = (e) => {
       enableCollectionCardFields()
       enableCollectionCheckBox()
       document.getElementById("packageCondition").setAttribute("data-selected","[]")
+      targetAnchorTagEl()
       cancelChanges.removeEventListener("click",cancelConfirm)
       window.removeEventListener("beforeunload",beforeUnloadMessage)
       
@@ -345,6 +346,7 @@ const cancelConfirm = (e) => {
         enableCollectionCardFields();
         enableCollectionCheckBox();
         document.getElementById("packageCondition").setAttribute("data-selected","[]");
+        targetAnchorTagEl()
         cancelChanges.removeEventListener("click",cancelConfirm);
         window.removeEventListener("beforeunload",beforeUnloadMessage);
 
