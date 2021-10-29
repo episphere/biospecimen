@@ -44,8 +44,6 @@ export const packageReceiptScreen = async (auth, route) => {
   dateCollectionCardEl.addEventListener("change",hasChanged)
   timeCollectionCardEl.addEventListener("input",hasChanged)
   collectionCommentsEl.addEventListener("input",hasChanged)
-
-  
 }
 
 /*
@@ -225,25 +223,25 @@ const checkCourierType = () => {
   if (a) {
     a.addEventListener("input", (e) => {
       input = e.target.value
-      if (input.length === 34) {
+      if (input.length === 22) {
             document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
             document.getElementById('collectionCheckBox').checked = true;
             checkCardIncluded()
             disableCollectionCardFields();
             return
           }
-            else if (input.length === 30){
-            document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
-            document.getElementById('collectionCheckBox').checked = false;
-            enableCollectionCardFields()
-            return
-          }
-          else {
-            document.getElementById('courierType').innerHTML = ``
-            document.getElementById('collectionCheckBox').checked = false;
-            enableCollectionCardFields()
-            return
-          }
+      else if (input.length === 30){
+      document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
+      document.getElementById('collectionCheckBox').checked = false;
+      enableCollectionCardFields()
+      return
+      }
+      else {
+        document.getElementById('courierType').innerHTML = ``
+        document.getElementById('collectionCheckBox').checked = false;
+        enableCollectionCardFields()
+        return
+      }
     }) }
 }
 
@@ -326,7 +324,6 @@ const cancelConfirm = (e) => {
       document.getElementById("receivePackageComments").value = "";
       document.getElementById("dateReceived").value = "";
       
-      // Remove Later include with error handling for USPS and Fedex?
       document.getElementById("collectionComments").value = "";
       document.getElementById("collectionId").value = "";
       enableCollectionCardFields()
@@ -495,7 +492,7 @@ const checkAllInputChanges = () => {
   } else return false
 }
 
-function parseDataSelected(value) {
+const parseDataSelected = (value) => {
   let parseData = JSON.parse(value)
   if(parseData.length === 0){
     return false
