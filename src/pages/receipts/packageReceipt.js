@@ -9,7 +9,6 @@ const inputObject = {
   inputChange: false
 }
 
-
 export const packageReceiptScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
@@ -21,101 +20,8 @@ export const packageReceiptScreen = async (auth, route) => {
   enableCollectionCardFields();
   formSubmit();
   targetAnchorTagEl();
-
-  // Receive Packages: barcode, packageconditions,receive package comments, date received
-  const scannedBarcodeInputEl = document.getElementById("scannedBarcode");
-  const packageConditionEl = document.getElementById("packageCondition");
-  const receivePackageCommentsEl = document.getElementById("receivePackageComments");
-  const dateReceivedEl = document.getElementById("dateReceived");
-
-  scannedBarcodeInputEl.addEventListener("input",hasChanged)
-  packageConditionEl.addEventListener("change",handleConditionChange)
-  receivePackageCommentsEl.addEventListener("input",hasChanged)
-  dateReceivedEl.addEventListener("input",hasChanged)
-
-  // Collection Card Date Entry: collectionCheckBox,collectionId, dateCollectionCard,timeCollectionCard,collectionComments
-
-  const collectionCheckBoxEl = document.getElementById("collectionCheckBox")
-  const collectionIdEl = document.getElementById("collectionId")
-  const dateCollectionCardEl = document.getElementById("dateCollectionCard")
-  const timeCollectionCardEl = document.getElementById("timeCollectionCard")
-  const collectionCommentsEl = document.getElementById("collectionComments")
-  collectionCheckBoxEl.addEventListener("change",isChecked)
-  collectionIdEl.addEventListener("input",hasChanged)
-  dateCollectionCardEl.addEventListener("change",hasChanged)
-  timeCollectionCardEl.addEventListener("input",hasChanged)
-  collectionCommentsEl.addEventListener("input",hasChanged)
+  addListenersOnPageLoad();
 }
-
-/*
-scannedBarcodeInputEl 
-receivePackageCommentsEl
-dateReceivedEl
-*/ 
-const hasChanged = (e) => {
-  // array of input has no value of true (false to true)
-  if(e.target.value.trim() ==="" && !checkAllInputChanges()) {
-    inputObject.inputChange = false
-    targetAnchorTagEl(inputObject.inputChange)
-    cancelChanges(inputObject.inputChange)
-    unsavedMessageUnload(inputObject.inputChange)
-  }
-  else if(e.target.value.trim() !== ""){
-    inputObject.inputChange = true
-    targetAnchorTagEl(inputObject.inputChange)
-    cancelChanges(inputObject.inputChange)
-    unsavedMessageUnload(inputObject.inputChange)
-    return
-  }
-}
-
-// collectionCheckBoxEl
-const isChecked = (e) => {
-  if(e.target.checked) {
-    inputObject.inputChange = true
-    targetAnchorTagEl(inputObject.inputChange)
-    cancelChanges(inputObject.inputChange)
-    unsavedMessageUnload(inputObject.inputChange)
-  }
-  // if no check and array of input has no value of true (false to true)
-  else if (!e.target.checked && !checkAllInputChanges()){
-    inputObject.inputChange = false
-    targetAnchorTagEl(inputObject.inputChange)
-    cancelChanges(inputObject.inputChange)
-    unsavedMessageUnload(inputObject.inputChange)
-  }
-}
-
-
-const handleConditionChange = (e) => {
-  let arr = Array.from(e.target.selectedOptions, option => option.value);
-  // Removes Empty String from first option value
-  const filteredArr = arr.filter(condition => condition !== "")
-
-  if(filteredArr.length) {
-    // filteredArr.forEach(condition => packageConditionsArr.push(condition))
-    inputObject.inputChange = true
-    document.getElementById("packageCondition").setAttribute("data-selected",`${JSON.stringify(filteredArr)}`)
-    // call function to add eventlistener to anchor tags  
-    targetAnchorTagEl(inputObject.inputChange)
-    cancelChanges(inputObject.inputChange)
-    unsavedMessageUnload(inputObject.inputChange)
-  }
-  // if no check and array of input has no value of true (false to true)
-  else if(!filteredArr.length){
-    // set data-selected attribute
-    document.getElementById("packageCondition").setAttribute("data-selected","[]")
-    if(!checkAllInputChanges()){
-      inputObject.inputChange = false
-      // call function to remove eventlistener from anchor tags
-      targetAnchorTagEl(inputObject.inputChange)
-      cancelChanges(inputObject.inputChange)
-      unsavedMessageUnload(inputObject.inputChange)
-    }
-  }
-}
-
-
 
 const packageReceiptTemplate = async (name, auth, route) => {
     let template = ``;
@@ -222,27 +128,28 @@ const checkCourierType = () => {
   if (a) {
     a.addEventListener("input", (e) => {
       input = e.target.value.trim()
-      if (input.length === 22) {
-            document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
-            document.getElementById('collectionCheckBox').checked = true;
-            checkCardIncluded()
-            disableCollectionCardFields();
-            return
-          }
-      else if (input.length === 30){
-      document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
-      document.getElementById('collectionCheckBox').checked = false;
-      enableCollectionCardFields()
-      return
-      }
-      else {
+      if(input.length === 0){
         document.getElementById('courierType').innerHTML = ``
+        enableCollectionCardFields();
         document.getElementById('collectionCheckBox').checked = false;
-        enableCollectionCardFields()
         return
       }
-    }) }
-}
+      else if (input.length <= 12) {
+        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
+        document.getElementById('collectionCheckBox').checked = true;
+        checkCardIncluded();
+        disableCollectionCardFields();
+        return
+      }
+      else {
+        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
+        document.getElementById('collectionCheckBox').checked = false;
+        enableCollectionCardFields();
+        return
+      }
+    }) 
+  }
+};
 
 const checkCardIncluded = () => {
   const a = document.getElementById('collectionCheckBox')
@@ -301,64 +208,6 @@ const formSubmit = () => {
   })
 }      
 
-
-// onload attach event listener
-// input changes add event listener - use click me as test
-// no input changes and not onload - remove click me as test
-
-// Add two parameters and check truthy and falsy values
-const cancelChanges = (inputChanges) => {
-    const cancelChanges = document.getElementById("clearForm");
-    if(inputChanges) {
-      cancelChanges.addEventListener("click",cancelConfirm)
-    }
-    else {
-      cancelChanges.removeEventListener("click",cancelConfirm)
-    }
-};
-
-const cancelConfirm = (e) => {
-    const cancelChanges = document.getElementById("clearForm");
-    let result = confirm("Changes were made and will not be saved.")
-
-    if(result){
-      document.getElementById("courierType").innerHTML = ``;
-      document.getElementById("scannedBarcode").value = "";
-      document.getElementById("packageCondition").value = "";
-      document.getElementById("receivePackageComments").value = "";
-      document.getElementById("dateReceived").value = "";
-      
-      document.getElementById("collectionComments").value = "";
-      document.getElementById("collectionId").value = "";
-      enableCollectionCardFields()
-      enableCollectionCheckBox()
-      document.getElementById("packageCondition").setAttribute("data-selected","[]")
-      targetAnchorTagEl()
-      cancelChanges.removeEventListener("click",cancelConfirm)
-      window.removeEventListener("beforeunload",beforeUnloadMessage)
-      
-      if (document.getElementById("collectionId").value) {
-        document.getElementById("collectionId").value = "";
-        document.getElementById("dateCollectionCard").value = "";
-        document.getElementById("timeCollectionCard").value = "";
-        document.getElementById("collectionCheckBox").checked = false;
-        document.getElementById("collectionComments").value = "";
-
-        enableCollectionCardFields();
-        enableCollectionCheckBox();
-        document.getElementById("packageCondition").setAttribute("data-selected","[]");
-        targetAnchorTagEl()
-        cancelChanges.removeEventListener("click",cancelConfirm);
-        window.removeEventListener("beforeunload",beforeUnloadMessage);
-
-      }
-    }
-    else {
-      return 
-    }
-  
-}
-
 const storePackageReceipt = async (data) => {
     showAnimation();
     const idToken = await getIdToken();
@@ -391,12 +240,19 @@ const storePackageReceipt = async (data) => {
     }
 };
 
+const enableCollectionCheckBox = () => {
+  const collectionCheckBoxEl = document.getElementById("collectionCheckBox")
+  collectionCheckBoxEl.removeAttribute("disabled")
+  collectionCheckBoxEl.checked = false
+}
 
 /*
+=========================================
 FUNCTIONS FOR UNSAVED CHANGES
+=========================================
 */
 
-// Add to shared.js later as an export function expression
+/* TARGET ALL ANCHOR TAG ELEMENTS */ 
 const targetAnchorTagEl = (inputChange = false) => {
   // Target all items with anchor tags, convert HTML Collection to a normal array of elements
   // Filter and remove current anchor tag with the current location.hash
@@ -405,28 +261,48 @@ const targetAnchorTagEl = (inputChange = false) => {
   
   if(inputChange) {
     filteredAnchorTags.forEach(el => {
-        // el.addEventListener("click", clickMe)
         el.addEventListener("click", unsavedChangesRoutingMessage)
     })
   }
   else {
     filteredAnchorTags.forEach(el => {
-      // el.removeEventListener("click", clickMe)
       el.removeEventListener("click", unsavedChangesRoutingMessage)
     })
   }
 }
 
+/* ADD EVENT LISTENERS TO INPUTS THAT CAN BE SUBMITTED WHEN PAGE LOADS */ 
+const addListenersOnPageLoad = () => {
+  // Receive Packages: barcode, packageconditions,receive package comments, date received
+  const scannedBarcodeInputEl = document.getElementById("scannedBarcode");
+  const packageConditionEl = document.getElementById("packageCondition");
+  const receivePackageCommentsEl = document.getElementById("receivePackageComments");
+  const dateReceivedEl = document.getElementById("dateReceived");
+
+  scannedBarcodeInputEl.addEventListener("input", hasInputChanged)
+  packageConditionEl.addEventListener("change",handleConditionChange)
+  receivePackageCommentsEl.addEventListener("input", hasInputChanged)
+  dateReceivedEl.addEventListener("input", hasInputChanged)
+
+  // Collection Card Date Entry: collectionCheckBox,collectionId, dateCollectionCard,timeCollectionCard,collectionComments
+
+  const collectionCheckBoxEl = document.getElementById("collectionCheckBox")
+  const collectionIdEl = document.getElementById("collectionId")
+  const dateCollectionCardEl = document.getElementById("dateCollectionCard")
+  const timeCollectionCardEl = document.getElementById("timeCollectionCard")
+  const collectionCommentsEl = document.getElementById("collectionComments")
+  collectionCheckBoxEl.addEventListener("change",isChecked)
+  collectionIdEl.addEventListener("input", hasInputChanged)
+  dateCollectionCardEl.addEventListener("change", hasInputChanged)
+  timeCollectionCardEl.addEventListener("input", hasInputChanged)
+  collectionCommentsEl.addEventListener("input", hasInputChanged)
+}
+
+/* NAMED EVENT LISTENERS FOR UNSAVED CHANGES ADDED / REMOVED */
+
 const unsavedChangesRoutingMessage = (e) => {
   unsavedMessageConfirmation(e)
 }
-
-const enableCollectionCheckBox = () => {
-  const collectionCheckBoxEl = document.getElementById("collectionCheckBox")
-  collectionCheckBoxEl.removeAttribute("disabled")
-  collectionCheckBoxEl.checked = false
-}
-
 
 // Reusable message alert
 const unsavedMessageConfirmation = (e) => {
@@ -436,10 +312,130 @@ const unsavedMessageConfirmation = (e) => {
     return false
   }
   else { 
+    // IMPORTANT - REMOVES EVENT LISTENER FROM WINDOW OBJECT AFTER ROUTE CHANGE IS CONFIRMED
     window.removeEventListener("beforeunload",beforeUnloadMessage)
     return true
   }
 }
+
+/*
+WINDOW
+*/
+const beforeUnloadMessage = (e) => { 
+  e.preventDefault()
+  // Chrome requires returnValue to be set.
+  e.returnValue = "";
+  return
+}
+
+/*
+INPUT ELEMENTS - scannedBarcodeInputEl, receivePackageCommentsEl, dateReceivedEl
+*/ 
+const hasInputChanged = (e) => {
+  // array of input has no value of true (false to true)
+  if(e.target.value.trim() ==="" && !checkAllInputChanges()) {
+    inputObject.inputChange = false
+    targetAnchorTagEl(inputObject.inputChange)
+    clearChanges(inputObject.inputChange)
+    unsavedMessageUnload(inputObject.inputChange)
+  }
+  else if(e.target.value.trim() !== ""){
+    inputObject.inputChange = true
+    targetAnchorTagEl(inputObject.inputChange)
+    clearChanges(inputObject.inputChange)
+    unsavedMessageUnload(inputObject.inputChange)
+    return
+  }
+}
+
+// INPUT(CHECKBOX) ELEMENT - collectionCheckBoxEl
+const isChecked = (e) => {
+  if(e.target.checked) {
+    inputObject.inputChange = true
+    targetAnchorTagEl(inputObject.inputChange)
+    clearChanges(inputObject.inputChange)
+    unsavedMessageUnload(inputObject.inputChange)
+  }
+  // if no check and array of input has no value of true (false to true)
+  else if (!e.target.checked && !checkAllInputChanges()){
+    inputObject.inputChange = false
+    targetAnchorTagEl(inputObject.inputChange)
+    clearChanges(inputObject.inputChange)
+    unsavedMessageUnload(inputObject.inputChange)
+  }
+}
+
+// SELECT ELEMENT - packageConditionEl
+const handleConditionChange = (e) => {
+  let arr = Array.from(e.target.selectedOptions, option => option.value);
+  // Removes Empty String from first option value
+  const filteredArr = arr.filter(condition => condition !== "")
+
+  if(filteredArr.length) {
+    // filteredArr.forEach(condition => packageConditionsArr.push(condition))
+    inputObject.inputChange = true
+    document.getElementById("packageCondition").setAttribute("data-selected",`${JSON.stringify(filteredArr)}`)
+    // call function to add eventlistener to anchor tags  
+    targetAnchorTagEl(inputObject.inputChange)
+    clearChanges(inputObject.inputChange)
+    unsavedMessageUnload(inputObject.inputChange)
+  }
+  // if no check and array of input has no value of true (false to true)
+  else if(!filteredArr.length){
+    // set data-selected attribute
+    document.getElementById("packageCondition").setAttribute("data-selected","[]")
+    if(!checkAllInputChanges()){
+      inputObject.inputChange = false
+      // call function to remove eventlistener from anchor tags
+      targetAnchorTagEl(inputObject.inputChange)
+      clearChanges(inputObject.inputChange)
+      unsavedMessageUnload(inputObject.inputChange)
+    }
+  }
+}
+
+const cancelConfirm = (e) => {
+  const clearButtonEl = document.getElementById("clearForm");
+  let result = confirm("Changes were made and will not be saved.")
+
+  if(result){
+    document.getElementById("courierType").innerHTML = ``;
+    document.getElementById("scannedBarcode").value = "";
+    document.getElementById("packageCondition").value = "";
+    document.getElementById("receivePackageComments").value = "";
+    document.getElementById("dateReceived").value = "";
+    
+    document.getElementById("collectionComments").value = "";
+    document.getElementById("collectionId").value = "";
+    enableCollectionCardFields()
+    enableCollectionCheckBox()
+    document.getElementById("packageCondition").setAttribute("data-selected","[]")
+    targetAnchorTagEl()
+    clearButtonEl.removeEventListener("click",cancelConfirm)
+    window.removeEventListener("beforeunload",beforeUnloadMessage)
+    
+    if (document.getElementById("collectionId").value) {
+      document.getElementById("collectionId").value = "";
+      document.getElementById("dateCollectionCard").value = "";
+      document.getElementById("timeCollectionCard").value = "";
+      document.getElementById("collectionCheckBox").checked = false;
+      document.getElementById("collectionComments").value = "";
+
+      enableCollectionCardFields();
+      enableCollectionCheckBox();
+      document.getElementById("packageCondition").setAttribute("data-selected","[]");
+      targetAnchorTagEl()
+      clearButtonEl.removeEventListener("click",cancelConfirm);
+      window.removeEventListener("beforeunload",beforeUnloadMessage);
+
+    }
+  }
+  else {
+    return 
+  }
+}
+
+// OTHER UNSAVED CHANGES FUNCTIONS 
 
 const unsavedMessageUnload = (inputChange) => {
   if(inputChange) {
@@ -450,23 +446,25 @@ const unsavedMessageUnload = (inputChange) => {
   }
 }
 
-const beforeUnloadMessage = (e) => { 
-  e.preventDefault()
-  // Chrome requires returnValue to be set.
-  e.returnValue = "";
-  return
-}
-
+// Add two parameters and check truthy and falsy values
+const clearChanges = (inputChanges) => {
+  const clearButtonEl = document.getElementById("clearForm");
+  if(inputChanges) {
+    clearButtonEl.addEventListener("click",cancelConfirm)
+  }
+  else {
+    clearButtonEl.removeEventListener("click",cancelConfirm)
+  }
+};
 
 const checkAllInputChanges = () => {
-  
   /*
   Get values, data-sets, checked ---> 
   Compare to --> 
   empty string, data-selected not "", checkbox not checked
   || document.getElementById("packageCondition").getAttribute("data-selected").length !== 0
   */ 
-  // Input Change made !== "" or checked === true or 
+  // Input Change made !== "" or checked === true or data selected any option element selected !== "select packaage condition"
 
   const condition1 = document.getElementById("scannedBarcode").value !== "" 
   const condition2 = parseDataSelected(document.getElementById("packageCondition").getAttribute("data-selected"))
