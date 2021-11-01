@@ -838,7 +838,7 @@ const alertTemplate = (message, status = "warn", duration = 5000) => {
 };
 
 // Automatically Close Alert Message
-export const closeAlert = (status = "warn", duration = 5000) => {
+const closeAlert = (status = "warn", duration = 5000) => {
   if (status === "success") {
     const alertSuccess = document.getElementById("alert-success");
     alertSuccess.style.display = "block";
