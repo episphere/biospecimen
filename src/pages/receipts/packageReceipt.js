@@ -217,7 +217,6 @@ const packageReceiptTemplate = async (name, auth, route) => {
 };
 
 const checkCourierType = () => {
-  // if fedex remove first 8 characters
   const a = document.getElementById("scannedBarcode");
   let input = ""
   if (a) {
@@ -298,7 +297,8 @@ const formSubmit = () => {
     }
     window.removeEventListener("beforeunload",beforeUnloadMessage)
     targetAnchorTagEl()
-    storePackageReceipt(obj);
+    console.log(obj)
+    // storePackageReceipt(obj);
   })
 }      
 
