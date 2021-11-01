@@ -222,7 +222,7 @@ const checkCourierType = () => {
   let input = ""
   if (a) {
     a.addEventListener("input", (e) => {
-      input = e.target.value
+      input = e.target.value.trim()
       if (input.length === 22) {
             document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
             document.getElementById('collectionCheckBox').checked = true;
@@ -490,7 +490,6 @@ const checkAllInputChanges = () => {
     condition8,
     condition9
   ]
-
   // if any items returns true (Any input changes are made)
   if(conditionsArr.includes(true)) {
     return true
