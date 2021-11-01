@@ -297,8 +297,7 @@ const formSubmit = () => {
     }
     window.removeEventListener("beforeunload",beforeUnloadMessage)
     targetAnchorTagEl()
-    console.log(obj)
-    // storePackageReceipt(obj);
+    storePackageReceipt(obj);
   })
 }      
 
