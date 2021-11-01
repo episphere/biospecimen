@@ -3,6 +3,7 @@ import { getIdToken, showAnimation, hideAnimation } from "../../shared.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
+import fieldMapping from "../../fieldToConceptIdMapping.js";
 
 const inputObject = {
   inputChange: false
@@ -138,25 +139,24 @@ const packageReceiptTemplate = async (name, auth, route) => {
                              <div style="display:inline-block; max-width:90%;"> 
                                 <select required class="col form-control" id="packageCondition" style="width:100%" multiple="multiple" data-selected="[]">
                                     <option id="select-dashboard" value="">-- Select Package Condition --</option>
-                                    <option id="select-noIcePack" value="noIcePack">No Ice Pack</option>
-                                    <option id="select-warmIcePack" value="warmIcePack">Warm Ice Pack</option>
-                                    <option id="select-incorrectMaterialTypeSent" value="incorrectMaterialTypeSent">Incorrect Material Type Sent</option>
-                                    <option id="select-noLabelonVials" value="noLabelonVials">No Label on Vials</option>
-                                    <option id="select-returnedEmptyVials" value="returnedEmptyVials">Returned Empty Vials</option>
-                                    <option id="select-participantRefusal" value="participantRefusal">Participant Refusal</option>
-                                    <option id="select-crushed" value="crushed">Crushed</option>
-                                    <option id="select-damagedContainer" value="damagedContainer">Damaged Container (outer and inner)</option>
-                                    <option id="select-materialThawed" value="materialThawed">Material Thawed</option>
-                                    <option id="select-insufficientIce" value="insufficientIce">Insufficient Ice</option>
-                                    <option id="select-improperPackaging" value=improperPackaging">Improper Packaging</option>
-                                    <option id="select-damagedVials" value="damagedVials">Damaged Vials</option>
-                                    <option id="select-other" value="other">Other</option>
-                                    <option id="select-noPreNotification" value="noPreNotification">No Pre-notification</option>
-                                    <option id="select-noRefrigerant" value="noRefrigerant">No Refrigerant</option>
-                                    <option id="select-improperManifest" value="improperManifest">Improper/Incorrect Manifest</option> 
-                                    <option id="select-infoDoNotMatch" value="infoDoNotMatch">Vial/Paperwork info do not match</option>
-                                    <option id="select-shipmentDelay" value="shipmentDelay">Shipment Delay</option>
-                                    <option id="select-noManifestProvided" value="noManifestProvided">No Manifest provided</option>
+                                    <option id="select-noIcePack" value=${fieldMapping.coldPacksNone}>No Ice Pack</option>
+                                    <option id="select-warmIcePack" value=${fieldMapping.coldPacksWarm}>Warm Ice Pack</option>
+                                    <option id="select-incorrectMaterialTypeSent" value=${fieldMapping.vialsIncorrectMaterialType}>Vials - Incorrect Material Type Sent</option>
+                                    <option id="select-noLabelonVials" value=${fieldMapping.vialsMissingLabels}>No Label on Vials</option>
+                                    <option id="select-returnedEmptyVials" value=${fieldMapping.vialsEmpty}>Returned Empty Vials</option>
+                                    <option id="select-participantRefusal" value=${fieldMapping.participantRefusal}>Participant Refusal</option>
+                                    <option id="select-crushed" value=${fieldMapping.other}>Crushed</option>
+                                    <option id="select-damagedContainer" value=${fieldMapping.damagedContainer}>Damaged Container (outer and inner)</option>
+                                    <option id="select-materialThawed" value=${fieldMapping.other}>Material Thawed</option>
+                                    <option id="select-insufficientIce" value=${fieldMapping.coldPacksInsufficient}>Insufficient Ice</option>
+                                    <option id="select-improperPackaging" value=${fieldMapping.improperPackaging}>Improper Packaging</option>
+                                    <option id="select-damagedVials" value=${fieldMapping.damagedVials}>Damaged Vials</option>
+                                    <option id="select-other" value=${fieldMapping.other}>Other</option>
+                                    <option id="select-noPreNotification" value=${fieldMapping.noPreNotification}>No Pre-notification</option>
+                                    <option id="select-noRefrigerant" value=${fieldMapping.other}>No Refrigerant</option>
+                                    <option id="select-infoDoNotMatch" value=${fieldMapping.manifestDoNotMatch}>Manifest/Vial/Paperwork info do not match</option>
+                                    <option id="select-shipmentDelay" value=${fieldMapping.shipmentDelay}>Shipment Delay</option>
+                                    <option id="select-noManifestProvided" value=${fieldMapping.manifestNotProvided}>No Manifest provided</option>
                                 </select>
                                 <br />
                                 <span><h6><i>Press command/control to make multiple selections</i></h6></span>
@@ -271,14 +271,20 @@ const enableCollectionCardFields = () => {
 const formSubmit = () => {
   const form = document.getElementById('configForm');
   form.addEventListener('submit', e => {
-      e.preventDefault();
-      let obj = {};
-      let packageConditions = [];
-      obj['scannedBarcode'] = document.getElementById('scannedBarcode').value.trim();
-      for (let option of document.getElementById('packageCondition').options) {
-        if (option.selected) {packageConditions.push(option.value)}
-      }
-      obj['packageCondition'] = packageConditions;
+    e.preventDefault();
+    let obj = {};
+    let packageConditions = [];
+    const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
+    obj['scannedBarcode'] = scannedBarcode
+    for (let option of document.getElementById('packageCondition').options) {
+      if (option.selected) {packageConditions.push(option.value)}
+    }
+    obj[`${fieldMapping.packageCondition}`] = packageConditions;
+    if (scannedBarcode.length <= 12) {  
+      obj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
+      obj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
+      obj[`${fieldMapping.siteShipmentDateReceived}`] = document.getElementById('dateReceived').value;
+    } else { 
       obj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
       obj['dateReceived'] = document.getElementById('dateReceived').value;
       if(document.getElementById('collectionId').value) {
@@ -288,12 +294,11 @@ const formSubmit = () => {
         document.getElementById('collectionCheckBox').checked === true ? 
             obj['collectionCheckBox'] = true : obj['collectionCheckBox'] = false
         obj['collectionComments'] = document.getElementById('collectionComments').value;
-       
-      }
-      
-      window.removeEventListener("beforeunload",beforeUnloadMessage)
-      targetAnchorTagEl()
-      storePackageReceipt(obj);
+      }    
+    }
+    window.removeEventListener("beforeunload",beforeUnloadMessage)
+    targetAnchorTagEl()
+    storePackageReceipt(obj);
   })
 }      
 
