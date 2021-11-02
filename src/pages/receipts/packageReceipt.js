@@ -14,6 +14,7 @@ export const packageReceiptScreen = async (auth, route) => {
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
   packageReceiptTemplate(username, auth, route);
+  defaultDateReceived(getCurrentDate);
   checkCourierType();
   checkCardIncluded();
   disableCollectionCardFields();
@@ -282,7 +283,7 @@ const addListenersOnPageLoad = () => {
   scannedBarcodeInputEl.addEventListener("input", hasInputChanged)
   packageConditionEl.addEventListener("change",handleConditionChange)
   receivePackageCommentsEl.addEventListener("input", hasInputChanged)
-  dateReceivedEl.addEventListener("input", hasInputChanged)
+  dateReceivedEl.addEventListener("input", hasInputDateChanged)
 
   // Collection Card Date Entry: collectionCheckBox,collectionId, dateCollectionCard,timeCollectionCard,collectionComments
 
@@ -348,6 +349,25 @@ const hasInputChanged = (e) => {
   }
 }
 
+/*
+INPUT(DATE) ELEMENT - dateReceivedEl
+*/ 
+const hasInputDateChanged = (e) => {
+    if(e.target.value.trim() === getCurrentDate() && !checkAllInputChanges()) {
+      inputObject.inputChange = false
+      targetAnchorTagEl(inputObject.inputChange)
+      clearChanges(inputObject.inputChange)
+      unsavedMessageUnload(inputObject.inputChange)
+    }
+    else if(e.target.value.trim() !== getCurrentDate()){
+      inputObject.inputChange = true
+      targetAnchorTagEl(inputObject.inputChange)
+      clearChanges(inputObject.inputChange)
+      unsavedMessageUnload(inputObject.inputChange)
+      return
+    }
+}
+
 // INPUT(CHECKBOX) ELEMENT - collectionCheckBoxEl
 const isChecked = (e) => {
   if(e.target.checked) {
@@ -394,7 +414,7 @@ const handleConditionChange = (e) => {
   }
 }
 
-const cancelConfirm = (e) => {
+const cancelConfirm = () => {
   const clearButtonEl = document.getElementById("clearForm");
   let result = confirm("Changes were made and will not be saved.")
 
@@ -403,7 +423,7 @@ const cancelConfirm = (e) => {
     document.getElementById("scannedBarcode").value = "";
     document.getElementById("packageCondition").value = "";
     document.getElementById("receivePackageComments").value = "";
-    document.getElementById("dateReceived").value = "";
+    document.getElementById("dateReceived").value = getCurrentDate();
     
     document.getElementById("collectionComments").value = "";
     document.getElementById("collectionId").value = "";
@@ -469,7 +489,7 @@ const checkAllInputChanges = () => {
   const condition1 = document.getElementById("scannedBarcode").value !== "" 
   const condition2 = parseDataSelected(document.getElementById("packageCondition").getAttribute("data-selected"))
   const condition3 = document.getElementById("receivePackageComments").value !== "";
-  const condition4 = document.getElementById("dateReceived").value !== "";
+  const condition4 = document.getElementById("dateReceived").value !== getCurrentDate();
 
   const condition5 = document.getElementById("collectionCheckBox").checked === true;
   const condition6 = document.getElementById("collectionId").value !== "";
@@ -502,4 +522,18 @@ const parseDataSelected = (value) => {
     return true
   }
   return false
+}
+
+const defaultDateReceived = (getCurrentDate) => {
+  const dateReceivedEl = document.getElementById("dateReceived")
+  if(getCurrentDate()){
+    dateReceivedEl.value = getCurrentDate()
+  }
+  else dateReceivedEl.value = ""
+}
+
+// returns current date in english canada format ("YYYY-MM-DD")
+const getCurrentDate = () => {
+  const currentDate = new Date().toLocaleDateString('en-CA');
+  return currentDate
 }
