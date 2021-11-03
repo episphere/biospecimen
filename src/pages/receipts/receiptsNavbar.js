@@ -11,8 +11,8 @@ export const receiptsNavbar = () => {
                       <li id="packageReceiptNavItem" class="nav-item">
                       <a class="nav-link" aria-current="page" href="#packagereceipt" id="packageReceipt">Packages Receipt</a>
                       </li>
-                      <li class="nav-item">
-                      <a class="nav-link" aria-current="page">Create .csv file</a>
+                      <li id="csvFileReceiptNavItem" class="nav-item">
+                      <a class="nav-link" aria-current="page" href="#csvfilereceipt" id="csvFileReceipt">Create .csv file</a>
                       </li>
                   </ul>`;
     return template;

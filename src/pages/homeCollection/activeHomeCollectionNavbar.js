@@ -21,7 +21,7 @@ export const activeHomeCollectionNavbar = () => {
     kitShipmentNavItem.classList.add("active");
     kitShipmentNavItem.style.backgroundColor = "#bbcffc85";
     kitShipmentNavItem.style.borderRadius = "4px 4px 0 0";
-}
+  }
   else return;
   };
 
