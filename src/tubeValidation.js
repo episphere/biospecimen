@@ -105,21 +105,6 @@ const tube0021 = {
     'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
-const tube0022 = {
-    'specimenType': 'Serum Separator Tube',
-    'tubeType': 'Blood tube',
-    'readableValue': 'Serum Separator Tube',
-    'image': './static/images/tube1.PNG',
-    'name': 'tube22',
-    'id': '0022',
-    'concept': '746999767',
-    'tubeColor': 'Gold',
-    'collectionChkBox': true,
-    'deviationChkBox': true,
-    'deviationOptions': deviationCollection1,
-    'tubeNotCollectedOptions': tubeNotCollectedOptions1
-};
-
 const tube0031 = {
     'specimenType': 'Serum Separator Tube',
     'tubeType': 'Blood tube',
@@ -305,7 +290,6 @@ export const workflows = {
         tube0011,
         tube0012,
         tube0021,
-        tube0022,
         tube0031,
         tube0032,
         tube0003,
