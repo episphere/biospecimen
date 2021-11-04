@@ -11,9 +11,7 @@ export const csvFileReceiptScreen = async (auth, route) => {
 
   csvFileReceiptTemplate(username, auth, route);
   activeReceiptsNavbar();
-  csvFileBtnClick();
-  // createCsvFile();
-  // getCsvDateInput();
+  csvFileButtonSubmit();
 
   const csvDateInputEl = document.getElementById("csvDateInput");
   console.log(csvDateInputEl)
@@ -48,14 +46,7 @@ const csvFileReceiptTemplate = async (username, auth, route) => {
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
 }
 
-
-// const getCsvDateInput = () => {
-//   const csvDateInputEl = document.getElementById("csvDateInput");
-//   csvDateInputEl.innerHTML = getCurrentDate()
-//   return csvDateInputEl
-// }
-
-const csvFileBtnClick = () => {
+const csvFileButtonSubmit = () => {
   document.getElementById("csvCreateFileButton").addEventListener("click", (e)=> {
     e.preventDefault()
   })
