@@ -11,8 +11,9 @@ export const csvFileReceiptScreen = async (auth, route) => {
 
   csvFileReceiptTemplate(username, auth, route);
   activeReceiptsNavbar();
-  createCsvFile();
-  getCsvDateInput();
+  csvFileBtnClick();
+  // createCsvFile();
+  // getCsvDateInput();
 
   const csvDateInputEl = document.getElementById("csvDateInput");
   console.log(csvDateInputEl)
@@ -27,26 +28,37 @@ const csvFileReceiptTemplate = async (username, auth, route) => {
   let template = "";
 
   template += receiptsNavbar();
-  template += `<div id="root root-margin">
+  template += `<div id="root root-margin" style="margin-top:3rem;">
                   <span> <h3 style="text-align: center; margin: 1rem 0;">Create CSV File</h3> </span>
-                      <div class="container-fluid d-flex flex-wrap align-items-center justify-content-center" style="margin-top:25%;">
-                        <p style="display:inline-block;margin-bottom:0; margin-right:5%; font-size:1.3rem;">Enter a Date</p>
-                        <input type="date" id="csvDateInput" style="margin-right:5%;" max="${getCurrentDate()};"></input>
-                        <button id="csvCreateFileButton">Create File</button>
+                  <div class="container-fluid">
+                    <div class="card bg-light mb-3 mt-3 mx-auto" style="max-width:50rem;">
+                      <div class="card-body" style="padding: 4rem 2.5rem;">
+                        <form class="form">
+                        <div class="form-group d-flex flex-wrap align-items-center justify-content-center m-0">
+                          <label for="csvDateInput" style="display:inline-block;margin-bottom:0; margin-right:5%; font-size:1.3rem;">Enter a Date</label>
+                          <input type="date" name="csvDate" id="csvDateInput" describedby="enterEmail" style="margin-right:5%; padding:0.2rem;" value="${getCurrentDate()}" max="${getCurrentDate()}"/>
+                          <button id="csvCreateFileButton" class="btn btn-primary">Create File</button>
+                        </div>
+                        </form>
                       </div>
+                    </div>
+                  </div>
               </div>`
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
 }
 
 
-const getCsvDateInput = () => {
-  const csvDateInputEl = document.getElementById("csvDateInput");
-  return csvDateInputEl
-}
+// const getCsvDateInput = () => {
+//   const csvDateInputEl = document.getElementById("csvDateInput");
+//   csvDateInputEl.innerHTML = getCurrentDate()
+//   return csvDateInputEl
+// }
 
-const createCsvFile = () => {
-  document.getElementById
+const csvFileBtnClick = () => {
+  document.getElementById("csvCreateFileButton").addEventListener("click", (e)=> {
+    e.preventDefault()
+  })
 }
 
 const getCurrentDate = () => {
