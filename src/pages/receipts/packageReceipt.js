@@ -137,7 +137,8 @@ const checkCourierType = () => {
       }
       else if (input.length <= 12) {
         document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
-        document.getElementById('collectionCheckBox').checked = true;
+        document.getElementById('collectionCheckBox').checked = false;
+        document.getElementById('collectionCheckBox').disabled = true;
         checkCardIncluded();
         disableCollectionCardFields();
         return
@@ -145,6 +146,7 @@ const checkCourierType = () => {
       else {
         document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
         document.getElementById('collectionCheckBox').checked = false;
+        document.getElementById('collectionCheckBox').removeAttribute("disabled")
         enableCollectionCardFields();
         return
       }
@@ -537,3 +539,35 @@ const getCurrentDate = () => {
   const currentDate = new Date().toLocaleDateString('en-CA');
   return currentDate
 }
+
+
+
+
+
+/* 
+IF / ELSE 
+
+a1 - enable
+a2 - disable
+b1 - uncheck checkbox
+b2- check checkbox
+c1 - enable checkbox
+c2 - disable checkbox
+
+USPS - a1, b1
+
+if length 0 --> a1, b1
+
+if number starts with 420 --> USPS
+OR 
+if number is 34 AND Starts with 420 --> usps
+
+if number is 22  || 20 length--> usps
+
+if number is 34 --> Fedex 
+
+if number is 12 Fedex
+
+input length <= 12 --> 
+
+*/
