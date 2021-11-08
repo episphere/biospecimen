@@ -143,7 +143,6 @@ const checkCourierType = () => {
         document.getElementById('collectionCheckBox').checked = false;
         document.getElementById('collectionCheckBox').removeAttribute("disabled")
         enableCollectionCardFields();
-        debugger;
         return
       }
       // USPS
@@ -153,7 +152,6 @@ const checkCourierType = () => {
         document.getElementById('collectionCheckBox').checked = false;
         document.getElementById('collectionCheckBox').removeAttribute("disabled")
         enableCollectionCardFields();
-        debugger;
         return
       }
       // FEDEX
@@ -572,35 +570,6 @@ const getCurrentDate = () => {
   const currentDate = new Date().toLocaleDateString('en-CA');
   return currentDate
 }
-
-/* 
-IF / ELSE 
-
-a1 - enable
-a2 - disable
-b1 - uncheck checkbox
-b2- check checkbox
-c1 - enable checkbox
-c2 - disable checkbox
-
-USPS - a1, b1, c1
-FEDEX - a2, c2
-
-1. if length 0 --> None a1, b1
-
-2. if number starts with 420 --> USPS
-OR 
-if number is 34 AND Starts with 420 --> usps
-
-3. if number is 22  || 20 length--> usps
-
-4. if number is 34 --> Fedex 
-
-5. if number is 12 Fedex
-
-6. input length <= 12 --> None
-
-*/
 
 const uspsFirstThreeNumbersCheck = (input) => {
   const regExp = /^420[0-9]{31}$/
