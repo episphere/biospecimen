@@ -127,15 +127,37 @@ const checkCourierType = () => {
   const a = document.getElementById("scannedBarcode");
   let input = ""
   if (a) {
-    a.addEventListener("input", (e) => {
+    a.addEventListener("change", (e) => {
       input = e.target.value.trim()
+      // None
       if(input.length === 0){
         document.getElementById('courierType').innerHTML = ``
         enableCollectionCardFields();
         document.getElementById('collectionCheckBox').checked = false;
         return
       }
-      else if (input.length <= 12) {
+      // USPS
+      else if (uspsFirstThreeNumbersCheck(input) || (input.length === 34 && uspsFirstThreeNumbersCheck(input))) {
+        // console.log(uspsFirstThreeNumbersCheck(input))
+        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
+        document.getElementById('collectionCheckBox').checked = false;
+        document.getElementById('collectionCheckBox').removeAttribute("disabled")
+        enableCollectionCardFields();
+        debugger;
+        return
+      }
+      // USPS
+      else if (input.length === 22 || input.length === 20) {
+        // console.log(uspsFirstThreeNumbersCheck(input))
+        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
+        document.getElementById('collectionCheckBox').checked = false;
+        document.getElementById('collectionCheckBox').removeAttribute("disabled")
+        enableCollectionCardFields();
+        debugger;
+        return
+      }
+      // FEDEX
+      else if (input.length === 34) {
         document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
         document.getElementById('collectionCheckBox').checked = false;
         document.getElementById('collectionCheckBox').disabled = true;
@@ -143,8 +165,18 @@ const checkCourierType = () => {
         disableCollectionCardFields();
         return
       }
+      // FEDEX
+      else if (input.length === 12) {
+        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
+        document.getElementById('collectionCheckBox').checked = false;
+        document.getElementById('collectionCheckBox').disabled = true;
+        checkCardIncluded();
+        disableCollectionCardFields();
+        return
+      }
+      // None
       else {
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
+        document.getElementById('courierType').innerHTML = ``
         document.getElementById('collectionCheckBox').checked = false;
         document.getElementById('collectionCheckBox').removeAttribute("disabled")
         enableCollectionCardFields();
@@ -189,7 +221,7 @@ const formSubmit = () => {
       if (option.selected) {packageConditions.push(option.value)}
     }
     obj[`${fieldMapping.packageCondition}`] = packageConditions;
-    if (scannedBarcode.length <= 12) {  
+    if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode) && scannedBarcode.length === 34)) {  
       obj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
       obj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
       obj[`${fieldMapping.siteShipmentDateReceived}`] = document.getElementById('dateReceived').value;
@@ -207,6 +239,7 @@ const formSubmit = () => {
     }
     window.removeEventListener("beforeunload",beforeUnloadMessage)
     targetAnchorTagEl()
+    console.log(obj)
     storePackageReceipt(obj);
   })
 }      
@@ -540,10 +573,6 @@ const getCurrentDate = () => {
   return currentDate
 }
 
-
-
-
-
 /* 
 IF / ELSE 
 
@@ -554,20 +583,27 @@ b2- check checkbox
 c1 - enable checkbox
 c2 - disable checkbox
 
-USPS - a1, b1
+USPS - a1, b1, c1
+FEDEX - a2, c2
 
-if length 0 --> a1, b1
+1. if length 0 --> None a1, b1
 
-if number starts with 420 --> USPS
+2. if number starts with 420 --> USPS
 OR 
 if number is 34 AND Starts with 420 --> usps
 
-if number is 22  || 20 length--> usps
+3. if number is 22  || 20 length--> usps
 
-if number is 34 --> Fedex 
+4. if number is 34 --> Fedex 
 
-if number is 12 Fedex
+5. if number is 12 Fedex
 
-input length <= 12 --> 
+6. input length <= 12 --> None
 
 */
+
+const uspsFirstThreeNumbersCheck = (input) => {
+  const regExp = /^420[0-9]{31}$/
+  return regExp.test(input);
+}
+
