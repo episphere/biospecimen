@@ -598,10 +598,10 @@ const userInputHandler = async (
       return;
     }
 
-    // 30 to 32 digit number will have first 8 characters removed
+    // 32 to 34 digit number will have first 8 characters removed
     // Trim and remove message if nuber is between range criteria
-    if (usps.length >= 30 && usps.length <= 32) {
-      usps = usps.split("").splice(8).join("").trim();
+    if (uspsFirstThreeNumbersCheck(usps) && usps.length >= 32 && usps.length <= 34) {
+      usps = usps.split("").splice(12).join("").trim();
       inputUsps.value = usps;
       uspsErrorMessage.style.display = "none";
       uspsInput.style.borderColor = "";
@@ -875,6 +875,11 @@ const uspsTrackingNumberRegExp = (searchStr) => {
   let regExp = /^[0-9]{20,22}$/;
   return regExp.test(searchStr);
 };
+
+const uspsFirstThreeNumbersCheck = (input) => {
+  const regExp = /^420[0-9]{29,31}$/
+  return regExp.test(input);
+}
 
 /*
  FORMAT MATCH (SPECIMEN KIT ID & SUPPLY KIT ID) TEST EXAMPLE  --> CON000007
