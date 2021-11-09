@@ -149,26 +149,31 @@ export const searchResults = (result) => {
             <table class="table table-borderless table-striped">
                 <thead>
                     <tr>
-                        <th>Select</th>
                         <th>Last name</th>
                         <th>First name</th>
                         <th>Middle name</th>
                         <th>Date of birth</th>
                         <th>Address</th>
                         <th>Connect ID</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>`
     result.forEach(data => {
         template += `
             <tr>
-                <td><input type="radio" name="selectParticipantRadio" required data-token=${data.token} value="${data.Connect_ID}"></td>
+               
                 <td>${data['996038075']}</td>
                 <td>${data['399159511']}</td>
                 <td>${data['231676651']}</td>
                 <td>${data['564964481']}/${data['795827569']}/${data['544150384']}</td>
                 <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
                 <td>${data.Connect_ID}</td>
+                <td><button type="Submit" class="btn btn-outline-primary btn-sm">Go to check-in</button></td>
+                <td><button type="Submit" class="btn btn-outline-primary btn-sm">Specimen Link</button></td>
+                <td><input type="radio" name="selectParticipantRadio" required data-token=${data.token} value="${data.Connect_ID}"></td>
             </tr>
         `
     });

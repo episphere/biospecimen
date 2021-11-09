@@ -180,7 +180,14 @@ export const bodyNavBar = () => {
             <li class="nav-item">
                 <button class="nav-link navbar-btn" id="navBarSpecimenSearch">Specimen Search</button>
             </li>
-            ${workflow && workflow === 'clinical' ? ``:`
+           
+        </ul>`;
+        
+        document.getElementById('contentHeader').innerHTML = template;
+}
+
+/**
+ ${workflow && workflow === 'clinical' ? ``:`
                 <li class="nav-item">
                     <button class="nav-link disabled navbar-btn" id="navBarParticipantCheckIn">Participant Check-In</button>
                 </li>
@@ -199,10 +206,7 @@ export const bodyNavBar = () => {
                     <button class="nav-link disabled navbar-btn" id="participantCheckOut">Participant Check-Out</button>
                 </li>
             `}
-        </ul>`;
-        
-        document.getElementById('contentHeader').innerHTML = template;
-}
+ */
 export const shippingNavBar = () => {
     return `
         <ul class="nav nav-tabs row">
