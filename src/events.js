@@ -1804,7 +1804,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     }
     if(hasError) return;
 
-    if(document.getElementById('collectionLocation')) formData[getWorflow() === 'research' ? '951355211' : '525480516'] = parseInt(document.getElementById('collectionLocation').value);
+    if(document.getElementById('collectionLocation')) formData['951355211'] = parseInt(document.getElementById('collectionLocation').value);
     const collectionID = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     const n = document.getElementById('399159511').innerText || ""
     const confirmVal = await swal({
