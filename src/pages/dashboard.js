@@ -145,7 +145,6 @@ export const searchResults = (result) => {
         </br>
         
         <div class="row allow-overflow">
-            <form method="POST" id="selectParticipant">
             <table class="table table-borderless table-striped">
                 <thead>
                     <tr>
@@ -164,7 +163,6 @@ export const searchResults = (result) => {
     result.forEach(data => {
         template += `
             <tr>
-               
                 <td>${data['996038075']}</td>
                 <td>${data['399159511']}</td>
                 <td>${data['231676651']}</td>
@@ -172,28 +170,18 @@ export const searchResults = (result) => {
                 <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
                 <td>${data.Connect_ID}</td>
                 <td><button type="Submit" class="btn btn-outline-primary btn-sm">Go to check-in</button></td>
-                <td><button type="Submit" class="btn btn-outline-primary btn-sm">Specimen Link</button></td>
-                <td><input type="radio" name="selectParticipantRadio" required data-token=${data.token} value="${data.Connect_ID}"></td>
             </tr>
         `
     });
-    template += `</tbody></table>
-        <div class="row remove-margin">
-            <div>
-                <button type="button" class="btn btn-outline-dark" id="backToSearch"><i class="fas fa-arrow-left"></i> Return to search</button>
-            </div>
-            <div class="ml-auto">
-                <button type="Submit" class="btn btn-outline-primary">${getWorflow() === 'clinical' ? `Go to Specimen Link`:`Go to participant check-in`}</button>
-            </div>
-        </div>
-    </form></div>`;
+    template += `</tbody></table></div>`;
 
     document.getElementById('contentBody').innerHTML = template;
+    addEventBackToSearch('navBarSearch');
     if(getWorflow() === 'clinical') {
         addEventSelectParticipantForm(true);
     }
     else {
         addEventSelectParticipantForm();
     }
-    addEventBackToSearch('backToSearch');
+  
 }
