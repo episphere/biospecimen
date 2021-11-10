@@ -32,7 +32,7 @@ export const finalizeTemplate = (data, specimenData) => {
             <table id="finalizeTable" class="table-borderless collection-table">
                 <thead>
                     <tr>
-                        <th>Tube Type</th>
+                        <th>Specimen Type</th>
                         ${getWorflow() === 'clinical' ? `<th>Received</th>`:`<th>Collected</th>`}
                         <th>Full Specimen ID</th>
                         <th>Deviation</th>
