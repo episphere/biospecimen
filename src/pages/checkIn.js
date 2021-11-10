@@ -17,7 +17,7 @@ export const checkInTemplate = (data) => {
                 <div>${data['996038075']}, ${data['399159511']}</div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
-            <div class="row">
+            <div class="row" style="display: none;">
                 Verify contact information &nbsp;
                 <button type="button" class="btn btn-outline-primary" id="contactInformationModal" data-target="#biospecimenModal" data-toggle="modal">Contact Information</button>
             </div>
