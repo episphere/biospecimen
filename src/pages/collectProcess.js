@@ -57,7 +57,7 @@ export const collectProcessTemplate = (data, formData) => {
                                 <td>${obj.deviationChkBox === true ? `
                                     <input 
                                         type="checkbox" 
-                                        data-tube-label="(${index+1}) ${obj.specimenType}" 
+                                        data-tube-label="(${index+1}) ${obj.specimenType} (${obj.tubeColor})" 
                                         class="tube-deviated custom-checkbox-size ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''}" 
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['678857215'] === 353358909 ? 'checked': ''} 
                                         data-tube-type="${obj.tubeType}" 
