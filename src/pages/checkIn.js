@@ -4,8 +4,9 @@ import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventB
 export const checkInTemplate = (data) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarParticipantCheckIn');
-    navBarBtn.classList.remove('disabled');
-    navBarBtn.classList.add('active');
+    navBarBtn.style.display = 'block';
+    navBarBtn?.classList.remove('disabled');
+    navBarBtn?.classList.add('active');
     let template = `
         </br>
         <div class="row">
@@ -15,6 +16,10 @@ export const checkInTemplate = (data) => {
         <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
             <div class="row">
                 <div>${data['996038075']}, ${data['399159511']}</div>
+                <div class="ml-auto">
+                    <select value="Select Visit"></select>
+                    <button class="btn btn-outline-primary" type="submit" id="checkInComplete">Check-In and Continue</button>
+                </div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
             <div class="row">
@@ -90,15 +95,6 @@ export const checkInTemplate = (data) => {
                         <div class="row"><span class="full-width">Baseline urine</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
                     </div>
-                </div>
-            </div>
-            </br>
-            <div class="row">
-                <div class="col">
-                    <button class="btn btn-outline-dark" id="checkInExit"><i class="fas fa-arrow-left"></i> Exit</button>
-                </div>
-                <div class="ml-auto">
-                    <button class="btn btn-outline-primary" type="submit" id="checkInComplete">Check-In and Continue</button>
                 </div>
             </div>
         </form>

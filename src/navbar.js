@@ -180,7 +180,9 @@ export const bodyNavBar = () => {
             <li class="nav-item">
                 <button class="nav-link navbar-btn" id="navBarSpecimenSearch">Specimen Search</button>
             </li>
-           
+            <li class="nav-item">
+            <button style="display:none" class="nav-link navbar-btn" id="navBarParticipantCheckIn">Check-In/Check-Out</button>
+        </li>
         </ul>`;
         
         document.getElementById('contentHeader').innerHTML = template;

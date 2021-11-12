@@ -1,5 +1,5 @@
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates, getWorflow, isDeviceiPad, replaceDateInputWithMaskedInput } from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
+import { addGoToCheckInEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
@@ -137,6 +137,7 @@ export const searchBiospecimenTemplate = () => {
 }
 
 export const searchResults = (result) => {
+    const f = () => addEventSelectParticipantForm();
     let template = `
         </br>
         <div class="row">
@@ -156,7 +157,6 @@ export const searchResults = (result) => {
                         <th>Connect ID</th>
                         <th></th>
                         <th></th>
-                        <th></th>
                     </tr>
                 </thead>
                 <tbody>`
@@ -169,7 +169,8 @@ export const searchResults = (result) => {
                 <td>${data['564964481']}/${data['795827569']}/${data['544150384']}</td>
                 <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
                 <td>${data.Connect_ID}</td>
-                <td><button type="Submit" class="btn btn-outline-primary btn-sm">Go to check-in</button></td>
+                <td><button class="btn btn-outline-primary btn-sm" data-check-in-btn-connect-id=${data.Connect_ID}>Go to check-in</button></td>
+                <td><button class="btn btn-outline-primary btn-sm">Specimen Link</button></td>
             </tr>
         `
     });
@@ -177,11 +178,13 @@ export const searchResults = (result) => {
 
     document.getElementById('contentBody').innerHTML = template;
     addEventBackToSearch('navBarSearch');
-    if(getWorflow() === 'clinical') {
-        addEventSelectParticipantForm(true);
+    if (getWorflow() === 'clinical') {
+        addGoToCheckInEvent();
+      //  addEventSelectParticipantForm(true);
     }
     else {
-        addEventSelectParticipantForm();
+        addGoToCheckInEvent();
+       // addEventSelectParticipantForm();
     }
   
 }

@@ -1685,7 +1685,34 @@ export const addEventRemoveUser = () => {
     })
 }
 
+export const addGoToCheckInEvent = () => {
+  const handler = (connectId) => async (_event) => {
+    try {
+      showAnimation();
+      const data = await findParticipant(`connectId=${connectId}`).then(
+        (res) => res.data?.[0]
+      );
+      checkInTemplate(data);
+    } catch (error) {
+      console.log("Error checking in participant: ", error);
+    } finally {
+      hideAnimation();
+    }
+  };
+
+  const checkInButtons = document.querySelectorAll(
+    `[data-check-in-btn-connect-id]`
+  );
+
+  Array.from(checkInButtons).forEach((btn) => {
+    btn.addEventListener("click", handler(Number(btn.dataset.checkInBtnConnectId)));
+  });
+};
+
+
+  
 export const addEventSelectParticipantForm = (skipCheckIn) => {
+    console.log("skipCheckIn", skipCheckIn);
     const form = document.getElementById('selectParticipant');
     form.addEventListener('submit', e => {
         e.preventDefault();
