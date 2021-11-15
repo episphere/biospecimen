@@ -66,7 +66,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
             const deviationOptions = tubes.filter(tube => tube.concept === tubeId)[0].deviationOptions;
             const tubeLabel = ele.dataset.tubeLabel;
             template += `
-                <div class="row"><div class="col">Tube Type: <strong>${tubeLabel}</strong></div></div>
+                <div class="row"><div class="col">Specimen Type: <strong>${tubeLabel}</strong></div></div>
                 <div class="row"><div class="col">Full Specimen ID: ${ele.parentNode.parentNode.querySelectorAll('[type="text"]')[0].value}</div></div>
                 <div class="form-group row">
                     <div class="col">
