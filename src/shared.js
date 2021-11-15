@@ -18,9 +18,6 @@ const conversion = {
     "376960806":"0011",
     "232343615":"0012",
     "589588440":"0021",
-    "746999767":"0022",
-    "857757831":"0031",
-    "654812257":"0032",
     "958646668":"0013",
     "677469051":"0014",
     "683613884":"0024"
@@ -430,9 +427,6 @@ export const searchSpecimenInstitute = async () => {
         "376960806":"0011",
         "232343615":"0012",
         "589588440":"0021",
-        "746999767":"0022",
-        "857757831":"0031",
-        "654812257":"0032",
         "958646668":"0013",
         "677469051":"0014",
         "683613884":"0024"
@@ -746,7 +740,7 @@ export const siteLocations = {
         'NCI': [{location: 'NCI-1', concept: 111111111}, {location: 'NCI-2', concept: 222222222}]
     },
     'clinical': {
-        'KPHI': [{location:'Oahu', concept: 945449846}, {location: 'Non-Oahu', concept: 704199032}]
+        'KPHI': [{location:'KPHI RRL', concept: 531313956}]
     }
 }
 
@@ -814,7 +808,7 @@ export const getWorflow = () => document.getElementById('contentBody').dataset.w
 export const getSiteTubesLists = (specimenData) => {
     const dashboardType = document.getElementById('contentBody').dataset.workflow;
     const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-    const subSiteLocation = siteLocations[dashboardType][siteAcronym] ? siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === specimenData[dashboardType === 'research' ? '951355211' : '525480516'])[0].location : undefined;
+    const subSiteLocation = siteLocations[dashboardType][siteAcronym] ? siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === specimenData['951355211'])[0].location : undefined;
     const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType];
     return siteTubesList;
 }
