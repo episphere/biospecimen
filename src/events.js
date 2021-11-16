@@ -1973,7 +1973,8 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     if((hasError && cntd == true) || hasCntdError) return;
     data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
     Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[dt.id.replace('Deviated', '')]['678857215'] = dt.checked ? 353358909 : 104430631)
-    
+    Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === false).forEach(dt => biospecimenData[dt.id.replace('Deviated', '')]['248868659'] = '')
+
     showAnimation();
     
     if(cntd) {
