@@ -11,16 +11,14 @@ const deviationReason10 = {'concept': 550088682, 'label':'Improper temperature -
 const deviationReason11 = {'concept': 690540566, 'label':'Improper temperature - too high (record time and temperature Deviation in the comments)'}
 const deviationReason12 = {'concept': 956345366, 'label':'Insufficient volume - not enough volume to transfer to urine tube (discard)'}
 const deviationReason13 = {'concept': 757246707, 'label':'Leaked/spilled'}
-const deviationReason14 = {'concept': 262420266, 'label':'Lipemia'}
-const deviationReason15 = {'concept': 728366619, 'label':'Low volume - (tube/container partially filled but still usable)'}
-const deviationReason16 = {'concept': 806820884, 'label':'Mislabeled'}
-const deviationReason17 = {'concept': 468668640, 'label':'Urine hat used'}
-const deviationReason18 = {'concept': 453343022, 'label':'Other'}
+const deviationReason14 = {'concept': 728366619, 'label':'Low volume - (tube/container partially filled but still usable)'}
+const deviationReason15 = {'concept': 806820884, 'label':'Mislabeled'}
+const deviationReason16 = {'concept': 453343022, 'label':'Other'}
 
-const deviationCollection1 = [deviationReason1, deviationReason2, deviationReason3, deviationReason4, deviationReason5, deviationReason6, deviationReason7, deviationReason8, deviationReason9, deviationReason10, deviationReason11, deviationReason13, deviationReason14, deviationReason15, deviationReason16, deviationReason18];
-const deviationCollection2 = [deviationReason1, deviationReason9, deviationReason10, deviationReason11, deviationReason13, deviationReason14, deviationReason15, deviationReason16, deviationReason18];
-const deviationCollection3 = [deviationReason1, deviationReason10, deviationReason11, deviationReason12, deviationReason13, deviationReason15, deviationReason16, deviationReason17, deviationReason18];
-const deviationCollection4 = [deviationReason1, deviationReason13, deviationReason15, deviationReason16, deviationReason18];
+const deviationCollection1 = [deviationReason1, deviationReason2, deviationReason3, deviationReason4, deviationReason5, deviationReason6, deviationReason7, deviationReason8, deviationReason9, deviationReason10, deviationReason11, deviationReason13, deviationReason14, deviationReason15, deviationReason16];
+const deviationCollection2 = [deviationReason1, deviationReason9, deviationReason10, deviationReason11, deviationReason13, deviationReason14, deviationReason15, deviationReason16];
+const deviationCollection3 = [deviationReason1, deviationReason10, deviationReason11, deviationReason12, deviationReason13, deviationReason14, deviationReason15, deviationReason16];
+const deviationCollection4 = [deviationReason1, deviationReason13, deviationReason14, deviationReason15, deviationReason16];
 
 const tubeNotCollectedReason1 = {'concept': 234139565, 'label': 'Short draw'};
 const tubeNotCollectedReason2 = {'concept': 681745422, 'label': 'Participant refusal'};
@@ -98,51 +96,6 @@ const tube0021 = {
     'name': 'tube21',
     'concept': '589588440',
     'id': '0021',
-    'tubeColor': 'Gold',
-    'collectionChkBox': true,
-    'deviationChkBox': true,
-    'deviationOptions': deviationCollection1,
-    'tubeNotCollectedOptions': tubeNotCollectedOptions1
-};
-
-const tube0022 = {
-    'specimenType': 'Serum Separator Tube',
-    'tubeType': 'Blood tube',
-    'readableValue': 'Serum Separator Tube',
-    'image': './static/images/tube1.PNG',
-    'name': 'tube22',
-    'id': '0022',
-    'concept': '746999767',
-    'tubeColor': 'Gold',
-    'collectionChkBox': true,
-    'deviationChkBox': true,
-    'deviationOptions': deviationCollection1,
-    'tubeNotCollectedOptions': tubeNotCollectedOptions1
-};
-
-const tube0031 = {
-    'specimenType': 'Serum Separator Tube',
-    'tubeType': 'Blood tube',
-    'readableValue': 'Serum Separator Tube',
-    'image': './static/images/tube1.PNG',
-    'name': 'tube31',
-    'concept': '857757831',
-    'id': '0031',
-    'tubeColor': 'Gold',
-    'collectionChkBox': true,
-    'deviationChkBox': true,
-    'deviationOptions': deviationCollection1,
-    'tubeNotCollectedOptions': tubeNotCollectedOptions1
-};
-
-const tube0032 = {
-    'specimenType': 'Serum Separator Tube',
-    'tubeType': 'Blood tube',
-    'readableValue': 'Serum Separator Tube',
-    'image': './static/images/tube1.PNG',
-    'name': 'tube32',
-    'concept': '654812257',
-    'id': '0032',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
     'deviationChkBox': true,
@@ -298,22 +251,6 @@ export const workflows = {
         tube0014,
         tube0005,
         tube0008
-    ],
-    clinical_non_oahu : [
-        tube0001,
-        tube0002,
-        tube0011,
-        tube0012,
-        tube0021,
-        tube0022,
-        tube0031,
-        tube0032,
-        tube0003,
-        tube0013,
-        tube0004,
-        tube0014,
-        tube0005,
-        tube0008
     ]
 };
 
@@ -356,11 +293,7 @@ export const siteSpecificTubeRequirements = {
     },
     'KPHI': {
         'research': workflows.research,
-        'clinical': {
-            'Oahu': workflows.clinical,
-            'non-Oahu': workflows.clinical_non_oahu
-        }
-        
+        'clinical': workflows.clinical
     }
 }
 

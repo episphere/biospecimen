@@ -22,19 +22,7 @@ export const checkInTemplate = (data) => {
                 </div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
-            <div class="row">
-            Participant Check-In and Check-Out
-           </div>
-           <div class="row">
-            Has SSN been entered?
-           </div>
-           <div class="row">
-            Are Inital Surveys complete?
-           </div>
-           <div class="row">
-           Baseline sample status
-          </div>
-            <div class="row">
+            <div class="row" style="display: none;">
                 Verify contact information &nbsp;
                 <button type="button" class="btn btn-outline-primary" id="contactInformationModal" data-target="#biospecimenModal" data-toggle="modal">Contact Information</button>
             </div>

@@ -540,9 +540,6 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
         "376960806":"0011",
         "232343615":"0012",
         "589588440":"0021",
-        "746999767":"0022",
-        "857757831":"0031",
-        "654812257":"0032",
         "958646668":"0013",
         "677469051":"0014",
         "683613884":"0024"
@@ -1834,7 +1831,7 @@ const btnsClicked = async (connectId, formData, cont) => {
     }
     if(hasError) return;
 
-    if(document.getElementById('collectionLocation')) formData[getWorflow() === 'research' ? '951355211' : '525480516'] = parseInt(document.getElementById('collectionLocation').value);
+    if(document.getElementById('collectionLocation')) formData['951355211'] = parseInt(document.getElementById('collectionLocation').value);
     const collectionID = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     const n = document.getElementById('399159511').innerText || ""
     const confirmVal = await swal({
@@ -1997,19 +1994,18 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
             errorMessage(input.id, 'Invalid Full Specimen ID.', focus);
             focus = false;
         }
-        if(additionalTubeIDRequirement.regExp.test(tubeID))  data[`${input.id.replace('Id', '')}`]['226562200'] = 353358909;
         
         if(input.required) data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim();
     });
     if((hasError && cntd == true) || hasCntdError) return;
     data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
     Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[dt.id.replace('Deviated', '')]['678857215'] = dt.checked ? 353358909 : 104430631)
-    
+    Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === false).forEach(dt => biospecimenData[dt.id.replace('Deviated', '')]['248868659'] = '')
+
     showAnimation();
     
     if(cntd) {
         if(getWorflow() === 'clinical') {
-            data['539197670'] = 353358909;
             if(data['915838974'] === undefined) data['915838974'] = new Date().toISOString();
         }
         await storeSpecimen([data]);

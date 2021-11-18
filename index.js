@@ -8,14 +8,15 @@ import { welcomeScreen } from "./src/pages/welcome.js";
 import { bptlScreen } from "./src/pages/bptl.js";
 import { kitAssemblyScreen } from "./src/pages/homeCollection/kitAssembly.js";
 import { printAddressesScreen } from "./src/pages/homeCollection/printAddresses.js";
-import { assignedScreen } from "./src/pages/homeCollection/assigned.js";
-import { addressesPrintedScreen } from "./src/pages/homeCollection/assignKit.js";
 import { allParticipantsScreen } from "./src/pages/homeCollection/allParticipants.js";
-import { kitShipmentScreen } from "./src/pages/homeCollection/kitShipment.js";
+import { addressesPrintedScreen } from "./src/pages/homeCollection/assignKit.js";
+import { assignedScreen } from "./src/pages/homeCollection/assigned.js";
 import { shippedScreen } from "./src/pages/homeCollection/shipped.js";
 import { receivedKitsScreen } from "./src/pages/homeCollection/receivedKits.js";
+import { kitShipmentScreen } from "./src/pages/homeCollection/kitShipment.js";
 import { packagesInTransitScreen } from "./src/pages/receipts/packagesInTransit.js";
 import { packageReceiptScreen } from "./src/pages/receipts/packageReceipt.js";
+import { csvFileReceiptScreen } from "./src/pages/receipts/csvFileReceipt.js";
 import { kitReportsScreen } from "./src/pages/reports/kitReports.js";
 
 
@@ -51,16 +52,16 @@ const manageRoutes = async () => {
         else if (route === "#allParticipants") allParticipantsScreen(auth, route);
         else if (route === "#addressPrinted") addressesPrintedScreen(auth, route);
         else if (route === "#assigned") assignedScreen(auth, route);
-        else if (route === "#kitshipment") kitShipmentScreen(auth, route);
         else if (route === "#shipped") shippedScreen(auth, route);
+        else if (route === "#received") receivedKitsScreen(auth,route);
+        else if (route === "#kitshipment") kitShipmentScreen(auth, route);
+        else if (route === "#packagesintransit") packagesInTransitScreen(auth, route);
         else if (route === "#packagereceipt") packageReceiptScreen(auth, route);
+        else if (route === "#csvfilereceipt") csvFileReceiptScreen(auth, route);
+        else if (route === "#kitreports") kitReportsScreen(auth, route);
+        else if (route === "#reports") reportsQuery(auth, route);
         else if (route === "#manage_users") manageUsers(auth, route);
         else if (route === "#sign_out") signOut();
-        else if (route === "#reports") reportsQuery(auth, route);
-        else if (route === "#packagesintransit") packagesInTransitScreen(auth, route);
-        else if (route === "#receivepackages") packageReceiptScreen(auth, route);
-        else if (route === "#kitreports") kitReportsScreen(auth, route);
-        else if (route === "#received") receivedKitsScreen(auth,route);
         else window.location.hash = "#welcome";
     } else {
         if (route === "#") signIn();

@@ -32,7 +32,7 @@ export const finalizeTemplate = (data, specimenData) => {
             <table id="finalizeTable" class="table-borderless collection-table">
                 <thead>
                     <tr>
-                        <th>Tube Type</th>
+                        <th>Specimen Type</th>
                         ${getWorflow() === 'clinical' ? `<th>Received</th>`:`<th>Collected</th>`}
                         <th>Full Specimen ID</th>
                         <th>Deviation</th>
@@ -45,7 +45,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 siteTubesList.forEach((obj, index) => {
                     template += `
                         <tr>
-                            <td>(${index+1}) ${obj.specimenType}</td>
+                            <td>${obj.specimenType}</td>
                             <td>${obj.collectionChkBox === true ? `${specimenData[`${obj.concept}`]['593843561'] === 353358909 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>'}` : ``}</td>
                             <td>${specimenData[`${obj.concept}`]['593843561'] === 353358909 ? `${specimenData[`${obj.concept}`]['825582494']}` : '' }</td>
                             <td>${obj.deviationChkBox === true ? `${specimenData[`${obj.concept}`]['678857215'] === 353358909 ? 'Yes' : 'No'}`: ``}</td>
@@ -69,10 +69,10 @@ export const finalizeTemplate = (data, specimenData) => {
                 </br>
                 <div class="form-group row">
                     <div class="col-auto">
-                        <button class="btn btn-outline-danger" type="button" data-connect-id="${data.Connect_ID}" id="returnToCollectProcess" data-master-specimen-id="${specimenData['820476880']}">${getWorflow() === 'research' ? 'Return to Collect/Process' : 'Return to Labeling and Scanning'}</button>
+                        <button class="btn btn-outline-danger" type="button" data-connect-id="${data.Connect_ID}" id="returnToCollectProcess" data-master-specimen-id="${specimenData['820476880']}">${getWorflow() === 'research' ? 'Return to Process' : 'Return to Labeling and Scanning'}</button>
                     </div>
                     <div class="ml-auto">
-                        <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['820476880']}" type="button" id="finalizedSaveExit">Save and Exit</button>
+                        <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['820476880']}" type="button" id="finalizedSaveExit">Exit</button>
                     </div>
                     <div class="col-auto">
                         <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['820476880']}" type="submit" id="finalizedContinue">Review Complete</button>
