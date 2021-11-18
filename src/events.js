@@ -1740,7 +1740,15 @@ export const addEventSelectParticipantForm = (skipCheckIn) => {
 export const addEventCheckInCompleteForm = () => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
+        debugger;
+        let confirmed = await swal('Confirm');
+        if(!confirmed) {
+            return;
+        }
+
         e.preventDefault();
+       
+
         let formData = {};
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
