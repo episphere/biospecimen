@@ -7,6 +7,7 @@ export const checkInTemplate = (data) => {
     navBarBtn.style.display = 'block';
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
+    console.log('DATA::::::', {data});
     let template = `
         </br>
         <div class="row">
@@ -37,21 +38,24 @@ export const checkInTemplate = (data) => {
             <div class="row">
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">1</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                      </div>
+            <div class="row"><span class="full-width">Consent</span></div>
+            <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+            <div class="row"><span class="full-width">${new Date(data['454445267']).toLocaleString()}</span></div>
+            </div>
             </div>
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">2</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                      </div>
+            <div class="row"><span class="full-width">Match Verification</span></div>
+            <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span></div>
+            <div class="row"></br></div>
+            </div>
             </div>
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">3</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                      </div>
+            <div class="row"><span class="full-width">Not Withdrawn</span></div>
+            <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span></div>
+            <div class="row"></br></div>
+            </div>
             </div>
             </div>
             <br/>
@@ -64,7 +68,7 @@ export const checkInTemplate = (data) => {
             <div class="row">
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">1</span></div>
+                        <div class="row"><span class="full-width">${true ? 'SSN Entered' : "SSN not entered"}</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
                       </div>
             </div>
@@ -137,18 +141,8 @@ export const checkInTemplate = (data) => {
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
                       </div>
             </div>
-            <div class="col-md-4">
-            <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">2</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                      </div>
-            </div>
-            <div class="col-md-4">
-            <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">3</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                      </div>
-            </div>
+            
+           
             </div>
             <br/>
 
@@ -164,18 +158,8 @@ export const checkInTemplate = (data) => {
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
                       </div>
             </div>
-            <div class="col-md-4">
-            <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">2</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                      </div>
-            </div>
-            <div class="col-md-4">
-            <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">3</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                      </div>
-            </div>
+            
+        
             </div>
             <br/>
 
