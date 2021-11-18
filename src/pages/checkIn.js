@@ -83,21 +83,31 @@ export const checkInTemplate = (data) => {
             <div class="row">
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">1</span></div>
+                        <div class="row"><span class="full-width">Background and Overall Health</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                      </div>
+                        <div class="row"><span class="full-width">${new Date().toLocaleString()}</span></div>
+                        </div>
             </div>
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">2</span></div>
+                        <div class="row"><span class="full-width">Medications, Reproductive Health, Excercise, and Sleep</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                      </div>
+                        <div class="row"><span class="full-width">${new Date().toLocaleString()}</span></div>
+                        </div>
             </div>
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">3</span></div>
+                        <div class="row"><span class="full-width">Smoking, Alcohol, and Sun Exposure</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                      </div>
+                        <div class="row"><span class="full-width">${new Date().toLocaleString()}</span></div>
+                        </div>
+            </div>
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">Where you live and work</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                        <div class="row"><span class="full-width">${new Date().toLocaleString()}</span></div>
+                        </div>
             </div>
             </div>
             <br/>
@@ -110,19 +120,19 @@ export const checkInTemplate = (data) => {
             <div class="row">
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">1</span></div>
+                        <div class="row"><span class="full-width">Baseline Blood</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
                       </div>
             </div>
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">2</span></div>
+                        <div class="row"><span class="full-width">Baseline Mouthwash</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
                       </div>
             </div>
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">3</span></div>
+                        <div class="row"><span class="full-width">Baseline Urine</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
                       </div>
             </div>
@@ -137,7 +147,7 @@ export const checkInTemplate = (data) => {
             <div class="row">
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">1</span></div>
+                        <div class="row"><span class="full-width">Not Eligible</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
                       </div>
             </div>
@@ -154,9 +164,11 @@ export const checkInTemplate = (data) => {
             <div class="row">
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">1</span></div>
+                        <div class="row"><span class="full-width">Baseline Specimen Survey</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                      </div>
+                        <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span></div>
+                        
+                        </div>
             </div>
             
         
@@ -167,77 +179,7 @@ export const checkInTemplate = (data) => {
                 Verify contact information &nbsp;
                 <button type="button" class="btn btn-outline-primary" id="contactInformationModal" data-target="#biospecimenModal" data-toggle="modal">Contact Information</button>
             </div>
-            
-            </br>
-            <div class="row info-row">
-                <div class="col-md-3">
-                    <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">Consent</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                        <div class="row"><span class="full-width">${new Date(data['454445267']).toLocaleString()}</span></div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">Match Verification</span></div>
-                        <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span></div>
-                        <div class="row"></br></div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">SSN entered</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
-                        <div class="row"><span class="full-width">Not entered</span></div>
-                    </div>
-                </div>
-            </div>
-            <div class="row info-row">
-                <div class="col-md-3">
-                    <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">Initial Survey - BOH</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">Initial Survey - MRE</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">Initial Survey - SAS</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">Initial Survey - LAW</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
-                    </div>
-                </div>
-            </div>
-            <div class="row info-row">
-                <div class="col-md-3">
-                    <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">Baseline blood</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">Baseline mouthwash</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">Baseline urine</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
-                    </div>
-                </div>
-            </div>
+
         </form>
     `;
     document.getElementById('contentBody').innerHTML = template;
