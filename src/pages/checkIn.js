@@ -15,13 +15,170 @@ export const checkInTemplate = (data) => {
         </br>
         <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
             <div class="row">
-                <div>${data['996038075']}, ${data['399159511']}</div>
-                <div class="ml-auto">
-                    <select value="Select Visit"><option>Select Visit</option></select>
-                    <button class="btn btn-outline-primary" type="submit" id="checkInComplete">Check-In and Continue</button>
-                </div>
+            <div class="col-md-12">
+                    <h5>${data['996038075']}, ${data['399159511'] }</h5>
+            </div>
+            </div>
+            <div class="row">
+                    <div class="col-md-5"><select class="custom-select" value="Select Visit"><option>Select Visit</option></select>
+                    </div>
+                    <div class="col-md-3">
+                    <button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete">Check-In</button>
+                    </div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
+            <hr/>
+            
+            <div class="row">
+            <div class="col-md-12">
+                    <h6>Participant Check-In and Check-Out</h6>
+            </div>
+            </div>
+            <div class="row">
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">1</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">2</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">3</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            </div>
+            <br/>
+
+            <div class="row">
+            <div class="col-md-12">
+                    <h6>Has SSN been entered? </h6>
+            </div>
+            </div>
+            <div class="row">
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">1</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            </div>
+            <br/>
+
+            <div class="row">
+            <div class="col-md-12">
+                    <h6>Are Initial Surveys complete?</h6>
+            </div>
+            </div>
+            <div class="row">
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">1</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">2</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">3</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            </div>
+            <br/>
+
+            <div class="row">
+            <div class="col-md-12">
+                    <h6>Baseline sample status</h6>
+            </div>
+            </div>
+            <div class="row">
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">1</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">2</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">3</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            </div>
+            <br/>
+
+            <div class="row">
+            <div class="col-md-12">
+                    <h6>Incentives</h6>
+            </div>
+            </div>
+            <div class="row">
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">1</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">2</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">3</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            </div>
+            <br/>
+
+            <div class="row">
+            <div class="col-md-12">
+                    <h6>Baseline Specimen Survey</h6>
+            </div>
+            </div>
+            <div class="row">
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">1</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">2</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            <div class="col-md-4">
+            <div class="col-md-12 info-box">
+                        <div class="row"><span class="full-width">3</span></div>
+                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+                      </div>
+            </div>
+            </div>
+            <br/>
+
             <div class="row" style="display: none;">
                 Verify contact information &nbsp;
                 <button type="button" class="btn btn-outline-primary" id="contactInformationModal" data-target="#biospecimenModal" data-toggle="modal">Contact Information</button>
