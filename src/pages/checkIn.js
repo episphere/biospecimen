@@ -17,11 +17,23 @@ export const checkInTemplate = (data) => {
             <div class="row">
                 <div>${data['996038075']}, ${data['399159511']}</div>
                 <div class="ml-auto">
-                    <select value="Select Visit"></select>
+                    <select value="Select Visit"><option>Select Visit</option></select>
                     <button class="btn btn-outline-primary" type="submit" id="checkInComplete">Check-In and Continue</button>
                 </div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
+            <div class="row">
+            Participant Check-In and Check-Out
+           </div>
+           <div class="row">
+            Has SSN been entered?
+           </div>
+           <div class="row">
+            Are Inital Surveys complete?
+           </div>
+           <div class="row">
+           Baseline sample status
+          </div>
             <div class="row">
                 Verify contact information &nbsp;
                 <button type="button" class="btn btn-outline-primary" id="contactInformationModal" data-target="#biospecimenModal" data-toggle="modal">Contact Information</button>
