@@ -1740,16 +1740,34 @@ export const addEventSelectParticipantForm = (skipCheckIn) => {
 export const addEventCheckInCompleteForm = () => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
-        debugger;
-        let confirmed = await swal('Confirm');
-        if(!confirmed) {
-            return;
-        }
-
         e.preventDefault();
-       
 
-        let formData = {};
+        const confirmVal = await swal({
+            title:"Success", 
+            icon:"success",
+            text: "Particpant has been checked in.",
+             buttons: {
+                 cancel: {
+                     text: "Cancel",
+                     value: "cancel",
+                     visible: true,
+                     className: "btn btn-default",
+                     closeModal: true,
+                   },
+                   confirm: {
+                     text: "Continue to Specimen Link",
+                     value: 'confirmed',
+                     visible: true,
+                     className: "",
+                     closeModal: true,
+                     className: "btn btn-success",
+                   }
+               },
+           });
+     
+        if(confirmVal === "cancel") return;
+
+        let formData   = {};
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
         formData['962267121'] = new Date().toISOString();

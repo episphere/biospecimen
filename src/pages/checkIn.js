@@ -186,6 +186,5 @@ export const checkInTemplate = (data) => {
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventContactInformationModal(data);
     addEventBackToSearch('navBarSearch');
-    addEventBackToSearch('checkInExit');
     addEventCheckInCompleteForm();
 }
