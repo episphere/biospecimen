@@ -145,7 +145,7 @@ export const searchResults = (result) => {
         </div>
         </br>
         
-        <div class="row allow-overflow">
+        <div class="row">
             <table class="table table-borderless table-striped">
                 <thead>
                     <tr>

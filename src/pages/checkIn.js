@@ -21,7 +21,11 @@ export const checkInTemplate = (data) => {
             </div>
             </div>
             <div class="row">
-                    <div class="col-md-5"><select class="custom-select" value="Select Visit"><option>Select Visit</option></select>
+                    <div class="col-md-5">
+                    <select class="custom-select">
+                    <option value="" selected disabled> -- Select Visit -- </option>
+                    <option value="153098257">Baseline</option>
+                    </select>
                     </div>
                     <div class="col-md-3">
                     <button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete">Check-In</button>
@@ -166,9 +170,7 @@ export const checkInTemplate = (data) => {
             <div class="col-md-12 info-box">
                         <div class="row"><span class="full-width">Baseline Specimen Survey</span></div>
                         <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
-                        <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span></div>
-                        
-                        </div>
+                 </div>
             </div>
             
         

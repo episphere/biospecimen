@@ -1773,13 +1773,21 @@ export const addEventCheckInCompleteForm = () => {
         formData['962267121'] = new Date().toISOString();
         formData['135591601'] = 353358909;
         let query = `connectId=${parseInt(form.dataset.connectId)}`;
-        showAnimation();
+
+        try {
+        showAnimation(); 
         const response = await findParticipant(query);
         const data = response.data[0];
         const collections = (await getParticipantCollections(data.token)).data;
-        hideAnimation();
+        console.log('specTemp', data, formData, collections);
         specimenTemplate(data, formData, collections);
-    })
+        } catch (error) {
+            console.log('Error check-in', error);
+        } finally {
+            hideAnimation();
+        }
+        
+    });
 };
 
 export const addEventSpecimenLinkForm = formData => {

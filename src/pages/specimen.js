@@ -5,8 +5,9 @@ import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 export const specimenTemplate = async (data, formData, collections) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenLink');
-    navBarBtn.classList.remove('disabled');
-    navBarBtn.classList.add('active');
+    navBarBtn.style.display = 'block';
+    navBarBtn?.classList.remove('disabled');
+    navBarBtn?.classList.add('active');
     let template = `
         </br>
         <div class="row">
