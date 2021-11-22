@@ -95,7 +95,7 @@ export const specimenTemplate = async (data, formData, collections) => {
             }
             template += `<div class="form-group row">
                 <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan Collection ID from Label Sheet Label</label>
-                <input autocomplete="off" type="text" class="form-control col-md-5 disabled" disabled placeholder="Scan in Collection ID from Label Sheet Label" id="scanSpecimenID"/> 
+                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan in Collection ID from Label Sheet Label" id="scanSpecimenID"/> 
             </div>
             </br>
             <div class="form-group row">

@@ -127,7 +127,7 @@ export const addEventAddSpecimenToBox = (userName) => {
         let foundInShipping = false;
         for(let i = 1; i < shippingTable.rows.length; i++){
             let currRow = shippingTable.rows[i];
-            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
+            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()){
                 tableIndex = i;
                 biospecimensList = JSON.parse(currRow.cells[2].innerText)
                 foundInShipping = true;
@@ -137,7 +137,7 @@ export const addEventAddSpecimenToBox = (userName) => {
         
        for(let i = 1; i < orphanTable.rows.length; i++){
             let currRow = orphanTable.rows[i];
-            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
+            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()){
                 tableIndex = i;
                 let currTubeNum = currRow.cells[0].innerText.split(' ')[1];
                 biospecimensList = [currTubeNum];
@@ -2405,7 +2405,7 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         let emptyField= false;
         for(let i = 0; i < boxes.length; i++){
-            let boxi = document.getElementById(boxes[i] + "trackingId").value;
+            let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
             if(boxi == ''){
                 emptyField = true;
                 showNotifications({title: 'Missing Fields', body: 'Please fill out required fields!'}, true)
@@ -2440,7 +2440,7 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         for(let i = 0; i < boxNames.length; i++){
             trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
         }
-        if(finalizeTextField.value === userName){
+        if(finalizeTextField.value.toUpperCase() === userName.toUpperCase()){
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
             await ship(boxes, shippingData, trackingNumbers);
             document.getElementById('finalizeModalCancel').click();
