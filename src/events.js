@@ -160,7 +160,7 @@ export const addEventAddSpecimenToBox = (userName) => {
         showAnimation();
         //getCurrBoxNumber
 
-        const masterSpecimenId = document.getElementById('masterSpecimenId').value;
+        const masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase();
         let mouthwashList = document.getElementById("mouthwashList")
         let currTubeTable = document.getElementById("currTubeTable")
 
