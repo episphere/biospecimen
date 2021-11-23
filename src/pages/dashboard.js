@@ -138,6 +138,15 @@ export const searchBiospecimenTemplate = () => {
 
 export const searchResults = (result) => {
     const f = () => addEventSelectParticipantForm();
+
+    let conversion = {
+        '875007964': 'Not Yet Verified',
+        '197316935': 'Verified',
+        '219863910': 'Cannot Be Verified',
+        '922622075': 'Duplicate',
+        '160161595': 'Outreach Maxed Out'
+    }
+
     let template = `
         </br>
         <div class="row">
@@ -155,6 +164,8 @@ export const searchResults = (result) => {
                         <th>Date of birth</th>
                         <th>Address</th>
                         <th>Connect ID</th>
+                        <th>Study Status</th>
+                        <th>Participant Status</th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -169,6 +180,8 @@ export const searchResults = (result) => {
                 <td>${data['564964481']}/${data['795827569']}/${data['544150384']}</td>
                 <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
                 <td>${data.Connect_ID}</td>
+                <td>${conversion[data['821247024']]}</td>
+                <td><i class="fas fa-2x fa-times"></i></td>
                 <td><button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>Go to check-in</button></td>
                 <td><button class="btn btn-outline-primary text-nowrap">Specimen Link</button></td>
             </tr>
