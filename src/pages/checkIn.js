@@ -7,7 +7,7 @@ export const checkInTemplate = (data) => {
     navBarBtn.style.display = 'block';
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
-    console.log('DATA::::::', {data});
+
     let template = `
         </br>
         <div class="row">
@@ -23,8 +23,7 @@ export const checkInTemplate = (data) => {
             <div class="row">
                     <div class="col-md-5">
                     <select class="custom-select">
-                    <option value="" selected disabled> -- Select Visit -- </option>
-                    <option value="153098257">Baseline</option>
+                    <option selected value="153098257">Select Visit: Baseline</option>
                     </select>
                     </div>
                     <div class="col-md-3">
