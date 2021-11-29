@@ -181,7 +181,7 @@ export const searchResults = (result) => {
                 <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
                 <td>${data.Connect_ID}</td>
                 <td>${conversion[data['821247024']]}</td>
-                <td><i class="fas fa-2x fa-times"></i></td>
+                <td>${data['773707518'] === 353358909 || data['831041022'] === 353358909 || data['747006172'] === 353358909 ? `<i class="fas fa-2x fa-times"></i>` : `<i class="fas fa-2x fa-check"></i>`}</td>
                 <td><button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>Go to check-in</button></td>
                 <td><button class="btn btn-outline-primary text-nowrap">Specimen Link</button></td>
             </tr>
