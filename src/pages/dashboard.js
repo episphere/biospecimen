@@ -172,6 +172,9 @@ export const searchResults = (result) => {
                 </thead>
                 <tbody>`
     result.forEach(data => {
+
+        if(data['821247024'] === 922622075) return;
+
         template += `
             <tr>
                 <td>${data['996038075']}</td>
