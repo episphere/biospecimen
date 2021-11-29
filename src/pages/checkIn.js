@@ -23,7 +23,7 @@ export const checkInTemplate = (data) => {
             <div class="row">
                     <div class="col-md-5">
                     <select class="custom-select">
-                    <option selected value="153098257">Select Visit: Baseline</option>
+                    <option selected value="153098257">Visit: Baseline</option>
                     </select>
                     </div>
                     <div class="col-md-3">

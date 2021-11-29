@@ -808,8 +808,8 @@ export const getWorflow = () => document.getElementById('contentBody').dataset.w
 export const getSiteTubesLists = (specimenData) => {
     const dashboardType = document.getElementById('contentBody').dataset.workflow;
     const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-    const subSiteLocation = siteLocations[dashboardType][siteAcronym] ? siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === specimenData['951355211'])[0].location : undefined;
-    const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType];
+    const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === specimenData['951355211'])[0]?.location : undefined;
+    const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
     return siteTubesList;
 }
 

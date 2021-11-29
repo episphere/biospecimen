@@ -33,7 +33,7 @@ export const collectProcessTemplate = (data, formData) => {
                     <tbody>`
                     
                     const siteTubesList = getSiteTubesLists(formData);
-                    siteTubesList.forEach((obj, index) => {
+                    siteTubesList?.forEach((obj, index) => {
                         let required = false;
                         if(formData[obj.concept] && formData[obj.concept]['593843561'] !== 104430631) {
                             required = true;
@@ -142,7 +142,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                     <tbody>`
                     
                     const siteTubesList = getSiteTubesLists(formData)
-                    siteTubesList.forEach((obj, index) => {
+                    siteTubesList?.forEach((obj, index) => {
                         template += `
                             <tr>
                                 <td>${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
@@ -164,8 +164,8 @@ export const tubeCollectedTemplate = (data, formData) => {
     `;
     removeActiveClass('navbar-btn', 'active');
     const navBarBtn = document.getElementById('navBarSpecimenProcess');
-    navBarBtn.classList.remove('disabled');
-    navBarBtn.classList.add('active');
+    navBarBtn?.classList.remove('disabled');
+    navBarBtn?.classList.add('active');
     addEventBackToSearch('navBarSearch');
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);

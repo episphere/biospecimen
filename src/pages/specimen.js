@@ -101,10 +101,18 @@ export const specimenTemplate = async (data, formData, collections) => {
             </div>
 
             <div class="form-group row">
-                <div class="col-auto">
-                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Enter</button>
-                </div>
+            <div class="col">
+            <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Submit</button>
             </div>
+            </div>
+             <div class="form-group row" style="display:none">
+            <div class="ml-auto">
+                <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="button" id="specimenSaveExit">Yes: Save and Exit</button>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Yes: Continue</button>
+            </div>
+        </div>
         </form>
         </br>
     `;
