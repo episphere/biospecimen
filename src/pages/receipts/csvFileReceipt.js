@@ -46,7 +46,7 @@ const csvFileButtonSubmit = () => {
     let dateFilter = document.getElementById("csvDateInput").value
     dateFilter = dateFilter+'T00:00:00.000Z'
     showAnimation();
-    const results =  getFakeResults();// await getBSIQueryData(dateFilter)
+    const results =  await getBSIQueryData(dateFilter) //getFakeResults();
     hideAnimation();
     let modifiedResults = modifyBSIQueryResults(results.data);
     console.log('modifiedResults', modifiedResults)
@@ -59,10 +59,11 @@ const getCurrentDate = () => {
   const currentDate = new Date().toLocaleDateString('en-CA');
   return currentDate;
 }
+// http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=queryBsiData&type=${filter}`, {
 
 const getBSIQueryData = async (filter) => {
   const idToken = await getIdToken();
-  const response = await fetch(`http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=queryBsiData&type=${filter}`, {
+  const response = await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=queryBsiData&type=${filter}`, {
     method: "GET",
     headers: {
       Authorization: "Bearer" + idToken,
@@ -87,7 +88,6 @@ const modifyBSIQueryResults = (results) => {
     console.log('vialMappings', vialMappings)
     updateResultMappings(i, vialMappings)
   })
-  console.log('r', results)
   return results
 }
 
