@@ -1,4 +1,4 @@
-import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventTubeCollectedForm, addEventBackToTubeCollection } from './../events.js'
+import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventTubeCollectedForm, addEventBackToTubeCollection, addEventBiospecimenCollectionFormEdit } from './../events.js'
 import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists } from '../shared.js';
 import { totalCollectionIDLength } from '../tubeValidation.js';
 
@@ -66,6 +66,7 @@ export const collectProcessTemplate = (data, formData) => {
                                         id="${obj.concept}Deviated"
                                     >`: ``}
                                 </td>
+                                <td>${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? `<button class="collection-edit" type="button" id="${obj.concept}editButton">Edit</button>` : ``}</td>
                             </tr>
                         `
                     });
@@ -105,6 +106,7 @@ export const collectProcessTemplate = (data, formData) => {
     addEventBackToTubeCollection(data, formData['820476880']);
     addEventBiospecimenCollectionForm(data, formData);
     addEventBiospecimenCollectionFormCntd(data, formData);
+    addEventBiospecimenCollectionFormEdit(data, formData);
 //     const barCodeBtns = Array.from(document.getElementsByClassName('barcode-btn-collect-process'));
 //     barCodeBtns.forEach(btn => {
 //         addEventBarCodeScanner(btn.id, 0, totalCollectionIDLength);
