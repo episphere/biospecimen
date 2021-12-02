@@ -52,6 +52,7 @@ export const collectProcessTemplate = (data, formData) => {
                                         class="form-control ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} input-barcode-id" 
                                         ${required ? 'required' : 'disabled'} 
                                         placeholder="Scan/Type in Full Specimen ID"
+                                        style="font-size:1.3rem;"
                                     >
                                 </td>
                                 <td>${obj.deviationChkBox === true ? `
