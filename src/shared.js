@@ -270,6 +270,7 @@ export const storeBox = async (box) =>{
         body: JSON.stringify(box)
     }
     const response = await fetch(`${api}api=addBox`, requestObj);
+    debugger;
     return response.json();
 }
 
