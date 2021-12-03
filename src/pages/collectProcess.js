@@ -50,7 +50,8 @@ export const collectProcessTemplate = (data, formData) => {
                                         id="${obj.concept}Id" 
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['825582494'] ? `value='${formData[`${obj.concept}`]['825582494']}'`: ``}
                                         class="form-control ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} input-barcode-id" 
-                                        ${required ? 'required' : 'disabled'} 
+                                        ${required ? 'required' : ''} 
+                                        ${formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? 'disabled' : ''}
                                         placeholder="Scan/Type in Full Specimen ID"
                                     >
                                 </td>
@@ -62,11 +63,11 @@ export const collectProcessTemplate = (data, formData) => {
                                         class="tube-deviated custom-checkbox-size ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''}" 
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['678857215'] === 353358909 ? 'checked': ''} 
                                         data-tube-type="${obj.tubeType}" 
-                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} 
+                                        ${formData[`${obj.concept}`]['593843561'] === 353358909 && !formData[`${obj.concept}`]['825582494'] ? '': 'disabled'} 
                                         id="${obj.concept}Deviated"
                                     >`: ``}
                                 </td>
-                                <td>${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? `<button class="collection-edit" type="button" id="${obj.concept}editButton">Edit</button>` : ``}</td>
+                                <td>${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? `<button class="btn btn-outline-primary" type="button" id="${obj.concept}collectEditBtn">Edit</button>` : ``}</td>
                             </tr>
                         `
                     });

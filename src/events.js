@@ -1891,14 +1891,14 @@ export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
 };
 
 export const addEventBiospecimenCollectionFormEdit = (dt, biospecimenData) => {
-    const editButtons = Array.from(document.getElementsByClassName('collection-edit'));
+    const editButtons = Array.from(document.querySelectorAll('[id$="collectEditBtn"]'));
     editButtons.forEach(button => {
         button.addEventListener('click', () => {
-            const conceptID = button.id.replace('editButton', '');
+            const conceptID = button.id.replace('collectEditBtn', '');
             const editId = document.getElementById(conceptID + 'Id');
             editId.disabled = false;
             const deviationBox = document.getElementById(conceptID + 'Deviated');
-            deviationBox.disabled = false;
+            if(deviationBox) deviationBox.disabled = false;
         });
 
     });
