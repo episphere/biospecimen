@@ -1,4 +1,4 @@
-import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventTubeCollectedForm, addEventBackToTubeCollection } from './../events.js'
+import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventTubeCollectedForm, addEventBackToTubeCollection, addEventBiospecimenCollectionFormEdit } from './../events.js'
 import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists } from '../shared.js';
 import { totalCollectionIDLength } from '../tubeValidation.js';
 
@@ -50,7 +50,8 @@ export const collectProcessTemplate = (data, formData) => {
                                         id="${obj.concept}Id" 
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['825582494'] ? `value='${formData[`${obj.concept}`]['825582494']}'`: ``}
                                         class="form-control ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} input-barcode-id" 
-                                        ${required ? 'required' : 'disabled'} 
+                                        ${required ? 'required' : ''} 
+                                        ${formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? 'disabled' : ''}
                                         placeholder="Scan/Type in Full Specimen ID"
                                         style="font-size:1.3rem;"
                                     >
@@ -63,10 +64,11 @@ export const collectProcessTemplate = (data, formData) => {
                                         class="tube-deviated custom-checkbox-size ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''}" 
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['678857215'] === 353358909 ? 'checked': ''} 
                                         data-tube-type="${obj.tubeType}" 
-                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} 
+                                        ${formData[`${obj.concept}`]['593843561'] === 353358909 && !formData[`${obj.concept}`]['825582494'] ? '': 'disabled'} 
                                         id="${obj.concept}Deviated"
                                     >`: ``}
                                 </td>
+                                <td>${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? `<button class="btn btn-outline-primary" type="button" id="${obj.concept}collectEditBtn">Edit</button>` : ``}</td>
                             </tr>
                         `
                     });
@@ -106,6 +108,7 @@ export const collectProcessTemplate = (data, formData) => {
     addEventBackToTubeCollection(data, formData['820476880']);
     addEventBiospecimenCollectionForm(data, formData);
     addEventBiospecimenCollectionFormCntd(data, formData);
+    addEventBiospecimenCollectionFormEdit(data, formData);
 //     const barCodeBtns = Array.from(document.getElementsByClassName('barcode-btn-collect-process'));
 //     barCodeBtns.forEach(btn => {
 //         addEventBarCodeScanner(btn.id, 0, totalCollectionIDLength);
