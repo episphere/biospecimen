@@ -1896,7 +1896,9 @@ export const addEventBiospecimenCollectionFormEdit = (dt, biospecimenData) => {
         button.addEventListener('click', () => {
             const conceptID = button.id.replace('editButton', '');
             const editId = document.getElementById(conceptID + 'Id');
-            editId.disabled = !editId.disabled;
+            editId.disabled = false;
+            const deviationBox = document.getElementById(conceptID + 'Deviated');
+            deviationBox.disabled = false;
         });
 
     });
