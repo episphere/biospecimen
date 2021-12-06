@@ -140,19 +140,28 @@ export const tubeCollectedTemplate = (data, formData) => {
             <div class="row">
                 <table class="table collection-table">
                     <thead>
-                        <tr><th></th><th class="align-left"><input class="custom-checkbox-size" type="checkbox" id="selectAllCollection"><label for="selectAllCollection">&nbsp;Check All</label></th></tr>
-                        <tr><th>Specimen Type</th><th class="align-left">Select If Collected</th></tr>
-                        <tr><th>Specimen Type</th><th class="align-left">Reason Not Collected</th></tr>
-                        <tr><th>Specimen Type</th><th class="align-left">Scan Full Specimen ID</th></tr>
-                        <tr><th></th><th class="align-left"><input class="custom-checkbox-size" type="checkbox"id="selectAllCollection2"><label for="selectAllCollection2">&nbsp;Select For Deviation</label></th></tr>
-                        <tr><th></th><th class="align-left"><input class="custom-checkbox-size" type="checkbox"id="selectAllCollection2"><label for="selectAllCollection2">&nbsp;Select For Deviation</label></th></tr>
-                        <tr><th>Specimen Type</th><th class="align-left">Deviation Type</th></tr>
-                        <tr><th>Specimen Type</th><th class="align-left">Comments</th></tr>
+                        <tr>
+                        <th class="align-left">Specimen Type</th>
+                        <th class="align-left">Sample Collected 
+                        <input class="custom-checkbox-size" type="checkbox" id="selectAllCollection">
+                        <label for="selectAllCollection">&nbsp;Check All</label>
+                        </th>
+                          <th class="align-left">Reason Not Collected</th> 
+                         <th class="align-left">Scan Full Specimen ID</th> 
+                         <th class="align-left"><input class="custom-checkbox-size" type="checkbox"id="selectAllCollection2">
+                         <label for="selectAllCollection2">&nbsp;Select For Deviation</label>
+                         </th> 
+                         <th class="align-left">Deviation Type</th> 
+                         <th class="align-left">Comments</th>
+                        </tr>
                         
                         </thead>
                     <tbody>`
                     
-                    const siteTubesList = getSiteTubesLists(formData)
+                    const siteTubesList = getSiteTubesLists(formData);
+                    if(!siteTubesList || siteTubesList?.length === 0){
+                        template += `<tr><td>No data.</td></tr>`;
+                    }
                     siteTubesList?.forEach((obj, index) => {
                         template += `
                             <tr>
