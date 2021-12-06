@@ -166,7 +166,7 @@ export const addEventAddSpecimenToBox = (userName) => {
 
         const header = document.getElementById('shippingModalHeader');
         const body = document.getElementById('shippingModalBody');
-        header.innerHTML = `<h5 class="modal-title">Add Specimens</h5>
+        header.innerHTML = `<h5 class="modal-title">Specimen Verification</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="shippingCloseButton">
                                 <span aria-hidden="true">&times;</span>
                             </button>`;
@@ -1948,6 +1948,20 @@ export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     const collectionSaveExit = document.getElementById('collectionSaveExit');
     collectionSaveExit.addEventListener('click', () => {
         collectionSubmission(dt, biospecimenData);
+    });
+};
+
+export const addEventBiospecimenCollectionFormEdit = (dt, biospecimenData) => {
+    const editButtons = Array.from(document.querySelectorAll('[id$="collectEditBtn"]'));
+    editButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const conceptID = button.id.replace('collectEditBtn', '');
+            document.getElementById(conceptID + 'Id').disabled = false;
+            
+            const deviationBox = document.getElementById(conceptID + 'Deviated');
+            if(deviationBox) deviationBox.disabled = false;
+        });
+
     });
 };
 
