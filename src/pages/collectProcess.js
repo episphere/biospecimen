@@ -138,11 +138,18 @@ export const tubeCollectedTemplate = (data, formData) => {
         </br>
         <form id="tubeCollectionForm" method="POST">
             <div class="row">
-                <table class="table-borderless collection-table">
+                <table class="table collection-table">
                     <thead>
                         <tr><th></th><th class="align-left"><input class="custom-checkbox-size" type="checkbox" id="selectAllCollection"><label for="selectAllCollection">&nbsp;Check All</label></th></tr>
                         <tr><th>Specimen Type</th><th class="align-left">Select If Collected</th></tr>
-                    </thead>
+                        <tr><th>Specimen Type</th><th class="align-left">Reason Not Collected</th></tr>
+                        <tr><th>Specimen Type</th><th class="align-left">Scan Full Specimen ID</th></tr>
+                        <tr><th></th><th class="align-left"><input class="custom-checkbox-size" type="checkbox"id="selectAllCollection2"><label for="selectAllCollection2">&nbsp;Select For Deviation</label></th></tr>
+                        <tr><th></th><th class="align-left"><input class="custom-checkbox-size" type="checkbox"id="selectAllCollection2"><label for="selectAllCollection2">&nbsp;Select For Deviation</label></th></tr>
+                        <tr><th>Specimen Type</th><th class="align-left">Deviation Type</th></tr>
+                        <tr><th>Specimen Type</th><th class="align-left">Comments</th></tr>
+                        
+                        </thead>
                     <tbody>`
                     
                     const siteTubesList = getSiteTubesLists(formData)
@@ -151,7 +158,12 @@ export const tubeCollectedTemplate = (data, formData) => {
                             <tr>
                                 <td>${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
                                 <td class="align-left">${obj.collectionChkBox === true ? `<input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="${obj.tubeType}" ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? 'checked': ''} id="${obj.concept}">`:``}</td>
-                            </tr>
+                                <td>1-</td>
+                                <td>2-</td>
+                                <td>3-</td>
+                                <td>4-</td>
+                                </td>5-</td>
+                                </tr>
                         `
                     });
                         template +=`
