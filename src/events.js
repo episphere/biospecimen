@@ -166,7 +166,7 @@ export const addEventAddSpecimenToBox = (userName) => {
 
         const header = document.getElementById('shippingModalHeader');
         const body = document.getElementById('shippingModalBody');
-        header.innerHTML = `<h5 class="modal-title">Add Specimens</h5>
+        header.innerHTML = `<h5 class="modal-title">Specimen Verification</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="shippingCloseButton">
                                 <span aria-hidden="true">&times;</span>
                             </button>`;
