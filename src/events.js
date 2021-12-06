@@ -1890,6 +1890,20 @@ export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     });
 };
 
+export const addEventBiospecimenCollectionFormEdit = (dt, biospecimenData) => {
+    const editButtons = Array.from(document.querySelectorAll('[id$="collectEditBtn"]'));
+    editButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const conceptID = button.id.replace('collectEditBtn', '');
+            document.getElementById(conceptID + 'Id').disabled = false;
+            
+            const deviationBox = document.getElementById(conceptID + 'Deviated');
+            if(deviationBox) deviationBox.disabled = false;
+        });
+
+    });
+};
+
 export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
     const form = document.getElementById('tubeCollectionForm');
     form.addEventListener('submit', async e => {
