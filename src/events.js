@@ -1904,6 +1904,33 @@ export const addEventBiospecimenCollectionFormEdit = (dt, biospecimenData) => {
     });
 };
 
+export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
+    const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
+    inputFields.forEach(input => {
+        input.addEventListener('change', () => {
+            const siteTubesList = getSiteTubesLists(biospecimenData)
+            const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
+            
+            let value = getValue(`${input.id}`).toUpperCase();
+            const masterID = value.substr(0, masterSpecimenIDRequirement.length);
+            const tubeID = value.substr(masterSpecimenIDRequirement.length + 1, totalCollectionIDLength);
+
+            if(input.required && value.length !== totalCollectionIDLength) {
+                errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`);
+            }
+            else if(input.required && masterID !== biospecimenData['820476880']) {
+                errorMessage(input.id, 'Invalid Collection ID.');
+            }
+            else if(input.required && tubes.length === 0) {
+                errorMessage(input.id, 'Invalid Full Specimen ID.');
+            }
+            else if(input.required && (tubes[0].id !== tubeID && !additionalTubeIDRequirement.regExp.test(tubeID))) {
+                errorMessage(input.id, 'Invalid Full Specimen ID.');
+            }
+        });
+    });
+};
+
 export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
     const form = document.getElementById('tubeCollectionForm');
     form.addEventListener('submit', async e => {
