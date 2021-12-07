@@ -102,6 +102,8 @@ export const startShipping = async (userName) => {
         </div>
         <div class="row">
     <div class="col-5">
+
+    <h3 style="text-align:center; margin-bottom:1rem;">Available Collections</h3>
     <div class="panel panel-default" style="border-style:solid;height:400px;border-width:1px;overflow:auto;" id="specimenPanel">
             <table class = "table" style="width: 100%;margin-bottom:0px;" id="specimenList" >
                 <tr>
@@ -110,19 +112,24 @@ export const startShipping = async (userName) => {
                 </tr>
             </table>
     </div>
-    <div class="panel panel-default" style="border-style:solid;height:150px;border-width:1px;overflow:auto;margin-top:50px" id="orphansPanel">
+
+    <h3 style="margin:1rem auto; text-align:center">Location Unknown</h3>
+    <div class="panel panel-default" style="border-style:solid;height:150px;border-width:1px;overflow:auto;" id="orphansPanel">
             <table class = "table" style="width: 100%; margin-bottom:0px;" id="orphansList" >
                 
             </table>
     </div>
     </div>
     <div class="col-7">
-        <div class="row" style="margin-bottom:10px;">
-            <div class="col" style="width:50%;float:left;">
+        <div class="d-flex justify-content-between align-items-center" style="margin-bottom:.625rem;">
+            <div style="width:25%;">
                 <select class="selectpicker" id="selectBoxList">
                 </select>
             </div>
-            <div class="col" style="width:50%;">
+            <div>
+                <h3 style="text-align:center">Shipping Box Contents</h3>
+            </div>
+            <div style="width:25%;">
                 <button type="button" class="btn btn-primary" style="float:right;" id="addBoxButton">Create New Box</button>
             </div>
         </div>
@@ -170,6 +177,12 @@ export const startShipping = async (userName) => {
         </p>
     </div>
     <div id="edit">
+        <div class="row">
+          <div class="col-5 no-gutters">
+            <h3 style="text-align:center;">Boxes in Process</h3>
+          </div>
+        </div>
+        
             <table  class="table" style="width:100%;border:1px solid;" id = "saveTable">
                 <tr>
                     <th>To Ship</th>
@@ -187,6 +200,7 @@ export const startShipping = async (userName) => {
             <label for="tempMonitorChecked">Temp Monitor is included in this shipment</label><br>
         </div>
     </div>
+    
     <div class="row" style="margin-top:50px;margin-bottom:50px;">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
             </div>
