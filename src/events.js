@@ -93,7 +93,7 @@ export const addEventsearchSpecimen = () => {
         const response = await findParticipant(query);
         hideAnimation();
         const data = response.data[0];
-        console.log("here")
+        
         if(allTubesCollected(biospecimenData)) {
             if(biospecimenData['410912345'] && biospecimenData['410912345'] === 353358909 ) {
                 if(biospecimenData['420757389'] && biospecimenData['420757389'] === 353358909) {
