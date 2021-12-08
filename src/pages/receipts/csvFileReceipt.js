@@ -46,10 +46,9 @@ const csvFileButtonSubmit = () => {
     let dateFilter = document.getElementById("csvDateInput").value
     dateFilter = dateFilter+'T00:00:00.000Z'
     showAnimation();
-    const results =  await getBSIQueryData(dateFilter) //getFakeResults();
+    const results =  await getBSIQueryData(dateFilter);
     hideAnimation();
     let modifiedResults = modifyBSIQueryResults(results.data);
-    console.log('modifiedResults', modifiedResults)
     generateBSIqueryCSVData(modifiedResults);
 
   })
@@ -85,7 +84,6 @@ const getBSIQueryData = async (filter) => {
 const modifyBSIQueryResults = (results) => {
   results.forEach( i => {
     let vialMappings = getVialTypesMappings(i)
-    console.log('vialMappings', vialMappings)
     updateResultMappings(i, vialMappings)
   })
   return results
