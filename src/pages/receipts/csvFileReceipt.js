@@ -48,8 +48,10 @@ const csvFileButtonSubmit = () => {
     showAnimation();
     const results = await getBSIQueryData(dateFilter);// getFakeResults() 
     hideAnimation();
+    document.getElementById("csvDateInput").value = ``;
     let modifiedResults = modifyBSIQueryResults(results.data);
     generateBSIqueryCSVData(modifiedResults);
+    
 
   })
 }
@@ -58,7 +60,7 @@ const getCurrentDate = () => {
   const currentDate = new Date().toLocaleDateString('en-CA');
   return currentDate;
 }
-// http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=queryBsiData&type=${filter} 
+// http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=queryBsiData&type=${filter}`, {
 
 const getBSIQueryData = async (filter) => {
   const idToken = await getIdToken();
