@@ -322,7 +322,24 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                     }
                     row.insertCell(1).innerHTML= toAddType;
                     // row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
-                    row.insertCell(2).innerHTML= '<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;" checked>';
+                    row.insertCell(2).innerHTML = '<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;"  checked>';
+
+                    row.cells[2].style.verticalAlign = "middle" 
+                    
+                    let checkboxEl = row.cells[2].firstChild
+                    checkboxEl.setAttribute("data-full-specimen-id", `${currSplit[0]} ${biospecimensList[i]}`)
+                    checkboxEl.addEventListener("click", e => {
+                        e.target.toggleAttribute("checked")
+                        console.log(e.target)
+
+                        let samplePresentCheckboxEls = Array.from(document.getElementsByClassName("samplePresentCheckbox"))
+    console.log(Array.from(samplePresentCheckboxEls))
+    
+    if (samplePresentCheckboxEls.length) {
+        let checkedBoxArr = samplePresentCheckboxEls.filter(checkbox => checkbox.hasAttribute("checked"))
+        console.log(checkedBoxArr)
+    }
+                    })
 
                     // let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
                     // currDeleteButton.addEventListener("click", async e => {
@@ -340,9 +357,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                     empty = false;
                     currBag.push(biospecimensList[i])
                     var rowCount = tubeTable.rows.length;
-                    var row = tubeTable.insertRow(rowCount);   
-                    console.log(row.insertCell(0))
-                    
+                    var row = tubeTable.insertRow(rowCount);
                     row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
                     let thisId = biospecimensList[i]
                     let toAddType = 'N/A'
@@ -351,7 +366,25 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                     }
                     row.insertCell(1).innerHTML= toAddType;
                     // row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
-                    row.insertCell(2).innerHTML= '<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;" checked>';
+                    row.insertCell(2).innerHTML= `<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;" checked>`;
+
+                    row.cells[2].style.verticalAlign = "middle" 
+                    
+                    let checkboxEl = row.cells[2].firstChild
+                    checkboxEl.setAttribute("data-full-specimen-id", `${currSplit[0]} ${biospecimensList[i]}`)
+                    checkboxEl.addEventListener("click", e => {
+                        e.target.toggleAttribute("checked")
+                        console.log(e.target)
+
+                        let samplePresentCheckboxEls = Array.from(document.getElementsByClassName("samplePresentCheckbox"))
+    console.log(Array.from(samplePresentCheckboxEls))
+    
+    if (samplePresentCheckboxEls.length) {
+        let checkedBoxArr = samplePresentCheckboxEls.filter(checkbox => checkbox.hasAttribute("checked"))
+        console.log(checkedBoxArr)
+    }
+                    })
+
 
                     // let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
                     // currDeleteButton.addEventListener("click", async e => {
@@ -380,8 +413,25 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
             }
             row.insertCell(1).innerHTML= toAddType;
             // row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
-            row.insertCell(2).innerHTML= '<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;" checked>';
+            row.insertCell(2).innerHTML = '<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;"  checked>';
             
+            row.cells[2].style.verticalAlign = "middle" 
+
+            let checkboxEl = row.cells[2].firstChild
+            checkboxEl.setAttribute("data-full-specimen-id", `${currSplit[0]} ${biospecimensList[i]}`)
+            checkboxEl.addEventListener("click", e => {
+                console.log(e.target)
+                e.target.toggleAttribute("checked")
+                
+                let samplePresentCheckboxEls = Array.from(document.getElementsByClassName("samplePresentCheckbox"))
+    console.log(Array.from(samplePresentCheckboxEls))
+    
+    if (samplePresentCheckboxEls.length) {
+        let checkedBoxArr = samplePresentCheckboxEls.filter(checkbox => checkbox.hasAttribute("checked"))
+        console.log(checkedBoxArr)
+    }
+            })
+
             // let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
             // currDeleteButton.addEventListener("click", async e => {
             //     var index = e.target.parentNode.parentNode.rowIndex;
@@ -391,13 +441,8 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         }
     }
     populateModalSelect(hiddenJSON)
-    let samplePresentCheckboxEls = Array.from(document.getElementsByClassName("samplePresentCheckbox"))
-    console.log(Array.from(samplePresentCheckboxEls))
-    if(samplePresentCheckboxEls.length) {
-      samplePresentCheckboxEls.forEach(el => {
-        el.parentNode.style.verticalAlign = "middle"
-      })
-    }
+    
+    
     if(empty){
         showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
         document.getElementById('shippingCloseButton').click();
