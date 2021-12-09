@@ -146,7 +146,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                         <input class="custom-checkbox-size" type="checkbox" id="selectAllCollection">
                         <label for="selectAllCollection">&nbsp;Check All</label>
                         </th>
-                          <th class="align-left">Reason Not Collected</th> 
+                        <th class="align-left">Reason Not Collected</th> 
                          <th class="align-left">Scan Full Specimen ID</th> 
                          <th class="align-left"><input class="custom-checkbox-size" type="checkbox"id="selectAllCollection2">
                          <label for="selectAllCollection2">&nbsp;Select For Deviation</label>
@@ -154,26 +154,25 @@ export const tubeCollectedTemplate = (data, formData) => {
                          <th class="align-left">Deviation Type</th> 
                          <th class="align-left">Comments</th>
                         </tr>
-                        
                         </thead>
                     <tbody>`
                     
                     const siteTubesList = getSiteTubesLists(formData);
                     if(!siteTubesList || siteTubesList?.length === 0){
-                        template += `<tr><td>No data.</td></tr>`;
+                        //template += `<tr><td>No data.</td></tr>`;
                     }
-                    siteTubesList?.forEach((obj, index) => {
+                    [{name:"",specimenType:"", image:"",readableValue:"", collectionChkBox:true}]?.forEach((obj, index) => {
                         template += `
                             <tr>
                                 <td>${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
                                 <td class="align-left">${obj.collectionChkBox === true ? `<input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="${obj.tubeType}" ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? 'checked': ''} id="${obj.concept}">`:``}</td>
-                                <td>1-</td>
-                                <td>2-</td>
-                                <td>3-</td>
-                                <td>4-</td>
-                                </td>5-</td>
+                                <td><input type="select" placeholder="Select..."/></td>
+                                <td><input type="text" placeholder="Scan Full Specimen ID"/></td>
+                                <td><input type="checkbox"/></td>
+                                <td><input type="select" placeholder="Select..."/></td>
+                                </td><input type="text" placeholder="Comments"/></td>
                                 </tr>
-                        `
+                        `   
                     });
                         template +=`
                     </tbody>
