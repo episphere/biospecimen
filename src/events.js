@@ -481,17 +481,21 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         let nameSplit = userName.split(' ');
         let firstName = nameSplit[0] ? nameSplit[0] : '';
         let lastName = nameSplit[1] ? nameSplit[1] : '';
+        let checkedSpecimensArr = Array.from(document.getElementsByClassName("samplePresentCheckbox")).filter(item => item.hasAttribute("checked"))
         boxId = document.getElementById('shippingModalChooseBox').value;
 
+        console.log(checkedSpecimensArr)
         if(isOrphan){
             bagid = 'unlabelled'
         }
 
         let toDelete = [];
 
-        for(let i = 1; i < numRows; i++){
+        for(let i = 0; i < checkedSpecimensArr.length; i++){
             //get the first element (tube id) from the thingx
-            let toAddId = tubeTable.rows[i].cells[0].innerText;
+            // let toAddId = tubeTable.rows[i].cells[0].innerText;
+            let toAddId = checkedSpecimensArr[i].getAttribute("data-full-specimen-id")
+
             toDelete.push(toAddId.split(/\s+/)[1]);
 
             if(hiddenJSON.hasOwnProperty(boxId)){
