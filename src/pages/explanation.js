@@ -100,6 +100,9 @@ export const explanationTemplate = (dt, biospecimenData) => {
                     <div class="ml-auto">
                         <button class="btn btn-outline-warning" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['820476880']}" type="button" id="explanationSaveExit">Save and Exit</button>
                     </div>
+                    <div class="col-auto">
+                        <button class="btn btn-outline-primary" data-connect-id="${dt.Connect_ID}" data-master-specimen-id="${biospecimenData['820476880']}" type="submit" id="explanationSaveContinue">Save and Continue</button>
+                    </div>
                 </div>
         `
         template += '</form>'

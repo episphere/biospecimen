@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking} from './pages/shipping.js';
@@ -93,12 +93,18 @@ export const addEventsearchSpecimen = () => {
         const response = await findParticipant(query);
         hideAnimation();
         const data = response.data[0];
-        if(biospecimenData['410912345'] && biospecimenData['410912345'] === 353358909 && biospecimenData['420757389'] && biospecimenData['420757389'] === 353358909) {
-            searchTemplate();
-            showNotifications({title: 'Completed', body: 'Specimen is finalized and the Participant is already checked out!'})
+        
+        if(allTubesCollected(biospecimenData)) {
+            if(biospecimenData['410912345'] && biospecimenData['410912345'] === 353358909 ) {
+                if(biospecimenData['420757389'] && biospecimenData['420757389'] === 353358909) {
+                    searchTemplate();
+                    showNotifications({title: 'Completed', body: 'Specimen is finalized and the Participant is already checked out!'})
+                }
+                else checkOutScreen(data, biospecimenData);
+            }
+            else finalizeTemplate(data, biospecimenData);
         }
-        else if(biospecimenData['410912345'] && biospecimenData['410912345'] === 353358909) checkOutScreen(data, biospecimenData);
-        else tubeCollectedTemplate(data, biospecimenData)
+        else tubeCollectedTemplate(data, biospecimenData);
     })
 }
 
@@ -166,7 +172,7 @@ export const addEventAddSpecimenToBox = (userName) => {
 
         const header = document.getElementById('shippingModalHeader');
         const body = document.getElementById('shippingModalBody');
-        header.innerHTML = `<h5 class="modal-title">Add Specimens</h5>
+        header.innerHTML = `<h5 class="modal-title">Specimen Verification</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="shippingCloseButton">
                                 <span aria-hidden="true">&times;</span>
                             </button>`;
@@ -1953,6 +1959,20 @@ export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     const collectionSaveExit = document.getElementById('collectionSaveExit');
     collectionSaveExit.addEventListener('click', () => {
         collectionSubmission(dt, biospecimenData);
+    });
+};
+
+export const addEventBiospecimenCollectionFormEdit = (dt, biospecimenData) => {
+    const editButtons = Array.from(document.querySelectorAll('[id$="collectEditBtn"]'));
+    editButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const conceptID = button.id.replace('collectEditBtn', '');
+            document.getElementById(conceptID + 'Id').disabled = false;
+            
+            const deviationBox = document.getElementById(conceptID + 'Deviated');
+            if(deviationBox) deviationBox.disabled = false;
+        });
+
     });
 };
 

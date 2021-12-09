@@ -3,6 +3,7 @@ import { searchResults } from "./pages/dashboard.js";
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
 import { collectProcessTemplate } from "./pages/collectProcess.js";
+import { workflows } from "./tubeValidation.js";
 
 
 const conversion = {
@@ -914,4 +915,23 @@ export const convertTime = (time) => {
         hour: "2-digit",
         minute: "2-digit",
     });
+};
+
+export const allTubesCollected = (data) => {
+
+    let flag = true; 
+
+    if(data['650516960']) {
+        const tubes = workflows[collectionSettings[data['650516960']]];
+        tubes.forEach(tube => {
+            if(!data[tube['concept']]['593843561'] || data[tube['concept']]['593843561'] !== 353358909 || !data[tube['concept']]['825582494']) {
+                flag = false;
+            }
+        });
+    }
+    else {
+        flag = false;
+    }
+
+    return flag;
 };
