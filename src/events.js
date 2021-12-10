@@ -1976,6 +1976,9 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
     form.addEventListener('submit', async e => {
         e.preventDefault();
         const checkboxes = Array.from(document.getElementsByClassName('tube-collected'));
+        if(checkboxes.length === 0){
+           document.getElementById('navBarSearch').click();
+        }
         let atLeastOneChecked = false;
         checkboxes.forEach(chkbox => {
             if(atLeastOneChecked) return

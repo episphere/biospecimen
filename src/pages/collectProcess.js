@@ -157,20 +157,22 @@ export const tubeCollectedTemplate = (data, formData) => {
                         </thead>
                     <tbody>`
                     
-                    const siteTubesList = getSiteTubesLists(formData);
+                    let siteTubesList = getSiteTubesLists(formData);
+                    console.log({siteTubesList})
                     if(!siteTubesList || siteTubesList?.length === 0){
-                        //template += `<tr><td>No data.</td></tr>`;
+                        siteTubesList = [];
+                    //    template += `<tr><td>No data.</td></tr>`;
                     }
-                    [{name:"",specimenType:"", image:"",readableValue:"", collectionChkBox:true}]?.forEach((obj, index) => {
+                    siteTubesList?.forEach((obj, index) => {
                         template += `
                             <tr>
                                 <td>${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
                                 <td class="align-left">${obj.collectionChkBox === true ? `<input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="${obj.tubeType}" ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? 'checked': ''} id="${obj.concept}">`:``}</td>
-                                <td><input type="select" placeholder="Select..."/></td>
+                                <td><select placeholder="Select..."><option>-</option></td>
                                 <td><input type="text" placeholder="Scan Full Specimen ID"/></td>
                                 <td><input type="checkbox"/></td>
-                                <td><input type="select" placeholder="Select..."/></td>
-                                </td><input type="text" placeholder="Comments"/></td>
+                                <td><select placeholder="Select..."><option>-</option></td>
+                                <td><input type="text" placeholder="Comments"/></td>
                                 </tr>
                         `   
                     });

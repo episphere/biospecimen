@@ -1,5 +1,5 @@
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates, getWorflow, isDeviceiPad, replaceDateInputWithMaskedInput } from "./../shared.js"
-import { addGoToCheckInEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
+import {  addGoToCheckInEvent, addEventCheckInCompleteForm, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
@@ -186,7 +186,9 @@ export const searchResults = (result) => {
                 <td>${conversion[data['821247024']]}</td>
                 <td>${data['773707518'] === 353358909 || data['831041022'] === 353358909 || data['747006172'] === 353358909 ? `<i class="fas fa-2x fa-times"></i>` : `<i class="fas fa-2x fa-check"></i>`}</td>
                 <td><button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>Go to check-in</button></td>
-                <td><button class="btn btn-outline-primary text-nowrap">Specimen Link</button></td>
+                <td>
+                <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
+                <button class="btn btn-outline-primary text-nowrap" id="checkInComplete">Specimen Link</button></td>
             </tr>
         `
     });
@@ -194,6 +196,7 @@ export const searchResults = (result) => {
 
     document.getElementById('contentBody').innerHTML = template;
     addEventBackToSearch('navBarSearch');
+    addEventCheckInCompleteForm();
     if (getWorflow() === 'clinical') {
         addGoToCheckInEvent();
       //  addEventSelectParticipantForm(true);
