@@ -327,9 +327,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                         toAddType = translateNumToType[thisId];
                     }
                     row.insertCell(1).innerHTML= toAddType;
-                    // row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
                     row.insertCell(2).innerHTML = '<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;"  checked>';
-
                     row.cells[2].style.verticalAlign = "middle" 
                     
                     let checkboxEl = row.cells[2].firstChild
@@ -354,9 +352,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                         toAddType = translateNumToType[thisId];
                     }
                     row.insertCell(1).innerHTML= toAddType;
-                    // row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
                     row.insertCell(2).innerHTML= `<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;" checked>`;
-
                     row.cells[2].style.verticalAlign = "middle" 
                     
                     let checkboxEl = row.cells[2].firstChild
@@ -382,9 +378,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                 toAddType = translateNumToType[thisId];
             }
             row.insertCell(1).innerHTML= toAddType;
-            // row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
             row.insertCell(2).innerHTML = '<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;"  checked>';
-            
             row.cells[2].style.verticalAlign = "middle" 
 
             let checkboxEl = row.cells[2].firstChild
@@ -395,8 +389,6 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         }
     }
     populateModalSelect(hiddenJSON)
-    
-    
     if(empty){
         showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
         document.getElementById('shippingCloseButton').click();
@@ -444,7 +436,6 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
 
         for(let i = 0; i < checkedSpecimensArr.length; i++){
             let toAddId = checkedSpecimensArr[i].getAttribute("data-full-specimen-id")
-
             toDelete.push(toAddId.split(/\s+/)[1]);
 
             if(hiddenJSON.hasOwnProperty(boxId)){
