@@ -2387,6 +2387,28 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
     
 }
 
+export const addEventSaveButton = (hiddenJSON) => {
+    document.getElementById('saveTracking').addEventListener('click', async () =>{
+        let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+        for(let i = 0; i < boxes.length; i++){
+            let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
+            hiddenJSON[boxes[i]] = {'959708259':boxi, specimens:hiddenJSON[boxes[i]]}
+            
+        }
+
+        let shippingData = {}
+
+        let trackingNumbers = {}
+        let boxNames = Object.keys(hiddenJSON);
+        for(let i = 0; i < boxNames.length; i++){
+            trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
+        }
+
+        await ship(boxes, shippingData, trackingNumbers);
+        console.log("HERE");
+    })
+}
+
 export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked, shipmentCourier) => {
     document.getElementById('finalizeModalSign').addEventListener('click', async () =>{
         let finalizeTextField = document.getElementById('finalizeSignInput');
