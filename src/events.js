@@ -183,7 +183,7 @@ export const addEventAddSpecimenToBox = (userName) => {
                 <tr>
                     <th>Full Specimen ID</th>
                     <th>Type/Color</th>
-                    <th>Sample Present</th>
+                    <th style="text-align:center;">Sample Present</th>
                 </tr>
             </thead>
         </table>
@@ -336,24 +336,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                     checkboxEl.setAttribute("data-full-specimen-id", `${currSplit[0]} ${biospecimensList[i]}`)
                     checkboxEl.addEventListener("click", e => {
                         e.target.toggleAttribute("checked")
-                        console.log(e.target)
-
-                        let samplePresentCheckboxEls = Array.from(document.getElementsByClassName("samplePresentCheckbox"))
-    console.log(Array.from(samplePresentCheckboxEls))
-    
-    if (samplePresentCheckboxEls.length) {
-        let checkedBoxArr = samplePresentCheckboxEls.filter(checkbox => checkbox.hasAttribute("checked"))
-        console.log(checkedBoxArr)
-    }
                     })
-
-                    // let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
-                    // currDeleteButton.addEventListener("click", async e => {
-                    //     var index = e.target.parentNode.parentNode.rowIndex;
-                    //     var table = document.getElementById("shippingModalTable");
-                    //     table.deleteRow(index);
-                    // })
-                    
                 }
             }
         }
@@ -380,25 +363,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                     checkboxEl.setAttribute("data-full-specimen-id", `${currSplit[0]} ${biospecimensList[i]}`)
                     checkboxEl.addEventListener("click", e => {
                         e.target.toggleAttribute("checked")
-                        console.log(e.target)
-
-                        let samplePresentCheckboxEls = Array.from(document.getElementsByClassName("samplePresentCheckbox"))
-    console.log(Array.from(samplePresentCheckboxEls))
-    
-    if (samplePresentCheckboxEls.length) {
-        let checkedBoxArr = samplePresentCheckboxEls.filter(checkbox => checkbox.hasAttribute("checked"))
-        console.log(checkedBoxArr)
-    }
                     })
-
-
-                    // let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
-                    // currDeleteButton.addEventListener("click", async e => {
-                    //     var index = e.target.parentNode.parentNode.rowIndex;
-                    //     var table = document.getElementById("shippingModalTable");
-                    //     table.deleteRow(index);
-                    // })
-                    
                 }
             }
         }
@@ -409,7 +374,6 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
             currBag.push(biospecimensList[i])
             var rowCount = tubeTable.rows.length;
             var row = tubeTable.insertRow(rowCount);
-            console.log(row.insertCell(0))
 
             row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
             let thisId = biospecimensList[i]
@@ -426,24 +390,8 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
             let checkboxEl = row.cells[2].firstChild
             checkboxEl.setAttribute("data-full-specimen-id", `${currSplit[0]} ${biospecimensList[i]}`)
             checkboxEl.addEventListener("click", e => {
-                console.log(e.target)
                 e.target.toggleAttribute("checked")
-                
-                let samplePresentCheckboxEls = Array.from(document.getElementsByClassName("samplePresentCheckbox"))
-    console.log(Array.from(samplePresentCheckboxEls))
-    
-    if (samplePresentCheckboxEls.length) {
-        let checkedBoxArr = samplePresentCheckboxEls.filter(checkbox => checkbox.hasAttribute("checked"))
-        console.log(checkedBoxArr)
-    }
             })
-
-            // let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
-            // currDeleteButton.addEventListener("click", async e => {
-            //     var index = e.target.parentNode.parentNode.rowIndex;
-            //     var table = document.getElementById("shippingModalTable");
-            //     table.deleteRow(index);
-            // })
         }
     }
     populateModalSelect(hiddenJSON)
@@ -455,8 +403,6 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         hideAnimation();
         return
     }
-    debugger;
-    return
 }
 
 export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan, userName)=>{
@@ -490,7 +436,6 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         let checkedSpecimensArr = Array.from(document.getElementsByClassName("samplePresentCheckbox")).filter(item => item.hasAttribute("checked"))
         boxId = document.getElementById('shippingModalChooseBox').value;
 
-        console.log(checkedSpecimensArr)
         if(isOrphan){
             bagid = 'unlabelled'
         }
@@ -498,8 +443,6 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         let toDelete = [];
 
         for(let i = 0; i < checkedSpecimensArr.length; i++){
-            //get the first element (tube id) from the thingx
-            // let toAddId = tubeTable.rows[i].cells[0].innerText;
             let toAddId = checkedSpecimensArr[i].getAttribute("data-full-specimen-id")
 
             toDelete.push(toAddId.split(/\s+/)[1]);
@@ -593,8 +536,6 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         hideAnimation();
     },{once:true})
     //ppulateSpecimensList();
-    debugger;
-    return
 }
 
 export const getInstituteSpecimensList = async(hiddenJSON) => {
