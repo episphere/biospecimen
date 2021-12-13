@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, siteContactInformation } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking} from './pages/shipping.js';
@@ -856,7 +856,7 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
     newP.innerHTML = "Last Modified: " + toInsertDate2;
     document.getElementById('boxManifestCol1').appendChild(newP);
     newP = document.createElement("p");
-    newP.innerHTML = "Number of Bags " + numBags;
+    newP.innerHTML = "Number of Bags: " + numBags;
     document.getElementById('boxManifestCol3').appendChild(newP);
     newP = document.createElement("p");
     newP.innerHTML = "Number of Tubes:  " + numTubes;
@@ -991,9 +991,13 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                 //addEventNavBarBoxManifest("viewBoxManifestBlood")
                 //if(hiddenJSON[boxes[i]])
                 //table.deleteRow(index);
+                debugger;
+                return
             })
         }    
     }
+    debugger;
+    return;
 }
 
 export const populateTempNotification = async () => {
@@ -1026,6 +1030,7 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
     let column2 = document.getElementById("boxManifestCol3")
 
     let newP = document.createElement("p");
+    let newDiv = document.createElement("div")
     newP.innerHTML = "Shipment Manifest";
     document.getElementById('boxManifestCol1').appendChild(newP);
 
@@ -1050,6 +1055,10 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
     newP = document.createElement("p");
     newP.innerHTML = "Sender: " + userName;
     document.getElementById('boxManifestCol1').appendChild(newP);
+
+    newDiv = document.createElement("p");
+    newDiv.innerHTML = displayContactInformation(site, siteContactInformation)
+    document.getElementById('boxManifestCol1').appendChild(newDiv);
 
     newP = document.createElement("p");
     newP.innerHTML = "Site: " + site;
@@ -2829,3 +2838,59 @@ export const addEventFilter = () => {
     })
 
 }
+
+export const displayContactInformation = (site,siteContactInformation) => {
+  // Find if site exists in Object
+  // 
+  if(siteContactInformation.hasOwnProperty(site)){
+    // console.log(currentSite)
+    // console.log(siteContactInformation[site])
+    // console.log(siteContactInformation[site][0])
+    let contactStr = ""
+    contactStr += `<p>Site Contact Information:</p>`
+    // contactStr += `<p>${siteContactInformation[site][0].fullName}</p>`
+    // contactStr += `<p>Email: ${siteContactInformation[site][0].email}</p>`
+    // contactStr += `<p>Phone: ${siteContactInformation[site][0].phone}</p>`
+    // debugger
+    // ================ ADD BACK ================
+
+    let numContacts = siteContactInformation[site].length
+    console.log(siteContactInformation[site], numContacts)
+    // iterate over length of existing site's contact array
+    for(let i= 0; i < numContacts;i++) {
+    contactStr += `${numContacts > 1 ? "<p>Contact ${i+1}</p>": ""}`
+    contactStr += `<p>${siteContactInformation[site][i].fullName}</p>`
+    contactStr += `<p>Email: ${siteContactInformation[site][i].email}</p>`
+    
+    let numPhones = siteContactInformation[site][i].phone
+    console.log(numPhones.length,numPhones)
+    if(numPhones.length === 1){
+      contactStr += `<p>Phone: ${siteContactInformation[site][i].phone}</p>`  
+    }
+    else if(numPhones.length > 1){
+      contactStr += `<p>Phone:</p>`
+      for(let j = 0; j < numPhones.length; j++){
+        contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
+      }
+    }
+    else contactStr+= `<p>Phone:</p>`
+  }
+    return contactStr
+  }
+  else return ""
+}
+
+// const getPhoneNumbers =
+/* 
+STEPS
+
+1. Find length of full contact for site and store in variable
+2. Find Length of individual information and store in variable 
+  - name***
+  - email***
+  - phone***
+3. Create P tags according to number 
+4. Only one Available information no line break
+5. More than one individual information add line break
+
+*/

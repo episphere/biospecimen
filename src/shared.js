@@ -576,60 +576,58 @@ export const siteFullNames = {
     'HFHS': 'Henry Ford Health System'
 }
 
-export const siteFullContactInformation = {
-  "NCI":[{
-    "fullName":"",
-    "email":"",
-    "phone":"",
-  }],
+export const siteContactInformation = {
   "UCM":[{
     "fullName":"Jaime King",
     "email":"jaimeking@bsd.uchicago.edu",
-    "phone":"(773) 702-5073",
+    "phone":["(773) 702-5073"],
   }],
   "MFC":[{
     "fullName":"Jacob Johnston",
     "email":"johnston.jacob@marshfieldclinic.org",
-    "phone":"715-898-9444",
+    "phone":["715-898-9444"],
   }],
   "HP":[{
     "fullName":"Erin Schwartz",
     "email":"Erin.C.Schwartz@HealthPartners.com",
-    "phone":"Office: (651) 495-6371 Cell: (612) 836-7885",
+    "phone":[
+     "Office: (651) 495-6371",
+     "Cell: (612) 836-7885"
+    ]
   }],
   "SFH":[{
     "fullName":"Kimberly (Kay) Spellmeyer",
     "email":"kimberly.spellmeyer@sanfordhealth.org",
-    "phone":"605-312-6100",
+    "phone":["605-312-6100"],
   },{
     "fullName":"DeAnn Witte",
     "email":"deann.witte@sanfordhealth.org",
-    "phone":"701-234-6718",
+    "phone":["701-234-6718"],
   }],
   "KPCO":[{
     "fullName":"Brooke Thompson",
     "email":"Brooke.x.thompson@kp.org",
-    "phone":"720-369-4316",
+    "phone":["720-369-4316"],
   }],
   "KPHI":[{
     "fullName":"Cyndee Yonehara",
     "email":"Cyndee.H.Yonehara@kp.org",
-    "phone":"Mobile: 808-341-5736",
+    "phone":["Mobile: 808-341-5736"],
   }],
   "KPNW":[{
     "fullName":"Sarah Vertrees",
     "email":"sarah.vertrees@kpchr.org",
-    "phone":"503-261-4144",
+    "phone":["503-261-4144"],
   }],
   "KPGA":[{
     "fullName":"Brandi Robinson",
     "email":"brandi.e.robinson@kp.org",
-    "phone":"470-217-2993",
+    "phone":["470-217-2993"],
   }],
   "HFHS":[{
     "fullName":"Kathleen Dawson",
     "email":"kdawson7@hfhs.org",
-    "phone":"248-910-6716",
+    "phone":["248-910-6716"],
   }]
 }
 
