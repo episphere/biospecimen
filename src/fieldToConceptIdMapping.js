@@ -42,7 +42,15 @@ export default {
     siteShipmentDateReceived: 259439191,
     siteShipmentReceived: 434049748,
     yes: 353358909,
-    no: 104430631
+    no: 104430631,
+
+    // collection id
+    collectionId: 825582494,
+    dateWithdrawn: 259439191,
+    collectionType: 650516960,
+    research: 534621077,
+    clinical: 664882224,
+    
 
 
 };

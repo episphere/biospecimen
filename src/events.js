@@ -93,12 +93,18 @@ export const addEventsearchSpecimen = () => {
         const response = await findParticipant(query);
         hideAnimation();
         const data = response.data[0];
-        if(biospecimenData['410912345'] && biospecimenData['410912345'] === 353358909 && biospecimenData['420757389'] && biospecimenData['420757389'] === 353358909) {
-            searchTemplate();
-            showNotifications({title: 'Completed', body: 'Specimen is finalized and the Participant is already checked out!'})
+        
+        if(allTubesCollected(biospecimenData)) {
+            if(biospecimenData['410912345'] && biospecimenData['410912345'] === 353358909 ) {
+                if(biospecimenData['420757389'] && biospecimenData['420757389'] === 353358909) {
+                    searchTemplate();
+                    showNotifications({title: 'Completed', body: 'Specimen is finalized and the Participant is already checked out!'})
+                }
+                else checkOutScreen(data, biospecimenData);
+            }
+            else finalizeTemplate(data, biospecimenData);
         }
-        else if(biospecimenData['410912345'] && biospecimenData['410912345'] === 353358909) checkOutScreen(data, biospecimenData);
-        else tubeCollectedTemplate(data, biospecimenData)
+        else tubeCollectedTemplate(data, biospecimenData);
     })
 }
 
@@ -177,7 +183,7 @@ export const addEventAddSpecimenToBox = (userName) => {
                 <tr>
                     <th>Full Specimen ID</th>
                     <th>Type/Color</th>
-                    <th></th>
+                    <th style="text-align:center;">Sample Present</th>
                 </tr>
             </thead>
         </table>
@@ -313,6 +319,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                     currBag.push(biospecimensList[i])
                     var rowCount = tubeTable.rows.length;
                     var row = tubeTable.insertRow(rowCount);
+                    
                     row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
                     let thisId =biospecimensList[i];
                     let toAddType = 'N/A'
@@ -320,15 +327,14 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                         toAddType = translateNumToType[thisId];
                     }
                     row.insertCell(1).innerHTML= toAddType;
-                    row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
-
-                    let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
-                    currDeleteButton.addEventListener("click", async e => {
-                        var index = e.target.parentNode.parentNode.rowIndex;
-                        var table = document.getElementById("shippingModalTable");
-                        table.deleteRow(index);
-                    })
+                    row.insertCell(2).innerHTML = '<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;"  checked>';
+                    row.cells[2].style.verticalAlign = "middle" 
                     
+                    let checkboxEl = row.cells[2].firstChild
+                    checkboxEl.setAttribute("data-full-specimen-id", `${currSplit[0]} ${biospecimensList[i]}`)
+                    checkboxEl.addEventListener("click", e => {
+                        e.target.toggleAttribute("checked")
+                    })
                 }
             }
         }
@@ -338,7 +344,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                     empty = false;
                     currBag.push(biospecimensList[i])
                     var rowCount = tubeTable.rows.length;
-                    var row = tubeTable.insertRow(rowCount);           
+                    var row = tubeTable.insertRow(rowCount);
                     row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
                     let thisId = biospecimensList[i]
                     let toAddType = 'N/A'
@@ -346,15 +352,14 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                         toAddType = translateNumToType[thisId];
                     }
                     row.insertCell(1).innerHTML= toAddType;
-                    row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
-
-                    let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
-                    currDeleteButton.addEventListener("click", async e => {
-                        var index = e.target.parentNode.parentNode.rowIndex;
-                        var table = document.getElementById("shippingModalTable");
-                        table.deleteRow(index);
-                    })
+                    row.insertCell(2).innerHTML= `<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;" checked>`;
+                    row.cells[2].style.verticalAlign = "middle" 
                     
+                    let checkboxEl = row.cells[2].firstChild
+                    checkboxEl.setAttribute("data-full-specimen-id", `${currSplit[0]} ${biospecimensList[i]}`)
+                    checkboxEl.addEventListener("click", e => {
+                        e.target.toggleAttribute("checked")
+                    })
                 }
             }
         }
@@ -364,7 +369,8 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
             empty = false;
             currBag.push(biospecimensList[i])
             var rowCount = tubeTable.rows.length;
-            var row = tubeTable.insertRow(rowCount);           
+            var row = tubeTable.insertRow(rowCount);
+
             row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
             let thisId = biospecimensList[i]
             let toAddType = 'N/A'
@@ -372,25 +378,23 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                 toAddType = translateNumToType[thisId];
             }
             row.insertCell(1).innerHTML= toAddType;
-            row.insertCell(2).innerHTML= '<input type="button" class="delButton" value = "Not in Bag">';
+            row.insertCell(2).innerHTML = '<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;"  checked>';
+            row.cells[2].style.verticalAlign = "middle" 
 
-            let currDeleteButton = row.cells[2].getElementsByClassName("delButton")[0];
-            currDeleteButton.addEventListener("click", async e => {
-                var index = e.target.parentNode.parentNode.rowIndex;
-                var table = document.getElementById("shippingModalTable");
-                table.deleteRow(index);
+            let checkboxEl = row.cells[2].firstChild
+            checkboxEl.setAttribute("data-full-specimen-id", `${currSplit[0]} ${biospecimensList[i]}`)
+            checkboxEl.addEventListener("click", e => {
+                e.target.toggleAttribute("checked")
             })
         }
     }
     populateModalSelect(hiddenJSON)
-
     if(empty){
         showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
         document.getElementById('shippingCloseButton').click();
         hideAnimation();
         return
     }
-    
 }
 
 export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan, userName)=>{
@@ -421,6 +425,7 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         let nameSplit = userName.split(' ');
         let firstName = nameSplit[0] ? nameSplit[0] : '';
         let lastName = nameSplit[1] ? nameSplit[1] : '';
+        let checkedSpecimensArr = Array.from(document.getElementsByClassName("samplePresentCheckbox")).filter(item => item.hasAttribute("checked"))
         boxId = document.getElementById('shippingModalChooseBox').value;
 
         if(isOrphan){
@@ -429,9 +434,8 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
 
         let toDelete = [];
 
-        for(let i = 1; i < numRows; i++){
-            //get the first element (tube id) from the thingx
-            let toAddId = tubeTable.rows[i].cells[0].innerText;
+        for(let i = 0; i < checkedSpecimensArr.length; i++){
+            let toAddId = checkedSpecimensArr[i].getAttribute("data-full-specimen-id")
             toDelete.push(toAddId.split(/\s+/)[1]);
 
             if(hiddenJSON.hasOwnProperty(boxId)){
@@ -2404,6 +2408,28 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
         }
     })
     
+}
+
+export const addEventSaveButton = (hiddenJSON) => {
+    document.getElementById('saveTracking').addEventListener('click', async () =>{
+        let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+        for(let i = 0; i < boxes.length; i++){
+            let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
+            hiddenJSON[boxes[i]] = {'959708259':boxi, specimens:hiddenJSON[boxes[i]]}
+            
+        }
+
+        let shippingData = {}
+
+        let trackingNumbers = {}
+        let boxNames = Object.keys(hiddenJSON);
+        for(let i = 0; i < boxNames.length; i++){
+            trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
+        }
+
+        await ship(boxes, shippingData, trackingNumbers);
+        console.log("HERE");
+    })
 }
 
 export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked, shipmentCourier) => {
