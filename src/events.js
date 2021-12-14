@@ -2041,6 +2041,17 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     console.log(biospecimenData)
     const data = biospecimenData;
     removeAllErrors();
+
+    const checkboxes = Array.from(document.getElementsByClassName('tube-collected'));
+    if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+    checkboxes.forEach((dt) => {
+        if(biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
+        if(biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
+            biospecimenData[`${dt.id}`] = {};
+        }
+        biospecimenData[`${dt.id}`]['593843561'] = dt.checked ? 353358909 : 104430631;
+    });
+
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
     let hasError = false;
     let focus = true;
@@ -2098,7 +2109,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         await storeSpecimen([data]);
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
-        explanationTemplate(dt, specimenData);
+        finalizeTemplate(dt, specimenData);
     }
     else {
         await storeSpecimen([data]);
