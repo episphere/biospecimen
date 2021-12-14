@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking} from './pages/shipping.js';
@@ -798,7 +798,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
 
 }
 
-export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
+export const populateBoxManifestHeader= (boxId, hiddenJSON,currInstitute) => {
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
 
@@ -815,10 +815,10 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
         numTubes += currJSON['bags'][currJSONKeys[i]]['arrElements'].length;
     }
 
+    let newDiv = document.createElement("div")
     let newP = document.createElement("p");
     newP.innerHTML = boxId + " Manifest";
     document.getElementById('boxManifestCol1').appendChild(newP);
-
     let toInsertDate = ''
     if(currJSON.hasOwnProperty('672863981')){
         let dateStarted = Date.parse(currJSON['672863981'])
@@ -856,7 +856,11 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
     newP.innerHTML = "Last Modified: " + toInsertDate2;
     document.getElementById('boxManifestCol1').appendChild(newP);
     newP = document.createElement("p");
-    newP.innerHTML = "Number of Bags " + numBags;
+    newDiv = document.createElement("div")
+    newDiv.innerHTML = displayContactInformation(currInstitute,siteContactInformation)
+    document.getElementById('boxManifestCol1').appendChild(newDiv);
+
+    newP.innerHTML = "Number of Bags: " + numBags;
     document.getElementById('boxManifestCol3').appendChild(newP);
     newP = document.createElement("p");
     newP.innerHTML = "Number of Tubes:  " + numTubes;
@@ -1026,6 +1030,7 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
     let column2 = document.getElementById("boxManifestCol3")
 
     let newP = document.createElement("p");
+    let newDiv = document.createElement("div")
     newP.innerHTML = "Shipment Manifest";
     document.getElementById('boxManifestCol1').appendChild(newP);
 
@@ -1050,6 +1055,10 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
     newP = document.createElement("p");
     newP.innerHTML = "Sender: " + userName;
     document.getElementById('boxManifestCol1').appendChild(newP);
+
+    newDiv = document.createElement("div");
+    newDiv.innerHTML = displayContactInformation(site, siteContactInformation)
+    document.getElementById('boxManifestCol1').appendChild(newDiv);
 
     newP = document.createElement("p");
     newP.innerHTML = "Site: " + site;
@@ -2038,7 +2047,6 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
 }
 
 const collectionSubmission = async (dt, biospecimenData, cntd) => {
-    console.log(biospecimenData)
     const data = biospecimenData;
     removeAllErrors();
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
@@ -2733,11 +2741,12 @@ export const addEventViewManifestButton = (buttonId, currPage) => {
 }
 
 
-export const populateReportManifestHeader= (currPage) => {
+export const populateReportManifestHeader = (currPage) => {
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
+    let site = currPage["siteAcronym"]
 
-  
+    let newDiv = document.createElement("div")
     let newP = document.createElement("p");
     newP.innerHTML = currPage['132929440'] + " Manifest";
     document.getElementById('boxManifestCol1').appendChild(newP);
@@ -2778,8 +2787,8 @@ export const populateReportManifestHeader= (currPage) => {
     newP = document.createElement("p");
     newP.innerHTML = "Date Shipped: " + toInsertDate2;
     document.getElementById('boxManifestCol1').appendChild(newP);
-     
-
+    newDiv.innerHTML = displayContactInformation(site,siteContactInformation)
+    document.getElementById('boxManifestCol1').appendChild(newDiv) 
 }
 
 export const populateReportManifestTable = (currPage) => {
@@ -2837,12 +2846,6 @@ export const populateReportManifestTable = (currPage) => {
                 fullScannerName += currBox[bags[i]]['618036638'];
             }
             currRow.insertCell(3).innerHTML = fullScannerName;
-            if(currPage['bags'][bags[i]].hasOwnProperty('scanner') && j == 0){
-                currRow.insertCell(3).innerHTML = currBox[bags[i]]['scanner'];
-            }
-            else{
-                currRow.insertCell(3).innerHTML = '';
-            }
             if(i % 2 == 0){
                 currRow.style['background-color'] = "lightgrey";
             }
@@ -2924,4 +2927,32 @@ export const addEventFilter = () => {
 
     })
 
+}
+
+export const displayContactInformation = (site,siteContactInformation) => {
+  if(siteContactInformation.hasOwnProperty(site)){
+    let contactStr = ""
+    contactStr += `<p>Site Contact Information:</p>`
+    let numContacts = siteContactInformation[site].length
+    // iterate over length of existing site's contact array
+    for(let i= 0; i < numContacts;i++) {
+    contactStr += `${numContacts > 1 ? "<p>Contact ${i+1}</p>": ""}`
+    contactStr += `<p>${siteContactInformation[site][i].fullName}</p>`
+    contactStr += `<p>Email: ${siteContactInformation[site][i].email}</p>`
+    
+    let numPhones = siteContactInformation[site][i].phone.length
+    if(numPhones === 1){
+      contactStr += `<p>Phone: ${siteContactInformation[site][i].phone}</p>`  
+    }
+    else if(numPhones > 1){
+      contactStr += `<p>Phone:</p>`
+      for(let j = 0; j < numPhones; j++){
+        contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
+      }
+    }
+    else contactStr+= `<p>Phone:</p>`
+  }
+    return contactStr
+  }
+  else return ""
 }

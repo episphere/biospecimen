@@ -1,5 +1,5 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox, addEventSaveButton} from "./../events.js";
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation} from "./../shared.js"
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox, addEventSaveButton, displayContactInformation} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 const conversion = {
@@ -250,7 +250,6 @@ export const startShipping = async (userName) => {
     addEventModalAddBox(userName);
     hideAnimation();
     //addEventSubmitAddBag();
-    
 }
 
 export const boxManifest = async (boxId, userName) => {    
@@ -318,7 +317,7 @@ export const boxManifest = async (boxId, userName) => {
     
     //addEventNavBarShipment("returnToPackaging");
     //document.getElementById('boxManifestTable').appendChild(result);
-    populateBoxManifestHeader(boxId,boxJSONS);
+    populateBoxManifestHeader(boxId,boxJSONS,currInstitute);
     populateBoxManifestTable(boxId,hiddenJSON);
     addEventNavBarShipment("returnToPackaging", userName);
     document.getElementById('printBox').addEventListener('click', e => {
@@ -359,7 +358,6 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
         toDisplayJSON[currBox] = hiddenJSON[currBox];
         location = locations[currBox];
     }
-
     let template = `
         </br>
         <div id="shippingHiddenTable" style="display:none">
