@@ -137,23 +137,21 @@ export const tubeCollectedTemplate = (data, formData) => {
             }
         </div>
         </br>
-        <form id="tubeCollectionForm" method="POST">
+        <form id="biospecimenCollectionForm" method="POST">
             <div class="row">
                 <table class="table collection-table">
                     <thead>
                         <tr>
-                        <th class="align-left">Specimen Type</th>
-                        <th class="align-left">Sample Collected 
-                        <input class="custom-checkbox-size" type="checkbox" id="selectAllCollection">
-                        <label for="selectAllCollection">&nbsp;Check All</label>
-                        </th>
-                        <th class="align-left">Reason Not Collected</th> 
-                         <th class="align-left">Scan Full Specimen ID</th> 
-                         <th class="align-left"><input class="custom-checkbox-size" type="checkbox"id="selectAllCollection2">
-                         <label for="selectAllCollection2">&nbsp;Select For Deviation</label>
-                         </th> 
-                         <th class="align-left">Deviation Type</th> 
-                         <th class="align-left">Comments</th>
+                            <th class="align-left">Specimen Type</th>
+                            <th class="align-left">Sample Collected 
+                                <input class="custom-checkbox-size" type="checkbox" id="selectAllCollection">
+                                <label for="selectAllCollection">&nbsp;Check All</label>
+                            </th>
+                            <th class="align-left">Reason Not Collected</th> 
+                            <th class="align-left">Scan Full Specimen ID</th> 
+                            <th class="align-left">Select For Deviation</th>
+                            <th class="align-left">Deviation Type</th> 
+                            <th class="align-left">Comments</th>
                         </tr>
                         </thead>
                     <tbody>`
@@ -166,6 +164,9 @@ export const tubeCollectedTemplate = (data, formData) => {
                     }
                     siteTubesList?.forEach((obj, index) => {
 
+                        const notCollectedOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].tubeNotCollectedOptions;
+                        const deviationOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].deviationOptions;
+
                         let required = false;
                         if(formData[obj.concept] && formData[obj.concept]['593843561'] !== 104430631) {
                             required = true;
@@ -176,7 +177,21 @@ export const tubeCollectedTemplate = (data, formData) => {
                             <tr>
                                 <td>${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
                                 <td class="align-left">${obj.collectionChkBox === true ? `<input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="${obj.tubeType}" ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? 'checked': ''} id="${obj.concept}">`:``}</td>
-                                <td><select placeholder="Select..."><option>-</option></td>
+                                <td>`
+
+                                    if(notCollectedOptions) {
+                                        template += `
+                                            <select data-connect-id="${data.Connect_ID}" id="${obj.id}Reason">
+                                            <option value=""> -- Select Reason -- </option>`
+
+                                            notCollectedOptions.forEach(option => {
+                                                template += `<option ${formData[`${obj.concept}`]['883732523'] == `${option.concept}` ? 'selected' : ''} value=${option.concept}>${option.label}</option>`;
+                                            })
+
+                                        template += `</select>`    
+                                    }
+
+                                template += `
                                 <td>
                                     <input 
                                         type="text" 
@@ -202,14 +217,41 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         id="${obj.concept}Deviated"
                                     >`: ``}
                                 </td>
-                                <td><select placeholder="Select..."><option>-</option></td>
-                                <td><input type="text" placeholder="Comments"/></td>
+                                <td>`
+                                
+                                    if(obj.deviationChkBox) {
+                                        template += `
+                                            <select data-connect-id="${data.Connect_ID}" id="${obj.id}Deviated">
+                                            <option value=""> -- Select Deviation -- </option>`
+
+                                            deviationOptions.forEach(deviation => {
+                                                template += `<option ${formData[`${obj.concept}`]['248868659'] == `${deviation.concept}` ? 'selected' : ''} value=${deviation.concept}>${deviation.label}</option>`;
+                                            })
+
+                                        template += `</select>`  
+                                    }
+
+                                template += `
+                                </td>
+                                <td>${obj.deviationChkBox === true ? `
+                                    <input type="text" placeholder="Details (Optional)" id="${obj.id}DeviatedExplanation">${formData[obj.concept]['536710547'] ? formData[obj.concept]['536710547'] : '' }</input>
+
+                                    `: ``}
+                                </td>
+                                <td>${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? `<button class="btn btn-outline-primary" type="button" id="${obj.concept}collectEditBtn">Edit</button>` : ``}</td>
                                 </tr>
                         `   
                     });
                         template +=`
                     </tbody>
                 </table>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="collectionAdditionalNotes">Additional notes on collection</label>
+                    </br>
+                    <textarea rows=3 class="form-control" id="collectionAdditionalNotes">${formData['338570265'] ? `${formData["338570265"]}`: ''}</textarea>
+                </div>
             </div>
             </br>
             <div class="row">
@@ -227,5 +269,8 @@ export const tubeCollectedTemplate = (data, formData) => {
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventSelectAllCollection();
-    addEventTubeCollectedForm(data, `${formData['820476880']}`);
+    //addEventTubeCollectedForm(data, `${formData['820476880']}`);
+    addEventBiospecimenCollectionFormCntd(data, formData);
+    //addEventBiospecimenCollectionFormEdit(data, formData);
+    //addEventBiospecimenCollectionFormText(data, formData);
 }
