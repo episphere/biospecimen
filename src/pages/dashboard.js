@@ -164,7 +164,7 @@ export const searchResults = (result) => {
                         <th>Date of birth</th>
                         <th>Address</th>
                         <th>Connect ID</th>
-                        <th>Study Status</th>
+                        <th>Verification Status</th>
                         <th>Participant Status</th>
                         <th></th>
                         <th></th>
