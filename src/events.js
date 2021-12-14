@@ -2677,7 +2677,7 @@ export const addEventViewManifestButton = (buttonId, currPage) => {
 }
 
 
-export const populateReportManifestHeader= async (currPage) => {
+export const populateReportManifestHeader = (currPage) => {
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
     let site = currPage["siteAcronym"]
