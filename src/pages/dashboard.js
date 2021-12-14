@@ -175,6 +175,10 @@ export const searchResults = (result) => {
 
         if(data['821247024'] === 922622075) return;
 
+        // whether the participant is checked in already.
+        //TODO: replace hard coded value
+        const checkedIn = false; 
+        
         template += `
             <tr>
                 <td>${data['996038075']}</td>
@@ -185,10 +189,16 @@ export const searchResults = (result) => {
                 <td>${data.Connect_ID}</td>
                 <td>${conversion[data['821247024']]}</td>
                 <td>${data['773707518'] === 353358909 || data['831041022'] === 353358909 || data['747006172'] === 353358909 ? `<i class="fas fa-2x fa-times"></i>` : `<i class="fas fa-2x fa-check"></i>`}</td>
-                <td><button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>Go to check-in</button></td>
+                
+                <td>
+                ${!checkedIn ? 
+                `<button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>Go to check-in</button>` :
+                `<button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>Go to check-out</button>`}
+                </td>
                 <td>
                 <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
-                <button class="btn btn-outline-primary text-nowrap" id="checkInComplete">Specimen Link</button></td>
+                ${!checkedIn ? `<button class="btn btn-outline-primary text-nowrap" id="checkInComplete">Specimen Link</button>` : ``}
+                </td>
             </tr>
         `
     });
