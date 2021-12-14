@@ -798,7 +798,8 @@ export const populateSpecimensList = async (hiddenJSON) => {
 
 }
 
-export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
+export const populateBoxManifestHeader= (boxId, hiddenJSON,currInstitute) => {
+  console.log(boxId, hiddenJSON,currInstitute)
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
 
@@ -815,10 +816,10 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
         numTubes += currJSON['bags'][currJSONKeys[i]]['arrElements'].length;
     }
 
+    let newDiv = document.createElement("div")
     let newP = document.createElement("p");
     newP.innerHTML = boxId + " Manifest";
     document.getElementById('boxManifestCol1').appendChild(newP);
-
     let toInsertDate = ''
     if(currJSON.hasOwnProperty('672863981')){
         let dateStarted = Date.parse(currJSON['672863981'])
@@ -856,6 +857,10 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON) => {
     newP.innerHTML = "Last Modified: " + toInsertDate2;
     document.getElementById('boxManifestCol1').appendChild(newP);
     newP = document.createElement("p");
+    newDiv = document.createElement("div")
+    newDiv.innerHTML = displayContactInformation(currInstitute,siteContactInformation)
+    document.getElementById('boxManifestCol1').appendChild(newDiv);
+
     newP.innerHTML = "Number of Bags: " + numBags;
     document.getElementById('boxManifestCol3').appendChild(newP);
     newP = document.createElement("p");
@@ -1056,7 +1061,7 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
     newP.innerHTML = "Sender: " + userName;
     document.getElementById('boxManifestCol1').appendChild(newP);
 
-    newDiv = document.createElement("p");
+    newDiv = document.createElement("div");
     newDiv.innerHTML = displayContactInformation(site, siteContactInformation)
     document.getElementById('boxManifestCol1').appendChild(newDiv);
 
@@ -2646,11 +2651,12 @@ export const addEventViewManifestButton = (buttonId, currPage) => {
 }
 
 
-export const populateReportManifestHeader= (currPage) => {
+export const populateReportManifestHeader= async (currPage) => {
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
+    let site = currPage["siteAcronym"]
 
-  
+    let newDiv = document.createElement("div")
     let newP = document.createElement("p");
     newP.innerHTML = currPage['132929440'] + " Manifest";
     document.getElementById('boxManifestCol1').appendChild(newP);
@@ -2691,8 +2697,8 @@ export const populateReportManifestHeader= (currPage) => {
     newP = document.createElement("p");
     newP.innerHTML = "Date Shipped: " + toInsertDate2;
     document.getElementById('boxManifestCol1').appendChild(newP);
-     
-
+    newDiv.innerHTML = displayContactInformation(site,siteContactInformation)
+    document.getElementById('boxManifestCol1').appendChild(newDiv) 
 }
 
 export const populateReportManifestTable = (currPage) => {
@@ -2840,36 +2846,25 @@ export const addEventFilter = () => {
 }
 
 export const displayContactInformation = (site,siteContactInformation) => {
-  // Find if site exists in Object
-  // 
   if(siteContactInformation.hasOwnProperty(site)){
-    // console.log(currentSite)
-    // console.log(siteContactInformation[site])
-    // console.log(siteContactInformation[site][0])
     let contactStr = ""
     contactStr += `<p>Site Contact Information:</p>`
-    // contactStr += `<p>${siteContactInformation[site][0].fullName}</p>`
-    // contactStr += `<p>Email: ${siteContactInformation[site][0].email}</p>`
-    // contactStr += `<p>Phone: ${siteContactInformation[site][0].phone}</p>`
-    // debugger
-    // ================ ADD BACK ================
-
     let numContacts = siteContactInformation[site].length
-    console.log(siteContactInformation[site], numContacts)
+    // console.log(siteContactInformation[site], numContacts)
     // iterate over length of existing site's contact array
     for(let i= 0; i < numContacts;i++) {
     contactStr += `${numContacts > 1 ? "<p>Contact ${i+1}</p>": ""}`
     contactStr += `<p>${siteContactInformation[site][i].fullName}</p>`
     contactStr += `<p>Email: ${siteContactInformation[site][i].email}</p>`
     
-    let numPhones = siteContactInformation[site][i].phone
-    console.log(numPhones.length,numPhones)
-    if(numPhones.length === 1){
+    let numPhones = siteContactInformation[site][i].phone.length
+    // console.log(numPhones)
+    if(numPhones === 1){
       contactStr += `<p>Phone: ${siteContactInformation[site][i].phone}</p>`  
     }
-    else if(numPhones.length > 1){
+    else if(numPhones > 1){
       contactStr += `<p>Phone:</p>`
-      for(let j = 0; j < numPhones.length; j++){
+      for(let j = 0; j < numPhones; j++){
         contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
       }
     }
@@ -2879,18 +2874,3 @@ export const displayContactInformation = (site,siteContactInformation) => {
   }
   else return ""
 }
-
-// const getPhoneNumbers =
-/* 
-STEPS
-
-1. Find length of full contact for site and store in variable
-2. Find Length of individual information and store in variable 
-  - name***
-  - email***
-  - phone***
-3. Create P tags according to number 
-4. Only one Available information no line break
-5. More than one individual information add line break
-
-*/
