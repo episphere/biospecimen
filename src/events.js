@@ -1752,7 +1752,7 @@ export const addEventCheckInCompleteForm = () => {
             text: "Particpant has been checked in.",
              buttons: {
                  cancel: {
-                     text: "Cancel",
+                     text: "Close",
                      value: "cancel",
                      visible: true,
                      className: "btn btn-default",
