@@ -1878,7 +1878,7 @@ const btnsClicked = async (connectId, formData, cont) => {
         text:`Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n || ""}`,
          buttons: {
              cancel: {
-                 text: "Cancel",
+                 text: "Close",
                  value: "cancel",
                  visible: true,
                  className: "btn btn-default",
