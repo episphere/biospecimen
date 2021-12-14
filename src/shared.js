@@ -246,6 +246,24 @@ export const removeAllErrors = () => {
     })
 }
 
+export const removeSingleError = (id) => {
+    const elements = document.getElementsByClassName('form-error');
+    Array.from(elements).forEach(element => {
+        
+        const errorMsg = element.parentNode;
+        const parent = element.parentNode.parentNode;
+        
+        if(parent.contains(document.getElementById(id))) parent.removeChild(errorMsg);
+        
+    });
+    const invalids = document.getElementsByClassName('invalid');
+    Array.from(invalids).forEach(element => {
+        if(element.id === id){
+            element.classList.remove('invalid');
+        }
+    })
+}
+
 export const storeSpecimen = async (array) => {
     const idToken = await getIdToken();
     let requestObj = {

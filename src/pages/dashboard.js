@@ -78,7 +78,7 @@ export const searchTemplate = (goToSpecimenSearch) => {
                         <form id="search3" method="POST">
                             <div class="form-group">
                                 <label class="col-form-label search-label">Phone no.</label>
-                                <input class="form-control" autocomplete="off" required type="text" maxlength="10" id="phone" placeholder="Enter Phone No."/>
+                                <input class="form-control" autocomplete="off" required type="text" maxlength="12" id="phone" placeholder="XXX-XXX-XXXX" pattern="\\d{3}-\\d{3}-\\d{4}"/>
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-outline-primary">Search</button>
