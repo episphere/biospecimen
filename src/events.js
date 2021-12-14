@@ -2782,12 +2782,6 @@ export const populateReportManifestTable = (currPage) => {
                 fullScannerName += currBox[bags[i]]['618036638'];
             }
             currRow.insertCell(3).innerHTML = fullScannerName;
-            // if(currPage['bags'][bags[i]].hasOwnProperty('scanner') && j == 0){
-            //     currRow.insertCell(3).innerHTML = currBox[bags[i]]['scanner'];
-            // }
-            // else{
-            //     currRow.insertCell(3).innerHTML = '';
-            // }
             if(i % 2 == 0){
                 currRow.style['background-color'] = "lightgrey";
             }
