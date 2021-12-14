@@ -165,13 +165,43 @@ export const tubeCollectedTemplate = (data, formData) => {
                     //    template += `<tr><td>No data.</td></tr>`;
                     }
                     siteTubesList?.forEach((obj, index) => {
+
+                        let required = false;
+                        if(formData[obj.concept] && formData[obj.concept]['593843561'] !== 104430631) {
+                            required = true;
+                            if(obj.concept === '223999569' && formData['143615646']['593843561'] === 104430631) required = false;
+                        }
+
                         template += `
                             <tr>
                                 <td>${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
                                 <td class="align-left">${obj.collectionChkBox === true ? `<input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="${obj.tubeType}" ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? 'checked': ''} id="${obj.concept}">`:``}</td>
                                 <td><select placeholder="Select..."><option>-</option></td>
-                                <td><input type="text" placeholder="Scan Full Specimen ID"/></td>
-                                <td><input type="checkbox"/></td>
+                                <td>
+                                    <input 
+                                        type="text" 
+                                        autocomplete="off" 
+                                        id="${obj.concept}Id" 
+                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['825582494'] ? `value='${formData[`${obj.concept}`]['825582494']}'`: ``}
+                                        class="form-control ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} input-barcode-id" 
+                                        ${required ? 'required' : ''} 
+                                        ${(formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494']) || (formData[`${obj.concept}`]['593843561'] === 104430631) ? 'disabled' : ''}
+                                        placeholder="Scan/Type in Full Specimen ID"
+                                        style="font-size:1.3rem;"
+                                    >
+                                </td>
+                                <td>${obj.deviationChkBox === true ? `
+                                    <input 
+                                        type="checkbox" 
+                                        data-tube-label="${obj.specimenType}" 
+                                        data-tube-color="${obj.tubeColor}"
+                                        class="tube-deviated custom-checkbox-size ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''}" 
+                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['678857215'] === 353358909 ? 'checked': ''} 
+                                        data-tube-type="${obj.tubeType}" 
+                                        ${formData[`${obj.concept}`]['593843561'] === 353358909 && !formData[`${obj.concept}`]['825582494'] ? '': 'disabled'} 
+                                        id="${obj.concept}Deviated"
+                                    >`: ``}
+                                </td>
                                 <td><select placeholder="Select..."><option>-</option></td>
                                 <td><input type="text" placeholder="Comments"/></td>
                                 </tr>
