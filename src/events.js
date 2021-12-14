@@ -799,7 +799,6 @@ export const populateSpecimensList = async (hiddenJSON) => {
 }
 
 export const populateBoxManifestHeader= (boxId, hiddenJSON,currInstitute) => {
-  console.log(boxId, hiddenJSON,currInstitute)
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
 
@@ -996,13 +995,9 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                 //addEventNavBarBoxManifest("viewBoxManifestBlood")
                 //if(hiddenJSON[boxes[i]])
                 //table.deleteRow(index);
-                debugger;
-                return
             })
         }    
     }
-    debugger;
-    return;
 }
 
 export const populateTempNotification = async () => {
@@ -1956,7 +1951,6 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
 }
 
 const collectionSubmission = async (dt, biospecimenData, cntd) => {
-    console.log(biospecimenData)
     const data = biospecimenData;
     removeAllErrors();
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
@@ -2850,7 +2844,6 @@ export const displayContactInformation = (site,siteContactInformation) => {
     let contactStr = ""
     contactStr += `<p>Site Contact Information:</p>`
     let numContacts = siteContactInformation[site].length
-    // console.log(siteContactInformation[site], numContacts)
     // iterate over length of existing site's contact array
     for(let i= 0; i < numContacts;i++) {
     contactStr += `${numContacts > 1 ? "<p>Contact ${i+1}</p>": ""}`
@@ -2858,7 +2851,6 @@ export const displayContactInformation = (site,siteContactInformation) => {
     contactStr += `<p>Email: ${siteContactInformation[site][i].email}</p>`
     
     let numPhones = siteContactInformation[site][i].phone.length
-    // console.log(numPhones)
     if(numPhones === 1){
       contactStr += `<p>Phone: ${siteContactInformation[site][i].phone}</p>`  
     }
