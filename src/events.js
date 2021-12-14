@@ -1750,11 +1750,12 @@ export const addEventSelectParticipantForm = (skipCheckIn) => {
     })
 }
 
-export const addEventCheckInCompleteForm = () => {
+export const addEventCheckInCompleteForm = (skipFlag = false) => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
 
+        if(!skipFlag){
         const confirmVal = await swal({
             title:"Success", 
             icon:"success",
@@ -1780,6 +1781,8 @@ export const addEventCheckInCompleteForm = () => {
      
         if(confirmVal === "cancel") return;
 
+        }
+        
         let formData   = {};
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);

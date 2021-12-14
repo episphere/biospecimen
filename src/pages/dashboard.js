@@ -196,7 +196,7 @@ export const searchResults = (result) => {
 
     document.getElementById('contentBody').innerHTML = template;
     addEventBackToSearch('navBarSearch');
-    addEventCheckInCompleteForm();
+    addEventCheckInCompleteForm(true);
     if (getWorflow() === 'clinical') {
         addGoToCheckInEvent();
       //  addEventSelectParticipantForm(true);
