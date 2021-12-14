@@ -595,19 +595,6 @@ export const siteFullNames = {
 }
 
 export const siteContactInformation = {
-  "NCI1":[{
-    "fullName":"",
-    "email":"",
-    "phone":[""],
-  }],
-  "NCI":[{
-    "fullName":"Erin Schwartz",
-    "email":"Erin.C.Schwartz@HealthPartners.com",
-    "phone":[
-     "Office: (651) 495-6371",
-     "Cell: (612) 836-7885"
-    ]
-  }],
   "UCM":[{
     "fullName":"Jaime King",
     "email":"jaimeking@bsd.uchicago.edu",
