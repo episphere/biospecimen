@@ -152,6 +152,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                             <th class="align-left">Select For Deviation</th>
                             <th class="align-left">Deviation Type</th> 
                             <th class="align-left">Comments</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>`
@@ -176,17 +177,27 @@ export const tubeCollectedTemplate = (data, formData) => {
                         template += `
                             <tr>
                                 <td>${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
-                                <td class="align-left">${obj.collectionChkBox === true ? `<input type="checkbox" class="tube-collected custom-checkbox-size" data-tube-type="${obj.tubeType}" ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? 'checked': ''} id="${obj.concept}">`:``}</td>
+                                <td class="align-left">${obj.collectionChkBox === true ? `
+                                    <input type="checkbox" 
+                                        class="tube-collected custom-checkbox-size" 
+                                        data-tube-type="${obj.tubeType}" ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? 'checked': ''} 
+                                        id="${obj.concept}"
+                                    >`
+                                    :``}</td>
                                 <td>`
 
                                     if(notCollectedOptions) {
                                         template += `
-                                            <select data-connect-id="${data.Connect_ID}" id="${obj.concept}Reason">
-                                            <option value=""> -- Select Reason -- </option>`
+                                            <select 
+                                                data-connect-id="${data.Connect_ID}" 
+                                                id="${obj.concept}Reason"
+                                                style="width:200px"
+                                            >
+                                                <option value=""> -- Select Reason -- </option>`
 
-                                            notCollectedOptions.forEach(option => {
-                                                template += `<option ${formData[`${obj.concept}`]['883732523'] == `${option.concept}` ? 'selected' : ''} value=${option.concept}>${option.label}</option>`;
-                                            })
+                                                notCollectedOptions.forEach(option => {
+                                                    template += `<option ${formData[`${obj.concept}`]['883732523'] == `${option.concept}` ? 'selected' : ''} value=${option.concept}>${option.label}</option>`;
+                                                })
 
                                         template += `</select>`    
                                     }
@@ -200,9 +211,8 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['825582494'] ? `value='${formData[`${obj.concept}`]['825582494']}'`: ``}
                                         class="form-control ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} input-barcode-id" 
                                         ${required ? 'required' : ''} 
-                                        ${(formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494']) || (formData[`${obj.concept}`]['593843561'] === 104430631) ? 'disabled' : ''}
                                         placeholder="Scan/Type in Full Specimen ID"
-                                        style="font-size:1.3rem;"
+                                        style="font-size:1.3rem; width:200px"
                                     >
                                 </td>
                                 <td>${obj.deviationChkBox === true ? `
@@ -210,10 +220,9 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         type="checkbox" 
                                         data-tube-label="${obj.specimenType}" 
                                         data-tube-color="${obj.tubeColor}"
-                                        class="tube-deviated custom-checkbox-size ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''}" 
+                                        class="tube-deviated custom-checkbox-size 
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['678857215'] === 353358909 ? 'checked': ''} 
                                         data-tube-type="${obj.tubeType}" 
-                                        ${formData[`${obj.concept}`]['593843561'] === 353358909 && !formData[`${obj.concept}`]['825582494'] ? '': 'disabled'} 
                                         id="${obj.concept}Deviated"
                                     >`: ``}
                                 </td>
@@ -221,12 +230,16 @@ export const tubeCollectedTemplate = (data, formData) => {
                                 
                                     if(obj.deviationChkBox) {
                                         template += `
-                                            <select data-connect-id="${data.Connect_ID}" id="${obj.concept}Deviation">
-                                            <option value=""> -- Select Deviation -- </option>`
+                                            <select 
+                                                data-connect-id="${data.Connect_ID}" 
+                                                id="${obj.concept}Deviation"
+                                                style="width:200px"
+                                            >
+                                                <option value=""> -- Select Deviation -- </option>`
 
-                                            deviationOptions.forEach(deviation => {
-                                                template += `<option ${formData[`${obj.concept}`]['248868659'] == `${deviation.concept}` ? 'selected' : ''} value=${deviation.concept}>${deviation.label}</option>`;
-                                            })
+                                                deviationOptions.forEach(deviation => {
+                                                    template += `<option ${formData[`${obj.concept}`]['248868659'] == `${deviation.concept}` ? 'selected' : ''} value=${deviation.concept}>${deviation.label}</option>`;
+                                                })
 
                                         template += `</select>`  
                                     }
@@ -242,7 +255,15 @@ export const tubeCollectedTemplate = (data, formData) => {
                                     >
                                     `: ``}
                                 </td>
-                                <td>${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? `<button class="btn btn-outline-primary" type="button" id="${obj.concept}collectEditBtn">Edit</button>` : ``}</td>
+                                <td>${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? `
+                                    <button 
+                                        class="btn btn-outline-primary" 
+                                        type="button" 
+                                        id="${obj.concept}collectEditBtn">
+                                        Edit
+                                    </button>` 
+                                    : ``}
+                                </td>
                             </tr>
                         `   
                     });
