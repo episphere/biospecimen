@@ -2439,8 +2439,10 @@ export const addEventSaveButton = (hiddenJSON) => {
             trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
         }
 
-        await ship(boxes, shippingData, trackingNumbers);
         console.log("HERE");
+        console.log("TEST")
+        debugger;
+        return;
     })
 }
 

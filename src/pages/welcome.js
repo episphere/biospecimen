@@ -15,6 +15,20 @@ export const welcomeScreen = async (auth, route) => {
         return;
     }
     welcomeScreenTemplate(name, response.data, auth, route);
+
+    let trackingNum = localforage.createInstance({
+      name:"courier",
+    })
+    trackingNum.setItem("tracking", "test");
+
+    trackingNum.getItem('tracking').then(function(value) {
+      // This code runs once the value has been loaded
+      // from the offline store.
+      console.log(value);
+  }).catch(function(err) {
+      // This code runs if there were any errors
+      console.log(err);
+  });
 }
 
 const welcomeScreenTemplate = (name, data, auth, route) => {
@@ -94,3 +108,4 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
         //shippingDashboard(auth, route, true);
     });
 }
+
