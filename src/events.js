@@ -2615,16 +2615,15 @@ export const populateBoxTable = async (page, filter) => {
     var rowCount = currTable.rows.length;
     let currRow = currTable.insertRow(rowCount);
     currRow.insertCell(0).innerHTML = "Tracking Number";
-    currRow.insertCell(1).innerHTML = "Courier";
-    currRow.insertCell(2).innerHTML = "Date Shipped";
-    currRow.insertCell(3).innerHTML = "Shipping Location";
-    currRow.insertCell(4).innerHTML = "Box Id";
-    currRow.insertCell(5).innerHTML = "Number of Tubes";
-    currRow.insertCell(6).innerHTML = "View Manifest";
-    currRow.insertCell(7).innerHTML = "Status";
-    currRow.insertCell(8).innerHTML = "Date Received";
-    currRow.insertCell(9).innerHTML = "# Tubes Received";
-    currRow.insertCell(10).innerHTML = "Condition";
+    currRow.insertCell(1).innerHTML = "Date Shipped";
+    currRow.insertCell(2).innerHTML = "Shipping Location";
+    currRow.insertCell(3).innerHTML = "Box Id";
+    currRow.insertCell(4).innerHTML = "View Manifest";
+    currRow.insertCell(5).innerHTML = `Received<span style="display:block;">(Yes/No)</span>`;
+    currRow.insertCell(6).innerHTML = "Date Received";
+    currRow.insertCell(7).innerHTML = "Condition";
+    currRow.insertCell(8).innerHTML = "Comments"
+    
     let conversion = {
         "712278213":"FedEx",
         "149772928":"World Courier"
@@ -2652,16 +2651,14 @@ export const populateBoxTable = async (page, filter) => {
 */
         }
         currRow.insertCell(0).innerHTML = currPage.hasOwnProperty('959708259') ? currPage['959708259'] : '';
-        currRow.insertCell(1).innerHTML = currPage.hasOwnProperty('666553960') ? conversion[currPage['666553960']] : '';
-        currRow.insertCell(2).innerHTML = shippedDate;
-        currRow.insertCell(3).innerHTML = currPage['560975149'];
-        currRow.insertCell(4).innerHTML = currPage['132929440'];
-        currRow.insertCell(5).innerHTML = numTubes;
-        currRow.insertCell(6).innerHTML = '<button type="button" class="button" id="reportsViewManifest' + i + '">View manifest</button>';
-        currRow.insertCell(7).innerHTML = '';
+        currRow.insertCell(1).innerHTML = shippedDate;
+        currRow.insertCell(2).innerHTML = currPage['560975149'];
+        currRow.insertCell(3).innerHTML = currPage['132929440'];
+        currRow.insertCell(4).innerHTML = '<button type="button" class="button" id="reportsViewManifest' + i + '">View manifest</button>';
+        currRow.insertCell(5).innerHTML = '';
+        currRow.insertCell(6).innerHTML = '';
+        currRow.insertCell(7).innerHTML = currPage.hasOwnProperty('') ? currPage[''] : '';
         currRow.insertCell(8).innerHTML = '';
-        currRow.insertCell(9).innerHTML = currPage.hasOwnProperty('') ? currPage[''] : '';
-        currRow.insertCell(10).innerHTML = '';
         addEventViewManifestButton('reportsViewManifest' + i, currPage);
         
     }
