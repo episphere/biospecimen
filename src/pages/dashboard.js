@@ -176,7 +176,7 @@ export const searchResults = (result) => {
         if(data['821247024'] === 922622075) return;
 
         // whether the participant is checked in already.
-        //TODO: replace hard coded value
+        //TODO: replace hard coded value and persist through local storage
         const checkedIn = false; 
         
         template += `
