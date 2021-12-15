@@ -4,8 +4,8 @@ import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollect
 export const finalizeTemplate = (data, specimenData) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenFinalize');
-    navBarBtn.classList.remove('disabled');
-    navBarBtn.classList.add('active');
+    navBarBtn?.classList.remove('disabled');
+    navBarBtn?.classList.add('active');
     let template = '';
 
     template += `
@@ -34,6 +34,7 @@ export const finalizeTemplate = (data, specimenData) => {
                     <tr>
                         <th>Specimen Type</th>
                         ${getWorflow() === 'clinical' ? `<th>Received</th>`:`<th>Collected</th>`}
+                        <th>Reason</th>
                         <th>Full Specimen ID</th>
                         <th>Deviation</th>
                         <th>Deviation Type</th>
@@ -43,14 +44,19 @@ export const finalizeTemplate = (data, specimenData) => {
                 <tbody>`
                 const siteTubesList = getSiteTubesLists(specimenData)
                 siteTubesList.forEach((obj, index) => {
+
+                    const notCollectedOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].tubeNotCollectedOptions;
+                    const deviationOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].deviationOptions;
+
                     template += `
                         <tr>
                             <td>${obj.specimenType}</td>
                             <td>${obj.collectionChkBox === true ? `${specimenData[`${obj.concept}`]['593843561'] === 353358909 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>'}` : ``}</td>
+                            <td>${specimenData[`${obj.concept}`]['883732523'] ? notCollectedOptions.filter(option => option.concept == specimenData[`${obj.concept}`]['883732523'])[0].label : ''}</td>
                             <td>${specimenData[`${obj.concept}`]['593843561'] === 353358909 ? `${specimenData[`${obj.concept}`]['825582494']}` : '' }</td>
                             <td>${obj.deviationChkBox === true ? `${specimenData[`${obj.concept}`]['678857215'] === 353358909 ? 'Yes' : 'No'}`: ``}</td>
-                            <td class="deviation-comments-width">${specimenData[`${obj.concept}`]['248868659'] ? specimenData[`${obj.concept}`]['248868659'].map(concept => obj.deviationOptions.filter(dt => dt.concept === concept)[0].label) : ''}</td>
-                            <td class="deviation-comments-width">${specimenData[`${obj.concept}`]['248868659'] ? specimenData[`${obj.concept}`]['248868659'].map(concept => obj.deviationOptions.filter(dt => dt.concept === concept)[0].label) : ''}</td>
+                            <td class="deviation-comments-width">${specimenData[`${obj.concept}`]['248868659'] ? deviationOptions.filter(deviation => deviation.concept == specimenData[`${obj.concept}`]['248868659'])[0].label : ''}</td>
+                            <td class="deviation-comments-width">${specimenData[`${obj.concept}`]['536710547'] ? specimenData[`${obj.concept}`]['536710547'] : ''}</td>
                         </tr>
                     `
                 });

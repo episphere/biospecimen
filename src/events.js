@@ -1965,7 +1965,7 @@ export const addEventBiospecimenCollectionFormCntd = (dt, biospecimenData) => {
 };
 
 export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
-    const collectionSaveExit = document.getElementById('collectionSaveExit');
+    const collectionSaveExit = document.getElementById('collectionSave');
     collectionSaveExit.addEventListener('click', () => {
         collectionSubmission(dt, biospecimenData);
     });
@@ -2056,6 +2056,17 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
 const collectionSubmission = async (dt, biospecimenData, cntd) => {
     const data = biospecimenData;
     removeAllErrors();
+
+    const checkboxes = Array.from(document.getElementsByClassName('tube-collected'));
+    if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+    checkboxes.forEach((dt) => {
+        if(biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
+        if(biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
+            biospecimenData[`${dt.id}`] = {};
+        }
+        biospecimenData[`${dt.id}`]['593843561'] = dt.checked ? 353358909 : 104430631;
+    });
+
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
     let hasError = false;
     let focus = true;
@@ -2100,6 +2111,46 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         if(input.required) data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim();
     });
     if((hasError && cntd == true) || hasCntdError) return;
+
+    const textAreas = document.getElementsByClassName('additional-explanation');
+
+    const reasons = Array.from(document.querySelectorAll('[id$="Reason"]'));
+    const deviations = Array.from(document.querySelectorAll('[id$="Deviation"]'));
+
+    reasons.forEach(reason => {
+        const tubeId = reason.id.replace('Reason', '');
+
+        biospecimenData[tubeId]['883732523'] = reason.value;
+        
+        // biospecimenData[tubeId]['338286049'] = ta.value.trim();
+    });
+
+    deviations.forEach(deviation => {
+        const tubeId = deviation.id.replace('Deviation', '');
+        const deviationNotes = document.getElementById(tubeId + 'DeviatedExplanation');
+
+        biospecimenData[tubeId]['248868659'] = deviation.value;
+        biospecimenData[tubeId]['536710547'] = deviationNotes.value.trim();
+
+        // Discard tube
+        if(biospecimenData[tubeId]['248868659'].includes(472864016) || biospecimenData[tubeId]['248868659'].includes(956345366)) {
+            biospecimenData[tubeId]['762124027'] = 353358909
+        }
+        else {
+            biospecimenData[tubeId]['762124027'] = 104430631
+        }
+
+        if(biospecimenData[tubeId]['248868659'].includes(453343022) && !ta.value.trim()) { // If other is selected, make text area mandatory.
+            hasError = true;
+            errorMessage(ta.id, 'Please provide more details', focus);
+            focus = false;
+            return
+        }
+
+    });
+
+    if(hasError) return;
+
     data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
     Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[dt.id.replace('Deviated', '')]['678857215'] = dt.checked ? 353358909 : 104430631)
     Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === false).forEach(dt => biospecimenData[dt.id.replace('Deviated', '')]['248868659'] = '')
@@ -2113,12 +2164,27 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         await storeSpecimen([data]);
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
-        explanationTemplate(dt, specimenData);
+        finalizeTemplate(dt, specimenData);
     }
     else {
         await storeSpecimen([data]);
+
+        await swal({
+            title:"Success", 
+            icon:"success",
+            text: "Collection specimen data has been saved",
+             buttons: {
+                 close: {
+                     text: "Close",
+                     value: "close",
+                     visible: true,
+                     className: "btn btn-success",
+                     closeModal: true,
+                }
+            },
+        });
+
         hideAnimation();
-        searchTemplate();
     }
 }
 
