@@ -2105,9 +2105,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     reasons.forEach(reason => {
         const tubeId = reason.id.replace('Reason', '');
 
-        if(reason.value) {
-            biospecimenData[tubeId]['883732523'] = reason.value;
-        }
+        biospecimenData[tubeId]['883732523'] = reason.value;
         
         // biospecimenData[tubeId]['338286049'] = ta.value.trim();
     });
@@ -2155,8 +2153,23 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     }
     else {
         await storeSpecimen([data]);
+
+        await swal({
+            title:"Success", 
+            icon:"success",
+            text: "Collection specimen data has been saved",
+             buttons: {
+                 close: {
+                     text: "Close",
+                     value: "close",
+                     visible: true,
+                     className: "btn btn-success",
+                     closeModal: true,
+                }
+            },
+        });
+
         hideAnimation();
-        searchTemplate();
     }
 }
 

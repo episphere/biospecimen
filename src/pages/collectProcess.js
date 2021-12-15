@@ -243,7 +243,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                     `: ``}
                                 </td>
                                 <td>${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? `<button class="btn btn-outline-primary" type="button" id="${obj.concept}collectEditBtn">Edit</button>` : ``}</td>
-                                </tr>
+                            </tr>
                         `   
                     });
                         template +=`
