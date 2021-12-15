@@ -1107,12 +1107,16 @@ export const populateShippingManifestBody = (hiddenJSON) =>{
                 }
 
                 currRow.insertCell(2).innerHTML= currTube;
-                if(hiddenJSON[boxes[i]][specimen].hasOwnProperty('scanner') && k == 0){
-                    currRow.insertCell(3).innerHTML = hiddenJSON[boxes[i]][specimen]['scanner']
+                let fullScannerName = ''
+                
+                if(hiddenJSON[boxes[i]][specimen].hasOwnProperty('469819603') && k == 0){
+                  fullScannerName += hiddenJSON[boxes[i]][specimen]['469819603'] + ' '
                 }
-                else{
-                    currRow.insertCell(3).innerHTML = '';
+                if(hiddenJSON[boxes[i]][specimen].hasOwnProperty('618036638') && k == 0){
+                  fullScannerName += hiddenJSON[boxes[i]][specimen]['618036638']
                 }
+                currRow.insertCell(3).innerHTML = fullScannerName
+
                 if(greyIndex % 2 == 0){
                     currRow.style['background-color'] = "lightgrey";
                 }
@@ -2623,7 +2627,7 @@ export const populateBoxTable = async (page, filter) => {
     currRow.insertCell(6).innerHTML = "Date Received";
     currRow.insertCell(7).innerHTML = "Condition";
     currRow.insertCell(8).innerHTML = "Comments"
-    
+
     let conversion = {
         "712278213":"FedEx",
         "149772928":"World Courier"
@@ -2724,6 +2728,7 @@ export const populateReportManifestHeader = (currPage) => {
     document.getElementById('boxManifestCol1').appendChild(newDiv) 
 }
 
+//***
 export const populateReportManifestTable = (currPage) => {
     let currTable = document.getElementById('boxManifestTable');
     
