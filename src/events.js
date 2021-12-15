@@ -2096,6 +2096,55 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         if(input.required) data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim();
     });
     if((hasError && cntd == true) || hasCntdError) return;
+
+    const textAreas = document.getElementsByClassName('additional-explanation');
+
+    const reasons = Array.from(document.querySelectorAll('[id$="Reason"]'));
+    const deviations = Array.from(document.querySelectorAll('[id$="Deviation"]'));
+    const explanations = Array.from(document.querySelectorAll('[id$="DeviatedExplanation"]'));
+
+    reasons.forEach(reason => {
+        const tubeId = reason.id.replace('Reason', '')
+
+        if(reason.value) {
+            biospecimenData[tubeId]['883732523'] = reason.value;
+        }
+        
+        // biospecimenData[tubeId]['338286049'] = ta.value.trim();
+    });
+
+    Array.from(textAreas).forEach(ta => {
+        const tubeId = ta.id.replace('Explanation','').replace('Deviated', '');
+        if(document.getElementById(ta.id.replace('Explanation', 'Reason')).multiple) { // Deviation
+            biospecimenData[tubeId]['248868659'] = Array.from(document.getElementById(ta.id.replace('Explanation', 'Reason'))).filter(el => el.selected).map(el => parseInt(el.value));
+            biospecimenData[tubeId]['536710547'] = ta.value.trim();
+            // Discard tube
+            if(biospecimenData[tubeId]['248868659'].includes(472864016) || biospecimenData[tubeId]['248868659'].includes(956345366)) {
+                biospecimenData[tubeId]['762124027'] = 353358909
+            }
+            else {
+                biospecimenData[tubeId]['762124027'] = 104430631
+            }
+            if(biospecimenData[tubeId]['248868659'].includes(453343022) && !ta.value.trim()) { // If other is selected, make text area mandatory.
+                hasError = true;
+                errorMessage(ta.id, 'Please provide more details', focus);
+                focus = false;
+                return
+            }
+        }
+        else { // Tubes not collected
+            biospecimenData[tubeId]['883732523'] = parseInt(document.getElementById(ta.id.replace('Explanation', 'Reason')).value);
+            biospecimenData[tubeId]['338286049'] = ta.value.trim();
+            if(biospecimenData[tubeId]['883732523'] === 181769837 && !ta.value.trim()) {
+                hasError = true;
+                errorMessage(ta.id, 'Please provide more details', focus);
+                focus = false;
+                return;
+            }
+        }
+    });
+    if(hasError) return;
+
     data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
     Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[dt.id.replace('Deviated', '')]['678857215'] = dt.checked ? 353358909 : 104430631)
     Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === false).forEach(dt => biospecimenData[dt.id.replace('Deviated', '')]['248868659'] = '')

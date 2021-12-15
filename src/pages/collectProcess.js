@@ -181,7 +181,7 @@ export const tubeCollectedTemplate = (data, formData) => {
 
                                     if(notCollectedOptions) {
                                         template += `
-                                            <select data-connect-id="${data.Connect_ID}" id="${obj.id}Reason">
+                                            <select data-connect-id="${data.Connect_ID}" id="${obj.concept}Reason">
                                             <option value=""> -- Select Reason -- </option>`
 
                                             notCollectedOptions.forEach(option => {
@@ -221,7 +221,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                 
                                     if(obj.deviationChkBox) {
                                         template += `
-                                            <select data-connect-id="${data.Connect_ID}" id="${obj.id}Deviated">
+                                            <select data-connect-id="${data.Connect_ID}" id="${obj.id}Deviation">
                                             <option value=""> -- Select Deviation -- </option>`
 
                                             deviationOptions.forEach(deviation => {
