@@ -36,7 +36,7 @@ export const checkInTemplate = (data) => {
             
             <div class="row">
             <div class="col-md-12">
-                    <h5>Confirm participant has consented, been verified and has not withdrawn.</h5>
+                    <h5>Confirm participant has consented, been verified and has not withdrawn</h5>
             </div>
             </div>
             <div class="row">
