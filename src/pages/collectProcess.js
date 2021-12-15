@@ -153,7 +153,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                             <th class="align-left">Deviation Type</th> 
                             <th class="align-left">Comments</th>
                         </tr>
-                        </thead>
+                    </thead>
                     <tbody>`
                     
                     let siteTubesList = getSiteTubesLists(formData);
@@ -221,7 +221,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                 
                                     if(obj.deviationChkBox) {
                                         template += `
-                                            <select data-connect-id="${data.Connect_ID}" id="${obj.id}Deviation">
+                                            <select data-connect-id="${data.Connect_ID}" id="${obj.concept}Deviation">
                                             <option value=""> -- Select Deviation -- </option>`
 
                                             deviationOptions.forEach(deviation => {
@@ -234,8 +234,12 @@ export const tubeCollectedTemplate = (data, formData) => {
                                 template += `
                                 </td>
                                 <td>${obj.deviationChkBox === true ? `
-                                    <input type="text" placeholder="Details (Optional)" id="${obj.id}DeviatedExplanation">${formData[obj.concept]['536710547'] ? formData[obj.concept]['536710547'] : '' }</input>
-
+                                    <input 
+                                        type="text" 
+                                        placeholder="Details (Optional)" 
+                                        id="${obj.concept}DeviatedExplanation" 
+                                        ${formData[obj.concept]['536710547'] ? `value='${formData[`${obj.concept}`]['536710547']}'`: ``}
+                                    >
                                     `: ``}
                                 </td>
                                 <td>${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? `<button class="btn btn-outline-primary" type="button" id="${obj.concept}collectEditBtn">Edit</button>` : ``}</td>
@@ -255,8 +259,14 @@ export const tubeCollectedTemplate = (data, formData) => {
             </div>
             </br>
             <div class="row">
+                <div class="col-auto">
+                    <button class="btn btn-outline-danger" type="button" id="backToSearch">Return to Search</button>
+                </div>
                 <div class="ml-auto">
-                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="collectionNext">Save and Continue</button>
+                    <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="button" id="collectionSave">Save</button>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="collectionNext">Save and Review</button>
                 </div>
             </div>
         </form>
@@ -270,6 +280,8 @@ export const tubeCollectedTemplate = (data, formData) => {
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventSelectAllCollection();
     //addEventTubeCollectedForm(data, `${formData['820476880']}`);
+    addEventBackToSearch('backToSearch');
+    addEventBiospecimenCollectionForm(data, formData);
     addEventBiospecimenCollectionFormCntd(data, formData);
     //addEventBiospecimenCollectionFormEdit(data, formData);
     //addEventBiospecimenCollectionFormText(data, formData);
