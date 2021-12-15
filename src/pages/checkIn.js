@@ -36,7 +36,7 @@ export const checkInTemplate = (data) => {
             
             <div class="row">
             <div class="col-md-12">
-                    <h6>Participant Check-In and Check-Out</h6>
+                    <h5>Confirm participant has consented, been verified and has not withdrawn.</h5>
             </div>
             </div>
             <div class="row">
@@ -49,9 +49,9 @@ export const checkInTemplate = (data) => {
             </div>
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-            <div class="row"><span class="full-width">Match Verification</span></div>
+            <div class="row"><span class="full-width">Verification</span></div>
             <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span></div>
-            <div class="row"></br></div>
+            <div class="row"><span class="full-width">${new Date(data['454445267']).toLocaleString()}</span></div>
             </div>
             </div>
             <div class="col-md-4">
@@ -66,7 +66,7 @@ export const checkInTemplate = (data) => {
 
             <div class="row">
             <div class="col-md-12">
-                    <h6>Has SSN been entered? </h6>
+                    <h5>Has SSN been entered? </h5>
             </div>
             </div>
             <div class="row">
@@ -81,7 +81,7 @@ export const checkInTemplate = (data) => {
 
             <div class="row">
             <div class="col-md-12">
-                    <h6>Are Initial Surveys complete?</h6>
+                    <h5>Are Initial Surveys complete?</h5>
             </div>
             </div>
             <div class="row">
@@ -118,7 +118,7 @@ export const checkInTemplate = (data) => {
 
             <div class="row">
             <div class="col-md-12">
-                    <h6>Baseline sample status</h6>
+                    <h5>Baseline sample status</h5>
             </div>
             </div>
             <div class="row">
@@ -145,7 +145,7 @@ export const checkInTemplate = (data) => {
 
             <div class="row">
             <div class="col-md-12">
-                    <h6>Incentives</h6>
+                    <h5>Incentives</h5>
             </div>
             </div>
             <div class="row">
@@ -162,7 +162,7 @@ export const checkInTemplate = (data) => {
 
             <div class="row">
             <div class="col-md-12">
-                    <h6>Baseline Specimen Survey</h6>
+                    <h5>Baseline Specimen Survey</h5>
             </div>
             </div>
             <div class="row">
