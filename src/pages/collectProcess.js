@@ -1,5 +1,5 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventBackToTubeCollection, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormText } from './../events.js'
-import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists } from '../shared.js';
+import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow } from '../shared.js';
 import { totalCollectionIDLength } from '../tubeValidation.js';
 
 export const tubeCollectedTemplate = (data, formData) => {
@@ -33,7 +33,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                 <input class="custom-checkbox-size" type="checkbox" id="selectAllCollection">
                                 <label for="selectAllCollection">&nbsp;Check All</label>
                             </th>
-                            <th class="align-left">Reason Not Collected</th> 
+                            ${getWorflow() === 'research' ? `<th class="align-left">Reason Not Collected</th>` : ''}
                             <th class="align-left">Scan Full Specimen ID</th> 
                             <th class="align-left">Select For Deviation</th>
                             <th class="align-left">Deviation Type</th> 
@@ -70,25 +70,32 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? 'checked': ''} 
                                         id="${obj.concept}"
                                     >`
-                                    :``}</td>
-                                <td>`
+                                    :``}
+                                </td>`
+                                if(getWorflow === 'research') {
 
-                                    if(notCollectedOptions) {
-                                        template += `
-                                            <select 
-                                                data-connect-id="${data.Connect_ID}" 
-                                                id="${obj.concept}Reason"
-                                                style="width:200px"
-                                            >
-                                                <option value=""> -- Select Reason -- </option>`
+                                    template += 
+                                
+                                        `<td>`
 
-                                                notCollectedOptions.forEach(option => {
-                                                    template += `<option ${formData[`${obj.concept}`]['883732523'] == `${option.concept}` ? 'selected' : ''} value=${option.concept}>${option.label}</option>`;
-                                                })
+                                            if(notCollectedOptions) {
+                                                template += `
+                                                    <select 
+                                                        data-connect-id="${data.Connect_ID}" 
+                                                        id="${obj.concept}Reason"
+                                                        style="width:200px"
+                                                    >
+                                                        <option value=""> -- Select Reason -- </option>`
 
-                                        template += `</select>`    
-                                    }
+                                                        notCollectedOptions.forEach(option => {
+                                                            template += `<option ${formData[`${obj.concept}`]['883732523'] == `${option.concept}` ? 'selected' : ''} value=${option.concept}>${option.label}</option>`;
+                                                        })
 
+                                                template += `</select>`    
+                                            }
+
+                                        `</td>`
+                                }
                                 template += `
                                 <td>
                                     <input 
