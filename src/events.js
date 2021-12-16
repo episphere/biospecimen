@@ -1800,14 +1800,15 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
         const data = response.data[0];
         const collections = (await getParticipantCollections(data.token)).data;
 
+
+        specimenTemplate(data, formData, collections);
+
         // update participant as checked in.
         await updateParticipant({
             '135591601': 353358909,
             token: data.token,
         });
 
-
-        specimenTemplate(data, formData, collections);
         } catch (error) {
             console.log('Error check-in', error);
         } finally {
