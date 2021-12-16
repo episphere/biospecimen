@@ -126,7 +126,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                                 <option value=""> -- Select Deviation -- </option>`
 
                                                 deviationOptions.forEach(deviation => {
-                                                    template += `<option ${formData[`${obj.concept}`]['248868659'] == `${deviation.concept}` ? 'selected' : ''} value=${deviation.concept}>${deviation.label}</option>`;
+                                                    template += `<option ${formData[`${obj.concept}`]['248868659'].includes(deviation.concept) ? 'selected' : ''} value=${deviation.concept}>${deviation.label}</option>`;
                                                 })
 
                                         template += `</select>`  

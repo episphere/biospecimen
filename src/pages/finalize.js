@@ -55,7 +55,7 @@ export const finalizeTemplate = (data, specimenData) => {
                             <td>${specimenData[`${obj.concept}`]['883732523'] ? notCollectedOptions.filter(option => option.concept == specimenData[`${obj.concept}`]['883732523'])[0].label : ''}</td>
                             <td>${specimenData[`${obj.concept}`]['593843561'] === 353358909 ? `${specimenData[`${obj.concept}`]['825582494']}` : '' }</td>
                             <td>${obj.deviationChkBox === true ? `${specimenData[`${obj.concept}`]['678857215'] === 353358909 ? 'Yes' : 'No'}`: ``}</td>
-                            <td class="deviation-comments-width">${specimenData[`${obj.concept}`]['248868659'] ? deviationOptions.filter(deviation => deviation.concept == specimenData[`${obj.concept}`]['248868659'])[0].label : ''}</td>
+                            <td class="deviation-comments-width">${specimenData[`${obj.concept}`]['248868659'] ? deviationOptions.filter(deviation => specimenData[`${obj.concept}`]['248868659'].includes(deviation.concept))[0].label : ''}</td>
                             <td class="deviation-comments-width">${specimenData[`${obj.concept}`]['536710547'] ? specimenData[`${obj.concept}`]['536710547'] : ''}</td>
                         </tr>
                     `

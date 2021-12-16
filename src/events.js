@@ -2132,7 +2132,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
         if(deviated.checked) {
             biospecimenData[tubeId]['678857215'] = 353358909;
-            biospecimenData[tubeId]['248868659'] = deviation.value;
+            biospecimenData[tubeId]['248868659'] = Array.from(deviation).filter(dev => dev.selected).map(dev => parseInt(dev.value));
             biospecimenData[tubeId]['536710547'] = deviationNotes.value.trim();
         }
         else {
