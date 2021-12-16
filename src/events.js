@@ -5,7 +5,7 @@ import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, sh
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
-import { collectProcessTemplate, tubeCollectedTemplate } from './pages/collectProcess.js';
+import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { explanationTemplate } from './pages/explanation.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength } from './tubeValidation.js';
@@ -2128,9 +2128,19 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     deviations.forEach(deviation => {
         const tubeId = deviation.id.replace('Deviation', '');
         const deviationNotes = document.getElementById(tubeId + 'DeviatedExplanation');
+        const deviated = document.getElementById(tubeId + 'Deviated');
 
-        biospecimenData[tubeId]['248868659'] = deviation.value;
-        biospecimenData[tubeId]['536710547'] = deviationNotes.value.trim();
+        if(deviated.checked) {
+            biospecimenData[tubeId]['678857215'] = 353358909;
+            biospecimenData[tubeId]['248868659'] = deviation.value;
+            biospecimenData[tubeId]['536710547'] = deviationNotes.value.trim();
+        }
+        else {
+            biospecimenData[tubeId]['678857215'] = 104430631;
+            biospecimenData[tubeId]['248868659'] = '';
+            biospecimenData[tubeId]['536710547'] = '';
+        }
+        
 
         // Discard tube
         if(biospecimenData[tubeId]['248868659'].includes(472864016) || biospecimenData[tubeId]['248868659'].includes(956345366)) {
@@ -2152,8 +2162,6 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     if(hasError) return;
 
     data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
-    Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[dt.id.replace('Deviated', '')]['678857215'] = dt.checked ? 353358909 : 104430631)
-    Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === false).forEach(dt => biospecimenData[dt.id.replace('Deviated', '')]['248868659'] = '')
 
     showAnimation();
     
