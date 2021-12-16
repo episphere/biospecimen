@@ -174,9 +174,9 @@ export const searchResults = (result) => {
     result.forEach(data => {
 
         if(data['821247024'] === 922622075) return;
-        
+        console.log("CHECKED IN : ", data['135591601']);
         const checkedIn = data['135591601'] ?? false; 
-        
+       
         template += `
             <tr>
                 <td>${data['996038075']}</td>
