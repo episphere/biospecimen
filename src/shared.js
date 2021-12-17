@@ -48,6 +48,21 @@ export const findParticipant = async (query) => {
     return await response.json();
 }
 
+export const updateParticipant = async (array) => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=updateParticipantData`, {
+        method: "POST",
+        headers: {
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body:  JSON.stringify({data:array}),
+    });
+    
+    return await response.json();
+}
+
+
 export const biospecimenUsers = async () => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=users`, {

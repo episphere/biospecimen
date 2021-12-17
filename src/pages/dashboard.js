@@ -174,11 +174,8 @@ export const searchResults = (result) => {
     result.forEach(data => {
 
         if(data['821247024'] === 922622075) return;
-
-        // whether the participant is checked in already.
-        //TODO: replace hard coded value and persist through local storage
-        const checkedIn = false; 
-        
+        const checkedIn = data['135591601'] ?? Boolean(localStorage.getItem(`check-in-${data.Connect_ID}`)) ?? false; 
+    
         template += `
             <tr>
                 <td>${data['996038075']}</td>
