@@ -2021,14 +2021,14 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
     
     let siteTubesList = getSiteTubesLists(formData);
 
+    // Explicitely specify 2 biohazard bags
+    if(biospecimenData['787237543'] === undefined) biospecimenData['787237543'] = { '593843561': 353358909 }
+    if(biospecimenData['223999569'] === undefined) biospecimenData['223999569'] = { '593843561': 353358909 }
+
     if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
     siteTubesList.forEach((dt) => {
         if(biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = {'593843561': 104430631};
     });
-
-    // Explicitely specify 2 biohazard bags
-    if(biospecimenData['787237543'] === undefined) biospecimenData['787237543'] = { '593843561': 353358909 }
-    if(biospecimenData['223999569'] === undefined) biospecimenData['223999569'] = { '593843561': 353358909 }
 
     await storeSpecimen([biospecimenData]);
 }
@@ -2058,6 +2058,10 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         let value = getValue(`${input.id}`).toUpperCase();
         const masterID = value.substr(0, masterSpecimenIDRequirement.length);
         const tubeID = value.substr(masterSpecimenIDRequirement.length + 1, totalCollectionIDLength);
+
+        const tubeCheckBox = document.getElementById(input.id.replace('Id',''));
+
+        if(!input.required && tubeCheckBox) input.required = tubeCheckBox.checked;
         
         if(input.required && value.length !== totalCollectionIDLength) {
             hasError = true;

@@ -74,7 +74,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                     >`
                                     :``}
                                 </td>`
-                                if(getWorflow === 'research') {
+                                if(getWorflow() === 'research') {
 
                                     template += 
                                 
