@@ -2383,16 +2383,21 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
     
 }
 
-export const populateTrackingQuery = (hiddenJSON) => {
+//SAVE
+export const populateTrackingQuery = async (hiddenJSON) => {
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     let toBeInnerHTML = ""
+    let shipData = await localforage.getItem("shippingData")
+    let shipDataLogic = (typeof shipData["959708259"] === "string") ? shipData["959708259"] : ""
+    console.log(shipDateLogic)
+
     for(let i = 0; i < boxes.length; i++){
         toBeInnerHTML +=`
         <div class = "row">
                             <div class="form-group" style="margin-top:30px">
                                 <label style="float:left;margin-top:5px">`+ boxes[i] +`</label>
                                 <div style="float:left;margin-left:30px">
-                                    <input class="form-control" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number"/>
+                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${shipDataLogic}" />
                                 </div>
                             </div>
                         </div>
@@ -2422,15 +2427,15 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
     
 }
 
+//Save
 export const addEventSaveButton = (hiddenJSON) => {
     document.getElementById('saveTracking').addEventListener('click', async () =>{
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         for(let i = 0; i < boxes.length; i++){
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
             hiddenJSON[boxes[i]] = {'959708259':boxi, specimens:hiddenJSON[boxes[i]]}
-            
         }
-
+        
         let shippingData = {}
 
         let trackingNumbers = {}
@@ -2439,8 +2444,27 @@ export const addEventSaveButton = (hiddenJSON) => {
             trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
         }
 
-        console.log("HERE");
-        console.log("TEST")
+        for(let i = 0; i < boxes.length; i++){
+          let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
+          localforage.setItem("shippingData",{'959708259':boxi})
+      }
+        console.log(localforage.getItem("shippingData"))
+
+
+
+        // use 959708259 for Box Trackign Number Scan
+        // Get input ids of all input boxes Elements
+        // Get all ids and values (tracking number) from input box Elements
+        // store unique box ids and values (tracking number) into shippingData object
+        // send shippingData to localforage set key shippingData
+        // get shipping Data from localforage to test
+        
+        
+        console.log("boxNames",boxNames)
+        console.log("hiddenKSON", hiddenJSON)
+        console.log("boxes",boxes)
+        
+        console.log("test")
         debugger;
         return;
     })
