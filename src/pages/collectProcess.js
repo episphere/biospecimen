@@ -1,8 +1,10 @@
-import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventBackToTubeCollection, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormText } from './../events.js'
+import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormText } from './../events.js'
 import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow } from '../shared.js';
-import { totalCollectionIDLength } from '../tubeValidation.js';
 
 export const tubeCollectedTemplate = (data, formData) => {
+
+    
+
     let template = `
         </br>
         <div class="row">
@@ -195,7 +197,6 @@ export const tubeCollectedTemplate = (data, formData) => {
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventSelectAllCollection();
-    //addEventTubeCollectedForm(data, `${formData['820476880']}`);
     addEventBackToSearch('backToSearch');
     addEventBiospecimenCollectionForm(data, formData);
     addEventBiospecimenCollectionFormCntd(data, formData);

@@ -7,7 +7,6 @@ import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
-import { explanationTemplate } from './pages/explanation.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength } from './tubeValidation.js';
 import { checkOutScreen } from './pages/checkout.js';
 
@@ -1945,6 +1944,7 @@ const btnsClicked = async (connectId, formData, cont) => {
         showAnimation();
         await storeSpecimen([formData]);
         const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
+        await createTubesForCollection(formData, biospecimenData);
         hideAnimation();
         tubeCollectedTemplate(data, biospecimenData);
     }
@@ -2017,40 +2017,20 @@ export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
     });
 };
 
-export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
-    const form = document.getElementById('tubeCollectionForm');
-    form.addEventListener('submit', async e => {
-        e.preventDefault();
-        const checkboxes = Array.from(document.getElementsByClassName('tube-collected'));
-        if(checkboxes.length === 0){
-           document.getElementById('navBarSearch').click();
-        }
-        let atLeastOneChecked = false;
-        checkboxes.forEach(chkbox => {
-            if(atLeastOneChecked) return
-            if(chkbox.checked) atLeastOneChecked = true;
-        });
-        if(!atLeastOneChecked) return;
-        
-        showAnimation();
-        const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
-        if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
-        checkboxes.forEach((dt) => {
-            if(biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
-            if(biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
-                biospecimenData[`${dt.id}`] = {};
-            }
-            biospecimenData[`${dt.id}`]['593843561'] = dt.checked ? 353358909 : 104430631;
-        });
+export const createTubesForCollection = async (formData, biospecimenData) => {
+    
+    let siteTubesList = getSiteTubesLists(formData);
 
-        // Explicitely specify 2 biohazard bags
-        if(biospecimenData['787237543'] === undefined) biospecimenData['787237543'] = { '593843561': 353358909 }
-        if(biospecimenData['223999569'] === undefined) biospecimenData['223999569'] = { '593843561': 353358909 }
+    if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+    siteTubesList.forEach((dt) => {
+        if(biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = {};
+    });
 
-        await storeSpecimen([biospecimenData]);
-        hideAnimation();
-        collectProcessTemplate(data, biospecimenData);
-    })
+    // Explicitely specify 2 biohazard bags
+    if(biospecimenData['787237543'] === undefined) biospecimenData['787237543'] = { '593843561': 353358909 }
+    if(biospecimenData['223999569'] === undefined) biospecimenData['223999569'] = { '593843561': 353358909 }
+
+    await storeSpecimen([biospecimenData]);
 }
 
 const collectionSubmission = async (dt, biospecimenData, cntd) => {
