@@ -46,7 +46,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                     <tbody>`
                     
                     let siteTubesList = getSiteTubesLists(formData);
-                    console.log({siteTubesList})
+                    
                     if(!siteTubesList || siteTubesList?.length === 0){
                         siteTubesList = [];
                     //    template += `<tr><td>No data.</td></tr>`;

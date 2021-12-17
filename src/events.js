@@ -2023,7 +2023,7 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
 
     if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
     siteTubesList.forEach((dt) => {
-        if(biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = {};
+        if(biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = {'593843561': 104430631};
     });
 
     // Explicitely specify 2 biohazard bags
