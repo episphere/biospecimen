@@ -1813,12 +1813,13 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
             const data = response.data[0];
             const collections = (await getParticipantCollections(data.token)).data;
             participantToken = data.token;
+            const datauid = data.state.uid;
             
             try {
              // update participant as checked in.
              await updateParticipant({
                 '135591601': 353358909,
-                token: participantToken,
+                uid: datauid,
             });
             } catch (error) {
                 console.log(error);

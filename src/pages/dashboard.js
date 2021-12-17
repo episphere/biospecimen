@@ -174,8 +174,9 @@ export const searchResults = (result) => {
     result.forEach(data => {
 
         if(data['821247024'] === 922622075) return;
-        const checkedIn = data['135591601'] ?? Boolean(localStorage.getItem(`check-in-${data.Connect_ID}`)) ?? false; 
-    
+        //const checkedIn = data['135591601'] ?? Boolean(localStorage.getItem(`check-in-${data.Connect_ID}`)) ?? false; 
+        const checkedIn = (data['135591601'] === 353358909);
+
         template += `
             <tr>
                 <td>${data['996038075']}</td>
