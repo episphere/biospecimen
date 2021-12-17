@@ -7,7 +7,7 @@ export const checkInTemplate = (data) => {
     navBarBtn.style.display = 'block';
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
-    const checkedIn = data['135591601'] ?? false; 
+    const checkedIn = data['135591601'] ?? Boolean(localStorage.getItem('check-in-135591601')); 
     let template = `
         </br>
         <div class="row">
@@ -31,7 +31,7 @@ export const checkInTemplate = (data) => {
 
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 ${checkedIn ? 
-                    `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete">Check-Out</button>` :
+                    `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete" data-check-out="true">Check-Out</button>` :
                     `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete">Check-In</button>`
                 }
                     </div>

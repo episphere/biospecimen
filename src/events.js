@@ -1,7 +1,7 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
-import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking} from './pages/shipping.js';
+import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
@@ -13,7 +13,7 @@ import { checkOutScreen } from './pages/checkout.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
-    if(!form) return;
+    if (!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
         const firstName = document.getElementById('firstName').value;
@@ -21,71 +21,71 @@ export const addEventSearchForm1 = () => {
         const dobEl = document.getElementById('dob');
         let dob = dobEl.value;
 
-        if(dobEl.dataset.maskedInputFormat === "mm/dd/yyyy"){
+        if (dobEl.dataset.maskedInputFormat === "mm/dd/yyyy") {
             dob = dob.split('/').reverse().join('-');
         }
-        
-        if(!firstName && !lastName && !dob) return;
+
+        if (!firstName && !lastName && !dob) return;
         let query = '';
-        if(firstName) query += `firstName=${firstName}&`;
-        if(lastName) query += `lastName=${lastName}&`;
-        if(dob) query += `dob=${dob.replace(/-/g,'')}&`;
+        if (firstName) query += `firstName=${firstName}&`;
+        if (lastName) query += `lastName=${lastName}&`;
+        if (dob) query += `dob=${dob.replace(/-/g, '')}&`;
         performSearch(query);
     })
 };
 
 export const addEventSearchForm2 = () => {
     const form = document.getElementById('search2');
-    if(!form) return;
+    if (!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
         const email = document.getElementById('email').value;
         let query = '';
-        if(email) query += `email=${email}`;
+        if (email) query += `email=${email}`;
         performSearch(query);
     })
 };
 
 export const addEventSearchForm3 = () => {
     const form = document.getElementById('search3');
-    if(!form) return;
+    if (!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
         const phone = document.getElementById('phone').value;
         let query = '';
-        if(phone) query += `phone=${phone}`;
+        if (phone) query += `phone=${phone}`;
         performSearch(query);
     })
 };
 
 export const addEventSearchForm4 = () => {
     const form = document.getElementById('search4');
-    if(!form) return;
+    if (!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
         const connectId = document.getElementById('connectId').value;
         let query = '';
-        if(connectId) query += `connectId=${connectId}`;
+        if (connectId) query += `connectId=${connectId}`;
         performSearch(query);
     })
 };
 
 export const addEventsearchSpecimen = () => {
     const form = document.getElementById('specimenLookupForm');
-    if(!form) return;
+    if (!form) return;
     form.addEventListener('submit', async e => {
         e.preventDefault();
         removeAllErrors();
         const masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase();
-        if(!masterSpecimenIDRequirement.regExp.test(masterSpecimenId) || masterSpecimenId.length !== masterSpecimenIDRequirement.length) {
+        if (!masterSpecimenIDRequirement.regExp.test(masterSpecimenId) || masterSpecimenId.length !== masterSpecimenIDRequirement.length) {
             errorMessage('masterSpecimenId', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, true);
             return;
         }
         showAnimation();
         const biospecimen = await searchSpecimen(masterSpecimenId);
-        if(biospecimen.code !== 200) {
+        if (biospecimen.code !== 200) {
             hideAnimation();
-            showNotifications({title: 'Not found', body: 'Specimen not found!'}, true)
+            showNotifications({ title: 'Not found', body: 'Specimen not found!' }, true)
             return
         }
         const biospecimenData = biospecimen.data;
@@ -93,12 +93,12 @@ export const addEventsearchSpecimen = () => {
         const response = await findParticipant(query);
         hideAnimation();
         const data = response.data[0];
-        
-        if(allTubesCollected(biospecimenData)) {
-            if(biospecimenData['410912345'] && biospecimenData['410912345'] === 353358909 ) {
-                if(biospecimenData['420757389'] && biospecimenData['420757389'] === 353358909) {
+
+        if (allTubesCollected(biospecimenData)) {
+            if (biospecimenData['410912345'] && biospecimenData['410912345'] === 353358909) {
+                if (biospecimenData['420757389'] && biospecimenData['420757389'] === 353358909) {
                     searchTemplate();
-                    showNotifications({title: 'Completed', body: 'Specimen is finalized and the Participant is already checked out!'})
+                    showNotifications({ title: 'Completed', body: 'Specimen is finalized and the Participant is already checked out!' })
                 }
                 else checkOutScreen(data, biospecimenData);
             }
@@ -108,7 +108,7 @@ export const addEventsearchSpecimen = () => {
     })
 }
 
-export const getCurrBoxNumber=(j)=>{
+export const getCurrBoxNumber = (j) => {
     let keys = Object.keys(j);
     let count = 1;
     return keys.length;
@@ -119,8 +119,8 @@ export const addEventAddSpecimenToBox = (userName) => {
     form.addEventListener('submit', async e => {
         e.preventDefault();
         const masterSpecimenId = document.getElementById('masterSpecimenId').value;
-        if(masterSpecimenId == ''){
-            showNotifications({title: 'Not found', body: 'The submited bag or tube could not be found!'}, true)
+        if (masterSpecimenId == '') {
+            showNotifications({ title: 'Not found', body: 'The submited bag or tube could not be found!' }, true)
             return
         }
         let masterIdSplit = masterSpecimenId.split(/\s+/);
@@ -131,33 +131,33 @@ export const addEventAddSpecimenToBox = (userName) => {
         let biospecimensList = []
         let tableIndex = -1;
         let foundInShipping = false;
-        for(let i = 1; i < shippingTable.rows.length; i++){
+        for (let i = 1; i < shippingTable.rows.length; i++) {
             let currRow = shippingTable.rows[i];
-            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()){
+            if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) {
                 tableIndex = i;
                 biospecimensList = JSON.parse(currRow.cells[2].innerText)
                 foundInShipping = true;
             }
-            
+
         }
-        
-       for(let i = 1; i < orphanTable.rows.length; i++){
+
+        for (let i = 1; i < orphanTable.rows.length; i++) {
             let currRow = orphanTable.rows[i];
-            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()){
+            if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) {
                 tableIndex = i;
                 let currTubeNum = currRow.cells[0].innerText.split(' ')[1];
                 biospecimensList = [currTubeNum];
                 foundInOrphan = true;
             }
-            
+
         }
 
-        if(biospecimensList.length == 0){
-            showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+        if (biospecimensList.length == 0) {
+            showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' }, true)
             return
         }
-        else{
-            document.getElementById('submitMasterSpecimenId').click(); 
+        else {
+            document.getElementById('submitMasterSpecimenId').click();
         }
     });
     const submitButtonSpecimen = document.getElementById('submitMasterSpecimenId');
@@ -196,29 +196,29 @@ export const addEventAddSpecimenToBox = (userName) => {
         let biospecimensList = []
         let tableIndex = -1;
         let foundInShipping = false;
-        for(let i = 1; i < shippingTable.rows.length; i++){
+        for (let i = 1; i < shippingTable.rows.length; i++) {
             let currRow = shippingTable.rows[i];
-            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
+            if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId) {
                 tableIndex = i;
                 biospecimensList = JSON.parse(currRow.cells[2].innerText)
                 foundInShipping = true;
             }
-            
+
         }
-        
-       for(let i = 1; i < orphanTable.rows.length; i++){
+
+        for (let i = 1; i < orphanTable.rows.length; i++) {
             let currRow = orphanTable.rows[i];
-            if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
+            if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId) {
                 tableIndex = i;
                 let currTubeNum = currRow.cells[0].innerText.split(' ')[1];
                 biospecimensList = [currTubeNum];
                 foundInOrphan = true;
             }
-            
+
         }
 
-        if(biospecimensList.length == 0){
-            showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+        if (biospecimensList.length == 0) {
+            showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' }, true)
             hideAnimation();
             const delay = ms => new Promise(res => setTimeout(res, ms));
             await delay(500);
@@ -227,7 +227,7 @@ export const addEventAddSpecimenToBox = (userName) => {
         }
 
         biospecimensList.sort();
-        await createShippingModalBody(biospecimensList, masterSpecimenId,foundInOrphan)
+        await createShippingModalBody(biospecimensList, masterSpecimenId, foundInOrphan)
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
 
@@ -277,7 +277,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let response = await getBoxesByLocation(currLocation);
     let boxJSONS = response.data;
     let hiddenJSON = {};
-    for(let i = 0; i < boxJSONS.length; i++){
+    for (let i = 0; i < boxJSONS.length; i++) {
         let box = boxJSONS[i]
         hiddenJSON[box['132929440']] = box['bags']
     }
@@ -287,49 +287,49 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let currBag = [];
     let empty = true;
     let translateNumToType = {
-        "0001":"SST/Gold",
-        "0002":"SST/Gold",
-        "0003":"Heparin/Green",
-        "0004":"EDTA/Lavender",
-        "0005":"ACD/Yellow",
-        "0006":"Urine/Yellow",
-        "0007":"Mouthwash Container",
-        "0011":"SST/Gold",
-        "0012":"SST/Gold",
-        "0013":"Heparin/Green",
-        "0014":"EDTA/Lavender",
-        "0016":"Urine Cup",
-        "0021":"SST/Gold",
-        "0022":"SST/Gold",
-        "0031":"SST/Gold",
-        "0032":"SST/Gold",
-        "0024":"EDTA/Lavender",
-        "0050":"NA",
-        "0051":"NA",
-        "0052":"NA",
-        "0053":"NA",
-        "0054":"NA"
+        "0001": "SST/Gold",
+        "0002": "SST/Gold",
+        "0003": "Heparin/Green",
+        "0004": "EDTA/Lavender",
+        "0005": "ACD/Yellow",
+        "0006": "Urine/Yellow",
+        "0007": "Mouthwash Container",
+        "0011": "SST/Gold",
+        "0012": "SST/Gold",
+        "0013": "Heparin/Green",
+        "0014": "EDTA/Lavender",
+        "0016": "Urine Cup",
+        "0021": "SST/Gold",
+        "0022": "SST/Gold",
+        "0031": "SST/Gold",
+        "0032": "SST/Gold",
+        "0024": "EDTA/Lavender",
+        "0050": "NA",
+        "0051": "NA",
+        "0052": "NA",
+        "0053": "NA",
+        "0054": "NA"
     };
-    if(!isOrphan){
-        if(currSplit.length >= 2 && currSplit[1] == '0008'){
+    if (!isOrphan) {
+        if (currSplit.length >= 2 && currSplit[1] == '0008') {
             //look for all non-moutwash (0007)
-            for(let i = 0; i < biospecimensList.length; i++){
-                if(biospecimensList[i] != '0007' && biospecimensList[i] != '0008'){
+            for (let i = 0; i < biospecimensList.length; i++) {
+                if (biospecimensList[i] != '0007' && biospecimensList[i] != '0008') {
                     empty = false;
                     currBag.push(biospecimensList[i])
                     var rowCount = tubeTable.rows.length;
                     var row = tubeTable.insertRow(rowCount);
-                    
-                    row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
-                    let thisId =biospecimensList[i];
+
+                    row.insertCell(0).innerHTML = currSplit[0] + ' ' + biospecimensList[i];
+                    let thisId = biospecimensList[i];
                     let toAddType = 'N/A'
-                    if(translateNumToType.hasOwnProperty(thisId)){
+                    if (translateNumToType.hasOwnProperty(thisId)) {
                         toAddType = translateNumToType[thisId];
                     }
-                    row.insertCell(1).innerHTML= toAddType;
+                    row.insertCell(1).innerHTML = toAddType;
                     row.insertCell(2).innerHTML = '<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;"  checked>';
-                    row.cells[2].style.verticalAlign = "middle" 
-                    
+                    row.cells[2].style.verticalAlign = "middle"
+
                     let checkboxEl = row.cells[2].firstChild
                     checkboxEl.setAttribute("data-full-specimen-id", `${currSplit[0]} ${biospecimensList[i]}`)
                     checkboxEl.addEventListener("click", e => {
@@ -338,23 +338,23 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
                 }
             }
         }
-        else{
-            for(let i = 0; i < biospecimensList.length; i++){
-                if(biospecimensList[i] == '0007' && biospecimensList[i] != '0009'){
+        else {
+            for (let i = 0; i < biospecimensList.length; i++) {
+                if (biospecimensList[i] == '0007' && biospecimensList[i] != '0009') {
                     empty = false;
                     currBag.push(biospecimensList[i])
                     var rowCount = tubeTable.rows.length;
                     var row = tubeTable.insertRow(rowCount);
-                    row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
+                    row.insertCell(0).innerHTML = currSplit[0] + ' ' + biospecimensList[i];
                     let thisId = biospecimensList[i]
                     let toAddType = 'N/A'
-                    if(translateNumToType.hasOwnProperty(thisId)){
+                    if (translateNumToType.hasOwnProperty(thisId)) {
                         toAddType = translateNumToType[thisId];
                     }
-                    row.insertCell(1).innerHTML= toAddType;
-                    row.insertCell(2).innerHTML= `<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;" checked>`;
-                    row.cells[2].style.verticalAlign = "middle" 
-                    
+                    row.insertCell(1).innerHTML = toAddType;
+                    row.insertCell(2).innerHTML = `<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;" checked>`;
+                    row.cells[2].style.verticalAlign = "middle"
+
                     let checkboxEl = row.cells[2].firstChild
                     checkboxEl.setAttribute("data-full-specimen-id", `${currSplit[0]} ${biospecimensList[i]}`)
                     checkboxEl.addEventListener("click", e => {
@@ -364,22 +364,22 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
             }
         }
     }
-    else{
-        for(let i = 0; i < biospecimensList.length; i++){
+    else {
+        for (let i = 0; i < biospecimensList.length; i++) {
             empty = false;
             currBag.push(biospecimensList[i])
             var rowCount = tubeTable.rows.length;
             var row = tubeTable.insertRow(rowCount);
 
-            row.insertCell(0).innerHTML= currSplit[0] + ' ' + biospecimensList[i];
+            row.insertCell(0).innerHTML = currSplit[0] + ' ' + biospecimensList[i];
             let thisId = biospecimensList[i]
             let toAddType = 'N/A'
-            if(translateNumToType.hasOwnProperty(thisId)){
+            if (translateNumToType.hasOwnProperty(thisId)) {
                 toAddType = translateNumToType[thisId];
             }
-            row.insertCell(1).innerHTML= toAddType;
+            row.insertCell(1).innerHTML = toAddType;
             row.insertCell(2).innerHTML = '<input type="checkbox" class="samplePresentCheckbox" style="transform: scale(2); display:block; margin:0 auto;"  checked>';
-            row.cells[2].style.verticalAlign = "middle" 
+            row.cells[2].style.verticalAlign = "middle"
 
             let checkboxEl = row.cells[2].firstChild
             checkboxEl.setAttribute("data-full-specimen-id", `${currSplit[0]} ${biospecimensList[i]}`)
@@ -389,27 +389,27 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         }
     }
     populateModalSelect(hiddenJSON)
-    if(empty){
-        showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+    if (empty) {
+        showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' }, true)
         document.getElementById('shippingCloseButton').click();
         hideAnimation();
         return
     }
 }
 
-export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan, userName)=>{
+export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrphan, userName) => {
     let submitButton = document.getElementById('addToBagButton')
-    submitButton.addEventListener('click', async e =>{
+    submitButton.addEventListener('click', async e => {
         e.preventDefault();
-        
-        
+
+
         showAnimation();
         let hiddenJSON = {};
         let isBlood = true;
-        let response = await  getBoxes();
+        let response = await getBoxes();
         let boxJSONS = response.data;
         let locations = {};
-        for(let i = 0; i < boxJSONS.length; i++){
+        for (let i = 0; i < boxJSONS.length; i++) {
             let box = boxJSONS[i]
             hiddenJSON[box['132929440']] = box['bags']
             locations[box['132929440']] = box['560975149'];
@@ -428,74 +428,74 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
         let checkedSpecimensArr = Array.from(document.getElementsByClassName("samplePresentCheckbox")).filter(item => item.hasAttribute("checked"))
         boxId = document.getElementById('shippingModalChooseBox').value;
 
-        if(isOrphan){
+        if (isOrphan) {
             bagid = 'unlabelled'
         }
 
         let toDelete = [];
 
-        for(let i = 0; i < checkedSpecimensArr.length; i++){
+        for (let i = 0; i < checkedSpecimensArr.length; i++) {
             let toAddId = checkedSpecimensArr[i].getAttribute("data-full-specimen-id")
             toDelete.push(toAddId.split(/\s+/)[1]);
 
-            if(hiddenJSON.hasOwnProperty(boxId)){
-                if(hiddenJSON[boxId].hasOwnProperty(bagid)){
+            if (hiddenJSON.hasOwnProperty(boxId)) {
+                if (hiddenJSON[boxId].hasOwnProperty(bagid)) {
                     let arr = hiddenJSON[boxId][bagid]['arrElements'];
                     arr.push(toAddId);
                 }
-                else{
-                    hiddenJSON[boxId][bagid] = {'isBlood':isBlood,'arrElements':[toAddId], '469819603': firstName, '618036638': lastName};
+                else {
+                    hiddenJSON[boxId][bagid] = { 'isBlood': isBlood, 'arrElements': [toAddId], '469819603': firstName, '618036638': lastName };
                 }
             }
-            else{
+            else {
                 hiddenJSON[boxId] = {}
-                hiddenJSON[boxId][bagid] = {'isBlood':isBlood,'arrElements':[toAddId], '469819603': firstName, '618036638': lastName};
+                hiddenJSON[boxId][bagid] = { 'isBlood': isBlood, 'arrElements': [toAddId], '469819603': firstName, '618036638': lastName };
             }
 
         }
 
-        
-        
+
+
 
         document.getElementById('selectBoxList').value = boxId;
         //document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
 
         let shippingTable = document.getElementById('specimenList')
         let currArr = JSON.parse(shippingTable.rows[tableIndex].cells[2].innerText);
-        for (let i = 0; i < toDelete.length; i++){
+        for (let i = 0; i < toDelete.length; i++) {
             let currDel = toDelete[i];
-            currArr.splice(currArr.indexOf(toDelete[i]),1);
+            currArr.splice(currArr.indexOf(toDelete[i]), 1);
         }
-        if(currArr.length == 0){
+        if (currArr.length == 0) {
             shippingTable.deleteRow(tableIndex);
         }
-        else{
+        else {
             shippingTable.rows[tableIndex].cells[2].innerText = JSON.stringify(currArr);
             shippingTable.rows[tableIndex].cells[1].innerText = currArr.length;
         }
         let boxIds = Object.keys(hiddenJSON).sort(compareBoxIds);
 
-        for(let i = 0; i < boxIds.length; i++){
+        for (let i = 0; i < boxIds.length; i++) {
             let currTime = new Date();
             let toPass = {};
             let found = false;
-            if(boxIds[i] == boxId){
-                for(let j = 0; j < boxJSONS.length; j++){
-                    if(boxJSONS[j]['132929440'] == boxIds[i]){
-                        if(boxJSONS[j].hasOwnProperty('672863981')){
+            if (boxIds[i] == boxId) {
+                for (let j = 0; j < boxJSONS.length; j++) {
+                    if (boxJSONS[j]['132929440'] == boxIds[i]) {
+                        if (boxJSONS[j].hasOwnProperty('672863981')) {
                             toPass['672863981'] = boxJSONS[j]['672863981'];
                             found = true;
                         }
-                        if(boxJSONS[j].hasOwnProperty('555611076')){
+                        if (boxJSONS[j].hasOwnProperty('555611076')) {
                             toPass['555611076'] = boxJSONS[j]['555611076'];
                         }
                     }
                 }
 
-                if(found == false){
+                if (found == false) {
                     toPass['672863981'] = currTime.toString();
                 }
-                
+
                 toPass['132929440'] = boxIds[i];
                 toPass['bags'] = hiddenJSON[boxIds[i]]
                 toPass['560975149'] = locations[boxIds[i]]
@@ -504,83 +504,83 @@ export const addEventAddSpecimensToListModalButton=(bagid, tableIndex, isOrphan,
             }
         }
 
-        response = await  getAllBoxes();
+        response = await getAllBoxes();
         boxJSONS = response.data;
         hiddenJSON = {};
-        for(let i = 0; i < boxJSONS.length; i++){
+        for (let i = 0; i < boxJSONS.length; i++) {
             let box = boxJSONS[i]
             hiddenJSON[box['132929440']] = box['bags']
         }
-        
-            
+
+
         await populateTubeInBoxList(userName);
         await populateSpecimensList(hiddenJSON);
         hiddenJSON = {};
-        for(let i = 0; i < boxJSONS.length; i++){
-            if(!boxJSONS[i].hasOwnProperty('145971562') || boxJSONS[i]['145971562'] != '353358909'){
+        for (let i = 0; i < boxJSONS.length; i++) {
+            if (!boxJSONS[i].hasOwnProperty('145971562') || boxJSONS[i]['145971562'] != '353358909') {
                 let box = boxJSONS[i]
                 hiddenJSON[box['132929440']] = box['bags']
             }
-           
+
         }
         await populateSaveTable(hiddenJSON, boxJSONS, userName)
         hideAnimation();
-    },{once:true})
+    }, { once: true })
     //ppulateSpecimensList();
 }
 
-export const getInstituteSpecimensList = async(hiddenJSON) => {
+export const getInstituteSpecimensList = async (hiddenJSON) => {
     //const response = await searchSpecimenInstitute();
     const conversion = {
-        "299553921":"0001",
-        "703954371":"0002",
-        "838567176":"0003",
-        "454453939":"0004",
-        "652357376":"0005",
-        "973670172":"0006",
-        "143615646":"0007",
-        "787237543":"0008",
-        "223999569":"0009",
-        "376960806":"0011",
-        "232343615":"0012",
-        "589588440":"0021",
-        "958646668":"0013",
-        "677469051":"0014",
-        "683613884":"0024"
+        "299553921": "0001",
+        "703954371": "0002",
+        "838567176": "0003",
+        "454453939": "0004",
+        "652357376": "0005",
+        "973670172": "0006",
+        "143615646": "0007",
+        "787237543": "0008",
+        "223999569": "0009",
+        "376960806": "0011",
+        "232343615": "0012",
+        "589588440": "0021",
+        "958646668": "0013",
+        "677469051": "0014",
+        "683613884": "0024"
     }
     let specimenData = await searchSpecimenInstitute();
     //let specimenData = response.data;
     let toReturn = {};
     let checkedOrphans = false;
 
-    for(let i = 0; i < specimenData.length; i++){
+    for (let i = 0; i < specimenData.length; i++) {
         let toExclude8 = [];
         let toExclude9 = [];
         let toExcludeOrphans = [];
-        if(specimenData[i].hasOwnProperty('820476880')){
+        if (specimenData[i].hasOwnProperty('820476880')) {
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
-            for(let j = 0; j < boxes.length; j++){
+            for (let j = 0; j < boxes.length; j++) {
                 let specimens = Object.keys(hiddenJSON[boxes[j]]);
-                if(specimens.includes(specimenData[i]['820476880'] + ' 0008')){
-                    let currList =  hiddenJSON[boxes[j]][specimens[specimens.indexOf(specimenData[i]['820476880'] + ' 0008')]]['arrElements']
-                    for(let k = 0; k < currList.length; k++){
+                if (specimens.includes(specimenData[i]['820476880'] + ' 0008')) {
+                    let currList = hiddenJSON[boxes[j]][specimens[specimens.indexOf(specimenData[i]['820476880'] + ' 0008')]]['arrElements']
+                    for (let k = 0; k < currList.length; k++) {
                         toExclude8.push(currList[k].split(/\s+/)[1]);
                     }
                 }
-                if(specimens.includes(specimenData[i]['820476880'] + ' 0009')){
-                    let currList =  hiddenJSON[boxes[j]][specimens[specimens.indexOf(specimenData[i]['820476880'] + ' 0009')]]['arrElements']
-                    for(let k = 0; k < currList.length; k++){
+                if (specimens.includes(specimenData[i]['820476880'] + ' 0009')) {
+                    let currList = hiddenJSON[boxes[j]][specimens[specimens.indexOf(specimenData[i]['820476880'] + ' 0009')]]['arrElements']
+                    for (let k = 0; k < currList.length; k++) {
                         toExclude9.push(currList[k].split(/\s+/)[1]);
                     }
 
                 }
-                if(checkedOrphans == false){
-                    if(specimens.includes('unlabelled')){
-                        let currList =  hiddenJSON[boxes[j]]['unlabelled']['arrElements']
-                        for(let k = 0; k < currList.length; k++){
+                if (checkedOrphans == false) {
+                    if (specimens.includes('unlabelled')) {
+                        let currList = hiddenJSON[boxes[j]]['unlabelled']['arrElements']
+                        for (let k = 0; k < currList.length; k++) {
                             toExcludeOrphans.push(currList[k].split(/\s+/)[1]);
                         }
-                        
+
                     }
                 }
             }
@@ -588,49 +588,49 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
         let list8 = [];
         let list9 = [];
         let keys = Object.keys(specimenData[i])
-        for(let j = 0; j < keys.length; j++){
-            
+        for (let j = 0; j < keys.length; j++) {
+
             let currKey = keys[j];
-            if(conversion.hasOwnProperty(currKey)){
+            if (conversion.hasOwnProperty(currKey)) {
                 //get number of the tube
                 //let tubeNum = currKey.substring(4, currKey.indexOf("Id"));
                 let shippedKey = '145971562'
                 let missingKey = '258745303'
                 let currJSON = specimenData[i][currKey];
 
-                if(currJSON.hasOwnProperty(shippedKey) && currJSON[shippedKey] == '353358909'){
-                    if(conversion[currKey] != '0007'){
-                        if(toExclude8.indexOf(conversion[currKey]) == -1){
+                if (currJSON.hasOwnProperty(shippedKey) && currJSON[shippedKey] == '353358909') {
+                    if (conversion[currKey] != '0007') {
+                        if (toExclude8.indexOf(conversion[currKey]) == -1) {
                             list8.push(conversion[currKey]);
                         }
                     }
-                    else{
-                        if(toExclude9.indexOf(conversion[currKey]) == -1){
+                    else {
+                        if (toExclude9.indexOf(conversion[currKey]) == -1) {
                             list9.push(conversion[currKey]);
                         }
                     }
                 }
-                else{
-                    if(currJSON.hasOwnProperty(missingKey) && currJSON[missingKey] == '353358909'){
-                        if(conversion[currKey] != '0007'){
-                            if(toExclude8.indexOf(conversion[currKey]) == -1){
+                else {
+                    if (currJSON.hasOwnProperty(missingKey) && currJSON[missingKey] == '353358909') {
+                        if (conversion[currKey] != '0007') {
+                            if (toExclude8.indexOf(conversion[currKey]) == -1) {
                                 toExclude8.push(conversion[currKey])
                             }
                         }
-                        else{
-                            if(toExclude9.indexOf(conversion[currKey]) == -1){
+                        else {
+                            if (toExclude9.indexOf(conversion[currKey]) == -1) {
                                 toExclude9.push(conversion[currKey])
                             }
                         }
                     }
-                    else{
-                        if(conversion[currKey] != '0007'){
-                            if(toExclude8.indexOf(conversion[currKey]) == -1){
+                    else {
+                        if (conversion[currKey] != '0007') {
+                            if (toExclude8.indexOf(conversion[currKey]) == -1) {
                                 list8.push(conversion[currKey]);
                             }
                         }
-                        else{
-                            if(toExclude9.indexOf(conversion[currKey]) == -1){
+                        else {
+                            if (toExclude9.indexOf(conversion[currKey]) == -1) {
                                 list9.push(conversion[currKey]);
                             }
                         }
@@ -638,40 +638,40 @@ export const getInstituteSpecimensList = async(hiddenJSON) => {
                 }
             }
         }
-        if(toExclude8.length > 0 && list8.length > 0 && specimenData[i].hasOwnProperty('820476880')){
+        if (toExclude8.length > 0 && list8.length > 0 && specimenData[i].hasOwnProperty('820476880')) {
             //add orphan tubes
-            
+
             //toInsert[specimenData[i]['masterSpecimenId'] + ' 0008'] = list8
-            if(!toReturn.hasOwnProperty('unlabelled')){
+            if (!toReturn.hasOwnProperty('unlabelled')) {
                 toReturn['unlabelled'] = []
             }
-            for(let j = 0; j < list8.length; j++){
-                if(!toExcludeOrphans.includes(list8[j])){
+            for (let j = 0; j < list8.length; j++) {
+                if (!toExcludeOrphans.includes(list8[j])) {
                     toReturn['unlabelled'].push(specimenData[i]['820476880'] + ' ' + list8[j])
                 }
             }
 
         }
-        if(toExclude9.length > 0 && list9.length > 0 && specimenData[i].hasOwnProperty('820476880')){
-            
-            if(!toReturn.hasOwnProperty('unlabelled')){
+        if (toExclude9.length > 0 && list9.length > 0 && specimenData[i].hasOwnProperty('820476880')) {
+
+            if (!toReturn.hasOwnProperty('unlabelled')) {
                 toReturn['unlabelled'] = []
             }
-            for(let j = 0; j < list9.length; j++){
-                if(!toExcludeOrphans.includes(list9[j])){
+            for (let j = 0; j < list9.length; j++) {
+                if (!toExcludeOrphans.includes(list9[j])) {
                     toReturn['unlabelled'].push(specimenData[i]['820476880'] + ' ' + list9[j])
                 }
             }
 
         }
-        if(toExclude8.length == 0 && list8.length > 0 && specimenData[i].hasOwnProperty('820476880')){
+        if (toExclude8.length == 0 && list8.length > 0 && specimenData[i].hasOwnProperty('820476880')) {
             toReturn[specimenData[i]['820476880'] + ' 0008'] = list8;
         }
-        if(toExclude9.length == 0 && list9.length > 0 && specimenData[i].hasOwnProperty('820476880')){
+        if (toExclude9.length == 0 && list9.length > 0 && specimenData[i].hasOwnProperty('820476880')) {
             toReturn[specimenData[i]['820476880'] + ' 0009'] = list9;
         }
     }
-    
+
     return toReturn;
 }
 
@@ -679,13 +679,13 @@ export const populateSpecimensList = async (hiddenJSON) => {
     let specimenObject = await getInstituteSpecimensList(hiddenJSON);
     let specimenData = await searchSpecimenInstitute();
     //let specimenData = response.data
-    for(let i = 0; i < specimenData.length; i++){
+    for (let i = 0; i < specimenData.length; i++) {
         //let specimenData = 
-        
+
     }
     let list = Object.keys(specimenObject);
     list.sort();
-    
+
     var specimenList = document.getElementById("specimenList");
     let numRows = 1;
     specimenList.innerHTML = `<tr>
@@ -693,66 +693,66 @@ export const populateSpecimensList = async (hiddenJSON) => {
                                 <th># Specimens in Bag</th>
                             </th>`;
     let orphansIndex = -1;
-    
-   
-    for(let i = 0; i < list.length; i++){
-        if(list[i] != "unlabelled"){
+
+
+    for (let i = 0; i < list.length; i++) {
+        if (list[i] != "unlabelled") {
             var rowCount = specimenList.rows.length;
-            var row = specimenList.insertRow(rowCount);           
-            row.insertCell(0).innerHTML= list[i];
+            var row = specimenList.insertRow(rowCount);
+            row.insertCell(0).innerHTML = list[i];
             row.insertCell(1).innerHTML = specimenObject[list[i]].length;
-            
+
             let hiddenChannel = row.insertCell(2)
             hiddenChannel.innerHTML = JSON.stringify(specimenObject[list[i]]);
             hiddenChannel.style.display = "none";
-            if(numRows % 2 == 0){
+            if (numRows % 2 == 0) {
                 row.style['background-color'] = "lightgrey";
             }
             numRows += 1;
         }
-        else{
+        else {
             orphansIndex = i;
         }
     }
-    
+
     let orphanPanel = document.getElementById('orphansPanel');
     let orphanTable = document.getElementById('orphansList')
     let specimenPanel = document.getElementById('specimenPanel')
     orphanTable.innerHTML = '';
 
-    if(orphansIndex != -1 && specimenObject['unlabelled'].length > 0){
+    if (orphansIndex != -1 && specimenObject['unlabelled'].length > 0) {
 
         orphanPanel.style.display = 'block'
         specimenPanel.style.height = '400px'
-        
+
         let toInsert = specimenObject['unlabelled'];
         var rowCount = orphanTable.rows.length;
-        var row = orphanTable.insertRow(rowCount); 
-        row.insertCell(0).innerHTML= 'Stray tubes';
+        var row = orphanTable.insertRow(rowCount);
+        row.insertCell(0).innerHTML = 'Stray tubes';
         row.insertCell(1).innerHTML = toInsert.length;
         let hiddenChannel = row.insertCell(2)
         hiddenChannel.innerHTML = JSON.stringify(toInsert);
         hiddenChannel.style.display = "none";
-        for(let i = 0; i < toInsert.length; i++){
+        for (let i = 0; i < toInsert.length; i++) {
             rowCount = orphanTable.rows.length;
-            row = orphanTable.insertRow(rowCount); 
-            if(rowCount % 2  == 0){
+            row = orphanTable.insertRow(rowCount);
+            if (rowCount % 2 == 0) {
                 row.style['background-color'] = 'lightgrey'
             }
-            row.insertCell(0).innerHTML= toInsert[i];
-            row.insertCell(1).innerHTML ='<input type="button" class="delButton" value = "Report as Missing"/>';
-        
+            row.insertCell(0).innerHTML = toInsert[i];
+            row.insertCell(1).innerHTML = '<input type="button" class="delButton" value = "Report as Missing"/>';
+
             //boxes[i]
-    
+
             //let currBoxButton = currRow.cells[5].getElementsByClassName("delButton")[0];
-            let currDeleteButton = row.cells[1].getElementsByClassName("delButton")[0]; 
-    
+            let currDeleteButton = row.cells[1].getElementsByClassName("delButton")[0];
+
             //This should remove the entrire bag
             currDeleteButton.addEventListener("click", async e => {
                 showAnimation();
                 var index = e.target.parentNode.parentNode.rowIndex;
                 var table = e.target.parentNode.parentNode.parentNode.parentNode;
-                
+
                 let currRow = table.rows[index];
                 let currTubeId = table.rows[index].cells[0].innerText;
 
@@ -760,16 +760,16 @@ export const populateSpecimensList = async (hiddenJSON) => {
                 let result = await removeMissingSpecimen(currTubeId);
 
                 currRow = table.rows[index];
-                while(currRow != undefined && currRow.cells[0].innerText ==""){
+                while (currRow != undefined && currRow.cells[0].innerText == "") {
                     table.deleteRow(index);
                     currRow = table.rows[index];
                 }
 
 
-                let response = await  getAllBoxes();
+                let response = await getAllBoxes();
                 let boxJSONS = response.data;
                 let hiddenJSON = {};
-                for(let i = 0; i < boxJSONS.length; i++){
+                for (let i = 0; i < boxJSONS.length; i++) {
                     let box = boxJSONS[i]
                     hiddenJSON[box['132929440']] = box['bags']
                 }
@@ -781,13 +781,13 @@ export const populateSpecimensList = async (hiddenJSON) => {
             })
         }
     }
-    else{
+    else {
         orphanPanel.style.display = 'none'
         specimenPanel.style.height = '600px'
     }
     var rowCount = specimenList.rows.length;
     var row = specimenList.insertRow(rowCount);
-        
+
     //put in orphans
     /*
     for(let i = 0; i < list.length; i++){
@@ -798,20 +798,20 @@ export const populateSpecimensList = async (hiddenJSON) => {
 
 }
 
-export const populateBoxManifestHeader= (boxId, hiddenJSON,currInstitute) => {
+export const populateBoxManifestHeader = (boxId, hiddenJSON, currInstitute) => {
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
 
     let currJSON = {};
-    for(let i =0;i < hiddenJSON.length; i++){
-        if(hiddenJSON[i]['132929440'] == boxId){
+    for (let i = 0; i < hiddenJSON.length; i++) {
+        if (hiddenJSON[i]['132929440'] == boxId) {
             currJSON = hiddenJSON[i]
         }
     }
     let currJSONKeys = Object.keys(currJSON['bags'])
     let numBags = currJSONKeys.length;
     let numTubes = 0;
-    for(let i = 0; i < currJSONKeys.length; i++){
+    for (let i = 0; i < currJSONKeys.length; i++) {
         numTubes += currJSON['bags'][currJSONKeys[i]]['arrElements'].length;
     }
 
@@ -820,33 +820,33 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON,currInstitute) => {
     newP.innerHTML = boxId + " Manifest";
     document.getElementById('boxManifestCol1').appendChild(newP);
     let toInsertDate = ''
-    if(currJSON.hasOwnProperty('672863981')){
+    if (currJSON.hasOwnProperty('672863981')) {
         let dateStarted = Date.parse(currJSON['672863981'])
-        let currentdate = new Date(dateStarted); 
+        let currentdate = new Date(dateStarted);
         console.group(currentdate.getMinutes())
-        let currMins = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes():currentdate.getMinutes();
-        let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
-        let hour = parseInt(currentdate.getHours())%12;
-        toInsertDate =  (currentdate.getMonth()+1) + "/"
-                        + currentdate.getDate()  + "/" 
-                        + currentdate.getFullYear() + " "  
-                        + hour.toString()+ ":"  
-                        + currMins + ampm;
+        let currMins = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes() : currentdate.getMinutes();
+        let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
+        let hour = parseInt(currentdate.getHours()) % 12;
+        toInsertDate = (currentdate.getMonth() + 1) + "/"
+            + currentdate.getDate() + "/"
+            + currentdate.getFullYear() + " "
+            + hour.toString() + ":"
+            + currMins + ampm;
 
     }
     let toInsertDate2 = ''
-    if(currJSON.hasOwnProperty('555611076')){
+    if (currJSON.hasOwnProperty('555611076')) {
         let dateStarted = Date.parse(currJSON['555611076'])
-        
-        let currentdate = new Date(dateStarted); 
-        let currMins = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes():currentdate.getMinutes();
-        let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
-        let hour = parseInt(currentdate.getHours())%12;
-        toInsertDate2 =  (currentdate.getMonth()+1) + "/"
-                        + currentdate.getDate()  + "/" 
-                        + currentdate.getFullYear() + " "  
-                        + hour.toString()+ ":"  
-                        + currMins+ ampm;
+
+        let currentdate = new Date(dateStarted);
+        let currMins = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes() : currentdate.getMinutes();
+        let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
+        let hour = parseInt(currentdate.getHours()) % 12;
+        toInsertDate2 = (currentdate.getMonth() + 1) + "/"
+            + currentdate.getDate() + "/"
+            + currentdate.getFullYear() + " "
+            + hour.toString() + ":"
+            + currMins + ampm;
 
     }
     newP = document.createElement("p");
@@ -857,7 +857,7 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON,currInstitute) => {
     document.getElementById('boxManifestCol1').appendChild(newP);
     newP = document.createElement("p");
     newDiv = document.createElement("div")
-    newDiv.innerHTML = displayContactInformation(currInstitute,siteContactInformation)
+    newDiv.innerHTML = displayContactInformation(currInstitute, siteContactInformation)
     document.getElementById('boxManifestCol1').appendChild(newDiv);
 
     newP.innerHTML = "Number of Bags: " + numBags;
@@ -865,7 +865,7 @@ export const populateBoxManifestHeader= (boxId, hiddenJSON,currInstitute) => {
     newP = document.createElement("p");
     newP.innerHTML = "Number of Tubes:  " + numTubes;
     document.getElementById('boxManifestCol3').appendChild(newP);
-     
+
 
 }
 
@@ -875,10 +875,10 @@ export const populateModalSelect = (hiddenJSON) => {
     let boxList = document.getElementById('shippingModalChooseBox');
     let list = ''
     let keys = Object.keys(hiddenJSON).sort(compareBoxIds);
-    for(let i = 0; i < keys.length; i++){
+    for (let i = 0; i < keys.length; i++) {
         list += '<option>' + keys[i] + '</option>';
     }
-    if(list == ''){
+    if (list == '') {
         list = 'remember to add Box'
     }
     boxList.innerHTML = list;
@@ -894,12 +894,12 @@ export const populateTempSelect = (boxes) => {
     </select>`;
 
     let toPopulate = document.getElementById('tempBox')
-    
-    for(let i = 0; i<  boxes.length; i++){
+
+    for (let i = 0; i < boxes.length; i++) {
         var opt = document.createElement("option");
-        opt.value= boxes[i];
-        opt.innerHTML = boxes[i]; 
-     
+        opt.value = boxes[i];
+        opt.innerHTML = boxes[i];
+
         // then append it to the select element
         toPopulate.appendChild(opt);
     }
@@ -918,77 +918,77 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                     </tr>`
     let count = 0;
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
-    for(let i = 0; i < boxes.length; i++){
-        if(Object.keys(hiddenJSON[boxes[i]]).length > 0 ){
-            let currRow = table.insertRow(count+1);
-            if(count % 2 == 1){
+    for (let i = 0; i < boxes.length; i++) {
+        if (Object.keys(hiddenJSON[boxes[i]]).length > 0) {
+            let currRow = table.insertRow(count + 1);
+            if (count % 2 == 1) {
                 currRow.style['background-color'] = 'lightgrey'
             }
             count += 1;
-            currRow.insertCell(0).innerHTML=`<input type="checkbox" class="markForShipping" style="transform: scale(1.5);">`
+            currRow.insertCell(0).innerHTML = `<input type="checkbox" class="markForShipping" style="transform: scale(1.5);">`
             let dateStarted = '';
             let lastModified = '';
             let thisLocation = '';
 
-            for(let j = 0; j < boxJSONS.length; j++){
-                if(boxJSONS[j]['132929440'] == boxes[i]){
-                    if(boxJSONS[j].hasOwnProperty('672863981')){
+            for (let j = 0; j < boxJSONS.length; j++) {
+                if (boxJSONS[j]['132929440'] == boxes[i]) {
+                    if (boxJSONS[j].hasOwnProperty('672863981')) {
                         let timestamp = Date.parse(boxJSONS[j]['672863981']);
                         let newDate = new Date(timestamp);
                         let am = 'AM'
-                        if(newDate.getHours() >= 12){
+                        if (newDate.getHours() >= 12) {
                             am = 'PM'
                         }
                         let minutesTag = newDate.getMinutes();
-                        if(minutesTag < 10){
+                        if (minutesTag < 10) {
                             minutesTag = '0' + minutesTag;
                         }
-                        dateStarted = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11)%12 + 1) + ':' + minutesTag + ' ' + am;
+                        dateStarted = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11) % 12 + 1) + ':' + minutesTag + ' ' + am;
                         //dateStarted = boxJSONS[j]['672863981'];
                     }
-                    if(boxJSONS[j].hasOwnProperty('555611076')){
+                    if (boxJSONS[j].hasOwnProperty('555611076')) {
                         let timestamp = Date.parse(boxJSONS[j]['555611076']);
                         let newDate = new Date(timestamp);
                         let am = 'AM'
-                        if(newDate.getHours() >= 12){
+                        if (newDate.getHours() >= 12) {
                             am = 'PM'
                         }
                         let minutesTag = newDate.getMinutes();
-                        if(minutesTag < 10){
+                        if (minutesTag < 10) {
                             minutesTag = '0' + minutesTag;
                         }
-                        lastModified = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11)%12 + 1)  + ':' + minutesTag + ' ' + am;
+                        lastModified = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11) % 12 + 1) + ':' + minutesTag + ' ' + am;
                         //lastModified = boxJSONS[j]['555611076']
 
                     }
-                    if(boxJSONS[j].hasOwnProperty('560975149')){
+                    if (boxJSONS[j].hasOwnProperty('560975149')) {
                         thisLocation = boxJSONS[j]['560975149'];
                     }
                 }
             }
-            currRow.insertCell(1).innerHTML= dateStarted;
-            currRow.insertCell(2).innerHTML= lastModified;
-            currRow.insertCell(3).innerHTML= boxes[i];
+            currRow.insertCell(1).innerHTML = dateStarted;
+            currRow.insertCell(2).innerHTML = lastModified;
+            currRow.insertCell(3).innerHTML = boxes[i];
             currRow.insertCell(4).innerHTML = thisLocation;
             //get num tubes
             let currBox = hiddenJSON[boxes[i]];
             let numTubes = 0;
-            let boxKeys=Object.keys(currBox);
-            for(let j = 0; j < boxKeys.length; j++ ){
+            let boxKeys = Object.keys(currBox);
+            for (let j = 0; j < boxKeys.length; j++) {
                 numTubes += currBox[boxKeys[j]]['arrElements'].length;
             }
-            currRow.insertCell(5).innerHTML= numTubes.toString() + " tubes";
-            currRow.insertCell(6).innerHTML= '<input type="button" class="boxManifestButton" value = "Box Manifest"/>';
-            
+            currRow.insertCell(5).innerHTML = numTubes.toString() + " tubes";
+            currRow.insertCell(6).innerHTML = '<input type="button" class="boxManifestButton" value = "Box Manifest"/>';
+
             //boxes[i]
 
             let currBoxButton = currRow.cells[6].getElementsByClassName("boxManifestButton")[0];
-            
+
             currBoxButton.addEventListener("click", async e => {
                 var index = e.target.parentNode.parentNode.rowIndex;
                 var table = document.getElementById("shippingModalTable");
                 //bring up edit on the corresponding table
-                
+
                 await boxManifest(boxes[i], userName);
 
 
@@ -996,20 +996,20 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                 //if(hiddenJSON[boxes[i]])
                 //table.deleteRow(index);
             })
-        }    
+        }
     }
 }
 
 export const populateTempNotification = async () => {
-    
+
     let checkDate = false;
     //let checkDate = await getNextTempCheck();
     let toToggle = document.getElementById('tempTubeReminder');
-    if(checkDate == true){
-        toToggle.style.display='block';
+    if (checkDate == true) {
+        toToggle.style.display = 'block';
     }
-    else{
-        toToggle.style.display='none';
+    else {
+        toToggle.style.display = 'none';
     }
 }
 
@@ -1017,11 +1017,11 @@ export const populateTempCheck = async () => {
     let checkDate = false;
     //let checkDate = await getNextTempCheck();
     let toToggle = document.getElementById('checkForTemp');
-    if(checkDate == true){
-        toToggle.style.display='block';
+    if (checkDate == true) {
+        toToggle.style.display = 'block';
     }
-    else{
-        toToggle.style.display='none';
+    else {
+        toToggle.style.display = 'none';
     }
 }
 
@@ -1035,23 +1035,23 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
     document.getElementById('boxManifestCol1').appendChild(newP);
 
     //let date = "";
-    let currentdate = new Date(); 
-    let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
-    let hour = (currentdate.getHours() - 1 + 12)%12 + 1;
-    let minutes = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes():currentdate.getMinutes();
+    let currentdate = new Date();
+    let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
+    let hour = (currentdate.getHours() - 1 + 12) % 12 + 1;
+    let minutes = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes() : currentdate.getMinutes();
 
-    if(minutes < 10){
+    if (minutes < 10) {
         minutes = "0" + minutes;
     }
-    let datetime =  (currentdate.getMonth()+1) + "/"
-                    + currentdate.getDate()  + "/" 
-                    + currentdate.getFullYear() + " "  
-                    + hour.toString()+ ":"  
-                    + minutes + ampm;
+    let datetime = (currentdate.getMonth() + 1) + "/"
+        + currentdate.getDate() + "/"
+        + currentdate.getFullYear() + " "
+        + hour.toString() + ":"
+        + minutes + ampm;
     newP = document.createElement("p");
     newP.innerHTML = "Current Date/Time: " + datetime;
     document.getElementById('boxManifestCol1').appendChild(newP);
-    
+
     newP = document.createElement("p");
     newP.innerHTML = "Sender: " + userName;
     document.getElementById('boxManifestCol1').appendChild(newP);
@@ -1068,76 +1068,76 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
     newP.innerHTML = "Location: " + location;
     document.getElementById('boxManifestCol3').appendChild(newP);
 
-} 
+}
 
-export const populateShippingManifestBody = (hiddenJSON) =>{
+export const populateShippingManifestBody = (hiddenJSON) => {
     let table = document.getElementById("shippingManifestTable");
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     let currRowIndex = 1;
     let greyIndex = 0;
-    for(let i = 0; i < boxes.length; i++){
+    for (let i = 0; i < boxes.length; i++) {
         let firstSpec = true;
         let currBox = boxes[i];
         let specimens = Object.keys(hiddenJSON[boxes[i]])
-        for(let j = 0; j < specimens.length; j++){
+        for (let j = 0; j < specimens.length; j++) {
             let firstTube = true;
             let specimen = specimens[j];
             let tubes = hiddenJSON[boxes[i]][specimen]['arrElements'];
-            for(let k = 0; k < tubes.length; k++){
+            for (let k = 0; k < tubes.length; k++) {
 
                 let currTube = tubes[k];
                 let currRow = table.insertRow(currRowIndex);
 
-                if(firstSpec){
-                    
-                    currRow.insertCell(0).innerHTML= currBox;
+                if (firstSpec) {
+
+                    currRow.insertCell(0).innerHTML = currBox;
                     firstSpec = false;
 
                 }
-                else{
-                    currRow.insertCell(0).innerHTML= '';
+                else {
+                    currRow.insertCell(0).innerHTML = '';
                 }
-                if(firstTube){
+                if (firstTube) {
 
-                    currRow.insertCell(1).innerHTML= specimen;
+                    currRow.insertCell(1).innerHTML = specimen;
                     firstTube = false;
                 }
-                else{
-                    currRow.insertCell(1).innerHTML= '';
+                else {
+                    currRow.insertCell(1).innerHTML = '';
                 }
 
-                currRow.insertCell(2).innerHTML= currTube;
+                currRow.insertCell(2).innerHTML = currTube;
                 let fullScannerName = ''
-                
-                if(hiddenJSON[boxes[i]][specimen].hasOwnProperty('469819603') && k == 0){
-                  fullScannerName += hiddenJSON[boxes[i]][specimen]['469819603'] + ' '
+
+                if (hiddenJSON[boxes[i]][specimen].hasOwnProperty('469819603') && k == 0) {
+                    fullScannerName += hiddenJSON[boxes[i]][specimen]['469819603'] + ' '
                 }
-                if(hiddenJSON[boxes[i]][specimen].hasOwnProperty('618036638') && k == 0){
-                  fullScannerName += hiddenJSON[boxes[i]][specimen]['618036638']
+                if (hiddenJSON[boxes[i]][specimen].hasOwnProperty('618036638') && k == 0) {
+                    fullScannerName += hiddenJSON[boxes[i]][specimen]['618036638']
                 }
                 currRow.insertCell(3).innerHTML = fullScannerName
 
-                if(greyIndex % 2 == 0){
+                if (greyIndex % 2 == 0) {
                     currRow.style['background-color'] = "lightgrey";
                 }
-                
-                currRowIndex+=1;
-            
+
+                currRowIndex += 1;
+
             }
-                greyIndex += 1;
+            greyIndex += 1;
         }
-       
+
 
     }
 }
 
-const compareBoxIds = (a,b) => {
+const compareBoxIds = (a, b) => {
     let a1 = parseInt(a.substring(3));
     let b1 = parseInt(b.substring(3));
-    if(a1 < b1){
+    if (a1 < b1) {
         return -1;
     }
-    else if(a1 > b1){
+    else if (a1 > b1) {
         return 1;
     }
     return 0;
@@ -1149,97 +1149,97 @@ export const populateBoxSelectList = async (hiddenJSON, userName) => {
     let selectBoxList = document.getElementById('selectBoxList');
     let list = ''
     let keys = Object.keys(hiddenJSON).sort(compareBoxIds);
-    for(let i = 0; i < keys.length; i++){
+    for (let i = 0; i < keys.length; i++) {
         list += '<option>' + keys[i] + '</option>';
     }
-    if(list == ''){
+    if (list == '') {
         await addNewBox(userName);
         return;
     }
     boxList.innerHTML = list;
 
     let currBoxId = selectBoxList.value;
-    if(currBoxId != ''){
-    let currBox = hiddenJSON[currBoxId];
-        
-    
-    //document.getElementById('BoxNumBlood').innerText = currBoxId;
-    let toInsertTable = document.getElementById('currTubeTable')
-    let boxKeys = Object.keys(currBox)
-    toInsertTable.innerHTML = ` <tr>
+    if (currBoxId != '') {
+        let currBox = hiddenJSON[currBoxId];
+
+
+        //document.getElementById('BoxNumBlood').innerText = currBoxId;
+        let toInsertTable = document.getElementById('currTubeTable')
+        let boxKeys = Object.keys(currBox)
+        toInsertTable.innerHTML = ` <tr>
                                     <th style = "border-bottom:1px solid;">Specimen Bag ID</th>
                                     <th style = "border-bottom:1px solid;">Full Specimen ID</th>
                                     <th style = "border-bottom:1px solid;">Type/Color</th>
                                     <th style = "border-bottom:1px solid;"></th>
                                 </tr>`;
-    let translateNumToType = {
-        "0001":"SST/Gold",
-        "0002":"SST/Gold",
-        "0003":"Heparin/Green",
-        "0004":"EDTA/Lavender",
-        "0005":"ACD/Yellow",
-        "0006":"Urine/Yellow",
-        "0007":"Mouthwash Container",
-        "0011":"SST/Gold",
-        "0012":"SST/Gold",
-        "0013":"Heparin/Green",
-        "0014":"EDTA/Lavender",
-        "0016":"Urine Cup",
-        "0021":"SST/Gold",
-        "0022":"SST/Gold",
-        "0031":"SST/Gold",
-        "0032":"SST/Gold",
-        "0024":"EDTA/Lavender",
-        "0050":"NA",
-        "0051":"NA",
-        "0052":"NA",
-        "0053":"NA",
-        "0054":"NA"
-    };
-    //set the rest of the table up
-    for(let j = 0; j < boxKeys.length; j++){
-        let currBagId = boxKeys[j];
-        let currTubes = currBox[boxKeys[j]]['arrElements'];
-        
-        for(let k = 0; k < currTubes.length; k++){
+        let translateNumToType = {
+            "0001": "SST/Gold",
+            "0002": "SST/Gold",
+            "0003": "Heparin/Green",
+            "0004": "EDTA/Lavender",
+            "0005": "ACD/Yellow",
+            "0006": "Urine/Yellow",
+            "0007": "Mouthwash Container",
+            "0011": "SST/Gold",
+            "0012": "SST/Gold",
+            "0013": "Heparin/Green",
+            "0014": "EDTA/Lavender",
+            "0016": "Urine Cup",
+            "0021": "SST/Gold",
+            "0022": "SST/Gold",
+            "0031": "SST/Gold",
+            "0032": "SST/Gold",
+            "0024": "EDTA/Lavender",
+            "0050": "NA",
+            "0051": "NA",
+            "0052": "NA",
+            "0053": "NA",
+            "0054": "NA"
+        };
+        //set the rest of the table up
+        for (let j = 0; j < boxKeys.length; j++) {
+            let currBagId = boxKeys[j];
+            let currTubes = currBox[boxKeys[j]]['arrElements'];
+
+            for (let k = 0; k < currTubes.length; k++) {
 
                 //get the first element (tube id) from the thingx
                 let toAddId = currTubes[k];
                 let thisId = toAddId.split(' ');
                 let toAddType = 'N/A'
-                if(translateNumToType.hasOwnProperty(thisId[1])){
+                if (translateNumToType.hasOwnProperty(thisId[1])) {
                     toAddType = translateNumToType[thisId[1]];
                 }
                 var rowCount = toInsertTable.rows.length;
                 var row = toInsertTable.insertRow(rowCount);
-                if(j % 2 == 1){
+                if (j % 2 == 1) {
                     row.style['background-color'] = "lightgrey"
                 }
-                if(k == 0){
-                    row.insertCell(0).innerHTML=currBagId
+                if (k == 0) {
+                    row.insertCell(0).innerHTML = currBagId
                 }
-                else{
-                    row.insertCell(0).innerHTML=""
+                else {
+                    row.insertCell(0).innerHTML = ""
                 }
-                row.insertCell(1).innerHTML= toAddId;
-                row.insertCell(2).innerHTML= toAddType;
-                if(k == 0){
-                    row.insertCell(3).innerHTML='<input type="button" class="delButton" value = "remove bag" style="margin-top:2px;margin-bottom:2px">';
+                row.insertCell(1).innerHTML = toAddId;
+                row.insertCell(2).innerHTML = toAddType;
+                if (k == 0) {
+                    row.insertCell(3).innerHTML = '<input type="button" class="delButton" value = "remove bag" style="margin-top:2px;margin-bottom:2px">';
                 }
-                else{
-                    row.insertCell(3).innerHTML="";
+                else {
+                    row.insertCell(3).innerHTML = "";
                 }
                 //row.insertCell(3).innerHTML= '<input type="button" class="delButton" value = "remove">';
 
-                if(k == 0){
-                    let currDeleteButton = row.cells[3].getElementsByClassName("delButton")[0]; 
+                if (k == 0) {
+                    let currDeleteButton = row.cells[3].getElementsByClassName("delButton")[0];
 
                     //This should remove the entrire bag
                     currDeleteButton.addEventListener("click", async e => {
                         showAnimation();
                         var index = e.target.parentNode.parentNode.rowIndex;
                         var table = e.target.parentNode.parentNode.parentNode.parentNode;
-                        
+
                         let currRow = table.rows[index];
                         let currBagId = table.rows[index].cells[0].innerText;
                         /*if(currRow.cells[0].innerText != ""){
@@ -1252,26 +1252,26 @@ export const populateBoxSelectList = async (hiddenJSON, userName) => {
                         table.deleteRow(index);
                         let result = await removeBag(boxList.value, [currBagId])
                         currRow = table.rows[index];
-                        while(currRow != undefined && currRow.cells[0].innerText ==""){
+                        while (currRow != undefined && currRow.cells[0].innerText == "") {
                             table.deleteRow(index);
                             currRow = table.rows[index];
                         }
-                        let response = await  getAllBoxes();
+                        let response = await getAllBoxes();
                         let boxJSONS = response.data;
                         let hiddenJSON = {};
-                        for(let i = 0; i < boxJSONS.length; i++){
+                        for (let i = 0; i < boxJSONS.length; i++) {
                             let box = boxJSONS[i]
                             hiddenJSON[box['132929440']] = box['bags']
                         }
 
                         await populateSpecimensList(hiddenJSON);
                         hiddenJSON = {};
-                        for(let i = 0; i < boxJSONS.length; i++){
-                            if(!boxJSONS[i].hasOwnProperty('145971562') || boxJSONS[i]['145971562'] != '353358909'){
+                        for (let i = 0; i < boxJSONS.length; i++) {
+                            if (!boxJSONS[i].hasOwnProperty('145971562') || boxJSONS[i]['145971562'] != '353358909') {
                                 let box = boxJSONS[i]
                                 hiddenJSON[box['132929440']] = box['bags']
                             }
-                        
+
                         }
                         await populateSaveTable(hiddenJSON, boxJSONS, userName)
                         hideAnimation();
@@ -1280,14 +1280,14 @@ export const populateBoxSelectList = async (hiddenJSON, userName) => {
                     })
                 }
 
+            }
         }
     }
-    }
-    
+
 }
 
-const addNewBox = async  (userName) => {
-    let response = await  getAllBoxes();
+const addNewBox = async (userName) => {
+    let response = await getAllBoxes();
     let hiddenJSON = response.data;
     let locations = {};
     let keys = [];
@@ -1297,27 +1297,27 @@ const addNewBox = async  (userName) => {
     let largestLocation = 0;
     let largestLocationIndex = -1;
     let pageLocation = document.getElementById('selectLocationList').value;
-    for(let i = 0; i < hiddenJSON.length; i++){
+    for (let i = 0; i < hiddenJSON.length; i++) {
         let curr = parseInt(hiddenJSON[i]['132929440'].substring(3))
         let currLocation = hiddenJSON[i]['560975149']
 
-        if(curr > largestOverall){
+        if (curr > largestOverall) {
             largestOverall = curr;
             largeIndex = i;
         }
-        if(curr > largestLocation && currLocation == pageLocation){
+        if (curr > largestLocation && currLocation == pageLocation) {
             largestLocation = curr;
             largestLocationIndex = i;
         }
-        
+
     }
-    if(largestLocationIndex != -1){
+    if (largestLocationIndex != -1) {
         let lastBox = hiddenJSON[largeIndex]['132929440']
-        if(Object.keys(hiddenJSON[largestLocationIndex]['bags']).length != 0){
+        if (Object.keys(hiddenJSON[largestLocationIndex]['bags']).length != 0) {
             //add a new Box
             //create new Box Id
             let newBoxNum = parseInt(lastBox.substring(3)) + 1;
-            if(newBoxNum === undefined){
+            if (newBoxNum === undefined) {
                 newBoxNum = 1;
             }
             let newBoxId = 'Box' + newBoxNum.toString();
@@ -1327,30 +1327,30 @@ const addNewBox = async  (userName) => {
             toPass['560975149'] = pageLocation;
             await storeBox(toPass);
 
-            hiddenJSON.push({'132929440':newBoxId, bags:{}, '560975149':pageLocation})
+            hiddenJSON.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocation })
             let boxJSONS = hiddenJSON;
-            
+
             hiddenJSON = {};
 
-            for(let i = 0; i < boxJSONS.length; i++){
+            for (let i = 0; i < boxJSONS.length; i++) {
                 let box = boxJSONS[i]
-                if(box['560975149'] == pageLocation){
-                    if(!box.hasOwnProperty('145971562') || box['145971562'] !== '353358909'){
+                if (box['560975149'] == pageLocation) {
+                    if (!box.hasOwnProperty('145971562') || box['145971562'] !== '353358909') {
                         hiddenJSON[box['132929440']] = box['bags']
                     }
                 }
             }
             await populateBoxSelectList(hiddenJSON, userName)
         }
-        else{
+        else {
             //error (ask them to put something in the previous box first)
         }
     }
-    else{
+    else {
         //add a new Box
         //create new Box Id
         let lastBox = 'Box0'
-        if(largeIndex != -1){
+        if (largeIndex != -1) {
             lastBox = hiddenJSON[largeIndex]['132929440']
         }
         let newBoxNum = parseInt(lastBox.substring(3)) + 1;
@@ -1361,20 +1361,20 @@ const addNewBox = async  (userName) => {
         toPass['560975149'] = pageLocation;
         await storeBox(toPass);
 
-        hiddenJSON.push({'132929440':newBoxId, bags:{}, '560975149':pageLocation})
+        hiddenJSON.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocation })
         let boxJSONS = hiddenJSON;
-        
+
         hiddenJSON = {};
-        for(let i = 0; i < boxJSONS.length; i++){
+        for (let i = 0; i < boxJSONS.length; i++) {
             let box = boxJSONS[i]
-            if(box['560975149'] == pageLocation){
-                if(!box.hasOwnProperty('145971562') || box['145971562'] !== '353358909'){
+            if (box['560975149'] == pageLocation) {
+                if (!box.hasOwnProperty('145971562') || box['145971562'] !== '353358909') {
                     hiddenJSON[box['132929440']] = box['bags']
                 }
             }
         }
         await populateBoxSelectList(hiddenJSON, userName)
-        
+
     }
 
 }
@@ -1388,20 +1388,20 @@ export const addEventAddBox = (userName) => {
         let response = await getBoxesByLocation(currLocation);
         let boxJSONS = response.data;
         let hiddenJSONLocation = {};
-        for(let i = 0; i < boxJSONS.length; i++){
+        for (let i = 0; i < boxJSONS.length; i++) {
             let box = boxJSONS[i]
             hiddenJSONLocation[box['132929440']] = box['bags']
         }
-        await populateBoxSelectList(hiddenJSONLocation,userName);
+        await populateBoxSelectList(hiddenJSONLocation, userName);
         hideAnimation()
     })
-   
+
 
 }
 
 export const addEventModalAddBox = (userName) => {
     let boxButton = document.getElementById('modalAddBoxButton');
-    
+
     boxButton.addEventListener('click', async () => {
         showAnimation();
         await addNewBox(userName);
@@ -1409,15 +1409,15 @@ export const addEventModalAddBox = (userName) => {
         let response = await getBoxesByLocation(currLocation);
         let boxJSONS = response.data;
         let hiddenJSONLocation = {};
-        for(let i = 0; i < boxJSONS.length; i++){
+        for (let i = 0; i < boxJSONS.length; i++) {
             let box = boxJSONS[i]
             hiddenJSONLocation[box['132929440']] = box['bags']
         }
         await populateModalSelect(hiddenJSONLocation)
-        await populateBoxSelectList(hiddenJSONLocation,userName);
+        await populateBoxSelectList(hiddenJSONLocation, userName);
         hideAnimation()
     })
-   
+
 
 }
 
@@ -1425,17 +1425,17 @@ export const populateTubeInBoxList = async (userName) => {
     let boxList = document.getElementById('selectBoxList');
     let selectBoxList = document.getElementById('selectBoxList');
     let currBoxId = selectBoxList.value;
-    let response = await  getBoxes();
+    let response = await getBoxes();
     let hiddenJSON = response.data;
     let currBox = {};
-    for(let i = 0; i < hiddenJSON.length; i++){
+    for (let i = 0; i < hiddenJSON.length; i++) {
         let currJSON = hiddenJSON[i];
-        if(currJSON['132929440'] == currBoxId){
+        if (currJSON['132929440'] == currBoxId) {
             currBox = currJSON.bags;
         }
     }
     let currList = "";
-    
+
     //document.getElementById('BoxNumBlood').innerText = currBoxId;
     let toInsertTable = document.getElementById('currTubeTable')
     let boxKeys = Object.keys(currBox)
@@ -1447,111 +1447,111 @@ export const populateTubeInBoxList = async (userName) => {
                                 </tr>`;
     //set the rest of the table up
     let translateNumToType = {
-        "0001":"SST/Gold",
-        "0002":"SST/Gold",
-        "0003":"Heparin/Green",
-        "0004":"EDTA/Lavender",
-        "0005":"ACD/Yellow",
-        "0006":"Urine/Yellow",
-        "0007":"Mouthwash Container",
-        "0011":"SST/Gold",
-        "0012":"SST/Gold",
-        "0013":"Heparin/Green",
-        "0014":"EDTA/Lavender",
-        "0016":"Urine Cup",
-        "0021":"SST/Gold",
-        "0022":"SST/Gold",
-        "0031":"SST/Gold",
-        "0032":"SST/Gold",
-        "0024":"EDTA/Lavender",
-        "0050":"NA",
-        "0051":"NA",
-        "0052":"NA",
-        "0053":"NA",
-        "0054":"NA"
+        "0001": "SST/Gold",
+        "0002": "SST/Gold",
+        "0003": "Heparin/Green",
+        "0004": "EDTA/Lavender",
+        "0005": "ACD/Yellow",
+        "0006": "Urine/Yellow",
+        "0007": "Mouthwash Container",
+        "0011": "SST/Gold",
+        "0012": "SST/Gold",
+        "0013": "Heparin/Green",
+        "0014": "EDTA/Lavender",
+        "0016": "Urine Cup",
+        "0021": "SST/Gold",
+        "0022": "SST/Gold",
+        "0031": "SST/Gold",
+        "0032": "SST/Gold",
+        "0024": "EDTA/Lavender",
+        "0050": "NA",
+        "0051": "NA",
+        "0052": "NA",
+        "0053": "NA",
+        "0054": "NA"
     };
-    for(let j = 0; j < boxKeys.length; j++){
+    for (let j = 0; j < boxKeys.length; j++) {
         let currBagId = boxKeys[j];
         let currTubes = currBox[boxKeys[j]]['arrElements'];
-        
-        for(let k = 0; k < currTubes.length; k++){
 
-                //get the first element (tube id) from the thingx
-                let toAddId = currTubes[k];
-                let thisId = toAddId.split(' ');
-                let toAddType = 'N/A'
-                if(translateNumToType.hasOwnProperty(thisId[1])){
-                    toAddType = translateNumToType[thisId[1]];
-                }
-                var rowCount = toInsertTable.rows.length;
-                var row = toInsertTable.insertRow(rowCount);           
-                if(j % 2 == 1){
-                    row.style['background-color'] = 'lightgrey'
-                }
-                if(k == 0){
-                    row.insertCell(0).innerHTML=currBagId
-                }
-                else{
-                    row.insertCell(0).innerHTML=""
-                }
-                row.insertCell(1).innerHTML= toAddId;
-                row.insertCell(2).innerHTML= toAddType;
-                if(k == 0){
-                    row.insertCell(3).innerHTML='<input type="button" class="delButton" value = "remove bag" style="margin-top:2px;margin-bottom:2px;">';
-                }
-                else{
-                    row.insertCell(3).innerHTML="";
-                }
-                //row.insertCell(3).innerHTML= '<input type="button" class="delButton" value = "remove">';
+        for (let k = 0; k < currTubes.length; k++) {
 
-                if(k == 0){
-                    let currDeleteButton = row.cells[3].getElementsByClassName("delButton")[0]; 
+            //get the first element (tube id) from the thingx
+            let toAddId = currTubes[k];
+            let thisId = toAddId.split(' ');
+            let toAddType = 'N/A'
+            if (translateNumToType.hasOwnProperty(thisId[1])) {
+                toAddType = translateNumToType[thisId[1]];
+            }
+            var rowCount = toInsertTable.rows.length;
+            var row = toInsertTable.insertRow(rowCount);
+            if (j % 2 == 1) {
+                row.style['background-color'] = 'lightgrey'
+            }
+            if (k == 0) {
+                row.insertCell(0).innerHTML = currBagId
+            }
+            else {
+                row.insertCell(0).innerHTML = ""
+            }
+            row.insertCell(1).innerHTML = toAddId;
+            row.insertCell(2).innerHTML = toAddType;
+            if (k == 0) {
+                row.insertCell(3).innerHTML = '<input type="button" class="delButton" value = "remove bag" style="margin-top:2px;margin-bottom:2px;">';
+            }
+            else {
+                row.insertCell(3).innerHTML = "";
+            }
+            //row.insertCell(3).innerHTML= '<input type="button" class="delButton" value = "remove">';
 
-                    //This should remove the entrire bag
-                    currDeleteButton.addEventListener("click", async e => {
-                        showAnimation();
-                        var index = e.target.parentNode.parentNode.rowIndex;
-                        var table = e.target.parentNode.parentNode.parentNode.parentNode;
-                        
-                        let currRow = table.rows[index];
-                        let currBagId = table.rows[index].cells[0].innerText;
-                        /*if(currRow.cells[0].innerText != ""){
-                            if(index < table.rows.length-1){
-                                if(table.rows[index + 1].cells[0].innerText ==""){
-                                    table.rows[index+1].cells[0].innerText = currRow.cells[0].innerText;
-                                }
+            if (k == 0) {
+                let currDeleteButton = row.cells[3].getElementsByClassName("delButton")[0];
+
+                //This should remove the entrire bag
+                currDeleteButton.addEventListener("click", async e => {
+                    showAnimation();
+                    var index = e.target.parentNode.parentNode.rowIndex;
+                    var table = e.target.parentNode.parentNode.parentNode.parentNode;
+
+                    let currRow = table.rows[index];
+                    let currBagId = table.rows[index].cells[0].innerText;
+                    /*if(currRow.cells[0].innerText != ""){
+                        if(index < table.rows.length-1){
+                            if(table.rows[index + 1].cells[0].innerText ==""){
+                                table.rows[index+1].cells[0].innerText = currRow.cells[0].innerText;
                             }
-                        }*/
-                        table.deleteRow(index);
-                        let result = await removeBag(boxList.value, [currBagId])
-                        currRow = table.rows[index];
-                        while(currRow != undefined && currRow.cells[0].innerText ==""){
-                            table.deleteRow(index);
-                            currRow = table.rows[index];
                         }
-                        let response = await  getAllBoxes();
-                        let boxJSONS = response.data;
-                        let hiddenJSON = {};
-                        for(let i = 0; i < boxJSONS.length; i++){
+                    }*/
+                    table.deleteRow(index);
+                    let result = await removeBag(boxList.value, [currBagId])
+                    currRow = table.rows[index];
+                    while (currRow != undefined && currRow.cells[0].innerText == "") {
+                        table.deleteRow(index);
+                        currRow = table.rows[index];
+                    }
+                    let response = await getAllBoxes();
+                    let boxJSONS = response.data;
+                    let hiddenJSON = {};
+                    for (let i = 0; i < boxJSONS.length; i++) {
+                        let box = boxJSONS[i]
+                        hiddenJSON[box['132929440']] = box['bags']
+                    }
+
+                    await populateSpecimensList(hiddenJSON);
+                    hiddenJSON = {};
+                    for (let i = 0; i < boxJSONS.length; i++) {
+                        if (!boxJSONS[i].hasOwnProperty('145971562') || boxJSONS[i]['145971562'] != '353358909') {
                             let box = boxJSONS[i]
                             hiddenJSON[box['132929440']] = box['bags']
                         }
 
-                        await populateSpecimensList(hiddenJSON);
-                        hiddenJSON = {};
-                        for(let i = 0; i < boxJSONS.length; i++){
-                            if(!boxJSONS[i].hasOwnProperty('145971562') || boxJSONS[i]['145971562'] != '353358909'){
-                                let box = boxJSONS[i]
-                                hiddenJSON[box['132929440']] = box['bags']
-                            }
-                        
-                        }
-                        await populateSaveTable(hiddenJSON, boxJSONS, userName)
-                        hideAnimation();
-                        //delete bag from json
+                    }
+                    await populateSaveTable(hiddenJSON, boxJSONS, userName)
+                    hideAnimation();
+                    //delete bag from json
 
-                    })
-                }
+                })
+            }
 
         }
     }
@@ -1560,7 +1560,7 @@ export const populateTubeInBoxList = async (userName) => {
 
 export const addEventBoxSelectListChanged = () => {
     let selectBoxList = document.getElementById('selectBoxList');
-    selectBoxList.addEventListener("change",  async () => {
+    selectBoxList.addEventListener("change", async () => {
         showAnimation();
         await populateTubeInBoxList();
         hideAnimation();
@@ -1569,13 +1569,13 @@ export const addEventBoxSelectListChanged = () => {
 
 export const addEventChangeLocationSelect = (userName) => {
     let selectBoxList = document.getElementById('selectLocationList');
-    selectBoxList.addEventListener("change",  async () => {
+    selectBoxList.addEventListener("change", async () => {
         showAnimation();
         let currLocation = selectBoxList.value;
         let boxJSONS = (await getBoxesByLocation(currLocation)).data;
 
         let hiddenJSON = {};
-        for(let i = 0; i < boxJSONS.length; i++){
+        for (let i = 0; i < boxJSONS.length; i++) {
             let box = boxJSONS[i]
             hiddenJSON[box['132929440']] = box['bags']
         }
@@ -1666,19 +1666,19 @@ const addEventNewUserForm = (userEmail) => {
         array.push(data)
         showAnimation();
         const response = await addBiospecimenUsers(array);
-        if(response.code === 200) {
-            showNotifications({title: 'New user added!', body: `<b>${data.email}</b> is added as <b>${data.role}</b>`});
+        if (response.code === 200) {
+            showNotifications({ title: 'New user added!', body: `<b>${data.email}</b> is added as <b>${data.role}</b>` });
             form.reset();
             const users = await biospecimenUsers();
             hideAnimation();
-            if(users.code === 200 && users.data.users.length > 0) {
+            if (users.code === 200 && users.data.users.length > 0) {
                 document.getElementById('usersList').innerHTML = userListTemplate(users.data.users, userEmail);
                 addEventRemoveUser();
             }
         }
-        else if(response.code === 400 && response.message === 'User with this email already exists') {
+        else if (response.code === 400 && response.message === 'User with this email already exists') {
             hideAnimation();
-            showNotifications({title: 'User already exists!', body: `User with email: <b>${data.email}</b> already exists`}, true);
+            showNotifications({ title: 'User already exists!', body: `User with email: <b>${data.email}</b> already exists` }, true);
         }
     })
 }
@@ -1691,40 +1691,40 @@ export const addEventRemoveUser = () => {
             showAnimation();
             const response = await removeBiospecimenUsers(email);
             hideAnimation();
-            if(response.code === 200) {
+            if (response.code === 200) {
                 element.parentNode.parentNode.parentNode.removeChild(element.parentNode.parentNode);
-                showNotifications({title: 'User removed!', body: `User with email <b>${email}</b> is removed.`});
+                showNotifications({ title: 'User removed!', body: `User with email <b>${email}</b> is removed.` });
             }
         })
     })
 }
 
 export const addGoToCheckInEvent = () => {
-  const handler = (connectId) => async (_event) => {
-    try {
-      showAnimation();
-      const data = await findParticipant(`connectId=${connectId}`).then(
-        (res) => res.data?.[0]
-      );
-      checkInTemplate(data);
-    } catch (error) {
-      console.log("Error checking in participant: ", error);
-    } finally {
-      hideAnimation();
-    }
-  };
+    const handler = (connectId) => async (_event) => {
+        try {
+            showAnimation();
+            const data = await findParticipant(`connectId=${connectId}`).then(
+                (res) => res.data?.[0]
+            );
+            checkInTemplate(data);
+        } catch (error) {
+            console.log("Error checking in participant: ", error);
+        } finally {
+            hideAnimation();
+        }
+    };
 
-  const checkInButtons = document.querySelectorAll(
-    `[data-check-in-btn-connect-id]`
-  );
+    const checkInButtons = document.querySelectorAll(
+        `[data-check-in-btn-connect-id]`
+    );
 
-  Array.from(checkInButtons).forEach((btn) => {
-    btn.addEventListener("click", handler(Number(btn.dataset.checkInBtnConnectId)));
-  });
+    Array.from(checkInButtons).forEach((btn) => {
+        btn.addEventListener("click", handler(Number(btn.dataset.checkInBtnConnectId)));
+    });
 };
 
 
-  
+
 export const addEventSelectParticipantForm = (skipCheckIn) => {
     console.log("skipCheckIn", skipCheckIn);
     const form = document.getElementById('selectParticipant');
@@ -1732,7 +1732,7 @@ export const addEventSelectParticipantForm = (skipCheckIn) => {
         e.preventDefault();
         const radios = document.getElementsByName('selectParticipantRadio');
         Array.from(radios).forEach(async radio => {
-            if(radio.checked) {
+            if (radio.checked) {
                 const connectId = parseInt(radio.value);
                 let formData = {};
                 formData['Connect_ID'] = connectId;
@@ -1743,7 +1743,7 @@ export const addEventSelectParticipantForm = (skipCheckIn) => {
                 showAnimation();
                 const response = await findParticipant(query);
                 const data = response.data[0];
-                if(skipCheckIn) {
+                if (skipCheckIn) {
                     const collections = (await getParticipantCollections(data.token)).data;
                     specimenTemplate(data, formData, collections);
                 }
@@ -1758,63 +1758,77 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
+        const isCheckOut = e.target?.elements?.[1].dataset?.checkOut;
+        
+        if(isCheckOut){
+            localStorage.removeItem('check-in-135591601');
+            window.location.reload();
+        }
 
-        if(!skipFlag){
-        const confirmVal = await swal({
-            title:"Success", 
-            icon:"success",
-            text: "Particpant has been checked in.",
-             buttons: {
-                 cancel: {
-                     text: "Close",
-                     value: "cancel",
-                     visible: true,
-                     className: "btn btn-default",
-                     closeModal: true,
-                   },
-                   confirm: {
-                     text: "Continue to Specimen Link",
-                     value: 'confirmed',
-                     visible: true,
-                     className: "",
-                     closeModal: true,
-                     className: "btn btn-success",
-                   }
-               },
-           });
-     
-        if(confirmVal === "cancel") return;
+        if (!skipFlag) {
+            const confirmVal = await swal({
+                title: "Success",
+                icon: "success",
+                text: "Particpant has been checked in.",
+                buttons: {
+                    cancel: {
+                        text: "Close",
+                        value: "cancel",
+                        visible: true,
+                        className: "btn btn-default",
+                        closeModal: true,
+                    },
+                    confirm: {
+                        text: "Continue to Specimen Link",
+                        value: 'confirmed',
+                        visible: true,
+                        className: "",
+                        closeModal: true,
+                        className: "btn btn-success",
+                    }
+                },
+            });
+
+            if (confirmVal === "cancel") return;
 
         }
-        
-        let formData   = {};
+
+        let formData = {};
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
         formData['962267121'] = new Date().toISOString();
         formData['135591601'] = 353358909;
         let query = `connectId=${parseInt(form.dataset.connectId)}`;
 
+
+        let participantToken = null;
         try {
-        showAnimation(); 
-        const response = await findParticipant(query);
-        const data = response.data[0];
-        const collections = (await getParticipantCollections(data.token)).data;
-
-
-        specimenTemplate(data, formData, collections);
-
-        // update participant as checked in.
-        await updateParticipant({
-            '135591601': 353358909,
-            token: data.token,
-        });
-
+            showAnimation();
+            const response = await findParticipant(query);
+            const data = response.data[0];
+            const collections = (await getParticipantCollections(data.token)).data;
+            participantToken = data.token;
+            
+            try {
+             // update participant as checked in.
+             await updateParticipant({
+                '135591601': 353358909,
+                token: participantToken,
+            });
+            } catch (error) {
+                console.log(error);
+            } finally{
+                localStorage.setItem('check-in-135591601', true);
+                
+            }
+            specimenTemplate(data, formData, collections);
         } catch (error) {
             console.log('Error check-in', error);
         } finally {
             hideAnimation();
+           
         }
-        
+
     });
 };
 
@@ -1822,7 +1836,7 @@ export const addEventSpecimenLinkForm = formData => {
     const specimenSaveExit = document.getElementById('specimenSaveExit');
     const specimenContinue = document.getElementById('specimenContinue');
     const connectId = specimenSaveExit.dataset.connectId || specimenContinue.dataset.connectId;
-    if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
+    if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
     specimenSaveExit.addEventListener('click', () => {
         btnsClicked(connectId, formData)
     });
@@ -1833,8 +1847,8 @@ export const addEventSpecimenLinkFormCntd = (formData) => {
     const specimenSaveExit = document.getElementById('specimenSaveExit');
     const specimenContinue = document.getElementById('specimenContinue');
     const connectId = specimenSaveExit.dataset.connectId || specimenContinue.dataset.connectId;
-    if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
-    
+    if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
+
     form.addEventListener('submit', e => {
         e.preventDefault();
         btnsClicked(connectId, formData, true);
@@ -1851,91 +1865,91 @@ const btnsClicked = async (connectId, formData, cont) => {
     const select = document.getElementById('biospecimenVisitType');
     let hasError = false;
     let focus = true;
-    if(accessionID1 && accessionID1.value && !accessionID2.value && !accessionID2.classList.contains('disabled')) {
+    if (accessionID1 && accessionID1.value && !accessionID2.value && !accessionID2.classList.contains('disabled')) {
         hasError = true;
         errorMessage('accessionID2', 'Please re-type Accession ID from tube.', focus, true);
         focus = false;
     }
-    else if(accessionID1 && accessionID1.value && accessionID2.value && accessionID1.value !== accessionID2.value) {
+    else if (accessionID1 && accessionID1.value && accessionID2.value && accessionID1.value !== accessionID2.value) {
         hasError = true;
         errorMessage('accessionID2', 'Accession ID doesn\'t match', focus, true);
         focus = false;
     }
-    if(scanSpecimenID && enterSpecimenID1){
+    if (scanSpecimenID && enterSpecimenID1) {
         hasError = true;
         errorMessage('scanSpecimenID', 'Please Provide either Scanned Collection ID or Manually typed.', focus, true);
         focus = false;
         errorMessage('enterSpecimenID1', 'Please Provide either Scanned Collection ID or Manually typed.', focus, true);
     }
-    else if(!scanSpecimenID && !enterSpecimenID1){
+    else if (!scanSpecimenID && !enterSpecimenID1) {
         hasError = true;
         errorMessage('scanSpecimenID', 'Please Scan Collection ID or Type in Manually', focus, true);
         focus = false;
         errorMessage('enterSpecimenID1', 'Please Scan Collection ID or Type in Manually', focus, true);
     }
-    else if(scanSpecimenID && !enterSpecimenID1) {
-        if(!masterSpecimenIDRequirement.regExp.test(scanSpecimenID) || scanSpecimenID.length !== masterSpecimenIDRequirement.length) {
+    else if (scanSpecimenID && !enterSpecimenID1) {
+        if (!masterSpecimenIDRequirement.regExp.test(scanSpecimenID) || scanSpecimenID.length !== masterSpecimenIDRequirement.length) {
             hasError = true;
             errorMessage('scanSpecimenID', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, focus, true);
             focus = false;
         }
     }
-    else if(!scanSpecimenID && enterSpecimenID1) {
-        if(!masterSpecimenIDRequirement.regExp.test(enterSpecimenID1) || enterSpecimenID1.length !== masterSpecimenIDRequirement.length) {
+    else if (!scanSpecimenID && enterSpecimenID1) {
+        if (!masterSpecimenIDRequirement.regExp.test(enterSpecimenID1) || enterSpecimenID1.length !== masterSpecimenIDRequirement.length) {
             hasError = true;
             errorMessage('enterSpecimenID1', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, focus, true);
             focus = false;
         }
-        if(enterSpecimenID1 !== enterSpecimenID2) {
+        if (enterSpecimenID1 !== enterSpecimenID2) {
             hasError = true;
             errorMessage('enterSpecimenID2', 'Does not match with Manually Entered Collection ID', focus, true);
         }
     }
-    if(hasError) return;
+    if (hasError) return;
 
-    if(document.getElementById('collectionLocation')) formData['951355211'] = parseInt(document.getElementById('collectionLocation').value);
+    if (document.getElementById('collectionLocation')) formData['951355211'] = parseInt(document.getElementById('collectionLocation').value);
     const collectionID = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     const n = document.getElementById('399159511').innerText || ""
     const confirmVal = await swal({
-        title:"Confirm Changes", 
-        icon:"info",
-        text:`Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n || ""}`,
-         buttons: {
-             cancel: {
-                 text: "Close",
-                 value: "cancel",
-                 visible: true,
-                 className: "btn btn-default",
-                 closeModal: true,
-               },
-               back: {
-                 text: "Confirm and exit",
-                 value: "back",
-                 visible: true,
-                 className: "btn btn-info",
-               },
-               confirm: {
-                 text: "Confirm and continue",
-                 value: 'confirmed',
-                 visible: true,
-                 className: "",
-                 closeModal: true,
-                 className: "btn btn-success",
-               }
-           },
-       });
- 
-    if(confirmVal === "cancel") return;
+        title: "Confirm Changes",
+        icon: "info",
+        text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n || ""}`,
+        buttons: {
+            cancel: {
+                text: "Close",
+                value: "cancel",
+                visible: true,
+                className: "btn btn-default",
+                closeModal: true,
+            },
+            back: {
+                text: "Confirm and exit",
+                value: "back",
+                visible: true,
+                className: "btn btn-info",
+            },
+            confirm: {
+                text: "Confirm and continue",
+                value: 'confirmed',
+                visible: true,
+                className: "",
+                closeModal: true,
+                className: "btn btn-success",
+            }
+        },
+    });
+
+    if (confirmVal === "cancel") return;
 
     formData['820476880'] = collectionID;
     formData['650516960'] = getWorflow() === 'research' ? 534621077 : 664882224;
-    if(enterSpecimenID1) formData['387108065'] = 353358909
+    if (enterSpecimenID1) formData['387108065'] = 353358909
     else formData['387108065'] = 104430631;
-    if(accessionID1 && accessionID1.value) {
+    if (accessionID1 && accessionID1.value) {
         formData['646899796'] = accessionID1.value;
         formData['148996099'] = 353358909;
     }
-    if(select) formData['331584571'] = parseInt(select.value);
+    if (select) formData['331584571'] = parseInt(select.value);
     formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
     formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
     let query = `connectId=${parseInt(connectId)}`;
@@ -1944,12 +1958,12 @@ const btnsClicked = async (connectId, formData, cont) => {
     const data = response.data[0];
     const specimenData = (await searchSpecimen(formData['820476880'])).data;
     hideAnimation();
-    if(specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID) {
-        showNotifications({title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.'}, true)
+    if (specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID) {
+        showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.' }, true)
         return;
     }
 
-    if(cont && confirmVal == "confirmed") {
+    if (cont && confirmVal == "confirmed") {
         showAnimation();
         await storeSpecimen([formData]);
         const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
@@ -1985,9 +1999,9 @@ export const addEventBiospecimenCollectionFormEdit = (dt, biospecimenData) => {
         button.addEventListener('click', () => {
             const conceptID = button.id.replace('collectEditBtn', '');
             document.getElementById(conceptID + 'Id').disabled = false;
-            
+
             const deviationBox = document.getElementById(conceptID + 'Deviated');
-            if(deviationBox) deviationBox.disabled = false;
+            if (deviationBox) deviationBox.disabled = false;
         });
 
     });
@@ -1999,25 +2013,25 @@ export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
         input.addEventListener('change', () => {
             const siteTubesList = getSiteTubesLists(biospecimenData)
             const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
-            
+
             removeSingleError(input.id);
-            
+
             let value = getValue(`${input.id}`).toUpperCase();
-            if(value.length != 0) {
+            if (value.length != 0) {
 
                 const masterID = value.substr(0, masterSpecimenIDRequirement.length);
                 const tubeID = value.substr(masterSpecimenIDRequirement.length + 1, totalCollectionIDLength);
 
-                if(input.required && value.length !== totalCollectionIDLength) {
+                if (input.required && value.length !== totalCollectionIDLength) {
                     errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`);
                 }
-                else if(input.required && masterID !== biospecimenData['820476880']) {
+                else if (input.required && masterID !== biospecimenData['820476880']) {
                     errorMessage(input.id, 'Invalid Collection ID.');
                 }
-                else if(input.required && tubes.length === 0) {
+                else if (input.required && tubes.length === 0) {
                     errorMessage(input.id, 'Invalid Full Specimen ID.');
                 }
-                else if(input.required && (tubes[0].id !== tubeID && !additionalTubeIDRequirement.regExp.test(tubeID))) {
+                else if (input.required && (tubes[0].id !== tubeID && !additionalTubeIDRequirement.regExp.test(tubeID))) {
                     errorMessage(input.id, 'Invalid Full Specimen ID.');
                 }
             }
@@ -2030,30 +2044,30 @@ export const addEventTubeCollectedForm = (data, masterSpecimenId) => {
     form.addEventListener('submit', async e => {
         e.preventDefault();
         const checkboxes = Array.from(document.getElementsByClassName('tube-collected'));
-        if(checkboxes.length === 0){
-           document.getElementById('navBarSearch').click();
+        if (checkboxes.length === 0) {
+            document.getElementById('navBarSearch').click();
         }
         let atLeastOneChecked = false;
         checkboxes.forEach(chkbox => {
-            if(atLeastOneChecked) return
-            if(chkbox.checked) atLeastOneChecked = true;
+            if (atLeastOneChecked) return
+            if (chkbox.checked) atLeastOneChecked = true;
         });
-        if(!atLeastOneChecked) return;
-        
+        if (!atLeastOneChecked) return;
+
         showAnimation();
         const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
-        if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+        if (getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
         checkboxes.forEach((dt) => {
-            if(biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
-            if(biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
+            if (biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
+            if (biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
                 biospecimenData[`${dt.id}`] = {};
             }
             biospecimenData[`${dt.id}`]['593843561'] = dt.checked ? 353358909 : 104430631;
         });
 
         // Explicitely specify 2 biohazard bags
-        if(biospecimenData['787237543'] === undefined) biospecimenData['787237543'] = { '593843561': 353358909 }
-        if(biospecimenData['223999569'] === undefined) biospecimenData['223999569'] = { '593843561': 353358909 }
+        if (biospecimenData['787237543'] === undefined) biospecimenData['787237543'] = { '593843561': 353358909 }
+        if (biospecimenData['223999569'] === undefined) biospecimenData['223999569'] = { '593843561': 353358909 }
 
         await storeSpecimen([biospecimenData]);
         hideAnimation();
@@ -2066,10 +2080,10 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     removeAllErrors();
 
     const checkboxes = Array.from(document.getElementsByClassName('tube-collected'));
-    if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+    if (getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
     checkboxes.forEach((dt) => {
-        if(biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
-        if(biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
+        if (biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
+        if (biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
             biospecimenData[`${dt.id}`] = {};
         }
         biospecimenData[`${dt.id}`]['593843561'] = dt.checked ? 353358909 : 104430631;
@@ -2082,43 +2096,43 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     inputFields.forEach(input => {
         const siteTubesList = getSiteTubesLists(biospecimenData)
         const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
-        
+
         let value = getValue(`${input.id}`).toUpperCase();
         const masterID = value.substr(0, masterSpecimenIDRequirement.length);
         const tubeID = value.substr(masterSpecimenIDRequirement.length + 1, totalCollectionIDLength);
-        
-        if(input.required && value.length !== totalCollectionIDLength) {
+
+        if (input.required && value.length !== totalCollectionIDLength) {
             hasError = true;
-            if(value.length > 0){
+            if (value.length > 0) {
                 hasCntdError = true;
             }
-            if(cntd || value.length > 0){
+            if (cntd || value.length > 0) {
                 errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`, focus);
             }
             focus = false;
         }
-        else if(input.required && masterID !== biospecimenData['820476880']) {
+        else if (input.required && masterID !== biospecimenData['820476880']) {
             hasError = true;
             hasCntdError = true;
             errorMessage(input.id, 'Invalid Collection ID.', focus);
             focus = false;
         }
-        else if(input.required && tubes.length === 0) {
+        else if (input.required && tubes.length === 0) {
             hasError = true;
             hasCntdError = true;
             errorMessage(input.id, 'Invalid Full Specimen ID.', focus);
             focus = false;
         }
-        else if(input.required && (tubes[0].id !== tubeID && !additionalTubeIDRequirement.regExp.test(tubeID))) {
+        else if (input.required && (tubes[0].id !== tubeID && !additionalTubeIDRequirement.regExp.test(tubeID))) {
             hasError = true;
             hasCntdError = true;
             errorMessage(input.id, 'Invalid Full Specimen ID.', focus);
             focus = false;
         }
-        
-        if(input.required) data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim();
+
+        if (input.required) data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim();
     });
-    if((hasError && cntd == true) || hasCntdError) return;
+    if ((hasError && cntd == true) || hasCntdError) return;
 
     const textAreas = document.getElementsByClassName('additional-explanation');
 
@@ -2129,7 +2143,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         const tubeId = reason.id.replace('Reason', '');
 
         biospecimenData[tubeId]['883732523'] = reason.value;
-        
+
         // biospecimenData[tubeId]['338286049'] = ta.value.trim();
     });
 
@@ -2141,14 +2155,14 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         biospecimenData[tubeId]['536710547'] = deviationNotes.value.trim();
 
         // Discard tube
-        if(biospecimenData[tubeId]['248868659'].includes(472864016) || biospecimenData[tubeId]['248868659'].includes(956345366)) {
+        if (biospecimenData[tubeId]['248868659'].includes(472864016) || biospecimenData[tubeId]['248868659'].includes(956345366)) {
             biospecimenData[tubeId]['762124027'] = 353358909
         }
         else {
             biospecimenData[tubeId]['762124027'] = 104430631
         }
 
-        if(biospecimenData[tubeId]['248868659'].includes(453343022) && !ta.value.trim()) { // If other is selected, make text area mandatory.
+        if (biospecimenData[tubeId]['248868659'].includes(453343022) && !ta.value.trim()) { // If other is selected, make text area mandatory.
             hasError = true;
             errorMessage(ta.id, 'Please provide more details', focus);
             focus = false;
@@ -2157,17 +2171,17 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
     });
 
-    if(hasError) return;
+    if (hasError) return;
 
     data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
     Array.from(document.getElementsByClassName('tube-deviated')).forEach(dt => data[dt.id.replace('Deviated', '')]['678857215'] = dt.checked ? 353358909 : 104430631)
     Array.from(document.getElementsByClassName('tube-deviated')).filter(dt => dt.checked === false).forEach(dt => biospecimenData[dt.id.replace('Deviated', '')]['248868659'] = '')
 
     showAnimation();
-    
-    if(cntd) {
-        if(getWorflow() === 'clinical') {
-            if(data['915838974'] === undefined) data['915838974'] = new Date().toISOString();
+
+    if (cntd) {
+        if (getWorflow() === 'clinical') {
+            if (data['915838974'] === undefined) data['915838974'] = new Date().toISOString();
         }
         await storeSpecimen([data]);
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
@@ -2178,16 +2192,16 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         await storeSpecimen([data]);
 
         await swal({
-            title:"Success", 
-            icon:"success",
+            title: "Success",
+            icon: "success",
             text: "Collection specimen data has been saved",
-             buttons: {
-                 close: {
-                     text: "Close",
-                     value: "close",
-                     visible: true,
-                     className: "btn btn-success",
-                     closeModal: true,
+            buttons: {
+                close: {
+                    text: "Close",
+                    value: "close",
+                    visible: true,
+                    className: "btn btn-success",
+                    closeModal: true,
                 }
             },
         });
@@ -2203,17 +2217,17 @@ const isChecked = (id) => document.getElementById(id).checked;
 export const addEventSelectAllCollection = () => {
     const checkbox = document.getElementById('selectAllCollection');
     checkbox.addEventListener('click', () => {
-        if(checkbox.checked) Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => chk.checked = true);
+        if (checkbox.checked) Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => chk.checked = true);
         else Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => chk.checked = false);
     })
 }
 
 export const addEventNavBarParticipantCheckIn = () => {
     const btn = document.getElementById('navBarParticipantCheckIn');
-    if(!btn) return
+    if (!btn) return
     btn.addEventListener('click', async () => {
         const connectId = btn.dataset.connectId;
-        if(!connectId) return;
+        if (!connectId) return;
         let query = `connectId=${parseInt(connectId)}`;
         showAnimation();
         const response = await findParticipant(query);
@@ -2245,18 +2259,18 @@ const explanationHandler = async (data, biospecimenData, cntd) => {
     let hasError = false;
     let focus = true;
     Array.from(textAreas).forEach(ta => {
-        const tubeId = ta.id.replace('Explanation','').replace('Deviated', '');
-        if(document.getElementById(ta.id.replace('Explanation', 'Reason')).multiple) { // Deviation
+        const tubeId = ta.id.replace('Explanation', '').replace('Deviated', '');
+        if (document.getElementById(ta.id.replace('Explanation', 'Reason')).multiple) { // Deviation
             biospecimenData[tubeId]['248868659'] = Array.from(document.getElementById(ta.id.replace('Explanation', 'Reason'))).filter(el => el.selected).map(el => parseInt(el.value));
             biospecimenData[tubeId]['536710547'] = ta.value.trim();
             // Discard tube
-            if(biospecimenData[tubeId]['248868659'].includes(472864016) || biospecimenData[tubeId]['248868659'].includes(956345366)) {
+            if (biospecimenData[tubeId]['248868659'].includes(472864016) || biospecimenData[tubeId]['248868659'].includes(956345366)) {
                 biospecimenData[tubeId]['762124027'] = 353358909
             }
             else {
                 biospecimenData[tubeId]['762124027'] = 104430631
             }
-            if(biospecimenData[tubeId]['248868659'].includes(453343022) && !ta.value.trim()) { // If other is selected, make text area mandatory.
+            if (biospecimenData[tubeId]['248868659'].includes(453343022) && !ta.value.trim()) { // If other is selected, make text area mandatory.
                 hasError = true;
                 errorMessage(ta.id, 'Please provide more details', focus);
                 focus = false;
@@ -2266,7 +2280,7 @@ const explanationHandler = async (data, biospecimenData, cntd) => {
         else { // Tubes not collected
             biospecimenData[tubeId]['883732523'] = parseInt(document.getElementById(ta.id.replace('Explanation', 'Reason')).value);
             biospecimenData[tubeId]['338286049'] = ta.value.trim();
-            if(biospecimenData[tubeId]['883732523'] === 181769837 && !ta.value.trim()) {
+            if (biospecimenData[tubeId]['883732523'] === 181769837 && !ta.value.trim()) {
                 hasError = true;
                 errorMessage(ta.id, 'Please provide more details', focus);
                 focus = false;
@@ -2274,10 +2288,10 @@ const explanationHandler = async (data, biospecimenData, cntd) => {
             }
         }
     });
-    if(hasError) return;
+    if (hasError) return;
     showAnimation();
     await storeSpecimen([biospecimenData]);
-    if(cntd) {
+    if (cntd) {
         const specimenData = (await searchSpecimen(masterSpecimenId)).data;
         hideAnimation();
         finalizeTemplate(data, specimenData);
@@ -2309,19 +2323,19 @@ const finalizeHandler = async (biospecimenData, cntd) => {
     const masterSpecimenId = biospecimenData['820476880']
     let formData = {};
     biospecimenData['260133861'] = document.getElementById('finalizedAdditionalNotes').value;
-    
-    if(cntd) {
+
+    if (cntd) {
         biospecimenData['410912345'] = 353358909;
         biospecimenData['556788178'] = new Date().toISOString();
         showAnimation();
         await storeSpecimen([biospecimenData]);
-        showNotifications({title: 'Specimen Finalized', body: 'Collection Finalized Successfully!'});
+        showNotifications({ title: 'Specimen Finalized', body: 'Collection Finalized Successfully!' });
         const specimenData = (await searchSpecimen(masterSpecimenId)).data;
         let query = `connectId=${parseInt(specimenData.Connect_ID)}`;
         const response = await findParticipant(query);
         const participantData = response.data[0];
         hideAnimation();
-        if(!document.getElementById('participantCheckOut')) searchTemplate();
+        if (!document.getElementById('participantCheckOut')) searchTemplate();
         else checkOutScreen(participantData, specimenData);
     }
     else {
@@ -2361,7 +2375,7 @@ export const addEventNavBarSpecimenSearch = () => {
     const btn = document.getElementById('navBarSpecimenSearch');
     btn.addEventListener('click', e => {
         e.stopPropagation();
-        if(btn.classList.contains('active')) return;
+        if (btn.classList.contains('active')) return;
         searchBiospecimenTemplate();
     });
 }
@@ -2371,9 +2385,9 @@ export const addEventNavBarShipment = (id, userName) => {
     btn.addEventListener('click', async e => {
         e.stopPropagation();
         let navButton = document.getElementById('navBarShippingDash')
-        if(navButton.classList.contains('active')) return;
+        if (navButton.classList.contains('active')) return;
         await startShipping(userName);
-        
+
     });
 }
 
@@ -2382,12 +2396,12 @@ export const addEventNavBarBoxManifest = (id, userName) => {
     const btn = document.getElementById(id);
     document.getElementById(id).addEventListener('click', e => {
         e.stopPropagation();
-        if(btn.classList.contains('active')) return;
-        if(id == 'viewBoxManifestBlood'){
+        if (btn.classList.contains('active')) return;
+        if (id == 'viewBoxManifestBlood') {
             //return box 1 info
             boxManifest(document.getElementById('currTubeTable'), userName);
         }
-        else if(id == 'viewBoxManifestMouthwash'){
+        else if (id == 'viewBoxManifestMouthwash') {
             //return box 2 info
             boxManifest(document.getElementById('mouthwashList'), userName)
         }
@@ -2398,20 +2412,20 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
     const btn = document.getElementById('completePackaging');
     document.getElementById('completePackaging').addEventListener('click', async e => {
         e.stopPropagation();
-        if(btn.classList.contains('active')) return;
+        if (btn.classList.contains('active')) return;
         //get table info
         let boxesToShip = [];
         let currTable = document.getElementById('saveTable')
-        for (var r = 1; r < currTable.rows.length; r++) {            
-            
+        for (var r = 1; r < currTable.rows.length; r++) {
+
             let currCheck = currTable.rows[r].cells[0]
-            if(currCheck.childNodes[0].checked){
+            if (currCheck.childNodes[0].checked) {
                 let currBoxId = currTable.rows[r].cells[3].innerText;
                 boxesToShip.push(currBoxId)
             }
-            
+
         }
-        if(document.getElementById('tempMonitorChecked')){
+        if (document.getElementById('tempMonitorChecked')) {
             tempChecked = document.getElementById('tempMonitorChecked').checked
         }
         //return box 1 info
@@ -2424,7 +2438,7 @@ export const addEventReturnToShippingManifest = (element, hiddenJSON, userName, 
     document.getElementById(element).addEventListener('click', async e => {
         let boxesToShip = Object.keys(hiddenJSON).sort(compareBoxIds)
         //return box 1 info
-        if(tempChecked != false){
+        if (tempChecked != false) {
             tempChecked = true;
         }
         await shippingManifest(boxesToShip, userName, tempChecked);
@@ -2435,9 +2449,9 @@ export const addEventNavBarTracking = (element, userName, hiddenJSON, tempChecke
     let btn = document.getElementById('navBarShipmentTracking');
     document.getElementById(element).addEventListener('click', async e => {
         e.stopPropagation();
-        if(btn.classList.contains('active')) return;
+        if (btn.classList.contains('active')) return;
         let keys = Object.keys(hiddenJSON).sort(compareBoxIds)
-        for(let i = 0; i < keys.length; i++){
+        for (let i = 0; i < keys.length; i++) {
             hiddenJSON[keys[i]] = hiddenJSON[keys[i]]['specimens']
         }
         //return box 1 info
@@ -2448,10 +2462,10 @@ export const populateSelectLocationList = async () => {
     let currSelect = document.getElementById('selectLocationList')
     let response = await getLocationsInstitute();
     let list = ''
-    for(let i = 0; i < response.length; i++){
+    for (let i = 0; i < response.length; i++) {
         list += '<option>' + response[i] + '</option>';
     }
-    if(list == ''){
+    if (list == '') {
         list = 'remember to add Box'
     }
     currSelect.innerHTML = list;
@@ -2460,78 +2474,78 @@ export const populateSelectLocationList = async () => {
 export const populateBoxManifestTable = (boxId, hiddenJSON) => {
     let currTable = document.getElementById('boxManifestTable');
     let currBox = hiddenJSON[boxId];
-    
+
     let bags = Object.keys(currBox);
     let rowCount = 1;
     let translateNumToType = {
-        "0001":"SST/Gold",
-        "0002":"SST/Gold",
-        "0003":"Heparin/Green",
-        "0004":"EDTA/Lavender",
-        "0005":"ACD/Yellow",
-        "0006":"Urine/Yellow",
-        "0007":"Mouthwash Container",
-        "0011":"SST/Gold",
-        "0012":"SST/Gold",
-        "0013":"Heparin/Green",
-        "0014":"EDTA/Lavender",
-        "0016":"Urine Cup",
-        "0021":"SST/Gold",
-        "0022":"SST/Gold",
-        "0031":"SST/Gold",
-        "0032":"SST/Gold",
-        "0024":"EDTA/Lavender",
-        "0050":"NA",
-        "0051":"NA",
-        "0052":"NA",
-        "0053":"NA",
-        "0054":"NA"
+        "0001": "SST/Gold",
+        "0002": "SST/Gold",
+        "0003": "Heparin/Green",
+        "0004": "EDTA/Lavender",
+        "0005": "ACD/Yellow",
+        "0006": "Urine/Yellow",
+        "0007": "Mouthwash Container",
+        "0011": "SST/Gold",
+        "0012": "SST/Gold",
+        "0013": "Heparin/Green",
+        "0014": "EDTA/Lavender",
+        "0016": "Urine Cup",
+        "0021": "SST/Gold",
+        "0022": "SST/Gold",
+        "0031": "SST/Gold",
+        "0032": "SST/Gold",
+        "0024": "EDTA/Lavender",
+        "0050": "NA",
+        "0051": "NA",
+        "0052": "NA",
+        "0053": "NA",
+        "0054": "NA"
     };
-    for(let i = 0; i < bags.length; i++){
+    for (let i = 0; i < bags.length; i++) {
         let tubes = currBox[bags[i]]['arrElements'];
-        for(let j = 0; j < tubes.length; j++){
+        for (let j = 0; j < tubes.length; j++) {
             let currRow = currTable.insertRow(rowCount);
-            if(j == 0){
+            if (j == 0) {
                 currRow.insertCell(0).innerHTML = bags[i];
             }
-            else{
+            else {
                 currRow.insertCell(0).innerHTML = '';
             }
             currRow.insertCell(1).innerHTML = tubes[j]
             let thisId = tubes[j].split(' ');
             let toAddType = 'N/A'
-            if(translateNumToType.hasOwnProperty(thisId[1])){
+            if (translateNumToType.hasOwnProperty(thisId[1])) {
                 toAddType = translateNumToType[thisId[1]];
             }
             currRow.insertCell(2).innerHTML = toAddType
             let fullScannerName = ''
 
-            if(currBox[bags[i]].hasOwnProperty('469819603') && j == 0){
+            if (currBox[bags[i]].hasOwnProperty('469819603') && j == 0) {
                 fullScannerName += currBox[bags[i]]['469819603'] + ' ';
             }
-            if(currBox[bags[i]].hasOwnProperty('618036638') && j == 0){
+            if (currBox[bags[i]].hasOwnProperty('618036638') && j == 0) {
                 fullScannerName += currBox[bags[i]]['618036638'];
             }
             currRow.insertCell(3).innerHTML = fullScannerName;
 
-            if(i % 2 == 0){
+            if (i % 2 == 0) {
                 currRow.style['background-color'] = "lightgrey";
             }
             rowCount += 1;
 
         }
     }
-    
+
 }
 
 export const populateTrackingQuery = (hiddenJSON) => {
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     let toBeInnerHTML = ""
-    for(let i = 0; i < boxes.length; i++){
-        toBeInnerHTML +=`
+    for (let i = 0; i < boxes.length; i++) {
+        toBeInnerHTML += `
         <div class = "row">
                             <div class="form-group" style="margin-top:30px">
-                                <label style="float:left;margin-top:5px">`+ boxes[i] +`</label>
+                                <label style="float:left;margin-top:5px">`+ boxes[i] + `</label>
                                 <div style="float:left;margin-left:30px">
                                     <input class="form-control" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number"/>
                                 </div>
@@ -2543,40 +2557,40 @@ export const populateTrackingQuery = (hiddenJSON) => {
 }
 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
-    document.getElementById('completeTracking').addEventListener('click', () =>{
+    document.getElementById('completeTracking').addEventListener('click', () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
-        let emptyField= false;
-        for(let i = 0; i < boxes.length; i++){
+        let emptyField = false;
+        for (let i = 0; i < boxes.length; i++) {
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-            if(boxi == ''){
+            if (boxi == '') {
                 emptyField = true;
-                showNotifications({title: 'Missing Fields', body: 'Please fill out required fields!'}, true)
+                showNotifications({ title: 'Missing Fields', body: 'Please fill out required fields!' }, true)
             }
-            hiddenJSON[boxes[i]] = {'959708259':boxi, specimens:hiddenJSON[boxes[i]]}
+            hiddenJSON[boxes[i]] = { '959708259': boxi, specimens: hiddenJSON[boxes[i]] }
         }
-        if(emptyField == false){
+        if (emptyField == false) {
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
             let shipmentCourier = document.getElementById('courierSelect').value;
             finalShipmentTracking(hiddenJSON, userName, tempChecked, shipmentCourier);
         }
     })
-    
+
 }
 
 export const addEventSaveButton = (hiddenJSON) => {
-    document.getElementById('saveTracking').addEventListener('click', async () =>{
+    document.getElementById('saveTracking').addEventListener('click', async () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
-        for(let i = 0; i < boxes.length; i++){
+        for (let i = 0; i < boxes.length; i++) {
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-            hiddenJSON[boxes[i]] = {'959708259':boxi, specimens:hiddenJSON[boxes[i]]}
-            
+            hiddenJSON[boxes[i]] = { '959708259': boxi, specimens: hiddenJSON[boxes[i]] }
+
         }
 
         let shippingData = {}
 
         let trackingNumbers = {}
         let boxNames = Object.keys(hiddenJSON);
-        for(let i = 0; i < boxNames.length; i++){
+        for (let i = 0; i < boxNames.length; i++) {
             trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
         }
 
@@ -2586,14 +2600,14 @@ export const addEventSaveButton = (hiddenJSON) => {
 }
 
 export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked, shipmentCourier) => {
-    document.getElementById('finalizeModalSign').addEventListener('click', async () =>{
+    document.getElementById('finalizeModalSign').addEventListener('click', async () => {
         let finalizeTextField = document.getElementById('finalizeSignInput');
         let conversion = {
-            "FedEx":"712278213",
+            "FedEx": "712278213",
             "World Courier": "149772928"
         }
         let tempCheckedId = "104430631"
-        if(tempChecked != false){
+        if (tempChecked != false) {
             tempCheckedId = tempChecked
         }
         let shippingData = {}
@@ -2601,19 +2615,19 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         shippingData["105891443"] = tempCheckedId;
         let trackingNumbers = {}
         let boxNames = Object.keys(hiddenJSON);
-        for(let i = 0; i < boxNames.length; i++){
+        for (let i = 0; i < boxNames.length; i++) {
             trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
         }
-        if(finalizeTextField.value.toUpperCase() === userName.toUpperCase()){
+        if (finalizeTextField.value.toUpperCase() === userName.toUpperCase()) {
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
             await ship(boxes, shippingData, trackingNumbers);
             document.getElementById('finalizeModalCancel').click();
-            if(tempChecked){
+            if (tempChecked) {
                 updateNewTempDate();
             }
             startShipping(userName);
         }
-        else{
+        else {
             let errorMessage = document.getElementById('finalizeModalError');
             errorMessage.style.display = "block";
         }
@@ -2623,21 +2637,21 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
 export const populateFinalCheck = (hiddenJSON) => {
     let table = document.getElementById('finalCheckTable');
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
-    for(let i = 0; i < boxes.length; i++){
+    for (let i = 0; i < boxes.length; i++) {
         let currBox = boxes[i]
         let currShippingNumber = hiddenJSON[boxes[i]]['959708259']
         let specimenObj = hiddenJSON[boxes[i]]['specimens'];
         let keys = Object.keys(specimenObj);
         let numTubes = 0;
-        let numBags = specimenObj.hasOwnProperty('orphans') ? keys.length-1 : keys.length;
-        for(let j = 0; j < keys.length; j++){
+        let numBags = specimenObj.hasOwnProperty('orphans') ? keys.length - 1 : keys.length;
+        for (let j = 0; j < keys.length; j++) {
             numTubes += specimenObj[keys[j]]['arrElements'].length;
         }
-        let row = table.insertRow(i+1);           
-        row.insertCell(0).innerHTML= currBox;
-        row.insertCell(1).innerHTML= currShippingNumber;
-        row.insertCell(2).innerHTML= numTubes;
-        row.insertCell(3).innerHTML= numBags;
+        let row = table.insertRow(i + 1);
+        row.insertCell(0).innerHTML = currBox;
+        row.insertCell(1).innerHTML = currShippingNumber;
+        row.insertCell(2).innerHTML = numTubes;
+        row.insertCell(3).innerHTML = numBags;
     }
 }
 
@@ -2663,7 +2677,7 @@ export const addEventContactInformationModal = (data) => {
             </br>
             <div class="row">
                 <div class="col">
-                    <strong>Address:</strong> ${data['521824358']}${data['442166669'] ? ` ${data['442166669']}`: ''} ${data['703385619']} ${data['634434746']} ${data['892050548']}
+                    <strong>Address:</strong> ${data['521824358']}${data['442166669'] ? ` ${data['442166669']}` : ''} ${data['703385619']} ${data['634434746']} ${data['892050548']}
                 </div>
             </div>
             <div class="row">
@@ -2742,9 +2756,9 @@ export const addEventCntdToCollectProcess = () => {
 }
 
 export const populateCourierBox = async () => {
-    let couriers =await getSiteCouriers();
+    let couriers = await getSiteCouriers();
     let selectBox = document.getElementById('courierSelect');
-    for(let i = 0; i < couriers.length; i++){
+    for (let i = 0; i < couriers.length; i++) {
         let currElement = document.createElement('option');
         currElement.textContent = couriers[i];
         selectBox.appendChild(currElement);
@@ -2770,29 +2784,29 @@ export const populateBoxTable = async (page, filter) => {
     currRow.insertCell(8).innerHTML = "Comments"
 
     let conversion = {
-        "712278213":"FedEx",
-        "149772928":"World Courier"
+        "712278213": "FedEx",
+        "149772928": "World Courier"
     }
-    for(let i = 0; i < pageStuff.data.length; i++){
+    for (let i = 0; i < pageStuff.data.length; i++) {
         rowCount = currTable.rows.length;
         currRow = currTable.insertRow(rowCount);
         let currPage = pageStuff.data[i];
         let numTubes = 0;
         let keys = Object.keys(currPage['bags']);
-        for(let j = 0; j < keys.length; j++){
+        for (let j = 0; j < keys.length; j++) {
             numTubes += currPage['bags'][keys[j]]['arrElements'].length;
         }
         let shippedDate = ''
-        if(currPage.hasOwnProperty('656548982')){
-            let currentdate = new Date(currPage['656548982']); 
-            let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
-            let hour = parseInt(currentdate.getHours())%12;
-            shippedDate =  (currentdate.getMonth()+1) + "/"
-                            + currentdate.getDate()  + "/" 
-                            + currentdate.getFullYear() 
-                            /*+ " "  
-                            + hour.toString()+ ":"  
-                            + currentdate.getMinutes() + ampm;
+        if (currPage.hasOwnProperty('656548982')) {
+            let currentdate = new Date(currPage['656548982']);
+            let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
+            let hour = parseInt(currentdate.getHours()) % 12;
+            shippedDate = (currentdate.getMonth() + 1) + "/"
+                + currentdate.getDate() + "/"
+                + currentdate.getFullYear()
+            /*+ " "  
+            + hour.toString()+ ":"  
+            + currentdate.getMinutes() + ampm;
 */
         }
         currRow.insertCell(0).innerHTML = currPage.hasOwnProperty('959708259') ? currPage['959708259'] : '';
@@ -2805,7 +2819,7 @@ export const populateBoxTable = async (page, filter) => {
         currRow.insertCell(7).innerHTML = currPage.hasOwnProperty('') ? currPage[''] : '';
         currRow.insertCell(8).innerHTML = '';
         addEventViewManifestButton('reportsViewManifest' + i, currPage);
-        
+
     }
     hideAnimation();
 
@@ -2830,33 +2844,33 @@ export const populateReportManifestHeader = (currPage) => {
     document.getElementById('boxManifestCol1').appendChild(newP);
 
     let toInsertDate = ''
-    if(currPage.hasOwnProperty('672863981')){
+    if (currPage.hasOwnProperty('672863981')) {
         let dateStarted = Date.parse(currPage['672863981'])
-        
-        let currentdate = new Date(dateStarted); 
-        let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
-        let hour = parseInt(currentdate.getHours())%12;
-        toInsertDate =  (currentdate.getMonth()+1) + "/"
-                        + currentdate.getDate()  + "/" 
-                        + currentdate.getFullYear() 
-                        /*+ " "  
-                        + hour.toString()+ ":"  
-                        + currentdate.getMinutes() + ampm;
+
+        let currentdate = new Date(dateStarted);
+        let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
+        let hour = parseInt(currentdate.getHours()) % 12;
+        toInsertDate = (currentdate.getMonth() + 1) + "/"
+            + currentdate.getDate() + "/"
+            + currentdate.getFullYear()
+        /*+ " "  
+        + hour.toString()+ ":"  
+        + currentdate.getMinutes() + ampm;
 */
     }
     let toInsertDate2 = ''
-    if(currPage.hasOwnProperty('656548982')){
+    if (currPage.hasOwnProperty('656548982')) {
         let dateStarted = currPage['656548982']
-        
-        let currentdate = new Date(dateStarted); 
-        let ampm = parseInt(currentdate.getHours())/12 >= 1 ? "PM" : "AM"; 
-        let hour = parseInt(currentdate.getHours())%12;
-        toInsertDate2 =  (currentdate.getMonth()+1) + "/"
-                        + currentdate.getDate()  + "/" 
-                        + currentdate.getFullYear() 
-                        /*+ " "  
-                        + hour.toString()+ ":"  
-                        + currentdate.getMinutes() + ampm;
+
+        let currentdate = new Date(dateStarted);
+        let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
+        let hour = parseInt(currentdate.getHours()) % 12;
+        toInsertDate2 = (currentdate.getMonth() + 1) + "/"
+            + currentdate.getDate() + "/"
+            + currentdate.getFullYear()
+        /*+ " "  
+        + hour.toString()+ ":"  
+        + currentdate.getMinutes() + ampm;
 */
     }
     newP = document.createElement("p");
@@ -2865,74 +2879,74 @@ export const populateReportManifestHeader = (currPage) => {
     newP = document.createElement("p");
     newP.innerHTML = "Date Shipped: " + toInsertDate2;
     document.getElementById('boxManifestCol1').appendChild(newP);
-    newDiv.innerHTML = displayContactInformation(site,siteContactInformation)
-    document.getElementById('boxManifestCol1').appendChild(newDiv) 
+    newDiv.innerHTML = displayContactInformation(site, siteContactInformation)
+    document.getElementById('boxManifestCol1').appendChild(newDiv)
 }
 
 //***
 export const populateReportManifestTable = (currPage) => {
     let currTable = document.getElementById('boxManifestTable');
-    
+
     let bags = Object.keys(currPage['bags']);
     let rowCount = 1;
     let translateNumToType = {
-        "0001":"SST/Gold",
-        "0002":"SST/Gold",
-        "0003":"Heparin/Green",
-        "0004":"EDTA/Lavender",
-        "0005":"ACD/Yellow",
-        "0006":"Urine/Yellow",
-        "0007":"Mouthwash Container",
-        "0011":"SST/Gold",
-        "0012":"SST/Gold",
-        "0013":"Heparin/Green",
-        "0014":"EDTA/Lavender",
-        "0016":"Urine Cup",
-        "0021":"SST/Gold",
-        "0022":"SST/Gold",
-        "0031":"SST/Gold",
-        "0032":"SST/Gold",
-        "0024":"EDTA/Lavender",
-        "0050":"NA",
-        "0051":"NA",
-        "0052":"NA",
-        "0053":"NA",
-        "0054":"NA"
+        "0001": "SST/Gold",
+        "0002": "SST/Gold",
+        "0003": "Heparin/Green",
+        "0004": "EDTA/Lavender",
+        "0005": "ACD/Yellow",
+        "0006": "Urine/Yellow",
+        "0007": "Mouthwash Container",
+        "0011": "SST/Gold",
+        "0012": "SST/Gold",
+        "0013": "Heparin/Green",
+        "0014": "EDTA/Lavender",
+        "0016": "Urine Cup",
+        "0021": "SST/Gold",
+        "0022": "SST/Gold",
+        "0031": "SST/Gold",
+        "0032": "SST/Gold",
+        "0024": "EDTA/Lavender",
+        "0050": "NA",
+        "0051": "NA",
+        "0052": "NA",
+        "0053": "NA",
+        "0054": "NA"
     };
-    for(let i = 0; i < bags.length; i++){
+    for (let i = 0; i < bags.length; i++) {
         let tubes = currPage['bags'][bags[i]]['arrElements'];
-        for(let j = 0; j < tubes.length; j++){
+        for (let j = 0; j < tubes.length; j++) {
             let currRow = currTable.insertRow(rowCount);
-            if(j == 0){
+            if (j == 0) {
                 currRow.insertCell(0).innerHTML = bags[i];
             }
-            else{
+            else {
                 currRow.insertCell(0).innerHTML = '';
             }
             currRow.insertCell(1).innerHTML = tubes[j]
             let thisId = tubes[j].split(' ');
             let toAddType = 'N/A'
-            if(translateNumToType.hasOwnProperty(thisId[1])){
+            if (translateNumToType.hasOwnProperty(thisId[1])) {
                 toAddType = translateNumToType[thisId[1]];
             }
             currRow.insertCell(2).innerHTML = toAddType
             let fullScannerName = ''
             let currBox = currPage['bags'];
-            if(currBox[bags[i]].hasOwnProperty('469819603') && j == 0){
+            if (currBox[bags[i]].hasOwnProperty('469819603') && j == 0) {
                 fullScannerName += currBox[bags[i]]['469819603'] + ' ';
             }
-            if(currBox[bags[i]].hasOwnProperty('618036638') && j == 0){
+            if (currBox[bags[i]].hasOwnProperty('618036638') && j == 0) {
                 fullScannerName += currBox[bags[i]]['618036638'];
             }
             currRow.insertCell(3).innerHTML = fullScannerName;
-            if(i % 2 == 0){
+            if (i % 2 == 0) {
                 currRow.style['background-color'] = "lightgrey";
             }
             rowCount += 1;
 
         }
     }
-    
+
 }
 
 export const addPaginationFunctionality = (lastPage, filter) => {
@@ -2956,7 +2970,7 @@ export const addPaginationFunctionality = (lastPage, filter) => {
         middleNumber.innerHTML = '1'
         populateBoxTable(0, filter)
     })
-    
+
     previous.addEventListener('click', () => {
         middleNumber.innerHTML = middleNumber.innerHTML == '1' ? '1' : parseInt(middleNumber.innerHTML) - 1;
         populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter)
@@ -2976,29 +2990,29 @@ export const addPaginationFunctionality = (lastPage, filter) => {
 }
 
 export const addEventFilter = () => {
-    
+
     let filterButton = document.getElementById('submitFilter');
     filterButton.addEventListener('click', async () => {
         let trackingId = document.getElementById('trackingIdInput').value.trim();
-        
+
         let startDate = document.getElementById('startDate').value;
         let endDate = document.getElementById('endDate').value;
         let filter = {};
-        if(trackingId !== ""){
+        if (trackingId !== "") {
             filter['trackingId'] = trackingId;
         }
-        if(startDate !== ""){
+        if (startDate !== "") {
             filter['startDate'] = Date.parse(startDate + ' 00:00');
         }
-        if(endDate !== ""){
+        if (endDate !== "") {
             filter['endDate'] = Date.parse(endDate + ' 23:59');
-            if(startDate !== ""){
-                if(filter['endDate'] <= filter['startDate']){
+            if (startDate !== "") {
+                if (filter['endDate'] <= filter['startDate']) {
                     //throw error
                     return;
                 }
             }
-            
+
         }
         populateBoxTable(0, filter);
         let numPages = await getNumPages(5, filter);
@@ -3008,30 +3022,30 @@ export const addEventFilter = () => {
 
 }
 
-export const displayContactInformation = (site,siteContactInformation) => {
-  if(siteContactInformation.hasOwnProperty(site)){
-    let contactStr = ""
-    contactStr += `<p>Site Contact Information:</p>`
-    let numContacts = siteContactInformation[site].length
-    // iterate over length of existing site's contact array
-    for(let i= 0; i < numContacts;i++) {
-    contactStr += `${numContacts > 1 ? "<p>Contact ${i+1}</p>": ""}`
-    contactStr += `<p>${siteContactInformation[site][i].fullName}</p>`
-    contactStr += `<p>Email: ${siteContactInformation[site][i].email}</p>`
-    
-    let numPhones = siteContactInformation[site][i].phone.length
-    if(numPhones === 1){
-      contactStr += `<p>Phone: ${siteContactInformation[site][i].phone}</p>`  
+export const displayContactInformation = (site, siteContactInformation) => {
+    if (siteContactInformation.hasOwnProperty(site)) {
+        let contactStr = ""
+        contactStr += `<p>Site Contact Information:</p>`
+        let numContacts = siteContactInformation[site].length
+        // iterate over length of existing site's contact array
+        for (let i = 0; i < numContacts; i++) {
+            contactStr += `${numContacts > 1 ? "<p>Contact ${i+1}</p>" : ""}`
+            contactStr += `<p>${siteContactInformation[site][i].fullName}</p>`
+            contactStr += `<p>Email: ${siteContactInformation[site][i].email}</p>`
+
+            let numPhones = siteContactInformation[site][i].phone.length
+            if (numPhones === 1) {
+                contactStr += `<p>Phone: ${siteContactInformation[site][i].phone}</p>`
+            }
+            else if (numPhones > 1) {
+                contactStr += `<p>Phone:</p>`
+                for (let j = 0; j < numPhones; j++) {
+                    contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
+                }
+            }
+            else contactStr += `<p>Phone:</p>`
+        }
+        return contactStr
     }
-    else if(numPhones > 1){
-      contactStr += `<p>Phone:</p>`
-      for(let j = 0; j < numPhones; j++){
-        contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
-      }
-    }
-    else contactStr+= `<p>Phone:</p>`
-  }
-    return contactStr
-  }
-  else return ""
+    else return ""
 }
