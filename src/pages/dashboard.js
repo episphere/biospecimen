@@ -1,5 +1,5 @@
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates, getWorflow, isDeviceiPad, replaceDateInputWithMaskedInput } from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
+import {  addGoToCheckInEvent, addEventCheckInCompleteForm, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
@@ -137,6 +137,16 @@ export const searchBiospecimenTemplate = () => {
 }
 
 export const searchResults = (result) => {
+    const f = () => addEventSelectParticipantForm();
+
+    let conversion = {
+        '875007964': 'Not Yet Verified',
+        '197316935': 'Verified',
+        '219863910': 'Cannot Be Verified',
+        '922622075': 'Duplicate',
+        '160161595': 'Outreach Maxed Out'
+    }
+
     let template = `
         </br>
         <div class="row">
@@ -144,51 +154,63 @@ export const searchResults = (result) => {
         </div>
         </br>
         
-        <div class="row allow-overflow">
-            <form method="POST" id="selectParticipant">
+        <div class="row">
             <table class="table table-borderless table-striped">
                 <thead>
                     <tr>
-                        <th>Select</th>
                         <th>Last name</th>
                         <th>First name</th>
                         <th>Middle name</th>
                         <th>Date of birth</th>
                         <th>Address</th>
                         <th>Connect ID</th>
+                        <th>Verification Status</th>
+                        <th>Participant Status</th>
+                        <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>`
     result.forEach(data => {
+
+        if(data['821247024'] === 922622075) return;
+        const checkedIn = data['135591601'] ?? Boolean(localStorage.getItem(`check-in-${data.Connect_ID}`)) ?? false; 
+    
         template += `
             <tr>
-                <td><input type="radio" name="selectParticipantRadio" required data-token=${data.token} value="${data.Connect_ID}"></td>
                 <td>${data['996038075']}</td>
                 <td>${data['399159511']}</td>
                 <td>${data['231676651']}</td>
                 <td>${data['564964481']}/${data['795827569']}/${data['544150384']}</td>
                 <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
                 <td>${data.Connect_ID}</td>
+                <td>${conversion[data['821247024']]}</td>
+                <td>${data['773707518'] === 353358909 || data['831041022'] === 353358909 || data['747006172'] === 353358909 ? `<i class="fas fa-2x fa-times"></i>` : `<i class="fas fa-2x fa-check"></i>`}</td>
+                
+                <td>
+                ${!checkedIn ? 
+                `<button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>Go to check-in</button>` :
+                `<button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>Go to check-out</button>`}
+                </td>
+                <td>
+                <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
+                ${!checkedIn ? `<button class="btn btn-outline-primary text-nowrap" id="checkInComplete">Specimen Link</button>` : ``}
+                </td>
             </tr>
         `
     });
-    template += `</tbody></table>
-        <div class="row remove-margin">
-            <div>
-                <button type="button" class="btn btn-outline-dark" id="backToSearch"><i class="fas fa-arrow-left"></i> Return to search</button>
-            </div>
-            <div class="ml-auto">
-                <button type="Submit" class="btn btn-outline-primary">${getWorflow() === 'clinical' ? `Go to Specimen Link`:`Go to participant check-in`}</button>
-            </div>
-        </div>
-    </form></div>`;
+    template += `</tbody></table></div>`;
 
     document.getElementById('contentBody').innerHTML = template;
-    if(getWorflow() === 'clinical') {
-        addEventSelectParticipantForm(true);
+    addEventBackToSearch('navBarSearch');
+    addEventCheckInCompleteForm(true);
+    if (getWorflow() === 'clinical') {
+        addGoToCheckInEvent();
+      //  addEventSelectParticipantForm(true);
     }
     else {
-        addEventSelectParticipantForm();
+        addGoToCheckInEvent();
+       // addEventSelectParticipantForm();
     }
-    addEventBackToSearch('backToSearch');
+  
 }
