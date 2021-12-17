@@ -2,7 +2,6 @@ import { userNavBar, adminNavBar, nonUserNavBar } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
-import { collectProcessTemplate } from "./pages/collectProcess.js";
 import { workflows } from "./tubeValidation.js";
 
 
