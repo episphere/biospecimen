@@ -7,7 +7,9 @@ export const checkInTemplate = (data) => {
     navBarBtn.style.display = 'block';
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
-    const checkedIn = data['135591601'] ?? Boolean(localStorage.getItem(`check-in-${data.Connect_ID}`)); 
+    //const checkedIn = data['135591601'] ?? Boolean(localStorage.getItem(`check-in-${data.Connect_ID}`)); 
+    const checkedIn = (data['135591601'] === 353358909);
+
     let template = `
         </br>
         <div class="row">

@@ -50,13 +50,13 @@ export const findParticipant = async (query) => {
 
 export const updateParticipant = async (array) => {
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=updateParticipantData`, {
+    const response = await fetch(`${api}api=updateParticipantDataNotSite`, {
         method: "POST",
         headers: {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body:  JSON.stringify({data:array}),
+        body:  JSON.stringify(array),
     });
     
     return await response.json();
