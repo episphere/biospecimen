@@ -1758,11 +1758,17 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        const isCheckOut = e.target?.elements?.[1].dataset?.checkOut;
         
+        const isCheckOut = e.target?.elements[1]?.dataset?.checkOut;
         if(isCheckOut){
-            localStorage.removeItem('check-in-135591601');
+            await swal('PARTICIPANT HAS BEEN CHECKED OUT');
+            localStorage.removeItem(`check-in-${form.dataset.connectId}`);
             window.location.reload();
+        }
+
+        else {
+        await swal('PARTICIPANT HAS BEEN CHECKED IN');
+        localStorage.setItem(`check-in-${form.dataset.connectId}`, true);
         }
 
         if (!skipFlag) {
@@ -1818,7 +1824,6 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
             } catch (error) {
                 console.log(error);
             } finally{
-                localStorage.setItem('check-in-135591601', true);
                 
             }
             specimenTemplate(data, formData, collections);
