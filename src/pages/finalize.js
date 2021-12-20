@@ -3,7 +3,7 @@ import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollect
 
 export const finalizeTemplate = (data, specimenData) => {
     removeActiveClass('navbar-btn', 'active')
-    const navBarBtn = document.getElementById('navBarSpecimenFinalize');
+    const navBarBtn = document.getElementById('navBarReview');
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
     let template = '';

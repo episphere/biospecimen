@@ -3,8 +3,6 @@ import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, 
 
 export const tubeCollectedTemplate = (data, formData) => {
 
-    
-
     let template = `
         </br>
         <div class="row">
@@ -190,9 +188,12 @@ export const tubeCollectedTemplate = (data, formData) => {
         </form>
     `;
     removeActiveClass('navbar-btn', 'active');
-    const navBarBtn = document.getElementById('navBarSpecimenProcess');
+    const navBarBtn = document.getElementById('navBarTubeCollection');
+    navBarBtn.style.display = 'block';
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
+
+
     addEventBackToSearch('navBarSearch');
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);

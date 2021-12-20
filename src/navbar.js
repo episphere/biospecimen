@@ -186,6 +186,12 @@ export const bodyNavBar = () => {
             <li class="nav-item">
             <button style="display:none" class="nav-link navbar-btn" id="navBarSpecimenLink">Specimen Link</button>
             </li>
+            <li class="nav-item">
+            <button style="display:none" class="nav-link navbar-btn" id="navBarTubeCollection">Tube Collection</button>
+            </li>
+            <li class="nav-item">
+            <button style="display:none" class="nav-link navbar-btn" id="navBarReview">Collection Review</button>
+            </li>
         </ul>`;
         
         document.getElementById('contentHeader').innerHTML = template;
