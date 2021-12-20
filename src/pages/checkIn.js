@@ -18,7 +18,7 @@ export const checkInTemplate = (data) => {
         <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
             <div class="row">
             <div class="col-md-12">
-                    <h5>${data['996038075']}, ${data['399159511'] }</h5>
+                    <h5>${data['996038075']}, ${data['399159511']}</h5>
                     <h5>Login Method: ${data['995036844']}</h5>
             </div>
             </div>
@@ -29,12 +29,10 @@ export const checkInTemplate = (data) => {
                     </select>
                     </div>
                     <div class="col-md-3">
-
-                <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
-                ${checkedIn ? 
-                    `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete" data-check-out="true">Check-Out</button>` :
-                    `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete">Check-In</button>`
-                }
+ ${checkedIn ?
+            `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete" data-check-out="true">Check-Out</button>` :
+            `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete">Check-In</button>`
+        }
                     </div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
@@ -56,14 +54,14 @@ export const checkInTemplate = (data) => {
             <div class="col-md-4">
             <div class="col-md-12 info-box">
             <div class="row"><span class="full-width">Verification</span></div>
-            <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span></div>
+            <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>` : `<i class="fas fa-2x fa-times"></i>`}</span></div>
             <div class="row"><span class="full-width">${new Date(data['454445267']).toLocaleString()}</span></div>
             </div>
             </div>
             <div class="col-md-4">
             <div class="col-md-12 info-box">
             <div class="row"><span class="full-width">Not Withdrawn</span></div>
-            <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span></div>
+            <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>` : `<i class="fas fa-2x fa-times"></i>`}</span></div>
             <div class="row"></br></div>
             </div>
             </div>
