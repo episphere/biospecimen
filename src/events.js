@@ -2015,11 +2015,11 @@ export const addEventBiospecimenCollectionFormToggles = (dt, biospecimenData) =>
 
         collected.addEventListener('change', () => {
             
-            if(getWorflow === 'research') reason.disabled = !collected.checked;
+            if(getWorflow() === 'research') reason.disabled = !collected.checked;
             specimenId.disabled = !collected.checked;
             
             if(!collected.checked) {
-                if(getWorflow === 'research') reason.value = '';
+                if(getWorflow() === 'research') reason.value = '';
                 specimenId.value = '';
             }
         });

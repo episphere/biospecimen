@@ -88,6 +88,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                                         data-connect-id="${data.Connect_ID}" 
                                                         id="${obj.concept}Reason"
                                                         style="width:200px"
+                                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? '' : 'disabled'}
                                                     >
                                                         <option value=""> -- Select Reason -- </option>`
 
@@ -100,7 +101,7 @@ export const tubeCollectedTemplate = (data, formData) => {
 
                                         `</td>`
                                 }
-                                
+
                                 template += `
                                 <td>
                                     <input 
@@ -110,6 +111,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['825582494'] ? `value='${formData[`${obj.concept}`]['825582494']}'`: ``}
                                         class="form-control ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} input-barcode-id" 
                                         ${required ? 'required' : ''} 
+                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? '' : 'disabled'}
                                         placeholder="Scan/Type in Full Specimen ID"
                                         style="font-size:1.3rem; width:200px"
                                     >
@@ -136,6 +138,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                                 id="${obj.concept}Deviation"
                                                 style="width:200px"
                                                 multiple
+                                                ${formData[`${obj.concept}`]['678857215'] === 353358909 ? '': 'disabled'}
                                             >
                                                 <option value=""> -- Select Deviation -- </option>`
 
@@ -155,6 +158,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         placeholder="Details (Optional)" 
                                         id="${obj.concept}DeviatedExplanation" 
                                         ${formData[obj.concept]['536710547'] ? `value='${formData[`${obj.concept}`]['536710547']}'`: ``}
+                                        ${formData[`${obj.concept}`]['678857215'] === 353358909 ? '': 'disabled'}
                                     >
                                     `: ``}
                                 </td>
