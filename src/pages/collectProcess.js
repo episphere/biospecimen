@@ -214,5 +214,5 @@ export const tubeCollectedTemplate = (data, formData) => {
     addEventBiospecimenCollectionFormCntd(data, formData);
     addEventBiospecimenCollectionFormToggles(data, formData);
     //addEventBiospecimenCollectionFormEdit(data, formData);
-    //addEventBiospecimenCollectionFormText(data, formData);
+    addEventBiospecimenCollectionFormText(data, formData);
 }
