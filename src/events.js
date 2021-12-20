@@ -88,6 +88,22 @@ export const addEventsearchSpecimen = () => {
             return
         }
         const biospecimenData = biospecimen.data;
+
+        if(getWorflow() === 'research') {
+            if(biospecimenData['650516960'] != 534621077) {
+                hideAnimation();
+                showNotifications({ title: 'Incorrect Dashboard', body: 'Clinical Collections cannot be viewed on Research Dashboard' }, true);
+                return;
+            }
+        }
+        else {
+            if(biospecimenData['650516960'] === 534621077) {
+                hideAnimation();
+                showNotifications({ title: 'Incorrect Dashboard', body: 'Research Collections cannot be viewed on Clinical Dashboard' }, true);
+                return;
+            }
+        }
+
         let query = `connectId=${parseInt(biospecimenData.Connect_ID)}`;
         const response = await findParticipant(query);
         hideAnimation();
