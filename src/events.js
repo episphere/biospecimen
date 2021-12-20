@@ -2252,7 +2252,7 @@ export const addEventNavBarBoxManifest = (id, userName) => {
         }
     });
 }
-
+//Save
 export const addEventNavBarShippingManifest = (userName, tempChecked) => {
     const btn = document.getElementById('completePackaging');
     document.getElementById('completePackaging').addEventListener('click', async e => {
@@ -2260,6 +2260,7 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
         if(btn.classList.contains('active')) return;
         //get table info
         let boxesToShip = [];
+        let shipSetForage = []
         let currTable = document.getElementById('saveTable')
         for (var r = 1; r < currTable.rows.length; r++) {            
             
@@ -2273,6 +2274,10 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
         if(document.getElementById('tempMonitorChecked')){
             tempChecked = document.getElementById('tempMonitorChecked').checked
         }
+        boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
+        // console.log(shipSetForage)
+        checkShipForage(shipSetForage,boxesToShip)
+
         //return box 1 info
         await shippingManifest(boxesToShip, userName, tempChecked);
     });
@@ -2387,9 +2392,13 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
 export const populateTrackingQuery = async (hiddenJSON) => {
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     let toBeInnerHTML = ""
-    let shipData = await localforage.getItem("shippingData")
-    let shipDataLogic = (typeof shipData["959708259"] === "string") ? shipData["959708259"] : ""
-    console.log(shipDateLogic)
+
+
+    let shipData = await localforage.getItem("shipData")
+    console.log(shipData)
+    
+    
+    let shipDataValue = (typeof shipData["959708259"] === "string") ? shipData["959708259"] : ""
 
     for(let i = 0; i < boxes.length; i++){
         toBeInnerHTML +=`
@@ -2397,7 +2406,7 @@ export const populateTrackingQuery = async (hiddenJSON) => {
                             <div class="form-group" style="margin-top:30px">
                                 <label style="float:left;margin-top:5px">`+ boxes[i] +`</label>
                                 <div style="float:left;margin-left:30px">
-                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${shipDataLogic}" />
+                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${shipDataValue}" />
                                 </div>
                             </div>
                         </div>
@@ -2446,9 +2455,9 @@ export const addEventSaveButton = (hiddenJSON) => {
 
         for(let i = 0; i < boxes.length; i++){
           let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-          localforage.setItem("shippingData",{'959708259':boxi})
+          localforage.setItem("shipData",{'959708259':boxi})
       }
-        console.log(localforage.getItem("shippingData"))
+        console.log(localforage.getItem("shipData"))
 
 
 
@@ -2919,4 +2928,55 @@ export const displayContactInformation = (site,siteContactInformation) => {
     return contactStr
   }
   else return ""
+}
+
+export const checkShipForage = async (shipSetForage,boxesToShip) => {
+    // let shipSetForageLength = shipSetForage.length
+    let boxesToShipLength = boxesToShip.length
+    let forageBoxIdArr = []
+
+    // for (let i in shipSetForage) {
+    //     forageBoxIdArr.push(shipSetForage[i].boxId)
+    // }
+    // console.log(shipSetForage)
+    // console.log(boxesToShip)
+    // console.log(forageBoxIdArr)
+    // let boxMatch = forageBoxIdArr.every(item => {
+    //     console.log(item, boxesToShip.indexOf(item))
+    //     return boxesToShip.indexOf(item) >= 0
+    // })
+    // console.log(boxMatch)
+
+    // if (boxMatch && forageBoxIdArr.length === boxesToShipLength) {
+    //     console.log("true")
+    // }else console.log("false")
+    try {
+        let value = await localforage.getItem("shipData")
+        console.log(value)
+        if (value === null) {
+            await localforage.setItem("shipData", shipSetForage)
+        }
+         // reset if forage box ids do not match or length not equal
+        for (let i in value) {
+            forageBoxIdArr.push(value[i].boxId)
+        }
+        console.log("forageboxArr", forageBoxIdArr)
+        let boxMatch = forageBoxIdArr.every(item => {
+            // console.log(item, boxesToShip.indexOf(item))
+            return boxesToShip.indexOf(item) >= 0
+        })
+        console.log("boxMatch", boxMatch)
+        console.log("forageBoxIdArr.length", forageBoxIdArr.length, "boxesToShipLength", boxesToShipLength)
+        // boxmatch false and lengths are not equal
+        if (!boxMatch || forageBoxIdArr.length !== boxesToShipLength) {
+            console.log("boxMatch", boxMatch)
+            console.log("forageBoxIdArr.length",forageBoxIdArr.length,"boxesToShipLength",boxesToShipLength)
+            await localforage.setItem("shipData", shipSetForage)
+            localforage.getItem("shipData").then(data => console.log(data))
+        }
+    }    
+     catch (e) {
+        console.log(e)
+        await localforage.setItem("shipData", shipSetForage)
+    }
 }
