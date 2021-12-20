@@ -2473,7 +2473,7 @@ export const addEventSaveButton = (hiddenJSON) => {
         
         
         console.log("boxNames",boxNames)
-        console.log("hiddenKSON", hiddenJSON)
+        console.log("hiddenJSON", hiddenJSON)
         console.log("boxes",boxes)
         
         console.log("test")
@@ -2503,6 +2503,7 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         }
         if(finalizeTextField.value.toUpperCase() === userName.toUpperCase()){
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+            localforage.removeItem("shipData")
             await ship(boxes, shippingData, trackingNumbers);
             document.getElementById('finalizeModalCancel').click();
             if(tempChecked){
