@@ -88,6 +88,22 @@ export const addEventsearchSpecimen = () => {
             return
         }
         const biospecimenData = biospecimen.data;
+
+        if(getWorflow() === 'research') {
+            if(biospecimenData['650516960'] != 534621077) {
+                hideAnimation();
+                showNotifications({ title: 'Incorrect Dashboard', body: 'Clinical Collections cannot be viewed on Research Dashboard' }, true);
+                return;
+            }
+        }
+        else {
+            if(biospecimenData['650516960'] === 534621077) {
+                hideAnimation();
+                showNotifications({ title: 'Incorrect Dashboard', body: 'Research Collections cannot be viewed on Clinical Dashboard' }, true);
+                return;
+            }
+        }
+
         let query = `connectId=${parseInt(biospecimenData.Connect_ID)}`;
         const response = await findParticipant(query);
         hideAnimation();
@@ -1983,6 +1999,45 @@ export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     const collectionSaveExit = document.getElementById('collectionSave');
     collectionSaveExit.addEventListener('click', () => {
         collectionSubmission(dt, biospecimenData);
+    });
+};
+
+export const addEventBiospecimenCollectionFormToggles = (dt, biospecimenData) => {
+    const collectedBoxes = Array.from(document.getElementsByClassName('tube-collected'));
+    const deviationBoxes = Array.from(document.getElementsByClassName('tube-deviated'));
+
+    collectedBoxes.forEach(collected => {
+
+        const reason = document.getElementById(collected.id + "Reason");
+        const specimenId = document.getElementById(collected.id + "Id")
+
+        collected.addEventListener('change', () => {
+            
+            if(getWorflow() === 'research') reason.disabled = !collected.checked;
+            specimenId.disabled = !collected.checked;
+            
+            if(!collected.checked) {
+                if(getWorflow() === 'research') reason.value = '';
+                specimenId.value = '';
+            }
+        });
+    });
+
+    deviationBoxes.forEach(deviation => {
+
+        const type = document.getElementById(deviation.id.replace('Deviated', 'Deviation'));
+        const comment = document.getElementById(deviation.id + 'Explanation');
+
+        deviation.addEventListener('change', () => {
+
+            type.disabled = !deviation.checked;
+            comment.disabled = !deviation.checked;
+
+            if(!deviation.checked) {
+                type.value = '';
+                comment.value = '';
+            }
+        });
     });
 };
 

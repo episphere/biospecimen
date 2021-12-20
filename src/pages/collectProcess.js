@@ -1,4 +1,4 @@
-import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormText } from './../events.js'
+import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormText } from './../events.js'
 import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow } from '../shared.js';
 
 export const tubeCollectedTemplate = (data, formData) => {
@@ -63,6 +63,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                         template += `
                             <tr>
                                 <td>${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
+
                                 <td class="align-left">${obj.collectionChkBox === true ? `
                                     <input type="checkbox" 
                                         class="tube-collected custom-checkbox-size" 
@@ -72,6 +73,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                     >`
                                     :``}
                                 </td>`
+
                                 if(getWorflow() === 'research') {
 
                                     template += 
@@ -84,6 +86,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                                         data-connect-id="${data.Connect_ID}" 
                                                         id="${obj.concept}Reason"
                                                         style="width:200px"
+                                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? '' : 'disabled'}
                                                     >
                                                         <option value=""> -- Select Reason -- </option>`
 
@@ -96,6 +99,7 @@ export const tubeCollectedTemplate = (data, formData) => {
 
                                         `</td>`
                                 }
+
                                 template += `
                                 <td>
                                     <input 
@@ -105,10 +109,12 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['825582494'] ? `value='${formData[`${obj.concept}`]['825582494']}'`: ``}
                                         class="form-control ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} input-barcode-id" 
                                         ${required ? 'required' : ''} 
+                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? '' : 'disabled'}
                                         placeholder="Scan/Type in Full Specimen ID"
                                         style="font-size:1.3rem; width:200px"
                                     >
                                 </td>
+
                                 <td>${obj.deviationChkBox === true ? `
                                     <input 
                                         type="checkbox" 
@@ -120,6 +126,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         id="${obj.concept}Deviated"
                                     >`: ``}
                                 </td>
+
                                 <td>`
                                 
                                     if(obj.deviationChkBox) {
@@ -129,6 +136,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                                 id="${obj.concept}Deviation"
                                                 style="width:200px"
                                                 multiple
+                                                ${formData[`${obj.concept}`]['678857215'] === 353358909 ? '': 'disabled'}
                                             >
                                                 <option value=""> -- Select Deviation -- </option>`
 
@@ -141,15 +149,18 @@ export const tubeCollectedTemplate = (data, formData) => {
 
                                 template += `
                                 </td>
+
                                 <td>${obj.deviationChkBox === true ? `
                                     <input 
                                         type="text" 
                                         placeholder="Details (Optional)" 
                                         id="${obj.concept}DeviatedExplanation" 
                                         ${formData[obj.concept]['536710547'] ? `value='${formData[`${obj.concept}`]['536710547']}'`: ``}
+                                        ${formData[`${obj.concept}`]['678857215'] === 353358909 ? '': 'disabled'}
                                     >
                                     `: ``}
                                 </td>
+
                                 <td>${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? `
                                     <button 
                                         class="btn btn-outline-primary" 
@@ -201,6 +212,7 @@ export const tubeCollectedTemplate = (data, formData) => {
     addEventBackToSearch('backToSearch');
     addEventBiospecimenCollectionForm(data, formData);
     addEventBiospecimenCollectionFormCntd(data, formData);
+    addEventBiospecimenCollectionFormToggles(data, formData);
     //addEventBiospecimenCollectionFormEdit(data, formData);
     //addEventBiospecimenCollectionFormText(data, formData);
 }
