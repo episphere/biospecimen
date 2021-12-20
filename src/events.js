@@ -1757,17 +1757,39 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        
+
         const isCheckOut = e.target?.elements[1]?.dataset?.checkOut;
-        if(isCheckOut){
+
+        if (isCheckOut) {
             await swal('PARTICIPANT HAS BEEN CHECKED OUT');
             localStorage.removeItem(`check-in-${form.dataset.connectId}`);
-            window.location.reload();
+
+        }
+        else {
+            await swal('PARTICIPANT HAS BEEN CHECKED IN');
+            localStorage.setItem(`check-in-${form.dataset.connectId}`, true);
         }
 
-        else {
-        await swal('PARTICIPANT HAS BEEN CHECKED IN');
-        localStorage.setItem(`check-in-${form.dataset.connectId}`, true);
+        let formData = {};
+        formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
+        formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
+        formData['962267121'] = new Date().toISOString();
+        formData['135591601'] = 353358909;
+        let query = `connectId=${parseInt(form.dataset.connectId)}`;
+        const response = await findParticipant(query);
+        const data = response.data[0];
+        const collections = (await getParticipantCollections(data.token)).data;
+        const datauid = data.state.uid;
+
+
+        // update participant as checked in/out.
+        await updateParticipant({
+            '135591601': isCheckOut ? 104430631 : 353358909,
+            uid: datauid,
+        });
+
+        if(isCheckOut){
+            window.location.reload();
         }
 
         if (!skipFlag) {
@@ -1794,47 +1816,14 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
                 },
             });
 
-            if (confirmVal === "cancel") return;
+        if (confirmVal === "cancel") return;
 
         }
 
-        let formData = {};
-        formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
-        formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
-        formData['962267121'] = new Date().toISOString();
-        formData['135591601'] = 353358909;
-        let query = `connectId=${parseInt(form.dataset.connectId)}`;
-
-
-        let participantToken = null;
-        try {
-            showAnimation();
-            const response = await findParticipant(query);
-            const data = response.data[0];
-            const collections = (await getParticipantCollections(data.token)).data;
-            participantToken = data.token;
-            const datauid = data.state.uid;
-            
-            try {
-             // update participant as checked in.
-             await updateParticipant({
-                '135591601': 353358909,
-                uid: datauid,
-            });
-            } catch (error) {
-                console.log(error);
-            } finally{
-                
-            }
-            specimenTemplate(data, formData, collections);
-        } catch (error) {
-            console.log('Error check-in', error);
-        } finally {
-            hideAnimation();
-           
-        }
+        specimenTemplate(data, formData, collections);
 
     });
+
 };
 
 export const addEventSpecimenLinkForm = formData => {
