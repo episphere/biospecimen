@@ -5,8 +5,9 @@ import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 export const specimenTemplate = async (data, formData, collections) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenLink');
-    navBarBtn.classList.remove('disabled');
-    navBarBtn.classList.add('active');
+    navBarBtn.style.display = 'block';
+    navBarBtn?.classList.remove('disabled');
+    navBarBtn?.classList.add('active');
     let template = `
         </br>
         <div class="row">
@@ -25,48 +26,13 @@ export const specimenTemplate = async (data, formData, collections) => {
             `: ``}
         </div>
         `;
-        if(collections){
-            template+=`</br><div class="row"><h4>Participant's Existing Collection IDs</h4></div>
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Collection ID</th>
-                        <th>Accession ID</th>
-                        <th>Date of Collection</th>
-                        <th>Date scanned at Regional Lab</th>
-                        <th>Visit</th>
-                        <th>Collection Setting</th>
-                        <th>Select Action</th>
-                    </tr>
-                </thead>
-                <tbody>`
-                collections.forEach(collection => {
-                    template += `<tr>
-                        <td>${collection['820476880']}</td>
-                        <td>${collection['646899796'] ? collection['646899796'] : ''}</td>
-                        <td>${collection['678166505'] ? new Date(collection['678166505']).toLocaleString() : ''}</td>
-                        <td>${collection['915838974'] ? new Date(collection['915838974']).toLocaleString() : ''}</td>
-                        <td>${collection['331584571'] ? visitType[collection['331584571']] : ''}</td>
-                        <td>${collection['650516960'] ? collectionSettings[collection['650516960']] : ''}</td>
-                        <td><button class="custom-btn continue-collect-process" data-connect-id="${data.Connect_ID}" data-collection-id="${collection['820476880']}">Add Specimens</button></td>
-                    </tr>`
-                })
-            template +=`</tbody></table>`
-        }
         
-        template += `</br><div class="row"><h4>Link a new Collection ID</h4></div>
+        template += `</br><div class="">
+        <h4>Link a new Collection ID</h4><br/>
+        <h4> Visit: ${visitType[formData['331584571']] ?? "Baseline"}</h4>
+        </div>
         <form id="specimenLinkForm" method="POST" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">
-            
-            
-            <div class="form-group row">
-                <label class="col-md-4 col-form-label" for="biospecimenVisitType">Select visit</label>
-                <select class="form-control col-md-5" required id="biospecimenVisitType">
-                    <option value=""> -- Select Visit -- </option>
-                    <option selected value="153098257">Baseline</option>
-                </select>
-            </div>
-            
-            <div class="form-group row">`
+         <div class="form-group row">`
                 const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
                 const workflow = getWorflow();
                 if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {
@@ -107,16 +73,18 @@ export const specimenTemplate = async (data, formData, collections) => {
             </div>
 
             <div class="form-group row">
-                <div class="col-auto">
-                    <button class="btn btn-outline-danger" type="reset" id="reEnterSpecimen">No: Re-enter Collection ID</button>
-                </div>
-                <div class="ml-auto">
-                    <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="button" id="specimenSaveExit">Yes: Save and Exit</button>
-                </div>
-                <div class="col-auto">
-                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Yes: Continue</button>
-                </div>
+            <div class="col">
+            <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Submit</button>
             </div>
+            </div>
+             <div class="form-group row" style="display:none">
+            <div class="ml-auto">
+                <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="button" id="specimenSaveExit">Yes: Save and Exit</button>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Yes: Continue</button>
+            </div>
+        </div>
         </form>
         </br>
     `;

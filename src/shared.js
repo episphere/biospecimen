@@ -2,7 +2,6 @@ import { userNavBar, adminNavBar, nonUserNavBar } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
-import { collectProcessTemplate } from "./pages/collectProcess.js";
 import { workflows } from "./tubeValidation.js";
 
 
@@ -48,6 +47,21 @@ export const findParticipant = async (query) => {
     });
     return await response.json();
 }
+
+export const updateParticipant = async (array) => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=updateParticipantDataNotSite`, {
+        method: "POST",
+        headers: {
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body:  JSON.stringify(array),
+    });
+    
+    return await response.json();
+}
+
 
 export const biospecimenUsers = async () => {
     const idToken = await getIdToken();
@@ -883,8 +897,8 @@ export const getWorflow = () => document.getElementById('contentBody').dataset.w
 export const getSiteTubesLists = (specimenData) => {
     const dashboardType = document.getElementById('contentBody').dataset.workflow;
     const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-    const subSiteLocation = siteLocations[dashboardType][siteAcronym] ? siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === specimenData['951355211'])[0].location : undefined;
-    const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType];
+    const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === specimenData['951355211'])[0]?.location : undefined;
+    const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
     return siteTubesList;
 }
 
