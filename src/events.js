@@ -2252,7 +2252,7 @@ export const addEventNavBarBoxManifest = (id, userName) => {
         }
     });
 }
-//Save
+
 export const addEventNavBarShippingManifest = (userName, tempChecked) => {
     const btn = document.getElementById('completePackaging');
     document.getElementById('completePackaging').addEventListener('click', async e => {
@@ -2274,11 +2274,12 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
         if(document.getElementById('tempMonitorChecked')){
             tempChecked = document.getElementById('tempMonitorChecked').checked
         }
-        boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
-        console.log(boxesToShip)
-        console.log(shipSetForage)
-        checkShipForage(shipSetForage,boxesToShip)
 
+        // Push empty item with boxId and empty tracking number string
+        // shipSetForage used to handle empty localforage or no box id match
+        boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
+        checkShipForage(shipSetForage,boxesToShip)
+        
         //return box 1 info
         await shippingManifest(boxesToShip, userName, tempChecked);
     });
@@ -2389,37 +2390,22 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
     
 }
 
-//SAVE
 export const populateTrackingQuery = async (hiddenJSON) => {
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     let toBeInnerHTML = ""
 
-    let shipArr = []
     let shipping = {}
     let shipData = await localforage.getItem("shipData")
-    console.log("shipData", shipData) 
-    
-    console.log(boxes,"boxes length",boxes.length)
-    // ["Box1", "Box2"]
 
-    for(let a of shipData) {
-      console.log("a",a)
-      console.log(shipData)
+    for(let box of shipData) {
       // if boxes has box id of localforage shipData push
-      if(boxes.includes(a["boxId"])) {
-        // shipArr.push({"boxId":a["boxId"],"959708259":a["959708259"]})
-        // shipArr.push(shipArr[a["boxId"]] = {"959708259":a["959708259"]})
-        shipping[a["boxId"]] = {"959708259":a["959708259"]}
+      if(boxes.includes(box["boxId"])) {
+        shipping[box["boxId"]] = {"959708259":box["959708259"]}
       }
       else {
-        // shipArr.push({"boxId":a["boxId"],"959708259":""})
-        // shipArr.push(shipArr[a["boxId"]] = {"959708259":""})
-        shipping[a["boxId"]] = {"959708259":""}
+        shipping[box["boxId"]] = {"959708259":""}
       }
     }
-    console.log(shipping)
-    console.log("shipArr",shipArr)
-    // shipArr?.[i]?.["959708259"] ?? ""
     
     for(let i = 0; i < boxes.length; i++){
         let result = boxes[i] && shipping?.[boxes[i]]?.["959708259"];
@@ -2435,8 +2421,6 @@ export const populateTrackingQuery = async (hiddenJSON) => {
                         <br>`
     }
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
-    debugger;
-    return
 }
 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
@@ -2460,7 +2444,6 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
     
 }
 
-//Save
 export const addEventSaveButton = (hiddenJSON) => {
     document.getElementById('saveTracking').addEventListener('click', async () =>{
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
@@ -2479,37 +2462,17 @@ export const addEventSaveButton = (hiddenJSON) => {
 
         for(let i = 0; i < boxes.length; i++){
           let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-        //   localforage.setItem("shipData",{'959708259':boxi})
             shippingData.push({ "959708259": boxi, "boxId":boxes[i]})
         }
         localforage.setItem("shipData",shippingData)
 
+        // TODO: Add a success modal when participants are added back.
         // Swal.fire({
         //   title: 'Success!',
         //   text: 'Tracking numbers saved!',
         //   icon: 'success',
         //   timer: 1200,
         // })
-        console.log(shippingData)
-        // console.log(localforage.getItem("shipData"))
-
-
-
-        // use 959708259 for Box Trackign Number Scan
-        // Get input ids of all input boxes Elements
-        // Get all ids and values (tracking number) from input box Elements
-        // store unique box ids and values (tracking number) into shippingData object
-        // send shippingData to localforage set key shippingData
-        // get shipping Data from localforage to test
-        
-        
-        console.log("boxNames",boxNames)
-        console.log("hiddenJSON", hiddenJSON)
-        console.log("boxes",boxes)
-        
-        console.log("test")
-        // debugger;
-        // return;
     })
 }
 

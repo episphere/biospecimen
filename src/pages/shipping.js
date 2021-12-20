@@ -476,31 +476,6 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
         hiddenJSON = JSON.parse(document.getElementById('shippingHiddenTable').innerText);
     }
 */
-
-    //=======================================================================================
-    // Get localforage store instance, if not found set store instance
-
-    // Set localforage store instance
-
-      // const value = await localforage.getItem('shipNum');
-      // // This code runs once the value has been loaded
-      // // from the offline store.
-      // if(!value) {
-      //   localforage.setItem("shipNum","test")
-      // }
-      // console.log(value);
-      //     // This code runs if there were any errors.
-      //     // console.log(err);
-      //   //   let store = localforage.createInstance({
-      //   //     name: "shippingData"
-      //   // });
-      // localforage.setItem("shipNum","test")
-      
-
-
-
-
-
     let template = `
         <div id="shippingHiddenTable" style="display:none">
         {}
