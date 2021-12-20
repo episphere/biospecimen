@@ -2397,8 +2397,8 @@ export const populateTrackingQuery = async (hiddenJSON) => {
     let shipData = await localforage.getItem("shipData")
     console.log(shipData)
     
-    
-    let shipDataValue = (typeof shipData["959708259"] === "string") ? shipData["959708259"] : ""
+    console.log(boxes)
+    // let shipDataValue = (typeof shipData["959708259"] === "string") ? shipData["959708259"] : ""
 
     for(let i = 0; i < boxes.length; i++){
         toBeInnerHTML +=`
@@ -2406,7 +2406,7 @@ export const populateTrackingQuery = async (hiddenJSON) => {
                             <div class="form-group" style="margin-top:30px">
                                 <label style="float:left;margin-top:5px">`+ boxes[i] +`</label>
                                 <div style="float:left;margin-left:30px">
-                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${shipDataValue}" />
+                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${shipData[i]["959708259"]}" />
                                 </div>
                             </div>
                         </div>
@@ -2445,7 +2445,7 @@ export const addEventSaveButton = (hiddenJSON) => {
             hiddenJSON[boxes[i]] = {'959708259':boxi, specimens:hiddenJSON[boxes[i]]}
         }
         
-        let shippingData = {}
+        let shippingData = []
 
         let trackingNumbers = {}
         let boxNames = Object.keys(hiddenJSON);
@@ -2455,9 +2455,12 @@ export const addEventSaveButton = (hiddenJSON) => {
 
         for(let i = 0; i < boxes.length; i++){
           let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-          localforage.setItem("shipData",{'959708259':boxi})
-      }
-        console.log(localforage.getItem("shipData"))
+        //   localforage.setItem("shipData",{'959708259':boxi})
+            shippingData.push({ "959708259": boxi, "boxId":boxes[i]})
+        }
+        localforage.setItem("shipData",shippingData)
+        console.log(shippingData)
+        // console.log(localforage.getItem("shipData"))
 
 
 
@@ -2474,8 +2477,8 @@ export const addEventSaveButton = (hiddenJSON) => {
         console.log("boxes",boxes)
         
         console.log("test")
-        debugger;
-        return;
+        // debugger;
+        // return;
     })
 }
 
