@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, displayContactInformation, checkShipForage} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking} from './pages/shipping.js';
@@ -2275,7 +2275,8 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
             tempChecked = document.getElementById('tempMonitorChecked').checked
         }
         boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
-        // console.log(shipSetForage)
+        console.log(boxesToShip)
+        console.log(shipSetForage)
         checkShipForage(shipSetForage,boxesToShip)
 
         //return box 1 info
@@ -2393,26 +2394,49 @@ export const populateTrackingQuery = async (hiddenJSON) => {
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     let toBeInnerHTML = ""
 
-
+    let shipArr = []
+    let shipping = {}
     let shipData = await localforage.getItem("shipData")
-    console.log(shipData)
+    console.log("shipData", shipData) 
     
-    console.log(boxes)
-    // let shipDataValue = (typeof shipData["959708259"] === "string") ? shipData["959708259"] : ""
+    console.log(boxes,"boxes length",boxes.length)
+    // ["Box1", "Box2"]
 
+    for(let a of shipData) {
+      console.log("a",a)
+      console.log(shipData)
+      // if boxes has box id of localforage shipData push
+      if(boxes.includes(a["boxId"])) {
+        // shipArr.push({"boxId":a["boxId"],"959708259":a["959708259"]})
+        // shipArr.push(shipArr[a["boxId"]] = {"959708259":a["959708259"]})
+        shipping[a["boxId"]] = {"959708259":a["959708259"]}
+      }
+      else {
+        // shipArr.push({"boxId":a["boxId"],"959708259":""})
+        // shipArr.push(shipArr[a["boxId"]] = {"959708259":""})
+        shipping[a["boxId"]] = {"959708259":""}
+      }
+    }
+    console.log(shipping)
+    console.log("shipArr",shipArr)
+    // shipArr?.[i]?.["959708259"] ?? ""
+    
     for(let i = 0; i < boxes.length; i++){
+        let result = boxes[i] && shipping?.[boxes[i]]?.["959708259"];
         toBeInnerHTML +=`
         <div class = "row">
                             <div class="form-group" style="margin-top:30px">
                                 <label style="float:left;margin-top:5px">`+ boxes[i] +`</label>
                                 <div style="float:left;margin-left:30px">
-                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${shipData[i]["959708259"]}" />
+                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${result ?? ""}" />
                                 </div>
                             </div>
                         </div>
                         <br>`
     }
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
+    debugger;
+    return
 }
 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
@@ -2459,6 +2483,13 @@ export const addEventSaveButton = (hiddenJSON) => {
             shippingData.push({ "959708259": boxi, "boxId":boxes[i]})
         }
         localforage.setItem("shipData",shippingData)
+
+        // Swal.fire({
+        //   title: 'Success!',
+        //   text: 'Tracking numbers saved!',
+        //   icon: 'success',
+        //   timer: 1200,
+        // })
         console.log(shippingData)
         // console.log(localforage.getItem("shipData"))
 
@@ -2904,83 +2935,4 @@ export const addEventFilter = () => {
 
     })
 
-}
-
-export const displayContactInformation = (site,siteContactInformation) => {
-  if(siteContactInformation.hasOwnProperty(site)){
-    let contactStr = ""
-    contactStr += `<p>Site Contact Information:</p>`
-    let numContacts = siteContactInformation[site].length
-    // iterate over length of existing site's contact array
-    for(let i= 0; i < numContacts;i++) {
-    contactStr += `${numContacts > 1 ? "<p>Contact ${i+1}</p>": ""}`
-    contactStr += `<p>${siteContactInformation[site][i].fullName}</p>`
-    contactStr += `<p>Email: ${siteContactInformation[site][i].email}</p>`
-    
-    let numPhones = siteContactInformation[site][i].phone.length
-    if(numPhones === 1){
-      contactStr += `<p>Phone: ${siteContactInformation[site][i].phone}</p>`  
-    }
-    else if(numPhones > 1){
-      contactStr += `<p>Phone:</p>`
-      for(let j = 0; j < numPhones; j++){
-        contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
-      }
-    }
-    else contactStr+= `<p>Phone:</p>`
-  }
-    return contactStr
-  }
-  else return ""
-}
-
-export const checkShipForage = async (shipSetForage,boxesToShip) => {
-    // let shipSetForageLength = shipSetForage.length
-    let boxesToShipLength = boxesToShip.length
-    let forageBoxIdArr = []
-
-    // for (let i in shipSetForage) {
-    //     forageBoxIdArr.push(shipSetForage[i].boxId)
-    // }
-    // console.log(shipSetForage)
-    // console.log(boxesToShip)
-    // console.log(forageBoxIdArr)
-    // let boxMatch = forageBoxIdArr.every(item => {
-    //     console.log(item, boxesToShip.indexOf(item))
-    //     return boxesToShip.indexOf(item) >= 0
-    // })
-    // console.log(boxMatch)
-
-    // if (boxMatch && forageBoxIdArr.length === boxesToShipLength) {
-    //     console.log("true")
-    // }else console.log("false")
-    try {
-        let value = await localforage.getItem("shipData")
-        console.log(value)
-        if (value === null) {
-            await localforage.setItem("shipData", shipSetForage)
-        }
-         // reset if forage box ids do not match or length not equal
-        for (let i in value) {
-            forageBoxIdArr.push(value[i].boxId)
-        }
-        console.log("forageboxArr", forageBoxIdArr)
-        let boxMatch = forageBoxIdArr.every(item => {
-            // console.log(item, boxesToShip.indexOf(item))
-            return boxesToShip.indexOf(item) >= 0
-        })
-        console.log("boxMatch", boxMatch)
-        console.log("forageBoxIdArr.length", forageBoxIdArr.length, "boxesToShipLength", boxesToShipLength)
-        // boxmatch false and lengths are not equal
-        if (!boxMatch || forageBoxIdArr.length !== boxesToShipLength) {
-            console.log("boxMatch", boxMatch)
-            console.log("forageBoxIdArr.length",forageBoxIdArr.length,"boxesToShipLength",boxesToShipLength)
-            await localforage.setItem("shipData", shipSetForage)
-            localforage.getItem("shipData").then(data => console.log(data))
-        }
-    }    
-     catch (e) {
-        console.log(e)
-        await localforage.setItem("shipData", shipSetForage)
-    }
 }

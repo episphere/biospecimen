@@ -1008,3 +1008,87 @@ export const allTubesCollected = (data) => {
 
     return flag;
 };
+
+export const displayContactInformation = (site,siteContactInformation) => {
+  if(siteContactInformation.hasOwnProperty(site)){
+    let contactStr = ""
+    contactStr += `<p>Site Contact Information:</p>`
+    let numContacts = siteContactInformation[site].length
+    // iterate over length of existing site's contact array
+    for(let i= 0; i < numContacts;i++) {
+    contactStr += `${numContacts > 1 ? "<p>Contact ${i+1}</p>": ""}`
+    contactStr += `<p>${siteContactInformation[site][i].fullName}</p>`
+    contactStr += `<p>Email: ${siteContactInformation[site][i].email}</p>`
+    
+    let numPhones = siteContactInformation[site][i].phone.length
+    if(numPhones === 1){
+      contactStr += `<p>Phone: ${siteContactInformation[site][i].phone}</p>`  
+    }
+    else if(numPhones > 1){
+      contactStr += `<p>Phone:</p>`
+      for(let j = 0; j < numPhones; j++){
+        contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
+      }
+    }
+    else contactStr+= `<p>Phone:</p>`
+  }
+    return contactStr
+  }
+  else return ""
+}
+
+
+export const checkShipForage = async (shipSetForage,boxesToShip) => {
+  // let shipSetForageLength = shipSetForage.length
+  let boxesToShipLength = boxesToShip.length
+  let forageBoxIdArr = []
+
+  // for (let i in shipSetForage) {
+  //     forageBoxIdArr.push(shipSetForage[i].boxId)
+  // }
+  // console.log(shipSetForage)
+  // console.log(boxesToShip)
+  // console.log(forageBoxIdArr)
+  // let boxMatch = forageBoxIdArr.every(item => {
+  //     console.log(item, boxesToShip.indexOf(item))
+  //     return boxesToShip.indexOf(item) >= 0
+  // })
+  // console.log(boxMatch)
+
+  // if (boxMatch && forageBoxIdArr.length === boxesToShipLength) {
+  //     console.log("true")
+  // }else console.log("false")
+  console.log(shipSetForage)
+  try {
+      let value = await localforage.getItem("shipData")
+      console.log(value)
+      if (value === null) {
+          await localforage.setItem("shipData", shipSetForage)
+      }
+       // reset if forage box ids do not match or length not equal
+      for (let i in value) {
+          forageBoxIdArr.push(value[i].boxId)
+      }
+      console.log("forageboxArr", forageBoxIdArr)
+      let boxMatch = forageBoxIdArr.some(item => boxesToShip.includes(item))
+      console.log(forageBoxIdArr)
+      console.log(boxesToShip)
+      // let boxMatch = boxesToShip.some(item => forageBoxIdArr.includes(item))
+      console.log("boxMatch", boxMatch)
+      // console.log("forageBoxIdArr.length", forageBoxIdArr.length, "boxesToShipLength", boxesToShipLength)
+      // boxmatch false and lengths are not equal
+      // || forageBoxIdArr.length !== boxesToShipLength
+      if (!boxMatch) {
+          console.log("boxMatch", boxMatch)
+          console.log("forageBoxIdArr.length",forageBoxIdArr.length,"boxesToShipLength",boxesToShipLength)
+          await localforage.setItem("shipData", shipSetForage)
+          localforage.getItem("shipData").then(data => console.log(data))
+      }
+      debugger;
+      return
+  }    
+   catch (e) {
+      console.log(e)
+      await localforage.setItem("shipData", shipSetForage)
+  }
+}
