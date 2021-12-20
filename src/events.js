@@ -1760,22 +1760,14 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
 
         const isCheckOut = e.target?.elements[1]?.dataset?.checkOut;
 
-        if (isCheckOut) {
-            await swal('PARTICIPANT HAS BEEN CHECKED OUT');
-            localStorage.removeItem(`check-in-${form.dataset.connectId}`);
-
-        }
-        else {
-            await swal('PARTICIPANT HAS BEEN CHECKED IN');
-            localStorage.setItem(`check-in-${form.dataset.connectId}`, true);
-        }
-
         let formData = {};
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
         formData['962267121'] = new Date().toISOString();
         formData['135591601'] = 353358909;
+        
         let query = `connectId=${parseInt(form.dataset.connectId)}`;
+        
         const response = await findParticipant(query);
         const data = response.data[0];
         const collections = (await getParticipantCollections(data.token)).data;
@@ -1788,6 +1780,12 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
             uid: datauid,
         });
 
+        await swal({
+            title: "Success",
+            icon: "success",
+            text: `Particpant has been checked ${isCheckOut ? 'out' : 'in'}.`,
+        });
+        
         if(isCheckOut){
             window.location.reload();
         }
