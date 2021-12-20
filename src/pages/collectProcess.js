@@ -1,4 +1,4 @@
-import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormText } from './../events.js'
+import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormText } from './../events.js'
 import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow } from '../shared.js';
 
 export const tubeCollectedTemplate = (data, formData) => {
@@ -65,6 +65,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                         template += `
                             <tr>
                                 <td>${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
+
                                 <td class="align-left">${obj.collectionChkBox === true ? `
                                     <input type="checkbox" 
                                         class="tube-collected custom-checkbox-size" 
@@ -74,6 +75,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                     >`
                                     :``}
                                 </td>`
+
                                 if(getWorflow() === 'research') {
 
                                     template += 
@@ -98,6 +100,7 @@ export const tubeCollectedTemplate = (data, formData) => {
 
                                         `</td>`
                                 }
+                                
                                 template += `
                                 <td>
                                     <input 
@@ -111,6 +114,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         style="font-size:1.3rem; width:200px"
                                     >
                                 </td>
+
                                 <td>${obj.deviationChkBox === true ? `
                                     <input 
                                         type="checkbox" 
@@ -122,6 +126,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         id="${obj.concept}Deviated"
                                     >`: ``}
                                 </td>
+
                                 <td>`
                                 
                                     if(obj.deviationChkBox) {
@@ -143,6 +148,7 @@ export const tubeCollectedTemplate = (data, formData) => {
 
                                 template += `
                                 </td>
+
                                 <td>${obj.deviationChkBox === true ? `
                                     <input 
                                         type="text" 
@@ -152,6 +158,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                     >
                                     `: ``}
                                 </td>
+
                                 <td>${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? `
                                     <button 
                                         class="btn btn-outline-primary" 
@@ -200,6 +207,7 @@ export const tubeCollectedTemplate = (data, formData) => {
     addEventBackToSearch('backToSearch');
     addEventBiospecimenCollectionForm(data, formData);
     addEventBiospecimenCollectionFormCntd(data, formData);
+    addEventBiospecimenCollectionFormToggles(data, formData);
     //addEventBiospecimenCollectionFormEdit(data, formData);
     //addEventBiospecimenCollectionFormText(data, formData);
 }

@@ -2004,6 +2004,45 @@ export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     });
 };
 
+export const addEventBiospecimenCollectionFormToggles = (dt, biospecimenData) => {
+    const collectedBoxes = Array.from(document.getElementsByClassName('tube-collected'));
+    const deviationBoxes = Array.from(document.getElementsByClassName('tube-deviated'));
+
+    collectedBoxes.forEach(collected => {
+
+        const reason = document.getElementById(collected.id + "Reason");
+        const specimenId = document.getElementById(collected.id + "Id")
+
+        collected.addEventListener('change', () => {
+            
+            if(getWorflow === 'research') reason.disabled = !collected.checked;
+            specimenId.disabled = !collected.checked;
+            
+            if(!collected.checked) {
+                if(getWorflow === 'research') reason.value = '';
+                specimenId.value = '';
+            }
+        });
+    });
+
+    deviationBoxes.forEach(deviation => {
+
+        const type = document.getElementById(deviation.id.replace('Deviated', 'Deviation'));
+        const comment = document.getElementById(deviation.id + 'Explanation');
+
+        deviation.addEventListener('change', () => {
+
+            type.disabled = !deviation.checked;
+            comment.disabled = !deviation.checked;
+
+            if(!deviation.checked) {
+                type.value = '';
+                comment.value = '';
+            }
+        });
+    });
+};
+
 export const addEventBiospecimenCollectionFormEdit = (dt, biospecimenData) => {
     const editButtons = Array.from(document.querySelectorAll('[id$="collectEditBtn"]'));
     editButtons.forEach(button => {
