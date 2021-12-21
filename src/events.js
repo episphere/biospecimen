@@ -2009,16 +2009,24 @@ export const addEventBiospecimenCollectionFormToggles = (dt, biospecimenData) =>
     collectedBoxes.forEach(collected => {
 
         const reason = document.getElementById(collected.id + "Reason");
-        const specimenId = document.getElementById(collected.id + "Id")
+        const specimenId = document.getElementById(collected.id + "Id");
+        const deviated = document.getElementById(collected.id + "Deviated");
 
         collected.addEventListener('change', () => {
             
-            if(getWorflow() === 'research') reason.disabled = !collected.checked;
+            if(getWorflow() === 'research') reason.disabled = collected.checked;
             specimenId.disabled = !collected.checked;
+            deviated.disabled = !collected.checked;
             
-            if(!collected.checked) {
+            if(collected.checked) {
                 if(getWorflow() === 'research') reason.value = '';
+            }
+            else {
                 specimenId.value = '';
+                deviated.checked = false;
+                
+                const event = new CustomEvent('change');
+                deviated.dispatchEvent(event);
             }
         });
     });
@@ -2048,8 +2056,18 @@ export const addEventBiospecimenCollectionFormEdit = (dt, biospecimenData) => {
             const conceptID = button.id.replace('collectEditBtn', '');
             document.getElementById(conceptID + 'Id').disabled = false;
 
-            const deviationBox = document.getElementById(conceptID + 'Deviated');
-            if (deviationBox) deviationBox.disabled = false;
+            const deviation = document.getElementById(conceptID + 'Deviated');
+            if(deviation) {
+                deviation.disabled = false;
+
+                if(deviation.checked) {
+                    const type = document.getElementById(deviation.id.replace('Deviated', 'Deviation'));
+                    const comment = document.getElementById(deviation.id + 'Explanation'); 
+
+                    type.disabled = false;
+                    comment.disabled = false;
+                }
+            }
         });
 
     });

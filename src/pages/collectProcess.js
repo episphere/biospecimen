@@ -44,15 +44,17 @@ export const tubeCollectedTemplate = (data, formData) => {
                     <tbody>`
                     
                     let siteTubesList = getSiteTubesLists(formData);
+                    const collectionFinalized = (formData['410912345'] === 353358909);
                     
-                    if(!siteTubesList || siteTubesList?.length === 0){
-                        siteTubesList = [];
-                    //    template += `<tr><td>No data.</td></tr>`;
-                    }
+                    if(!siteTubesList || siteTubesList?.length === 0) siteTubesList = [];
+
                     siteTubesList?.forEach((obj, index) => {
 
                         const notCollectedOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].tubeNotCollectedOptions;
                         const deviationOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].deviationOptions;
+
+                        const tubeCollected = (formData[obj.concept]['593843561'] === 353358909);
+                        const tubeDeviated = (formData[obj.concept]['678857215'] === 353358909);
 
                         let required = false;
                         if(formData[obj.concept] && formData[obj.concept]['593843561'] !== 104430631) {
@@ -62,13 +64,15 @@ export const tubeCollectedTemplate = (data, formData) => {
 
                         template += `
                             <tr>
-                                <td>${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}</td>
+                                <td>
+                                    ${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}
+                                </td>
 
                                 <td class="align-left">${obj.collectionChkBox === true ? `
                                     <input type="checkbox" 
                                         class="tube-collected custom-checkbox-size" 
                                         data-tube-type="${obj.tubeType}" 
-                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? 'checked': ''} 
+                                        ${tubeCollected ? 'checked disabled': ''} 
                                         id="${obj.concept}"
                                     >`
                                     :``}
@@ -86,7 +90,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                                         data-connect-id="${data.Connect_ID}" 
                                                         id="${obj.concept}Reason"
                                                         style="width:200px"
-                                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? '' : 'disabled'}
+                                                        ${tubeCollected ? 'disabled' : ''}
                                                     >
                                                         <option value=""> -- Select Reason -- </option>`
 
@@ -107,9 +111,9 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         autocomplete="off" 
                                         id="${obj.concept}Id" 
                                         ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['825582494'] ? `value='${formData[`${obj.concept}`]['825582494']}'`: ``}
-                                        class="form-control ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 104430631 ? 'disabled': ''} input-barcode-id" 
+                                        class="form-control input-barcode-id" 
                                         ${required ? 'required' : ''} 
-                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 ? '' : 'disabled'}
+                                        disabled
                                         placeholder="Scan/Type in Full Specimen ID"
                                         style="font-size:1.3rem; width:200px"
                                     >
@@ -120,9 +124,10 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         type="checkbox" 
                                         data-tube-label="${obj.specimenType}" 
                                         data-tube-color="${obj.tubeColor}"
-                                        class="tube-deviated custom-checkbox-size" 
-                                        ${formData[`${obj.concept}`]['678857215'] === 353358909 ? 'checked': ''} 
                                         data-tube-type="${obj.tubeType}" 
+                                        class="tube-deviated custom-checkbox-size" 
+                                        ${tubeDeviated ? 'checked': ''} 
+                                        disabled
                                         id="${obj.concept}Deviated"
                                     >`: ``}
                                 </td>
@@ -136,7 +141,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                                 id="${obj.concept}Deviation"
                                                 style="width:200px"
                                                 multiple
-                                                ${formData[`${obj.concept}`]['678857215'] === 353358909 ? '': 'disabled'}
+                                                disabled
                                             >
                                                 <option value=""> -- Select Deviation -- </option>`
 
@@ -156,12 +161,12 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         placeholder="Details (Optional)" 
                                         id="${obj.concept}DeviatedExplanation" 
                                         ${formData[obj.concept]['536710547'] ? `value='${formData[`${obj.concept}`]['536710547']}'`: ``}
-                                        ${formData[`${obj.concept}`]['678857215'] === 353358909 ? '': 'disabled'}
+                                        disabled
                                     >
                                     `: ``}
                                 </td>
 
-                                <td>${formData[`${obj.concept}`] && formData[`${obj.concept}`]['593843561'] === 353358909 && formData[`${obj.concept}`]['825582494'] ? `
+                                <td>${tubeCollected && !collectionFinalized ? `
                                     <button 
                                         class="btn btn-outline-primary" 
                                         type="button" 
@@ -213,6 +218,6 @@ export const tubeCollectedTemplate = (data, formData) => {
     addEventBiospecimenCollectionForm(data, formData);
     addEventBiospecimenCollectionFormCntd(data, formData);
     addEventBiospecimenCollectionFormToggles(data, formData);
-    //addEventBiospecimenCollectionFormEdit(data, formData);
+    addEventBiospecimenCollectionFormEdit(data, formData);
     addEventBiospecimenCollectionFormText(data, formData);
 }
