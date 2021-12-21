@@ -2279,8 +2279,15 @@ const isChecked = (id) => document.getElementById(id).checked;
 export const addEventSelectAllCollection = () => {
     const checkbox = document.getElementById('selectAllCollection');
     checkbox.addEventListener('click', () => {
-        if (checkbox.checked) Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => chk.checked = true);
-        else Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => chk.checked = false);
+        
+        Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => {
+            if(!chk.disabled) {
+                chk.checked = checkbox.checked;
+
+                const event = new CustomEvent('change');
+                chk.dispatchEvent(event);
+            }
+        });
     })
 }
 
