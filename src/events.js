@@ -730,13 +730,14 @@ export const populateSpecimensList = async (hiddenJSON) => {
         }
     }
 
+    let orphanHeader = document.getElementById('orphanHeader')
     let orphanPanel = document.getElementById('orphansPanel');
     let orphanTable = document.getElementById('orphansList')
     let specimenPanel = document.getElementById('specimenPanel')
     orphanTable.innerHTML = '';
 
     if (orphansIndex != -1 && specimenObject['unlabelled'].length > 0) {
-
+        orphanHeader.style.display = 'block'
         orphanPanel.style.display = 'block'
         specimenPanel.style.height = '400px'
 
