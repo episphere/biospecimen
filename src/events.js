@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -2458,6 +2458,7 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
         if (btn.classList.contains('active')) return;
         //get table info
         let boxesToShip = [];
+        let shipSetForage = []
         let currTable = document.getElementById('saveTable')
         for (var r = 1; r < currTable.rows.length; r++) {
 
@@ -2471,6 +2472,12 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
         if (document.getElementById('tempMonitorChecked')) {
             tempChecked = document.getElementById('tempMonitorChecked').checked
         }
+
+        // Push empty item with boxId and empty tracking number string
+        // shipSetForage used to handle empty localforage or no box id match
+        boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
+        checkShipForage(shipSetForage,boxesToShip)
+        
         //return box 1 info
         await shippingManifest(boxesToShip, userName, tempChecked);
     });
@@ -2581,16 +2588,31 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
 
 }
 
-export const populateTrackingQuery = (hiddenJSON) => {
+export const populateTrackingQuery = async (hiddenJSON) => {
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
     let toBeInnerHTML = ""
-    for (let i = 0; i < boxes.length; i++) {
-        toBeInnerHTML += `
+
+    let shipping = {}
+    let shipData = await localforage.getItem("shipData")
+
+    for(let box of shipData) {
+      // if boxes has box id of localforage shipData push
+      if(boxes.includes(box["boxId"])) {
+        shipping[box["boxId"]] = {"959708259":box["959708259"]}
+      }
+      else {
+        shipping[box["boxId"]] = {"959708259":""}
+      }
+    }
+    
+    for(let i = 0; i < boxes.length; i++){
+        let result = boxes[i] && shipping?.[boxes[i]]?.["959708259"];
+        toBeInnerHTML +=`
         <div class = "row">
                             <div class="form-group" style="margin-top:30px">
                                 <label style="float:left;margin-top:5px">`+ boxes[i] + `</label>
                                 <div style="float:left;margin-left:30px">
-                                    <input class="form-control" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number"/>
+                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${result ?? ""}" />
                                 </div>
                             </div>
                         </div>
@@ -2625,11 +2647,10 @@ export const addEventSaveButton = (hiddenJSON) => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         for (let i = 0; i < boxes.length; i++) {
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-            hiddenJSON[boxes[i]] = { '959708259': boxi, specimens: hiddenJSON[boxes[i]] }
-
+            hiddenJSON[boxes[i]] = {'959708259':boxi, specimens:hiddenJSON[boxes[i]]}
         }
-
-        let shippingData = {}
+        
+        let shippingData = []
 
         let trackingNumbers = {}
         let boxNames = Object.keys(hiddenJSON);
@@ -2637,8 +2658,19 @@ export const addEventSaveButton = (hiddenJSON) => {
             trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
         }
 
-        await ship(boxes, shippingData, trackingNumbers);
-        console.log("HERE");
+        for(let i = 0; i < boxes.length; i++){
+          let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
+            shippingData.push({ "959708259": boxi, "boxId":boxes[i]})
+        }
+        localforage.setItem("shipData",shippingData)
+
+        // TODO: Add a success modal when participants are added back.
+        // Swal.fire({
+        //   title: 'Success!',
+        //   text: 'Tracking numbers saved!',
+        //   icon: 'success',
+        //   timer: 1200,
+        // })
     })
 }
 
@@ -2663,6 +2695,7 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         }
         if (finalizeTextField.value.toUpperCase() === userName.toUpperCase()) {
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+            localforage.removeItem("shipData")
             await ship(boxes, shippingData, trackingNumbers);
             document.getElementById('finalizeModalCancel').click();
             if (tempChecked) {
@@ -3063,32 +3096,4 @@ export const addEventFilter = () => {
 
     })
 
-}
-
-export const displayContactInformation = (site, siteContactInformation) => {
-    if (siteContactInformation.hasOwnProperty(site)) {
-        let contactStr = ""
-        contactStr += `<p>Site Contact Information:</p>`
-        let numContacts = siteContactInformation[site].length
-        // iterate over length of existing site's contact array
-        for (let i = 0; i < numContacts; i++) {
-            contactStr += `${numContacts > 1 ? "<p>Contact ${i+1}</p>" : ""}`
-            contactStr += `<p>${siteContactInformation[site][i].fullName}</p>`
-            contactStr += `<p>Email: ${siteContactInformation[site][i].email}</p>`
-
-            let numPhones = siteContactInformation[site][i].phone.length
-            if (numPhones === 1) {
-                contactStr += `<p>Phone: ${siteContactInformation[site][i].phone}</p>`
-            }
-            else if (numPhones > 1) {
-                contactStr += `<p>Phone:</p>`
-                for (let j = 0; j < numPhones; j++) {
-                    contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
-                }
-            }
-            else contactStr += `<p>Phone:</p>`
-        }
-        return contactStr
-    }
-    else return ""
 }

@@ -1022,3 +1022,57 @@ export const allTubesCollected = (data) => {
 
     return flag;
 };
+
+export const displayContactInformation = (site, siteContactInformation) => {
+  if(siteContactInformation.hasOwnProperty(site)){
+    let contactStr = ""
+    contactStr += `<p>Site Contact Information:</p>`
+    let numContacts = siteContactInformation[site].length
+    // iterate over length of existing site's contact array
+    for(let i= 0; i < numContacts;i++) {
+    contactStr += `${numContacts > 1 ? "<p>Contact ${i+1}</p>": ""}`
+    contactStr += `<p>${siteContactInformation[site][i].fullName}</p>`
+    contactStr += `<p>Email: ${siteContactInformation[site][i].email}</p>`
+    
+    let numPhones = siteContactInformation[site][i].phone.length
+    if(numPhones === 1){
+      contactStr += `<p>Phone: ${siteContactInformation[site][i].phone}</p>`  
+    }
+    else if(numPhones > 1){
+      contactStr += `<p>Phone:</p>`
+      for(let j = 0; j < numPhones; j++){
+        contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
+      }
+    }
+    else contactStr+= `<p>Phone:</p>`
+  }
+    return contactStr
+  }
+  else return ""
+}
+
+
+export const checkShipForage = async (shipSetForage, boxesToShip) => {
+  let forageBoxIdArr = []
+  try {
+      let value = await localforage.getItem("shipData")
+      console.log(value)
+      if (value === null) {
+          await localforage.setItem("shipData", shipSetForage)
+      }
+      for (let i in value) {
+          forageBoxIdArr.push(value[i].boxId)
+      }
+      
+      let boxMatch = forageBoxIdArr.some(item => boxesToShip.includes(item))
+      // Compare forageBoxIdArr with boxesToShip
+      // If there is not at least one boxid match from boxesToShip
+      if (!boxMatch) {
+          await localforage.setItem("shipData", shipSetForage)
+      }
+  }    
+   catch (e) {
+      console.log(e)
+      await localforage.setItem("shipData", shipSetForage)
+  }
+}

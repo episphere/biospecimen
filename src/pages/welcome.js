@@ -94,3 +94,4 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
         //shippingDashboard(auth, route, true);
     });
 }
+
