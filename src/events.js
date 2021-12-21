@@ -2660,7 +2660,7 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
 
 }
 
-export const addEventSaveButton = (hiddenJSON) => {
+export const addEventSaveButton = async (hiddenJSON) => {
     document.getElementById('saveTracking').addEventListener('click', async () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         for (let i = 0; i < boxes.length; i++) {
@@ -2682,13 +2682,12 @@ export const addEventSaveButton = (hiddenJSON) => {
         }
         localforage.setItem("shipData",shippingData)
 
-        // TODO: Add a success modal when participants are added back.
-        // Swal.fire({
-        //   title: 'Success!',
-        //   text: 'Tracking numbers saved!',
-        //   icon: 'success',
-        //   timer: 1200,
-        // })
+        await swal({
+          title: 'Success!',
+          icon: 'success',
+          text: 'Tracking input saved',
+          timer: 1600,
+        })
     })
 }
 
