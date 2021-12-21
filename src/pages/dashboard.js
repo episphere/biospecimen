@@ -193,8 +193,9 @@ export const searchResults = (result) => {
                 `<button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>Go to check-out</button>`}
                 </td>
                 <td>
-                <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
-                ${checkedIn ? `<button class="btn btn-outline-primary text-nowrap" id="checkInComplete">Specimen Link</button>` : ``}
+                ${checkedIn ? `<form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
+                <button class="btn btn-outline-primary text-nowrap" type="submit" id="checkInComplete">Specimen Link</button>
+                </form>` : ``}
                 </td>
             </tr>
         `
