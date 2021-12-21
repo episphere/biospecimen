@@ -1799,7 +1799,7 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
         await swal({
             title: "Success",
             icon: "success",
-            text: `Particpant has been checked ${isCheckOut ? 'out' : 'in'}.`,
+            text: `Participant is checked ${isCheckOut ? 'out' : 'in'}.`,
         });
         
         if(isCheckOut){
@@ -1810,7 +1810,7 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
             const confirmVal = await swal({
                 title: "Success",
                 icon: "success",
-                text: "Particpant has been checked in.",
+                text: "Participant is checked in.",
                 buttons: {
                     cancel: {
                         text: "Close",

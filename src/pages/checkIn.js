@@ -29,7 +29,7 @@ export const checkInTemplate = (data) => {
                     </select>
                     </div>
                     <div class="col-md-3">
- ${checkedIn ?
+        ${checkedIn ?
             `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete" data-check-out="true">Check-Out</button>` :
             `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete">Check-In</button>`
         }
