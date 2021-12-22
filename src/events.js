@@ -1809,6 +1809,7 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
                 icon: "success",
                 text: `Participant is checked ${isCheckOut ? 'out' : 'in'}.`,
             });
+            await new Promise((res) => setTimeout(res,1200));
             window.location.reload();
         }
 
