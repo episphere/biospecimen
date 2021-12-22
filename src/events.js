@@ -1792,18 +1792,24 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
 
 
         // update participant as checked in/out.
-        await updateParticipant({
-            '135591601': isCheckOut ? 104430631 : 353358909,
-            uid: datauid,
-        });
+        const checkInData = {
+           '135591601': isCheckOut ? 104430631 : 353358909,
+           uid: datauid,
+        };
 
-        await swal({
-            title: "Success",
-            icon: "success",
-            text: `Participant is checked ${isCheckOut ? 'out' : 'in'}.`,
-        });
+        // append check-in timestamp
+        if(!isCheckOut){
+            checkInData["40048338"] = new Date();
+        }
         
+        await updateParticipant(checkInData);
+       
         if(isCheckOut){
+            await swal({
+                title: "Success",
+                icon: "success",
+                text: `Participant is checked ${isCheckOut ? 'out' : 'in'}.`,
+            });
             window.location.reload();
         }
 

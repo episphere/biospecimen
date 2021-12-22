@@ -19,7 +19,8 @@ export const checkInTemplate = (data) => {
             <div class="row">
             <div class="col-md-12">
                     <h5>${data['996038075']}, ${data['399159511']}</h5>
-                    <h5>Login Method: ${data['995036844']}</h5>
+                    <h6>Login Method: ${data['995036844']}</h5>
+                    ${data["40048338"] && `<h6>Checked in @ ${new Date(data["40048338"]).toLocaleString()}</h6>`}
             </div>
             </div>
             <div class="row">
