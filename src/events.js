@@ -2158,17 +2158,13 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
         const tubeCheckBox = document.getElementById(input.id.replace('Id',''));
 
-        if(!input.required && tubeCheckBox) input.required = tubeCheckBox.checked;
+        if(tubeCheckBox) input.required = tubeCheckBox.checked;
         
         if(input.required && value.length !== totalCollectionIDLength) {
 
             hasError = true;
-            if (value.length > 0) {
-                hasCntdError = true;
-            }
-            if (cntd || value.length > 0) {
-                errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`, focus);
-            }
+            hasCntdError = true;
+            errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`, focus);
             focus = false;
         }
         else if (input.required && masterID !== biospecimenData['820476880']) {
