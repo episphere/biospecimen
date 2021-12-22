@@ -1076,3 +1076,19 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
       await localforage.setItem("shipData", shipSetForage)
   }
 }
+
+export const sortBiospecimensList = (biospecimensList,tubeOrder) => {
+  console.log(biospecimensList)
+  console.log(tubeOrder)
+  let bioArr = []
+  // push list of unordered ids
+  biospecimensList.forEach(id => {
+    console.log(id)
+    bioArr.push({"tubeId": id})
+  })
+  console.log(bioArr)
+  // sort unordered id list with custom tube order sort
+  bioArr.sort((a,b) => tubeOrder.indexOf(a.tubeId) - tubeOrder.indexOf(b.tubeId))
+  console.log(bioArr)
+  return bioArr.map(item => item.tubeId)
+}

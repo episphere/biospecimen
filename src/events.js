@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, sortBiospecimensList} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -211,6 +211,32 @@ export const addEventAddSpecimenToBox = (userName) => {
         let biospecimensList = []
         let tableIndex = -1;
         let foundInShipping = false;
+
+        // Modify to change tube order, tube ordered by color
+        let tubeOrder = [      
+        "0001", //"SST/Gold"
+        "0002", //"SST/Gold"
+        "0011", //"SST/Gold"
+        "0012", //"SST/Gold"
+        "0021", //"SST/Gold"
+        "0022", //"SST/Gold"
+        "0031", //"SST/Gold"
+        "0032", //"SST/Gold"
+        "0003", //"Heparin/Green"
+        "0013", //"Heparin/Green"
+        "0004", //"EDTA/Lavender"
+        "0014", //"EDTA/Lavender"
+        "0024", //"EDTA/Lavender"
+        "0005", //"ACD/Yellow"
+        "0006", //"Urine/Yellow"
+        "0016", //"Urine Cup"
+        "0007", //"Mouthwash Container"
+        "0050", //"NA"
+        "0051", //"NA"
+        "0052", //"NA"
+        "0053", //"NA"
+        "0054", //"NA
+      ] 
         for (let i = 1; i < shippingTable.rows.length; i++) {
             let currRow = shippingTable.rows[i];
             if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId) {
@@ -240,9 +266,13 @@ export const addEventAddSpecimenToBox = (userName) => {
             document.getElementById('shippingCloseButton').click();
             return
         }
-
-        biospecimensList.sort();
-        await createShippingModalBody(biospecimensList, masterSpecimenId, foundInOrphan)
+        // console.log("unsorted",biospecimensList)
+        // biospecimensList.sort();
+        // console.log("sort",biospecimensList,biospecimensList.sort())
+        let orderedBiospecimensList = sortBiospecimensList(biospecimensList, tubeOrder)
+        console.log("sort", biospecimensList.sort())
+        console.log("new sort", orderedBiospecimensList)
+        await createShippingModalBody(orderedBiospecimensList, masterSpecimenId, foundInOrphan)
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
 
@@ -274,6 +304,8 @@ export const addEventAddSpecimenToBox = (userName) => {
                 specimenList.remove(i);
         }
         */
+        debugger
+        return
     })
 }
 
@@ -325,6 +357,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         "0053": "NA",
         "0054": "NA"
     };
+
     if (!isOrphan) {
         if (currSplit.length >= 2 && currSplit[1] == '0008') {
             //look for all non-moutwash (0007)
