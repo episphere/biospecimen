@@ -194,7 +194,7 @@ export const searchResults = (result) => {
                 </td>
                 <td>
                 <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
-                ${!checkedIn ? `<button class="btn btn-outline-primary text-nowrap" id="checkInComplete">Specimen Link</button>` : ``}
+                ${checkedIn ? `<button class="btn btn-outline-primary text-nowrap" id="checkInComplete">Specimen Link</button></form>` : ``}
                 </td>
             </tr>
         `
