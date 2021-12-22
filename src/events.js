@@ -1774,9 +1774,8 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        console.log(e.target.elements);
         const isCheckOut = e.target?.elements[1]?.dataset?.checkOut;
-        console.log({isCheckOut});
+        
         let formData = {};
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
