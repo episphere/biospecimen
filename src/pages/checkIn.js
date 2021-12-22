@@ -8,7 +8,8 @@ export const checkInTemplate = (data) => {
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
     const checkedIn = (data['135591601'] === 353358909);
-
+    // ${!!data["40048338"] ? `<h6>Checked in @ ${new Date(data["40048338"]).toLocaleString()}</h6>`}
+           
     let template = `
         </br>
         <div class="row">
@@ -20,7 +21,6 @@ export const checkInTemplate = (data) => {
             <div class="col-md-12">
                     <h5>${data['996038075']}, ${data['399159511']}</h5>
                     <h6>Login Method: ${data['995036844']}</h5>
-                    ${data["40048338"] && `<h6>Checked in @ ${new Date(data["40048338"]).toLocaleString()}</h6>`}
             </div>
             </div>
             <div class="row">
