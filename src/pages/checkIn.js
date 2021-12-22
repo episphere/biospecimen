@@ -9,7 +9,7 @@ export const checkInTemplate = (data) => {
     navBarBtn?.classList.add('active');
     const checkedIn = (data['135591601'] === 353358909);
     // ${!!data["40048338"] ? `<h6>Checked in @ ${new Date(data["40048338"]).toLocaleString()}</h6>`}
-           
+    console.log({data})
     let template = `
         </br>
         <div class="row">
@@ -77,8 +77,10 @@ export const checkInTemplate = (data) => {
             <div class="row">
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">${true ? 'SSN Entered' : "SSN not entered"}</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
+                        <div class="row"><span class="full-width">${data["914639140"] === 197316935 ? 'SSN Entered' : "SSN not entered"}</span></div>
+                        <div class="row"><span class="full-width">
+                        ${data["914639140"] === 197316935 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}
+                        </span></div>
                       </div>
             </div>
             </div>
