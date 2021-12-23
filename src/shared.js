@@ -1078,7 +1078,7 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
 }
 
 export const sortBiospecimensList = (biospecimensList, tubeOrder) => {
-  let bioArr = []
+  const bioArr = []
   // push list of unordered ids
   biospecimensList.forEach(id => {
     bioArr.push({"tubeId": id})

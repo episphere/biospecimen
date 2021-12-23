@@ -327,7 +327,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let currSplit = masterBiospecimenId.split(/\s+/);
     let currBag = [];
     let empty = true;
-    let translateNumToType = {
+    const translateNumToType = {
         "0001": "SST/Gold",
         "0002": "SST/Gold",
         "0003": "Heparin/Green",
