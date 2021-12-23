@@ -165,7 +165,7 @@ export const searchResults = (result) => {
                         <th>Address</th>
                         <th>Connect ID</th>
                         <th>Verification Status</th>
-                        <th>Participant Status</th>
+                        <th>Participation Status</th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -175,7 +175,6 @@ export const searchResults = (result) => {
 
         if(data['821247024'] === 922622075) return;
         const checkedIn = (data['135591601'] === 353358909);
-
         template += `
             <tr>
                 <td>${data['996038075']}</td>

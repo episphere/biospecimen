@@ -8,7 +8,8 @@ export const checkInTemplate = (data) => {
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
     const checkedIn = (data['135591601'] === 353358909);
-
+    // ${!!data["40048338"] ? `<h6>Checked in @ ${new Date(data["40048338"]).toLocaleString()}</h6>`}
+    console.log({data})
     let template = `
         </br>
         <div class="row">
@@ -19,7 +20,7 @@ export const checkInTemplate = (data) => {
             <div class="row">
             <div class="col-md-12">
                     <h5>${data['996038075']}, ${data['399159511']}</h5>
-                    <h5>Login Method: ${data['995036844']}</h5>
+                    <h6>Login Method: ${data['995036844']}</h5>
             </div>
             </div>
             <div class="row">
@@ -47,20 +48,21 @@ export const checkInTemplate = (data) => {
             <div class="col-md-4">
             <div class="col-md-12 info-box">
             <div class="row"><span class="full-width">Consent</span></div>
-            <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
+            <div class="row"><span class="full-width"><i class="fas fa-2x fa-check"></i></span></div>
+            <div class="row"><span class="full-width">${new Date(data['454445267']).toLocaleString()}</span></div>
              </div>
             </div>
             <div class="col-md-4">
             <div class="col-md-12 info-box">
             <div class="row"><span class="full-width">Verification</span></div>
-            <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-times"></i>` : `<i class="fas fa-2x fa-times"></i>`}</span></div>
-            <div class="row"><span class="full-width">${new Date(data['454445267']).toLocaleString()}</span></div>
+            <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span></div>
             </div>
             </div>
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-            <div class="row"><span class="full-width">Not Withdrawn</span></div>
-            <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-times"></i>` : `<i class="fas fa-2x fa-times"></i>`}</span></div>
+            <div class="row"><span class="full-width">${data['821247024'] === 197316935 ? `Not Withdrawn` : `Withdrawn`}</span></div>
+            <div class="row"><span class="full-width">
+            ${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>` : `<i class="fas fa-2x fa-times"></i>`}</span></div>
             <div class="row"></br></div>
             </div>
             </div>
@@ -75,8 +77,10 @@ export const checkInTemplate = (data) => {
             <div class="row">
             <div class="col-md-4">
             <div class="col-md-12 info-box">
-                        <div class="row"><span class="full-width">${true ? 'SSN Entered' : "SSN not entered"}</span></div>
-                        <div class="row"><span class="full-width"><i class="fas fa-2x fa-times"></i></span></div>
+                        <div class="row"><span class="full-width">${data["914639140"] === 197316935 ? 'SSN Entered' : "SSN not entered"}</span></div>
+                        <div class="row"><span class="full-width">
+                        ${data["914639140"] === 197316935 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}
+                        </span></div>
                       </div>
             </div>
             </div>

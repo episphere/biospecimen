@@ -1801,9 +1801,8 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        console.log(e.target.elements);
         const isCheckOut = e.target?.elements[1]?.dataset?.checkOut;
-        console.log({isCheckOut});
+        
         let formData = {};
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
@@ -1819,18 +1818,25 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
 
 
         // update participant as checked in/out.
-        await updateParticipant({
-            '135591601': isCheckOut ? 104430631 : 353358909,
-            uid: datauid,
-        });
+        const checkInData = {
+           '135591601': isCheckOut ? 104430631 : 353358909,
+           uid: datauid,
+        };
 
-        await swal({
-            title: "Success",
-            icon: "success",
-            text: `Participant is checked ${isCheckOut ? 'out' : 'in'}.`,
-        });
+        // append check-in timestamp
+        if(!isCheckOut){
+            checkInData["40048338"] = new Date();
+        }
         
+        await updateParticipant(checkInData);
+       
         if(isCheckOut){
+            await swal({
+                title: "Success",
+                icon: "success",
+                text: `Participant is checked ${isCheckOut ? 'out' : 'in'}.`,
+            });
+            await new Promise((res) => setTimeout(res,1200));
             window.location.reload();
         }
 
@@ -2179,17 +2185,13 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
         const tubeCheckBox = document.getElementById(input.id.replace('Id',''));
 
-        if(!input.required && tubeCheckBox) input.required = tubeCheckBox.checked;
+        if(tubeCheckBox) input.required = tubeCheckBox.checked;
         
         if(input.required && value.length !== totalCollectionIDLength) {
 
             hasError = true;
-            if (value.length > 0) {
-                hasCntdError = true;
-            }
-            if (cntd || value.length > 0) {
-                errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`, focus);
-            }
+            hasCntdError = true;
+            errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`, focus);
             focus = false;
         }
         else if (input.required && masterID !== biospecimenData['820476880']) {
