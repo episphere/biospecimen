@@ -351,7 +351,6 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         "0053": "NA",
         "0054": "NA"
     };
-
     if (!isOrphan) {
         if (currSplit.length >= 2 && currSplit[1] == '0008') {
             //look for all non-moutwash (0007)
