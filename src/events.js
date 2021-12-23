@@ -267,7 +267,7 @@ export const addEventAddSpecimenToBox = (userName) => {
             return
         }
 
-        let biospecimensListByType = sortBiospecimensList(biospecimensList, tubeOrder)
+        const biospecimensListByType = sortBiospecimensList(biospecimensList, tubeOrder)
         await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan)
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
