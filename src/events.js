@@ -300,8 +300,6 @@ export const addEventAddSpecimenToBox = (userName) => {
                 specimenList.remove(i);
         }
         */
-        debugger
-        return
     })
 }
 
