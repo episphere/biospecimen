@@ -1967,9 +1967,11 @@ const btnsClicked = async (connectId, formData) => {
     let query = `connectId=${parseInt(connectId)}`;
 
     showAnimation();
+
     const response = await findParticipant(query);
     const data = response.data[0];
     const specimenData = (await searchSpecimen(formData['820476880'])).data;
+
     hideAnimation();
 
     if (specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID) {
@@ -1977,18 +1979,18 @@ const btnsClicked = async (connectId, formData) => {
         return;
     }
 
+    showAnimation(); 
+
+    await storeSpecimen([formData]);  
+    const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
+    await createTubesForCollection(formData, biospecimenData);
+
+    hideAnimation();
+
     if (confirmVal == "confirmed") {
-        showAnimation();
-        await storeSpecimen([formData]);
-        const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
-        await createTubesForCollection(formData, biospecimenData);
-        hideAnimation();
         tubeCollectedTemplate(data, biospecimenData);
     }
     else {
-        showAnimation();
-        await storeSpecimen([formData]);
-        hideAnimation();
         searchTemplate();
     }
 }
