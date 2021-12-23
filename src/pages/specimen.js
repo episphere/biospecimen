@@ -1,5 +1,5 @@
 import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType } from "./../shared.js";
-import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch, addEventCntdToCollectProcess, addEventSpecimenLinkFormCntd } from "./../events.js";
+import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch, addEventCntdToCollectProcess } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
 export const specimenTemplate = async (data, formData, collections) => {
@@ -80,6 +80,7 @@ export const specimenTemplate = async (data, formData, collections) => {
         </form>
         </br>
     `;
+    
     document.getElementById('contentBody').innerHTML = template;
     document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
     // addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, masterSpecimenIDRequirement.length);
@@ -87,7 +88,6 @@ export const specimenTemplate = async (data, formData, collections) => {
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventCntdToCollectProcess();
     addEventSpecimenLinkForm(formData);
-    addEventSpecimenLinkFormCntd(formData);
     addEventBackToSearch('navBarSearch');
     addEventNavBarParticipantCheckIn();
 }

@@ -1847,30 +1847,19 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
 
 };
 
-export const addEventSpecimenLinkForm = formData => {
-    const specimenSaveExit = document.getElementById('specimenSaveExit');
-    const specimenContinue = document.getElementById('specimenContinue');
-    const connectId = specimenSaveExit.dataset.connectId || specimenContinue.dataset.connectId;
-    if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
-    specimenSaveExit.addEventListener('click', () => {
-        btnsClicked(connectId, formData)
-    });
-}
-
-export const addEventSpecimenLinkFormCntd = (formData) => {
+export const addEventSpecimenLinkForm = (formData) => {
     const form = document.getElementById('specimenLinkForm');
-    const specimenSaveExit = document.getElementById('specimenSaveExit');
-    const specimenContinue = document.getElementById('specimenContinue');
-    const connectId = specimenSaveExit.dataset.connectId || specimenContinue.dataset.connectId;
+    const connectId = document.getElementById('specimenContinue').dataset.connectId;
+
     if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
 
     form.addEventListener('submit', e => {
         e.preventDefault();
-        btnsClicked(connectId, formData, true);
+        btnsClicked(connectId, formData);
     });
 };
 
-const btnsClicked = async (connectId, formData, cont) => {
+const btnsClicked = async (connectId, formData) => {
 
     removeAllErrors();
 
@@ -1982,13 +1971,13 @@ const btnsClicked = async (connectId, formData, cont) => {
     const data = response.data[0];
     const specimenData = (await searchSpecimen(formData['820476880'])).data;
     hideAnimation();
-    
+
     if (specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID) {
         showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.' }, true)
         return;
     }
 
-    if (cont && confirmVal == "confirmed") {
+    if (confirmVal == "confirmed") {
         showAnimation();
         await storeSpecimen([formData]);
         const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
