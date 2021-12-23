@@ -1934,13 +1934,13 @@ const btnsClicked = async (connectId, formData) => {
                 closeModal: true,
             },
             back: {
-                text: "Confirm and exit",
+                text: "Confirm and Exit",
                 value: "back",
                 visible: true,
                 className: "btn btn-info",
             },
             confirm: {
-                text: "Confirm and continue",
+                text: "Confirm and Continue",
                 value: 'confirmed',
                 visible: true,
                 className: "",
