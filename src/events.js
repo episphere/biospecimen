@@ -1847,39 +1847,32 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
 
 };
 
-export const addEventSpecimenLinkForm = formData => {
-    const specimenSaveExit = document.getElementById('specimenSaveExit');
-    const specimenContinue = document.getElementById('specimenContinue');
-    const connectId = specimenSaveExit.dataset.connectId || specimenContinue.dataset.connectId;
-    if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
-    specimenSaveExit.addEventListener('click', () => {
-        btnsClicked(connectId, formData)
-    });
-}
-
-export const addEventSpecimenLinkFormCntd = (formData) => {
+export const addEventSpecimenLinkForm = (formData) => {
     const form = document.getElementById('specimenLinkForm');
-    const specimenSaveExit = document.getElementById('specimenSaveExit');
-    const specimenContinue = document.getElementById('specimenContinue');
-    const connectId = specimenSaveExit.dataset.connectId || specimenContinue.dataset.connectId;
+    const connectId = document.getElementById('specimenContinue').dataset.connectId;
+
     if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
 
     form.addEventListener('submit', e => {
         e.preventDefault();
-        btnsClicked(connectId, formData, true);
+        btnsClicked(connectId, formData);
     });
 };
 
-const btnsClicked = async (connectId, formData, cont) => {
+const btnsClicked = async (connectId, formData) => {
+
     removeAllErrors();
+
     const scanSpecimenID = document.getElementById('scanSpecimenID').value;
     const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value.toUpperCase();
     const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value.toUpperCase();
     const accessionID1 = document.getElementById('accessionID1');
     const accessionID2 = document.getElementById('accessionID2');
     const select = document.getElementById('biospecimenVisitType');
+
     let hasError = false;
     let focus = true;
+
     if (accessionID1 && accessionID1.value && !accessionID2.value && !accessionID2.classList.contains('disabled')) {
         hasError = true;
         errorMessage('accessionID2', 'Please re-type Accession ID from tube.', focus, true);
@@ -1920,11 +1913,14 @@ const btnsClicked = async (connectId, formData, cont) => {
             errorMessage('enterSpecimenID2', 'Does not match with Manually Entered Collection ID', focus, true);
         }
     }
+
     if (hasError) return;
 
     if (document.getElementById('collectionLocation')) formData['951355211'] = parseInt(document.getElementById('collectionLocation').value);
+
     const collectionID = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     const n = document.getElementById('399159511').innerText || ""
+
     const confirmVal = await swal({
         title: "Confirm Changes",
         icon: "info",
@@ -1938,13 +1934,13 @@ const btnsClicked = async (connectId, formData, cont) => {
                 closeModal: true,
             },
             back: {
-                text: "Confirm and exit",
+                text: "Confirm and Exit",
                 value: "back",
                 visible: true,
                 className: "btn btn-info",
             },
             confirm: {
-                text: "Confirm and continue",
+                text: "Confirm and Continue",
                 value: 'confirmed',
                 visible: true,
                 className: "",
@@ -1958,38 +1954,43 @@ const btnsClicked = async (connectId, formData, cont) => {
 
     formData['820476880'] = collectionID;
     formData['650516960'] = getWorflow() === 'research' ? 534621077 : 664882224;
-    if (enterSpecimenID1) formData['387108065'] = 353358909
-    else formData['387108065'] = 104430631;
+    formData['387108065'] = enterSpecimenID1 ? 353358909 : 104430631;
+    formData['331584571'] = select ? parseInt(select.value) : '';
+    formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
+    formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
+
     if (accessionID1 && accessionID1.value) {
         formData['646899796'] = accessionID1.value;
         formData['148996099'] = 353358909;
     }
-    if (select) formData['331584571'] = parseInt(select.value);
-    formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
-    formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
+
     let query = `connectId=${parseInt(connectId)}`;
+
     showAnimation();
+
     const response = await findParticipant(query);
     const data = response.data[0];
     const specimenData = (await searchSpecimen(formData['820476880'])).data;
+
     hideAnimation();
+
     if (specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID) {
         showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.' }, true)
         return;
     }
 
-    if (cont && confirmVal == "confirmed") {
-        showAnimation();
-        await storeSpecimen([formData]);
-        const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
-        await createTubesForCollection(formData, biospecimenData);
-        hideAnimation();
+    showAnimation(); 
+
+    await storeSpecimen([formData]);  
+    const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
+    await createTubesForCollection(formData, biospecimenData);
+
+    hideAnimation();
+
+    if (confirmVal == "confirmed") {
         tubeCollectedTemplate(data, biospecimenData);
     }
     else {
-        showAnimation();
-        await storeSpecimen([formData]);
-        hideAnimation();
         searchTemplate();
     }
 }
