@@ -266,13 +266,9 @@ export const addEventAddSpecimenToBox = (userName) => {
             document.getElementById('shippingCloseButton').click();
             return
         }
-        // console.log("unsorted",biospecimensList)
-        // biospecimensList.sort();
-        // console.log("sort",biospecimensList,biospecimensList.sort())
-        let orderedBiospecimensList = sortBiospecimensList(biospecimensList, tubeOrder)
-        console.log("sort", biospecimensList.sort())
-        console.log("new sort", orderedBiospecimensList)
-        await createShippingModalBody(orderedBiospecimensList, masterSpecimenId, foundInOrphan)
+
+        let biospecimensListByType = sortBiospecimensList(biospecimensList, tubeOrder)
+        await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan)
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
 
