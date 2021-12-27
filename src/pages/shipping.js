@@ -81,11 +81,11 @@ export const startShipping = async (userName) => {
         <div class="row" style="margin:0;">
             <div class="col-lg" style="padding: 0;margin: 0;">
                 <div class="row form-row" style="padding-left:0px;margin:0;">
-                    <form id="addSpecimenForm" method="POST" style="width:100%;">
+                    <form id="addSpecimenForm" method="POST" style="width:100%;>
                       <label for="masterSpecimenId">To start packing the shipping boxes, scan specimen bag ID or Full Specimen ID here:</label>
                         <div class="form-group">
                           <div class="input-group">
-                            <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan"/>
+                            <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan" autocomplete="off"/>
                             <div class="input-group-append">
                               <button class="btn btn-primary" aria-label="Enter Specimen ID" type="submit">Enter</button>
                             </div>
