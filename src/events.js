@@ -109,17 +109,7 @@ export const addEventsearchSpecimen = () => {
         hideAnimation();
         const data = response.data[0];
 
-        if (allTubesCollected(biospecimenData)) {
-            if (biospecimenData['410912345'] && biospecimenData['410912345'] === 353358909) {
-                if (biospecimenData['420757389'] && biospecimenData['420757389'] === 353358909) {
-                    searchTemplate();
-                    showNotifications({ title: 'Completed', body: 'Specimen is finalized and the Participant is already checked out!' })
-                }
-                else checkOutScreen(data, biospecimenData);
-            }
-            else finalizeTemplate(data, biospecimenData);
-        }
-        else tubeCollectedTemplate(data, biospecimenData);
+        tubeCollectedTemplate(data, biospecimenData);
     })
 }
 
