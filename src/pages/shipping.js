@@ -395,7 +395,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="printBox">Print Full Manifest</button>
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging">Continue</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging">Continue to Assign Tracking Number</button>
             </div>
         </div>
         
