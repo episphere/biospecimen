@@ -1,5 +1,5 @@
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox, addEventSaveButton} from "./../events.js";
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox, addEventSaveButton} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 const conversion = {
@@ -73,7 +73,7 @@ export const startShipping = async (userName) => {
         </div>
         <div class="row" style="margin-bottom:10px">
             <div class = "col-lg">
-                <select class="selectpicker" id="selectLocationList">
+                <select class="selectpicker" id="selectLocationList" style="padding:.25rem">
                 </select>
             </div>
         </div>
@@ -121,16 +121,13 @@ export const startShipping = async (userName) => {
     </div>
     </div>
     <div class="col-7">
-        <div class="d-flex justify-content-between align-items-center" style="margin-bottom:.625rem;">
-            <div style="width:25%;">
-                <select class="selectpicker" id="selectBoxList">
-                </select>
+        <div style="display:flex; justify-content:space-evenly; align-items:center; margin-bottom:.625rem;">
+            <div>
+                <h3>View Shipping Box Contents</h3>
             </div>
             <div>
-                <h3 style="text-align:center">Shipping Box Contents</h3>
-            </div>
-            <div style="width:25%;">
-                <button type="button" class="btn btn-primary" style="float:right;" id="addBoxButton">Create New Box</button>
+                <select class="selectpicker" id="selectBoxList" name="box-ids" style="padding:0.25rem">
+                </select>
             </div>
         </div>
         <div class="row">
@@ -241,7 +238,6 @@ export const startShipping = async (userName) => {
     await populateTempNotification();
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarShippingManifest(userName, document.getElementById('tempMonitorChecked').checked);
-    addEventAddBox(userName);
     addEventBoxSelectListChanged();
     addEventNavBarBoxManifest("navBarBoxManifest", userName)
     addEventChangeLocationSelect(userName);
