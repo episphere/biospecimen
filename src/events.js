@@ -1395,26 +1395,6 @@ const addNewBox = async (userName) => {
 
 }
 
-export const addEventAddBox = (userName) => {
-    let boxButton = document.getElementById('addBoxButton');
-    boxButton.addEventListener('click', async () => {
-        showAnimation();
-        await addNewBox(userName);
-        let currLocation = document.getElementById('selectLocationList').value;
-        let response = await getBoxesByLocation(currLocation);
-        let boxJSONS = response.data;
-        let hiddenJSONLocation = {};
-        for (let i = 0; i < boxJSONS.length; i++) {
-            let box = boxJSONS[i]
-            hiddenJSONLocation[box['132929440']] = box['bags']
-        }
-        await populateBoxSelectList(hiddenJSONLocation, userName);
-        hideAnimation()
-    })
-
-
-}
-
 export const addEventModalAddBox = (userName) => {
     let boxButton = document.getElementById('modalAddBoxButton');
 
