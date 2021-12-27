@@ -238,7 +238,6 @@ export const startShipping = async (userName) => {
     await populateTempNotification();
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarShippingManifest(userName, document.getElementById('tempMonitorChecked').checked);
-    // addEventAddBox(userName);
     addEventBoxSelectListChanged();
     addEventNavBarBoxManifest("navBarBoxManifest", userName)
     addEventChangeLocationSelect(userName);
