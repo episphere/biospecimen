@@ -69,7 +69,7 @@ export const finalizeTemplate = (data, specimenData) => {
                     <div class="col">
                         <label for="finalizedAdditionalNotes">Additional Notes (Optional)</label>
                         </br>
-                        <textarea rows=3 class="form-control" id="finalizedAdditionalNotes">${specimenData['260133861'] ? `${specimenData['260133861']}` : ''}</textarea>
+                        <textarea rows=3 disabled class="form-control" id="finalizedAdditionalNotes">${specimenData['338570265'] ? `${specimenData['338570265']}` : ''}</textarea>
                     </div>
                 </div>
                 </br>

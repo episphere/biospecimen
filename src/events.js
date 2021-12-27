@@ -2364,7 +2364,6 @@ export const addEventFinalizeFormCntd = (specimenData) => {
 const finalizeHandler = async (biospecimenData, cntd) => {
     const masterSpecimenId = biospecimenData['820476880']
     let formData = {};
-    biospecimenData['260133861'] = document.getElementById('finalizedAdditionalNotes').value;
 
     if (cntd) {
         biospecimenData['410912345'] = 353358909;
