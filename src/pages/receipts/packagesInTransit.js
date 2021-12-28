@@ -17,7 +17,6 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     const response = await getAllBoxes();
     hideAnimation();
     const allShipped = filterShipped(response.data)
-    console.log(allShipped)
 
     let template = "";
     template += receiptsNavbar();
