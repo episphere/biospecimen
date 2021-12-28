@@ -3,6 +3,7 @@ import { searchResults } from "./pages/dashboard.js";
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
 import { workflows } from "./tubeValidation.js";
+import { signOut } from "./pages/signIn.js"
 
 
 const conversion = {
@@ -32,8 +33,8 @@ export const inactivityTime = () => {
         time = setTimeout(() => {
             const resposeTimeout = setTimeout(() => {
                 // log out user if they don't respond to warning after 5 minutes.
-                logOut();
-            }, 300000)
+                signOut();
+            }, 10000)
             // Show warning after 20 minutes of no activity.
             const button = document.createElement('button');
             button.dataset.toggle = 'modal';
@@ -52,7 +53,7 @@ export const inactivityTime = () => {
             document.body.removeChild(button);
             Array.from(document.getElementsByClassName('log-out-user')).forEach(e => {
                 e.addEventListener('click', () => {
-                    logOut();
+                    signOut();
                 })
             })
             Array.from(document.getElementsByClassName('extend-user-session')).forEach(e => {
