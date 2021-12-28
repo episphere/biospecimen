@@ -95,6 +95,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 };
 
 const filterShipped = (boxes) => {
+  // boxes are from searchBoxes endpoint
   if(boxes.length === 0) {
     return []
   } 
@@ -108,7 +109,7 @@ const filterShipped = (boxes) => {
 const createPackagesInTransitRows = (boxes) => {
     let template = "";
             const allBoxes = boxes;
-            // Return an array of an item of grouped bags from GET request***
+            // Return a filtered array of an item of grouped bags from GET request***
             const bagsArr = groupAllBags(allBoxes);
 
             // Returns an array of summed and grouped bag samples
