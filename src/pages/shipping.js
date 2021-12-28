@@ -476,18 +476,16 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
         <div id="shippingHiddenTable" style="display:none">
         {}
         </div>
-        <div class="row" style="margin-top:40px">
+        <div class="row" style="margin-top:40px;">
             <div class="col-lg">
-                Choose Shipment Courier
-                </br>
-                <select name="courier" id="courierSelect">
+                <label for="courierSelect" style="font-size:1.4rem; margin-bottom:1rem;">Choose Shipment Courier</label>
+                <select name="courier" id="courierSelect" style="padding:.2rem; display:block;">
                 </select>
             </div>
         </div>
         <div class="row" style="margin-top:40px">
             <div class="col-lg">
-                Shipment Tracking Numbers:
-                </br>
+                <p style="margin:0; font-size:1.4rem;">Enter Shipment Tracking Numbers:</p>
                 <div class="col-lg" id="forTrackingNumbers">
                     
                 </div>
