@@ -99,7 +99,10 @@ const filterShipped = (boxes) => {
     return []
   } 
   let filteredBoxes = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]])
-  return filteredBoxes
+  let sortShipped = filteredBoxes.sort((a,b) => {
+    return b[fieldToConceptIdMapping["shippingShipDate"]] - a[fieldToConceptIdMapping["shippingShipDate"]]
+  })
+  return sortShipped
 }
 
 const createPackagesInTransitRows = (boxes) => {
