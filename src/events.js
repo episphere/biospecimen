@@ -75,7 +75,10 @@ export const addEventsearchSpecimen = () => {
     form.addEventListener('submit', async e => {
         e.preventDefault();
         removeAllErrors();
-        const masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase();
+        let masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase();
+
+        if(masterSpecimenId.length > masterSpecimenIDRequirement.length) masterSpecimenId = masterSpecimenId.substring(0, masterSpecimenIDRequirement.length);
+
         if (!masterSpecimenIDRequirement.regExp.test(masterSpecimenId) || masterSpecimenId.length !== masterSpecimenIDRequirement.length) {
             errorMessage('masterSpecimenId', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, true);
             return;
@@ -1833,7 +1836,10 @@ const btnsClicked = async (connectId, formData) => {
 
     removeAllErrors();
 
-    const scanSpecimenID = document.getElementById('scanSpecimenID').value;
+    let scanSpecimenID = document.getElementById('scanSpecimenID').value;
+
+    if(scanSpecimenID.length > masterSpecimenIDRequirement.length) scanSpecimenID = scanSpecimenID.substring(0, masterSpecimenIDRequirement.length);
+
     const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value.toUpperCase();
     const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value.toUpperCase();
     const accessionID1 = document.getElementById('accessionID1');
@@ -2062,6 +2068,10 @@ export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
 
             let value = getValue(`${input.id}`).toUpperCase();
             if (value.length != 0) {
+
+                const tubeCheckBox = document.getElementById(input.id.replace('Id',''));
+
+                if(tubeCheckBox) input.required = tubeCheckBox.checked;
 
                 const masterID = value.substr(0, masterSpecimenIDRequirement.length);
                 const tubeID = value.substr(masterSpecimenIDRequirement.length + 1, totalCollectionIDLength);
@@ -2809,23 +2819,6 @@ export const addEventClearScannedBarcode = (id) => {
         document.getElementById(clearInputBtn.dataset.barcodeInput).value = '';
         clearInputBtn.hidden = true;
     });
-}
-
-export const addEventCntdToCollectProcess = () => {
-    const btns = document.getElementsByClassName('continue-collect-process');
-    Array.from(btns).forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const connectID = btn.dataset.connectId;
-            const collectionID = btn.dataset.collectionId;
-            let query = `connectId=${parseInt(connectID)}`;
-            showAnimation();
-            const response = await findParticipant(query);
-            const data = response.data[0];
-            const specimenData = (await searchSpecimen(collectionID)).data;
-            hideAnimation();
-            tubeCollectedTemplate(data, specimenData);
-        });
-    })
 }
 
 export const populateCourierBox = async () => {
