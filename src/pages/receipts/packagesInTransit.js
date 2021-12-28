@@ -90,8 +90,6 @@ const packagesInTransitTemplate = async (username, auth, route) => {
         bagIdArr,
     };
     manifestButton([...allBoxes], dataObj, manifestModalBodyEl);
-    debugger;
-    return;
 };
 
 const filterShipped = (boxes) => {
