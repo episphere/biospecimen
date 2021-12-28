@@ -1,3 +1,4 @@
+import { inactivityTime } from "./src/shared.js";
 import { firebaseConfig } from "./src/config.js";
 import { manageUsers } from "./src/pages/users.js";
 import { userDashboard } from "./src/pages/dashboard.js";
@@ -32,6 +33,11 @@ window.onload = () => {
     }
     !firebase.apps.length ? firebase.initializeApp(firebaseConfig()) : firebase.app();
     auth = firebase.auth();
+    auth.onAuthStateChanged(async user => {
+        if(user){
+            inactivityTime();
+        }
+    });
     // location.hash = '#welcome';
     manageRoutes();
 };
