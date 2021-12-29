@@ -97,7 +97,6 @@ const filterShipped = (boxes) => {
   if(boxes.length === 0) {
     return []
   } 
-  let tempProbeOrder = ["104430631","353358909"]
   let filteredBoxes = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]])
   let sortShipped = filteredBoxes.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]] - a[fieldToConceptIdMapping["shippingShipDate"]])
   // sort by temp probe, tempProbe is no ("104430631") or yes ("353358909")
