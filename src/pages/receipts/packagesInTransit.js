@@ -35,6 +35,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipped from Site</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipment Submitted</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Expected Number of Samples</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Temperature Monitor</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Manifest</th>
                                     </tr>
                                 </thead>   
@@ -97,10 +98,10 @@ const filterShipped = (boxes) => {
     return []
   } 
   let filteredBoxes = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]])
-  let sortShipped = filteredBoxes.sort((a,b) => {
-    return b[fieldToConceptIdMapping["shippingShipDate"]] - a[fieldToConceptIdMapping["shippingShipDate"]]
-  })
-  return sortShipped
+  let sortShipped = filteredBoxes.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]] - a[fieldToConceptIdMapping["shippingShipDate"]])
+  // sort by temp probe, tempProbe is no ("104430631") or yes ("353358909")
+  let sortTempProbe = sortShipped.sort((a,b) => a[fieldToConceptIdMapping["tempProbe"]] - b[fieldToConceptIdMapping["tempProbe"]])
+  return sortTempProbe
 }
 
 const createPackagesInTransitRows = (boxes) => {
@@ -130,6 +131,9 @@ const createPackagesInTransitRows = (boxes) => {
                       }</td>
                       <td style="text-align:center;">${
                           sumSamplesArr[index]
+                      }</td>
+                      <td style="text-align:center;">${
+                        tempProbeFound(i[fieldToConceptIdMapping["tempProbe"]])
                       }</td>
                       <td>
                         <button class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
@@ -367,6 +371,16 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupSca
     }
 };
 
+const tempProbeFound = (tempProbe) => {
+  if(tempProbe === '104430631') {
+    return "No"
+  }
+  else if(tempProbe === '353358909') {
+    return "Yes"
+  }
+  else return ""
+}
+
 // Returns Shipment Submitted Boolean Value --> Yes or No
 const shipmentSubmittedStatus = (booleanValue) => {
     let { booleanZero, booleanOne } = fieldToConceptIdMapping;
@@ -379,3 +393,4 @@ const shipmentSubmittedStatus = (booleanValue) => {
         return "";
     }
 };
+
