@@ -2728,7 +2728,7 @@ export const populateFinalCheck = (hiddenJSON) => {
         let numTubes = 0;
         let numBags = specimenObj.hasOwnProperty('orphans') ? keys.length - 1 : keys.length;
         for (let j = 0; j < keys.length; j++) {
-            numTubes += specimenObj[keys[j]]['arrElements'].length;
+            numTubes += specimenObj[keys[j]]?.['arrElements'].length;
         }
         let row = table.insertRow(i + 1);
         row.insertCell(0).innerHTML = currBox;
