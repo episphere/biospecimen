@@ -35,7 +35,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipped from Site</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipment Submitted</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Expected Number of Samples</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Temp Monitor</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Temperature Monitor</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Manifest</th>
                                     </tr>
                                 </thead>   
