@@ -1971,18 +1971,15 @@ const btnsClicked = async (connectId, formData) => {
     }
 }
 
-export const addEventBiospecimenCollectionFormCntd = (dt, biospecimenData) => {
-    const form = document.getElementById('biospecimenCollectionForm');
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        collectionSubmission(dt, biospecimenData, true);
-    });
-};
-
 export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     const collectionSaveExit = document.getElementById('collectionSave');
     collectionSaveExit.addEventListener('click', () => {
         collectionSubmission(dt, biospecimenData);
+    });
+
+    const collectionSaveContinue = document.getElementById('collectionNext');
+    collectionSaveContinue.addEventListener('click', () => {
+        collectionSubmission(dt, biospecimenData, true);
     });
 };
 
@@ -2059,6 +2056,7 @@ export const addEventBiospecimenCollectionFormEdit = (dt, biospecimenData) => {
 
 export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
+
     inputFields.forEach(input => {
         input.addEventListener('change', () => {
             const siteTubesList = getSiteTubesLists(biospecimenData)
@@ -2087,6 +2085,17 @@ export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
                 }
                 else if (input.required && (tubes[0].id !== tubeID && !additionalTubeIDRequirement.regExp.test(tubeID))) {
                     errorMessage(input.id, 'Invalid Full Specimen ID.');
+                }
+            }
+        });
+
+        input.addEventListener('keyup', e => {
+            if (e.keyCode == 13) {
+                const inputFieldsEnabled = inputFields.filter(i => i.disabled === false);
+                const inputIndex = inputFieldsEnabled.indexOf(input);
+
+                if(inputIndex != inputFieldsEnabled.length - 1) {
+                    inputFieldsEnabled[inputIndex + 1].focus();
                 }
             }
         });

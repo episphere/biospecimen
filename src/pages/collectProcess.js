@@ -1,4 +1,4 @@
-import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormCntd, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormText } from './../events.js'
+import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormText } from './../events.js'
 import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow } from '../shared.js';
 
 export const tubeCollectedTemplate = (data, formData) => {
@@ -198,7 +198,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                     <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="button" id="collectionSave">Save</button>
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="submit" id="collectionNext">Save and Review</button>
+                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="button" id="collectionNext">Save and Review</button>
                 </div>
             </div>
         </form>
@@ -216,7 +216,6 @@ export const tubeCollectedTemplate = (data, formData) => {
     addEventSelectAllCollection();
     addEventBackToSearch('backToSearch');
     addEventBiospecimenCollectionForm(data, formData);
-    addEventBiospecimenCollectionFormCntd(data, formData);
     addEventBiospecimenCollectionFormToggles(data, formData);
     addEventBiospecimenCollectionFormEdit(data, formData);
     addEventBiospecimenCollectionFormText(data, formData);
