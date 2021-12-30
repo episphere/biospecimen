@@ -314,18 +314,3 @@ canvas.drawing, canvas.drawingBuffer {
 .div-border {
     border: 1px solid #DDDDDD !important;
 }
-
-.swal-no-box .swal-footer {
-  text-align: center;
-}
-
-.swal-no-box-button {
-  color: #212529;
-  background-color: #ffc107;
-  border-color: #ffc107;
-}
-.swal-no-box-button:not([disabled]):hover {
-  background-color: #e0a800;
-  border-color: #d39e00;
-}
-
