@@ -1783,7 +1783,7 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
                 text: `Participant is checked ${isCheckOut ? 'out' : 'in'}.`,
             });
             await new Promise((res) => setTimeout(res,1200));
-            window.location.reload();
+            goToParticipantSearch();
         }
 
         if (!skipFlag) {
@@ -1819,6 +1819,9 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
     });
 
 };
+export const goToParticipantSearch = () => {
+    document.getElementById('navBarSearch').click();
+}
 
 export const addEventSpecimenLinkForm = (formData) => {
     const form = document.getElementById('specimenLinkForm');
