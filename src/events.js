@@ -1898,12 +1898,12 @@ const btnsClicked = async (connectId, formData) => {
     const n = document.getElementById('399159511').innerText || ""
 
     const confirmVal = await swal({
-        title: "Confirm Changes",
+        title: "Confirm Collection ID",
         icon: "info",
         text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n || ""}`,
         buttons: {
             cancel: {
-                text: "Close",
+                text: "Cancel",
                 value: "cancel",
                 visible: true,
                 className: "btn btn-default",
