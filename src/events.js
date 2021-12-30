@@ -2486,6 +2486,26 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
             }
 
         }
+
+        if(!boxesToShip.length) {
+          await swal({
+            title: "Reminder",
+            icon: "warning",
+            text: "Please select Box(es) to review and ship",
+            className: "swal-no-box",
+            buttons: {
+              confirm: {
+                text: "OK",
+                value: true,
+                visible: true,
+                closeModal: true,
+                className: "swal-no-box-button",
+              },
+            },
+          });
+          return
+        }
+
         if (document.getElementById('tempMonitorChecked')) {
             tempChecked = document.getElementById('tempMonitorChecked').checked
         }
