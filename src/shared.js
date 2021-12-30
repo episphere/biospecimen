@@ -34,15 +34,19 @@ export const inactivityTime = () => {
             const resposeTimeout = setTimeout(() => {
                 // log out user if they don't respond to warning after 5 minutes.
                 signOut();
-            }, 10000)
+            }, 300000)
             // Show warning after 20 minutes of no activity.
             const button = document.createElement('button');
             button.dataset.toggle = 'modal';
-            button.dataset.target = '#confluenceMainModal'
-            document.body.appendChild(button);
+            button.dataset.target = '#biospecimenModal'
+
+            document.getElementById('root').appendChild(button);
             button.click();
-            const header = document.getElementById('contentHeader');
-            const body = document.getElementById('contentBody');
+            document.getElementById('root').removeChild(button);
+
+            const header = document.getElementById('biospecimenModalHeader');
+            const body = document.getElementById('biospecimenModalBody');
+
             header.innerHTML = `<h5 class="modal-title">Inactive</h5>`;
 
             body.innerHTML = `You were inactive for 20 minutes, would you like to extend your session?
@@ -50,7 +54,7 @@ export const inactivityTime = () => {
                                 <button type="button" title="Close" class="btn btn-dark log-out-user" data-dismiss="modal">Log Out</button>
                                 <button type="button" title="Continue" class="btn btn-primary extend-user-session" data-dismiss="modal">Continue</button>
                             </div>`
-            document.body.removeChild(button);
+            
             Array.from(document.getElementsByClassName('log-out-user')).forEach(e => {
                 e.addEventListener('click', () => {
                     signOut();
@@ -62,7 +66,7 @@ export const inactivityTime = () => {
                     resetTimer;
                 })
             });
-        }, 10000);
+        }, 1200000);
     }
     window.onload = resetTimer;
     document.onmousemove = resetTimer;
