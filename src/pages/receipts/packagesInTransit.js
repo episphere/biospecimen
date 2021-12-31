@@ -99,9 +99,7 @@ const filterShipped = (boxes) => {
   } 
   let filteredBoxes = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]])
   let sortShipped = filteredBoxes.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]] - a[fieldToConceptIdMapping["shippingShipDate"]])
-  // sort by temp probe, tempProbe is no ("104430631") or yes ("353358909")
-  let sortTempProbe = sortShipped.sort((a,b) => a[fieldToConceptIdMapping["tempProbe"]] - b[fieldToConceptIdMapping["tempProbe"]])
-  return sortTempProbe
+  return sortShipped
 }
 
 const createPackagesInTransitRows = (boxes) => {
