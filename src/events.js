@@ -1780,12 +1780,13 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
             await swal({
                 title: "Success",
                 icon: "success",
-                text: `Participant is checked ${isCheckOut ? 'out' : 'in'}.`,
+                text: `Participant is checked out.`,
             });
             await new Promise((res) => setTimeout(res,1200));
             goToParticipantSearch();
+            return;
         }
-
+        
         if (!skipFlag) {
             const confirmVal = await swal({
                 title: "Success",

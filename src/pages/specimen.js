@@ -35,10 +35,6 @@ export const specimenTemplate = async (data, formData, collections) => {
          <div class="form-group row">`
                 const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym ?? localStorage.getItem('siteAcronym');
                 const workflow = getWorflow() ?? localStorage.getItem('workflow');
-                if(!siteAcronym || !workflow){
-                    window.alert(`Error: site:${siteAcronym} workflow:${workflow}`)
-                }
-                console.log('select collection location', {siteAcronym, workflow, siteLocations}, siteLocations?.[workflow], siteLocations?.[workflow]?.[siteAcronym]);
                 if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {
                     template +=`<label class="col-md-4 col-form-label" for="collectionLocation">Select Collection Location</label>
                     <select class="form-control col-md-5" id="collectionLocation">`
