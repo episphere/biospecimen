@@ -59,7 +59,6 @@ export const tubeCollectedTemplate = (data, formData) => {
                         let required = false;
                         if(formData[obj.concept] && formData[obj.concept]['593843561'] !== 104430631) {
                             required = true;
-                            if(obj.concept === '223999569' && formData['143615646']['593843561'] === 104430631) required = false;
                         }
 
                         template += `
