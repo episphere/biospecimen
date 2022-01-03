@@ -2542,7 +2542,11 @@ export const addEventNavBarTracking = (element, userName, hiddenJSON, tempChecke
         if (btn.classList.contains('active')) return;
         let keys = Object.keys(hiddenJSON).sort(compareBoxIds)
         for (let i = 0; i < keys.length; i++) {
-            hiddenJSON[keys[i]] = hiddenJSON[keys[i]]['specimens']
+            // hiddenJSON[keys[i]] = hiddenJSON[keys[i]]['specimens']
+            hiddenJSON[keys[i]] = {
+              "959708259" : hiddenJSON[keys[i]]["959708259"],
+              "specimens" : hiddenJSON[keys[i]]['specimens']
+          }
         }
         //return box 1 info
         shipmentTracking(hiddenJSON, userName, tempChecked);
@@ -2670,8 +2674,19 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
             if (boxi == '') {
                 emptyField = true;
                 showNotifications({ title: 'Missing Fields', body: 'Please fill out required fields!' }, true)
+                return
             }
-            hiddenJSON[boxes[i]] = { '959708259': boxi, specimens: hiddenJSON[boxes[i]] }
+            // if '959708259' exists update tracking number
+            if (hiddenJSON[boxes[i]].hasOwnProperty('959708259')) {
+              hiddenJSON[boxes[i]]['959708259'] = boxi
+            }
+            // if specimens exists update, else add following key/values
+            if (hiddenJSON[boxes[i]].hasOwnProperty('specimens')) {
+              hiddenJSON[boxes[i]]['specimens'] = hiddenJSON[boxes[i]]['specimens'] 
+            } 
+            else {
+              hiddenJSON[boxes[i]] = { '959708259': boxi, specimens: hiddenJSON[boxes[i]] }
+            }  
         }
         if (emptyField == false) {
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
@@ -2687,7 +2702,17 @@ export const addEventSaveButton = async (hiddenJSON) => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         for (let i = 0; i < boxes.length; i++) {
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-            hiddenJSON[boxes[i]] = {'959708259':boxi, specimens:hiddenJSON[boxes[i]]}
+            // if '959708259' exists update tracking number
+            if (hiddenJSON[boxes[i]].hasOwnProperty('959708259')) {
+              hiddenJSON[boxes[i]]['959708259'] = boxi
+            }
+            // if specimens exists update, else add following key/values
+            if (hiddenJSON[boxes[i]].hasOwnProperty('specimens')) {
+              hiddenJSON[boxes[i]]['specimens'] = hiddenJSON[boxes[i]]['specimens'] 
+            } 
+            else {
+              hiddenJSON[boxes[i]] = { '959708259': boxi, specimens: hiddenJSON[boxes[i]] }
+            }  
         }
         
         let shippingData = []
