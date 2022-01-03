@@ -71,6 +71,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             return;
         }
         document.getElementById('contentBody').dataset.workflow = selection.value;
+        localStorage.setItem('workflow', selection.value);
         location.hash = '#dashboard';
     });
 
@@ -82,6 +83,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             return;
         }
         document.getElementById('contentBody').dataset.workflow = selection.value;
+        localStorage.setItem('workflow', selection.value);
         window.history.replaceState({},'', './#dashboard');
         userDashboard(auth, route, true);
     });
