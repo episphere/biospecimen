@@ -1994,24 +1994,28 @@ export const addEventBiospecimenCollectionFormToggles = (dt, biospecimenData) =>
     collectedBoxes.forEach(collected => {
 
         const reason = document.getElementById(collected.id + "Reason");
-        const specimenId = document.getElementById(collected.id + "Id");
         const deviated = document.getElementById(collected.id + "Deviated");
+        const specimenId = document.getElementById(collected.id + "Id");
 
         collected.addEventListener('change', () => {
             
-            if(getWorflow() === 'research') reason.disabled = collected.checked;
+            if(getWorflow() === 'research' && reason) reason.disabled = collected.checked;
+            if(deviated) deviated.disabled = !collected.checked;
             specimenId.disabled = !collected.checked;
-            deviated.disabled = !collected.checked;
             
             if(collected.checked) {
-                if(getWorflow() === 'research') reason.value = '';
+                if(getWorflow() === 'research' && reason) reason.value = '';
             }
             else {
-                specimenId.value = '';
-                deviated.checked = false;
-                
                 const event = new CustomEvent('change');
-                deviated.dispatchEvent(event);
+
+                specimenId.value = '';
+                specimenId.dispatchEvent(event);
+
+                if(deviated) {
+                    deviated.checked = false;
+                    deviated.dispatchEvent(event);
+                }
             }
         });
     });
@@ -2109,13 +2113,10 @@ export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
 
 export const createTubesForCollection = async (formData, biospecimenData) => {
     
+    if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+
     let siteTubesList = getSiteTubesLists(formData);
 
-    // Explicitely specify 2 biohazard bags
-    if(biospecimenData['787237543'] === undefined) biospecimenData['787237543'] = { '593843561': 353358909 }
-    if(biospecimenData['223999569'] === undefined) biospecimenData['223999569'] = { '593843561': 353358909 }
-
-    if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
     siteTubesList.forEach((dt) => {
         if(biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = {'593843561': 104430631};
     });
