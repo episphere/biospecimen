@@ -104,7 +104,7 @@ export const startShipping = async (userName) => {
     <div class="col-5">
 
     <h3 style="text-align:center; margin-bottom:1rem;">Available Collections</h3>
-    <div class="panel panel-default" style="border-style:solid;height:400px;border-width:1px;overflow:auto;" id="specimenPanel">
+    <div class="panel panel-default" style="border-style:solid;height:550px;border-width:1px;overflow:auto;" id="specimenPanel">
             <table class = "table" style="width: 100%;margin-bottom:0px;" id="specimenList" >
                 <tr>
                     <th>Specimen Bag ID</th>
@@ -113,8 +113,8 @@ export const startShipping = async (userName) => {
             </table>
     </div>
 
-    <h3 style="margin:1rem auto; text-align:center; display:none;" id="orphanHeader">Location Unknown</h3>
-    <div class="panel panel-default" style="border-style:solid;height:150px;border-width:1px;overflow:auto;" id="orphansPanel">
+    <h3 style="margin:1rem auto; text-align:center; visibility:hidden;">Location Unknown</h3>
+    <div class="panel panel-default" style="visibility:hidden; border-style:solid;height:0px;border-width:1px;overflow:auto;" id="orphansPanel">
             <table class = "table" style="width: 100%; margin-bottom:0px;" id="orphansList" >
                 
             </table>
