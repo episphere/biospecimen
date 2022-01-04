@@ -1124,3 +1124,7 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
       await localforage.setItem("shipData", shipSetForage)
   }
 }
+
+export const sleep = (ms = 400) => {
+    return new Promise((res) => setTimeout(res,ms));
+}

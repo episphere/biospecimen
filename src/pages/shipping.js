@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation} from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation, sleep} from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox, addEventSaveButton} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
@@ -228,7 +228,8 @@ export const startShipping = async (userName) => {
     let currLocation = document.getElementById('selectLocationList').value;
 
     response = await getBoxesByLocation(currLocation);
-    boxJSONS = response.data;
+    boxJSONS = response?.data ?? [];
+
     let hiddenJSONLocation = {};
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
@@ -245,6 +246,8 @@ export const startShipping = async (userName) => {
     // addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 14, 0);
     addEventModalAddBox(userName);
     hideAnimation();
+    await sleep(400);
+    window.confirm("This shipment is now finalized; no other changes can be made");
     //addEventSubmitAddBag();
 }
 
