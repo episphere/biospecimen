@@ -59,6 +59,8 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     document.getElementById('contentBody').innerHTML = template;
     document.getElementById('contentBody').dataset.siteAcronym = data.siteAcronym;
     document.getElementById('contentBody').dataset.siteCode = data.siteCode;
+    localStorage.setItem('siteAcronym',data.siteAcronym);
+    localStorage.setItem('siteCode',data.siteCode);
     document.getElementById('contentHeader').innerHTML = '';
 
     document.getElementById('btnParticipantSearch').addEventListener('click', () => {
@@ -69,6 +71,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             return;
         }
         document.getElementById('contentBody').dataset.workflow = selection.value;
+        localStorage.setItem('workflow', selection.value);
         location.hash = '#dashboard';
     });
 
@@ -80,6 +83,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             return;
         }
         document.getElementById('contentBody').dataset.workflow = selection.value;
+        localStorage.setItem('workflow', selection.value);
         window.history.replaceState({},'', './#dashboard');
         userDashboard(auth, route, true);
     });
@@ -94,3 +98,4 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
         //shippingDashboard(auth, route, true);
     });
 }
+

@@ -2,8 +2,8 @@ import { userNavBar, adminNavBar, nonUserNavBar } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
-import { collectProcessTemplate } from "./pages/collectProcess.js";
 import { workflows } from "./tubeValidation.js";
+import { signOut } from "./pages/signIn.js"
 
 
 const conversion = {
@@ -26,6 +26,52 @@ const conversion = {
  const api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
 // const api = 'http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
 
+export const inactivityTime = () => {
+    let time;
+    const resetTimer = () => {
+        clearTimeout(time);
+        time = setTimeout(() => {
+            const resposeTimeout = setTimeout(() => {
+                // log out user if they don't respond to warning after 5 minutes.
+                signOut();
+            }, 300000)
+            // Show warning after 20 minutes of no activity.
+            const button = document.createElement('button');
+            button.dataset.toggle = 'modal';
+            button.dataset.target = '#biospecimenModal'
+
+            document.getElementById('root').appendChild(button);
+            button.click();
+            document.getElementById('root').removeChild(button);
+
+            const header = document.getElementById('biospecimenModalHeader');
+            const body = document.getElementById('biospecimenModalBody');
+
+            header.innerHTML = `<h5 class="modal-title">Inactive</h5>`;
+
+            body.innerHTML = `You were inactive for 20 minutes, would you like to extend your session?
+                            <div class="modal-footer">
+                                <button type="button" title="Close" class="btn btn-dark log-out-user" data-dismiss="modal">Log Out</button>
+                                <button type="button" title="Continue" class="btn btn-primary extend-user-session" data-dismiss="modal">Continue</button>
+                            </div>`
+            
+            Array.from(document.getElementsByClassName('log-out-user')).forEach(e => {
+                e.addEventListener('click', () => {
+                    signOut();
+                })
+            })
+            Array.from(document.getElementsByClassName('extend-user-session')).forEach(e => {
+                e.addEventListener('click', () => {
+                    clearTimeout(resposeTimeout);
+                    resetTimer;
+                })
+            });
+        }, 1200000);
+    }
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+};
 
 export const validateUser = async () => {
     const idToken = await getIdToken();
@@ -48,6 +94,21 @@ export const findParticipant = async (query) => {
     });
     return await response.json();
 }
+
+export const updateParticipant = async (array) => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=updateParticipantDataNotSite`, {
+        method: "POST",
+        headers: {
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body:  JSON.stringify(array),
+    });
+    
+    return await response.json();
+}
+
 
 export const biospecimenUsers = async () => {
     const idToken = await getIdToken();
@@ -243,6 +304,24 @@ export const removeAllErrors = () => {
     const invalids = document.getElementsByClassName('invalid');
     Array.from(invalids).forEach(element => {
         element.classList.remove('invalid');
+    })
+}
+
+export const removeSingleError = (id) => {
+    const elements = document.getElementsByClassName('form-error');
+    Array.from(elements).forEach(element => {
+        
+        const errorMsg = element.parentNode;
+        const parent = element.parentNode.parentNode;
+        
+        if(parent.contains(document.getElementById(id))) parent.removeChild(errorMsg);
+        
+    });
+    const invalids = document.getElementsByClassName('invalid');
+    Array.from(invalids).forEach(element => {
+        if(element.id === id){
+            element.classList.remove('invalid');
+        }
     })
 }
 
@@ -576,6 +655,62 @@ export const siteFullNames = {
     'HFHS': 'Henry Ford Health System'
 }
 
+export const siteContactInformation = {
+  "UCM":[{
+    "fullName":"Jaime King",
+    "email":"jaimeking@bsd.uchicago.edu",
+    "phone":["(773) 702-5073"],
+  }],
+  "MFC":[{
+    "fullName":"Jacob Johnston",
+    "email":"johnston.jacob@marshfieldclinic.org",
+    "phone":["715-898-9444"],
+  }],
+  "HP":[{
+    "fullName":"Erin Schwartz",
+    "email":"Erin.C.Schwartz@HealthPartners.com",
+    "phone":[
+     "Office: (651) 495-6371",
+     "Cell: (612) 836-7885"
+    ]
+  }],
+  "SFH":[{
+    "fullName":"Kimberly (Kay) Spellmeyer",
+    "email":"kimberly.spellmeyer@sanfordhealth.org",
+    "phone":["605-312-6100"],
+  },{
+    "fullName":"DeAnn Witte",
+    "email":"deann.witte@sanfordhealth.org",
+    "phone":["701-234-6718"],
+  }],
+  "KPCO":[{
+    "fullName":"Brooke Thompson",
+    "email":"Brooke.x.thompson@kp.org",
+    "phone":["720-369-4316"],
+  }],
+  "KPHI":[{
+    "fullName":"Cyndee Yonehara",
+    "email":"Cyndee.H.Yonehara@kp.org",
+    "phone":["Mobile: 808-341-5736"],
+  }],
+  "KPNW":[{
+    "fullName":"Sarah Vertrees",
+    "email":"sarah.vertrees@kpchr.org",
+    "phone":["503-261-4144"],
+  }],
+  "KPGA":[{
+    "fullName":"Brandi Robinson",
+    "email":"brandi.e.robinson@kp.org",
+    "phone":["470-217-2993"],
+  }],
+  "HFHS":[{
+    "fullName":"Kathleen Dawson",
+    "email":"kdawson7@hfhs.org",
+    "phone":["248-910-6716"],
+  }]
+}
+
+
 export const addEventBarCodeScanner = (id, start, end) => {
     const liveStreamConfig = {
         inputStream: {
@@ -809,8 +944,8 @@ export const getWorflow = () => document.getElementById('contentBody').dataset.w
 export const getSiteTubesLists = (specimenData) => {
     const dashboardType = document.getElementById('contentBody').dataset.workflow;
     const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-    const subSiteLocation = siteLocations[dashboardType][siteAcronym] ? siteLocations[dashboardType][siteAcronym].filter(dt => dt.concept === specimenData['951355211'])[0].location : undefined;
-    const siteTubesList = siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym][dashboardType][subSiteLocation] : siteSpecificTubeRequirements[siteAcronym][dashboardType];
+    const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === specimenData['951355211'])[0]?.location : undefined;
+    const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
     return siteTubesList;
 }
 
@@ -866,7 +1001,8 @@ export const getParticipantSelection = async (filter) => {
     return response.json();
   }
      
-export const isDeviceiPad = /iPad|iPhone/i.test(navigator.userAgent);
+export const isDeviceMobile = /(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(window.navigator.userAgent) ||
+    /Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(window.navigator.userAgent) || window.innerWidth < 1300;
 export const replaceDateInputWithMaskedInput = (dateInput) => {
 
   if (dateInput.type !== "date") throw new Error(`${dateInput} must be a input type="date"`);
@@ -934,3 +1070,57 @@ export const allTubesCollected = (data) => {
 
     return flag;
 };
+
+export const displayContactInformation = (site, siteContactInformation) => {
+  if(siteContactInformation.hasOwnProperty(site)){
+    let contactStr = ""
+    contactStr += `<p>Site Contact Information:</p>`
+    let numContacts = siteContactInformation[site].length
+    // iterate over length of existing site's contact array
+    for(let i= 0; i < numContacts;i++) {
+    contactStr += `${numContacts > 1 ? "<p>Contact ${i+1}</p>": ""}`
+    contactStr += `<p>${siteContactInformation[site][i].fullName}</p>`
+    contactStr += `<p>Email: ${siteContactInformation[site][i].email}</p>`
+    
+    let numPhones = siteContactInformation[site][i].phone.length
+    if(numPhones === 1){
+      contactStr += `<p>Phone: ${siteContactInformation[site][i].phone}</p>`  
+    }
+    else if(numPhones > 1){
+      contactStr += `<p>Phone:</p>`
+      for(let j = 0; j < numPhones; j++){
+        contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
+      }
+    }
+    else contactStr+= `<p>Phone:</p>`
+  }
+    return contactStr
+  }
+  else return ""
+}
+
+
+export const checkShipForage = async (shipSetForage, boxesToShip) => {
+  let forageBoxIdArr = []
+  try {
+      let value = await localforage.getItem("shipData")
+      console.log(value)
+      if (value === null) {
+          await localforage.setItem("shipData", shipSetForage)
+      }
+      for (let i in value) {
+          forageBoxIdArr.push(value[i].boxId)
+      }
+      
+      let boxMatch = forageBoxIdArr.some(item => boxesToShip.includes(item))
+      // Compare forageBoxIdArr with boxesToShip
+      // If there is not at least one boxid match from boxesToShip
+      if (!boxMatch) {
+          await localforage.setItem("shipData", shipSetForage)
+      }
+  }    
+   catch (e) {
+      console.log(e)
+      await localforage.setItem("shipData", shipSetForage)
+  }
+}

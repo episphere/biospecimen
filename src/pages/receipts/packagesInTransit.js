@@ -16,8 +16,9 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     showAnimation();
     const response = await getAllBoxes();
     hideAnimation();
-    let template = "";
+    const allShipped = filterShipped(response.data)
 
+    let template = "";
     template += receiptsNavbar();
 
     template += `<div class="container-fluid">
@@ -34,11 +35,12 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipped from Site</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipment Submitted</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Expected Number of Samples</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Temperature Monitor</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Manifest</th>
                                     </tr>
                                 </thead>   
                                 <tbody id="contentBodyPackagesInTransit">
-                                    ${createPackagesInTransitRows(response)}
+                                    ${createPackagesInTransitRows(allShipped)}
                                 </tbody>
                         </table>
                     </div>
@@ -62,7 +64,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     activeReceiptsNavbar();
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");
 
-    const allBoxes = response.data;
+    const allBoxes = allShipped;
 
     // // Return an array of an item of grouped bags from GET request***
     const bagsArr = groupAllBags(allBoxes);
@@ -90,14 +92,20 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     manifestButton([...allBoxes], dataObj, manifestModalBodyEl);
 };
 
-const createPackagesInTransitRows = (response) => {
+const filterShipped = (boxes) => {
+  // boxes are from searchBoxes endpoint
+  if(boxes.length === 0) {
+    return []
+  } 
+  let filteredBoxes = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]])
+  let sortShipped = filteredBoxes.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]] - a[fieldToConceptIdMapping["shippingShipDate"]])
+  return sortShipped
+}
+
+const createPackagesInTransitRows = (boxes) => {
     let template = "";
-    try {
-        if (response.code !== 200) {
-            throw "status code not 200!";
-        } else {
-            const allBoxes = response.data;
-            // Return an array of an item of grouped bags from GET request***
+            const allBoxes = boxes;
+            // Return a filtered array of an item of grouped bags from GET request***
             const bagsArr = groupAllBags(allBoxes);
 
             // Returns an array of summed and grouped bag samples
@@ -109,18 +117,21 @@ const createPackagesInTransitRows = (response) => {
                       <tr class="packageInTransitRow">
                       <td style="text-align:center;">${
                           i[fieldToConceptIdMapping.shippingShipDate]
-                              ? convertTime(i[fieldToConceptIdMapping.shippingShipDate]).split(",")[0] : "N/A"
+                              ? convertTime(i[fieldToConceptIdMapping.shippingShipDate]).split(",")[0] : ""
                       }</td>
                       <td style="text-align:center;">${
-                          i[fieldToConceptIdMapping.shippingTrackingNumber] ? i[ fieldToConceptIdMapping.shippingTrackingNumber] : "N/A"
+                          i[fieldToConceptIdMapping.shippingTrackingNumber] ? i[ fieldToConceptIdMapping.shippingTrackingNumber] : ""
                       }</td>
-                      <td style="text-align:center;">${i.siteAcronym ? i.siteAcronym : "N/A"}</td>
+                      <td style="text-align:center;">${i.siteAcronym ? i.siteAcronym : ""}</td>
                       <td style="text-align:center;">${
                           i[fieldToConceptIdMapping.submitShipmentFlag]
-                              ? shipmentSubmittedStatus(i[fieldToConceptIdMapping.submitShipmentFlag]) : "N/A"
+                              ? shipmentSubmittedStatus(i[fieldToConceptIdMapping.submitShipmentFlag]) : ""
                       }</td>
                       <td style="text-align:center;">${
                           sumSamplesArr[index]
+                      }</td>
+                      <td style="text-align:center;">${
+                        tempProbeFound(i[fieldToConceptIdMapping["tempProbe"]])
                       }</td>
                       <td>
                         <button class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
@@ -129,12 +140,8 @@ const createPackagesInTransitRows = (response) => {
                       </td>
                       </tr>`;
             });
-        }
-        return template;
-    } catch (e) {
-        console.log(e);
-    }
-};
+            return template;
+}
 
 const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
     const buttons = document.getElementsByClassName("manifest-button");
@@ -187,20 +194,20 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                     <p style="font-size:1.3rem;"><strong>Shipping Manifest</strong></p>
                 </div>
                 <div class="col-md-4 ml-auto">
-                    <p><strong>Site:</strong> ${site ? site : "N/A"} </p>
+                    <p><strong>Site:</strong> ${site ? site : ""} </p>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <p><strong>Shipped Date and Time:</strong> ${date ? convertTime(date) : "N/A"}</p>
+                    <p><strong>Shipped Date and Time:</strong> ${date ? convertTime(date) : ""}</p>
                 </div>
                 <div class="col-md-4 ml-auto">
-                    <p><strong>Location:</strong> ${location ? location : "N/A"}</p>
+                    <p><strong>Location:</strong> ${location ? location : ""}</p>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <p><strong>Sender:</strong><br/>${namesArr[index] ? namesArr[index].toString().replaceAll("," ,`<br/>`) : "N/A"}</p>
+                    <p><strong>Sender:</strong><br/>${namesArr[index] ? namesArr[index].toString().replaceAll("," ,`<br/>`) : ""}</p>
                 </div>
             </div>
             <div class="row">
@@ -328,7 +335,7 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupSca
             if (indexNum === 0) {
                 rows += `<tr>
                 <td style="text-align:center">
-                <p>${boxNumber ? boxNumber.replace("Box", "") : "N/A"}</p>
+                <p>${boxNumber ? boxNumber.replace("Box", "") : ""}</p>
                 </td>
                 <td style="text-align:center">
                     <p>${id ? id : "N//A"}</p>
@@ -346,7 +353,7 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupSca
                 <p></p>
                 </td>
                 <td style="text-align:center">
-                    <p>${id ? id : "N/A"}</p>
+                    <p>${id ? id : ""}</p>
                 </td>
                 <td style="text-align:center">
                     ${groupSamples[indexNum].toString().replaceAll(",", `<br>`)}
@@ -362,6 +369,16 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupSca
     }
 };
 
+const tempProbeFound = (tempProbe) => {
+  if(tempProbe === '104430631') {
+    return "No"
+  }
+  else if(tempProbe === '353358909') {
+    return "Yes"
+  }
+  else return ""
+}
+
 // Returns Shipment Submitted Boolean Value --> Yes or No
 const shipmentSubmittedStatus = (booleanValue) => {
     let { booleanZero, booleanOne } = fieldToConceptIdMapping;
@@ -371,6 +388,7 @@ const shipmentSubmittedStatus = (booleanValue) => {
     } else if (convertBoolToNumType === booleanOne) {
         return "Yes";
     } else {
-        return "N/A";
+        return "";
     }
 };
+

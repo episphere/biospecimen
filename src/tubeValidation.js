@@ -1,14 +1,14 @@
 const deviationReason1 = {'concept': 472864016, 'label':'Broken'}
-const deviationReason2 = {'concept': 102695484, 'label':'Centrifuge -  did not clot at least 30 minutes'}
-const deviationReason3 = {'concept': 912088602, 'label':'Centrifuge -  clotted for longer than 2 hours'}
-const deviationReason4 = {'concept': 861162895, 'label':'Centrifuge - Improper speed/force setting used (too high)'}
-const deviationReason5 = {'concept': 561005927, 'label':'Centrifuge - Improper speed/force setting used (too low)'}
+const deviationReason2 = {'concept': 102695484, 'label':'Centrifuge - did not clot at least 30 minutes'}
+const deviationReason3 = {'concept': 912088602, 'label':'Centrifuge - clotted for longer than 2 hours'}
+const deviationReason4 = {'concept': 861162895, 'label':'Centrifuge - speed/force too high'}
+const deviationReason5 = {'concept': 561005927, 'label':'Centrifuge - speed/force too low'}
 const deviationReason6 = {'concept': 654002184, 'label':'Centrifuge - improper time of spinning (too long)'}
 const deviationReason7 = {'concept': 937362785, 'label':'Centrifuge - improper time of spinning (too short)'}
 const deviationReason8 = {'concept': 635875253, 'label':'Failed/broken gel layer'}
 const deviationReason9 = {'concept': 242307474, 'label':'Hemolyzed'}
-const deviationReason10 = {'concept': 550088682, 'label':'Improper temperature - too low/frozen (record time and temperature Deviation in the comments)'}
-const deviationReason11 = {'concept': 690540566, 'label':'Improper temperature - too high (record time and temperature Deviation in the comments)'}
+const deviationReason10 = {'concept': 550088682, 'label':'Temp too low/frozen (put lowest temp & duration in comments)'}
+const deviationReason11 = {'concept': 690540566, 'label':'Temp too high (put highest temp & duration in comments)'}
 const deviationReason12 = {'concept': 956345366, 'label':'Insufficient volume - not enough volume to transfer to urine tube (discard)'}
 const deviationReason13 = {'concept': 757246707, 'label':'Leaked/spilled'}
 const deviationReason14 = {'concept': 728366619, 'label':'Low volume - (tube/container partially filled but still usable)'}
@@ -213,7 +213,7 @@ const tube0008 = {
     'name': 'tube8',
     'concept': '787237543',
     'id': '0008',
-    'collectionChkBox': false,
+    'collectionChkBox': true,
     'deviationChkBox': false
 };
 
@@ -224,7 +224,7 @@ const tube0009 = {
     'name': 'tube9',
     'concept': '223999569',
     'id': '0009',
-    'collectionChkBox': false,
+    'collectionChkBox': true,
     'deviationChkBox': false
 };
 

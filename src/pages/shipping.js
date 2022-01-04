@@ -1,5 +1,5 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox} from "./../events.js";
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation} from "./../shared.js"
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox, addEventSaveButton} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 const conversion = {
@@ -73,7 +73,7 @@ export const startShipping = async (userName) => {
         </div>
         <div class="row" style="margin-bottom:10px">
             <div class = "col-lg">
-                <select class="selectpicker" id="selectLocationList">
+                <select class="selectpicker" id="selectLocationList" style="padding:.25rem">
                 </select>
             </div>
         </div>
@@ -85,7 +85,7 @@ export const startShipping = async (userName) => {
                       <label for="masterSpecimenId">To start packing the shipping boxes, scan specimen bag ID or Full Specimen ID here:</label>
                         <div class="form-group">
                           <div class="input-group">
-                            <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan"/>
+                            <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan" autocomplete="off"/>
                             <div class="input-group-append">
                               <button class="btn btn-primary" aria-label="Enter Specimen ID" type="submit">Enter</button>
                             </div>
@@ -121,16 +121,13 @@ export const startShipping = async (userName) => {
     </div>
     </div>
     <div class="col-7">
-        <div class="d-flex justify-content-between align-items-center" style="margin-bottom:.625rem;">
-            <div style="width:25%;">
-                <select class="selectpicker" id="selectBoxList">
-                </select>
+        <div style="display:flex; justify-content:space-evenly; align-items:center; margin-bottom:.625rem;">
+            <div>
+                <h3>View Shipping Box Contents</h3>
             </div>
             <div>
-                <h3 style="text-align:center">Shipping Box Contents</h3>
-            </div>
-            <div style="width:25%;">
-                <button type="button" class="btn btn-primary" style="float:right;" id="addBoxButton">Create New Box</button>
+                <select class="selectpicker" id="selectBoxList" name="box-ids" style="padding:0.25rem">
+                </select>
             </div>
         </div>
         <div class="row">
@@ -241,7 +238,6 @@ export const startShipping = async (userName) => {
     await populateTempNotification();
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarShippingManifest(userName, document.getElementById('tempMonitorChecked').checked);
-    addEventAddBox(userName);
     addEventBoxSelectListChanged();
     addEventNavBarBoxManifest("navBarBoxManifest", userName)
     addEventChangeLocationSelect(userName);
@@ -250,7 +246,6 @@ export const startShipping = async (userName) => {
     addEventModalAddBox(userName);
     hideAnimation();
     //addEventSubmitAddBag();
-    
 }
 
 export const boxManifest = async (boxId, userName) => {    
@@ -318,7 +313,7 @@ export const boxManifest = async (boxId, userName) => {
     
     //addEventNavBarShipment("returnToPackaging");
     //document.getElementById('boxManifestTable').appendChild(result);
-    populateBoxManifestHeader(boxId,boxJSONS);
+    populateBoxManifestHeader(boxId,boxJSONS,currInstitute);
     populateBoxManifestTable(boxId,hiddenJSON);
     addEventNavBarShipment("returnToPackaging", userName);
     document.getElementById('printBox').addEventListener('click', e => {
@@ -359,7 +354,6 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
         toDisplayJSON[currBox] = hiddenJSON[currBox];
         location = locations[currBox];
     }
-
     let template = `
         </br>
         <div id="shippingHiddenTable" style="display:none">
@@ -401,7 +395,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="printBox">Print Full Manifest</button>
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging">Continue</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging">Continue to Assign Tracking Number</button>
             </div>
         </div>
         
@@ -478,25 +472,20 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
         hiddenJSON = JSON.parse(document.getElementById('shippingHiddenTable').innerText);
     }
 */
-
-
-
     let template = `
         <div id="shippingHiddenTable" style="display:none">
         {}
         </div>
-        <div class="row" style="margin-top:40px">
+        <div class="row" style="margin-top:40px;">
             <div class="col-lg">
-                Choose Shipment Courier
-                </br>
-                <select name="courier" id="courierSelect">
+                <label for="courierSelect" style="font-size:1.4rem; margin-bottom:1rem;">Choose Shipment Courier</label>
+                <select name="courier" id="courierSelect" style="padding:.2rem; display:block;">
                 </select>
             </div>
         </div>
         <div class="row" style="margin-top:40px">
             <div class="col-lg">
-                Shipment Tracking Numbers:
-                </br>
+                <p style="margin:0; font-size:1.4rem;">Enter Shipment Tracking Numbers:</p>
                 <div class="col-lg" id="forTrackingNumbers">
                     
                 </div>
@@ -504,12 +493,13 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
         </div>
         <div class="row" style="margin-top:100px">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToShipping">Back To Packaging Dashboard</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Return to Packaging</button>
             </div>
-            <div style="float: left;width: 33%;">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Home</button>
+            <div style="float: left;width: 33%;" id="boxManifestCol2">
+                
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveTracking" style="margin-right:.5rem;">Save</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="completeTracking">Continue</button>
             </div>
         </div>
@@ -531,11 +521,12 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
     if(Object.keys(hiddenJSON).length > 0){
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
     }
-    addEventReturnToShippingManifest('returnToShipping', hiddenJSON, userName, tempCheckChecked)
+    //addEventReturnToShippingManifest('returnToShipping', hiddenJSON, userName, tempCheckChecked)
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventReturnToShippingManifest('navBarShippingManifest', hiddenJSON, userName, tempCheckChecked)
     populateTrackingQuery(hiddenJSON);
     addEventCompleteButton(hiddenJSON, userName, tempCheckChecked);
+    addEventSaveButton(hiddenJSON);
     //addEventCompleteShippingButton(hiddenJSON);
     //addEventBackToSearch('navBarShippingDash');
     // addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
