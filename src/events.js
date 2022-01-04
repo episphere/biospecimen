@@ -2652,11 +2652,19 @@ export const populateTrackingQuery = async (hiddenJSON) => {
     for(let i = 0; i < boxes.length; i++){
         let result = boxes[i] && shipping?.[boxes[i]]?.["959708259"];
         toBeInnerHTML +=`
-        <div class = "row">
-                            <div class="form-group" style="margin-top:30px">
-                                <label style="float:left;margin-top:5px">`+ boxes[i] + `</label>
-                                <div style="float:left;margin-left:30px">
+        <div class = "row" style="justify-content:space-around">
+                            <div class="form-group" style="margin-top:30px; width:350px;">
+                                <label style="float:left;margin-top:5px">`+'Enter / Scan Shipping Tracking Number for ' + boxes[i] + `</label>
+                                <br>
+                                <div style="float:left;">
                                     <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${result ?? ""}" />
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top:30px; width:350px;">
+                                <label style="float:left;margin-top:5px">`+'Confirm Shipping Tracking Number for '+ boxes[i] + `</label>
+                                <br>
+                                <div style="float:left;">
+                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingIdConfirm' + `" placeholder="Enter/Scan Tracking Number" value="${result ?? ""}" />
                                 </div>
                             </div>
                         </div>
