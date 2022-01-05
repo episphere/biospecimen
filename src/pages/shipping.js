@@ -527,11 +527,8 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
     addEventTrimTrackingNums()
     addEventPreventTrackNumPaste()
     addEventCheckValidTrackInputs(hiddenJSON)
-    
-
     addEventCompleteButton(hiddenJSON, userName, tempCheckChecked);
     addEventSaveButton(hiddenJSON);
-
     //addEventCompleteShippingButton(hiddenJSON);
     //addEventBackToSearch('navBarShippingDash');
     // addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
