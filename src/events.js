@@ -2552,6 +2552,91 @@ export const addEventNavBarTracking = (element, userName, hiddenJSON, tempChecke
         shipmentTracking(hiddenJSON, userName, tempChecked);
     });
 }
+
+export const addEventTrimTrackingNums = () => {
+  let boxTrackingIdEls = Array.from(document.getElementsByClassName("boxTrackingId"))
+  let boxTrackingIdConfirmEls = Array.from(document.getElementsByClassName("boxTrackingIdConfirm"))
+  // Trim Function here
+  boxTrackingIdEls.forEach(el => el.addEventListener("blur", e => {
+    let inputTrack = e.target.value.trim()
+    if(inputTrack > 12) {
+      e.target.value = inputTrack.slice(-12)
+    }
+  }))
+  boxTrackingIdConfirmEls.forEach(el => el.addEventListener("blur", e => {
+    let inputTrackConfirm = e.target.value.trim()
+    if(inputTrackConfirm > 12) {
+      e.target.value = inputTrackConfirm.slice(-12)
+    }
+  }))
+}
+
+export const addEventPreventTrackNumPaste = () => {
+  let boxTrackingIdConfirmEls = Array.from(document.getElementsByClassName("boxTrackingIdConfirm"));
+  boxTrackingIdConfirmEls.forEach(el => {
+    el.addEventListener("paste", e => e.preventDefault())
+  })
+}
+
+export const addEventCheckValidTrackInputs = (hiddenJSON) => {
+
+  let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+
+  boxes.forEach(box => {
+    let input = document.getElementById(box+"trackingId").value.trim()
+    let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+    let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+    let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+    if(input !== inputConfirm) {
+      document.getElementById(box+"trackingId").classList.add("invalid")
+      document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+      inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
+      inputErrorMsg.textContent = "Please match " + box + " confirm input"
+    }
+  })
+
+  boxes.forEach(box => {
+    document.getElementById(box+"trackingId").addEventListener("blur", e => {
+      let input = document.getElementById(box+"trackingId").value.trim()
+      let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+      let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+      let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+      if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
+        // add invalid red border
+        document.getElementById(box+"trackingId").classList.add("invalid")
+        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+        inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
+        inputErrorMsg.textContent = "Please match " + box + " confirm input"
+      } else if (input === inputConfirm) {
+        // remove invalid
+        document.getElementById(box+"trackingId").classList.remove("invalid")
+        document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
+        inputErrorMsg.textContent = ""
+        inputConfirmErrorMsg.textContent = ""
+      }
+    })
+    document.getElementById(box+"trackingIdConfirm").addEventListener("blur",e => {
+      let input = document.getElementById(box+"trackingId").value.trim()
+      let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+      let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+      let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+      if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
+        // add invalid red border
+        document.getElementById(box+"trackingId").classList.add("invalid")
+        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+        inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
+        inputErrorMsg.textContent = "Please match " + box + " confirm input"
+      } else if (input === inputConfirm) {
+        // remove invalid
+        document.getElementById(box+"trackingId").classList.remove("invalid")
+        document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
+        inputErrorMsg.textContent = ""
+        inputConfirmErrorMsg.textContent = ""
+      }
+    })
+  })
+}
+
 export const populateSelectLocationList = async () => {
     let currSelect = document.getElementById('selectLocationList')
     let response = await getLocationsInstitute();
@@ -2642,52 +2727,80 @@ export const populateTrackingQuery = async (hiddenJSON) => {
     for(let box of shipData) {
       // if boxes has box id of localforage shipData push
       if(boxes.includes(box["boxId"])) {
-        shipping[box["boxId"]] = {"959708259":box["959708259"]}
+        shipping[box["boxId"]] = {"959708259":box["959708259"], "confirmTrackNum": box["confirmTrackNum"] }
       }
       else {
-        shipping[box["boxId"]] = {"959708259":""}
+        shipping[box["boxId"]] = {"959708259":"" , confirmTrackNum:"", }
       }
     }
     
     for(let i = 0; i < boxes.length; i++){
-        let result = boxes[i] && shipping?.[boxes[i]]?.["959708259"];
+        let trackNum = boxes[i] && shipping?.[boxes[i]]?.["959708259"];
+        let trackNumConfirm = boxes[i] && shipping?.[boxes[i]]?.["confirmTrackNum"];
         toBeInnerHTML +=`
-        <div class = "row">
-                            <div class="form-group" style="margin-top:30px">
-                                <label style="float:left;margin-top:5px">`+ boxes[i] + `</label>
-                                <div style="float:left;margin-left:30px">
-                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${result ?? ""}" />
+        <div class = "row" style="justify-content:space-around">
+                            <div class="form-group" style="margin-top:30px; width:350px;">
+                                <label style="float:left;margin-top:5px">`+'Enter / Scan Shipping Tracking Number for ' + boxes[i] + `</label>
+                                <br>
+                                <div style="float:left;">
+                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${trackNum ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type to the tracking number" autocomplete="off"/>
+                                    <p style="font-size:.8rem; margin-top:.5rem;">Ex. 457424072905</p>
+                                    <p id="${boxes[i]}trackingIdErrorMsg" class="text-danger"></p>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top:30px; width:350px;">
+                                <label style="float:left;margin-top:5px">`+'Confirm Shipping Tracking Number for '+ boxes[i] + `</label>
+                                <br>
+                                <div style="float:left;">
+                                    <input class="form-control boxTrackingIdConfirm" type="text" id="` + boxes[i] + 'trackingIdConfirm' + `" placeholder="Enter/Scan Tracking Number" value="${trackNumConfirm ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type to confirm the correct tracking number" autocomplete="off"/>
+                                    <p style="font-size:.8rem; margin-top:.5rem;">Ex. 457424072905</p>
+                                    <p id="${boxes[i]}trackingIdConfirmErrorMsg" class="text-danger"></p>
                                 </div>
                             </div>
                         </div>
                         <br>`
     }
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
+    
 }
 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
     document.getElementById('completeTracking').addEventListener('click', () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         let emptyField = false;
+        let trackingNumConfirmEls = Array.from(document.getElementsByClassName("invalid"))
+
+        if(trackingNumConfirmEls.length > 0) {
+          showNotifications({ title: 'Invalid Fields', body: 'Please add valid inputs to fields.' }, true)
+          return
+        }
+
         for (let i = 0; i < boxes.length; i++) {
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-            if (boxi == '') {
-                emptyField = true;
+            let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+            if (boxi == '' || boxiConfirm == '') {
+                emptyField = true
                 showNotifications({ title: 'Missing Fields', body: 'Please fill out required fields!' }, true)
                 return
             }
+        
             // if '959708259' exists update tracking number
             if (hiddenJSON[boxes[i]].hasOwnProperty('959708259')) {
               hiddenJSON[boxes[i]]['959708259'] = boxi
+            }
+            // if 'confirmTrackNum' exists update tracking number
+            if (hiddenJSON[boxes[i]].hasOwnProperty('confirmTrackNum')) {
+              hiddenJSON[boxes[i]]['confirmTrackNum'] = boxiConfirm 
             }
             // if specimens exists update, else add following key/values
             if (hiddenJSON[boxes[i]].hasOwnProperty('specimens')) {
               hiddenJSON[boxes[i]]['specimens'] = hiddenJSON[boxes[i]]['specimens'] 
             } 
             else {
-              hiddenJSON[boxes[i]] = { '959708259': boxi, specimens: hiddenJSON[boxes[i]] }
+              hiddenJSON[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: hiddenJSON[boxes[i]] }
             }  
         }
+
         if (emptyField == false) {
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
             let shipmentCourier = document.getElementById('courierSelect').value;
@@ -2702,30 +2815,30 @@ export const addEventSaveButton = async (hiddenJSON) => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         for (let i = 0; i < boxes.length; i++) {
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
+            let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
             // if '959708259' exists update tracking number
             if (hiddenJSON[boxes[i]].hasOwnProperty('959708259')) {
               hiddenJSON[boxes[i]]['959708259'] = boxi
+            }
+            // if 'confirmTrackNum' exists update tracking number
+            if (hiddenJSON[boxes[i]].hasOwnProperty('confirmTrackNum')) {
+              hiddenJSON[boxes[i]]['confirmTrackNum'] = boxiConfirm 
             }
             // if specimens exists update, else add following key/values
             if (hiddenJSON[boxes[i]].hasOwnProperty('specimens')) {
               hiddenJSON[boxes[i]]['specimens'] = hiddenJSON[boxes[i]]['specimens'] 
             } 
             else {
-              hiddenJSON[boxes[i]] = { '959708259': boxi, specimens: hiddenJSON[boxes[i]] }
+              hiddenJSON[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: hiddenJSON[boxes[i]] }
             }  
         }
         
         let shippingData = []
 
-        let trackingNumbers = {}
-        let boxNames = Object.keys(hiddenJSON);
-        for (let i = 0; i < boxNames.length; i++) {
-            trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
-        }
-
         for(let i = 0; i < boxes.length; i++){
           let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-            shippingData.push({ "959708259": boxi, "boxId":boxes[i]})
+          let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+            shippingData.push({ "959708259": boxi, confirmTrackNum: boxiConfirm, "boxId":boxes[i]})
         }
         localforage.setItem("shipData",shippingData)
 
@@ -2759,13 +2872,20 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         }
         if (finalizeTextField.value.toUpperCase() === userName.toUpperCase()) {
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
-            localforage.removeItem("shipData")
-            await ship(boxes, shippingData, trackingNumbers);
+            let shipSent = await ship(boxes, shippingData, trackingNumbers);
+            console.log(shipSent)
             document.getElementById('finalizeModalCancel').click();
             if (tempChecked) {
                 updateNewTempDate();
             }
-            startShipping(userName);
+            if(shipSent.code === 200) {
+              if (window.confirm("This shipment is now finalized; no other changes can be made")) {
+                localforage.removeItem("shipData")
+                startShipping(userName) 
+              } else startShipping(userName) 
+            }
+            // Add error logic here
+            else return
         }
         else {
             let errorMessage = document.getElementById('finalizeModalError');
