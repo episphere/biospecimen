@@ -21,7 +21,8 @@ export const addEventSearchForm1 = () => {
         let dob = dobEl.value;
 
         if (dobEl.dataset.maskedInputFormat === "mm/dd/yyyy") {
-            dob = dob.split('/').reverse().join('-');
+            const [mm,dd,yyyy] = dob.split('/');
+            dob = `${yyyy}${dd}${mm}`;
         }
 
         if (!firstName && !lastName && !dob) return;
