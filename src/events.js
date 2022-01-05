@@ -2552,6 +2552,23 @@ export const addEventNavBarTracking = (element, userName, hiddenJSON, tempChecke
         shipmentTracking(hiddenJSON, userName, tempChecked);
     });
 }
+
+export const addEventTrimTrackingNums = () => {
+  let boxTrackingIdEls = Array.from(document.getElementsByClassName("boxTrackingId"))
+  let boxTrackingIdConfirmEls = Array.from(document.getElementsByClassName("boxTrackingIdConfirm"))
+  // Trim Function here
+  boxTrackingIdEls.forEach(el => el.addEventListener("blur", e => {
+    if(e.target.value > 12) {
+      e.target.value = e.target.value.slice(-12)
+    }
+  }))
+  boxTrackingIdConfirmEls.forEach(el => el.addEventListener("blur", e => {
+    if(e.target.value > 12) {
+      e.target.value = e.target.value.slice(-12)
+    }
+  }))
+}
+
 export const populateSelectLocationList = async () => {
     let currSelect = document.getElementById('selectLocationList')
     let response = await getLocationsInstitute();
@@ -2659,34 +2676,44 @@ export const populateTrackingQuery = async (hiddenJSON) => {
                                 <label style="float:left;margin-top:5px">`+'Enter / Scan Shipping Tracking Number for ' + boxes[i] + `</label>
                                 <br>
                                 <div style="float:left;">
-                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${trackNum ?? ""}" />
+                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${trackNum ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type to the tracking number"/>
                                 </div>
                             </div>
                             <div class="form-group" style="margin-top:30px; width:350px;">
                                 <label style="float:left;margin-top:5px">`+'Confirm Shipping Tracking Number for '+ boxes[i] + `</label>
                                 <br>
                                 <div style="float:left;">
-                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingIdConfirm' + `" placeholder="Enter/Scan Tracking Number" value="${trackNumConfirm ?? ""}" />
+                                    <input class="form-control boxTrackingIdConfirm" type="text" id="` + boxes[i] + 'trackingIdConfirm' + `" placeholder="Enter/Scan Tracking Number" value="${trackNumConfirm ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type to confirm the correct tracking number" />
                                 </div>
                             </div>
                         </div>
                         <br>`
     }
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
+    
 }
 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
     document.getElementById('completeTracking').addEventListener('click', () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         let emptyField = false;
+        // let invalidField = true;
         for (let i = 0; i < boxes.length; i++) {
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
             let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
             if (boxi == '' || boxiConfirm == '') {
-                emptyField = true;
+                emptyField = false
                 showNotifications({ title: 'Missing Fields', body: 'Please fill out required fields!' }, true)
                 return
             }
+
+                    // Boxes must match
+        if(boxi !== boxiConfirm) {
+          console.log(boxes[i] + boxi + " does not equal "+ boxiConfirm)  
+          debugger;
+          return
+        }
+        
             // if '959708259' exists update tracking number
             if (hiddenJSON[boxes[i]].hasOwnProperty('959708259')) {
               hiddenJSON[boxes[i]]['959708259'] = boxi
@@ -2703,7 +2730,8 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
               hiddenJSON[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: hiddenJSON[boxes[i]] }
             }  
         }
-        if (emptyField == false) {
+
+        if (emptyField == false || invalidField == false) {
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
             let shipmentCourier = document.getElementById('courierSelect').value;
             finalShipmentTracking(hiddenJSON, userName, tempChecked, shipmentCourier);
