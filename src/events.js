@@ -2737,7 +2737,6 @@ export const populateTrackingQuery = async (hiddenJSON) => {
     for(let i = 0; i < boxes.length; i++){
         let trackNum = boxes[i] && shipping?.[boxes[i]]?.["959708259"];
         let trackNumConfirm = boxes[i] && shipping?.[boxes[i]]?.["confirmTrackNum"];
-        // console.log(trackNumConfirm)
         toBeInnerHTML +=`
         <div class = "row" style="justify-content:space-around">
                             <div class="form-group" style="margin-top:30px; width:350px;">
@@ -2775,12 +2774,12 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
           showNotifications({ title: 'Invalid Fields', body: 'Please add valid inputs to fields.' }, true)
           return
         }
-        
+
         for (let i = 0; i < boxes.length; i++) {
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
             let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
             if (boxi == '' || boxiConfirm == '') {
-                emptyField = false
+                emptyField = true
                 showNotifications({ title: 'Missing Fields', body: 'Please fill out required fields!' }, true)
                 return
             }
@@ -2802,7 +2801,7 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
             }  
         }
 
-        if (emptyField == false || invalidField == false) {
+        if (emptyField == false) {
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
             let shipmentCourier = document.getElementById('courierSelect').value;
             finalShipmentTracking(hiddenJSON, userName, tempChecked, shipmentCourier);
@@ -2835,12 +2834,6 @@ export const addEventSaveButton = async (hiddenJSON) => {
         }
         
         let shippingData = []
-
-        let trackingNumbers = {}
-        let boxNames = Object.keys(hiddenJSON);
-        // for (let i = 0; i < boxNames.length; i++) {
-        //     trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
-        // }
 
         for(let i = 0; i < boxes.length; i++){
           let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
