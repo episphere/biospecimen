@@ -2769,6 +2769,13 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
     document.getElementById('completeTracking').addEventListener('click', () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         let emptyField = false;
+        let trackingNumConfirmEls = Array.from(document.getElementsByClassName("invalid"))
+
+        if(trackingNumConfirmEls.length > 0) {
+          showNotifications({ title: 'Invalid Fields', body: 'Please add valid inputs to fields.' }, true)
+          return
+        }
+        
         for (let i = 0; i < boxes.length; i++) {
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
             let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
@@ -2777,9 +2784,6 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
                 showNotifications({ title: 'Missing Fields', body: 'Please fill out required fields!' }, true)
                 return
             }
-
-          
-        
         
             // if '959708259' exists update tracking number
             if (hiddenJSON[boxes[i]].hasOwnProperty('959708259')) {
