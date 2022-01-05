@@ -113,7 +113,6 @@ export const startShipping = async (userName) => {
             </table>
     </div>
 
-    <h3 style="margin:1rem auto; text-align:center; visibility:hidden;">Location Unknown</h3>
     <div class="panel panel-default" style="visibility:hidden; border-style:solid;height:0px;border-width:1px;overflow:auto;" id="orphansPanel">
             <table class = "table" style="width: 100%; margin-bottom:0px;" id="orphansList" >
                 
