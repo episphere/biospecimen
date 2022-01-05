@@ -213,7 +213,7 @@ const tube0008 = {
     'name': 'tube8',
     'concept': '787237543',
     'id': '0008',
-    'collectionChkBox': false,
+    'collectionChkBox': true,
     'deviationChkBox': false
 };
 
@@ -224,7 +224,7 @@ const tube0009 = {
     'name': 'tube9',
     'concept': '223999569',
     'id': '0009',
-    'collectionChkBox': false,
+    'collectionChkBox': true,
     'deviationChkBox': false
 };
 

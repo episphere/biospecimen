@@ -33,8 +33,8 @@ export const specimenTemplate = async (data, formData, collections) => {
         </div>
         <form id="specimenLinkForm" method="POST" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">
          <div class="form-group row">`
-                const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
-                const workflow = getWorflow();
+                const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym ?? localStorage.getItem('siteAcronym');
+                const workflow = getWorflow() ?? localStorage.getItem('workflow');
                 if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {
                     template +=`<label class="col-md-4 col-form-label" for="collectionLocation">Select Collection Location</label>
                     <select class="form-control col-md-5" id="collectionLocation">`

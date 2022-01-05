@@ -38,6 +38,9 @@ const packageReceiptTemplate = async (name, auth, route) => {
                       <div style="display:inline-block;">
                         <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" style="width: 600px;" placeholder="Scan a Fedex or USPS barcode">
                         <span id="courierType" style="padding-left: 10px;"></span>
+                        <br />
+                        <br />
+                        <span><h6><i>Press command/control while clicking with the mouse to make multiple selections</i></h6></span>
                       </div>
                     </div>
                         
@@ -46,6 +49,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
                              <div style="display:inline-block; max-width:90%;"> 
                                 <select required class="col form-control" id="packageCondition" style="width:100%" multiple="multiple" data-selected="[]">
                                     <option id="select-dashboard" value="">-- Select Package Condition --</option>
+                                    <option id="select-noIcePack" value=${fieldMapping.packageGood}>Package in good condition</option>
                                     <option id="select-noIcePack" value=${fieldMapping.coldPacksNone}>No Ice Pack</option>
                                     <option id="select-warmIcePack" value=${fieldMapping.coldPacksWarm}>Warm Ice Pack</option>
                                     <option id="select-incorrectMaterialTypeSent" value=${fieldMapping.vialsIncorrectMaterialType}>Vials - Incorrect Material Type Sent</option>
@@ -65,8 +69,6 @@ const packageReceiptTemplate = async (name, auth, route) => {
                                     <option id="select-shipmentDelay" value=${fieldMapping.shipmentDelay}>Shipment Delay</option>
                                     <option id="select-noManifestProvided" value=${fieldMapping.manifestNotProvided}>No Manifest provided</option>
                                 </select>
-                                <br />
-                                <span><h6><i>Press command/control to make multiple selections</i></h6></span>
                            </div>
                         </div>
 
@@ -238,8 +240,38 @@ const formSubmit = () => {
     window.removeEventListener("beforeunload",beforeUnloadMessage)
     targetAnchorTagEl()
     console.log(obj)
-    storePackageReceipt(obj);
-  })
+    const receiptStatus = storePackageReceipt(obj);
+    if (receiptStatus) {
+      document.getElementById("courierType").innerHTML = ``;
+      document.getElementById("scannedBarcode").value = "";
+      document.getElementById("packageCondition").value = "";
+      document.getElementById("receivePackageComments").value = "";
+      document.getElementById("dateReceived").value = getCurrentDate();
+      
+      document.getElementById("collectionComments").value = "";
+      document.getElementById("collectionId").value = "";
+      enableCollectionCardFields()
+      enableCollectionCheckBox()
+      document.getElementById("packageCondition").setAttribute("data-selected","[]")
+      targetAnchorTagEl()
+      clearButtonEl.removeEventListener("click",cancelConfirm)
+      window.removeEventListener("beforeunload",beforeUnloadMessage)
+    
+    if (document.getElementById("collectionId").value) {
+      document.getElementById("collectionId").value = "";
+      document.getElementById("dateCollectionCard").value = "";
+      document.getElementById("timeCollectionCard").value = "";
+      document.getElementById("collectionCheckBox").checked = false;
+      document.getElementById("collectionComments").value = "";
+
+      enableCollectionCardFields();
+      enableCollectionCheckBox();
+      document.getElementById("packageCondition").setAttribute("data-selected","[]");
+      targetAnchorTagEl()
+      clearButtonEl.removeEventListener("click",cancelConfirm);
+      window.removeEventListener("beforeunload",beforeUnloadMessage);
+    }
+  }})
 }      
 
 const storePackageReceipt = async (data) => {
