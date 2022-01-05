@@ -2872,13 +2872,20 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         }
         if (finalizeTextField.value.toUpperCase() === userName.toUpperCase()) {
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
-            localforage.removeItem("shipData")
-            await ship(boxes, shippingData, trackingNumbers);
+            let shipSent = await ship(boxes, shippingData, trackingNumbers);
+            console.log(shipSent)
             document.getElementById('finalizeModalCancel').click();
             if (tempChecked) {
                 updateNewTempDate();
             }
-            startShipping(userName);
+            if(shipSent.code === 200) {
+              if (window.confirm("This shipment is now finalized; no other changes can be made")) {
+                localforage.removeItem("shipData")
+                startShipping(userName) 
+              } else startShipping(userName) 
+            }
+            // Add error logic here
+            else return
         }
         else {
             let errorMessage = document.getElementById('finalizeModalError');
