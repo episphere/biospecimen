@@ -1305,6 +1305,7 @@ const addNewBox = async (userName) => {
     let largestLocation = 0;
     let largestLocationIndex = -1;
     let pageLocation = document.getElementById('selectLocationList').value;
+    // loop through entire hiddenJSON and determine the largest boxid number
     for (let i = 0; i < hiddenJSON.length; i++) {
         let curr = parseInt(hiddenJSON[i]['132929440'].substring(3))
         let currLocation = hiddenJSON[i]['560975149']
@@ -1320,6 +1321,7 @@ const addNewBox = async (userName) => {
 
     }
     if (largestLocationIndex != -1) {
+      // find index of largest box and assign boxid
         let lastBox = hiddenJSON[largeIndex]['132929440']
         if (Object.keys(hiddenJSON[largestLocationIndex]['bags']).length != 0) {
             //add a new Box
