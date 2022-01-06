@@ -625,7 +625,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
     
-    addEventNavBarShipment("returnToPackaging", userName);
+ 
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarTracking("returnToTracking", userName, hiddenJSON, tempChecked)
     addEventNavBarTracking("navBarSummaryAndReview", userName, hiddenJSON, tempChecked)
