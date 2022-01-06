@@ -791,7 +791,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
     }
     else {
         orphanPanel.style.display = 'none'
-        specimenPanel.style.height = '600px'
+        specimenPanel.style.height = '550px'
     }
     var rowCount = specimenList.rows.length;
     var row = specimenList.insertRow(rowCount);
@@ -2740,7 +2740,7 @@ export const populateTrackingQuery = async (hiddenJSON) => {
         let trackNumConfirm = boxes[i] && shipping?.[boxes[i]]?.["confirmTrackNum"];
         toBeInnerHTML +=`
         <div class = "row" style="justify-content:space-around">
-                            <div class="form-group" style="margin-top:30px; width:350px;">
+                            <div class="form-group" style="margin-top:30px; width:380px;">
                                 <label style="float:left;margin-top:5px">`+'Enter / Scan Shipping Tracking Number for ' + boxes[i] + `</label>
                                 <br>
                                 <div style="float:left;">
@@ -2749,7 +2749,7 @@ export const populateTrackingQuery = async (hiddenJSON) => {
                                     <p id="${boxes[i]}trackingIdErrorMsg" class="text-danger"></p>
                                 </div>
                             </div>
-                            <div class="form-group" style="margin-top:30px; width:350px;">
+                            <div class="form-group" style="margin-top:30px; width:380px;">
                                 <label style="float:left;margin-top:5px">`+'Confirm Shipping Tracking Number for '+ boxes[i] + `</label>
                                 <br>
                                 <div style="float:left;">
