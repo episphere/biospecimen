@@ -113,7 +113,7 @@ export const startShipping = async (userName) => {
             </table>
     </div>
 
-    <div class="panel panel-default" style="visibility:hidden; border-style:solid;height:0px;border-width:1px;overflow:auto;" id="orphansPanel">
+    <div class="panel panel-default" style="position:absolute; border-style:solid;height:0px;border-width:1px;overflow:auto; top:-100000px; " id="orphansPanel">
             <table class = "table" style="width: 100%; margin-bottom:0px;" id="orphansList" >
                 
             </table>
