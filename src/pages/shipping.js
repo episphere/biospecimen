@@ -577,7 +577,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToTracking">Back to Tracking</button>
             </div>
             <div style="float: left;width: 33%;">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Home</button>
+                 
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
                 <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#finalizeModal" id="completeShippingButton">Finalize</button>
@@ -625,7 +625,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
     
-    addEventNavBarShipment("returnToPackaging", userName);
+ 
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarTracking("returnToTracking", userName, hiddenJSON, tempChecked)
     addEventNavBarTracking("navBarSummaryAndReview", userName, hiddenJSON, tempChecked)
