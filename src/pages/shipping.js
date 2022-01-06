@@ -68,7 +68,7 @@ export const startShipping = async (userName) => {
         
         <div class="row">
             <div class="col-lg">
-                Choose your shipping location
+                <h5>Choose your shipping location</h5>
             </div>
         </div>
         <div class="row" style="margin-bottom:10px">
@@ -82,7 +82,9 @@ export const startShipping = async (userName) => {
             <div class="col-lg" style="padding: 0;margin: 0;">
                 <div class="row form-row" style="padding-left:0px;margin:0;">
                     <form id="addSpecimenForm" method="POST" style="width:100%;">
-                      <label for="masterSpecimenId">To start packing the shipping boxes, scan specimen bag ID or Full Specimen ID here:</label>
+                      <label for="masterSpecimenId">
+                      <h5>To start packing the shipping boxes, scan specimen bag ID or Full Specimen ID here:</h5>
+                      </label>
                         <div class="form-group">
                           <div class="input-group">
                             <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan" autocomplete="off"/>
@@ -103,7 +105,7 @@ export const startShipping = async (userName) => {
         <div class="row">
     <div class="col-5">
 
-    <h3 style="text-align:center; margin-bottom:1rem;">Available Collections</h3>
+    <h4 style="text-align:center; margin-bottom:1rem;">Available Collections</h4>
     <div class="panel panel-default" style="border-style:solid;height:550px;border-width:1px;overflow:auto;" id="specimenPanel">
             <table class = "table" style="width: 100%;margin-bottom:0px;" id="specimenList" >
                 <tr>
@@ -122,7 +124,7 @@ export const startShipping = async (userName) => {
     <div class="col-7">
         <div style="display:flex; justify-content:space-evenly; align-items:center; margin-bottom:.625rem;">
             <div>
-                <h3>View Shipping Box Contents</h3>
+                <h4>View Shipping Box Contents</h4>
             </div>
             <div>
                 <select class="selectpicker" id="selectBoxList" name="box-ids" style="padding:0.25rem">
@@ -151,7 +153,7 @@ export const startShipping = async (userName) => {
                 <div class="modal-body" id="shippingModalBody">
                 </div>
                 <div class="modal-body"> 
-                    <h4>Select Box<h4>
+                    <h4 style="margin-bottom:0.8rem">Select Box or Create New Box<h4>
                     <select class="selectpicker" id="shippingModalChooseBox"></select>
                     <button type="button" class="btn btn-primary" id="modalAddBoxButton">Create New Box</button>
                     
@@ -175,7 +177,7 @@ export const startShipping = async (userName) => {
     <div id="edit">
         <div class="row">
           <div class="col-5 no-gutters">
-            <h3 style="text-align:center;">Boxes in Process</h3>
+            <h4 style="text-align:center;">Boxes in Process</h4>
           </div>
         </div>
         
