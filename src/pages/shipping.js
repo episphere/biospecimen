@@ -151,7 +151,7 @@ export const startShipping = async (userName) => {
                 <div class="modal-body" id="shippingModalBody">
                 </div>
                 <div class="modal-body"> 
-                    <h4>Select Box<h4>
+                    <h4 style="margin-bottom:0.8rem">Select Box or Create New Box<h4>
                     <select class="selectpicker" id="shippingModalChooseBox"></select>
                     <button type="button" class="btn btn-primary" id="modalAddBoxButton">Create New Box</button>
                     
