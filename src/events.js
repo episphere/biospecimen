@@ -51,7 +51,7 @@ export const addEventSearchForm3 = () => {
     if (!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
-        const phone = document.getElementById('phone').value;
+        const phone = document.getElementById('phone').value.replaceAll("-", "");
         let query = '';
         if (phone) query += `phone=${phone}`;
         performSearch(query);
