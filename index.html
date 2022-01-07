@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        if(location.host !== 'myconnect.cancer.gov') {
+            const sentryScript = document.createElement('script');
+            sentryScript.src = 'https://browser.sentry-cdn.com/6.13.3/bundle.tracing.min.js';
+            document.head.appendChild(sentryScript);
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -87,6 +94,14 @@
             </div>
         </div>
     </footer>
+    <script>
+        if(location.host !== 'myconnect.cancer.gov') {
+            (function () {
+                'use strict';
+                Sentry.init({ dsn: 'https://113d31d0985947ae9f1876b0e31209cd@o1088108.ingest.sentry.io/6139072' });
+            })();
+        }
+    </script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="index.js" type="module"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
