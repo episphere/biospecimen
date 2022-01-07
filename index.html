@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <script>
-        if(location.host !== 'myconnect.cancer.gov') {
+        if(location.host !== 'biospecimen-myconnect.cancer.gov') {
             const sentryScript = document.createElement('script');
             sentryScript.src = 'https://browser.sentry-cdn.com/6.13.3/bundle.tracing.min.js';
             document.head.appendChild(sentryScript);
@@ -95,7 +95,7 @@
         </div>
     </footer>
     <script>
-        if(location.host !== 'myconnect.cancer.gov') {
+        if(location.host !== 'biospecimen-myconnect.cancer.gov') {
             (function () {
                 'use strict';
                 Sentry.init({ dsn: 'https://113d31d0985947ae9f1876b0e31209cd@o1088108.ingest.sentry.io/6139072' });
