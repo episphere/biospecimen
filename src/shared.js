@@ -1124,3 +1124,18 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
       await localforage.setItem("shipData", shipSetForage)
   }
 }
+
+export const matchingArrs = (arr1,arr2) => {
+    // match length of arrays 
+    if(arr1.length !== arr2.length) {
+      return false
+    }
+    // loop through each array and see if index matches
+    for(let i = 0; i < arr1.length; i++) {
+      if(arr1[i] !== arr2[i]) {
+        console.log(arr1[i],arr2[i])
+        return false
+      }
+    }
+    return true
+}

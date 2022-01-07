@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, matchingArrs} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -2560,13 +2560,13 @@ export const addEventTrimTrackingNums = () => {
   // Trim Function here
   boxTrackingIdEls.forEach(el => el.addEventListener("blur", e => {
     let inputTrack = e.target.value.trim()
-    if(inputTrack > 12) {
+    if(inputTrack.length > 12) {
       e.target.value = inputTrack.slice(-12)
     }
   }))
   boxTrackingIdConfirmEls.forEach(el => el.addEventListener("blur", e => {
     let inputTrackConfirm = e.target.value.trim()
-    if(inputTrackConfirm > 12) {
+    if(inputTrackConfirm.length > 12) {
       e.target.value = inputTrackConfirm.slice(-12)
     }
   }))
@@ -2765,7 +2765,9 @@ export const populateTrackingQuery = async (hiddenJSON) => {
     
 }
 
+// modify 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
+  
     document.getElementById('completeTracking').addEventListener('click', () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         let emptyField = false;
@@ -2804,6 +2806,7 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
 
         if (emptyField == false) {
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
+            addEventSaveContinue(hiddenJSON)
             let shipmentCourier = document.getElementById('courierSelect').value;
             finalShipmentTracking(hiddenJSON, userName, tempChecked, shipmentCourier);
         }
@@ -2850,6 +2853,39 @@ export const addEventSaveButton = async (hiddenJSON) => {
           timer: 1600,
         })
     })
+}
+
+export const addEventSaveContinue = (hiddenJSON) => {
+      let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+      for (let i = 0; i < boxes.length; i++) {
+          let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
+          let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+          // if '959708259' exists update tracking number
+          if (hiddenJSON[boxes[i]].hasOwnProperty('959708259')) {
+            hiddenJSON[boxes[i]]['959708259'] = boxi
+          }
+          // if 'confirmTrackNum' exists update tracking number
+          if (hiddenJSON[boxes[i]].hasOwnProperty('confirmTrackNum')) {
+            hiddenJSON[boxes[i]]['confirmTrackNum'] = boxiConfirm 
+          }
+          // if specimens exists update, else add following key/values
+          if (hiddenJSON[boxes[i]].hasOwnProperty('specimens')) {
+            hiddenJSON[boxes[i]]['specimens'] = hiddenJSON[boxes[i]]['specimens'] 
+          } 
+          else {
+            hiddenJSON[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: hiddenJSON[boxes[i]] }
+          }  
+      }
+      
+      let shippingData = []
+
+      for(let i = 0; i < boxes.length; i++){
+        let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
+        let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+          shippingData.push({ "959708259": boxi, confirmTrackNum: boxiConfirm, "boxId":boxes[i]})
+      }
+      localforage.setItem("shipData",shippingData)
+      console.log("success")
 }
 
 export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked, shipmentCourier) => {
