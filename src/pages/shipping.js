@@ -501,7 +501,7 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveTracking" style="margin-right:.5rem;">Save</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completeTracking">Continue</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completeTracking">Save and Continue</button>
             </div>
         </div>
 
