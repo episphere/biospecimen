@@ -527,7 +527,7 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
     addEventReturnToShippingManifest('navBarShippingManifest', hiddenJSON, userName, tempCheckChecked)
     await populateTrackingQuery(hiddenJSON);
     addEventTrimTrackingNums()
-    // addEventPreventTrackNumPaste()
+    addEventPreventTrackNumPaste()
     addEventCheckValidTrackInputs(hiddenJSON)
     addEventSaveButton(hiddenJSON);
     addEventCompleteButton(hiddenJSON, userName, tempCheckChecked);
