@@ -2153,6 +2153,8 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         const tubeCheckBox = document.getElementById(input.id.replace('Id',''));
 
         if(tubeCheckBox) input.required = tubeCheckBox.checked;
+
+        if(!cntd && value.length === 0) return;
         
         if(input.required && value.length !== totalCollectionIDLength) {
 
