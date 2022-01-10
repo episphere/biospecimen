@@ -194,8 +194,8 @@ export const startShipping = async (userName) => {
     </div>
     <div class="row" id="checkForTemp">
         <div class="col-lg">
-            <input type="checkbox" id="tempMonitorChecked" style="transform: scale(1.5); margin-right:10px; margin-top:5px;">
-            <label for="tempMonitorChecked">Temp Monitor is included in this shipment</label><br>
+            <input type="checkbox" id="tempMonitorChecked" style="transform: scale(1.5); margin-right:10px; margin-top:5px; margin-left:5px;">
+            <label for="tempMonitorChecked">Temperature Monitor is included in this shipment</label><br>
         </div>
     </div>
     
