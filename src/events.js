@@ -408,6 +408,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
 
 export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrphan, userName) => {
     let submitButton = document.getElementById('addToBagButton')
+    let specimenSearch = document.getElementById('masterSpecimenId')
     submitButton.addEventListener('click', async e => {
         e.preventDefault();
 
@@ -533,6 +534,8 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
 
         }
         await populateSaveTable(hiddenJSON, boxJSONS, userName)
+        // clear input field
+        specimenSearch.value = ""
         hideAnimation();
     }, { once: true })
     //ppulateSpecimensList();
