@@ -2793,7 +2793,7 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
             let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
             if (boxi == '' || boxiConfirm == '') {
                 emptyField = true
-                showNotifications({ title: 'Missing Fields', body: 'Please enter in shipment tracking numbers.'}, true)
+                showNotifications({ title: 'Missing Fields', body: 'Please enter in shipment tracking numbers'}, true)
                 return
             }
         
