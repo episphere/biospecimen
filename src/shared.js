@@ -1126,7 +1126,6 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
 
 export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl) => {
   if (typeof alertState === "boolean") {
-    console.log("boolean value")
     if (alertState) {
       createBoxSuccessAlertEl.style.display = createBoxSuccessAlertEl.style.display === "none" ? "" : "none";
       setTimeout(function () {
@@ -1139,7 +1138,5 @@ export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxEr
         createBoxErrorAlertEl.style.display = "none";
         }, 3000);
       }
-    } else {
-      console.log("not boolean value")
     }
 }

@@ -1399,8 +1399,8 @@ export const addEventModalAddBox = (userName) => {
     boxButton.addEventListener('click', async () => {
         let alertState = ''
         showAnimation();
+        // returns boolean value
         let notifyCreateBox = await addNewBox(userName);
-        console.log("notify create box", notifyCreateBox)
         alertState = notifyCreateBox
         let currLocation = document.getElementById('selectLocationList').value;
         let response = await getBoxesByLocation(currLocation);
@@ -1413,10 +1413,9 @@ export const addEventModalAddBox = (userName) => {
         await populateModalSelect(hiddenJSONLocation)
         await populateBoxSelectList(hiddenJSONLocation, userName);
         hideAnimation()
-        console.log(`The Modal State is: ${alertState}`)
         checkAlertState(alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl)
+        // reset alertState
         alertState = ''
-        console.log(typeof alertState)
     }
   )}
 
