@@ -919,13 +919,13 @@ export const populateTempSelect = (boxes) => {
 export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
     let table = document.getElementById("saveTable");
     table.innerHTML = `<tr>
-                        <th>To Ship</th>
-                        <th>Started</th>
-                        <th>Last Modified</th>
-                        <th>Box Number</th>
-                        <th>Location</th>
-                        <th>Contents</th>
-                        <th>View/Print Box Manifest</th>
+                        <th style="border-bottom:1px solid;">To Ship</th>
+                        <th style="border-bottom:1px solid;">Started</th>
+                        <th style="border-bottom:1px solid;">Last Modified</th>
+                        <th style="border-bottom:1px solid;">Box Number</th>
+                        <th style="border-bottom:1px solid;">Location</th>
+                        <th style="border-bottom:1px solid;">Contents</th>
+                        <th style="border-bottom:1px solid;">View/Print Box Manifest</th>
                     </tr>`
     let count = 0;
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
