@@ -183,7 +183,7 @@ export const startShipping = async (userName) => {
           <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging" style="margin:auto;display:block;">Continue to Shipping Manifest</button>
           </div>
         </div>
-        
+        <div style="border: 1px solid black; overflow: auto; margin-bottom: 0.5rem; height: 400px;">
             <table  class="table table-bordered" style="width:100%;border:1px solid;" id = "saveTable">
                 <tr>
                     <th>To Ship</th>
@@ -194,6 +194,7 @@ export const startShipping = async (userName) => {
                     <th>View/Print Box Manifest</th>
                 </tr>
             </table>
+            </div>
     </div>
     <div class="row" id="checkForTemp">
         <div class="col-lg">
