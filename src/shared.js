@@ -1128,11 +1128,13 @@ export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxEr
   if (typeof alertState === "boolean") {
     if (alertState) {
       createBoxSuccessAlertEl.style.display = createBoxSuccessAlertEl.style.display === "none" ? "" : "none";
-      setTimeout(() => { createBoxSuccessAlertEl.style.display = "none";}, 3000);
+      delay(3000).then(() => createBoxSuccessAlertEl.style.display = "none") 
     }
-      else {
-        createBoxErrorAlertEl.style.display = createBoxErrorAlertEl.style.display === "none" ? "" : "none";
-      setTimeout(() => { createBoxErrorAlertEl.style.display = "none";}, 3000);
+    else {
+      createBoxErrorAlertEl.style.display = createBoxErrorAlertEl.style.display === "none" ? "" : "none";
+      delay(3000).then(() => createBoxErrorAlertEl.style.display = "none")
     }
   }
 }
+
+export const delay = ms => new Promise(res => setTimeout(res, ms));
