@@ -1358,7 +1358,6 @@ const addNewBox = async (userName) => {
             return true
         }
         else {
-            //error (ask them to put something in the previous box first)
             return false
         }
     }
