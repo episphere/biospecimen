@@ -51,7 +51,7 @@ export const addEventSearchForm3 = () => {
     if (!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
-        const phone = document.getElementById('phone').value;
+        const phone = document.getElementById('phone').value.replaceAll("-", "");
         let query = '';
         if (phone) query += `phone=${phone}`;
         performSearch(query);
@@ -296,22 +296,22 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let currBag = [];
     let empty = true;
     let translateNumToType = {
-        "0001": "SST/Gold",
-        "0002": "SST/Gold",
+        "0001": "SST/Gold or Red",
+        "0002": "SST/Gold or Red",
         "0003": "Heparin/Green",
         "0004": "EDTA/Lavender",
         "0005": "ACD/Yellow",
         "0006": "Urine/Yellow",
         "0007": "Mouthwash Container",
-        "0011": "SST/Gold",
-        "0012": "SST/Gold",
+        "0011": "SST/Gold or Red",
+        "0012": "SST/Gold or Red",
         "0013": "Heparin/Green",
         "0014": "EDTA/Lavender",
         "0016": "Urine Cup",
-        "0021": "SST/Gold",
-        "0022": "SST/Gold",
-        "0031": "SST/Gold",
-        "0032": "SST/Gold",
+        "0021": "SST/Gold or Red",
+        "0022": "SST/Gold or Red",
+        "0031": "SST/Gold or Red",
+        "0032": "SST/Gold or Red",
         "0024": "EDTA/Lavender",
         "0050": "NA",
         "0051": "NA",
@@ -408,6 +408,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
 
 export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrphan, userName) => {
     let submitButton = document.getElementById('addToBagButton')
+    let specimenSearch = document.getElementById('masterSpecimenId')
     submitButton.addEventListener('click', async e => {
         e.preventDefault();
 
@@ -533,6 +534,8 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
 
         }
         await populateSaveTable(hiddenJSON, boxJSONS, userName)
+        // clear input field
+        specimenSearch.value = ""
         hideAnimation();
     }, { once: true })
     //ppulateSpecimensList();
@@ -1181,22 +1184,22 @@ export const populateBoxSelectList = async (hiddenJSON, userName) => {
                                     <th style = "border-bottom:1px solid;"></th>
                                 </tr>`;
         let translateNumToType = {
-            "0001": "SST/Gold",
-            "0002": "SST/Gold",
+            "0001": "SST/Gold or Red",
+            "0002": "SST/Gold or Red",
             "0003": "Heparin/Green",
             "0004": "EDTA/Lavender",
             "0005": "ACD/Yellow",
             "0006": "Urine/Yellow",
             "0007": "Mouthwash Container",
-            "0011": "SST/Gold",
-            "0012": "SST/Gold",
+            "0011": "SST/Gold or Red",
+            "0012": "SST/Gold or Red",
             "0013": "Heparin/Green",
             "0014": "EDTA/Lavender",
             "0016": "Urine Cup",
-            "0021": "SST/Gold",
-            "0022": "SST/Gold",
-            "0031": "SST/Gold",
-            "0032": "SST/Gold",
+            "0021": "SST/Gold or Red",
+            "0022": "SST/Gold or Red",
+            "0031": "SST/Gold or Red",
+            "0032": "SST/Gold or Red",
             "0024": "EDTA/Lavender",
             "0050": "NA",
             "0051": "NA",
@@ -1445,22 +1448,22 @@ export const populateTubeInBoxList = async (userName) => {
                                 </tr>`;
     //set the rest of the table up
     let translateNumToType = {
-        "0001": "SST/Gold",
-        "0002": "SST/Gold",
+        "0001": "SST/Gold or Red",
+        "0002": "SST/Gold or Red",
         "0003": "Heparin/Green",
         "0004": "EDTA/Lavender",
         "0005": "ACD/Yellow",
         "0006": "Urine/Yellow",
         "0007": "Mouthwash Container",
-        "0011": "SST/Gold",
-        "0012": "SST/Gold",
+        "0011": "SST/Gold or Red",
+        "0012": "SST/Gold or Red",
         "0013": "Heparin/Green",
         "0014": "EDTA/Lavender",
         "0016": "Urine Cup",
-        "0021": "SST/Gold",
-        "0022": "SST/Gold",
-        "0031": "SST/Gold",
-        "0032": "SST/Gold",
+        "0021": "SST/Gold or Red",
+        "0022": "SST/Gold or Red",
+        "0031": "SST/Gold or Red",
+        "0032": "SST/Gold or Red",
         "0024": "EDTA/Lavender",
         "0050": "NA",
         "0051": "NA",
@@ -2163,6 +2166,8 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         const tubeCheckBox = document.getElementById(input.id.replace('Id',''));
 
         if(tubeCheckBox) input.required = tubeCheckBox.checked;
+
+        if(!cntd && value.length === 0) return;
         
         if(input.required && value.length !== totalCollectionIDLength) {
 
@@ -2568,15 +2573,15 @@ export const addEventTrimTrackingNums = () => {
   let boxTrackingIdEls = Array.from(document.getElementsByClassName("boxTrackingId"))
   let boxTrackingIdConfirmEls = Array.from(document.getElementsByClassName("boxTrackingIdConfirm"))
   // Trim Function here
-  boxTrackingIdEls.forEach(el => el.addEventListener("blur", e => {
+  boxTrackingIdEls.forEach(el => el.addEventListener("input", e => {
     let inputTrack = e.target.value.trim()
-    if(inputTrack > 12) {
+    if(inputTrack.length > 12) {
       e.target.value = inputTrack.slice(-12)
     }
   }))
-  boxTrackingIdConfirmEls.forEach(el => el.addEventListener("blur", e => {
+  boxTrackingIdConfirmEls.forEach(el => el.addEventListener("input", e => {
     let inputTrackConfirm = e.target.value.trim()
-    if(inputTrackConfirm > 12) {
+    if(inputTrackConfirm.length > 12) {
       e.target.value = inputTrackConfirm.slice(-12)
     }
   }))
@@ -2607,7 +2612,7 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
   })
 
   boxes.forEach(box => {
-    document.getElementById(box+"trackingId").addEventListener("blur", e => {
+    document.getElementById(box+"trackingId").addEventListener("input", e => {
       let input = document.getElementById(box+"trackingId").value.trim()
       let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
       let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
@@ -2626,7 +2631,7 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
         inputConfirmErrorMsg.textContent = ""
       }
     })
-    document.getElementById(box+"trackingIdConfirm").addEventListener("blur",e => {
+    document.getElementById(box+"trackingIdConfirm").addEventListener("input",e => {
       let input = document.getElementById(box+"trackingId").value.trim()
       let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
       let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
@@ -2668,22 +2673,22 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
     let bags = Object.keys(currBox);
     let rowCount = 1;
     let translateNumToType = {
-        "0001": "SST/Gold",
-        "0002": "SST/Gold",
+        "0001": "SST/Gold or Red",
+        "0002": "SST/Gold or Red",
         "0003": "Heparin/Green",
         "0004": "EDTA/Lavender",
         "0005": "ACD/Yellow",
         "0006": "Urine/Yellow",
         "0007": "Mouthwash Container",
-        "0011": "SST/Gold",
-        "0012": "SST/Gold",
+        "0011": "SST/Gold or Red",
+        "0012": "SST/Gold or Red",
         "0013": "Heparin/Green",
         "0014": "EDTA/Lavender",
         "0016": "Urine Cup",
-        "0021": "SST/Gold",
-        "0022": "SST/Gold",
-        "0031": "SST/Gold",
-        "0032": "SST/Gold",
+        "0021": "SST/Gold or Red",
+        "0022": "SST/Gold or Red",
+        "0031": "SST/Gold or Red",
+        "0032": "SST/Gold or Red",
         "0024": "EDTA/Lavender",
         "0050": "NA",
         "0051": "NA",
@@ -2751,16 +2756,16 @@ export const populateTrackingQuery = async (hiddenJSON) => {
         toBeInnerHTML +=`
         <div class = "row" style="justify-content:space-around">
                             <div class="form-group" style="margin-top:30px; width:380px;">
-                                <label style="float:left;margin-top:5px">`+'Enter / Scan Shipping Tracking Number for ' + boxes[i] + `</label>
+                                <label style="float:left;margin-top:5px">`+'Enter / Scan Shipping Tracking Number for ' + `<span style="font-weight:600;display:block;">${boxes[i]}</span>` + `</label>
                                 <br>
                                 <div style="float:left;">
-                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${trackNum ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type to the tracking number" autocomplete="off"/>
+                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${trackNum ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type tracking number" autocomplete="off"/>
                                     <p style="font-size:.8rem; margin-top:.5rem;">Ex. 457424072905</p>
                                     <p id="${boxes[i]}trackingIdErrorMsg" class="text-danger"></p>
                                 </div>
                             </div>
                             <div class="form-group" style="margin-top:30px; width:380px;">
-                                <label style="float:left;margin-top:5px">`+'Confirm Shipping Tracking Number for '+ boxes[i] + `</label>
+                                <label style="float:left;margin-top:5px">`+'Confirm Shipping Tracking Number for '+ `<span style="font-weight:600;display:block;">${boxes[i]}</span>` + `</label>
                                 <br>
                                 <div style="float:left;">
                                     <input class="form-control boxTrackingIdConfirm" type="text" id="` + boxes[i] + 'trackingIdConfirm' + `" placeholder="Enter/Scan Tracking Number" value="${trackNumConfirm ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type to confirm the correct tracking number" autocomplete="off"/>
@@ -2814,6 +2819,7 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
 
         if (emptyField == false) {
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
+            addEventSaveContinue(hiddenJSON)
             let shipmentCourier = document.getElementById('courierSelect').value;
             finalShipmentTracking(hiddenJSON, userName, tempChecked, shipmentCourier);
         }
@@ -2860,6 +2866,38 @@ export const addEventSaveButton = async (hiddenJSON) => {
           timer: 1600,
         })
     })
+}
+
+export const addEventSaveContinue = (hiddenJSON) => {
+      let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+      for (let i = 0; i < boxes.length; i++) {
+          let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
+          let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+          // if '959708259' exists update tracking number
+          if (hiddenJSON[boxes[i]].hasOwnProperty('959708259')) {
+            hiddenJSON[boxes[i]]['959708259'] = boxi
+          }
+          // if 'confirmTrackNum' exists update tracking number
+          if (hiddenJSON[boxes[i]].hasOwnProperty('confirmTrackNum')) {
+            hiddenJSON[boxes[i]]['confirmTrackNum'] = boxiConfirm 
+          }
+          // if specimens exists update, else add following key/values
+          if (hiddenJSON[boxes[i]].hasOwnProperty('specimens')) {
+            hiddenJSON[boxes[i]]['specimens'] = hiddenJSON[boxes[i]]['specimens'] 
+          } 
+          else {
+            hiddenJSON[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: hiddenJSON[boxes[i]] }
+          }  
+      }
+      
+      let shippingData = []
+
+      for(let i = 0; i < boxes.length; i++){
+        let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
+        let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+          shippingData.push({ "959708259": boxi, confirmTrackNum: boxiConfirm, "boxId":boxes[i]})
+      }
+      localforage.setItem("shipData",shippingData)
 }
 
 export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked, shipmentCourier) => {
@@ -3144,22 +3182,22 @@ export const populateReportManifestTable = (currPage) => {
     let bags = Object.keys(currPage['bags']);
     let rowCount = 1;
     let translateNumToType = {
-        "0001": "SST/Gold",
-        "0002": "SST/Gold",
+        "0001": "SST/Gold or Red",
+        "0002": "SST/Gold or Red",
         "0003": "Heparin/Green",
         "0004": "EDTA/Lavender",
         "0005": "ACD/Yellow",
         "0006": "Urine/Yellow",
         "0007": "Mouthwash Container",
-        "0011": "SST/Gold",
-        "0012": "SST/Gold",
+        "0011": "SST/Gold or Red",
+        "0012": "SST/Gold or Red",
         "0013": "Heparin/Green",
         "0014": "EDTA/Lavender",
         "0016": "Urine Cup",
-        "0021": "SST/Gold",
-        "0022": "SST/Gold",
-        "0031": "SST/Gold",
-        "0032": "SST/Gold",
+        "0021": "SST/Gold or Red",
+        "0022": "SST/Gold or Red",
+        "0031": "SST/Gold or Red",
+        "0032": "SST/Gold or Red",
         "0024": "EDTA/Lavender",
         "0050": "NA",
         "0051": "NA",
