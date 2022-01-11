@@ -919,13 +919,13 @@ export const populateTempSelect = (boxes) => {
 export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
     let table = document.getElementById("saveTable");
     table.innerHTML = `<tr>
-                        <th>To Ship</th>
-                        <th>Started</th>
-                        <th>Last Modified</th>
-                        <th>Box Number</th>
-                        <th>Location</th>
-                        <th>Contents</th>
-                        <th>View/Print Box Manifest</th>
+                        <th style="border-bottom:1px solid;">To Ship</th>
+                        <th style="border-bottom:1px solid;">Started</th>
+                        <th style="border-bottom:1px solid;">Last Modified</th>
+                        <th style="border-bottom:1px solid;">Box Number</th>
+                        <th style="border-bottom:1px solid;">Location</th>
+                        <th style="border-bottom:1px solid;">Contents</th>
+                        <th style="border-bottom:1px solid;">View/Print Box Manifest</th>
                     </tr>`
     let count = 0;
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
@@ -2486,7 +2486,7 @@ export const addEventNavBarBoxManifest = (id, userName) => {
     });
 }
 
-export const addEventNavBarShippingManifest = (userName, tempChecked) => {
+export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
     const btn = document.getElementById('completePackaging');
     document.getElementById('completePackaging').addEventListener('click', async e => {
         e.stopPropagation();
@@ -2495,6 +2495,7 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
         let boxesToShip = [];
         let shipSetForage = []
         let currTable = document.getElementById('saveTable')
+        let tempCheckStatus = ""
         for (var r = 1; r < currTable.rows.length; r++) {
 
             let currCheck = currTable.rows[r].cells[0]
@@ -2524,17 +2525,14 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
           return
         }
 
-        if (document.getElementById('tempMonitorChecked')) {
-            tempChecked = document.getElementById('tempMonitorChecked').checked
-        }
-
+        tempCheckStatus = tempCheckedEl.checked 
         // Push empty item with boxId and empty tracking number string
         // shipSetForage used to handle empty localforage or no box id match
         boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
         checkShipForage(shipSetForage,boxesToShip)
         
         //return box 1 info
-        await shippingManifest(boxesToShip, userName, tempChecked);
+        await shippingManifest(boxesToShip, userName, tempCheckStatus);
     });
 }
 
