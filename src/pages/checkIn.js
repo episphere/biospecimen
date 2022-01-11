@@ -8,7 +8,7 @@ export const checkInTemplate = (data) => {
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
     const checkedIn = (data['135591601'] === 353358909);
-    // ${!!data["40048338"] ? `<h6>Checked in @ ${new Date(data["40048338"]).toLocaleString()}</h6>`}
+    
     console.log({data})
     let template = `
         </br>

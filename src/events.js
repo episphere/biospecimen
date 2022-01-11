@@ -1782,7 +1782,7 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
 
         // append check-in timestamp
         if(!isCheckOut){
-            checkInData["40048338"] = new Date();
+            checkInData["840048338"] = new Date();
         }
         
         await updateParticipant(checkInData);
