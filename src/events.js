@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -1323,6 +1323,7 @@ const addNewBox = async (userName) => {
     if (largestLocationIndex != -1) {
       // find index of largest box and assign boxid
         let lastBox = hiddenJSON[largeIndex]['132929440']
+        // check if largest boxid number has bags
         if (Object.keys(hiddenJSON[largestLocationIndex]['bags']).length != 0) {
             //add a new Box
             //create new Box Id
@@ -1351,9 +1352,11 @@ const addNewBox = async (userName) => {
                 }
             }
             await populateBoxSelectList(hiddenJSON, userName)
+            return true
         }
         else {
             //error (ask them to put something in the previous box first)
+            return false
         }
     }
     else {
@@ -1391,10 +1394,14 @@ const addNewBox = async (userName) => {
 
 export const addEventModalAddBox = (userName) => {
     let boxButton = document.getElementById('modalAddBoxButton');
-
+    let createBoxSuccessAlertEl = document.getElementById("create-box-success");
+    let createBoxErrorAlertEl = document.getElementById("create-box-error");
     boxButton.addEventListener('click', async () => {
+        let alertState = ''
         showAnimation();
-        await addNewBox(userName);
+        let notifyCreateBox = await addNewBox(userName);
+        console.log("notify create box", notifyCreateBox)
+        alertState = notifyCreateBox
         let currLocation = document.getElementById('selectLocationList').value;
         let response = await getBoxesByLocation(currLocation);
         let boxJSONS = response.data;
@@ -1406,10 +1413,12 @@ export const addEventModalAddBox = (userName) => {
         await populateModalSelect(hiddenJSONLocation)
         await populateBoxSelectList(hiddenJSONLocation, userName);
         hideAnimation()
-    })
-
-
-}
+        console.log(`The Modal State is: ${alertState}`)
+        checkAlertState(alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl)
+        alertState = ''
+        console.log(typeof alertState)
+    }
+  )}
 
 export const populateTubeInBoxList = async (userName) => {
     let boxList = document.getElementById('selectBoxList');

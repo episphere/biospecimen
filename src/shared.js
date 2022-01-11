@@ -1099,7 +1099,6 @@ export const displayContactInformation = (site, siteContactInformation) => {
   else return ""
 }
 
-
 export const checkShipForage = async (shipSetForage, boxesToShip) => {
   let forageBoxIdArr = []
   try {
@@ -1123,4 +1122,24 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
       console.log(e)
       await localforage.setItem("shipData", shipSetForage)
   }
+}
+
+export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl) => {
+  if (typeof alertState === "boolean") {
+    console.log("boolean value")
+    if (alertState) {
+      createBoxSuccessAlertEl.style.display = createBoxSuccessAlertEl.style.display === "none" ? "" : "none";
+      setTimeout(function () {
+        createBoxSuccessAlertEl.style.display = "none";
+        }, 3000);
+      }
+      else {
+        createBoxErrorAlertEl.style.display = createBoxErrorAlertEl.style.display === "none" ? "" : "none";
+      setTimeout(function () {
+        createBoxErrorAlertEl.style.display = "none";
+        }, 3000);
+      }
+    } else {
+      console.log("not boolean value")
+    }
 }
