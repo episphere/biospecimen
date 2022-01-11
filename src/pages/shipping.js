@@ -192,12 +192,12 @@ export const startShipping = async (userName) => {
         <div style="border: 1px solid black; overflow: auto; margin-bottom: 0.5rem; height: 400px;">
             <table  class="table table-bordered" style="width:100%;border:1px solid;" id = "saveTable">
                 <tr>
-                    <th>To Ship</th>
-                    <th>Started</th>
-                    <th>Last Modified</th>
-                    <th>Box Number</th>
-                    <th>Contents</th>
-                    <th>View/Print Box Manifest</th>
+                    <th style="border-bottom:1px solid; border-right:1px solid">To Ship</th>
+                    <th style="border-bottom:1px solid; border-right:1px solid">Started</th>
+                    <th style="border-bottom:1px solid; border-right:1px solid">Last Modified</th>
+                    <th style="border-bottom:1px solid; border-right:1px solid">Box Number</th>
+                    <th style="border-bottom:1px solid; border-right:1px solid">Contents</th>
+                    <th style="border-bottom:1px solid; border-right:1px solid">View/Print Box Manifest</th>
                 </tr>
             </table>
             </div>
@@ -226,6 +226,7 @@ export const startShipping = async (userName) => {
     await populateSpecimensList(hiddenJSON1);
 
     let currLocation = document.getElementById('selectLocationList').value;
+    let tempMonitorCheckedEl = document.getElementById('tempMonitorChecked')
 
     response = await getBoxesByLocation(currLocation);
     boxJSONS = response.data;
@@ -237,7 +238,7 @@ export const startShipping = async (userName) => {
     await populateBoxSelectList(hiddenJSONLocation,userName);
     await populateTempNotification();
     addEventNavBarShipment("navBarShippingDash", userName);
-    addEventNavBarShippingManifest(userName, document.getElementById('tempMonitorChecked').checked);
+    addEventNavBarShippingManifest(userName, tempMonitorCheckedEl);
     addEventBoxSelectListChanged();
     addEventNavBarBoxManifest("navBarBoxManifest", userName)
     addEventChangeLocationSelect(userName);
