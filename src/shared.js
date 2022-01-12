@@ -1124,6 +1124,23 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
   }
 }
 
+/* 
+Print Reminder Process:
+
+Localforage route
+1. Create Local Forage Checker for reminder
+2. Check if all boxes
+3.
+4.
+
+no localforage (less desired approach)
+1. Add a modal to Continue to Assign Tracking Number's click event listener 
+2. Create a custom modal with ok and close buttons
+3.
+4.
+
+*/
+
 export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl) => {
   if (typeof alertState === "boolean") {
     if (alertState) {
