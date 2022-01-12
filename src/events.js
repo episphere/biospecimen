@@ -208,14 +208,14 @@ export const addEventAddSpecimenToBox = (userName) => {
 
         // Modify to change tube order, tube ordered by color
         let tubeOrder = [      
-        "0001", //"SST/Gold"
-        "0002", //"SST/Gold"
-        "0011", //"SST/Gold"
-        "0012", //"SST/Gold"
-        "0021", //"SST/Gold"
-        "0022", //"SST/Gold"
-        "0031", //"SST/Gold"
-        "0032", //"SST/Gold"
+        "0001", //"SST/Gold or Red"
+        "0002", //"SST/Gold or Red"
+        "0011", //"SST/Gold or Red"
+        "0012", //"SST/Gold or Red"
+        "0021", //"SST/Gold or Red"
+        "0022", //"SST/Gold or Red"
+        "0031", //"SST/Gold or Red"
+        "0032", //"SST/Gold or Red"
         "0003", //"Heparin/Green"
         "0013", //"Heparin/Green"
         "0004", //"EDTA/Lavender"
