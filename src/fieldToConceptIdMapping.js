@@ -38,9 +38,11 @@ export default {
     vialsIncorrectMaterialType: 564936650,
     vialsMissingLabels: 242271549,
     other: 121720893,
+    packageGood: 123456789,
     siteShipmentComments: 869218574,
     siteShipmentDateReceived: 259439191,
     siteShipmentReceived: 434049748,
+    tempProbe: 105891443,
     yes: 353358909,
     no: 104430631,
 

@@ -3,6 +3,7 @@ import { searchResults } from "./pages/dashboard.js";
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
 import { workflows } from "./tubeValidation.js";
+import { signOut } from "./pages/signIn.js"
 
 
 const conversion = {
@@ -25,6 +26,52 @@ const conversion = {
  const api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
 // const api = 'http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
 
+export const inactivityTime = () => {
+    let time;
+    const resetTimer = () => {
+        clearTimeout(time);
+        time = setTimeout(() => {
+            const resposeTimeout = setTimeout(() => {
+                // log out user if they don't respond to warning after 5 minutes.
+                signOut();
+            }, 300000)
+            // Show warning after 20 minutes of no activity.
+            const button = document.createElement('button');
+            button.dataset.toggle = 'modal';
+            button.dataset.target = '#biospecimenModal'
+
+            document.getElementById('root').appendChild(button);
+            button.click();
+            document.getElementById('root').removeChild(button);
+
+            const header = document.getElementById('biospecimenModalHeader');
+            const body = document.getElementById('biospecimenModalBody');
+
+            header.innerHTML = `<h5 class="modal-title">Inactive</h5>`;
+
+            body.innerHTML = `You were inactive for 20 minutes, would you like to extend your session?
+                            <div class="modal-footer">
+                                <button type="button" title="Close" class="btn btn-dark log-out-user" data-dismiss="modal">Log Out</button>
+                                <button type="button" title="Continue" class="btn btn-primary extend-user-session" data-dismiss="modal">Continue</button>
+                            </div>`
+            
+            Array.from(document.getElementsByClassName('log-out-user')).forEach(e => {
+                e.addEventListener('click', () => {
+                    signOut();
+                })
+            })
+            Array.from(document.getElementsByClassName('extend-user-session')).forEach(e => {
+                e.addEventListener('click', () => {
+                    clearTimeout(resposeTimeout);
+                    resetTimer;
+                })
+            });
+        }, 1200000);
+    }
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+};
 
 export const validateUser = async () => {
     const idToken = await getIdToken();
@@ -954,7 +1001,8 @@ export const getParticipantSelection = async (filter) => {
     return response.json();
   }
      
-export const isDeviceiPad = /iPad|iPhone/i.test(navigator.userAgent);
+export const isDeviceMobile = /(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(window.navigator.userAgent) ||
+    /Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(window.navigator.userAgent) || window.innerWidth < 1300;
 export const replaceDateInputWithMaskedInput = (dateInput) => {
 
   if (dateInput.type !== "date") throw new Error(`${dateInput} must be a input type="date"`);
@@ -1051,7 +1099,6 @@ export const displayContactInformation = (site, siteContactInformation) => {
   else return ""
 }
 
-
 export const checkShipForage = async (shipSetForage, boxesToShip) => {
   let forageBoxIdArr = []
   try {
@@ -1080,10 +1127,22 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
 export const sortBiospecimensList = (biospecimensList, tubeOrder) => {
   const bioArr = []
   // push list of unordered ids
-  biospecimensList.forEach(id => {
-    bioArr.push({"tubeId": id})
-  })
+  biospecimensList.forEach(id => { bioArr.push({"tubeId": id}) })
   // sort unordered id list with custom tube order sort
   bioArr.sort((a, b) => tubeOrder.indexOf(a.tubeId) - tubeOrder.indexOf(b.tubeId))
   return bioArr.map(item => item.tubeId)
 }
+export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl) => {
+  if (typeof alertState === "boolean") {
+    if (alertState) {
+      createBoxSuccessAlertEl.style.display = createBoxSuccessAlertEl.style.display === "none" ? "" : "none";
+      delay(3000).then(() => createBoxSuccessAlertEl.style.display = "none") 
+    }
+    else {
+      createBoxErrorAlertEl.style.display = createBoxErrorAlertEl.style.display === "none" ? "" : "none";
+      delay(3000).then(() => createBoxErrorAlertEl.style.display = "none")
+    }
+  }
+}
+
+export const delay = ms => new Promise(res => setTimeout(res, ms));

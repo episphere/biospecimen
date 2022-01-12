@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, sortBiospecimensList} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -21,7 +21,8 @@ export const addEventSearchForm1 = () => {
         let dob = dobEl.value;
 
         if (dobEl.dataset.maskedInputFormat === "mm/dd/yyyy") {
-            dob = dob.split('/').reverse().join('-');
+            const [mm,dd,yyyy] = dob.split('/');
+            dob = `${yyyy}${mm}${dd}`;
         }
 
         if (!firstName && !lastName && !dob) return;
@@ -50,7 +51,7 @@ export const addEventSearchForm3 = () => {
     if (!form) return;
     form.addEventListener('submit', e => {
         e.preventDefault();
-        const phone = document.getElementById('phone').value;
+        const phone = document.getElementById('phone').value.replaceAll("-", "");
         let query = '';
         if (phone) query += `phone=${phone}`;
         performSearch(query);
@@ -75,7 +76,10 @@ export const addEventsearchSpecimen = () => {
     form.addEventListener('submit', async e => {
         e.preventDefault();
         removeAllErrors();
-        const masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase();
+        let masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase();
+
+        if(masterSpecimenId.length > masterSpecimenIDRequirement.length) masterSpecimenId = masterSpecimenId.substring(0, masterSpecimenIDRequirement.length);
+
         if (!masterSpecimenIDRequirement.regExp.test(masterSpecimenId) || masterSpecimenId.length !== masterSpecimenIDRequirement.length) {
             errorMessage('masterSpecimenId', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, true);
             return;
@@ -109,17 +113,7 @@ export const addEventsearchSpecimen = () => {
         hideAnimation();
         const data = response.data[0];
 
-        if (allTubesCollected(biospecimenData)) {
-            if (biospecimenData['410912345'] && biospecimenData['410912345'] === 353358909) {
-                if (biospecimenData['420757389'] && biospecimenData['420757389'] === 353358909) {
-                    searchTemplate();
-                    showNotifications({ title: 'Completed', body: 'Specimen is finalized and the Participant is already checked out!' })
-                }
-                else checkOutScreen(data, biospecimenData);
-            }
-            else finalizeTemplate(data, biospecimenData);
-        }
-        else tubeCollectedTemplate(data, biospecimenData);
+        tubeCollectedTemplate(data, biospecimenData);
     })
 }
 
@@ -327,23 +321,23 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let currSplit = masterBiospecimenId.split(/\s+/);
     let currBag = [];
     let empty = true;
-    const translateNumToType = {
-        "0001": "SST/Gold",
-        "0002": "SST/Gold",
+    let translateNumToType = {
+        "0001": "SST/Gold or Red",
+        "0002": "SST/Gold or Red",
         "0003": "Heparin/Green",
         "0004": "EDTA/Lavender",
         "0005": "ACD/Yellow",
         "0006": "Urine/Yellow",
         "0007": "Mouthwash Container",
-        "0011": "SST/Gold",
-        "0012": "SST/Gold",
+        "0011": "SST/Gold or Red",
+        "0012": "SST/Gold or Red",
         "0013": "Heparin/Green",
         "0014": "EDTA/Lavender",
         "0016": "Urine Cup",
-        "0021": "SST/Gold",
-        "0022": "SST/Gold",
-        "0031": "SST/Gold",
-        "0032": "SST/Gold",
+        "0021": "SST/Gold or Red",
+        "0022": "SST/Gold or Red",
+        "0031": "SST/Gold or Red",
+        "0032": "SST/Gold or Red",
         "0024": "EDTA/Lavender",
         "0050": "NA",
         "0051": "NA",
@@ -440,6 +434,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
 
 export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrphan, userName) => {
     let submitButton = document.getElementById('addToBagButton')
+    let specimenSearch = document.getElementById('masterSpecimenId')
     submitButton.addEventListener('click', async e => {
         e.preventDefault();
 
@@ -565,6 +560,8 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
 
         }
         await populateSaveTable(hiddenJSON, boxJSONS, userName)
+        // clear input field
+        specimenSearch.value = ""
         hideAnimation();
     }, { once: true })
     //ppulateSpecimensList();
@@ -756,16 +753,14 @@ export const populateSpecimensList = async (hiddenJSON) => {
         }
     }
 
-    let orphanHeader = document.getElementById('orphanHeader')
     let orphanPanel = document.getElementById('orphansPanel');
     let orphanTable = document.getElementById('orphansList')
     let specimenPanel = document.getElementById('specimenPanel')
     orphanTable.innerHTML = '';
 
     if (orphansIndex != -1 && specimenObject['unlabelled'].length > 0) {
-        orphanHeader.style.display = 'block'
         orphanPanel.style.display = 'block'
-        specimenPanel.style.height = '400px'
+        specimenPanel.style.height = '550px'
 
         let toInsert = specimenObject['unlabelled'];
         var rowCount = orphanTable.rows.length;
@@ -825,7 +820,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
     }
     else {
         orphanPanel.style.display = 'none'
-        specimenPanel.style.height = '600px'
+        specimenPanel.style.height = '550px'
     }
     var rowCount = specimenList.rows.length;
     var row = specimenList.insertRow(rowCount);
@@ -950,13 +945,13 @@ export const populateTempSelect = (boxes) => {
 export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
     let table = document.getElementById("saveTable");
     table.innerHTML = `<tr>
-                        <th>To Ship</th>
-                        <th>Started</th>
-                        <th>Last Modified</th>
-                        <th>Box Number</th>
-                        <th>Location</th>
-                        <th>Contents</th>
-                        <th>View/Print Box Manifest</th>
+                        <th style="border-bottom:1px solid;">To Ship</th>
+                        <th style="border-bottom:1px solid;">Started</th>
+                        <th style="border-bottom:1px solid;">Last Modified</th>
+                        <th style="border-bottom:1px solid;">Box Number</th>
+                        <th style="border-bottom:1px solid;">Location</th>
+                        <th style="border-bottom:1px solid;">Contents</th>
+                        <th style="border-bottom:1px solid;">View/Print Box Manifest</th>
                     </tr>`
     let count = 0;
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
@@ -1215,22 +1210,22 @@ export const populateBoxSelectList = async (hiddenJSON, userName) => {
                                     <th style = "border-bottom:1px solid;"></th>
                                 </tr>`;
         let translateNumToType = {
-            "0001": "SST/Gold",
-            "0002": "SST/Gold",
+            "0001": "SST/Gold or Red",
+            "0002": "SST/Gold or Red",
             "0003": "Heparin/Green",
             "0004": "EDTA/Lavender",
             "0005": "ACD/Yellow",
             "0006": "Urine/Yellow",
             "0007": "Mouthwash Container",
-            "0011": "SST/Gold",
-            "0012": "SST/Gold",
+            "0011": "SST/Gold or Red",
+            "0012": "SST/Gold or Red",
             "0013": "Heparin/Green",
             "0014": "EDTA/Lavender",
             "0016": "Urine Cup",
-            "0021": "SST/Gold",
-            "0022": "SST/Gold",
-            "0031": "SST/Gold",
-            "0032": "SST/Gold",
+            "0021": "SST/Gold or Red",
+            "0022": "SST/Gold or Red",
+            "0031": "SST/Gold or Red",
+            "0032": "SST/Gold or Red",
             "0024": "EDTA/Lavender",
             "0050": "NA",
             "0051": "NA",
@@ -1339,6 +1334,7 @@ const addNewBox = async (userName) => {
     let largestLocation = 0;
     let largestLocationIndex = -1;
     let pageLocation = document.getElementById('selectLocationList').value;
+    // loop through entire hiddenJSON and determine the largest boxid number
     for (let i = 0; i < hiddenJSON.length; i++) {
         let curr = parseInt(hiddenJSON[i]['132929440'].substring(3))
         let currLocation = hiddenJSON[i]['560975149']
@@ -1354,7 +1350,9 @@ const addNewBox = async (userName) => {
 
     }
     if (largestLocationIndex != -1) {
+      // find index of largest box and assign boxid
         let lastBox = hiddenJSON[largeIndex]['132929440']
+        // check if largest boxid number has bags
         if (Object.keys(hiddenJSON[largestLocationIndex]['bags']).length != 0) {
             //add a new Box
             //create new Box Id
@@ -1383,9 +1381,10 @@ const addNewBox = async (userName) => {
                 }
             }
             await populateBoxSelectList(hiddenJSON, userName)
+            return true
         }
         else {
-            //error (ask them to put something in the previous box first)
+            return false
         }
     }
     else {
@@ -1421,32 +1420,16 @@ const addNewBox = async (userName) => {
 
 }
 
-export const addEventAddBox = (userName) => {
-    let boxButton = document.getElementById('addBoxButton');
-    boxButton.addEventListener('click', async () => {
-        showAnimation();
-        await addNewBox(userName);
-        let currLocation = document.getElementById('selectLocationList').value;
-        let response = await getBoxesByLocation(currLocation);
-        let boxJSONS = response.data;
-        let hiddenJSONLocation = {};
-        for (let i = 0; i < boxJSONS.length; i++) {
-            let box = boxJSONS[i]
-            hiddenJSONLocation[box['132929440']] = box['bags']
-        }
-        await populateBoxSelectList(hiddenJSONLocation, userName);
-        hideAnimation()
-    })
-
-
-}
-
 export const addEventModalAddBox = (userName) => {
     let boxButton = document.getElementById('modalAddBoxButton');
-
+    let createBoxSuccessAlertEl = document.getElementById("create-box-success");
+    let createBoxErrorAlertEl = document.getElementById("create-box-error");
     boxButton.addEventListener('click', async () => {
+        let alertState = ''
         showAnimation();
-        await addNewBox(userName);
+        // returns boolean value
+        let notifyCreateBox = await addNewBox(userName);
+        alertState = notifyCreateBox
         let currLocation = document.getElementById('selectLocationList').value;
         let response = await getBoxesByLocation(currLocation);
         let boxJSONS = response.data;
@@ -1458,10 +1441,11 @@ export const addEventModalAddBox = (userName) => {
         await populateModalSelect(hiddenJSONLocation)
         await populateBoxSelectList(hiddenJSONLocation, userName);
         hideAnimation()
-    })
-
-
-}
+        checkAlertState(alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl)
+        // reset alertState
+        alertState = ''
+    }
+  )}
 
 export const populateTubeInBoxList = async (userName) => {
     let boxList = document.getElementById('selectBoxList');
@@ -1489,22 +1473,22 @@ export const populateTubeInBoxList = async (userName) => {
                                 </tr>`;
     //set the rest of the table up
     let translateNumToType = {
-        "0001": "SST/Gold",
-        "0002": "SST/Gold",
+        "0001": "SST/Gold or Red",
+        "0002": "SST/Gold or Red",
         "0003": "Heparin/Green",
         "0004": "EDTA/Lavender",
         "0005": "ACD/Yellow",
         "0006": "Urine/Yellow",
         "0007": "Mouthwash Container",
-        "0011": "SST/Gold",
-        "0012": "SST/Gold",
+        "0011": "SST/Gold or Red",
+        "0012": "SST/Gold or Red",
         "0013": "Heparin/Green",
         "0014": "EDTA/Lavender",
         "0016": "Urine Cup",
-        "0021": "SST/Gold",
-        "0022": "SST/Gold",
-        "0031": "SST/Gold",
-        "0032": "SST/Gold",
+        "0021": "SST/Gold or Red",
+        "0022": "SST/Gold or Red",
+        "0031": "SST/Gold or Red",
+        "0032": "SST/Gold or Red",
         "0024": "EDTA/Lavender",
         "0050": "NA",
         "0051": "NA",
@@ -1824,7 +1808,7 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
 
         // append check-in timestamp
         if(!isCheckOut){
-            checkInData["40048338"] = new Date();
+            checkInData["840048338"] = new Date();
         }
         
         await updateParticipant(checkInData);
@@ -1833,12 +1817,13 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
             await swal({
                 title: "Success",
                 icon: "success",
-                text: `Participant is checked ${isCheckOut ? 'out' : 'in'}.`,
+                text: `Participant is checked out.`,
             });
             await new Promise((res) => setTimeout(res,1200));
-            window.location.reload();
+            goToParticipantSearch();
+            return;
         }
-
+        
         if (!skipFlag) {
             const confirmVal = await swal({
                 title: "Success",
@@ -1872,40 +1857,39 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
     });
 
 };
-
-export const addEventSpecimenLinkForm = formData => {
-    const specimenSaveExit = document.getElementById('specimenSaveExit');
-    const specimenContinue = document.getElementById('specimenContinue');
-    const connectId = specimenSaveExit.dataset.connectId || specimenContinue.dataset.connectId;
-    if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
-    specimenSaveExit.addEventListener('click', () => {
-        btnsClicked(connectId, formData)
-    });
+export const goToParticipantSearch = () => {
+    document.getElementById('navBarSearch').click();
 }
 
-export const addEventSpecimenLinkFormCntd = (formData) => {
+export const addEventSpecimenLinkForm = (formData) => {
     const form = document.getElementById('specimenLinkForm');
-    const specimenSaveExit = document.getElementById('specimenSaveExit');
-    const specimenContinue = document.getElementById('specimenContinue');
-    const connectId = specimenSaveExit.dataset.connectId || specimenContinue.dataset.connectId;
+    const connectId = document.getElementById('specimenContinue').dataset.connectId;
+
     if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
 
     form.addEventListener('submit', e => {
         e.preventDefault();
-        btnsClicked(connectId, formData, true);
+        btnsClicked(connectId, formData);
     });
 };
 
-const btnsClicked = async (connectId, formData, cont) => {
+const btnsClicked = async (connectId, formData) => {
+
     removeAllErrors();
-    const scanSpecimenID = document.getElementById('scanSpecimenID').value;
+
+    let scanSpecimenID = document.getElementById('scanSpecimenID').value;
+
+    if(scanSpecimenID.length > masterSpecimenIDRequirement.length) scanSpecimenID = scanSpecimenID.substring(0, masterSpecimenIDRequirement.length);
+
     const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value.toUpperCase();
     const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value.toUpperCase();
     const accessionID1 = document.getElementById('accessionID1');
     const accessionID2 = document.getElementById('accessionID2');
     const select = document.getElementById('biospecimenVisitType');
+
     let hasError = false;
     let focus = true;
+
     if (accessionID1 && accessionID1.value && !accessionID2.value && !accessionID2.classList.contains('disabled')) {
         hasError = true;
         errorMessage('accessionID2', 'Please re-type Accession ID from tube.', focus, true);
@@ -1946,31 +1930,34 @@ const btnsClicked = async (connectId, formData, cont) => {
             errorMessage('enterSpecimenID2', 'Does not match with Manually Entered Collection ID', focus, true);
         }
     }
+
     if (hasError) return;
 
     if (document.getElementById('collectionLocation')) formData['951355211'] = parseInt(document.getElementById('collectionLocation').value);
+
     const collectionID = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     const n = document.getElementById('399159511').innerText || ""
+
     const confirmVal = await swal({
-        title: "Confirm Changes",
+        title: "Confirm Collection ID",
         icon: "info",
         text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n || ""}`,
         buttons: {
             cancel: {
-                text: "Close",
+                text: "Cancel",
                 value: "cancel",
                 visible: true,
                 className: "btn btn-default",
                 closeModal: true,
             },
             back: {
-                text: "Confirm and exit",
+                text: "Confirm and Exit",
                 value: "back",
                 visible: true,
                 className: "btn btn-info",
             },
             confirm: {
-                text: "Confirm and continue",
+                text: "Confirm and Continue",
                 value: 'confirmed',
                 visible: true,
                 className: "",
@@ -1984,54 +1971,56 @@ const btnsClicked = async (connectId, formData, cont) => {
 
     formData['820476880'] = collectionID;
     formData['650516960'] = getWorflow() === 'research' ? 534621077 : 664882224;
-    if (enterSpecimenID1) formData['387108065'] = 353358909
-    else formData['387108065'] = 104430631;
+    formData['387108065'] = enterSpecimenID1 ? 353358909 : 104430631;
+    formData['331584571'] = select ? parseInt(select.value) : '';
+    formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
+    formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
+
     if (accessionID1 && accessionID1.value) {
         formData['646899796'] = accessionID1.value;
         formData['148996099'] = 353358909;
     }
-    if (select) formData['331584571'] = parseInt(select.value);
-    formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
-    formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
+
     let query = `connectId=${parseInt(connectId)}`;
+
     showAnimation();
+
     const response = await findParticipant(query);
     const data = response.data[0];
     const specimenData = (await searchSpecimen(formData['820476880'])).data;
+
     hideAnimation();
+
     if (specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID) {
         showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.' }, true)
         return;
     }
 
-    if (cont && confirmVal == "confirmed") {
-        showAnimation();
-        await storeSpecimen([formData]);
-        const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
-        await createTubesForCollection(formData, biospecimenData);
-        hideAnimation();
+    showAnimation(); 
+
+    await storeSpecimen([formData]);  
+    const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
+    await createTubesForCollection(formData, biospecimenData);
+
+    hideAnimation();
+
+    if (confirmVal == "confirmed") {
         tubeCollectedTemplate(data, biospecimenData);
     }
     else {
-        showAnimation();
-        await storeSpecimen([formData]);
-        hideAnimation();
         searchTemplate();
     }
 }
-
-export const addEventBiospecimenCollectionFormCntd = (dt, biospecimenData) => {
-    const form = document.getElementById('biospecimenCollectionForm');
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        collectionSubmission(dt, biospecimenData, true);
-    });
-};
 
 export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     const collectionSaveExit = document.getElementById('collectionSave');
     collectionSaveExit.addEventListener('click', () => {
         collectionSubmission(dt, biospecimenData);
+    });
+
+    const collectionSaveContinue = document.getElementById('collectionNext');
+    collectionSaveContinue.addEventListener('click', () => {
+        collectionSubmission(dt, biospecimenData, true);
     });
 };
 
@@ -2042,24 +2031,28 @@ export const addEventBiospecimenCollectionFormToggles = (dt, biospecimenData) =>
     collectedBoxes.forEach(collected => {
 
         const reason = document.getElementById(collected.id + "Reason");
-        const specimenId = document.getElementById(collected.id + "Id");
         const deviated = document.getElementById(collected.id + "Deviated");
+        const specimenId = document.getElementById(collected.id + "Id");
 
         collected.addEventListener('change', () => {
             
-            if(getWorflow() === 'research') reason.disabled = collected.checked;
+            if(getWorflow() === 'research' && reason) reason.disabled = collected.checked;
+            if(deviated) deviated.disabled = !collected.checked;
             specimenId.disabled = !collected.checked;
-            deviated.disabled = !collected.checked;
             
             if(collected.checked) {
-                if(getWorflow() === 'research') reason.value = '';
+                if(getWorflow() === 'research' && reason) reason.value = '';
             }
             else {
-                specimenId.value = '';
-                deviated.checked = false;
-                
                 const event = new CustomEvent('change');
-                deviated.dispatchEvent(event);
+
+                specimenId.value = '';
+                specimenId.dispatchEvent(event);
+
+                if(deviated) {
+                    deviated.checked = false;
+                    deviated.dispatchEvent(event);
+                }
             }
         });
     });
@@ -2108,6 +2101,7 @@ export const addEventBiospecimenCollectionFormEdit = (dt, biospecimenData) => {
 
 export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
+
     inputFields.forEach(input => {
         input.addEventListener('change', () => {
             const siteTubesList = getSiteTubesLists(biospecimenData)
@@ -2117,6 +2111,10 @@ export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
 
             let value = getValue(`${input.id}`).toUpperCase();
             if (value.length != 0) {
+
+                const tubeCheckBox = document.getElementById(input.id.replace('Id',''));
+
+                if(tubeCheckBox) input.required = tubeCheckBox.checked;
 
                 const masterID = value.substr(0, masterSpecimenIDRequirement.length);
                 const tubeID = value.substr(masterSpecimenIDRequirement.length + 1, totalCollectionIDLength);
@@ -2135,19 +2133,27 @@ export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
                 }
             }
         });
+
+        input.addEventListener('keyup', e => {
+            if (e.keyCode == 13) {
+                const inputFieldsEnabled = inputFields.filter(i => i.disabled === false);
+                const inputIndex = inputFieldsEnabled.indexOf(input);
+
+                if(inputIndex != inputFieldsEnabled.length - 1) {
+                    inputFieldsEnabled[inputIndex + 1].focus();
+                }
+            }
+        });
     });
 };
 
 
 export const createTubesForCollection = async (formData, biospecimenData) => {
     
+    if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+
     let siteTubesList = getSiteTubesLists(formData);
 
-    // Explicitely specify 2 biohazard bags
-    if(biospecimenData['787237543'] === undefined) biospecimenData['787237543'] = { '593843561': 353358909 }
-    if(biospecimenData['223999569'] === undefined) biospecimenData['223999569'] = { '593843561': 353358909 }
-
-    if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
     siteTubesList.forEach((dt) => {
         if(biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = {'593843561': 104430631};
     });
@@ -2185,6 +2191,8 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         const tubeCheckBox = document.getElementById(input.id.replace('Id',''));
 
         if(tubeCheckBox) input.required = tubeCheckBox.checked;
+
+        if(!cntd && value.length === 0) return;
         
         if(input.required && value.length !== totalCollectionIDLength) {
 
@@ -2419,7 +2427,6 @@ export const addEventFinalizeFormCntd = (specimenData) => {
 const finalizeHandler = async (biospecimenData, cntd) => {
     const masterSpecimenId = biospecimenData['820476880']
     let formData = {};
-    biospecimenData['260133861'] = document.getElementById('finalizedAdditionalNotes').value;
 
     if (cntd) {
         biospecimenData['410912345'] = 353358909;
@@ -2505,7 +2512,7 @@ export const addEventNavBarBoxManifest = (id, userName) => {
     });
 }
 
-export const addEventNavBarShippingManifest = (userName, tempChecked) => {
+export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
     const btn = document.getElementById('completePackaging');
     document.getElementById('completePackaging').addEventListener('click', async e => {
         e.stopPropagation();
@@ -2514,6 +2521,7 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
         let boxesToShip = [];
         let shipSetForage = []
         let currTable = document.getElementById('saveTable')
+        let tempCheckStatus = ""
         for (var r = 1; r < currTable.rows.length; r++) {
 
             let currCheck = currTable.rows[r].cells[0]
@@ -2523,17 +2531,34 @@ export const addEventNavBarShippingManifest = (userName, tempChecked) => {
             }
 
         }
-        if (document.getElementById('tempMonitorChecked')) {
-            tempChecked = document.getElementById('tempMonitorChecked').checked
+
+        if(!boxesToShip.length) {
+          await swal({
+            title: "Reminder",
+            icon: "warning",
+            text: "Please select Box(es) to review and ship",
+            className: "swal-no-box",
+            buttons: {
+              confirm: {
+                text: "OK",
+                value: true,
+                visible: true,
+                closeModal: true,
+                className: "swal-no-box-button",
+              },
+            },
+          });
+          return
         }
 
+        tempCheckStatus = tempCheckedEl.checked 
         // Push empty item with boxId and empty tracking number string
         // shipSetForage used to handle empty localforage or no box id match
         boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
         checkShipForage(shipSetForage,boxesToShip)
         
         //return box 1 info
-        await shippingManifest(boxesToShip, userName, tempChecked);
+        await shippingManifest(boxesToShip, userName, tempCheckStatus);
     });
 }
 
@@ -2556,12 +2581,101 @@ export const addEventNavBarTracking = (element, userName, hiddenJSON, tempChecke
         if (btn.classList.contains('active')) return;
         let keys = Object.keys(hiddenJSON).sort(compareBoxIds)
         for (let i = 0; i < keys.length; i++) {
-            hiddenJSON[keys[i]] = hiddenJSON[keys[i]]['specimens']
+            // hiddenJSON[keys[i]] = hiddenJSON[keys[i]]['specimens']
+            hiddenJSON[keys[i]] = {
+              "959708259" : hiddenJSON[keys[i]]["959708259"],
+              "specimens" : hiddenJSON[keys[i]]['specimens']
+          }
         }
         //return box 1 info
         shipmentTracking(hiddenJSON, userName, tempChecked);
     });
 }
+
+export const addEventTrimTrackingNums = () => {
+  let boxTrackingIdEls = Array.from(document.getElementsByClassName("boxTrackingId"))
+  let boxTrackingIdConfirmEls = Array.from(document.getElementsByClassName("boxTrackingIdConfirm"))
+  // Trim Function here
+  boxTrackingIdEls.forEach(el => el.addEventListener("input", e => {
+    let inputTrack = e.target.value.trim()
+    if(inputTrack.length > 12) {
+      e.target.value = inputTrack.slice(-12)
+    }
+  }))
+  boxTrackingIdConfirmEls.forEach(el => el.addEventListener("input", e => {
+    let inputTrackConfirm = e.target.value.trim()
+    if(inputTrackConfirm.length > 12) {
+      e.target.value = inputTrackConfirm.slice(-12)
+    }
+  }))
+}
+
+export const addEventPreventTrackNumPaste = () => {
+  let boxTrackingIdConfirmEls = Array.from(document.getElementsByClassName("boxTrackingIdConfirm"));
+  boxTrackingIdConfirmEls.forEach(el => {
+    el.addEventListener("paste", e => e.preventDefault())
+  })
+}
+
+export const addEventCheckValidTrackInputs = (hiddenJSON) => {
+
+  let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+
+  boxes.forEach(box => {
+    let input = document.getElementById(box+"trackingId").value.trim()
+    let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+    let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+    let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+    if(input !== inputConfirm) {
+      document.getElementById(box+"trackingId").classList.add("invalid")
+      document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+      inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
+      inputErrorMsg.textContent = "Please match " + box + " confirm input"
+    }
+  })
+
+  boxes.forEach(box => {
+    document.getElementById(box+"trackingId").addEventListener("input", e => {
+      let input = document.getElementById(box+"trackingId").value.trim()
+      let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+      let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+      let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+      if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
+        // add invalid red border
+        document.getElementById(box+"trackingId").classList.add("invalid")
+        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+        inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
+        inputErrorMsg.textContent = "Please match " + box + " confirm input"
+      } else if (input === inputConfirm) {
+        // remove invalid
+        document.getElementById(box+"trackingId").classList.remove("invalid")
+        document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
+        inputErrorMsg.textContent = ""
+        inputConfirmErrorMsg.textContent = ""
+      }
+    })
+    document.getElementById(box+"trackingIdConfirm").addEventListener("input",e => {
+      let input = document.getElementById(box+"trackingId").value.trim()
+      let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+      let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+      let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+      if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
+        // add invalid red border
+        document.getElementById(box+"trackingId").classList.add("invalid")
+        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+        inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
+        inputErrorMsg.textContent = "Please match " + box + " confirm input"
+      } else if (input === inputConfirm) {
+        // remove invalid
+        document.getElementById(box+"trackingId").classList.remove("invalid")
+        document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
+        inputErrorMsg.textContent = ""
+        inputConfirmErrorMsg.textContent = ""
+      }
+    })
+  })
+}
+
 export const populateSelectLocationList = async () => {
     let currSelect = document.getElementById('selectLocationList')
     let response = await getLocationsInstitute();
@@ -2582,22 +2696,22 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
     let bags = Object.keys(currBox);
     let rowCount = 1;
     let translateNumToType = {
-        "0001": "SST/Gold",
-        "0002": "SST/Gold",
+        "0001": "SST/Gold or Red",
+        "0002": "SST/Gold or Red",
         "0003": "Heparin/Green",
         "0004": "EDTA/Lavender",
         "0005": "ACD/Yellow",
         "0006": "Urine/Yellow",
         "0007": "Mouthwash Container",
-        "0011": "SST/Gold",
-        "0012": "SST/Gold",
+        "0011": "SST/Gold or Red",
+        "0012": "SST/Gold or Red",
         "0013": "Heparin/Green",
         "0014": "EDTA/Lavender",
         "0016": "Urine Cup",
-        "0021": "SST/Gold",
-        "0022": "SST/Gold",
-        "0031": "SST/Gold",
-        "0032": "SST/Gold",
+        "0021": "SST/Gold or Red",
+        "0022": "SST/Gold or Red",
+        "0031": "SST/Gold or Red",
+        "0032": "SST/Gold or Red",
         "0024": "EDTA/Lavender",
         "0050": "NA",
         "0051": "NA",
@@ -2652,43 +2766,83 @@ export const populateTrackingQuery = async (hiddenJSON) => {
     for(let box of shipData) {
       // if boxes has box id of localforage shipData push
       if(boxes.includes(box["boxId"])) {
-        shipping[box["boxId"]] = {"959708259":box["959708259"]}
+        shipping[box["boxId"]] = {"959708259":box["959708259"], "confirmTrackNum": box["confirmTrackNum"] }
       }
       else {
-        shipping[box["boxId"]] = {"959708259":""}
+        shipping[box["boxId"]] = {"959708259":"" , confirmTrackNum:"", }
       }
     }
     
     for(let i = 0; i < boxes.length; i++){
-        let result = boxes[i] && shipping?.[boxes[i]]?.["959708259"];
+        let trackNum = boxes[i] && shipping?.[boxes[i]]?.["959708259"];
+        let trackNumConfirm = boxes[i] && shipping?.[boxes[i]]?.["confirmTrackNum"];
         toBeInnerHTML +=`
-        <div class = "row">
-                            <div class="form-group" style="margin-top:30px">
-                                <label style="float:left;margin-top:5px">`+ boxes[i] + `</label>
-                                <div style="float:left;margin-left:30px">
-                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${result ?? ""}" />
+        <div class = "row" style="justify-content:space-around">
+                            <div class="form-group" style="margin-top:30px; width:380px;">
+                                <label style="float:left;margin-top:5px">`+'Enter / Scan Shipping Tracking Number for ' + `<span style="font-weight:600;display:block;">${boxes[i]}</span>` + `</label>
+                                <br>
+                                <div style="float:left;">
+                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${trackNum ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type tracking number" autocomplete="off"/>
+                                    <p style="font-size:.8rem; margin-top:.5rem;">Ex. 457424072905</p>
+                                    <p id="${boxes[i]}trackingIdErrorMsg" class="text-danger"></p>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top:30px; width:380px;">
+                                <label style="float:left;margin-top:5px">`+'Confirm Shipping Tracking Number for '+ `<span style="font-weight:600;display:block;">${boxes[i]}</span>` + `</label>
+                                <br>
+                                <div style="float:left;">
+                                    <input class="form-control boxTrackingIdConfirm" type="text" id="` + boxes[i] + 'trackingIdConfirm' + `" placeholder="Enter/Scan Tracking Number" value="${trackNumConfirm ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type to confirm the correct tracking number" autocomplete="off"/>
+                                    <p style="font-size:.8rem; margin-top:.5rem;">Ex. 457424072905</p>
+                                    <p id="${boxes[i]}trackingIdConfirmErrorMsg" class="text-danger"></p>
                                 </div>
                             </div>
                         </div>
                         <br>`
     }
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
+    
 }
 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
     document.getElementById('completeTracking').addEventListener('click', () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         let emptyField = false;
+        let trackingNumConfirmEls = Array.from(document.getElementsByClassName("invalid"))
+
+        if(trackingNumConfirmEls.length > 0) {
+          showNotifications({ title: 'Invalid Fields', body: 'Please add valid inputs to fields.' }, true)
+          return
+        }
+
         for (let i = 0; i < boxes.length; i++) {
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-            if (boxi == '') {
-                emptyField = true;
-                showNotifications({ title: 'Missing Fields', body: 'Please fill out required fields!' }, true)
+            let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+            if (boxi == '' || boxiConfirm == '') {
+                emptyField = true
+                showNotifications({ title: 'Missing Fields', body: 'Please enter in shipment tracking numbers'}, true)
+                return
             }
-            hiddenJSON[boxes[i]] = { '959708259': boxi, specimens: hiddenJSON[boxes[i]] }
+        
+            // if '959708259' exists update tracking number
+            if (hiddenJSON[boxes[i]].hasOwnProperty('959708259')) {
+              hiddenJSON[boxes[i]]['959708259'] = boxi
+            }
+            // if 'confirmTrackNum' exists update tracking number
+            if (hiddenJSON[boxes[i]].hasOwnProperty('confirmTrackNum')) {
+              hiddenJSON[boxes[i]]['confirmTrackNum'] = boxiConfirm 
+            }
+            // if specimens exists update, else add following key/values
+            if (hiddenJSON[boxes[i]].hasOwnProperty('specimens')) {
+              hiddenJSON[boxes[i]]['specimens'] = hiddenJSON[boxes[i]]['specimens'] 
+            } 
+            else {
+              hiddenJSON[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: hiddenJSON[boxes[i]] }
+            }  
         }
+
         if (emptyField == false) {
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
+            addEventSaveContinue(hiddenJSON)
             let shipmentCourier = document.getElementById('courierSelect').value;
             finalShipmentTracking(hiddenJSON, userName, tempChecked, shipmentCourier);
         }
@@ -2701,20 +2855,30 @@ export const addEventSaveButton = async (hiddenJSON) => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         for (let i = 0; i < boxes.length; i++) {
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-            hiddenJSON[boxes[i]] = {'959708259':boxi, specimens:hiddenJSON[boxes[i]]}
+            let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+            // if '959708259' exists update tracking number
+            if (hiddenJSON[boxes[i]].hasOwnProperty('959708259')) {
+              hiddenJSON[boxes[i]]['959708259'] = boxi
+            }
+            // if 'confirmTrackNum' exists update tracking number
+            if (hiddenJSON[boxes[i]].hasOwnProperty('confirmTrackNum')) {
+              hiddenJSON[boxes[i]]['confirmTrackNum'] = boxiConfirm 
+            }
+            // if specimens exists update, else add following key/values
+            if (hiddenJSON[boxes[i]].hasOwnProperty('specimens')) {
+              hiddenJSON[boxes[i]]['specimens'] = hiddenJSON[boxes[i]]['specimens'] 
+            } 
+            else {
+              hiddenJSON[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: hiddenJSON[boxes[i]] }
+            }  
         }
         
         let shippingData = []
 
-        let trackingNumbers = {}
-        let boxNames = Object.keys(hiddenJSON);
-        for (let i = 0; i < boxNames.length; i++) {
-            trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
-        }
-
         for(let i = 0; i < boxes.length; i++){
           let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-            shippingData.push({ "959708259": boxi, "boxId":boxes[i]})
+          let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+            shippingData.push({ "959708259": boxi, confirmTrackNum: boxiConfirm, "boxId":boxes[i]})
         }
         localforage.setItem("shipData",shippingData)
 
@@ -2725,6 +2889,38 @@ export const addEventSaveButton = async (hiddenJSON) => {
           timer: 1600,
         })
     })
+}
+
+export const addEventSaveContinue = (hiddenJSON) => {
+      let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+      for (let i = 0; i < boxes.length; i++) {
+          let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
+          let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+          // if '959708259' exists update tracking number
+          if (hiddenJSON[boxes[i]].hasOwnProperty('959708259')) {
+            hiddenJSON[boxes[i]]['959708259'] = boxi
+          }
+          // if 'confirmTrackNum' exists update tracking number
+          if (hiddenJSON[boxes[i]].hasOwnProperty('confirmTrackNum')) {
+            hiddenJSON[boxes[i]]['confirmTrackNum'] = boxiConfirm 
+          }
+          // if specimens exists update, else add following key/values
+          if (hiddenJSON[boxes[i]].hasOwnProperty('specimens')) {
+            hiddenJSON[boxes[i]]['specimens'] = hiddenJSON[boxes[i]]['specimens'] 
+          } 
+          else {
+            hiddenJSON[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: hiddenJSON[boxes[i]] }
+          }  
+      }
+      
+      let shippingData = []
+
+      for(let i = 0; i < boxes.length; i++){
+        let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
+        let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+          shippingData.push({ "959708259": boxi, confirmTrackNum: boxiConfirm, "boxId":boxes[i]})
+      }
+      localforage.setItem("shipData",shippingData)
 }
 
 export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked, shipmentCourier) => {
@@ -2748,13 +2944,20 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         }
         if (finalizeTextField.value.toUpperCase() === userName.toUpperCase()) {
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
-            localforage.removeItem("shipData")
-            await ship(boxes, shippingData, trackingNumbers);
+            let shipSent = await ship(boxes, shippingData, trackingNumbers);
+            console.log(shipSent)
             document.getElementById('finalizeModalCancel').click();
             if (tempChecked) {
                 updateNewTempDate();
             }
-            startShipping(userName);
+            if(shipSent.code === 200) {
+              if (window.confirm("This shipment is now finalized; no other changes can be made")) {
+                localforage.removeItem("shipData")
+                startShipping(userName) 
+              } else startShipping(userName) 
+            }
+            // Add error logic here
+            else return
         }
         else {
             let errorMessage = document.getElementById('finalizeModalError');
@@ -2774,7 +2977,7 @@ export const populateFinalCheck = (hiddenJSON) => {
         let numTubes = 0;
         let numBags = specimenObj.hasOwnProperty('orphans') ? keys.length - 1 : keys.length;
         for (let j = 0; j < keys.length; j++) {
-            numTubes += specimenObj[keys[j]]['arrElements'].length;
+            numTubes += specimenObj[keys[j]]?.['arrElements'].length;
         }
         let row = table.insertRow(i + 1);
         row.insertCell(0).innerHTML = currBox;
@@ -2865,23 +3068,6 @@ export const addEventClearScannedBarcode = (id) => {
         document.getElementById(clearInputBtn.dataset.barcodeInput).value = '';
         clearInputBtn.hidden = true;
     });
-}
-
-export const addEventCntdToCollectProcess = () => {
-    const btns = document.getElementsByClassName('continue-collect-process');
-    Array.from(btns).forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const connectID = btn.dataset.connectId;
-            const collectionID = btn.dataset.collectionId;
-            let query = `connectId=${parseInt(connectID)}`;
-            showAnimation();
-            const response = await findParticipant(query);
-            const data = response.data[0];
-            const specimenData = (await searchSpecimen(collectionID)).data;
-            hideAnimation();
-            tubeCollectedTemplate(data, specimenData);
-        });
-    })
 }
 
 export const populateCourierBox = async () => {
@@ -3019,22 +3205,22 @@ export const populateReportManifestTable = (currPage) => {
     let bags = Object.keys(currPage['bags']);
     let rowCount = 1;
     let translateNumToType = {
-        "0001": "SST/Gold",
-        "0002": "SST/Gold",
+        "0001": "SST/Gold or Red",
+        "0002": "SST/Gold or Red",
         "0003": "Heparin/Green",
         "0004": "EDTA/Lavender",
         "0005": "ACD/Yellow",
         "0006": "Urine/Yellow",
         "0007": "Mouthwash Container",
-        "0011": "SST/Gold",
-        "0012": "SST/Gold",
+        "0011": "SST/Gold or Red",
+        "0012": "SST/Gold or Red",
         "0013": "Heparin/Green",
         "0014": "EDTA/Lavender",
         "0016": "Urine Cup",
-        "0021": "SST/Gold",
-        "0022": "SST/Gold",
-        "0031": "SST/Gold",
-        "0032": "SST/Gold",
+        "0021": "SST/Gold or Red",
+        "0022": "SST/Gold or Red",
+        "0031": "SST/Gold or Red",
+        "0032": "SST/Gold or Red",
         "0024": "EDTA/Lavender",
         "0050": "NA",
         "0051": "NA",

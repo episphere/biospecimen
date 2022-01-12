@@ -1,5 +1,5 @@
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventAddBox,addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox, addEventSaveButton} from "./../events.js";
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackNumPaste, addEventSaveContinue} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 const conversion = {
@@ -68,12 +68,12 @@ export const startShipping = async (userName) => {
         
         <div class="row">
             <div class="col-lg">
-                Choose your shipping location
+                <h5>Choose your shipping location</h5>
             </div>
         </div>
         <div class="row" style="margin-bottom:10px">
             <div class = "col-lg">
-                <select class="selectpicker" id="selectLocationList">
+                <select class="selectpicker" id="selectLocationList" style="padding:.25rem">
                 </select>
             </div>
         </div>
@@ -82,10 +82,12 @@ export const startShipping = async (userName) => {
             <div class="col-lg" style="padding: 0;margin: 0;">
                 <div class="row form-row" style="padding-left:0px;margin:0;">
                     <form id="addSpecimenForm" method="POST" style="width:100%;">
-                      <label for="masterSpecimenId">To start packing the shipping boxes, scan specimen bag ID or Full Specimen ID here:</label>
+                      <label for="masterSpecimenId">
+                      <h5>To start packing the shipping boxes, scan specimen bag ID or Full Specimen ID here:</h5>
+                      </label>
                         <div class="form-group">
                           <div class="input-group">
-                            <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan"/>
+                            <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan" autocomplete="off"/>
                             <div class="input-group-append">
                               <button class="btn btn-primary" aria-label="Enter Specimen ID" type="submit">Enter</button>
                             </div>
@@ -103,8 +105,8 @@ export const startShipping = async (userName) => {
         <div class="row">
     <div class="col-5">
 
-    <h3 style="text-align:center; margin-bottom:1rem;">Available Collections</h3>
-    <div class="panel panel-default" style="border-style:solid;height:400px;border-width:1px;overflow:auto;" id="specimenPanel">
+    <h4 style="text-align:center; margin-bottom:1rem;">Available Collections</h4>
+    <div class="panel panel-default" style="border-style:solid;height:550px;border-width:1px;overflow:auto;" id="specimenPanel">
             <table class = "table" style="width: 100%;margin-bottom:0px;" id="specimenList" >
                 <tr>
                     <th>Specimen Bag ID</th>
@@ -113,24 +115,20 @@ export const startShipping = async (userName) => {
             </table>
     </div>
 
-    <h3 style="margin:1rem auto; text-align:center; display:none;" id="orphanHeader">Location Unknown</h3>
-    <div class="panel panel-default" style="border-style:solid;height:150px;border-width:1px;overflow:auto;" id="orphansPanel">
+    <div class="panel panel-default" style="position:absolute; border-style:solid;height:0px;border-width:1px;overflow:auto; top:-100000px; " id="orphansPanel">
             <table class = "table" style="width: 100%; margin-bottom:0px;" id="orphansList" >
                 
             </table>
     </div>
     </div>
     <div class="col-7">
-        <div class="d-flex justify-content-between align-items-center" style="margin-bottom:.625rem;">
-            <div style="width:25%;">
-                <select class="selectpicker" id="selectBoxList">
-                </select>
+        <div style="display:flex; justify-content:space-evenly; align-items:center; margin-bottom:.625rem;">
+            <div>
+                <h4>View Shipping Box Contents</h4>
             </div>
             <div>
-                <h3 style="text-align:center">Shipping Box Contents</h3>
-            </div>
-            <div style="width:25%;">
-                <button type="button" class="btn btn-primary" style="float:right;" id="addBoxButton">Create New Box</button>
+                <select class="selectpicker" id="selectBoxList" name="box-ids" style="padding:0.25rem">
+                </select>
             </div>
         </div>
         <div class="row">
@@ -155,8 +153,14 @@ export const startShipping = async (userName) => {
                 <div class="modal-body" id="shippingModalBody">
                 </div>
                 <div class="modal-body"> 
-                    <h4>Select Box<h4>
-                    <select class="selectpicker" id="shippingModalChooseBox"></select>
+                    <h4 style="margin-bottom:0.8rem">Select Box or Create New Box</h4>
+                    <div id="create-box-success" class="alert alert-success" role="alert" style="display:none;">
+                      New Box has been created
+                    </div>
+                    <div id="create-box-error" class="alert alert-danger" role="alert" style="display:none;">
+                      Please add a specimen or specimens to last box
+                    </div>
+                    <select class="selectpicker" id="shippingModalChooseBox" style="font-size:1.4rem;"></select>
                     <button type="button" class="btn btn-primary" id="modalAddBoxButton">Create New Box</button>
                     
                 </div>
@@ -177,40 +181,33 @@ export const startShipping = async (userName) => {
         </p>
     </div>
     <div id="edit">
-        <div class="row">
-          <div class="col-5 no-gutters">
-            <h3 style="text-align:center;">Boxes in Process</h3>
+        <div class="row" style="margin-bottom:.5rem">
+          <div class="col-9 no-gutters">
+            <h4 style="text-align:start;">Select one or more boxes to ship</h4>
+          </div>
+          <div class="col-3 no-gutters">
+          <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging" style="margin:auto;display:block;">Continue to Shipping Manifest</button>
           </div>
         </div>
-        
-            <table  class="table" style="width:100%;border:1px solid;" id = "saveTable">
+        <div style="border: 1px solid black; overflow: auto; margin-bottom: 0.5rem; height: 400px;">
+            <table  class="table table-bordered" style="width:100%;border:1px solid;" id = "saveTable">
                 <tr>
-                    <th>To Ship</th>
-                    <th>Started</th>
-                    <th>Last Modified</th>
-                    <th>Box Number</th>
-                    <th>Contents</th>
-                    <th>View/Print Box Manifest</th>
+                    <th style="border-bottom:1px solid; ">To Ship</th>
+                    <th style="border-bottom:1px solid; ">Started</th>
+                    <th style="border-bottom:1px solid; ">Last Modified</th>
+                    <th style="border-bottom:1px solid; ">Box Number</th>
+                    <th style="border-bottom:1px solid; ">Contents</th>
+                    <th style="border-bottom:1px solid; ">View/Print Box Manifest</th>
                 </tr>
             </table>
+            </div>
     </div>
     <div class="row" id="checkForTemp">
         <div class="col-lg">
-            <input type="checkbox" id="tempMonitorChecked" style="transform: scale(1.5); margin-right:10px; margin-top:5px;">
-            <label for="tempMonitorChecked">Temp Monitor is included in this shipment</label><br>
+            <input type="checkbox" id="tempMonitorChecked" style="transform: scale(1.5); margin-right:10px; margin-top:5px; margin-left:5px;">
+            <label for="tempMonitorChecked">Temperature Monitor is included in this shipment</label><br>
         </div>
     </div>
-    
-    <div class="row" style="margin-top:50px;margin-bottom:50px;">
-            <div style="float: left;width: 33%;" id="boxManifestCol1">
-            </div>
-            <div style="float: left;width: 33%;">
-            </div>
-            <div style="float:left;width: 33%;" id="boxManifestCol3">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging" style="margin:auto;display:block;">Review/Ship</button>
-            </div>
-        </div>
-
     `;
     /*var x = document.getElementById("specimenList");
     var option = document.createElement("option");
@@ -229,6 +226,7 @@ export const startShipping = async (userName) => {
     await populateSpecimensList(hiddenJSON1);
 
     let currLocation = document.getElementById('selectLocationList').value;
+    let tempMonitorCheckedEl = document.getElementById('tempMonitorChecked')
 
     response = await getBoxesByLocation(currLocation);
     boxJSONS = response.data;
@@ -240,8 +238,7 @@ export const startShipping = async (userName) => {
     await populateBoxSelectList(hiddenJSONLocation,userName);
     await populateTempNotification();
     addEventNavBarShipment("navBarShippingDash", userName);
-    addEventNavBarShippingManifest(userName, document.getElementById('tempMonitorChecked').checked);
-    addEventAddBox(userName);
+    addEventNavBarShippingManifest(userName, tempMonitorCheckedEl);
     addEventBoxSelectListChanged();
     addEventNavBarBoxManifest("navBarBoxManifest", userName)
     addEventChangeLocationSelect(userName);
@@ -399,7 +396,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="printBox">Print Full Manifest</button>
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging">Continue</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging">Continue to Assign Tracking Number</button>
             </div>
         </div>
         
@@ -480,18 +477,16 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
         <div id="shippingHiddenTable" style="display:none">
         {}
         </div>
-        <div class="row" style="margin-top:40px">
+        <div class="row" style="margin-top:40px;">
             <div class="col-lg">
-                Choose Shipment Courier
-                </br>
-                <select name="courier" id="courierSelect">
+                <label for="courierSelect" style="font-size:1.4rem; margin-bottom:1rem;">Choose Shipment Courier</label>
+                <select name="courier" id="courierSelect" style="padding:.2rem; display:block;">
                 </select>
             </div>
         </div>
         <div class="row" style="margin-top:40px">
             <div class="col-lg">
-                Shipment Tracking Numbers:
-                </br>
+                <p style="margin:0; font-size:1.4rem;">Enter Shipment Tracking Numbers:</p>
                 <div class="col-lg" id="forTrackingNumbers">
                     
                 </div>
@@ -506,7 +501,7 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveTracking" style="margin-right:.5rem;">Save</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completeTracking">Continue</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completeTracking">Save and Continue</button>
             </div>
         </div>
 
@@ -530,9 +525,12 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
     //addEventReturnToShippingManifest('returnToShipping', hiddenJSON, userName, tempCheckChecked)
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventReturnToShippingManifest('navBarShippingManifest', hiddenJSON, userName, tempCheckChecked)
-    populateTrackingQuery(hiddenJSON);
-    addEventCompleteButton(hiddenJSON, userName, tempCheckChecked);
+    await populateTrackingQuery(hiddenJSON);
+    addEventTrimTrackingNums()
+    addEventPreventTrackNumPaste()
+    addEventCheckValidTrackInputs(hiddenJSON)
     addEventSaveButton(hiddenJSON);
+    addEventCompleteButton(hiddenJSON, userName, tempCheckChecked);
     //addEventCompleteShippingButton(hiddenJSON);
     //addEventBackToSearch('navBarShippingDash');
     // addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
@@ -579,7 +577,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToTracking">Back to Tracking</button>
             </div>
             <div style="float: left;width: 33%;">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Home</button>
+                 
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
                 <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#finalizeModal" id="completeShippingButton">Finalize</button>
@@ -627,7 +625,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
     
-    addEventNavBarShipment("returnToPackaging", userName);
+ 
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarTracking("returnToTracking", userName, hiddenJSON, tempChecked)
     addEventNavBarTracking("navBarSummaryAndReview", userName, hiddenJSON, tempChecked)

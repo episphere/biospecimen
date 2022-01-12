@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates, getWorflow, isDeviceiPad, replaceDateInputWithMaskedInput } from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates, getWorflow, isDeviceMobile, replaceDateInputWithMaskedInput } from "./../shared.js"
 import {  addGoToCheckInEvent, addEventCheckInCompleteForm, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
@@ -97,7 +97,9 @@ export const searchTemplate = (goToSpecimenSearch) => {
     addEventSearchForm3();
     addEventSearchForm4();
     addEventNavBarSpecimenSearch();
-    isDeviceiPad && replaceDateInputWithMaskedInput(document.getElementById('dob'));
+    if(isDeviceMobile) {
+    replaceDateInputWithMaskedInput(document.getElementById('dob'));
+    }
     //addEventNavBarShipment();
     if(goToSpecimenSearch) document.getElementById('navBarSpecimenSearch').click();
 }
