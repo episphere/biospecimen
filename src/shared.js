@@ -294,6 +294,37 @@ export const errorMessage = (id, msg, focus, offset) => {
     if(focus) currentElement.focus();
 }
 
+export const shippingPrintManifestReminder = () => {
+  const button = document.createElement('button');
+    button.dataset.target = '#biospecimenModal';
+    button.dataset.toggle = 'modal';
+
+    document.getElementById('root').appendChild(button);
+    button.click();
+    document.getElementById('root').removeChild(button);
+    const header = document.getElementById('biospecimenModalHeader');
+    const body = document.getElementById('biospecimenModalBody');
+    header.innerHTML = `<h5 class="modal-title"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>`;
+    body.innerHTML = `
+        <div class="row">
+            <div class="col">
+                <p>Print Reminder: Have you printed the shipping manifest?<p>
+            </div>
+        </div>
+        </br></br>
+        <div class="row">
+            <div class="ml-auto" style="margin-right: 1rem;">
+                <button type="button" class="btn btn-success" data-dismiss="modal" aria-label="Close">Yes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">No</button>
+            </div>
+        </div>
+`;
+
+}
+
 export const removeAllErrors = () => {
     const elements = document.getElementsByClassName('form-error');
     Array.from(elements).forEach(element => {
@@ -1123,23 +1154,6 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
       await localforage.setItem("shipData", shipSetForage)
   }
 }
-
-/* 
-Print Reminder Process:
-
-Localforage route
-1. Create Local Forage Checker for reminder
-2. Check if all boxes
-3.
-4.
-
-no localforage (less desired approach)
-1. Add a modal to Continue to Assign Tracking Number's click event listener 
-2. Create a custom modal with ok and close buttons
-3.
-4.
-
-*/
 
 export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl) => {
   if (typeof alertState === "boolean") {

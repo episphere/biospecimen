@@ -2469,6 +2469,22 @@ export const addEventNavBarShipment = (id, userName) => {
     });
 }
 
+export const addEventShipPrintManifest = (id) => {
+  const btn = document.getElementById(id)
+  btn.addEventListener('click', e => {
+    console.log('clicked',e)
+    window.print()
+    if(e.target.hasAttribute("print-manifest")) {
+      // console.log("true",e.target.hasAttribute("print-manifest"))
+      return
+    } else {
+      // console.log("false",e.target.hasAttribute("print-manifest"))
+      e.target.setAttribute("print-manifest","")
+    }
+  })
+
+}
+
 
 export const addEventNavBarBoxManifest = (id, userName) => {
     const btn = document.getElementById(id);
@@ -2530,7 +2546,7 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
         // shipSetForage used to handle empty localforage or no box id match
         boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
         checkShipForage(shipSetForage,boxesToShip)
-        
+
         //return box 1 info
         await shippingManifest(boxesToShip, userName, tempCheckStatus);
     });
