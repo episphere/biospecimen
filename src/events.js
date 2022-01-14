@@ -425,7 +425,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         }
     }
 
-    document.getElementById("shippingModalTable").innerHTML = `
+    document.getElementById('shippingModalBody').innerHTML = `
     <table class="table" id="shippingModalTable">
         <thead>
             <tr>
