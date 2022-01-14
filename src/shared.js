@@ -1124,6 +1124,14 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
   }
 }
 
+export const sortBiospecimensList = (biospecimensList, tubeOrder) => {
+  const bioArr = []
+  // push list of unordered ids
+  biospecimensList.forEach(id => { bioArr.push({"tubeId": id}) })
+  // sort unordered id list with custom tube order sort
+  bioArr.sort((a, b) => tubeOrder.indexOf(a.tubeId) - tubeOrder.indexOf(b.tubeId))
+  return bioArr.map(item => item.tubeId)
+}
 export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl) => {
   if (typeof alertState === "boolean") {
     if (alertState) {
