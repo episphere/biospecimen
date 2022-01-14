@@ -1790,7 +1790,6 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
         formData['962267121'] = new Date().toISOString();
-        formData['135591601'] = 353358909;
         
         let query = `connectId=${parseInt(form.dataset.connectId)}`;
         
