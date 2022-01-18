@@ -316,12 +316,12 @@ export const shippingPrintManifestReminder = (toDisplayJSON, userName, currCheck
                 <div style="display:flex; justify-content:center; margin-bottom:1rem;">
                   <i class="fas fa-exclamation-triangle fa-5x" style="color:#ffc107"></i>
                 </div>
-                <p style="text-align:center; font-size:1.4rem">Print Reminder: Have you printed the shipping manifest?</p>
+                <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; "><span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Print Reminder</span> Have you printed the shipping manifest?</p>
             </div>
         </div>
         <div class="row" style="display:flex; justify-content:center;">
-          <button id="shipManifestConfirm" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" style="margin-right:4%; padding:6px 18px;">Yes</button>
-          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" aria-label="Close" style="padding:6px 18px;">No</button>
+          <button id="shipManifestConfirm" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" style="margin-right:4%; padding:6px 25px;">Yes</button>
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" aria-label="Close" style="padding:6px 25px;">No</button>
         </div>
 `;
   const shipManifestConfirmButton = document.getElementById("shipManifestConfirm")
