@@ -451,11 +451,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
             currChecked = document.getElementById('tempBox').value;
         }
         //return box 1 info
-        
-        console.log(printManifestClicked)
         if(printManifestClicked) {
-          //  Add modal code here 
-          // shipmentTracking(toDisplayJSON, userName, currChecked);
           shippingPrintManifestReminder(toDisplayJSON, userName, currChecked)
         } else {
           shipmentTracking(toDisplayJSON, userName, currChecked);

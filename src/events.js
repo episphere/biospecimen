@@ -2521,7 +2521,6 @@ export const addEventShipPrintManifest = (id) => {
   })
 }
 
-
 export const addEventNavBarBoxManifest = (id, userName) => {
     const btn = document.getElementById(id);
     document.getElementById(id).addEventListener('click', e => {
@@ -2582,7 +2581,6 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
         // shipSetForage used to handle empty localforage or no box id match
         boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
         checkShipForage(shipSetForage,boxesToShip)
-
         //return box 1 info
         await shippingManifest(boxesToShip, userName, tempCheckStatus);
     });
