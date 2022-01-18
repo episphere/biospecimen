@@ -1,5 +1,5 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackNumPaste, addEventSaveContinue} from "./../events.js";
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation, shippingPrintManifestReminder} from "./../shared.js"
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackNumPaste, addEventSaveContinue, addEventShipPrintManifest} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 const conversion = {
@@ -393,7 +393,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Return to Packaging</button>
             </div>
             <div style="float: left;width: 33%;">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="printBox">Print Full Manifest</button>
+                <button type="button" class="btn btn-primary print-manifest" data-dismiss="modal" id="printBox">Print Full Manifest</button>
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging">Continue to Assign Tracking Number</button>
@@ -432,9 +432,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
     addEventNavBarShipment("navBarShippingDash", userName);
     await populateTempCheck();
     const btn = document.getElementById('completePackaging');
-    document.getElementById('printBox').addEventListener('click', e => {
-        window.print();
-    });
+    addEventShipPrintManifest('printBox')
     addEventNavBarShipment('returnToPackaging', userName);
 
     
@@ -448,11 +446,16 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
         }
         //let currChecked = document.getElementById('tempMonitorChecked').checked;
         let currChecked = false;
+        let printManifestClicked = document.getElementById('printBox').classList.contains('print-manifest')
         if(tempMonitorThere){
             currChecked = document.getElementById('tempBox').value;
         }
         //return box 1 info
-        shipmentTracking(toDisplayJSON, userName, currChecked);
+        if(printManifestClicked) {
+          shippingPrintManifestReminder(toDisplayJSON, userName, currChecked)
+        } else {
+          shipmentTracking(toDisplayJSON, userName, currChecked);
+        }
     });
     //addEventNavBarShipment("navBarShippingDash");
     //addEventSelectParticipantForm();
