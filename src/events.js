@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -186,7 +186,7 @@ export const addEventAddSpecimenToBox = (userName) => {
                                 <span aria-hidden="true">&times;</span>
                             </button>`;
 
-        body.innerHTML = `
+        /*body.innerHTML = `
         <table class="table" id="shippingModalTable">
             <thead>
                 <tr>
@@ -196,7 +196,7 @@ export const addEventAddSpecimenToBox = (userName) => {
                 </tr>
             </thead>
         </table>
-        `;
+        `;*/
         let masterIdSplit = masterSpecimenId.split(/\s+/);
         let foundInOrphan = false;
         //get all ids from the hidden
@@ -205,6 +205,32 @@ export const addEventAddSpecimenToBox = (userName) => {
         let biospecimensList = []
         let tableIndex = -1;
         let foundInShipping = false;
+
+        // Modify to change tube order, tube ordered by color
+        let tubeOrder = [      
+        "0001", //"SST/Gold or Red"
+        "0002", //"SST/Gold or Red"
+        "0011", //"SST/Gold or Red"
+        "0012", //"SST/Gold or Red"
+        "0021", //"SST/Gold or Red"
+        "0022", //"SST/Gold or Red"
+        "0031", //"SST/Gold or Red"
+        "0032", //"SST/Gold or Red"
+        "0003", //"Heparin/Green"
+        "0013", //"Heparin/Green"
+        "0004", //"EDTA/Lavender"
+        "0014", //"EDTA/Lavender"
+        "0024", //"EDTA/Lavender"
+        "0005", //"ACD/Yellow"
+        "0006", //"Urine/Yellow"
+        "0016", //"Urine Cup"
+        "0007", //"Mouthwash Container"
+        "0050", //"NA"
+        "0051", //"NA"
+        "0052", //"NA"
+        "0053", //"NA"
+        "0054", //"NA
+      ] 
         for (let i = 1; i < shippingTable.rows.length; i++) {
             let currRow = shippingTable.rows[i];
             if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId) {
@@ -235,8 +261,8 @@ export const addEventAddSpecimenToBox = (userName) => {
             return
         }
 
-        biospecimensList.sort();
-        await createShippingModalBody(biospecimensList, masterSpecimenId, foundInOrphan)
+        const biospecimensListByType = sortBiospecimensList(biospecimensList, tubeOrder)
+        await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan)
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
 
@@ -291,7 +317,8 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         hiddenJSON[box['132929440']] = box['bags']
     }
 
-    let tubeTable = document.getElementById("shippingModalTable")
+    //let tubeTable = document.getElementById("shippingModalTable")
+    let tubeTable = document.createElement('table');
     let currSplit = masterBiospecimenId.split(/\s+/);
     let currBag = [];
     let empty = true;
@@ -397,6 +424,19 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
             })
         }
     }
+
+    document.getElementById('shippingModalBody').innerHTML = `
+    <table class="table" id="shippingModalTable">
+        <thead>
+            <tr>
+                <th>Full Specimen ID</th>
+                <th>Type/Color</th>
+                <th style="text-align:center;">Sample Present</th>
+            </tr>
+        </thead>
+        ${tubeTable.innerHTML}
+    </table>
+    `;
     populateModalSelect(hiddenJSON)
     if (empty) {
         showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' }, true)
@@ -404,6 +444,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         hideAnimation();
         return
     }
+    
 }
 
 export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrphan, userName) => {
@@ -435,7 +476,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         let nameSplit = userName.split(' ');
         let firstName = nameSplit[0] ? nameSplit[0] : '';
         let lastName = nameSplit[1] ? nameSplit[1] : '';
-        let checkedSpecimensArr = Array.from(document.getElementsByClassName("samplePresentCheckbox")).filter(item => item.hasAttribute("checked"))
+        let checkedSpecimensArr = Array.from(document.getElementsByClassName("samplePresentCheckbox")).filter(item => item.checked)
         boxId = document.getElementById('shippingModalChooseBox').value;
 
         if (isOrphan) {
