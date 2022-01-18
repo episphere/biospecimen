@@ -3161,7 +3161,8 @@ export const populateBoxTable = async (page, filter) => {
 
     }
     hideAnimation();
-
+    debugger;
+    return
 }
 
 export const addEventViewManifestButton = (buttonId, currPage) => {
