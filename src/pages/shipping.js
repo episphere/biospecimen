@@ -393,7 +393,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Return to Packaging</button>
             </div>
             <div style="float: left;width: 33%;">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="printBox">Print Full Manifest</button>
+                <button type="button" class="btn btn-primary print-manifest" data-dismiss="modal" id="printBox">Print Full Manifest</button>
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging">Continue to Assign Tracking Number</button>
@@ -446,7 +446,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
         }
         //let currChecked = document.getElementById('tempMonitorChecked').checked;
         let currChecked = false;
-        let printManifestClicked = document.getElementById('printBox').hasAttribute('print-manifest')
+        let printManifestClicked = document.getElementById('printBox').classList.contains('print-manifest')
         if(tempMonitorThere){
             currChecked = document.getElementById('tempBox').value;
         }
@@ -456,7 +456,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
         if(printManifestClicked) {
           //  Add modal code here 
           // shipmentTracking(toDisplayJSON, userName, currChecked);
-          shippingPrintManifestReminder()
+          shippingPrintManifestReminder(toDisplayJSON, userName, currChecked)
         } else {
           shipmentTracking(toDisplayJSON, userName, currChecked);
         }

@@ -2515,15 +2515,10 @@ export const addEventShipPrintManifest = (id) => {
   btn.addEventListener('click', e => {
     console.log('clicked',e)
     window.print()
-    if(e.target.hasAttribute("print-manifest")) {
-      // console.log("true",e.target.hasAttribute("print-manifest"))
-      return
-    } else {
-      // console.log("false",e.target.hasAttribute("print-manifest"))
-      e.target.setAttribute("print-manifest","")
-    }
+    if(e.target.classList.contains("print-manifest")) {
+      e.target.classList.remove("print-manifest")
+    } else return
   })
-
 }
 
 

@@ -1,5 +1,6 @@
 import { userNavBar, adminNavBar, nonUserNavBar } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
+import { shipmentTracking } from "./pages/shipping.js"
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
 import { workflows } from "./tubeValidation.js";
@@ -294,7 +295,7 @@ export const errorMessage = (id, msg, focus, offset) => {
     if(focus) currentElement.focus();
 }
 
-export const shippingPrintManifestReminder = () => {
+export const shippingPrintManifestReminder = (toDisplayJSON, userName, currChecked) => {
   const button = document.createElement('button');
     button.dataset.target = '#biospecimenModal';
     button.dataset.toggle = 'modal';
@@ -304,25 +305,29 @@ export const shippingPrintManifestReminder = () => {
     document.getElementById('root').removeChild(button);
     const header = document.getElementById('biospecimenModalHeader');
     const body = document.getElementById('biospecimenModalBody');
+    header.style.borderBottom = 0;
     header.innerHTML = `<h5 class="modal-title"></h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="font-size:2rem;">
                             <span aria-hidden="true">&times;</span>
                         </button>`;
     body.innerHTML = `
         <div class="row">
             <div class="col">
-                <p>Print Reminder: Have you printed the shipping manifest?<p>
+                <div style="display:flex; justify-content:center; margin-bottom:1rem;">
+                  <i class="fas fa-exclamation-triangle fa-5x" style="color:#ffc107"></i>
+                </div>
+                <p style="text-align:center; font-size:1.4rem">Print Reminder: Have you printed the shipping manifest?</p>
             </div>
         </div>
-        </br></br>
-        <div class="row">
-            <div class="ml-auto" style="margin-right: 1rem;">
-                <button type="button" class="btn btn-success" data-dismiss="modal" aria-label="Close">Yes</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">No</button>
-            </div>
+        <div class="row" style="display:flex; justify-content:center;">
+          <button id="shipManifestConfirm" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" style="margin-right:4%; padding:6px 18px;">Yes</button>
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" aria-label="Close" style="padding:6px 18px;">No</button>
         </div>
 `;
-
+  const shipManifestConfirmButton = document.getElementById("shipManifestConfirm")
+  shipManifestConfirmButton.addEventListener("click", e => {
+    shipmentTracking(toDisplayJSON, userName, currChecked);
+  })
 }
 
 export const removeAllErrors = () => {
