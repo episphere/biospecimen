@@ -9,6 +9,7 @@ import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength } from './tubeValidation.js';
 import { checkOutScreen } from './pages/checkout.js';
+import fieldToConceptIdMapping from './fieldToConceptIdMapping.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -3136,6 +3137,8 @@ export const populateBoxTable = async (page, filter) => {
             numTubes += currPage['bags'][keys[j]]['arrElements'].length;
         }
         let shippedDate = ''
+        let shipReceived = ''
+
         if (currPage.hasOwnProperty('656548982')) {
             let currentdate = new Date(currPage['656548982']);
             let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
@@ -3148,12 +3151,20 @@ export const populateBoxTable = async (page, filter) => {
             + currentdate.getMinutes() + ampm;
 */
         }
+
+        if(currPage.hasOwnProperty('baseline')) {
+          shipReceived = (currPage['baseline'][fieldToConceptIdMapping.siteShipmentReceived] === fieldToConceptIdMapping.yes) ? "Yes" : "No"
+        }
+        else {
+          shipReceived = "No"
+        }
+        
         currRow.insertCell(0).innerHTML = currPage.hasOwnProperty('959708259') ? currPage['959708259'] : '';
         currRow.insertCell(1).innerHTML = shippedDate;
         currRow.insertCell(2).innerHTML = currPage['560975149'];
         currRow.insertCell(3).innerHTML = currPage['132929440'];
         currRow.insertCell(4).innerHTML = '<button type="button" class="button" id="reportsViewManifest' + i + '">View manifest</button>';
-        currRow.insertCell(5).innerHTML = '';
+        currRow.insertCell(5).innerHTML = shipReceived
         currRow.insertCell(6).innerHTML = '';
         currRow.insertCell(7).innerHTML = currPage.hasOwnProperty('') ? currPage[''] : '';
         currRow.insertCell(8).innerHTML = '';
@@ -3223,7 +3234,6 @@ export const populateReportManifestHeader = (currPage) => {
     document.getElementById('boxManifestCol1').appendChild(newDiv)
 }
 
-//***
 export const populateReportManifestTable = (currPage) => {
     let currTable = document.getElementById('boxManifestTable');
 
