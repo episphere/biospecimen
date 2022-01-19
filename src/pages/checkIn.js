@@ -24,17 +24,17 @@ export const checkInTemplate = (data) => {
             </div>
             </div>
             <div class="row">
-                    <div class="col-md-5">
+                <div class="col-md-5">
                     <select class="custom-select">
-                    <option selected value="153098257">Visit: Baseline</option>
+                        <option selected value="153098257">Visit: Baseline</option>
                     </select>
-                    </div>
-                    <div class="col-md-3">
-        ${checkedIn ?
-            `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete" data-check-out="true">Check-Out</button>` :
-            `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete">Check-In</button>`
-        }
-                    </div>
+                </div>
+                <div class="col-md-3">
+                        ${checkedIn ?
+                        `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete" data-check-out="true">Check-Out</button>` :
+                        `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete">Check-In</button>`
+                        }
+                </div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
             <hr/>
