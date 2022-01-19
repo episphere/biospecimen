@@ -2424,29 +2424,20 @@ export const addEventFinalizeFormCntd = (specimenData) => {
 }
 
 const finalizeHandler = async (biospecimenData, cntd) => {
-    const masterSpecimenId = biospecimenData['820476880']
-    let formData = {};
 
     if (cntd) {
+        showAnimation();
+
         biospecimenData['410912345'] = 353358909;
         biospecimenData['556788178'] = new Date().toISOString();
-        showAnimation();
+
         await storeSpecimen([biospecimenData]);
+
+        hideAnimation();
         showNotifications({ title: 'Specimen Finalized', body: 'Collection Finalized Successfully!' });
-        const specimenData = (await searchSpecimen(masterSpecimenId)).data;
-        let query = `connectId=${parseInt(specimenData.Connect_ID)}`;
-        const response = await findParticipant(query);
-        const participantData = response.data[0];
-        hideAnimation();
-        if (!document.getElementById('participantCheckOut')) searchTemplate();
-        else checkOutScreen(participantData, specimenData);
     }
-    else {
-        showAnimation();
-        await storeSpecimen([formData]);
-        hideAnimation();
-        searchTemplate();
-    }
+
+    searchTemplate();
 }
 
 export const addEventReturnToCollectProcess = () => {
