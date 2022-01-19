@@ -205,13 +205,5 @@ export const searchResults = (result) => {
     document.getElementById('contentBody').innerHTML = template;
     addEventBackToSearch('navBarSearch');
     addEventCheckInCompleteForm(true);
-    if (getWorflow() === 'clinical') {
-        addGoToCheckInEvent();
-      //  addEventSelectParticipantForm(true);
-    }
-    else {
-        addGoToCheckInEvent();
-       // addEventSelectParticipantForm();
-    }
-  
+    addGoToCheckInEvent();
 }
