@@ -19,8 +19,8 @@ export const checkInTemplate = (data) => {
         <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
             <div class="row">
             <div class="col-md-12">
-                    <h5>${data['996038075']}, ${data['399159511']}</h5>
-                    <h6>Login Method: ${data['995036844']}</h5>
+                <h5>${data['996038075']}, ${data['399159511']}</h5>
+                <h6>Login Method: ${data['995036844']}</h5>
             </div>
             </div>
             <div class="row">
