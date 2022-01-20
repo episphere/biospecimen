@@ -1,4 +1,4 @@
-import { generateBarCode, removeActiveClass, visitType } from "./../shared.js";
+import { generateBarCode, removeActiveClass, visitType, checkedIn } from "./../shared.js";
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch } from "./../events.js";
 
 export const checkInTemplate = (data) => {
@@ -7,35 +7,44 @@ export const checkInTemplate = (data) => {
     navBarBtn.style.display = 'block';
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
-    const checkedIn = (data['135591601'] === 353358909);
+
+    const isCheckedIn = checkedIn(data);
     
     let template = `
         </br>
         <div class="row">
-            <h5>Participant check-in</h5>
+            ${isCheckedIn ? `<h5>Participant Check-Out</h5>` : `<h5>Participant Check-In</h5>`}
         </div>
         </br>
         <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
             <div class="row">
                 <div class="col-md-12">
                     <h5>${data['996038075']}, ${data['399159511']}</h5>
-                    <h6>Login Method: ${data['995036844']}</h5>
+                    <h5>Login Method: ${data['995036844']}</h5>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-5">
-                    <select class="custom-select">
-                        <option value=""> -- Select Visit -- </option>`
-                        //<option selected value="153098257">Visit: Baseline</option>
-                        //<option value=""> -- Select reason  -- </option>
+                <div class="col-md-5">`
+                    
+                    if(isCheckedIn) {
+                        template += `<h5>Visit: [Type Here]</h5>`
+                    }
+                    else {
+                        template += `<select class="custom-select">
+                                        <option value=""> -- Select Visit -- </option>`;
+                                        
                         Array.from(visitType).forEach(option => {
                             template += `<option value=${option.concept}>${option.visitType}</option>`;
                         })
+
+                        template += `</select>`;
+                    }
                         
-                    template += `</select>
+                template += `
+
                 </div>
                 <div class="col-md-3">
-                        ${checkedIn ?
+                        ${isCheckedIn ?
                         `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete" data-check-out="true">Check-Out</button>` :
                         `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete">Check-In</button>`
                         }
@@ -44,10 +53,11 @@ export const checkInTemplate = (data) => {
             </div>
             <hr/>`
             
-        template += participantStatus(data)    
+        template += participantStatus(data) + 
 
-        template += `</form>
+        `</form>
     `;
+
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventContactInformationModal(data);
