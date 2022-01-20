@@ -936,12 +936,28 @@ export const allStates = {
 }
 
 export const visitType = [
-
     {'concept': '153098257', 'visitType': 'Baseline'},
     {'concept': '496823485', 'visitType': 'Follow-up 1'},
     {'concept': '650465111', 'visitType': 'Follow-up 2'},
     {'concept': '303552867', 'visitType': 'Follow-up 3'}
-]
+];
+
+export const checkedIn = (data) => {
+
+    let isCheckedIn = false;
+
+    if(data['331584571']) {
+        Array.from(visitType).forEach(visit => {
+            if(data['331584571'][visit.concept]) {
+                if(data['331584571'][visit.concept]['135591601'] && data['331584571'][visit.concept]['135591601'] === 353358909) {
+                    isCheckedIn = true;
+                }
+            }
+        });
+    }
+
+    return isCheckedIn;
+};
 
 export const getWorflow = () => document.getElementById('contentBody').dataset.workflow;
 
