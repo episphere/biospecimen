@@ -2,7 +2,7 @@ import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow
 import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
-export const specimenTemplate = async (data, formData, collections) => {
+export const specimenTemplate = async (data, formData) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenLink');
     navBarBtn.style.display = 'block';

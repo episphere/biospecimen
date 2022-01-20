@@ -1771,7 +1771,7 @@ export const addEventSelectParticipantForm = (skipCheckIn) => {
                 const data = response.data[0];
                 if (skipCheckIn) {
                     const collections = (await getParticipantCollections(data.token)).data;
-                    specimenTemplate(data, formData, collections);
+                    specimenTemplate(data, formData);
                 }
                 else checkInTemplate(data);
                 hideAnimation();
@@ -1851,7 +1851,7 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
 
         }
 
-        specimenTemplate(data, formData, collections);
+        specimenTemplate(data, formData);
 
     });
 
