@@ -581,7 +581,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
         
         <div class="row" style="margin-top:100px">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToTracking">Back to Tracking</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToTracking">Back to Assign Tracking Information</button>
             </div>
             <div style="float: left;width: 33%;">
                  
