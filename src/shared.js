@@ -935,12 +935,13 @@ export const allStates = {
     "NA": 52
 }
 
-export const visitType = {
-    '153098257': 'Baseline',
-    '496823485': 'Follow-up 1',
-    '650465111': 'Follow-up 2',
-    '303552867': 'Follow-up 3'
-}
+export const visitType = [
+
+    {'concept': '153098257', 'visitType': 'Baseline'},
+    {'concept': '496823485', 'visitType': 'Follow-up 1'},
+    {'concept': '650465111', 'visitType': 'Follow-up 2'},
+    {'concept': '303552867', 'visitType': 'Follow-up 3'}
+]
 
 export const getWorflow = () => document.getElementById('contentBody').dataset.workflow;
 
