@@ -1749,36 +1749,24 @@ export const addGoToCheckInEvent = () => {
     });
 };
 
+export const addGoToSpecimenLinkEvent = () => {
 
+    const specimenLinkButtons = document.querySelectorAll('[data-specimen-link-connect-id]');
+    Array.from(specimenLinkButtons).forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            let formData = {};
+            formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
+            formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
 
-export const addEventSelectParticipantForm = (skipCheckIn) => {
-    console.log("skipCheckIn", skipCheckIn);
-    const form = document.getElementById('selectParticipant');
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        const radios = document.getElementsByName('selectParticipantRadio');
-        Array.from(radios).forEach(async radio => {
-            if (radio.checked) {
-                const connectId = parseInt(radio.value);
-                let formData = {};
-                formData['Connect_ID'] = connectId;
-                formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
-                formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
-                formData['token'] = radio.dataset.token;
-                let query = `connectId=${parseInt(connectId)}`;
-                showAnimation();
-                const response = await findParticipant(query);
-                const data = response.data[0];
-                if (skipCheckIn) {
-                    const collections = (await getParticipantCollections(data.token)).data;
-                    specimenTemplate(data, formData);
-                }
-                else checkInTemplate(data);
-                hideAnimation();
-            }
-        })
-    })
-}
+            let query = `connectId=${parseInt(btn.dataset.specimenLinkConnectId)}`;
+        
+            const response = await findParticipant(query);
+            const data = response.data[0];
+    
+            specimenTemplate(data, formData);
+        });
+    });
+};
 
 export const addEventCheckInCompleteForm = (skipFlag = false) => {
     const form = document.getElementById('checkInCompleteForm');
@@ -1789,13 +1777,11 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
         let formData = {};
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
         formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
-        formData['962267121'] = new Date().toISOString();
         
         let query = `connectId=${parseInt(form.dataset.connectId)}`;
         
         const response = await findParticipant(query);
         const data = response.data[0];
-        const collections = (await getParticipantCollections(data.token)).data;
         const datauid = data.state.uid;
 
 
