@@ -1,13 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script>
-        if(location.host !== 'biospecimen-myconnect.cancer.gov') {
-            const sentryScript = document.createElement('script');
-            sentryScript.src = 'https://browser.sentry-cdn.com/6.13.3/bundle.tracing.min.js';
-            document.head.appendChild(sentryScript);
-        }
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -97,8 +90,12 @@
     <script>
         if(location.host !== 'biospecimen-myconnect.cancer.gov') {
             (function () {
-                'use strict';
-                Sentry.init({ dsn: 'https://113d31d0985947ae9f1876b0e31209cd@o1088108.ingest.sentry.io/6139072' });
+                const sentryScript = document.createElement('script');
+                sentryScript.src = 'https://browser.sentry-cdn.com/6.13.3/bundle.tracing.min.js';
+                document.head.appendChild(sentryScript);
+                sentryScript.addEventListener('load', () => {
+                    Sentry.init({ dsn: 'https://113d31d0985947ae9f1876b0e31209cd@o1088108.ingest.sentry.io/6139072' });
+                })
             })();
         }
     </script>
