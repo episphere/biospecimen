@@ -30,7 +30,7 @@ export const checkInTemplate = (data) => {
                         template += `<h5>Visit: [Type Here]</h5>`
                     }
                     else {
-                        template += `<select class="custom-select">
+                        template += `<select class="custom-select" id="visit-select">
                                         <option value=""> -- Select Visit -- </option>`;
                                         
                         Array.from(visitType).forEach(option => {
