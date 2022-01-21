@@ -2,12 +2,18 @@ import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow
 import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
-export const specimenTemplate = async (data, formData) => {
+export const specimenTemplate = async (data) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenLink');
     navBarBtn.style.display = 'block';
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
+
+    // get rid of all this
+    let formData = {};
+    formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
+    formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
+
     let template = `
         </br>
         <div class="row">
