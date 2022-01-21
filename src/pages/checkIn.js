@@ -44,10 +44,7 @@ export const checkInTemplate = (data) => {
 
                 </div>
                 <div class="col-md-3">
-                        ${isCheckedIn ?
-                        `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete" data-check-out="true">Check-Out</button>` :
-                        `<button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete">Check-In</button>`
-                        }
+                    <button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
                 </div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
@@ -62,7 +59,7 @@ export const checkInTemplate = (data) => {
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventContactInformationModal(data);
     addEventBackToSearch('navBarSearch');
-    addEventCheckInCompleteForm();
+    addEventCheckInCompleteForm(isCheckedIn);
 }
 
 const participantStatus = (data) => {
