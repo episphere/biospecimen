@@ -1768,11 +1768,14 @@ export const addGoToSpecimenLinkEvent = () => {
     });
 };
 
-export const addEventCheckInCompleteForm = (skipFlag = false) => {
+export const addEventCheckInCompleteForm = (isCheckedIn) => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        const isCheckOut = e.target?.elements[1]?.dataset?.checkOut;
+
+        if(isCheckedIn) {
+            
+        }
         
         let formData = {};
         formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
@@ -1833,8 +1836,7 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
                 },
             });
 
-        if (confirmVal === "cancel") return;
-
+            if (confirmVal === "cancel") return;
         }
 
         specimenTemplate(data, formData);
