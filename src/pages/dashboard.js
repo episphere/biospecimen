@@ -1,5 +1,5 @@
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates, getWorflow, isDeviceMobile, replaceDateInputWithMaskedInput, checkedIn } from "./../shared.js"
-import {  addGoToCheckInEvent, addEventCheckInCompleteForm, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
+import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 
 export const userDashboard = (auth, route, goToSpecimenSearch) => {
@@ -138,7 +138,6 @@ export const searchBiospecimenTemplate = () => {
 }
 
 export const searchResults = (result) => {
-    const f = () => addEventSelectParticipantForm();
 
     let conversion = {
         '875007964': 'Not Yet Verified',
@@ -188,13 +187,10 @@ export const searchResults = (result) => {
                 <td>${data['773707518'] === 353358909 || data['831041022'] === 353358909 || data['747006172'] === 353358909 ? `<i class="fas fa-2x fa-times"></i>` : `<i class="fas fa-2x fa-check"></i>`}</td>
         
                 <td>
-                    ${!isCheckedIn ? 
-                    `<button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>Go to check-in</button>` :
-                    `<button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>Go to check-out</button>`}
+                    <button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>${!isCheckedIn ? `Go to Check-In` : `Go to Check-Out`}</button>
                 </td>
                 <td>
-                    <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
-                    ${isCheckedIn ? `<button class="btn btn-outline-primary text-nowrap" id="checkInComplete">Specimen Link</button></form>` : ``}
+                    ${isCheckedIn ? `<button class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>` : ``}
                 </td>
             </tr>
         `
@@ -203,6 +199,6 @@ export const searchResults = (result) => {
 
     document.getElementById('contentBody').innerHTML = template;
     addEventBackToSearch('navBarSearch');
-    addEventCheckInCompleteForm(true);
     addGoToCheckInEvent();
+    addGoToSpecimenLinkEvent();
 }
