@@ -114,7 +114,7 @@ const createPackagesInTransitRows = (boxes) => {
 
             // Populate Cells with Data
             allBoxes.forEach((i, index) => {
-                if (i.hasOwnProperty('baseline') === false) {
+                if (i[fieldToConceptIdMapping.siteShipmentReceived] != fieldToConceptIdMapping.yes) {
                 template += `
                       <tr class="packageInTransitRow">
                       <td style="text-align:center;">${
