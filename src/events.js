@@ -942,16 +942,19 @@ export const populateTempSelect = (boxes) => {
     boxDiv.style.display = "block";
     boxDiv.innerHTML = `<p>Select the box that contains the temperature monitor</p>
     <select name="tempBox" id="tempBox">
-    <option disabled selected value> -- select a box -- </option>
+    <option disabled value> -- select a box -- </option>
     </select>`;
 
     let toPopulate = document.getElementById('tempBox')
 
     for (let i = 0; i < boxes.length; i++) {
+        
         var opt = document.createElement("option");
         opt.value = boxes[i];
         opt.innerHTML = boxes[i];
-
+        if(i === 0){
+            opt.selected = true;
+        }
         // then append it to the select element
         toPopulate.appendChild(opt);
     }
