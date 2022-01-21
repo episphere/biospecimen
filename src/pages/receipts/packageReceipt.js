@@ -74,7 +74,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
 
                         <div class="row form-group">
                             <label class="col-form-label col-md-4" for="receivePackageComments">Comment</label>
-                            <textarea class="col-md-8 form-control" required id="receivePackageComments" cols="30" rows="3" placeholder="Any comments?"></textarea>
+                            <textarea class="col-md-8 form-control" id="receivePackageComments" cols="30" rows="3" placeholder="Any comments?"></textarea>
                         </div>
 
                         <div class="row form-group">
@@ -83,7 +83,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
                         </div>
 
                         <div id="collectionCard">
-                            <h5 style="text-align: left;">Collection Card Data Entry</h5>
+                            <h5 style="text-align: left;">Collection Card Data Entry for Home Mouthwash Kits</h5>
 
                             <div class="row form-group">
                                 <label class="col-form-label col-md-4 for="collectionCheckBox">Check if card not included</label>
@@ -119,7 +119,15 @@ const packageReceiptTemplate = async (name, auth, route) => {
                     </form>
                    
                 </div>`;
-    document.getElementById("contentBody").innerHTML = template;
+  template += ` <div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content sub-div-shadow">
+            <div class="modal-header" id="modalHeader"></div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+  </div>`
+document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML =
         nonUserNavBar(name);
     activeReceiptsNavbar();
@@ -154,6 +162,7 @@ const checkCourierType = () => {
         document.getElementById('collectionCheckBox').checked = false;
         document.getElementById('collectionCheckBox').removeAttribute("disabled")
         enableCollectionCardFields();
+        triggerErrorModal()
         return
       }
       // FEDEX
@@ -186,6 +195,19 @@ const checkCourierType = () => {
   }
 };
 
+const triggerErrorModal = () => {
+    let alertList = document.getElementById("alert_placeholder");
+        let template = ``;
+        template += `
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                Scan limited only to FEDEX
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>`;
+        alertList.innerHTML = template;
+}
+
 const checkCardIncluded = () => {
   const a = document.getElementById('collectionCheckBox')
   if (a) {
@@ -216,69 +238,86 @@ const formSubmit = () => {
     let obj = {};
     let packageConditions = [];
     const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
-    obj['scannedBarcode'] = scannedBarcode
-    for (let option of document.getElementById('packageCondition').options) {
-      if (option.selected) {packageConditions.push(option.value)}
-    }
-    obj[`${fieldMapping.packageCondition}`] = packageConditions;
-    if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode) && scannedBarcode.length === 34)) {  
-      obj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
-      obj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
-      obj[`${fieldMapping.siteShipmentDateReceived}`] = document.getElementById('dateReceived').value;
-    } else { 
-      obj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
-      obj['dateReceived'] = document.getElementById('dateReceived').value;
-      if(document.getElementById('collectionId').value) {
-        obj['collectionId'] = document.getElementById('collectionId').value;
-        obj['dateCollectionCard'] = document.getElementById('dateCollectionCard').value;
-        obj['timeCollectionCard'] = document.getElementById('timeCollectionCard').value;
-        document.getElementById('collectionCheckBox').checked === true ? 
-            obj['collectionCheckBox'] = true : obj['collectionCheckBox'] = false
-        obj['collectionComments'] = document.getElementById('collectionComments').value;
-      }    
-    }
-    window.removeEventListener("beforeunload",beforeUnloadMessage)
-    targetAnchorTagEl()
-    console.log(obj)
-    const receiptStatus = storePackageReceipt(obj);
-    if (receiptStatus) {
-      document.getElementById("courierType").innerHTML = ``;
-      document.getElementById("scannedBarcode").value = "";
-      document.getElementById("packageCondition").value = "";
-      document.getElementById("receivePackageComments").value = "";
-      document.getElementById("dateReceived").value = getCurrentDate();
-      
-      document.getElementById("collectionComments").value = "";
-      document.getElementById("collectionId").value = "";
-      enableCollectionCardFields()
-      enableCollectionCheckBox()
-      document.getElementById("packageCondition").setAttribute("data-selected","[]")
-      targetAnchorTagEl()
-      clearButtonEl.removeEventListener("click",cancelConfirm)
+    const onlyFedexCourierType = identifyCourierType(scannedBarcode);
+    if (onlyFedexCourierType === true) {
+      obj['scannedBarcode'] = scannedBarcode
+      for (let option of document.getElementById('packageCondition').options) {
+        if (option.selected) {packageConditions.push(option.value)}
+      }
+      obj[`${fieldMapping.packageCondition}`] = packageConditions;
+      if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode) && scannedBarcode.length === 34)) {  
+        obj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
+        obj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
+        obj[`${fieldMapping.siteShipmentDateReceived}`] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
+      } else { 
+        obj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
+        obj['dateReceived'] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
+        if(document.getElementById('collectionId').value) {
+          obj['collectionId'] = document.getElementById('collectionId').value;
+          obj['dateCollectionCard'] = document.getElementById('dateCollectionCard').value;
+          obj['timeCollectionCard'] = document.getElementById('timeCollectionCard').value;
+          document.getElementById('collectionCheckBox').checked === true ? 
+              obj['collectionCheckBox'] = true : obj['collectionCheckBox'] = false
+          obj['collectionComments'] = document.getElementById('collectionComments').value;
+        }    
+      }
       window.removeEventListener("beforeunload",beforeUnloadMessage)
-    
-    if (document.getElementById("collectionId").value) {
-      document.getElementById("collectionId").value = "";
-      document.getElementById("dateCollectionCard").value = "";
-      document.getElementById("timeCollectionCard").value = "";
-      document.getElementById("collectionCheckBox").checked = false;
-      document.getElementById("collectionComments").value = "";
-
-      enableCollectionCardFields();
-      enableCollectionCheckBox();
-      document.getElementById("packageCondition").setAttribute("data-selected","[]");
       targetAnchorTagEl()
-      clearButtonEl.removeEventListener("click",cancelConfirm);
-      window.removeEventListener("beforeunload",beforeUnloadMessage);
+      const receiptStatus = storePackageReceipt(obj);
+      if (receiptStatus) {
+        document.getElementById("courierType").innerHTML = ``;
+        document.getElementById("scannedBarcode").value = "";
+        document.getElementById("packageCondition").value = "";
+        document.getElementById("receivePackageComments").value = "";
+        document.getElementById("dateReceived").value = getCurrentDate();
+        
+        document.getElementById("collectionComments").value = "";
+        document.getElementById("collectionId").value = "";
+        enableCollectionCardFields()
+        enableCollectionCheckBox()
+        document.getElementById("packageCondition").setAttribute("data-selected","[]")
+        targetAnchorTagEl()
+        clearButtonEl !== undefined ? clearButtonEl.removeEventListener("click",cancelConfirm) : ``
+        window.removeEventListener("beforeunload",beforeUnloadMessage)
+      
+      if (document.getElementById("collectionId").value) {
+        document.getElementById("collectionId").value = "";
+        document.getElementById("dateCollectionCard").value = "";
+        document.getElementById("timeCollectionCard").value = "";
+        document.getElementById("collectionCheckBox").checked = false;
+        document.getElementById("collectionComments").value = "";
+
+        enableCollectionCardFields();
+        enableCollectionCheckBox();
+        document.getElementById("packageCondition").setAttribute("data-selected","[]");
+        targetAnchorTagEl()
+        clearButtonEl.removeEventListener("click",cancelConfirm);
+        window.removeEventListener("beforeunload",beforeUnloadMessage);
+      }
+    } } else {
+      triggerErrorModal()
     }
-  }})
-}      
+})
+}
+
+const identifyCourierType = (scannedBarcode) => {
+ if (scannedBarcode.length === 34 || scannedBarcode.length === 12) {
+    return true
+  }
+  else {
+    return false
+}}
+
+const storeDateReceivedinISO = (date) => { // ("YYYY-MM-DD" to ISO format DateTime)
+  const isoDateTime= new Date(date).toISOString();
+  return isoDateTime
+}
 
 const storePackageReceipt = async (data) => {
     showAnimation();
     const idToken = await getIdToken();
     const response = await await fetch(
-        `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=storeReceipt`,
+        `http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=storeReceipt`,
         {
             method: "POST",
             body: JSON.stringify(data),
@@ -290,6 +329,7 @@ const storePackageReceipt = async (data) => {
     );
     hideAnimation();
     if (response.status === 200) {
+      console.log('res',response)
         let alertList = document.getElementById("alert_placeholder");
         let template = ``;
         template += `
