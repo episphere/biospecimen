@@ -2625,12 +2625,18 @@ export const addEventTrimTrackingNums = () => {
   // Trim Function here
   boxTrackingIdEls.forEach(el => el.addEventListener("input", e => {
     let inputTrack = e.target.value.trim()
+    if(inputTrack.length > 0) {
+      e.target.value = inputTrack.replace(/\s/g, '')
+    }
     if(inputTrack.length > 12) {
       e.target.value = inputTrack.slice(-12)
     }
   }))
   boxTrackingIdConfirmEls.forEach(el => el.addEventListener("input", e => {
     let inputTrackConfirm = e.target.value.trim()
+    if(inputTrackConfirm.length > 0) {
+      e.target.value = inputTrackConfirm.replace(/\s/g, '')
+    }
     if(inputTrackConfirm.length > 12) {
       e.target.value = inputTrackConfirm.slice(-12)
     }
@@ -2667,6 +2673,15 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
       let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
       let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
       let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+      if(input.length < 12) {
+        document.getElementById(box+"trackingId").classList.add("invalid")
+        inputErrorMsg.textContent = `Please input 12 digits`
+      }
+      else {
+        document.getElementById(box+"trackingId").classList.remove("invalid")
+        inputErrorMsg.textContent = ""
+      }
+      
       if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
         // add invalid red border
         document.getElementById(box+"trackingId").classList.add("invalid")
@@ -2681,11 +2696,23 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
         inputConfirmErrorMsg.textContent = ""
       }
     })
+
+    // 
+
     document.getElementById(box+"trackingIdConfirm").addEventListener("input",e => {
       let input = document.getElementById(box+"trackingId").value.trim()
       let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
       let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
       let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+      if (inputConfirm.length < 12){
+        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+        inputConfirmErrorMsg.textContent = "Please input 12 digits"
+      }
+      else{
+        document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
+        inputConfirmErrorMsg.textContent = ""
+      }
+
       if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
         // add invalid red border
         document.getElementById(box+"trackingId").classList.add("invalid")

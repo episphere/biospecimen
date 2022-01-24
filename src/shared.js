@@ -1189,7 +1189,6 @@ export const convertNumsToCondition = (packagedCondition, packageConversion) => 
     return listConditions
   }
   packagedCondition.forEach(condition => {
-    console.log(condition)
     listConditions +=`<p>${packageConversion[condition]}</p>`}
   )
   
