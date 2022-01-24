@@ -317,7 +317,7 @@ const storePackageReceipt = async (data) => {
     showAnimation();
     const idToken = await getIdToken();
     const response = await await fetch(
-        `http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=storeReceipt`,
+        `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=storeReceipt`,
         {
             method: "POST",
             body: JSON.stringify(data),

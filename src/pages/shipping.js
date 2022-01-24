@@ -383,14 +383,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
             <input type="checkbox" id="tempMonitorChecked">
             <label for="tempMonitorChecked">Temp Monitor is included in this shipment</label><br>
         </div>
-        <div class="row">
-            <p>Select the box that contains the temp monitor</p>
-        </div>
         <div class="row" id="tempCheckList">
-            <select name="tempBox" id="tempBox">
-            <option value=""> -- select a box -- </option>
-            ${boxesToShip.map((box, index) => `<option value="box" selected=${index === 0 ? true : false}>${box}</option>`)}
-            </select>
         </div>
         <div class="row" style="margin-top:100px">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
