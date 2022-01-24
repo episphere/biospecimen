@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime,  convertNumsToCondition} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -3127,6 +3127,48 @@ export const populateBoxTable = async (page, filter) => {
         "712278213": "FedEx",
         "149772928": "World Courier"
     }
+
+    let packageConversion = {
+        "123456789": "Package in good condition",
+        "694392646": "No Ice Pack",
+        "669336526": "Warm Ice Pack",
+        "564936650": "Vials - Incorrect Material Type Sent",
+        "242271549": "No Label on Vials",
+        "790986868": "Returned Empty Vials",
+        "470977257": "Participant Refusal",
+        "121720893": "Other",
+        "659684779": "Damaged Container (outer and inner)",
+        "665883282": "Insufficient Ice",
+        "967674331": "Improper Packaging",
+        "958386677": "Damaged Vials",
+        "188332319": "No Pre-notification",
+        "229360386": "Manifest/Vial/Paperwork info do not match",
+        "200647000": "Shipment Delay",
+        "352744555": "No Manifest provided"
+    }
+
+  // TODO: change this map once keys are changed on frontend and concept ids are made
+  //   let packageConversion1 = {
+  //     "123456789": "Package in good condition",
+  //     "694392646": "No Ice Pack",
+  //     "669336526": "Warm Ice Pack",
+  //     "564936650": "Vials - Incorrect Material Type Sent",
+  //     "242271549": "No Label on Vials",
+  //     "790986868": "Returned Empty Vials",
+  //     "470977257": "Participant Refusal",
+  //     "121720893": "Crushed",(SAME KEY)
+  //     "659684779": "Damaged Container (outer and inner)",
+  //     "121720893": "Material Thawed", (SAME KEY)
+  //     "665883282": "Insufficient Ice",
+  //     "967674331": "Improper Packaging",
+  //     "958386677": "Damaged Vials",
+  //     "121720893": "Other", (SAME KEY)
+  //     "188332319": "No Pre-notification",
+  //     "121720893": "No Refrigerant", (SAME KEY)
+  //     "229360386": "Manifest/Vial/Paperwork info do not match",
+  //     "200647000": "Shipment Delay",
+  //     "352744555": "No Manifest provided"
+  // }
     for (let i = 0; i < pageStuff.data.length; i++) {
         rowCount = currTable.rows.length;
         currRow = currTable.insertRow(rowCount);
@@ -3137,7 +3179,8 @@ export const populateBoxTable = async (page, filter) => {
             numTubes += currPage['bags'][keys[j]]['arrElements'].length;
         }
         let shippedDate = ''
-        let shipReceived = ''
+        let receivedDate = ''
+        let packagedCondition = ''
 
         if (currPage.hasOwnProperty('656548982')) {
             let currentdate = new Date(currPage['656548982']);
@@ -3152,11 +3195,13 @@ export const populateBoxTable = async (page, filter) => {
 */
         }
 
-        if(currPage.hasOwnProperty('baseline')) {
-          shipReceived = (currPage['baseline'][fieldToConceptIdMapping.siteShipmentReceived] === fieldToConceptIdMapping.yes) ? "Yes" : "No"
+        if(currPage.hasOwnProperty('259439191')) {
+          let isoFormat = currPage['259439191']
+          receivedDate = convertTime(isoFormat).split(',')[0]
         }
-        else {
-          shipReceived = "No"
+
+        if(currPage.hasOwnProperty('421016519')) {
+          packagedCondition = currPage['421016519']
         }
         
         currRow.insertCell(0).innerHTML = currPage.hasOwnProperty('959708259') ? currPage['959708259'] : '';
@@ -3164,10 +3209,10 @@ export const populateBoxTable = async (page, filter) => {
         currRow.insertCell(2).innerHTML = currPage['560975149'];
         currRow.insertCell(3).innerHTML = currPage['132929440'];
         currRow.insertCell(4).innerHTML = '<button type="button" class="button" id="reportsViewManifest' + i + '">View manifest</button>';
-        currRow.insertCell(5).innerHTML = shipReceived
-        currRow.insertCell(6).innerHTML = '';
-        currRow.insertCell(7).innerHTML = currPage.hasOwnProperty('') ? currPage[''] : '';
-        currRow.insertCell(8).innerHTML = '';
+        currRow.insertCell(5).innerHTML = currPage.hasOwnProperty('434049748') ? "Yes" : "No"
+        currRow.insertCell(6).innerHTML = receivedDate;
+        currRow.insertCell(7).innerHTML = convertNumsToCondition(packagedCondition, packageConversion);
+        currRow.insertCell(8).innerHTML = currPage.hasOwnProperty('869218574') ? currPage['869218574'] : '' ;
         addEventViewManifestButton('reportsViewManifest' + i, currPage);
 
     }
