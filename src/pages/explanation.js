@@ -1,5 +1,5 @@
 import { addEventExplanationForm, addEventExplanationFormCntd, addEventReturnToCollectProcess } from "./../events.js";
-import { generateBarCode, getWorflow, visitType } from "../shared.js";
+import { generateBarCode, getWorflow, visitType, getCheckedInVisit } from "../shared.js";
 import { finalizeTemplate } from "./finalize.js";
 import { workflows } from "../tubeValidation.js";
 
@@ -22,7 +22,7 @@ export const explanationTemplate = (dt, biospecimenData) => {
             </div>
             ${biospecimenData['331584571'] ? `
                 <div class="ml-auto form-group">
-                    Visit: ${visitType[biospecimenData['331584571']]}
+                    Visit: ${visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0].visitType}
                 </div>
             ` : ``
             }

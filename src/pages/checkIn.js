@@ -1,4 +1,4 @@
-import { generateBarCode, removeActiveClass, visitType, checkedIn } from "./../shared.js";
+import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit } from "./../shared.js";
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch } from "./../events.js";
 
 export const checkInTemplate = (data) => {
@@ -27,7 +27,7 @@ export const checkInTemplate = (data) => {
                 <div class="col-md-5">`
                     
                     if(isCheckedIn) {
-                        template += `<h5>Visit: [Type Here]</h5>`
+                        template += `<h5>Visit: ${visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0].visitType}</h5>`
                     }
                     else {
                         template += `<select class="custom-select" id="visit-select">

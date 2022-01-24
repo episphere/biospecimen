@@ -1,4 +1,4 @@
-import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorflow } from "./../shared.js";
+import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorflow, getCheckedInVisit } from "./../shared.js";
 import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollectProcess } from "./../events.js";
 
 export const finalizeTemplate = (data, specimenData) => {
@@ -22,7 +22,7 @@ export const finalizeTemplate = (data, specimenData) => {
             </div>
             ${specimenData['331584571'] ? `
                 <div class="ml-auto form-group">
-                    Visit: ${visitType[specimenData['331584571']]}
+                    Visit: ${visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0].visitType}
                 </div>
             ` : ``
             }

@@ -1,5 +1,5 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormText } from './../events.js'
-import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow } from '../shared.js';
+import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow, getCheckedInVisit } from '../shared.js';
 
 export const tubeCollectedTemplate = (data, formData) => {
 
@@ -17,7 +17,7 @@ export const tubeCollectedTemplate = (data, formData) => {
             </div>
             ${formData['331584571'] ? `
                 <div class="ml-auto form-group">
-                    Visit: ${visitType[formData['331584571']]}
+                    Visit: ${visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0].visitType}
                 </div>
             ` : ``
             }
