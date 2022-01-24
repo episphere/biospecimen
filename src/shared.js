@@ -1182,3 +1182,16 @@ export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxEr
 }
 
 export const delay = ms => new Promise(res => setTimeout(res, ms));
+
+export const convertNumsToCondition = (packagedCondition, packageConversion) => {
+  let listConditions = ''
+  if(!packagedCondition) {
+    return listConditions
+  }
+  packagedCondition.forEach(condition => {
+    console.log(condition)
+    listConditions +=`<p>${packageConversion[condition]}</p>`}
+  )
+  
+  return listConditions
+}

@@ -374,7 +374,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
                 <tr>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Box Number</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Specimen Bag ID</th>
-                    <th sxtyle="padding-top: 12px;padding-bottom: 12px;text-align: left;">Full Specimen ID</th>
+                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Full Specimen ID</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Scanned By</th>
                 </tr>
             </table>
