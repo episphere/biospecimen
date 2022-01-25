@@ -2650,7 +2650,7 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
       let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
 
       
-      if(input.length < 12 && input !== inputConfirm && input !== "" && inputConfirm !== "") {
+      if(input.length < 12 && input !== inputConfirm) {
         document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
         inputErrorMsg.textContent = `Please match ${box} confirm input and input a 12 digit tracking number` 
       }
@@ -2680,7 +2680,7 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
       let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
       let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
 
-      if(inputConfirm.length < 12 && inputConfirm !== input && input !== "" && inputConfirm !== "") {
+      if(inputConfirm.length < 12 && inputConfirm !== input) {
         document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
         inputConfirmErrorMsg.textContent = `Please match ${box} start input and input a 12 digit tracking number` 
       }
