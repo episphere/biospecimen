@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, checkInParticipant, checkOutParticipant, getCheckedInVisit} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkInParticipant, checkOutParticipant, getCheckedInVisit} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -186,7 +186,7 @@ export const addEventAddSpecimenToBox = (userName) => {
                                 <span aria-hidden="true">&times;</span>
                             </button>`;
 
-        body.innerHTML = `
+        /*body.innerHTML = `
         <table class="table" id="shippingModalTable">
             <thead>
                 <tr>
@@ -196,7 +196,7 @@ export const addEventAddSpecimenToBox = (userName) => {
                 </tr>
             </thead>
         </table>
-        `;
+        `;*/
         let masterIdSplit = masterSpecimenId.split(/\s+/);
         let foundInOrphan = false;
         //get all ids from the hidden
@@ -317,7 +317,8 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         hiddenJSON[box['132929440']] = box['bags']
     }
 
-    let tubeTable = document.getElementById("shippingModalTable")
+    //let tubeTable = document.getElementById("shippingModalTable")
+    let tubeTable = document.createElement('table');
     let currSplit = masterBiospecimenId.split(/\s+/);
     let currBag = [];
     let empty = true;
@@ -423,6 +424,19 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
             })
         }
     }
+
+    document.getElementById('shippingModalBody').innerHTML = `
+    <table class="table" id="shippingModalTable">
+        <thead>
+            <tr>
+                <th>Full Specimen ID</th>
+                <th>Type/Color</th>
+                <th style="text-align:center;">Sample Present</th>
+            </tr>
+        </thead>
+        ${tubeTable.innerHTML}
+    </table>
+    `;
     populateModalSelect(hiddenJSON)
     if (empty) {
         showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' }, true)
@@ -430,6 +444,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         hideAnimation();
         return
     }
+    
 }
 
 export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrphan, userName) => {
@@ -461,7 +476,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         let nameSplit = userName.split(' ');
         let firstName = nameSplit[0] ? nameSplit[0] : '';
         let lastName = nameSplit[1] ? nameSplit[1] : '';
-        let checkedSpecimensArr = Array.from(document.getElementsByClassName("samplePresentCheckbox")).filter(item => item.hasAttribute("checked"))
+        let checkedSpecimensArr = Array.from(document.getElementsByClassName("samplePresentCheckbox")).filter(item => item.checked)
         boxId = document.getElementById('shippingModalChooseBox').value;
 
         if (isOrphan) {
@@ -927,16 +942,19 @@ export const populateTempSelect = (boxes) => {
     boxDiv.style.display = "block";
     boxDiv.innerHTML = `<p>Select the box that contains the temperature monitor</p>
     <select name="tempBox" id="tempBox">
-    <option disabled selected value> -- select a box -- </option>
+    <option disabled value> -- select a box -- </option>
     </select>`;
 
     let toPopulate = document.getElementById('tempBox')
 
     for (let i = 0; i < boxes.length; i++) {
+        
         var opt = document.createElement("option");
         opt.value = boxes[i];
         opt.innerHTML = boxes[i];
-
+        if(i === 0){
+            opt.selected = true;
+        }
         // then append it to the select element
         toPopulate.appendChild(opt);
     }
@@ -2455,6 +2473,16 @@ export const addEventNavBarShipment = (id, userName) => {
     });
 }
 
+export const addEventShipPrintManifest = (id) => {
+  const btn = document.getElementById(id)
+  btn.addEventListener('click', e => {
+    console.log('clicked',e)
+    window.print()
+    if(e.target.classList.contains("print-manifest")) {
+      e.target.classList.remove("print-manifest")
+    } else return
+  })
+}
 
 export const addEventNavBarBoxManifest = (id, userName) => {
     const btn = document.getElementById(id);
@@ -2516,7 +2544,6 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
         // shipSetForage used to handle empty localforage or no box id match
         boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
         checkShipForage(shipSetForage,boxesToShip)
-        
         //return box 1 info
         await shippingManifest(boxesToShip, userName, tempCheckStatus);
     });
@@ -2558,12 +2585,18 @@ export const addEventTrimTrackingNums = () => {
   // Trim Function here
   boxTrackingIdEls.forEach(el => el.addEventListener("input", e => {
     let inputTrack = e.target.value.trim()
+    if(inputTrack.length >= 0) {
+      e.target.value = inputTrack.replace(/\s/g, '')
+    }
     if(inputTrack.length > 12) {
       e.target.value = inputTrack.slice(-12)
     }
   }))
   boxTrackingIdConfirmEls.forEach(el => el.addEventListener("input", e => {
     let inputTrackConfirm = e.target.value.trim()
+    if(inputTrackConfirm.length >=  0) {
+      e.target.value = inputTrackConfirm.replace(/\s/g, '')
+    }
     if(inputTrackConfirm.length > 12) {
       e.target.value = inputTrackConfirm.slice(-12)
     }
@@ -2581,12 +2614,27 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
 
   let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
 
+  // Check on page load 
   boxes.forEach(box => {
     let input = document.getElementById(box+"trackingId").value.trim()
     let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
     let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
     let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
-    if(input !== inputConfirm) {
+    if(input.length > 0 && input.length < 12) {
+      document.getElementById(box+"trackingId").classList.add("invalid")
+      inputErrorMsg.textContent = `Please input a 12 digit tracking number`
+    }
+    if(inputConfirm.length > 0 && inputConfirm.length < 12) {
+      document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+      inputConfirmErrorMsg.textContent = `Please input a 12 digit tracking number`
+    }
+    if(input !== inputConfirm && input.length > 0 && input.length < 12 && inputConfirm.length > 0 && inputConfirm.length < 12) {
+      document.getElementById(box+"trackingId").classList.add("invalid")
+      document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+      inputErrorMsg.textContent = `Please match ${box} confirm input and input a 12 digit tracking number` 
+      inputConfirmErrorMsg.textContent = `Please match ${box} start input and input a 12 digit tracking number` 
+    }
+    else if(input !== inputConfirm) {
       document.getElementById(box+"trackingId").classList.add("invalid")
       document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
       inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
@@ -2600,13 +2648,24 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
       let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
       let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
       let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
-      if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
+
+      
+      if(input.length < 12 && input !== inputConfirm && input !== "" && inputConfirm !== "") {
+        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+        inputErrorMsg.textContent = `Please match ${box} confirm input and input a 12 digit tracking number` 
+      }
+      else if(input.length < 12) {
+        document.getElementById(box+"trackingId").classList.add("invalid")
+        inputErrorMsg.textContent = `Please input a 12 digit tracking number`
+      }
+      else if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
         // add invalid red border
         document.getElementById(box+"trackingId").classList.add("invalid")
         document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
         inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
         inputErrorMsg.textContent = "Please match " + box + " confirm input"
-      } else if (input === inputConfirm) {
+      } 
+      else if (input === inputConfirm && input.length >= 12) {
         // remove invalid
         document.getElementById(box+"trackingId").classList.remove("invalid")
         document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
@@ -2614,18 +2673,28 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
         inputConfirmErrorMsg.textContent = ""
       }
     })
+
     document.getElementById(box+"trackingIdConfirm").addEventListener("input",e => {
       let input = document.getElementById(box+"trackingId").value.trim()
       let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
       let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
       let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
-      if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
+
+      if(inputConfirm.length < 12 && inputConfirm !== input && input !== "" && inputConfirm !== "") {
+        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+        inputConfirmErrorMsg.textContent = `Please match ${box} start input and input a 12 digit tracking number` 
+      }
+      else if(inputConfirm.length < 12){
+        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+        inputConfirmErrorMsg.textContent = "Please input a 12 digit tracking number"
+      }
+      else if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
         // add invalid red border
         document.getElementById(box+"trackingId").classList.add("invalid")
         document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
         inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
         inputErrorMsg.textContent = "Please match " + box + " confirm input"
-      } else if (input === inputConfirm) {
+      } else if (input === inputConfirm && inputConfirm.length >= 12) {
         // remove invalid
         document.getElementById(box+"trackingId").classList.remove("invalid")
         document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
@@ -3062,6 +3131,48 @@ export const populateBoxTable = async (page, filter) => {
         "712278213": "FedEx",
         "149772928": "World Courier"
     }
+    
+    let packageConversion = {
+        "123456789": "Package in good condition",
+        "694392646": "No Ice Pack",
+        "669336526": "Warm Ice Pack",
+        "564936650": "Vials - Incorrect Material Type Sent",
+        "242271549": "No Label on Vials",
+        "790986868": "Returned Empty Vials",
+        "470977257": "Participant Refusal",
+        "121720893": "Other",
+        "659684779": "Damaged Container (outer and inner)",
+        "665883282": "Insufficient Ice",
+        "967674331": "Improper Packaging",
+        "958386677": "Damaged Vials",
+        "188332319": "No Pre-notification",
+        "229360386": "Manifest/Vial/Paperwork info do not match",
+        "200647000": "Shipment Delay",
+        "352744555": "No Manifest provided"
+    }
+
+  // TODO: change this map once keys are changed on frontend and concept ids are made
+  //   let packageConversion1 = {
+  //     "123456789": "Package in good condition",
+  //     "694392646": "No Ice Pack",
+  //     "669336526": "Warm Ice Pack",
+  //     "564936650": "Vials - Incorrect Material Type Sent",
+  //     "242271549": "No Label on Vials",
+  //     "790986868": "Returned Empty Vials",
+  //     "470977257": "Participant Refusal",
+  //     "121720893": "Crushed",(SAME KEY)
+  //     "659684779": "Damaged Container (outer and inner)",
+  //     "121720893": "Material Thawed", (SAME KEY)
+  //     "665883282": "Insufficient Ice",
+  //     "967674331": "Improper Packaging",
+  //     "958386677": "Damaged Vials",
+  //     "121720893": "Other", (SAME KEY)
+  //     "188332319": "No Pre-notification",
+  //     "121720893": "No Refrigerant", (SAME KEY)
+  //     "229360386": "Manifest/Vial/Paperwork info do not match",
+  //     "200647000": "Shipment Delay",
+  //     "352744555": "No Manifest provided"
+  // }
     for (let i = 0; i < pageStuff.data.length; i++) {
         rowCount = currTable.rows.length;
         currRow = currTable.insertRow(rowCount);
@@ -3072,6 +3183,9 @@ export const populateBoxTable = async (page, filter) => {
             numTubes += currPage['bags'][keys[j]]['arrElements'].length;
         }
         let shippedDate = ''
+        let receivedDate = ''
+        let packagedCondition = ''
+
         if (currPage.hasOwnProperty('656548982')) {
             let currentdate = new Date(currPage['656548982']);
             let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
@@ -3084,20 +3198,29 @@ export const populateBoxTable = async (page, filter) => {
             + currentdate.getMinutes() + ampm;
 */
         }
+
+        if(currPage.hasOwnProperty('259439191')) {
+          let isoFormat = currPage['259439191']
+          receivedDate = convertTime(isoFormat).split(',')[0]
+        }
+
+        if(currPage.hasOwnProperty('421016519')) {
+          packagedCondition = currPage['421016519']
+        }
+        
         currRow.insertCell(0).innerHTML = currPage.hasOwnProperty('959708259') ? currPage['959708259'] : '';
         currRow.insertCell(1).innerHTML = shippedDate;
         currRow.insertCell(2).innerHTML = currPage['560975149'];
         currRow.insertCell(3).innerHTML = currPage['132929440'];
         currRow.insertCell(4).innerHTML = '<button type="button" class="button" id="reportsViewManifest' + i + '">View manifest</button>';
-        currRow.insertCell(5).innerHTML = '';
-        currRow.insertCell(6).innerHTML = '';
-        currRow.insertCell(7).innerHTML = currPage.hasOwnProperty('') ? currPage[''] : '';
-        currRow.insertCell(8).innerHTML = '';
+        currRow.insertCell(5).innerHTML = currPage.hasOwnProperty('434049748') ? "Yes" : "No"
+        currRow.insertCell(6).innerHTML = receivedDate;
+        currRow.insertCell(7).innerHTML = convertNumsToCondition(packagedCondition, packageConversion);
+        currRow.insertCell(8).innerHTML = currPage.hasOwnProperty('869218574') ? currPage['869218574'] : '' ;
         addEventViewManifestButton('reportsViewManifest' + i, currPage);
 
     }
     hideAnimation();
-
 }
 
 export const addEventViewManifestButton = (buttonId, currPage) => {
@@ -3158,7 +3281,6 @@ export const populateReportManifestHeader = (currPage) => {
     document.getElementById('boxManifestCol1').appendChild(newDiv)
 }
 
-//***
 export const populateReportManifestTable = (currPage) => {
     let currTable = document.getElementById('boxManifestTable');
 

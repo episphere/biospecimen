@@ -105,6 +105,7 @@ const filterShipped = (boxes) => {
 const createPackagesInTransitRows = (boxes) => {
     let template = "";
             const allBoxes = boxes;
+
             // Return a filtered array of an item of grouped bags from GET request***
             const bagsArr = groupAllBags(allBoxes);
 
@@ -113,6 +114,7 @@ const createPackagesInTransitRows = (boxes) => {
 
             // Populate Cells with Data
             allBoxes.forEach((i, index) => {
+                if (i[fieldToConceptIdMapping.siteShipmentReceived] != fieldToConceptIdMapping.yes) {
                 template += `
                       <tr class="packageInTransitRow">
                       <td style="text-align:center;">${
@@ -139,7 +141,7 @@ const createPackagesInTransitRows = (boxes) => {
                         </button>
                       </td>
                       </tr>`;
-            });
+            }});
             return template;
 }
 
