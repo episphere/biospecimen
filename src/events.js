@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, checkInParticipant, checkOutParticipant} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -1754,16 +1754,13 @@ export const addGoToSpecimenLinkEvent = () => {
     const specimenLinkButtons = document.querySelectorAll('[data-specimen-link-connect-id]');
     Array.from(specimenLinkButtons).forEach((btn) => {
         btn.addEventListener('click', async () => {
-            let formData = {};
-            formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
-            formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
 
             let query = `connectId=${parseInt(btn.dataset.specimenLinkConnectId)}`;
         
             const response = await findParticipant(query);
             const data = response.data[0];
     
-            specimenTemplate(data, formData);
+            specimenTemplate(data);
         });
     });
 };
@@ -1773,46 +1770,35 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
     form.addEventListener('submit', async e => {
         e.preventDefault();
 
-        if(isCheckedIn) {
-            
-        }
-        
-        let formData = {};
-        formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
-        formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
-        
         let query = `connectId=${parseInt(form.dataset.connectId)}`;
         
         const response = await findParticipant(query);
         const data = response.data[0];
-        const datauid = data.state.uid;
 
+        if(isCheckedIn) {
+            
+            checkOutParticipant(data);
 
-        // update participant as checked in/out.
-        const checkInData = {
-           '135591601': isCheckOut ? 104430631 : 353358909,
-           uid: datauid,
-        };
-
-        // append check-in timestamp
-        if(!isCheckOut){
-            checkInData["840048338"] = new Date();
-        }
-        
-        await updateParticipant(checkInData);
-       
-        if(isCheckOut){
             await swal({
                 title: "Success",
                 icon: "success",
                 text: `Participant is checked out.`,
             });
-            await new Promise((res) => setTimeout(res,1200));
+            //await new Promise((res) => setTimeout(res,1200));
             goToParticipantSearch();
-            return;
+            //return;
         }
-        
-        if (!skipFlag) {
+        else {
+
+            const visitConcept = document.getElementById('visit-select').value;
+
+            if(!visitConcept) {
+                showNotifications({ title: 'Invalid Selection', body: 'Select a visit for check-in' }, true)
+                return;
+            }
+
+            checkInParticipant(data, visitConcept);
+
             const confirmVal = await swal({
                 title: "Success",
                 icon: "success",
@@ -1836,13 +1822,9 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
                 },
             });
 
-            if (confirmVal === "cancel") return;
+            if (confirmVal === "confirmed") specimenTemplate(data);
         }
-
-        specimenTemplate(data, formData);
-
     });
-
 };
 export const goToParticipantSearch = () => {
     document.getElementById('navBarSearch').click();
