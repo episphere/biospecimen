@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -1767,82 +1767,56 @@ export const addGoToCheckInEvent = () => {
     });
 };
 
+export const addGoToSpecimenLinkEvent = () => {
 
+    const specimenLinkButtons = document.querySelectorAll('[data-specimen-link-connect-id]');
+    Array.from(specimenLinkButtons).forEach((btn) => {
+        btn.addEventListener('click', async () => {
 
-export const addEventSelectParticipantForm = (skipCheckIn) => {
-    console.log("skipCheckIn", skipCheckIn);
-    const form = document.getElementById('selectParticipant');
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        const radios = document.getElementsByName('selectParticipantRadio');
-        Array.from(radios).forEach(async radio => {
-            if (radio.checked) {
-                const connectId = parseInt(radio.value);
-                let formData = {};
-                formData['Connect_ID'] = connectId;
-                formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
-                formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
-                formData['token'] = radio.dataset.token;
-                let query = `connectId=${parseInt(connectId)}`;
-                showAnimation();
-                const response = await findParticipant(query);
-                const data = response.data[0];
-                if (skipCheckIn) {
-                    const collections = (await getParticipantCollections(data.token)).data;
-                    specimenTemplate(data, formData, collections);
-                }
-                else checkInTemplate(data);
-                hideAnimation();
-            }
-        })
-    })
-}
+            let query = `connectId=${parseInt(btn.dataset.specimenLinkConnectId)}`;
+        
+            const response = await findParticipant(query);
+            const data = response.data[0];
+    
+            specimenTemplate(data);
+        });
+    });
+};
 
-export const addEventCheckInCompleteForm = (skipFlag = false) => {
+export const addEventCheckInCompleteForm = (isCheckedIn) => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        const isCheckOut = e.target?.elements[1]?.dataset?.checkOut;
-        
-        let formData = {};
-        formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
-        formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
-        formData['962267121'] = new Date().toISOString();
-        formData['135591601'] = 353358909;
-        
+
         let query = `connectId=${parseInt(form.dataset.connectId)}`;
         
         const response = await findParticipant(query);
         const data = response.data[0];
-        const collections = (await getParticipantCollections(data.token)).data;
-        const datauid = data.state.uid;
 
+        if(isCheckedIn) {
+            
+            checkOutParticipant(data);
 
-        // update participant as checked in/out.
-        const checkInData = {
-           '135591601': isCheckOut ? 104430631 : 353358909,
-           uid: datauid,
-        };
-
-        // append check-in timestamp
-        if(!isCheckOut){
-            checkInData["840048338"] = new Date();
-        }
-        
-        await updateParticipant(checkInData);
-       
-        if(isCheckOut){
             await swal({
                 title: "Success",
                 icon: "success",
                 text: `Participant is checked out.`,
             });
-            await new Promise((res) => setTimeout(res,1200));
+            //await new Promise((res) => setTimeout(res,1200));
             goToParticipantSearch();
-            return;
+            //return;
         }
-        
-        if (!skipFlag) {
+        else {
+
+            const visitConcept = document.getElementById('visit-select').value;
+
+            if(!visitConcept) {
+                showNotifications({ title: 'Invalid Selection', body: 'Select a visit for check-in' }, true)
+                return;
+            }
+
+            checkInParticipant(data, visitConcept);
+
             const confirmVal = await swal({
                 title: "Success",
                 icon: "success",
@@ -1866,14 +1840,9 @@ export const addEventCheckInCompleteForm = (skipFlag = false) => {
                 },
             });
 
-        if (confirmVal === "cancel") return;
-
+            if (confirmVal === "confirmed") specimenTemplate(data);
         }
-
-        specimenTemplate(data, formData, collections);
-
     });
-
 };
 export const goToParticipantSearch = () => {
     document.getElementById('navBarSearch').click();
@@ -1903,7 +1872,6 @@ const btnsClicked = async (connectId, formData) => {
     const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value.toUpperCase();
     const accessionID1 = document.getElementById('accessionID1');
     const accessionID2 = document.getElementById('accessionID2');
-    const select = document.getElementById('biospecimenVisitType');
 
     let hasError = false;
     let focus = true;
@@ -1990,7 +1958,6 @@ const btnsClicked = async (connectId, formData) => {
     formData['820476880'] = collectionID;
     formData['650516960'] = getWorflow() === 'research' ? 534621077 : 664882224;
     formData['387108065'] = enterSpecimenID1 ? 353358909 : 104430631;
-    formData['331584571'] = select ? parseInt(select.value) : '';
     formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
     formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
 
@@ -2015,6 +1982,8 @@ const btnsClicked = async (connectId, formData) => {
     }
 
     showAnimation(); 
+
+    formData['331584571'] = parseInt(getCheckedInVisit(data));
 
     await storeSpecimen([formData]);  
     const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
@@ -2443,29 +2412,20 @@ export const addEventFinalizeFormCntd = (specimenData) => {
 }
 
 const finalizeHandler = async (biospecimenData, cntd) => {
-    const masterSpecimenId = biospecimenData['820476880']
-    let formData = {};
 
     if (cntd) {
+        showAnimation();
+
         biospecimenData['410912345'] = 353358909;
         biospecimenData['556788178'] = new Date().toISOString();
-        showAnimation();
+
         await storeSpecimen([biospecimenData]);
+
+        hideAnimation();
         showNotifications({ title: 'Specimen Finalized', body: 'Collection Finalized Successfully!' });
-        const specimenData = (await searchSpecimen(masterSpecimenId)).data;
-        let query = `connectId=${parseInt(specimenData.Connect_ID)}`;
-        const response = await findParticipant(query);
-        const participantData = response.data[0];
-        hideAnimation();
-        if (!document.getElementById('participantCheckOut')) searchTemplate();
-        else checkOutScreen(participantData, specimenData);
     }
-    else {
-        showAnimation();
-        await storeSpecimen([formData]);
-        hideAnimation();
-        searchTemplate();
-    }
+
+    searchTemplate();
 }
 
 export const addEventReturnToCollectProcess = () => {

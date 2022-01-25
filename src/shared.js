@@ -1000,9 +1000,101 @@ export const allStates = {
     "NA": 52
 }
 
-export const visitType = {
-    '153098257': 'Baseline'
-}
+export const visitType = [
+    {'concept': '266600170', 'visitType': 'Baseline'},
+    {'concept': '496823485', 'visitType': 'Follow-up 1'},
+    {'concept': '650465111', 'visitType': 'Follow-up 2'},
+    {'concept': '303552867', 'visitType': 'Follow-up 3'}
+];
+
+export const checkedIn = (data) => {
+
+    let isCheckedIn = false;
+
+    if(data['331584571']) {
+        Array.from(visitType).forEach(visit => {
+            if(data['331584571'][visit.concept]) {
+                if(data['331584571'][visit.concept]['135591601'] && data['331584571'][visit.concept]['135591601'] === 353358909) {
+                    isCheckedIn = true;
+                }
+            }
+        });
+    }
+
+    return isCheckedIn;
+};
+
+export const getCheckedInVisit = (data) => {
+
+    let visitConcept;
+
+    Array.from(visitType).forEach(visit => {
+        if(data['331584571'][visit.concept] && data['331584571'][visit.concept]['135591601'] === 353358909) {
+            visitConcept = visit.concept;
+        }
+    });
+
+    return visitConcept;
+};
+
+export const checkInParticipant = async (data, visitConcept) => {
+    
+    let visits;
+    const user_uid = data.state.uid;
+
+    if(data['331584571']) {
+
+        visits = data['331584571'];
+
+        if(!visits[visitConcept]) {
+
+            visits[visitConcept] = {
+                '840048338': new Date()
+            }
+        }
+
+        visits[visitConcept]['135591601'] = 353358909;
+    }
+    else {
+
+        visits = {
+            visitConcept: {
+                '135591601': 353358909,
+                '840048338': new Date()
+            }
+        };
+    }
+
+    const checkInData = {
+        '331584571': visits,
+        uid: user_uid
+    };
+        
+    await updateParticipant(checkInData);
+};
+
+export const checkOutParticipant = async (data) => {
+
+    let visits = data['331584571'];
+    const checkedInVisit = getCheckedInVisit(data);
+    const user_uid = data.state.uid;
+
+    if(checkedInVisit) {
+
+        visits[checkedInVisit]['135591601'] = 104430631;
+
+        if(!visits[checkedInVisit]['343048998']) {
+            visits[checkedInVisit]['343048998'] = new Date();
+        }
+
+        const checkOutData = {
+            '331584571': visits,
+            uid: user_uid
+        };
+         
+         await updateParticipant(checkOutData);
+    }
+};
 
 export const getWorflow = () => document.getElementById('contentBody').dataset.workflow;
 

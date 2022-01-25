@@ -1,15 +1,22 @@
-import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType } from "./../shared.js";
+import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
-export const specimenTemplate = async (data, formData, collections) => {
+export const specimenTemplate = async (data) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenLink');
     navBarBtn.style.display = 'block';
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
+
+    // get rid of all this
+    let formData = {};
+    formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
+    formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
+
     let template = `
         </br>
+
         <div class="row">
             <h5>Specimen Link</h5>
         </div>
@@ -19,20 +26,17 @@ export const specimenTemplate = async (data, formData, collections) => {
                 <div class="row">${data['996038075']},<span id='399159511'>${data['399159511']}</span></div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
-            ${formData['331584571'] ? `
-                <div class="ml-auto form-group">
-                    Visit: ${visitType[formData['331584571']]}
-                </div>
-            `: ``}
         </div>
-        `;
-        
-        template += `</br><div class="">
-        <h4>Link a new Collection ID</h4><br/>
-        <h4> Visit: ${visitType[formData['331584571']] ?? "Baseline"}</h4>
+
+        </br>
+
+        <div class="">
+            <h4>Link a new Collection ID</h4><br/>
+            <h4> Visit: ${visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0].visitType}</h4>
         </div>
+
         <form id="specimenLinkForm" method="POST" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">
-         <div class="form-group row">`
+            <div class="form-group row">`
                 const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym ?? localStorage.getItem('siteAcronym');
                 const workflow = getWorflow() ?? localStorage.getItem('workflow');
                 if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {
