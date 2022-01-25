@@ -2714,14 +2714,11 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
       }
     })
 
-    // 
-
     document.getElementById(box+"trackingIdConfirm").addEventListener("input",e => {
       let input = document.getElementById(box+"trackingId").value.trim()
       let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
       let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
       let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
-
 
       if(inputConfirm.length < 12 && inputConfirm !== input && input !== "" && inputConfirm !== "") {
         document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
