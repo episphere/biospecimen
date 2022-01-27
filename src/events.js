@@ -1808,13 +1808,6 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
         }
         else {
 
-            const visitConcept = document.getElementById('visit-select').value;
-
-            if(!visitConcept) {
-                showNotifications({ title: 'Invalid Selection', body: 'Select a visit for check-in' }, true)
-                return;
-            }
-
             checkInParticipant(data, visitConcept);
 
             const confirmVal = await swal({
@@ -1849,6 +1842,18 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
         }
     });
 };
+
+export const addEventVisitSelection = () => {
+
+    const visitSelection = document.getElementById('visit-select');
+
+    visitSelection.addEventListener('change', () => {
+
+        const checkInButton = document.getElementById('checkInComplete');
+        checkInButton.disabled = !visitSelection.value;
+    });
+}
+
 export const goToParticipantSearch = () => {
     document.getElementById('navBarSearch').click();
 }

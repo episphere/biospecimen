@@ -1,5 +1,5 @@
 import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit } from "./../shared.js";
-import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch } from "./../events.js";
+import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 
 export const checkInTemplate = (data) => {
     removeActiveClass('navbar-btn', 'active')
@@ -44,7 +44,7 @@ export const checkInTemplate = (data) => {
 
                 </div>
                 <div class="col-md-3">
-                    <button class="btn btn-outline-primary btn-block text-nowrap" type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
+                    <button class="btn btn-outline-primary btn-block text-nowrap" ${isCheckedIn ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
                 </div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
@@ -60,6 +60,7 @@ export const checkInTemplate = (data) => {
     addEventContactInformationModal(data);
     addEventBackToSearch('navBarSearch');
     addEventCheckInCompleteForm(isCheckedIn);
+    addEventVisitSelection();
 }
 
 const participantStatus = (data) => {
