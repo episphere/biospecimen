@@ -1058,7 +1058,7 @@ export const checkInParticipant = async (data, visitConcept) => {
     else {
 
         visits = {
-            visitConcept: {
+            [visitConcept]: {
                 '135591601': 353358909,
                 '840048338': new Date()
             }
