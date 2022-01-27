@@ -1808,6 +1808,8 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
         }
         else {
 
+            const visitConcept = document.getElementById('visit-select').value;
+
             checkInParticipant(data, visitConcept);
 
             const confirmVal = await swal({
