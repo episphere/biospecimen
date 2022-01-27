@@ -1840,7 +1840,12 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
                 },
             });
 
-            if (confirmVal === "confirmed") specimenTemplate(data);
+            if (confirmVal === "confirmed") {
+                const updatedResponse = await findParticipant(query);
+                const updatedData = updatedResponse.data[0];
+
+                specimenTemplate(updatedData);
+            }
         }
     });
 };
