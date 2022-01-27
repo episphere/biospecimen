@@ -22,7 +22,7 @@ export const finalizeTemplate = (data, specimenData) => {
             </div>
             ${specimenData['331584571'] ? `
                 <div class="ml-auto form-group">
-                    Visit: ${visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0].visitType}
+                    Visit: ${visitType.filter(visit => visit.concept == specimenData['331584571'])[0].visitType}
                 </div>
             ` : ``
             }
