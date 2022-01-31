@@ -1,6 +1,6 @@
 import { userNavBar, adminNavBar, nonUserNavBar } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
-import { shipmentTracking } from "./pages/shipping.js"
+import { shipmentTracking, shippingManifest } from "./pages/shipping.js"
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
 import { workflows } from "./tubeValidation.js";
@@ -295,7 +295,7 @@ export const errorMessage = (id, msg, focus, offset) => {
     if(focus) currentElement.focus();
 }
 
-export const shippingPrintManifestReminder = (toDisplayJSON, userName, currChecked) => {
+export const shippingPrintManifestReminder = (boxesToShip, userName, tempCheckStatus) => {
   const button = document.createElement('button');
     button.dataset.target = '#biospecimenModal';
     button.dataset.toggle = 'modal';
@@ -316,7 +316,7 @@ export const shippingPrintManifestReminder = (toDisplayJSON, userName, currCheck
                 <div style="display:flex; justify-content:center; margin-bottom:1rem;">
                   <i class="fas fa-exclamation-triangle fa-5x" style="color:#ffc107"></i>
                 </div>
-                <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; "><span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Print Reminder</span> Have you printed the shipping manifest?</p>
+                <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; "><span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Print Reminder</span> Have you printed the box manifest(s)?</p>
             </div>
         </div>
         <div class="row" style="display:flex; justify-content:center;">
@@ -325,8 +325,8 @@ export const shippingPrintManifestReminder = (toDisplayJSON, userName, currCheck
         </div>
 `;
   const shipManifestConfirmButton = document.getElementById("shipManifestConfirm")
-  shipManifestConfirmButton.addEventListener("click", e => {
-    shipmentTracking(toDisplayJSON, userName, currChecked);
+  shipManifestConfirmButton.addEventListener("click", async () => {
+    await shippingManifest(boxesToShip, userName, tempCheckStatus);
   })
 }
 
