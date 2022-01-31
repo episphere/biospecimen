@@ -228,7 +228,7 @@ export const shippingNavBar = () => {
                 <button class="nav-link navbar-btn" id="navBarBoxManifest">Box Manifest</button>
             </li>
             <li class="nav-item col-auto">
-                <button class="nav-link navbar-btn" id="navBarShippingManifest">Shipping Manifest</button>
+                <button class="nav-link navbar-btn" id="navBarReviewShipmentContents">Review Shipment Contents</button>
             </li>
             <li class="nav-item col-auto">
                 <button class="nav-link navbar-btn" id="navBarShipmentTracking">Assign Tracking Information</button>
