@@ -2557,7 +2557,7 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
         boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
         checkShipForage(shipSetForage,boxesToShip)
         //return box 1 info
-        shippingPrintManifestReminder(boxesToShip, userName, tempCheckStatus)
+        shippingPrintManifestReminder(boxesToShip, userName, tempCheckStatus);
     });
 }
 
