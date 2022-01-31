@@ -79,7 +79,7 @@ const participantStatus = (data) => {
                         <span class="full-width">Consent</span>
                     </div>
                     <div class="row">
-                        <span class="full-width"><i class="fas fa-2x fa-check"></i></span>
+                        <span class="full-width">${data['919254129'] === 353358909 ? `<i class="fas fa-2x fa-check"></i>` : `<i class="fas fa-2x fa-times"></i>`}</i></span>
                     </div>
                     <div class="row">
                         <span class="full-width">${new Date(data['454445267']).toLocaleString()}</span>
