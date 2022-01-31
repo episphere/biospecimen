@@ -446,9 +446,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
             currChecked = document.getElementById('tempBox').value;
         }
         //return box 1 info
-        
         shipmentTracking(toDisplayJSON, userName, currChecked);
-        
     });
     //addEventNavBarShipment("navBarShippingDash");
     //addEventBackToSearch('backToSearch');

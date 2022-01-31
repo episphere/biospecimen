@@ -2558,7 +2558,6 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
         checkShipForage(shipSetForage,boxesToShip)
         //return box 1 info
         shippingPrintManifestReminder(boxesToShip, userName, tempCheckStatus)
-        // await shippingManifest(boxesToShip, userName, tempCheckStatus);
     });
 }
 
