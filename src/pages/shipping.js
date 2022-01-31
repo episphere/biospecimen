@@ -442,16 +442,13 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
         }
         //let currChecked = document.getElementById('tempMonitorChecked').checked;
         let currChecked = false;
-        let printManifestClicked = document.getElementById('printBox').classList.contains('print-manifest')
         if(tempMonitorThere){
             currChecked = document.getElementById('tempBox').value;
         }
         //return box 1 info
-        if(printManifestClicked) {
-          shippingPrintManifestReminder(toDisplayJSON, userName, currChecked)
-        } else {
-          shipmentTracking(toDisplayJSON, userName, currChecked);
-        }
+        
+        shipmentTracking(toDisplayJSON, userName, currChecked);
+        
     });
     //addEventNavBarShipment("navBarShippingDash");
     //addEventBackToSearch('backToSearch');
