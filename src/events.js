@@ -869,6 +869,8 @@ export const populateBoxManifestHeader = (boxId, hiddenJSON, currInstitute) => {
 
     let newDiv = document.createElement("div")
     let newP = document.createElement("p");
+    newP.style.fontWeight = 700;
+    newP.style.fontSize = "1.5rem";
     newP.innerHTML = boxId + " Manifest";
     document.getElementById('boxManifestCol1').appendChild(newP);
     let toInsertDate = ''
