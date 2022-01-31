@@ -234,7 +234,7 @@ export const shippingNavBar = () => {
                 <button class="nav-link navbar-btn" id="navBarShipmentTracking">Assign Tracking Information</button>
             </li>
             <li class="nav-item col-auto">
-                <button class="nav-link navbar-btn" id="navBarSummaryAndReview">Summary and Review</button>
+                <button class="nav-link navbar-btn" id="navBarFinalizeShipment">Finalize Shipment</button>
             </li>
         </ul>`
 }

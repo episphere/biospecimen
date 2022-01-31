@@ -614,14 +614,14 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
     
     removeActiveClass('navbar-btn', 'active')
     document.getElementById('contentHeader').innerHTML = `<h2 >Connect for Cancer Prevention Study</h2></br>` + shippingNavBar();
-    const navBarBtn = document.getElementById('navBarSummaryAndReview');
+    const navBarBtn = document.getElementById('navBarFinalizeShipment');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
     
  
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarTracking("returnToTracking", userName, hiddenJSON, tempChecked)
-    addEventNavBarTracking("navBarSummaryAndReview", userName, hiddenJSON, tempChecked)
+    addEventNavBarTracking("navBarFinalizeShipment", userName, hiddenJSON, tempChecked)
     if(Object.keys(hiddenJSON).length > 0){
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
     }
