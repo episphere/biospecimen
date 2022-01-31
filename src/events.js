@@ -914,7 +914,7 @@ export const populateBoxManifestHeader = (boxId, hiddenJSON, currInstitute) => {
     newDiv.innerHTML = displayContactInformation(currInstitute, siteContactInformation)
     document.getElementById('boxManifestCol1').appendChild(newDiv);
 
-    newP.innerHTML = "Number of Bags: " + numBags;
+    newP.innerHTML = "Number of Sleeves/Bags: " + numBags;
     document.getElementById('boxManifestCol3').appendChild(newP);
     newP = document.createElement("p");
     newP.innerHTML = "Number of Tubes:  " + numTubes;
