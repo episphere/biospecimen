@@ -2561,7 +2561,7 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
     });
 }
 
-export const addEventReturnToShippingManifest = (element, hiddenJSON, userName, tempChecked) => {
+export const addEventReturnToReviewShipmentContents = (element, hiddenJSON, userName, tempChecked) => {
     const btn = document.getElementById(element);
     document.getElementById(element).addEventListener('click', async e => {
         let boxesToShip = Object.keys(hiddenJSON).sort(compareBoxIds)

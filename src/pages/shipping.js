@@ -1,5 +1,5 @@
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation, shippingPrintManifestReminder} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToShippingManifest, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackNumPaste, addEventSaveContinue, addEventShipPrintManifest} from "./../events.js";
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackNumPaste, addEventSaveContinue, addEventShipPrintManifest} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
 
 const conversion = {
@@ -186,7 +186,7 @@ export const startShipping = async (userName) => {
             <h4 style="text-align:start;">Select one or more boxes to ship</h4>
           </div>
           <div class="col-3 no-gutters">
-          <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging" style="margin:auto;display:block;">Continue to Shipping Manifest</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging" style="margin:auto;display:block;">Continue to Review Shipment Contents</button>
           </div>
         </div>
         <div style="border: 1px solid black; overflow: auto; margin-bottom: 0.5rem; height: 400px;">
@@ -411,7 +411,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
         </div>
         `;*/
     removeActiveClass('navbar-btn', 'active')
-    const navBarBtn = document.getElementById('navBarShippingManifest');
+    const navBarBtn = document.getElementById('navBarReviewShipmentContents');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
     if(tempMonitorThere){
@@ -517,7 +517,7 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
     }
     //addEventReturnToShippingManifest('returnToShipping', hiddenJSON, userName, tempCheckChecked)
     addEventNavBarShipment("navBarShippingDash", userName);
-    addEventReturnToShippingManifest('navBarShippingManifest', hiddenJSON, userName, tempCheckChecked)
+    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', hiddenJSON, userName, tempCheckChecked)
     await populateTrackingQuery(hiddenJSON);
     addEventTrimTrackingNums()
     addEventPreventTrackNumPaste()
@@ -626,7 +626,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
     }
     populateFinalCheck(hiddenJSON);
-    addEventReturnToShippingManifest('navBarShippingManifest', hiddenJSON, userName)
+    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', hiddenJSON, userName)
     addEventCompleteShippingButton(hiddenJSON, userName, tempChecked, shipmentCourier);
     addEventBackToSearch('navBarShippingDash');
     //addEventBackToSearch('navBarShippingDash');
