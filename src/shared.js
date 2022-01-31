@@ -326,7 +326,7 @@ export const shippingPrintManifestReminder = (boxesToShip, userName, tempCheckSt
 `;
   const shipManifestConfirmButton = document.getElementById("shipManifestConfirm")
   shipManifestConfirmButton.addEventListener("click", async () => {
-    await shippingManifest(boxesToShip, userName, tempCheckStatus)
+    await shippingManifest(boxesToShip, userName, tempCheckStatus);
   })
 }
 
