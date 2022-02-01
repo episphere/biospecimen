@@ -775,12 +775,22 @@ export const siteContactInformation = {
   }]
 }
 
-export const verifiedConversion = {
+export const verificationConversion = {
     '875007964': 'Not Yet Verified',
     '197316935': 'Verified',
     '219863910': 'Cannot Be Verified',
     '922622075': 'Duplicate',
     '160161595': 'Outreach Maxed Out'
+};
+
+export const participationConversion = {
+    '980683548': 'No Refusal',
+    '581116389': 'Refused some activities',
+    '458508122': 'Refused all future activities',
+    '769989901': 'Revoked HIPAA only',
+    '815443726': 'Withdrew consent',
+    '119607689': 'Destroy data',
+    '618686157': 'Deceased'
 };
 
 export const addEventBarCodeScanner = (id, start, end) => {

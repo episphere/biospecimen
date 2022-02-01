@@ -1,4 +1,4 @@
-import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit } from "./../shared.js";
+import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion } from "./../shared.js";
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 
 export const checkInTemplate = (data) => {
@@ -89,23 +89,26 @@ const participantStatus = (data) => {
             <div class="col-md-4">
                 <div class="col-md-12 info-box">
                     <div class="row">
-                        <span class="full-width">Verification</span>
+                        <span class="full-width">Verification Status</span>
                     </div>
                     <div class="row">
                         <span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${verificationConversion[data['821247024']]}</span>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="col-md-12 info-box">
                     <div class="row">
-                        <span class="full-width">${data['821247024'] === 197316935 ? `Not Withdrawn` : `Withdrawn`}</span>
+                        <span class="full-width">Participation Status</span>
                     </div>
                     <div class="row">
-                        <span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>` : `<i class="fas fa-2x fa-times"></i>`}</span>
+                        <span class="full-width">${data['912301837'] === 980683548 ? `<i class="fas fa-2x fa-check"></i>` : `<i class="fas fa-2x fa-times"></i>`}</span>
                     </div>
                     <div class="row">
-                        </br>
+                    <span class="full-width">${participationConversion[data['912301837']]}</span>
                     </div>
                 </div>
             </div>

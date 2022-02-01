@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates, getWorflow, isDeviceMobile, replaceDateInputWithMaskedInput, checkedIn, verifiedConversion } from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates, getWorflow, isDeviceMobile, replaceDateInputWithMaskedInput, checkedIn, verificationConversion } from "./../shared.js"
 import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 
@@ -175,7 +175,7 @@ export const searchResults = (result) => {
                 <td>${data['564964481']}/${data['795827569']}/${data['544150384']}</td>
                 <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
                 <td>${data.Connect_ID}</td>
-                <td>${verifiedConversion[[data['821247024']]]}</td>
+                <td>${verificationConversion[[data['821247024']]]}</td>
                 <td>${data['773707518'] === 353358909 || data['831041022'] === 353358909 || data['747006172'] === 353358909 ? `<i class="fas fa-2x fa-times"></i>` : `<i class="fas fa-2x fa-check"></i>`}</td>
         
                 <td>
