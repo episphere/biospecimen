@@ -293,7 +293,16 @@ export const boxManifest = async (boxId, userName) => {
                 </tr>
             </table>
         </div>
-        <div class="row" style="margin-top:100px">
+        <div class="row" style="margin-top:3.125rem">
+          <div class="card" style="width:100%">
+            <div class="card-body" style="text-align:center;">
+              <p style="margin-bottom: 0;">
+                <strong><span style="margin-right:0.5rem;"><i class="fas fa-exclamation-triangle fa-lg" style="color:#ffc107"></i></span>IMPORTANT: PRINT AND INCLUDE THIS MANIFEST IN SHIPPING BOX</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:3.125rem">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Return to Packaging</button>
             </div>
