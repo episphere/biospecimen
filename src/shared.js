@@ -775,6 +775,13 @@ export const siteContactInformation = {
   }]
 }
 
+export const verifiedConversion = {
+    '875007964': 'Not Yet Verified',
+    '197316935': 'Verified',
+    '219863910': 'Cannot Be Verified',
+    '922622075': 'Duplicate',
+    '160161595': 'Outreach Maxed Out'
+};
 
 export const addEventBarCodeScanner = (id, start, end) => {
     const liveStreamConfig = {
