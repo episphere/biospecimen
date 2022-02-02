@@ -793,6 +793,12 @@ export const participationConversion = {
     '618686157': 'Deceased'
 };
 
+export const surveyConversion = {
+    '972455046': 'Not Started',
+    '615768760': 'Started',
+    '231311385': 'Submitted'
+};
+
 export const addEventBarCodeScanner = (id, start, end) => {
     const liveStreamConfig = {
         inputStream: {
