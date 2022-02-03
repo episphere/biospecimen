@@ -160,7 +160,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         placeholder="Details (Optional)" 
                                         id="${obj.concept}DeviatedExplanation" 
                                         ${formData[obj.concept]['536710547'] ? `value='${formData[`${obj.concept}`]['536710547']}'`: formData[obj.concept]['338286049'] ? `value='${formData[`${obj.concept}`]['338286049']}'` : ``}
-                                        disabled
+                                        ${tubeCollected ? 'disabled': ''}
                                     >
                                     `: ``}
                                 </td>
