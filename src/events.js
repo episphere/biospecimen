@@ -2166,20 +2166,14 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     const data = biospecimenData;
     removeAllErrors();
 
-    const checkboxes = Array.from(document.getElementsByClassName('tube-collected'));
     if (getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
-    checkboxes.forEach((dt) => {
-        if (biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
-        if (biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
-            biospecimenData[`${dt.id}`] = {};
-        }
-        biospecimenData[`${dt.id}`]['593843561'] = dt.checked ? 353358909 : 104430631;
-    });
 
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
+
     let hasError = false;
     let focus = true;
     let hasCntdError = false;
+
     inputFields.forEach(input => {
         const siteTubesList = getSiteTubesLists(biospecimenData)
         const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
@@ -2223,12 +2217,26 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
         if (input.required) data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim();
     });
+    
     if ((hasError && cntd == true) || hasCntdError) return;
-
-    const textAreas = document.getElementsByClassName('additional-explanation');
 
     const reasons = Array.from(document.querySelectorAll('[id$="Reason"]'));
     const deviations = Array.from(document.querySelectorAll('[id$="Deviation"]'));
+    const tubesCollected = Array.from(document.getElementsByClassName('tube-collected'));
+
+    tubesCollected.forEach((tube) => {
+        if (biospecimenData[`${tube.id}`] === undefined) biospecimenData[`${tube.id}`] = {};
+        if (biospecimenData[tube.id] && biospecimenData[tube.id]['593843561'] === 353358909 && tube.checked === false) {
+            biospecimenData[`${tube.id}`] = {};
+        }
+
+        biospecimenData[`${tube.id}`]['593843561'] = tube.checked ? 353358909 : 104430631;
+
+        //get value from not selected
+        //tube[value] = value
+
+        //if value -> tube[comment] = comment.value
+    });
 
     reasons.forEach(reason => {
         const tubeId = reason.id.replace('Reason', '');
