@@ -2061,17 +2061,12 @@ export const addEventBiospecimenCollectionFormToggles = (dt, biospecimenData) =>
     deviationBoxes.forEach(deviation => {
 
         const type = document.getElementById(deviation.id.replace('Deviated', 'Deviation'));
-        const comment = document.getElementById(deviation.id + 'Explanation');
 
         deviation.addEventListener('change', () => {
 
             type.disabled = !deviation.checked;
-            comment.disabled = !deviation.checked;
 
-            if(!deviation.checked) {
-                type.value = '';
-                comment.value = '';
-            }
+            if(!deviation.checked) type.value = '';
         });
     });
 };
@@ -2224,30 +2219,32 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     const tubesCollected = Array.from(document.getElementsByClassName('tube-collected'));
 
     tubesCollected.forEach((tube) => {
-        if (biospecimenData[`${tube.id}`] === undefined) biospecimenData[`${tube.id}`] = {};
+        if (biospecimenData[tube.id] === undefined) biospecimenData[`${tube.id}`] = {};
         if (biospecimenData[tube.id] && biospecimenData[tube.id]['593843561'] === 353358909 && tube.checked === false) {
-            biospecimenData[`${tube.id}`] = {};
+            biospecimenData[tube.id] = {};
         }
 
-        biospecimenData[`${tube.id}`]['593843561'] = tube.checked ? 353358909 : 104430631;
+        biospecimenData[tube.id]['593843561'] = tube.checked ? 353358909 : 104430631;
 
         const reason = document.getElementById(tube.id + 'Reason');
         const comment = document.getElementById(tube.id + 'DeviatedExplanation');
 
-        if(reason.value) {
-            biospecimenData[tubeId]['883732523'] = reason.value; //THIS NEEDS TO CHANGE WITH OTHER ISSUE
-            biospecimenData[tubeId]['338286049'] = comment.value.trim();
-        }
-        else {
-            biospecimenData[tubeId]['883732523'] = ''; //THIS NEEDS TO CHANGE WITH OTHER ISSUE
-            biospecimenData[tubeId]['338286049'] = '';
-        }
+        if(reason) {
+            if(reason.value) {
+                biospecimenData[tube.id]['883732523'] = reason.value; //THIS NEEDS TO CHANGE WITH OTHER ISSUE
+                biospecimenData[tube.id]['338286049'] = comment.value.trim();
+            }
+            else {
+                biospecimenData[tube.id]['883732523'] = ''; //THIS NEEDS TO CHANGE WITH OTHER ISSUE
+                biospecimenData[tube.id]['338286049'] = '';
+            }
 
-        if(biospecimenData[tubeId]['338286049'].includes(181769837) && !comment.value.trim()) { 
-            hasError = true;
-            errorMessage(comment.id, 'Please provide more details', focus);
-            focus = false;
-            return
+            if(biospecimenData[tube.id]['883732523'].includes(181769837) && !comment.value.trim()) { 
+                hasError = true;
+                errorMessage(comment.id, 'Please provide more details', focus);
+                focus = false;
+                return
+            }
         }
     });
 
