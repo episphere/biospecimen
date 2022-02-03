@@ -2629,94 +2629,124 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
   let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
 
   // Check on page load 
+
+  // boxes.forEach(box => {
+  //   let input = document.getElementById(box+"trackingId").value.trim()
+  //   let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+  //   let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+  //   let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+  //   if(input.length > 0 && input.length < 12) {
+  //     document.getElementById(box+"trackingId").classList.add("invalid")
+  //     inputErrorMsg.textContent = `Please input a 12 digit tracking number`
+  //   }
+  //   if(inputConfirm.length > 0 && inputConfirm.length < 12) {
+  //     document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+  //     inputConfirmErrorMsg.textContent = `Please input a 12 digit tracking number`
+  //   }
+  //   if(input !== inputConfirm && input.length > 0 && input.length < 12 && inputConfirm.length > 0 && inputConfirm.length < 12) {
+  //     document.getElementById(box+"trackingId").classList.add("invalid")
+  //     document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+  //     inputErrorMsg.textContent = `Please match ${box} confirm input and input a 12 digit tracking number` 
+  //     inputConfirmErrorMsg.textContent = `Please match ${box} start input and input a 12 digit tracking number` 
+  //   }
+  //   else if(input !== inputConfirm) {
+  //     document.getElementById(box+"trackingId").classList.add("invalid")
+  //     document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+  //     inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
+  //     inputErrorMsg.textContent = "Please match " + box + " confirm input"
+  //   }
+  // })
+      
+  // boxes.forEach(box => {
+  //   document.getElementById(box+"trackingId").addEventListener("input", e => {
+  //     let input = document.getElementById(box+"trackingId").value.trim()
+  //     let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+  //     let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+  //     let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+
+      
+  //     if(input.length < 12 && input !== inputConfirm) {
+  //       document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+  //       inputErrorMsg.textContent = `Please match ${box} confirm input and input a 12 digit tracking number` 
+  //     }
+  //     else if(input.length < 12) {
+  //       document.getElementById(box+"trackingId").classList.add("invalid")
+  //       inputErrorMsg.textContent = `Please input a 12 digit tracking number`
+  //     }
+  //     else if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
+  //       // add invalid red border
+  //       document.getElementById(box+"trackingId").classList.add("invalid")
+  //       document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+  //       inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
+  //       inputErrorMsg.textContent = "Please match " + box + " confirm input"
+  //     } 
+  //     else if (input === inputConfirm && input.length >= 12) {
+  //       // remove invalid
+  //       document.getElementById(box+"trackingId").classList.remove("invalid")
+  //       document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
+  //       inputErrorMsg.textContent = ""
+  //       inputConfirmErrorMsg.textContent = ""
+  //     }
+  //   })
+
+    // document.getElementById(box+"trackingIdConfirm").addEventListener("input",e => {
+    //   let input = document.getElementById(box+"trackingId").value.trim()
+    //   let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+    //   let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+    //   let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+
+    //   if(inputConfirm.length < 12 && inputConfirm !== input) {
+    //     document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+    //     inputConfirmErrorMsg.textContent = `Please match ${box} start input and input a 12 digit tracking number` 
+    //   }
+    //   else if(inputConfirm.length < 12){
+    //     document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+    //     inputConfirmErrorMsg.textContent = "Please input a 12 digit tracking number"
+    //   }
+    //   else if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
+    //     // add invalid red border
+    //     document.getElementById(box+"trackingId").classList.add("invalid")
+    //     document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+    //     inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
+    //     inputErrorMsg.textContent = "Please match " + box + " confirm input"
+    //   } else if (input === inputConfirm && inputConfirm.length >= 12) {
+    //     // remove invalid
+    //     document.getElementById(box+"trackingId").classList.remove("invalid")
+    //     document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
+    //     inputErrorMsg.textContent = ""
+    //     inputConfirmErrorMsg.textContent = ""
+    //   }
+    // })
+  // })
+
+  /* 
+  Steps Check - On Load
+  Check if input is 12 digits - ???
+  Check if input confirm matches input - ???
+  */
   boxes.forEach(box => {
     let input = document.getElementById(box+"trackingId").value.trim()
     let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+    let inputTest = document.getElementById(box+"trackingId").value
+    let inputConfirmTest = document.getElementById(box+"trackingIdConfirm").value
     let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
     let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
-    if(input.length > 0 && input.length < 12) {
+
+    console.log(`input trim val: ${input}, input no trim val: ${inputTest}`)
+    console.log(`input confirm trim val: ${inputConfirm}, input confirm no trim val: ${inputConfirmTest}`)
+
+    if(input.length == 12) {
+      console.log("input field does not equal 12")
       document.getElementById(box+"trackingId").classList.add("invalid")
-      inputErrorMsg.textContent = `Please input a 12 digit tracking number`
+      inputErrorMsg.textContent = `Tracking number must be 12 digits`
     }
-    if(inputConfirm.length > 0 && inputConfirm.length < 12) {
+    if(inputConfirm !== input ) {
+      console.log(`inputConfirm does not match input`)
       document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
-      inputConfirmErrorMsg.textContent = `Please input a 12 digit tracking number`
-    }
-    if(input !== inputConfirm && input.length > 0 && input.length < 12 && inputConfirm.length > 0 && inputConfirm.length < 12) {
-      document.getElementById(box+"trackingId").classList.add("invalid")
-      document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
-      inputErrorMsg.textContent = `Please match ${box} confirm input and input a 12 digit tracking number` 
-      inputConfirmErrorMsg.textContent = `Please match ${box} start input and input a 12 digit tracking number` 
-    }
-    else if(input !== inputConfirm) {
-      document.getElementById(box+"trackingId").classList.add("invalid")
-      document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
-      inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
-      inputErrorMsg.textContent = "Please match " + box + " confirm input"
+      inputConfirmErrorMsg.textContent = `Tracking numbers must match`
     }
   })
 
-  boxes.forEach(box => {
-    document.getElementById(box+"trackingId").addEventListener("input", e => {
-      let input = document.getElementById(box+"trackingId").value.trim()
-      let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
-      let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
-      let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
-
-      
-      if(input.length < 12 && input !== inputConfirm) {
-        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
-        inputErrorMsg.textContent = `Please match ${box} confirm input and input a 12 digit tracking number` 
-      }
-      else if(input.length < 12) {
-        document.getElementById(box+"trackingId").classList.add("invalid")
-        inputErrorMsg.textContent = `Please input a 12 digit tracking number`
-      }
-      else if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
-        // add invalid red border
-        document.getElementById(box+"trackingId").classList.add("invalid")
-        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
-        inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
-        inputErrorMsg.textContent = "Please match " + box + " confirm input"
-      } 
-      else if (input === inputConfirm && input.length >= 12) {
-        // remove invalid
-        document.getElementById(box+"trackingId").classList.remove("invalid")
-        document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
-        inputErrorMsg.textContent = ""
-        inputConfirmErrorMsg.textContent = ""
-      }
-    })
-
-    document.getElementById(box+"trackingIdConfirm").addEventListener("input",e => {
-      let input = document.getElementById(box+"trackingId").value.trim()
-      let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
-      let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
-      let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
-
-      if(inputConfirm.length < 12 && inputConfirm !== input) {
-        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
-        inputConfirmErrorMsg.textContent = `Please match ${box} start input and input a 12 digit tracking number` 
-      }
-      else if(inputConfirm.length < 12){
-        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
-        inputConfirmErrorMsg.textContent = "Please input a 12 digit tracking number"
-      }
-      else if(input !== inputConfirm && input !== "" && inputConfirm !== "") {
-        // add invalid red border
-        document.getElementById(box+"trackingId").classList.add("invalid")
-        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
-        inputConfirmErrorMsg.textContent = "Please match " + box + " start input"
-        inputErrorMsg.textContent = "Please match " + box + " confirm input"
-      } else if (input === inputConfirm && inputConfirm.length >= 12) {
-        // remove invalid
-        document.getElementById(box+"trackingId").classList.remove("invalid")
-        document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
-        inputErrorMsg.textContent = ""
-        inputConfirmErrorMsg.textContent = ""
-      }
-    })
-  })
 }
 
 export const populateSelectLocationList = async () => {
