@@ -2163,7 +2163,7 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
 }
 
 const collectionSubmission = async (dt, biospecimenData, cntd) => {
-    const data = biospecimenData;
+    
     removeAllErrors();
 
     if (getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
@@ -2215,7 +2215,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
             focus = false;
         }
 
-        if (input.required) data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim();
+        if (input.required) biospecimenData[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim();
     });
 
     if ((hasError && cntd == true) || hasCntdError) return;
@@ -2232,7 +2232,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         biospecimenData[`${tube.id}`]['593843561'] = tube.checked ? 353358909 : 104430631;
 
         const reason = document.getElementById(tube.id + 'Reason');
-        const comment = document.getElementById(tube.id + 'Explanation');
+        const comment = document.getElementById(tube.id + 'DeviatedExplanation');
 
         if(reason.value) {
             biospecimenData[tubeId]['883732523'] = reason.value; //THIS NEEDS TO CHANGE WITH OTHER ISSUE
@@ -2241,6 +2241,13 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         else {
             biospecimenData[tubeId]['883732523'] = ''; //THIS NEEDS TO CHANGE WITH OTHER ISSUE
             biospecimenData[tubeId]['338286049'] = '';
+        }
+
+        if(biospecimenData[tubeId]['338286049'].includes(181769837) && !comment.value.trim()) { 
+            hasError = true;
+            errorMessage(comment.id, 'Please provide more details', focus);
+            focus = false;
+            return
         }
     });
 
@@ -2259,9 +2266,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
             biospecimenData[tubeId]['248868659'] = '';
             biospecimenData[tubeId]['536710547'] = '';
         }
-        
 
-        // Discard tube
         if (biospecimenData[tubeId]['248868659'].includes(472864016) || biospecimenData[tubeId]['248868659'].includes(956345366)) {
             biospecimenData[tubeId]['762124027'] = 353358909
         }
@@ -2269,32 +2274,31 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
             biospecimenData[tubeId]['762124027'] = 104430631
         }
 
-        if (biospecimenData[tubeId]['248868659'].includes(453343022) && !ta.value.trim()) { // If other is selected, make text area mandatory.
+        if (biospecimenData[tubeId]['248868659'].includes(453343022) && !deviationNotes.value.trim()) { // If other is selected, make text area mandatory.
             hasError = true;
-            errorMessage(ta.id, 'Please provide more details', focus);
+            errorMessage(deviationNotes.id, 'Please provide more details', focus);
             focus = false;
             return
         }
-
     });
 
     if (hasError) return;
 
-    data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
+    biospecimenData['338570265'] = document.getElementById('collectionAdditionalNotes').value;
 
     showAnimation();
 
     if (cntd) {
         if (getWorflow() === 'clinical') {
-            if (data['915838974'] === undefined) data['915838974'] = new Date().toISOString();
+            if (biospecimenData['915838974'] === undefined) biospecimenData['915838974'] = new Date().toISOString();
         }
-        await storeSpecimen([data]);
+        await storeSpecimen([biospecimenData]);
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
         finalizeTemplate(dt, specimenData);
     }
     else {
-        await storeSpecimen([data]);
+        await storeSpecimen([biospecimenData]);
 
         await swal({
             title: "Success",
