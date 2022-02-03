@@ -2217,10 +2217,9 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
         if (input.required) data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim();
     });
-    
+
     if ((hasError && cntd == true) || hasCntdError) return;
 
-    const reasons = Array.from(document.querySelectorAll('[id$="Reason"]'));
     const deviations = Array.from(document.querySelectorAll('[id$="Deviation"]'));
     const tubesCollected = Array.from(document.getElementsByClassName('tube-collected'));
 
@@ -2232,18 +2231,17 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
         biospecimenData[`${tube.id}`]['593843561'] = tube.checked ? 353358909 : 104430631;
 
-        //get value from not selected
-        //tube[value] = value
+        const reason = document.getElementById(tube.id + 'Reason');
+        const comment = document.getElementById(tube.id + 'Explanation');
 
-        //if value -> tube[comment] = comment.value
-    });
-
-    reasons.forEach(reason => {
-        const tubeId = reason.id.replace('Reason', '');
-
-        biospecimenData[tubeId]['883732523'] = reason.value;
-
-        // biospecimenData[tubeId]['338286049'] = ta.value.trim();
+        if(reason.value) {
+            biospecimenData[tubeId]['883732523'] = reason.value; //THIS NEEDS TO CHANGE WITH OTHER ISSUE
+            biospecimenData[tubeId]['338286049'] = comment.value.trim();
+        }
+        else {
+            biospecimenData[tubeId]['883732523'] = ''; //THIS NEEDS TO CHANGE WITH OTHER ISSUE
+            biospecimenData[tubeId]['338286049'] = '';
+        }
     });
 
     deviations.forEach(deviation => {
