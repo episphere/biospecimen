@@ -94,7 +94,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                                         <option value=""> -- Select Reason -- </option>`
 
                                                         notCollectedOptions.forEach(option => {
-                                                            template += `<option ${formData[`${obj.concept}`]['883732523'] == `${option.concept}` ? 'selected' : ''} value=${option.concept}>${option.label}</option>`;
+                                                            template += `<option ${formData[`${obj.concept}`]['883732523'] == option.concept ? 'selected' : ''} value=${option.concept}>${option.label}</option>`;
                                                         })
 
                                                 template += `</select>`    
