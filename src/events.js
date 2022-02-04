@@ -2152,6 +2152,13 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
 
     siteTubesList.forEach((dt) => {
         if(biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = {'593843561': 104430631};
+
+        if(biospecimenData[dt.concept]['248868659'] === undefined && dt.deviationOptions) {
+            biospecimenData[dt.concept]['248868659'] = {};
+            dt.deviationOptions.forEach(dev => {
+                biospecimenData[dt.concept]['248868659'][dev.concept] = 104430631;
+            });
+        }
     });
 
     await storeSpecimen([biospecimenData]);
