@@ -2231,19 +2231,19 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
         if(reason) {
             if(reason.value) {
-                biospecimenData[tube.id]['883732523'] = reason.value; //THIS NEEDS TO CHANGE WITH OTHER ISSUE
+                biospecimenData[tube.id]['883732523'] = parseInt(reason.value); 
                 biospecimenData[tube.id]['338286049'] = comment.value.trim();
+
+                if(biospecimenData[tube.id]['883732523'] === 181769837 && !comment.value.trim()) { 
+                    hasError = true;
+                    errorMessage(comment.id, 'Please provide more details', focus);
+                    focus = false;
+                    return
+                }
             }
             else {
-                biospecimenData[tube.id]['883732523'] = ''; //THIS NEEDS TO CHANGE WITH OTHER ISSUE
+                delete biospecimenData[tube.id]['883732523'];
                 biospecimenData[tube.id]['338286049'] = '';
-            }
-
-            if(biospecimenData[tube.id]['883732523'].includes(181769837) && !comment.value.trim()) { 
-                hasError = true;
-                errorMessage(comment.id, 'Please provide more details', focus);
-                focus = false;
-                return
             }
         }
     });
