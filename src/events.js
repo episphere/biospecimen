@@ -2222,7 +2222,6 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
     if ((hasError && cntd == true) || hasCntdError) return;
 
-    const deviations = Array.from(document.querySelectorAll('[id$="Deviation"]'));
     const tubesCollected = Array.from(document.getElementsByClassName('tube-collected'));
 
     tubesCollected.forEach((tube) => {
@@ -2234,6 +2233,8 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         biospecimenData[tube.id]['593843561'] = tube.checked ? 353358909 : 104430631;
 
         const reason = document.getElementById(tube.id + 'Reason');
+        const deviated = document.getElementById(tube.id + 'Deviated');
+        const deviation = document.getElementById(tube.id + 'Deviation');
         const comment = document.getElementById(tube.id + 'DeviatedExplanation');
 
         if(reason) {
@@ -2250,39 +2251,37 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
             }
             else {
                 delete biospecimenData[tube.id]['883732523'];
-                biospecimenData[tube.id]['338286049'] = '';
+                biospecimenData[tube.id]['338286049'] = ''; // delete?
             }
         }
-    });
-
-    deviations.forEach(deviation => {
-        const tubeId = deviation.id.replace('Deviation', '');
-        const deviationNotes = document.getElementById(tubeId + 'DeviatedExplanation');
-        const deviated = document.getElementById(tubeId + 'Deviated');
-
-        if(deviated.checked) {
-            biospecimenData[tubeId]['678857215'] = 353358909;
-            biospecimenData[tubeId]['248868659'] = Array.from(deviation).filter(dev => dev.selected).map(dev => parseInt(dev.value));
-            biospecimenData[tubeId]['536710547'] = deviationNotes.value.trim();
-        }
-        else {
-            biospecimenData[tubeId]['678857215'] = 104430631;
-            biospecimenData[tubeId]['248868659'] = '';
-            biospecimenData[tubeId]['536710547'] = '';
-        }
-
-        if (biospecimenData[tubeId]['248868659'].includes(472864016) || biospecimenData[tubeId]['248868659'].includes(956345366)) {
-            biospecimenData[tubeId]['762124027'] = 353358909
-        }
-        else {
-            biospecimenData[tubeId]['762124027'] = 104430631
-        }
-
-        if (biospecimenData[tubeId]['248868659'].includes(453343022) && !deviationNotes.value.trim()) { // If other is selected, make text area mandatory.
-            hasError = true;
-            errorMessage(deviationNotes.id, 'Please provide more details', focus);
-            focus = false;
-            return
+        
+        if(deviated) {
+            if(deviated.checked) {
+                biospecimenData[tube.id]['678857215'] = 353358909;
+                biospecimenData[tube.id]['536710547'] = comment.value.trim();
+            }
+            else {
+                biospecimenData[tube.id]['678857215'] = 104430631;
+                delete biospecimenData[tube.id]['536710547']; // delete?
+            }
+    
+            const tubeData = getSiteTubesLists(biospecimenData).filter(td => td.concept === tube.id)[0];
+            const deviationSelections = Array.from(deviation).filter(dev => dev.selected).map(dev => parseInt(dev.value));
+    
+            if(tubeData.deviationOptions) {
+                tubeData.deviationOptions.forEach(option => {
+                    biospecimenData[tube.id]['248868659'][option.concept] = (deviationSelections.indexOf(option.concept) != -1 ? 353358909 : 104430631);
+                });
+            }
+    
+            biospecimenData[tube.id]['762124027'] = (biospecimenData[tube.id]['248868659']['472864016'] === 353358909 || biospecimenData[tube.id]['248868659']['956345366'] === 353358909 ? 353358909 : 104430631);
+    
+            if (biospecimenData[tube.id]['248868659']['453343022'] === 353358909 && !comment.value.trim()) { 
+                hasError = true;
+                errorMessage(comment.id, 'Please provide more details', focus);
+                focus = false;
+                return
+            }
         }
     });
 
