@@ -2720,7 +2720,7 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
   // })
 
   /* 
-  Steps Check - On Load
+  Steps Check - ON LOAD 
   Check if input is 12 digits - ???
   Check if input confirm matches input - ???
   */
@@ -2729,8 +2729,7 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
     let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
     let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
     let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
-
-    if(input.length == 0 && input.length < 12) {
+    if(input.length !== 0 && input.length < 12) {
       console.log("input field does not equal 12")
       document.getElementById(box+"trackingId").classList.add("invalid")
       inputErrorMsg.textContent = `Tracking number must be 12 digits`
@@ -2743,34 +2742,66 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
   })
 
   boxes.forEach(box => {
-    let input = document.getElementById(box+"trackingId").value.trim()
-    let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
-    let inputTest = document.getElementById(box+"trackingId").value
-    let inputConfirmTest = document.getElementById(box+"trackingIdConfirm").value
-    let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
-    let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+    // let input = document.getElementById(box+"trackingId").value.trim()
+    // let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+    // let inputTest = document.getElementById(box+"trackingId").value
+    // let inputConfirmTest = document.getElementById(box+"trackingIdConfirm").value
+    // let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+    // let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
 
-    console.log(`input trim val: ${input}, input no trim val: ${inputTest}`)
-    console.log(`input confirm trim val: ${inputConfirm}, input confirm no trim val: ${inputConfirmTest}`)
+    //     document.getElementById(box+"trackingId").classList.remove("invalid")
+    //     document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
 
     // box tracking id 
     // input must equal 12 characters
     document.getElementById(box+"trackingId").addEventListener("input", e => {
+        let input = document.getElementById(box+"trackingId").value.trim()
+        let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+        let inputTest = document.getElementById(box+"trackingId").value
+        let inputConfirmTest = document.getElementById(box+"trackingIdConfirm").value
+        let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg") 
+        let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+        console.log(`input trim val: ${input}, input no trim val: ${inputTest}`)
+        console.log(`input confirm trim val: ${inputConfirm}, input confirm no trim val: ${inputConfirmTest}`)
       if(input.length  === 12) {
         console.log("tracking id input is 12 characters")
+          inputErrorMsg.textContent = ``
+          document.getElementById(box+"trackingId").classList.remove("invalid")
+          
+          if (input === inputConfirm) { 
+              console.log(`input and inputConfirm match!`)
+              console.log("Value:" + inputConfirmErrorMsg)
+              inputConfirmErrorMsg.textContent = ``
+              document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
+          }
+          else {
+            inputConfirmErrorMsg.textContent = `Tracking numbers must match`
+          }
       }
       else {
         console.log("tracking id input length does not equal 12 characters")
+        inputErrorMsg.textContent = `Tracking number must be 12 digits`
       }
     })
     // box tracking id confirm
     // trackingid input confirm must equal tackingid input 
-    document.getElementById(box+"trackingIdConfirm").addEventListener("input", e => {
+      document.getElementById(box + "trackingIdConfirm").addEventListener("input", e => {
+        let input = document.getElementById(box+"trackingId").value.trim()
+        let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+        let inputTest = document.getElementById(box+"trackingId").value
+        let inputConfirmTest = document.getElementById(box+"trackingIdConfirm").value
+        let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+        let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+        console.log(`input trim val: ${input}, input no trim val: ${inputTest}`)
+        console.log(`input confirm trim val: ${inputConfirm}, input confirm no trim val: ${inputConfirmTest}`)
       if(inputConfirm === input) {
         console.log("Input trackingid confirm MATCHES trackingid")
+          inputConfirmErrorMsg.textContent = ``
+          document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
       }
       else {
-        console.oog("Input trackingid confirm DOES NOT MATCH trackingid")
+        console.log("Input trackingid confirm DOES NOT MATCH trackingid")
+        inputConfirmErrorMsg.textContent = `Tracking numbers must match`
       }
     })
 
