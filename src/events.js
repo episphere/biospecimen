@@ -527,7 +527,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         let boxIds = Object.keys(hiddenJSON).sort(compareBoxIds);
 
         for (let i = 0; i < boxIds.length; i++) {
-            let currTime = new Date();
+            let currTime = new Date().toISOString();
             let toPass = {};
             let found = false;
             if (boxIds[i] == boxId) {
@@ -544,13 +544,13 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
                 }
 
                 if (found == false) {
-                    toPass['672863981'] = currTime.toString();
+                    toPass['672863981'] = currTime;
                 }
 
                 toPass['132929440'] = boxIds[i];
                 toPass['bags'] = hiddenJSON[boxIds[i]]
                 toPass['560975149'] = locations[boxIds[i]]
-                toPass['555611076'] = currTime.toString();
+                toPass['555611076'] = currTime;
                 await storeBox(toPass);
             }
         }
@@ -2727,15 +2727,10 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
   boxes.forEach(box => {
     let input = document.getElementById(box+"trackingId").value.trim()
     let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
-    let inputTest = document.getElementById(box+"trackingId").value
-    let inputConfirmTest = document.getElementById(box+"trackingIdConfirm").value
     let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
     let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
 
-    console.log(`input trim val: ${input}, input no trim val: ${inputTest}`)
-    console.log(`input confirm trim val: ${inputConfirm}, input confirm no trim val: ${inputConfirmTest}`)
-
-    if(input.length == 12) {
+    if(input.length == 0 && input.length < 12) {
       console.log("input field does not equal 12")
       document.getElementById(box+"trackingId").classList.add("invalid")
       inputErrorMsg.textContent = `Tracking number must be 12 digits`
@@ -2747,7 +2742,41 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
     }
   })
 
+  boxes.forEach(box => {
+    let input = document.getElementById(box+"trackingId").value.trim()
+    let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+    let inputTest = document.getElementById(box+"trackingId").value
+    let inputConfirmTest = document.getElementById(box+"trackingIdConfirm").value
+    let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+    let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+
+    console.log(`input trim val: ${input}, input no trim val: ${inputTest}`)
+    console.log(`input confirm trim val: ${inputConfirm}, input confirm no trim val: ${inputConfirmTest}`)
+
+    // box tracking id 
+    // input must equal 12 characters
+    document.getElementById(box+"trackingId").addEventListener("input", e => {
+      if(input.length  === 12) {
+        console.log("tracking id input is 12 characters")
+      }
+      else {
+        console.log("tracking id input length does not equal 12 characters")
+      }
+    })
+    // box tracking id confirm
+    // trackingid input confirm must equal tackingid input 
+    document.getElementById(box+"trackingIdConfirm").addEventListener("input", e => {
+      if(inputConfirm === input) {
+        console.log("Input trackingid confirm MATCHES trackingid")
+      }
+      else {
+        console.oog("Input trackingid confirm DOES NOT MATCH trackingid")
+      }
+    })
+
+  })
 }
+
 
 export const populateSelectLocationList = async () => {
     let currSelect = document.getElementById('selectLocationList')
