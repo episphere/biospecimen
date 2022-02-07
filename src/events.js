@@ -2251,7 +2251,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
             }
             else {
                 delete biospecimenData[tube.id]['883732523'];
-                biospecimenData[tube.id]['338286049'] = ''; // delete?
+                delete biospecimenData[tube.id]['338286049'];
             }
         }
         
@@ -2262,7 +2262,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
             }
             else {
                 biospecimenData[tube.id]['678857215'] = 104430631;
-                delete biospecimenData[tube.id]['536710547']; // delete?
+                delete biospecimenData[tube.id]['536710547'];
             }
     
             const tubeData = getSiteTubesLists(biospecimenData).filter(td => td.concept === tube.id)[0];
