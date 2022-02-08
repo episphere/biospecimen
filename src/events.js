@@ -2596,11 +2596,12 @@ export const addEventNavBarTracking = (element, userName, hiddenJSON, tempChecke
 export const addEventTrimTrackingNums = () => {
   let boxTrackingIdEls = Array.from(document.getElementsByClassName("boxTrackingId"))
   let boxTrackingIdConfirmEls = Array.from(document.getElementsByClassName("boxTrackingIdConfirm"))
+  const alphaNumericRegExp = /[^a-zA-Z0-9]/gm;
   // Trim Function here
   boxTrackingIdEls.forEach(el => el.addEventListener("input", e => {
     let inputTrack = e.target.value.trim()
     if(inputTrack.length >= 0) {
-      e.target.value = inputTrack.replace(/\s/g, '')
+      e.target.value = inputTrack.replace(alphaNumericRegExp, '')
     }
     if(inputTrack.length > 12) {
       e.target.value = inputTrack.slice(-12)
@@ -2608,8 +2609,8 @@ export const addEventTrimTrackingNums = () => {
   }))
   boxTrackingIdConfirmEls.forEach(el => el.addEventListener("input", e => {
     let inputTrackConfirm = e.target.value.trim()
-    if(inputTrackConfirm.length >=  0) {
-      e.target.value = inputTrackConfirm.replace(/\s/g, '')
+    if(inputTrackConfirm.length >= 0) {
+      e.target.value = inputTrackConfirm.replace(alphaNumericRegExp, '')
     }
     if(inputTrackConfirm.length > 12) {
       e.target.value = inputTrackConfirm.slice(-12)
@@ -2617,7 +2618,7 @@ export const addEventTrimTrackingNums = () => {
   }))
 }
 
-export const addEventPreventTrackNumPaste = () => {
+export const addEventPreventTrackingConfirmPaste = () => {
   let boxTrackingIdConfirmEls = Array.from(document.getElementsByClassName("boxTrackingIdConfirm"));
   boxTrackingIdConfirmEls.forEach(el => {
     el.addEventListener("paste", e => e.preventDefault())
