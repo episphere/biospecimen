@@ -359,6 +359,35 @@ export const shippingDuplicateMessage = () => {
         </div>`;
 }
 
+export const shippingNonAlphaNumericStrMessage = () => {
+  const button = document.createElement('button');
+    button.dataset.target = '#biospecimenModal';
+    button.dataset.toggle = 'modal';
+
+    document.getElementById('root').appendChild(button);
+    button.click();
+    document.getElementById('root').removeChild(button);
+    const header = document.getElementById('biospecimenModalHeader');
+    const body = document.getElementById('biospecimenModalBody');
+    header.style.borderBottom = 0;
+    header.innerHTML = `<h5 class="modal-title"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="font-size:2rem;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>`;
+    body.innerHTML = `
+        <div class="row">
+            <div class="col">
+                <div style="display:flex; justify-content:center; margin-bottom:1rem;">
+                  <i class="fas fa fa-times-circle fa-6x" style="color:#d9534f"></i>
+                </div>
+                <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; "><span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Invalid Input:</span> Please enter only alphanumeric characters</p>
+            </div>
+        </div>
+        <div class="row" style="display:flex; justify-content:center;">
+          <button id="shipManifestConfirm" type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close" style="margin-right:4%; padding:6px 25px;">Close</button>
+        </div>`;
+}
+
 export const removeAllErrors = () => {
     const elements = document.getElementsByClassName('form-error');
     Array.from(elements).forEach(element => {
@@ -1344,4 +1373,16 @@ export const checkFedexShipDuplicate = (boxes) => {
   boxes.forEach(boxId => arr.push(document.getElementById(`${boxId}trackingId`).value))
   let filteredArr = new Set(arr)
   return arr.length !== filteredArr.size
+}
+
+export const checkNonAlphanumericStr = (boxes) => {
+  let regExp = /^[a-z0-9]+$/i
+  let arr = []
+  boxes.forEach(boxId => arr.push(document.getElementById(`${boxId}trackingId`).value))
+  for (let i = 0; i< arr.length; i++) {
+    //check if str is not alphanumeric
+    if(!regExp.test(arr[i])) {
+      return true
+    }
+  }
 }
