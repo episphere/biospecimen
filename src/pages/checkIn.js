@@ -1,4 +1,4 @@
-import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit } from "./../shared.js";
+import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion } from "./../shared.js";
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 
 export const checkInTemplate = (data) => {
@@ -79,7 +79,7 @@ const participantStatus = (data) => {
                         <span class="full-width">Consent</span>
                     </div>
                     <div class="row">
-                        <span class="full-width"><i class="fas fa-2x fa-check"></i></span>
+                        <span class="full-width">${data['919254129'] === 353358909 ? `<i class="fas fa-2x fa-check"></i>` : `<i class="fas fa-2x fa-times"></i>`}</i></span>
                     </div>
                     <div class="row">
                         <span class="full-width">${new Date(data['454445267']).toLocaleString()}</span>
@@ -89,23 +89,26 @@ const participantStatus = (data) => {
             <div class="col-md-4">
                 <div class="col-md-12 info-box">
                     <div class="row">
-                        <span class="full-width">Verification</span>
+                        <span class="full-width">Verification Status</span>
                     </div>
                     <div class="row">
                         <span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>`: `<i class="fas fa-2x fa-times"></i>`}</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${verificationConversion[data['821247024']]}</span>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="col-md-12 info-box">
                     <div class="row">
-                        <span class="full-width">${data['821247024'] === 197316935 ? `Not Withdrawn` : `Withdrawn`}</span>
+                        <span class="full-width">Participation Status</span>
                     </div>
                     <div class="row">
-                        <span class="full-width">${data['821247024'] === 197316935 ? `<i class="fas fa-2x fa-check"></i>` : `<i class="fas fa-2x fa-times"></i>`}</span>
+                        <span class="full-width">${data['912301837'] === 980683548 ? `<i class="fas fa-2x fa-check"></i>` : `<i class="fas fa-2x fa-times"></i>`}</span>
                     </div>
                     <div class="row">
-                        </br>
+                        <span class="full-width">${participationConversion[data['912301837']]}</span>
                     </div>
                 </div>
             </div>
@@ -118,15 +121,18 @@ const participantStatus = (data) => {
                 <h5>Has SSN been entered? </h5>
             </div>
         </div>
-            
+        
         <div class="row">
             <div class="col-md-4">
                 <div class="col-md-12 info-box">
                     <div class="row">
-                        <span class="full-width">${data["914639140"] === 197316935 ? 'SSN Entered' : "SSN not entered"}</span>
+                        <br>
                     </div>
                     <div class="row">
-                        <span class="full-width">${data["914639140"] === 197316935 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}</span>
+                        <span class="full-width">${data['311580100'] === 353358909 ? 'Full SSN Received' : data['914639140'] === 353358909 ? 'Partial SSN Received' : 'No SSN Entered'}</span>
+                    </div>
+                    <div class="row">
+                        <br>
                     </div>
                 </div>
             </div>
@@ -147,8 +153,11 @@ const participantStatus = (data) => {
                         <span class="full-width">Background and Overall Health</span>
                     </div>
                     <div class="row">
-                        <span class="full-width"><i class="fas fa-2x fa-times"></i></span>
+                        <span class="full-width">${surveyConversion[data['949302066']]}</span>
                     </div>    
+                    <div class="row">
+                        <span class="full-width">${data['949302066'] === 615768760 ? data['205553981'] : data['949302066'] === 231311385 ? data['517311251'] : '<br>'}</span>
+                    </div> 
                 </div>
             </div>
             <div class="col-md-4">
@@ -157,8 +166,11 @@ const participantStatus = (data) => {
                         <span class="full-width">Medications, Reproductive Health, Excercise, and Sleep</span>
                     </div>
                     <div class="row">
-                        <span class="full-width"><i class="fas fa-2x fa-times"></i></span>
+                        <span class="full-width">${surveyConversion[data['536735468']]}</span>
                     </div>
+                    <div class="row">
+                        <span class="full-width">${data['536735468'] === 615768760 ? data['541836531'] : data['536735468'] === 231311385 ? data['832139544'] : ''}</span>
+                    </div> 
                 </div>
             </div>
             <div class="col-md-4">
@@ -167,7 +179,10 @@ const participantStatus = (data) => {
                         <span class="full-width">Smoking, Alcohol, and Sun Exposure</span>
                     </div>
                     <div class="row">
-                        <span class="full-width"><i class="fas fa-2x fa-times"></i></span>
+                        <span class="full-width">${surveyConversion[data['976570371']]}</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['976570371'] === 615768760 ? data['386488297'] : data['976570371'] === 231311385 ? data['770257102'] : '<br>'}</span>
                     </div>
                 </div>
             </div>
@@ -177,7 +192,10 @@ const participantStatus = (data) => {
                         <span class="full-width">Where you live and work</span>
                     </div>
                     <div class="row">
-                        <span class="full-width"><i class="fas fa-2x fa-times"></i></span>
+                        <span class="full-width">${surveyConversion[data['663265240']]}</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['663265240'] === 615768760 ? data['452942800'] : data['663265240'] === 231311385 ? data['264644252'] : '<br>'}</span>
                     </div>
                 </div>
             </div>
@@ -198,7 +216,10 @@ const participantStatus = (data) => {
                         <span class="full-width">Baseline Blood</span>
                     </div>
                     <div class="row">
-                        <span class="full-width"><i class="fas fa-2x fa-times"></i></span>
+                        <span class="full-width">${data['878865966'] === 353358909 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['878865966'] === 353358909 ? 'Collected' : 'Not Collected'}</span>
                     </div>
                 </div>
             </div>
@@ -208,7 +229,10 @@ const participantStatus = (data) => {
                         <span class="full-width">Baseline Mouthwash</span>
                     </div>
                     <div class="row">
-                        <span class="full-width"><i class="fas fa-2x fa-times"></i></span>
+                        <span class="full-width">${data['684635302'] === 353358909 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['684635302'] === 353358909 ? 'Collected' : 'Not Collected'}</span>
                     </div>
                 </div>
             </div>
@@ -218,7 +242,10 @@ const participantStatus = (data) => {
                         <span class="full-width">Baseline Urine</span>
                     </div>
                     <div class="row">
-                        <span class="full-width"><i class="fas fa-2x fa-times"></i></span>
+                        <span class="full-width">${data['167958071'] === 353358909 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['167958071'] === 353358909 ? 'Collected' : 'Not Collected' }</span>
                     </div>
                 </div>
             </div>
@@ -241,6 +268,9 @@ const participantStatus = (data) => {
                     <div class="row">
                         <span class="full-width"><i class="fas fa-2x fa-times"></i></span>
                     </div>
+                    <div class="row">
+                        <br>
+                    </div>
                 </div>
             </div>
         </div>
@@ -261,6 +291,9 @@ const participantStatus = (data) => {
                     </div>
                     <div class="row">
                         <span class="full-width"><i class="fas fa-2x fa-times"></i></span>
+                    </div>
+                    <div class="row">
+                        <br>
                     </div>
                  </div>
             </div>

@@ -8,7 +8,6 @@ import { specimenTemplate } from './pages/specimen.js';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength } from './tubeValidation.js';
-import { checkOutScreen } from './pages/checkout.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -2288,6 +2287,9 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     if (hasError) return;
 
     biospecimenData['338570265'] = document.getElementById('collectionAdditionalNotes').value;
+
+    const baselineVisit = (biospecimenData['331584571'] === 266600170);
+    const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
 
     showAnimation();
 
