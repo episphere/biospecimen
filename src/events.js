@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -2868,6 +2868,11 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
         if(checkFedexShipDuplicate(boxes) && boxes.length > 1){
           shippingDuplicateMessage()
           return
+        }
+
+        if(checkNonAlphanumericStr(boxes)) {
+          shippingNonAlphaNumericStrMessage()
+          return 
         }
 
         if (emptyField == false) {
