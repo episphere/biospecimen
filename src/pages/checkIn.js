@@ -108,7 +108,7 @@ const participantStatus = (data) => {
                         <span class="full-width">${data['912301837'] === 980683548 ? `<i class="fas fa-2x fa-check"></i>` : `<i class="fas fa-2x fa-times"></i>`}</span>
                     </div>
                     <div class="row">
-                    <span class="full-width">${participationConversion[data['912301837']]}</span>
+                        <span class="full-width">${participationConversion[data['912301837']]}</span>
                     </div>
                 </div>
             </div>
@@ -126,10 +126,10 @@ const participantStatus = (data) => {
             <div class="col-md-4">
                 <div class="col-md-12 info-box">
                     <div class="row">
-                        <span class="full-width">${data["914639140"] === 197316935 ? 'SSN Entered' : "SSN not entered"}</span>
+                        <br>
                     </div>
                     <div class="row">
-                        <span class="full-width">${data["914639140"] === 197316935 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}</span>
+                        <span class="full-width">${data['311580100'] === 353358909 ? 'Full SSN Received' : data['914639140'] === 353358909 ? 'Partial SSN Received' : 'No SSN Entered'}</span>
                     </div>
                     <div class="row">
                         <br>
