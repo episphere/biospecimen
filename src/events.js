@@ -2275,6 +2275,9 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
     data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
 
+    const baselineVisit = (biospecimenData['331584571'] === 266600170);
+    const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
+
     showAnimation();
 
     if (cntd) {
