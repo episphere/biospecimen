@@ -2170,13 +2170,14 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     if (getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
 
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
+    const siteTubesList = getSiteTubesLists(biospecimenData);
 
     let hasError = false;
     let focus = true;
     let hasCntdError = false;
 
     inputFields.forEach(input => {
-        const siteTubesList = getSiteTubesLists(biospecimenData)
+        
         const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
 
         let value = getValue(`${input.id}`).toUpperCase();
@@ -2264,7 +2265,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
                 delete biospecimenData[tube.id]['536710547'];
             }
     
-            const tubeData = getSiteTubesLists(biospecimenData).filter(td => td.concept === tube.id)[0];
+            const tubeData = siteTubesList.filter(td => td.concept === tube.id)[0];
             const deviationSelections = Array.from(deviation).filter(dev => dev.selected).map(dev => parseInt(dev.value));
     
             if(tubeData.deviationOptions) {
