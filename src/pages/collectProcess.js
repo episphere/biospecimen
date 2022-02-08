@@ -94,7 +94,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                                         <option value=""> -- Select Reason -- </option>`
 
                                                         notCollectedOptions.forEach(option => {
-                                                            template += `<option ${formData[`${obj.concept}`]['883732523'] == `${option.concept}` ? 'selected' : ''} value=${option.concept}>${option.label}</option>`;
+                                                            template += `<option ${formData[`${obj.concept}`]['883732523'] == option.concept ? 'selected' : ''} value=${option.concept}>${option.label}</option>`;
                                                         })
 
                                                 template += `</select>`    
@@ -145,7 +145,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                                 <option value=""> -- Select Deviation -- </option>`
 
                                                 deviationOptions.forEach(deviation => {
-                                                    template += `<option ${formData[`${obj.concept}`]['248868659'] && formData[`${obj.concept}`]['248868659'].includes(deviation.concept) ? 'selected' : ''} value=${deviation.concept}>${deviation.label}</option>`;
+                                                    template += `<option ${formData[obj.concept]['248868659'][deviation.concept] === 353358909 ? 'selected' : ''} value=${deviation.concept}>${deviation.label}</option>`;
                                                 })
 
                                         template += `</select>`  
@@ -159,8 +159,8 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         type="text" 
                                         placeholder="Details (Optional)" 
                                         id="${obj.concept}DeviatedExplanation" 
-                                        ${formData[obj.concept]['536710547'] ? `value='${formData[`${obj.concept}`]['536710547']}'`: ``}
-                                        disabled
+                                        ${formData[obj.concept]['536710547'] ? `value='${formData[`${obj.concept}`]['536710547']}'`: formData[obj.concept]['338286049'] ? `value='${formData[`${obj.concept}`]['338286049']}'` : ``}
+                                        ${tubeCollected ? 'disabled': ''}
                                     >
                                     `: ``}
                                 </td>

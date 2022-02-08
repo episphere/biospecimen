@@ -8,7 +8,6 @@ import { specimenTemplate } from './pages/specimen.js';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength } from './tubeValidation.js';
-import { checkOutScreen } from './pages/checkout.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -2061,17 +2060,12 @@ export const addEventBiospecimenCollectionFormToggles = (dt, biospecimenData) =>
     deviationBoxes.forEach(deviation => {
 
         const type = document.getElementById(deviation.id.replace('Deviated', 'Deviation'));
-        const comment = document.getElementById(deviation.id + 'Explanation');
 
         deviation.addEventListener('change', () => {
 
             type.disabled = !deviation.checked;
-            comment.disabled = !deviation.checked;
 
-            if(!deviation.checked) {
-                type.value = '';
-                comment.value = '';
-            }
+            if(!deviation.checked) type.value = '';
         });
     });
 };
@@ -2157,29 +2151,30 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
 
     siteTubesList.forEach((dt) => {
         if(biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = {'593843561': 104430631};
+
+        if(biospecimenData[dt.concept]['248868659'] === undefined && dt.deviationOptions) {
+            biospecimenData[dt.concept]['248868659'] = {};
+            dt.deviationOptions.forEach(dev => {
+                biospecimenData[dt.concept]['248868659'][dev.concept] = 104430631;
+            });
+        }
     });
 
     await storeSpecimen([biospecimenData]);
 }
 
 const collectionSubmission = async (dt, biospecimenData, cntd) => {
-    const data = biospecimenData;
+    
     removeAllErrors();
 
-    const checkboxes = Array.from(document.getElementsByClassName('tube-collected'));
     if (getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
-    checkboxes.forEach((dt) => {
-        if (biospecimenData[`${dt.id}`] === undefined) biospecimenData[`${dt.id}`] = {};
-        if (biospecimenData[dt.id] && biospecimenData[dt.id]['593843561'] === 353358909 && dt.checked === false) {
-            biospecimenData[`${dt.id}`] = {};
-        }
-        biospecimenData[`${dt.id}`]['593843561'] = dt.checked ? 353358909 : 104430631;
-    });
 
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
+
     let hasError = false;
     let focus = true;
     let hasCntdError = false;
+
     inputFields.forEach(input => {
         const siteTubesList = getSiteTubesLists(biospecimenData)
         const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
@@ -2221,74 +2216,94 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
             focus = false;
         }
 
-        if (input.required) data[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim();
+        if (input.required) biospecimenData[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim();
     });
+
     if ((hasError && cntd == true) || hasCntdError) return;
 
-    const textAreas = document.getElementsByClassName('additional-explanation');
+    const tubesCollected = Array.from(document.getElementsByClassName('tube-collected'));
 
-    const reasons = Array.from(document.querySelectorAll('[id$="Reason"]'));
-    const deviations = Array.from(document.querySelectorAll('[id$="Deviation"]'));
-
-    reasons.forEach(reason => {
-        const tubeId = reason.id.replace('Reason', '');
-
-        biospecimenData[tubeId]['883732523'] = reason.value;
-
-        // biospecimenData[tubeId]['338286049'] = ta.value.trim();
-    });
-
-    deviations.forEach(deviation => {
-        const tubeId = deviation.id.replace('Deviation', '');
-        const deviationNotes = document.getElementById(tubeId + 'DeviatedExplanation');
-        const deviated = document.getElementById(tubeId + 'Deviated');
-
-        if(deviated.checked) {
-            biospecimenData[tubeId]['678857215'] = 353358909;
-            biospecimenData[tubeId]['248868659'] = Array.from(deviation).filter(dev => dev.selected).map(dev => parseInt(dev.value));
-            biospecimenData[tubeId]['536710547'] = deviationNotes.value.trim();
+    tubesCollected.forEach((tube) => {
+        if (biospecimenData[tube.id] === undefined) biospecimenData[`${tube.id}`] = {};
+        if (biospecimenData[tube.id] && biospecimenData[tube.id]['593843561'] === 353358909 && tube.checked === false) {
+            biospecimenData[tube.id] = {};
         }
-        else {
-            biospecimenData[tubeId]['678857215'] = 104430631;
-            biospecimenData[tubeId]['248868659'] = '';
-            biospecimenData[tubeId]['536710547'] = '';
+
+        biospecimenData[tube.id]['593843561'] = tube.checked ? 353358909 : 104430631;
+
+        const reason = document.getElementById(tube.id + 'Reason');
+        const deviated = document.getElementById(tube.id + 'Deviated');
+        const deviation = document.getElementById(tube.id + 'Deviation');
+        const comment = document.getElementById(tube.id + 'DeviatedExplanation');
+
+        if(reason) {
+            if(reason.value) {
+                biospecimenData[tube.id]['883732523'] = parseInt(reason.value); 
+                biospecimenData[tube.id]['338286049'] = comment.value.trim();
+
+                if(biospecimenData[tube.id]['883732523'] === 181769837 && !comment.value.trim()) { 
+                    hasError = true;
+                    errorMessage(comment.id, 'Please provide more details', focus);
+                    focus = false;
+                    return
+                }
+            }
+            else {
+                delete biospecimenData[tube.id]['883732523'];
+                delete biospecimenData[tube.id]['338286049'];
+            }
         }
         
-
-        // Discard tube
-        if (biospecimenData[tubeId]['248868659'].includes(472864016) || biospecimenData[tubeId]['248868659'].includes(956345366)) {
-            biospecimenData[tubeId]['762124027'] = 353358909
+        if(deviated) {
+            if(deviated.checked) {
+                biospecimenData[tube.id]['678857215'] = 353358909;
+                biospecimenData[tube.id]['536710547'] = comment.value.trim();
+            }
+            else {
+                biospecimenData[tube.id]['678857215'] = 104430631;
+                delete biospecimenData[tube.id]['536710547'];
+            }
+    
+            const tubeData = getSiteTubesLists(biospecimenData).filter(td => td.concept === tube.id)[0];
+            const deviationSelections = Array.from(deviation).filter(dev => dev.selected).map(dev => parseInt(dev.value));
+    
+            if(tubeData.deviationOptions) {
+                tubeData.deviationOptions.forEach(option => {
+                    biospecimenData[tube.id]['248868659'][option.concept] = (deviationSelections.indexOf(option.concept) != -1 ? 353358909 : 104430631);
+                });
+            }
+    
+            biospecimenData[tube.id]['762124027'] = (biospecimenData[tube.id]['248868659']['472864016'] === 353358909 || biospecimenData[tube.id]['248868659']['956345366'] === 353358909 ? 353358909 : 104430631);
+    
+            if (biospecimenData[tube.id]['248868659']['453343022'] === 353358909 && !comment.value.trim()) { 
+                hasError = true;
+                errorMessage(comment.id, 'Please provide more details', focus);
+                focus = false;
+                return
+            }
         }
-        else {
-            biospecimenData[tubeId]['762124027'] = 104430631
-        }
-
-        if (biospecimenData[tubeId]['248868659'].includes(453343022) && !ta.value.trim()) { // If other is selected, make text area mandatory.
-            hasError = true;
-            errorMessage(ta.id, 'Please provide more details', focus);
-            focus = false;
-            return
-        }
-
     });
 
     if (hasError) return;
 
-    data['338570265'] = document.getElementById('collectionAdditionalNotes').value;
+    biospecimenData['338570265'] = document.getElementById('collectionAdditionalNotes').value;
+
+    const baselineVisit = (biospecimenData['331584571'] === 266600170);
+    const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
 
     showAnimation();
 
     if (cntd) {
         if (getWorflow() === 'clinical') {
-            if (data['915838974'] === undefined) data['915838974'] = new Date().toISOString();
+            if (biospecimenData['915838974'] === undefined) biospecimenData['915838974'] = new Date().toISOString();
         }
-        await storeSpecimen([data]);
+        await storeSpecimen([biospecimenData]);
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
         finalizeTemplate(dt, specimenData);
     }
     else {
-        await storeSpecimen([data]);
+        await storeSpecimen([biospecimenData]);
 
         await swal({
             title: "Success",
@@ -2342,73 +2357,6 @@ export const addEventNavBarParticipantCheckIn = () => {
         checkInTemplate(data);
     })
 }
-
-export const addEventExplanationFormCntd = (data, biospecimenData) => {
-    const form = document.getElementById('explanationForm');
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        explanationHandler(data, biospecimenData, true);
-    });
-}
-
-export const addEventExplanationForm = (data, biospecimenData) => {
-    const explanationSaveExit = document.getElementById('explanationSaveExit');
-    explanationSaveExit.addEventListener('click', () => {
-        explanationHandler(data, biospecimenData);
-    });
-}
-
-const explanationHandler = async (data, biospecimenData, cntd) => {
-    removeAllErrors();
-    const masterSpecimenId = biospecimenData['820476880'];
-    const textAreas = document.getElementsByClassName('additional-explanation');
-    let hasError = false;
-    let focus = true;
-    Array.from(textAreas).forEach(ta => {
-        const tubeId = ta.id.replace('Explanation', '').replace('Deviated', '');
-        if (document.getElementById(ta.id.replace('Explanation', 'Reason')).multiple) { // Deviation
-            biospecimenData[tubeId]['248868659'] = Array.from(document.getElementById(ta.id.replace('Explanation', 'Reason'))).filter(el => el.selected).map(el => parseInt(el.value));
-            biospecimenData[tubeId]['536710547'] = ta.value.trim();
-            // Discard tube
-            if (biospecimenData[tubeId]['248868659'].includes(472864016) || biospecimenData[tubeId]['248868659'].includes(956345366)) {
-                biospecimenData[tubeId]['762124027'] = 353358909
-            }
-            else {
-                biospecimenData[tubeId]['762124027'] = 104430631
-            }
-            if (biospecimenData[tubeId]['248868659'].includes(453343022) && !ta.value.trim()) { // If other is selected, make text area mandatory.
-                hasError = true;
-                errorMessage(ta.id, 'Please provide more details', focus);
-                focus = false;
-                return
-            }
-        }
-        else { // Tubes not collected
-            biospecimenData[tubeId]['883732523'] = parseInt(document.getElementById(ta.id.replace('Explanation', 'Reason')).value);
-            biospecimenData[tubeId]['338286049'] = ta.value.trim();
-            if (biospecimenData[tubeId]['883732523'] === 181769837 && !ta.value.trim()) {
-                hasError = true;
-                errorMessage(ta.id, 'Please provide more details', focus);
-                focus = false;
-                return;
-            }
-        }
-    });
-    if (hasError) return;
-    showAnimation();
-    await storeSpecimen([biospecimenData]);
-    if (cntd) {
-        const specimenData = (await searchSpecimen(masterSpecimenId)).data;
-        hideAnimation();
-        finalizeTemplate(data, specimenData);
-    }
-    else {
-        hideAnimation();
-        searchTemplate();
-    }
-}
-
-
 
 export const addEventFinalizeForm = (specimenData) => {
     const finalizedSaveExit = document.getElementById('finalizedSaveExit');
