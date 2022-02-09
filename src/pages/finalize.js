@@ -81,7 +81,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 </br>
                 <div class="form-group row">
                     <div class="col-auto">
-                        <button class="btn btn-outline-danger" type="button" data-connect-id="${data.Connect_ID}" id="returnToCollectProcess" data-master-specimen-id="${specimenData['820476880']}">${getWorflow() === 'research' ? 'Return to Tube Collection' : 'Return to Labeling and Scanning'}</button>
+                        <button class="btn btn-outline-danger" type="button" data-connect-id="${data.Connect_ID}" id="returnToCollectProcess" data-master-specimen-id="${specimenData['820476880']}">${getWorflow() === 'research' ? 'Return to Collection Data Entry' : 'Return to Labeling and Scanning'}</button>
                     </div>
                     <div class="ml-auto">
                         <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['820476880']}" type="button" id="finalizedSaveExit">Exit</button>
