@@ -2170,13 +2170,14 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     if (getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
 
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
+    const siteTubesList = getSiteTubesLists(biospecimenData);
 
     let hasError = false;
     let focus = true;
     let hasCntdError = false;
 
     inputFields.forEach(input => {
-        const siteTubesList = getSiteTubesLists(biospecimenData)
+        
         const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
 
         let value = getValue(`${input.id}`).toUpperCase();
@@ -2264,7 +2265,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
                 delete biospecimenData[tube.id]['536710547'];
             }
     
-            const tubeData = getSiteTubesLists(biospecimenData).filter(td => td.concept === tube.id)[0];
+            const tubeData = siteTubesList.filter(td => td.concept === tube.id)[0];
             const deviationSelections = Array.from(deviation).filter(dev => dev.selected).map(dev => parseInt(dev.value));
     
             if(tubeData.deviationOptions) {
@@ -2291,7 +2292,52 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     const baselineVisit = (biospecimenData['331584571'] === 266600170);
     const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
 
+    const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
+    const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
+    const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
+
+    let bloodCollected = false;
+    let urineCollected = false;
+    let mouthwashCollected = false;
+
+    let bloodTime;
+    let urineTime;
+    let mouthwashTime;
+
+    bloodTubes.forEach(tube => {
+        if(biospecimenData[tube.concept]['593843561'] === 353358909) {
+            bloodCollected = true;
+            bloodTime = biospecimenData['678166505'];
+        }
+    });
+
+    urineTubes.forEach(tube => {
+        if(biospecimenData[tube.concept]['593843561'] === 353358909) {
+            urineCollected = true;
+            urineTime = biospecimenData['678166505'];
+        }
+    });
+
+    mouthwashTubes.forEach(tube => {
+        if(biospecimenData[tube.concept]['593843561'] === 353358909) {
+            mouthwashCollected = true;
+            mouthwashTime = biospecimenData['678166505'];
+        }
+    });
+
     showAnimation();
+
+    const baselineData = {
+        '878865966': baselineVisit && clinicalResearchSetting && bloodCollected ? 353358909 : 104430631,
+        '561681068': bloodTime ? bloodTime : '',
+        '167958071': baselineVisit && clinicalResearchSetting && urineCollected ? 353358909 : 104430631, 
+        '847159717': urineTime ? urineTime : '',
+        '684635302': baselineVisit && clinicalResearchSetting && mouthwashCollected ? 353358909 : 104430631,
+        '448660695': mouthwashTime ? mouthwashTime : '',
+        uid: dt.state.uid
+    };
+        
+    await updateParticipant(baselineData);
 
     if (cntd) {
         if (getWorflow() === 'clinical') {
