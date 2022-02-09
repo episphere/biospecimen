@@ -1849,12 +1849,13 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
 export const addEventVisitSelection = () => {
 
     const visitSelection = document.getElementById('visit-select');
+    if(visitSelection) {
+        visitSelection.addEventListener('change', () => {
 
-    visitSelection.addEventListener('change', () => {
-
-        const checkInButton = document.getElementById('checkInComplete');
-        checkInButton.disabled = !visitSelection.value;
-    });
+            const checkInButton = document.getElementById('checkInComplete');
+            checkInButton.disabled = !visitSelection.value;
+        });
+    }
 }
 
 export const goToParticipantSearch = () => {
