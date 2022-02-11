@@ -1999,7 +1999,13 @@ const btnsClicked = async (connectId, formData) => {
 
     formData['331584571'] = parseInt(getCheckedInVisit(data));
 
-    await storeSpecimen([formData]);  
+    const storeResponse = await storeSpecimen([formData]);  
+    if (storeResponse.code === 400) {
+        hideAnimation();
+        showNotifications({ title: 'Specimen already exists!', body: `Collection ID ${collectionID} is already associated with a different Connect ID` }, true);
+        return;
+    }
+
     const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
     await createTubesForCollection(formData, biospecimenData);
 
