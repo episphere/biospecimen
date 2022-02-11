@@ -433,6 +433,20 @@ export const storeSpecimen = async (array) => {
     return response.json();
 }
 
+export const updateSpecimen = async (array) => {
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(array)
+    }
+    const response = await fetch(`${api}api=updateSpecimen`, requestObj);
+    return response.json();
+}
+
 export const storeBox = async (box) =>{
     const idToken = await getIdToken();
     let requestObj = {
