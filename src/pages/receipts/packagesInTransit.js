@@ -33,7 +33,6 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Ship Date</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Tracking Number</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipped from Site</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipment Submitted</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Expected Number of Samples</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Temperature Monitor</th>
                                         <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Manifest</th>
@@ -125,10 +124,6 @@ const createPackagesInTransitRows = (boxes) => {
                           i[fieldToConceptIdMapping.shippingTrackingNumber] ? i[ fieldToConceptIdMapping.shippingTrackingNumber] : ""
                       }</td>
                       <td style="text-align:center;">${i.siteAcronym ? i.siteAcronym : ""}</td>
-                      <td style="text-align:center;">${
-                          i[fieldToConceptIdMapping.submitShipmentFlag]
-                              ? shipmentSubmittedStatus(i[fieldToConceptIdMapping.submitShipmentFlag]) : ""
-                      }</td>
                       <td style="text-align:center;">${
                           sumSamplesArr[index]
                       }</td>
@@ -381,16 +376,16 @@ const tempProbeFound = (tempProbe) => {
   else return ""
 }
 
-// Returns Shipment Submitted Boolean Value --> Yes or No
-const shipmentSubmittedStatus = (booleanValue) => {
-    let { booleanZero, booleanOne } = fieldToConceptIdMapping;
-    const convertBoolToNumType = parseInt(booleanValue);
-    if (convertBoolToNumType === booleanZero) {
-        return "No";
-    } else if (convertBoolToNumType === booleanOne) {
-        return "Yes";
-    } else {
-        return "";
-    }
-};
+// // Returns Shipment Submitted Boolean Value --> Yes or No
+// const shipmentSubmittedStatus = (booleanValue) => {
+//     let { booleanZero, booleanOne } = fieldToConceptIdMapping;
+//     const convertBoolToNumType = parseInt(booleanValue);
+//     if (convertBoolToNumType === booleanZero) {
+//         return "No";
+//     } else if (convertBoolToNumType === booleanOne) {
+//         return "Yes";
+//     } else {
+//         return "";
+//     }
+// };
 

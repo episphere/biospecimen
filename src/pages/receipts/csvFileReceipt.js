@@ -155,22 +155,22 @@ const getVialTypesMappings = (i) => {
       vialMappingsHolder.push('10 ml Vacutainer', 'No Additive', 'Urine', '10')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Hawaii' && 
-    (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001') || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' 
-    || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0011' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0012') {
+    (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' 
+    || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0011' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0012')) {
       vialMappingsHolder.push('5 ml Serum separator tube', 'SST', 'Serum', '5')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Hawaii' && 
-    (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003') || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0013') {
+    (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0013')) {
       vialMappingsHolder.push('4 mL Vacutainer', 'Lithium Heparin', 'Whole BI', '4')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Hawaii' && 
-    (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004') || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014' 
-    || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0024') {
+    (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014' 
+    || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0024')) {
       vialMappingsHolder.push('3 mL Vacutainer', 'EDTA', 'Whole BI', '3')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Hawaii' && 
-    (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004') || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014' 
-    || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0024') {
+    (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014' 
+    || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0024')) {
       vialMappingsHolder.push('3 mL Vacutainer', 'EDTA', 'Whole BI', '3')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Hawaii' && 
@@ -236,7 +236,8 @@ const updateResultMappings = (i, vialMappings) => {
   i['Sequence #'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[1] : ``
   i['BSI ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId] : ``
   i['Subject ID'] = i['Connect_ID']
-  i['Date Drawn'] = i[fieldToConceptIdMapping.dateWithdrawn]
+  i['Date Received'] = i[fieldToConceptIdMapping.dateReceived].split('T')[0]
+  i['Date Drawn'] =  i[fieldToConceptIdMapping.dateWithdrawn] != undefined ? i[fieldToConceptIdMapping.dateWithdrawn].split('T')[0] : `` 
   i['Vial Type'] = vialMappings[0]
   i['Additive/Preservative'] = vialMappings[1]
   i['Material Type'] = vialMappings[2]
@@ -251,12 +252,13 @@ const updateResultMappings = (i, vialMappings) => {
   delete i['Connect_ID']
   delete i[fieldToConceptIdMapping.collectionId]
   delete i[fieldToConceptIdMapping.dateWithdrawn]
+  delete i[fieldToConceptIdMapping.dateReceived]
   delete i[fieldToConceptIdMapping.collectionType]
 }
 
 const generateBSIqueryCSVData = (items) => {
   let csv = ``;
-  csv += `Study ID, Sample Collection Center, Sample ID, Sequence #, BSI ID, Subject ID, Date Drawn, Vial Type, Additive/Preservative, Material Type, Volume, Volume Estimate, Volume Unit, Vial Warnings, Hemolyzed, Label Status, Visit\r\n`
+  csv += `Study ID, Sample Collection Center, Sample ID, Sequence #, BSI ID, Subject ID, Date Received, Date Drawn, Vial Type, Additive/Preservative, Material Type, Volume, Volume Estimate, Volume Unit, Vial Warnings, Hemolyzed, Label Status, Visit\r\n`
   for (let row = 0; row < (items.length); row++) {
     let keysAmount = Object.keys(items[row]).length
     let keysCounter = 0
