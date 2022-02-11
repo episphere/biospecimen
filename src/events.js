@@ -2031,7 +2031,7 @@ export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     });
 };
 
-export const addEventBiospecimenCollectionFormToggles = (dt, biospecimenData) => {
+export const addEventBiospecimenCollectionFormToggles = () => {
     const collectedBoxes = Array.from(document.getElementsByClassName('tube-collected'));
     const deviationBoxes = Array.from(document.getElementsByClassName('tube-deviated'));
 
@@ -2077,7 +2077,7 @@ export const addEventBiospecimenCollectionFormToggles = (dt, biospecimenData) =>
     });
 };
 
-export const addEventBiospecimenCollectionFormEdit = (dt, biospecimenData) => {
+export const addEventBiospecimenCollectionFormEdit = () => {
     const editButtons = Array.from(document.querySelectorAll('[id$="collectEditBtn"]'));
     editButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -2098,6 +2098,18 @@ export const addEventBiospecimenCollectionFormEdit = (dt, biospecimenData) => {
             }
         });
 
+    });
+};
+
+export const addEventBiospecimenCollectionFormEditAll = () => {
+    const editAll = document.getElementById('collectEditAllBtn');
+
+    editAll.addEventListener('click', () => {
+
+        const editButtons = Array.from(document.querySelectorAll('[id$="collectEditBtn"]'));
+        editButtons.forEach(button => {
+            button.dispatchEvent(new CustomEvent('click'));
+        });
     });
 };
 
