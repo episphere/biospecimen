@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getParticipantCollections, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -1642,7 +1642,7 @@ export const addEventCheckOutComplete = (specimenData) => {
         specimenData['420757389'] = 353358909;
         specimenData['343048998'] = new Date().toISOString();
         showAnimation();
-        await storeSpecimen([specimenData]);
+        await updateSpecimen([specimenData]);
         hideAnimation();
         searchTemplate();
     })
@@ -1999,7 +1999,13 @@ const btnsClicked = async (connectId, formData) => {
 
     formData['331584571'] = parseInt(getCheckedInVisit(data));
 
-    await storeSpecimen([formData]);  
+    const storeResponse = await storeSpecimen([formData]);  
+    if (storeResponse.code === 400) {
+        hideAnimation();
+        showNotifications({ title: 'Specimen already exists!', body: `Collection ID ${collectionID} is already associated with a different Connect ID` }, true);
+        return;
+    }
+
     const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
     await createTubesForCollection(formData, biospecimenData);
 
@@ -2161,7 +2167,7 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
         }
     });
 
-    await storeSpecimen([biospecimenData]);
+    await updateSpecimen([biospecimenData]);
 }
 
 const collectionSubmission = async (dt, biospecimenData, cntd) => {
@@ -2344,13 +2350,13 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
         if (getWorflow() === 'clinical') {
             if (biospecimenData['915838974'] === undefined) biospecimenData['915838974'] = new Date().toISOString();
         }
-        await storeSpecimen([biospecimenData]);
+        await updateSpecimen([biospecimenData]);
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
         finalizeTemplate(dt, specimenData);
     }
     else {
-        await storeSpecimen([biospecimenData]);
+        await updateSpecimen([biospecimenData]);
 
         await swal({
             title: "Success",
@@ -2428,7 +2434,7 @@ const finalizeHandler = async (biospecimenData, cntd) => {
         biospecimenData['410912345'] = 353358909;
         biospecimenData['556788178'] = new Date().toISOString();
 
-        await storeSpecimen([biospecimenData]);
+        await updateSpecimen([biospecimenData]);
 
         hideAnimation();
         showNotifications({ title: 'Specimen Finalized', body: 'Collection Finalized Successfully!' });
