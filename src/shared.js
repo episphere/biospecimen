@@ -586,7 +586,8 @@ export const searchSpecimenInstitute = async () => {
 
     let a = await response.json();
 
-    let data = a.data;    
+    /* Filter collections with ShipFlag value yes */
+    let data = a.data.filter(item => item[410912345] === 353358909);    
 
     const conversion = {
         "299553921":"0001",
