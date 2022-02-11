@@ -48,7 +48,8 @@ export default {
 
     // collection id
     collectionId: 825582494,
-    dateWithdrawn: 259439191,
+    dateReceived: 259439191,
+    dateWithdrawn: 678166505,
     collectionType: 650516960,
     research: 534621077,
     clinical: 664882224,

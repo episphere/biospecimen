@@ -22,6 +22,7 @@ export const packageReceiptScreen = async (auth, route) => {
   formSubmit();
   targetAnchorTagEl();
   addListenersOnPageLoad();
+  dropdownTrigger();
 }
 
 const packageReceiptTemplate = async (name, auth, route) => {
@@ -32,7 +33,16 @@ const packageReceiptTemplate = async (name, auth, route) => {
                       <span> <h3 style="text-align: center; margin: 0 0 1rem;">Package Receipt</h3> </span>
                       <form method="post" class="mt-3" id="configForm">
                         <h5 style="text-align: left;">Receive Packages</h5>
-
+                        <div style=" display:inline-block;" class="dropdown">
+                          <button class="btn btn-secondary dropdown-toggle dropdown-toggle-sites" id="dropdownSelection" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Select Shipment
+                          </button>
+                          <ul class="dropdown-menu" id="dropdownMenuButtonSelection" aria-labelledby="dropdownMenuButton">
+                              <li><a class="dropdown-item" data-siteKey="allResults" id="all">Home Collection Shipment</a></li>
+                              <li><a class="dropdown-item" data-siteKey="hfHealth" id="hfHealth">Site Shipment</a></li>
+                          </ul>
+                      </div>
+                      <br />
                     <div class="row form-group">
                       <label class="col-form-label col-md-4" for="scannedBarcode">Scan FedEx/USPS Barcode</label>
                       <div style="display:inline-block;">
@@ -142,53 +152,53 @@ const checkCourierType = () => {
       // None
       if(input.length === 0){
         document.getElementById('courierType').innerHTML = ``
-        enableCollectionCardFields();
-        document.getElementById('collectionCheckBox').checked = false;
+        // enableCollectionCardFields();
+        // document.getElementById('collectionCheckBox').checked = false;
         return
       }
       // USPS
       else if (uspsFirstThreeNumbersCheck(input) || (input.length === 34 && uspsFirstThreeNumbersCheck(input))) {
         // console.log(uspsFirstThreeNumbersCheck(input))
         document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
-        document.getElementById('collectionCheckBox').checked = false;
-        document.getElementById('collectionCheckBox').removeAttribute("disabled")
-        enableCollectionCardFields();
+        // document.getElementById('collectionCheckBox').checked = false;
+        // document.getElementById('collectionCheckBox').removeAttribute("disabled")
+        // enableCollectionCardFields();
         return
       }
       // USPS
       else if (input.length === 22 || input.length === 20) {
         // console.log(uspsFirstThreeNumbersCheck(input))
         document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
-        document.getElementById('collectionCheckBox').checked = false;
-        document.getElementById('collectionCheckBox').removeAttribute("disabled")
-        enableCollectionCardFields();
+        // document.getElementById('collectionCheckBox').checked = false;
+        // document.getElementById('collectionCheckBox').removeAttribute("disabled")
+        // enableCollectionCardFields();
         triggerErrorModal()
         return
       }
       // FEDEX
       else if (input.length === 34) {
         document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
-        document.getElementById('collectionCheckBox').checked = false;
-        document.getElementById('collectionCheckBox').disabled = true;
-        checkCardIncluded();
-        disableCollectionCardFields();
+        // document.getElementById('collectionCheckBox').checked = false;
+        // document.getElementById('collectionCheckBox').disabled = true;
+        // checkCardIncluded();
+        // disableCollectionCardFields();
         return
       }
       // FEDEX
       else if (input.length === 12) {
         document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
-        document.getElementById('collectionCheckBox').checked = false;
-        document.getElementById('collectionCheckBox').disabled = true;
-        checkCardIncluded();
-        disableCollectionCardFields();
+        // document.getElementById('collectionCheckBox').checked = false;
+        // document.getElementById('collectionCheckBox').disabled = true;
+        // checkCardIncluded();
+        // disableCollectionCardFields();
         return
       }
       // None
       else {
         document.getElementById('courierType').innerHTML = ``
-        document.getElementById('collectionCheckBox').checked = false;
-        document.getElementById('collectionCheckBox').removeAttribute("disabled")
-        enableCollectionCardFields();
+        // document.getElementById('collectionCheckBox').checked = false;
+        // document.getElementById('collectionCheckBox').removeAttribute("disabled")
+        // enableCollectionCardFields();
         return
       }
     }) 
@@ -648,3 +658,28 @@ const uspsFirstThreeNumbersCheck = (input) => {
   return regExp.test(input);
 }
 
+const dropdownTrigger = () => {
+  let a = document.getElementById('dropdownSelection');
+  let dropdownMenuButton = document.getElementById('dropdownMenuButtonSelection');
+  const tempCategory = a.innerHTML.trim();
+  if (dropdownMenuButton) {
+      dropdownMenuButton.addEventListener('click', async (e) => {
+          if (tempCategory === 'Select Shipment' || tempCategory === 'Home Collection Shipment' || tempCategory === 'Site Shipment') {
+              a.innerHTML = e.target.textContent;
+              controlCollectionCardField(e.target.textContent)
+          }
+      })
+  }
+}
+
+const controlCollectionCardField = (dropdownSelection) => {
+  if (dropdownSelection === 'Site Shipment') {
+    document.getElementById('collectionCheckBox').checked = false;
+    document.getElementById('collectionCheckBox').disabled = true;
+    disableCollectionCardFields()
+  } else { 
+    document.getElementById('collectionCheckBox').checked = false;
+    document.getElementById('collectionCheckBox').removeAttribute("disabled")
+    enableCollectionCardFields() 
+  }
+} 

@@ -4,7 +4,10 @@ import { shipmentTracking, shippingManifest } from "./pages/shipping.js"
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
 import { workflows } from "./tubeValidation.js";
-import { signOut } from "./pages/signIn.js"
+import { signOut } from "./pages/signIn.js";
+import { devSSOConfig } from './dev/identityProvider.js';
+import { stageSSOConfig } from './stage/identityProvider.js';
+import { prodSSOConfig } from './prod/identityProvider.js';
 
 
 const conversion = {
@@ -1112,38 +1115,25 @@ export const collectionSettings = {
     103209024: 'home'
 }
 
-export const SSOConfig = (inputValue) => {
+export const SSOConfig = (email) => {
     let tenantID = '';
     let provider = '';
-    if(/nih.gov/i.test(inputValue)) {
-        tenantID = 'NIH-SSO-qfszp';
-        provider = 'saml.nih-sso';
-    };
-    if(/healthpartners.com/i.test(inputValue)) {
-        tenantID = 'HP-SSO-wb1zb';
-        provider = 'saml.healthpartner';
-    };
-    if(/hfhs.org/i.test(inputValue)) {
-        tenantID = 'HFHS-SSO-ay0iz';
-        provider = 'saml.connect-hfhs';
-    };
-    if(/sanfordhealth.org/i.test(inputValue)) {
-        tenantID = 'SFH-SSO-cgzpj';
-        provider = 'saml.connect-sanford';
-    };
-    if(/uchicago.edu/i.test(inputValue)) {
-        tenantID = 'UCM-SSO-tovai';
-        provider = 'saml.connect-uchicago';
-    };
-    if(/norc.org/i.test(inputValue)) {
-        tenantID = 'NORC-SSO-dilvf';
-        provider = 'saml.connect-norc';
-    };
-    if(/kp.org/i.test(inputValue)) {
-        tenantID = 'KP-SSO-wulix';
-        provider = 'saml.connect-kp';
-    };
-    return {tenantID, provider}
+    if(location.host === urls.prod) {
+        let config = prodSSOConfig(tenantID, provider, email);
+        tenantID = config.tenantID;
+        provider = config.provider;
+    }
+    else if(location.host === urls.stage) {
+        let config = stageSSOConfig(tenantID, provider, email);
+        tenantID = config.tenantID;
+        provider = config.provider;
+    }
+    else {
+        let config = devSSOConfig(tenantID, provider, email);
+        tenantID = config.tenantID;
+        provider = config.provider;
+    }
+    return { tenantID, provider }
 }
 
 export const getParticipantSelection = async (filter) => {
@@ -1322,3 +1312,9 @@ export const checkFedexShipDuplicate = (boxes) => {
   let filteredArr = new Set(arr)
   return arr.length !== filteredArr.size
 }
+
+export const urls = {
+    'stage': 'biospecimen-myconnect-stage.cancer.gov',
+    'prod': 'biospecimen-myconnect.cancer.gov'
+  }
+  
