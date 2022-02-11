@@ -362,6 +362,35 @@ export const shippingDuplicateMessage = () => {
         </div>`;
 }
 
+export const shippingNonAlphaNumericStrMessage = () => {
+  const button = document.createElement('button');
+    button.dataset.target = '#biospecimenModal';
+    button.dataset.toggle = 'modal';
+
+    document.getElementById('root').appendChild(button);
+    button.click();
+    document.getElementById('root').removeChild(button);
+    const header = document.getElementById('biospecimenModalHeader');
+    const body = document.getElementById('biospecimenModalBody');
+    header.style.borderBottom = 0;
+    header.innerHTML = `<h5 class="modal-title"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="font-size:2rem;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>`;
+    body.innerHTML = `
+        <div class="row">
+            <div class="col">
+                <div style="display:flex; justify-content:center; margin-bottom:1rem;">
+                  <i class="fas fa fa-times-circle fa-6x" style="color:#d9534f"></i>
+                </div>
+                <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; "><span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Invalid Input:</span> Please enter only alphanumeric characters</p>
+            </div>
+        </div>
+        <div class="row" style="display:flex; justify-content:center;">
+          <button id="shipManifestConfirm" type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close" style="margin-right:4%; padding:6px 25px;">Close</button>
+        </div>`;
+}
+
 export const removeAllErrors = () => {
     const elements = document.getElementsByClassName('form-error');
     Array.from(elements).forEach(element => {
@@ -404,6 +433,20 @@ export const storeSpecimen = async (array) => {
         body: JSON.stringify(array)
     }
     const response = await fetch(`${api}api=addSpecimen`, requestObj);
+    return response.json();
+}
+
+export const updateSpecimen = async (array) => {
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(array)
+    }
+    const response = await fetch(`${api}api=updateSpecimen`, requestObj);
     return response.json();
 }
 
@@ -560,7 +603,8 @@ export const searchSpecimenInstitute = async () => {
 
     let a = await response.json();
 
-    let data = a.data;    
+    /* Filter collections with ShipFlag value yes */
+    let data = a.data.filter(item => item[410912345] === 353358909);    
 
     const conversion = {
         "299553921":"0001",
@@ -778,6 +822,29 @@ export const siteContactInformation = {
   }]
 }
 
+export const verificationConversion = {
+    '875007964': 'Not Yet Verified',
+    '197316935': 'Verified',
+    '219863910': 'Cannot Be Verified',
+    '922622075': 'Duplicate',
+    '160161595': 'Outreach Maxed Out'
+};
+
+export const participationConversion = {
+    '208325815': 'No Refusal',
+    '622008261': 'Refused some activities',
+    '906417725': 'Refused all future activities',
+    '872012139': 'Revoked HIPAA only',
+    '854021266': 'Withdrew consent',
+    '241236037': 'Destroy data',
+    '987563196': 'Deceased'
+};
+
+export const surveyConversion = {
+    '972455046': 'Not Started',
+    '615768760': 'Started',
+    '231311385': 'Submitted'
+};
 
 export const addEventBarCodeScanner = (id, start, end) => {
     const liveStreamConfig = {
@@ -1318,3 +1385,14 @@ export const urls = {
     'prod': 'biospecimen-myconnect.cancer.gov'
   }
   
+export const checkNonAlphanumericStr = (boxes) => {
+  let regExp = /^[a-z0-9]+$/i
+  let arr = []
+  boxes.forEach(boxId => arr.push(document.getElementById(`${boxId}trackingId`).value))
+  for (let i = 0; i< arr.length; i++) {
+    //check if str is not alphanumeric
+    if(!regExp.test(arr[i])) {
+      return true
+    }
+  }
+}

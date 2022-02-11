@@ -1,4 +1,4 @@
-import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormText } from './../events.js'
+import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormEditAll, addEventBiospecimenCollectionFormText } from './../events.js'
 import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow, getCheckedInVisit } from '../shared.js';
 
 export const tubeCollectedTemplate = (data, formData) => {
@@ -38,7 +38,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                             <th class="align-left">Select For Deviation</th>
                             <th class="align-left">Deviation Type</th> 
                             <th class="align-left">Comments</th>
-                            <th></th>
+                            <th><button class="btn btn-outline-primary" type="button" id="collectEditAllBtn">Edit All</button></th>
                         </tr>
                     </thead>
                     <tbody>`
@@ -215,7 +215,8 @@ export const tubeCollectedTemplate = (data, formData) => {
     addEventSelectAllCollection();
     addEventBackToSearch('backToSearch');
     addEventBiospecimenCollectionForm(data, formData);
-    addEventBiospecimenCollectionFormToggles(data, formData);
-    addEventBiospecimenCollectionFormEdit(data, formData);
+    addEventBiospecimenCollectionFormToggles();
+    addEventBiospecimenCollectionFormEdit();
+    addEventBiospecimenCollectionFormEditAll();
     addEventBiospecimenCollectionFormText(data, formData);
 }
