@@ -1166,6 +1166,10 @@ export const checkOutParticipant = async (data) => {
     }
 };
 
+export const getCollectionsByVisit = async () => {
+    //getParticipantCollections();
+};
+
 export const getWorflow = () => document.getElementById('contentBody').dataset.workflow;
 
 export const getSiteTubesLists = (specimenData) => {
