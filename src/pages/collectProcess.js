@@ -138,7 +138,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                             <select 
                                                 data-connect-id="${data.Connect_ID}" 
                                                 id="${obj.concept}Deviation"
-                                                style="width:200px"
+                                                style="width:300px"
                                                 multiple
                                                 disabled
                                             >
