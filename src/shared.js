@@ -1166,8 +1166,11 @@ export const checkOutParticipant = async (data) => {
     }
 };
 
-export const getCollectionsByVisit = async () => {
-    //getParticipantCollections();
+export const getCollectionsByVisit = async (data) => {
+
+
+    const response = await getParticipantCollections(data.state.uid);
+    console.log(response);
 };
 
 export const getWorflow = () => document.getElementById('contentBody').dataset.workflow;

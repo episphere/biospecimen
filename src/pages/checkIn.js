@@ -9,6 +9,7 @@ export const checkInTemplate = (data) => {
     navBarBtn?.classList.add('active');
 
     const isCheckedIn = checkedIn(data);
+    const visitCollection = getCollectionsByVisit(data);
     
     let template = `
         </br>
