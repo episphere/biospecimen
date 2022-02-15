@@ -1,7 +1,7 @@
-import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion } from "./../shared.js";
+import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getCollectionsByVisit } from "./../shared.js";
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 
-export const checkInTemplate = (data) => {
+export const checkInTemplate = async (data) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarParticipantCheckIn');
     navBarBtn.style.display = 'block';
@@ -9,8 +9,8 @@ export const checkInTemplate = (data) => {
     navBarBtn?.classList.add('active');
 
     const isCheckedIn = checkedIn(data);
-    const visitCollection = getCollectionsByVisit(data);
-    
+    const visitCollections = isCheckedIn ? await getCollectionsByVisit(data) : '';
+    console.log(visitCollections);
     let template = `
         </br>
         <div class="row">

@@ -1168,9 +1168,16 @@ export const checkOutParticipant = async (data) => {
 
 export const getCollectionsByVisit = async (data) => {
 
+    const visit = getCheckedInVisit(data);
+    let collections = [];
 
-    const response = await getParticipantCollections(data.state.uid);
-    console.log(response);
+    const response = await getParticipantCollections(data.token);
+
+    response.data.forEach(col => {
+        if(col['331584571'] == visit) collections.push(col);
+    });
+
+    return collections;
 };
 
 export const getWorflow = () => document.getElementById('contentBody').dataset.workflow;
