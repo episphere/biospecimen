@@ -45,7 +45,7 @@ export const checkInTemplate = async (data) => {
 
                 </div>
                 <div class="col-md-3">
-                    <button class="btn btn-outline-primary btn-block text-nowrap" ${isCheckedIn ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
+                    <button class="btn btn-outline-primary btn-block text-nowrap" ${!isCheckedIn ? `disabled` : visitCollections && visitCollections.length > 0 ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
                 </div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
