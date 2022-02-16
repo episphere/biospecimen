@@ -1,5 +1,5 @@
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates, getWorflow, isDeviceMobile, replaceDateInputWithMaskedInput, checkedIn, verificationConversion } from "./../shared.js"
-import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
+import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment, addEventClearAll } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 
 export const userDashboard = (auth, route, goToSpecimenSearch) => {
@@ -43,6 +43,12 @@ export const searchTemplate = (goToSpecimenSearch) => {
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>
+                        </div>
+                        <div class="form-group">
+                            <br/>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" id="btnClearAll" class="btn btn-outline-danger">Clear All</button>
                         </div>
                     </form>
                 </div>
@@ -95,6 +101,7 @@ export const searchTemplate = (goToSpecimenSearch) => {
     addEventSearchForm2();
     addEventSearchForm3();
     addEventSearchForm4();
+    addEventClearAll();
     addEventNavBarSpecimenSearch();
     if(isDeviceMobile) {
     replaceDateInputWithMaskedInput(document.getElementById('dob'));
