@@ -1810,6 +1810,31 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
         else {
 
             const visitConcept = document.getElementById('visit-select').value;
+            
+            if(data['331584571'][visitConcept] && data['331584571'][visitConcept]['840048338']) {
+                const confirmRepeat = await swal({
+                    title: "Success",
+                    icon: "success",
+                    text: "Participant [NAME] was previously Checked In on [Date/Time]. Do you wish to check them in again? \\r\\n If this is today, DO NOT check the participant in again. \\r\\n See Check-In SOP for further instructions",
+                    buttons: {
+                        cancel: {
+                            text: "Close",
+                            value: "cancel",
+                            visible: true,
+                            className: "btn btn-default",
+                            closeModal: true,
+                        },
+                        confirm: {
+                            text: "Continue to Specimen Link",
+                            value: 'confirmed',
+                            visible: true,
+                            className: "",
+                            closeModal: true,
+                            className: "btn btn-success",
+                        }
+                    },
+                });
+            }
 
             checkInParticipant(data, visitConcept);
 
