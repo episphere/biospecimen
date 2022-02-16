@@ -1,7 +1,7 @@
-import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion } from "./../shared.js";
+import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getCollectionsByVisit } from "./../shared.js";
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 
-export const checkInTemplate = (data) => {
+export const checkInTemplate = async (data) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarParticipantCheckIn');
     navBarBtn.style.display = 'block';
@@ -9,6 +9,7 @@ export const checkInTemplate = (data) => {
     navBarBtn?.classList.add('active');
 
     const isCheckedIn = checkedIn(data);
+    const visitCollections = isCheckedIn ? await getCollectionsByVisit(data) : '';
     
     let template = `
         </br>
@@ -44,7 +45,7 @@ export const checkInTemplate = (data) => {
 
                 </div>
                 <div class="col-md-3">
-                    <button class="btn btn-outline-primary btn-block text-nowrap" ${isCheckedIn ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
+                    <button class="btn btn-outline-primary btn-block text-nowrap" ${!isCheckedIn ? `disabled` : visitCollections && visitCollections.length > 0 ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
                 </div>
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
