@@ -1173,9 +1173,11 @@ export const getCollectionsByVisit = async (data) => {
 
     const response = await getParticipantCollections(data.token);
 
-    response.data.forEach(col => {
-        if(col['331584571'] == visit) collections.push(col);
-    });
+    if(response.code != 404) {
+        response.data.forEach(col => {
+            if(col['331584571'] == visit) collections.push(col);
+        });
+    }
 
     return collections;
 };
