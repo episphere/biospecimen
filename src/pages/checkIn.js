@@ -10,7 +10,7 @@ export const checkInTemplate = async (data) => {
 
     const isCheckedIn = checkedIn(data);
     const visitCollections = isCheckedIn ? await getCollectionsByVisit(data) : '';
-    console.log(visitCollections);
+    
     let template = `
         </br>
         <div class="row">
