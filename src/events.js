@@ -69,6 +69,32 @@ export const addEventSearchForm4 = () => {
     })
 };
 
+export const addEventClearAll = () => {
+
+    const btnClearAll = document.getElementById('btnClearAll');
+
+    btnClearAll.addEventListener('click', () => {
+
+        const firstName = document.getElementById('firstName');
+        if(firstName) firstName.value = '';
+
+        const lastName = document.getElementById('lastName');
+        if(lastName) lastName.value = '';
+
+        const dob = document.getElementById('dob');
+        if(dob) dob.value = '';
+
+        const connectID = document.getElementById('connectId');
+        if(connectID) connectID.value = '';
+
+        const email = document.getElementById('email');
+        if(email) email.value = '';
+
+        const phone = document.getElementById('phone');
+        if(phone) phone.value = '';
+    });
+};
+
 export const addEventsearchSpecimen = () => {
     const form = document.getElementById('specimenLookupForm');
     if (!form) return;
