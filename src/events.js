@@ -1813,22 +1813,21 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
             
             if(data['331584571'][visitConcept] && data['331584571'][visitConcept]['840048338']) {
                 const confirmRepeat = await swal({
-                    title: "Success",
-                    icon: "success",
-                    text: "Participant [NAME] was previously Checked In on [Date/Time]. Do you wish to check them in again? \\r\\n If this is today, DO NOT check the participant in again. \\r\\n See Check-In SOP for further instructions",
+                    title: "Warning - Participant Previously Checked In",
+                    icon: "warning",
+                    text: "Participant [NAMEis is today, DO NOT check the participant in again. \\r\\n See Check-In SOP for further instructions",
                     buttons: {
                         cancel: {
-                            text: "Close",
+                            text: "Stay on Check-In Screen",
                             value: "cancel",
                             visible: true,
-                            className: "btn btn-default",
+                            className: "btn-outline-danger",
                             closeModal: true,
                         },
                         confirm: {
-                            text: "Continue to Specimen Link",
+                            text: "Continue with Check-In",
                             value: 'confirmed',
                             visible: true,
-                            className: "",
                             closeModal: true,
                             className: "btn btn-success",
                         }
