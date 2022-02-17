@@ -1811,17 +1811,17 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
 
             const visitConcept = document.getElementById('visit-select').value;
             
-            if(data['331584571'][visitConcept] && data['331584571'][visitConcept]['840048338']) {
+            if(data['331584571']) {
                 const confirmRepeat = await swal({
                     title: "Warning - Participant Previously Checked In",
                     icon: "warning",
-                    text: "Participant [NAMEis is today, DO NOT check the participant in again. \\r\\n See Check-In SOP for further instructions",
+                    text: "Participant [NAME] was previously checked in on [DATE/TIME] with Collection ID [CXA######].\r\nIf this is today, DO NOT check the participant in again.\r\nNote Collection ID above and see Check-In SOP for further instructions.\r\n\r\nIf this is is not today, you may check the participant in for an additional visit.",
                     buttons: {
                         cancel: {
-                            text: "Stay on Check-In Screen",
+                            text: "Cancel",
                             value: "cancel",
                             visible: true,
-                            className: "btn-outline-danger",
+                            className: "btn btn-danger",
                             closeModal: true,
                         },
                         confirm: {
@@ -1833,6 +1833,8 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
                         }
                     },
                 });
+
+                if (confirmRepeat === "cancel") return;
             }
 
             checkInParticipant(data, visitConcept);
