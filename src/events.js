@@ -1818,18 +1818,12 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
                     if(now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
 
                         const response = await getParticipantCollections(data.token);
-                        let collection;
-
-                        if(response.code != 404) {
-                            response.data.forEach(col => {
-                                if(col['331584571'] == visit.concept) collection = col;
-                            });
-                        }
+                        let collection = response.data.filter(res => res['331584571'] == visit.concept);
 
                         const confirmRepeat = await swal({
                             title: "Warning - Participant Previously Checked In",
                             icon: "warning",
-                            text: "Participant " + data['399159511'] + " " + data['996038075'] + " was previously checked in on " + new Date(data['331584571'][visit.concept]['840048338']).toLocaleString() + " with Collection ID " + collection['820476880'] + ".\r\nIf this is today, DO NOT check the participant in again.\r\nNote Collection ID above and see Check-In SOP for further instructions.\r\n\r\nIf this is is not today, you may check the participant in for an additional visit.",
+                            text: "Participant " + data['399159511'] + " " + data['996038075'] + " was previously checked in on " + new Date(data['331584571'][visit.concept]['840048338']).toLocaleString() + " with Collection ID " + collection[0]['820476880'] + ".\r\nIf this is today, DO NOT check the participant in again.\r\nNote Collection ID above and see Check-In SOP for further instructions.\r\n\r\nIf this is is not today, you may check the participant in for an additional visit.",
                             buttons: {
                                 cancel: {
                                     text: "Cancel",
