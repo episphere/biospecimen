@@ -113,6 +113,20 @@ export const updateParticipant = async (array) => {
     return await response.json();
 }
 
+export const sendEmail = async (array) => {
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(array)
+    }
+    const response = await fetch(`${api}api=sendBioEmail`, requestObj);
+    
+    return response;
+}
 
 export const biospecimenUsers = async () => {
     const idToken = await getIdToken();

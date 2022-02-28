@@ -1,4 +1,4 @@
-import { validateUser, siteFullNames, showAnimation, hideAnimation, errorMessage, removeAllErrors } from "./../shared.js";
+import { validateUser, siteFullNames, showAnimation, hideAnimation, errorMessage, removeAllErrors, sendEmail } from "./../shared.js";
 import { userDashboard } from "./dashboard.js";
 import { nonUserNavBar, unAuthorizedUser } from './../navbar.js'
 
@@ -28,6 +28,9 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
         </div>
         <div class="row welcome-screen-div">
             <div class="col">Site: ${siteFullNames[data.siteAcronym]}</div>
+        </div>
+        <div class="row welcome-screen-div">
+            <div class="col"><button class="btn btn-outline-warning" id="btnEmailTest">Send Email</button></div>
         </div>
         <div class="row welcome-screen-div">
             <div class="col div-border" style="margin-right: 1rem;padding-bottom: 1rem;">
@@ -62,6 +65,10 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     localStorage.setItem('siteAcronym',data.siteAcronym);
     localStorage.setItem('siteCode',data.siteCode);
     document.getElementById('contentHeader').innerHTML = '';
+
+    document.getElementById('btnEmailTest').addEventListener('click', () => {
+        console.log(sendEmail({test: "test"}));
+    });
 
     document.getElementById('btnParticipantSearch').addEventListener('click', () => {
         removeAllErrors();
