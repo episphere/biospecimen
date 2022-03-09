@@ -1125,12 +1125,15 @@ export const checkInParticipant = async (data, visitConcept) => {
     
     let visits;
     const user_uid = data.state.uid;
+    let sendEmail = false;
 
     if(data['331584571']) {
 
         visits = data['331584571'];
 
         if(!visits[visitConcept]) {
+
+            if(visitConcept === '266600170') sendEmail = true;
 
             visits[visitConcept] = {
                 '840048338': new Date()
@@ -1140,6 +1143,7 @@ export const checkInParticipant = async (data, visitConcept) => {
         visits[visitConcept]['135591601'] = 353358909;
     }
     else {
+        sendEmail = true;
 
         visits = {
             [visitConcept]: {
@@ -1154,6 +1158,10 @@ export const checkInParticipant = async (data, visitConcept) => {
         uid: user_uid
     };
         
+    if(sendEmail) {
+        //send email logic
+    }
+
     await updateParticipant(checkInData);
 };
 
