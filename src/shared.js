@@ -464,6 +464,20 @@ export const storeBox = async (box) =>{
     return response.json();
 }
 
+export const updateBox = async (box) => {
+  const idToken = await getIdToken();
+  let requestObj = {
+      method: "POST",
+      headers:{
+          Authorization:"Bearer "+idToken,
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify(box)
+  }
+  const response = await fetch(`${api}api=updateBox`, requestObj);
+  return response.json();
+}
+
 export const updateNewTempDate = async () =>{
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=updateTempCheckDate`, {
