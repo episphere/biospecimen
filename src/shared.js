@@ -1114,10 +1114,10 @@ const baselineEmailTemplate = (data) => {
         Dear ${data['399159511']},
         <br/>
         <br/>
-        Thank you for donating your samples for the Connect for Cancer Prevention Study! Next, please visit the <a href="https://myconnect.cancer.gov/#dashboard">MyConnect app</a> to answer the Baseline Blood, Urine, and Mouthwash Sample Survey. This short survey asks questions about the day that you donated samples, so it is important to complete it as soon as you can.
+        Thank you for donating your samples for the Connect for Cancer Prevention Study! Next, please visit the <a href="https://episphere.github.io/connectApp/">MyConnect app</a> to answer the Baseline Blood, Urine, and Mouthwash Sample Survey. This short survey asks questions about the day that you donated samples, so it is important to complete it as soon as you can.
         <br/>
         <br/>
-        Have questions? Please contact the <a href="https://myconnect.cancer.gov/support">Connect Support Center.</a>
+        Have questions? Please contact the <a href="https://episphere.github.io/connectApp/support">Connect Support Center.</a>
         <br/>
         <br/>
         Thank you for your commitment to helping us learn how to better prevent cancer.
