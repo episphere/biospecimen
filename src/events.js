@@ -472,6 +472,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     
 }
 
+
 export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrphan, userName) => {
     let submitButton = document.getElementById('addToBagButton')
     let specimenSearch = document.getElementById('masterSpecimenId')
@@ -576,7 +577,9 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
                 toPass['bags'] = hiddenJSON[boxIds[i]]
                 toPass['560975149'] = locations[boxIds[i]]
                 toPass['555611076'] = currTime;
+                // MODIFY API
                 await storeBox(toPass);
+                // await modifyBox(toPass)
             }
         }
 
@@ -1226,7 +1229,8 @@ const compareBoxIds = (a, b) => {
 
 }
 
-export const populateBoxSelectList = async (hiddenJSON, userName) => {
+// [MODIFY] - MAKE EDITS 
+export const populateBoxSelectList = async (hiddenJSON, userName, createBoxFlag = false) => {
     let boxList = document.getElementById('selectBoxList');
     let selectBoxList = document.getElementById('selectBoxList');
     let list = ''
@@ -1234,10 +1238,13 @@ export const populateBoxSelectList = async (hiddenJSON, userName) => {
     for (let i = 0; i < keys.length; i++) {
         list += '<option>' + keys[i] + '</option>';
     }
-    if (list == '') {
+    // ADD BOX FLAG TO TRIGGER NEW BOX CREATION WHEN LIST IS EMPTY
+    
+    if (list == '' && createBoxFlag) {
         await addNewBox(userName);
         return;
     }
+
     boxList.innerHTML = list;
 
     let currBoxId = selectBoxList.value;
@@ -1367,7 +1374,7 @@ export const populateBoxSelectList = async (hiddenJSON, userName) => {
     }
 
 }
-
+// [MODIFY] - MAKE EDITS 
 const addNewBox = async (userName) => {
     let response = await getAllBoxes();
     let hiddenJSON = response.data;
@@ -1394,6 +1401,7 @@ const addNewBox = async (userName) => {
         }
 
     }
+
     if (largestLocationIndex != -1) {
       // find index of largest box and assign boxid
         let lastBox = hiddenJSON[largeIndex]['132929440']
@@ -1408,10 +1416,12 @@ const addNewBox = async (userName) => {
             let newBoxId = 'Box' + newBoxNum.toString();
             let toPass = {};
             toPass['132929440'] = newBoxId;
+            // bags ???
             toPass['bags'] = {};
             toPass['560975149'] = pageLocation;
+            // Create Box API []
             await storeBox(toPass);
-
+            // await createBox(toPass)
             hiddenJSON.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocation })
             let boxJSONS = hiddenJSON;
 
@@ -1425,6 +1435,8 @@ const addNewBox = async (userName) => {
                     }
                 }
             }
+            // check if flag needed? 
+            // TEST
             await populateBoxSelectList(hiddenJSON, userName)
             return true
         }
@@ -1444,8 +1456,11 @@ const addNewBox = async (userName) => {
         let toPass = {};
         toPass['132929440'] = newBoxId;
         toPass['bags'] = {};
+        // This will pass the string value of site location instead of the concept ID
         toPass['560975149'] = pageLocation;
+        // CREATE NEW BOX API 
         await storeBox(toPass);
+        // await createBox(toPass);
 
         hiddenJSON.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocation })
         let boxJSONS = hiddenJSON;
@@ -1474,6 +1489,7 @@ export const addEventModalAddBox = (userName) => {
         showAnimation();
         // returns boolean value
         let notifyCreateBox = await addNewBox(userName);
+        let createBoxFlag = true
         alertState = notifyCreateBox
         let currLocation = document.getElementById('selectLocationList').value;
         let response = await getBoxesByLocation(currLocation);
@@ -1484,7 +1500,8 @@ export const addEventModalAddBox = (userName) => {
             hiddenJSONLocation[box['132929440']] = box['bags']
         }
         await populateModalSelect(hiddenJSONLocation)
-        await populateBoxSelectList(hiddenJSONLocation, userName);
+        // generate a box if no box exists
+        await populateBoxSelectList(hiddenJSONLocation, userName, createBoxFlag);
         hideAnimation()
         checkAlertState(alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl)
         // reset alertState
@@ -1643,6 +1660,9 @@ export const addEventChangeLocationSelect = (userName) => {
     selectBoxList.addEventListener("change", async () => {
         showAnimation();
         let currLocation = selectBoxList.value;
+        // add this here to prevent autogeneration on load
+        let createBoxFlag = false
+        // This can return an empty [] if no matches
         let boxJSONS = (await getBoxesByLocation(currLocation)).data;
 
         let hiddenJSON = {};
@@ -1650,7 +1670,10 @@ export const addEventChangeLocationSelect = (userName) => {
             let box = boxJSONS[i]
             hiddenJSON[box['132929440']] = box['bags']
         }
-        await populateBoxSelectList(hiddenJSON, userName)
+
+        // MODIFY populateBoxSelectList
+        // hidden JSON can be empty if no matches found from siteAcronym and filter
+        await populateBoxSelectList(hiddenJSON, userName, createBoxFlag)
         hideAnimation();
     })
 }
@@ -2778,6 +2801,7 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
 
 export const populateSelectLocationList = async () => {
     let currSelect = document.getElementById('selectLocationList')
+    // This returns all available locations based on users siteAcronym
     let response = await getLocationsInstitute();
     let list = ''
     for (let i = 0; i < response.length; i++) {
