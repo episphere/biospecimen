@@ -1108,6 +1108,34 @@ export const checkedIn = (data) => {
     return isCheckedIn;
 };
 
+const baselineEmailTemplate = (data) => {
+  
+    return `
+        Dear ${data['399159511']}
+        <br>
+        <br>
+        Thank you for donating your samples for the Connect for Cancer Prevention Study! Next, please visit the <a href="https://myconnect.cancer.gov/#dashboard">MyConnect app</a> to answer the Baseline Blood, Urine, and Mouthwash Sample Survey. This short survey asks questions about the day that you donated samples, so it is important to complete it as soon as you can.
+        <br>
+        <br>
+        Have questions? Please contact the <a href="https://myconnect.cancer.gov/support">Connect Support Center.</a>
+        <br>
+        <br>
+        Thank you for your commitment to helping us learn how to better prevent cancer.
+        <br>
+        <br>
+        Sincerely,
+        <br>
+        the Connect team at the National Cancer Institute
+        <br>
+        9609 Medical Center Drive, Rockville MD 20850
+        <br>
+        To protect your information, we follow federal privacy rules, including the Privacy Act and the Common Rule.
+        <br>
+        <br>
+        This message is private. If you have received it by mistake, please let us know by emailing ConnectSupport@NORC.org, and please kindly delete the message. If you are not the right recipient, please do not share this message with anyone.
+    `;
+};
+
 export const getCheckedInVisit = (data) => {
 
     let visitConcept;
@@ -1125,7 +1153,7 @@ export const checkInParticipant = async (data, visitConcept) => {
     
     let visits;
     const user_uid = data.state.uid;
-    let sendEmail = false;
+    let sendBioEmail = false;
 
     if(data['331584571']) {
 
@@ -1133,7 +1161,7 @@ export const checkInParticipant = async (data, visitConcept) => {
 
         if(!visits[visitConcept]) {
 
-            if(visitConcept === '266600170') sendEmail = true;
+            if(visitConcept === '266600170') sendBioEmail = true;
 
             visits[visitConcept] = {
                 '840048338': new Date()
@@ -1143,7 +1171,7 @@ export const checkInParticipant = async (data, visitConcept) => {
         visits[visitConcept]['135591601'] = 353358909;
     }
     else {
-        sendEmail = true;
+        sendBioEmail = true;
 
         visits = {
             [visitConcept]: {
@@ -1158,8 +1186,14 @@ export const checkInParticipant = async (data, visitConcept) => {
         uid: user_uid
     };
         
-    if(sendEmail) {
-        //send email logic
+    if(sendBioEmail) {
+        const emailData = {
+            email: "tony.petersen@nih.gov",
+            subject: "Please complete a short survey about your samples",
+            message: baselineEmailTemplate(data)
+        };
+
+        await(sendEmail(emailData));
     }
 
     await updateParticipant(checkInData);

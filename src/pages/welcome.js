@@ -30,9 +30,6 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             <div class="col">Site: ${siteFullNames[data.siteAcronym]}</div>
         </div>
         <div class="row welcome-screen-div">
-            <div class="col"><button class="btn btn-outline-warning" id="btnEmailTest">Send Email</button></div>
-        </div>
-        <div class="row welcome-screen-div">
             <div class="col div-border" style="margin-right: 1rem;padding-bottom: 1rem;">
                 <div>
                     <label for="dashboardSelection" class="col-form-label">Select dashboard to use </label>
@@ -65,10 +62,6 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     localStorage.setItem('siteAcronym',data.siteAcronym);
     localStorage.setItem('siteCode',data.siteCode);
     document.getElementById('contentHeader').innerHTML = '';
-
-    document.getElementById('btnEmailTest').addEventListener('click', () => {
-        console.log(sendEmail({test: "test"}));
-    });
 
     document.getElementById('btnParticipantSearch').addEventListener('click', () => {
         removeAllErrors();
