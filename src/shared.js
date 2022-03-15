@@ -1139,29 +1139,6 @@ const baselineEmailTemplate = (data) => {
     `;
 };
 
-const notificationTemplate = (data, emailData) => {
-
-    const uuid = require('uuid');
-    
-    let notification = {
-        id: uuid(),
-        notificationType: "email",
-        email: emailData.email,
-        notification : {
-            title: emailData.subject,
-            body: emailData.message,
-            time: new Date().toISOString()
-        },
-        attempt: "1st contact",            
-        category: "Biospecimen Survey Reminder",
-        token: data.token,
-        uid: data.state.uid,
-        read: false
-    };
-
-    return notification;
-};
-
 export const getCheckedInVisit = (data) => {
 
     let visitConcept;
@@ -1214,18 +1191,22 @@ export const checkInParticipant = async (data, visitConcept) => {
         
     if(sendBioEmail) {
         const emailData = {
-            email: "petersenaa@nih.gov",
+            email: data['421823980'],
             subject: "Please complete a short survey about your samples",
-            message: baselineEmailTemplate(data)
+            message: baselineEmailTemplate(data),
+            notificationType: "email",
+            time: new Date().toISOString(),
+            attempt: "1st contact",
+            category: "Biospecimen Survey Reminder",
+            token: data.token,
+            uid: data.state.uid,
+            read: false
         };
-
-        //const notificationData = notificationTemplate(data, emailData);
-
-        //console.log(notificationTemplate);
+        
         await(sendClientEmail(emailData));
     }
 
-    //await updateParticipant(checkInData);
+    await updateParticipant(checkInData);
 };
 
 export const checkOutParticipant = async (data) => {
