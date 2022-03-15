@@ -8,6 +8,7 @@ import { signOut } from "./pages/signIn.js";
 import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
+import { baselineEmailTemplate } from "./emailTemplates.js";
 
 
 const conversion = {
@@ -113,6 +114,20 @@ export const updateParticipant = async (array) => {
     return await response.json();
 }
 
+export const sendClientEmail = async (array) => {
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(array)
+    }
+    const response = await fetch(`${api}api=sendClientEmail`, requestObj);
+    
+    return response;
+}
 
 export const biospecimenUsers = async () => {
     const idToken = await getIdToken();
@@ -1111,12 +1126,15 @@ export const checkInParticipant = async (data, visitConcept) => {
     
     let visits;
     const user_uid = data.state.uid;
+    let sendBioEmail = false;
 
     if(data['331584571']) {
 
         visits = data['331584571'];
 
         if(!visits[visitConcept]) {
+
+            if(visitConcept === '266600170') sendBioEmail = true;
 
             visits[visitConcept] = {
                 '840048338': new Date()
@@ -1126,6 +1144,7 @@ export const checkInParticipant = async (data, visitConcept) => {
         visits[visitConcept]['135591601'] = 353358909;
     }
     else {
+        sendBioEmail = true;
 
         visits = {
             [visitConcept]: {
@@ -1140,6 +1159,23 @@ export const checkInParticipant = async (data, visitConcept) => {
         uid: user_uid
     };
         
+    if(sendBioEmail) {
+        const emailData = {
+            email: data['421823980'],
+            subject: "Please complete a short survey about your samples",
+            message: baselineEmailTemplate(data),
+            notificationType: "email",
+            time: new Date().toISOString(),
+            attempt: "1st contact",
+            category: "Biospecimen Survey Reminder",
+            token: data.token,
+            uid: data.state.uid,
+            read: false
+        };
+        
+        await(sendClientEmail(emailData));
+    }
+
     await updateParticipant(checkInData);
 };
 
