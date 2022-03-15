@@ -1,4 +1,4 @@
-import { validateUser, siteFullNames, showAnimation, hideAnimation, errorMessage, removeAllErrors, sendEmail } from "./../shared.js";
+import { validateUser, siteFullNames, showAnimation, hideAnimation, errorMessage, removeAllErrors } from "./../shared.js";
 import { userDashboard } from "./dashboard.js";
 import { nonUserNavBar, unAuthorizedUser } from './../navbar.js'
 

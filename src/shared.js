@@ -113,7 +113,7 @@ export const updateParticipant = async (array) => {
     return await response.json();
 }
 
-export const sendEmail = async (array) => {
+export const sendClientEmail = async (array) => {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -123,7 +123,7 @@ export const sendEmail = async (array) => {
         },
         body: JSON.stringify(array)
     }
-    const response = await fetch(`${api}api=sendBioEmail`, requestObj);
+    const response = await fetch(`${api}api=sendClientEmail`, requestObj);
     
     return response;
 }
@@ -1139,6 +1139,29 @@ const baselineEmailTemplate = (data) => {
     `;
 };
 
+const notificationTemplate = (data, emailData) => {
+
+    const uuid = require('uuid');
+    
+    let notification = {
+        id: uuid(),
+        notificationType: "email",
+        email: emailData.email,
+        notification : {
+            title: emailData.subject,
+            body: emailData.message,
+            time: new Date().toISOString()
+        },
+        attempt: "1st contact",            
+        category: "Biospecimen Survey Reminder",
+        token: data.token,
+        uid: data.state.uid,
+        read: false
+    };
+
+    return notification;
+};
+
 export const getCheckedInVisit = (data) => {
 
     let visitConcept;
@@ -1196,10 +1219,13 @@ export const checkInParticipant = async (data, visitConcept) => {
             message: baselineEmailTemplate(data)
         };
 
-        await(sendEmail(emailData));
+        //const notificationData = notificationTemplate(data, emailData);
+
+        //console.log(notificationTemplate);
+        await(sendClientEmail(emailData));
     }
 
-    await updateParticipant(checkInData);
+    //await updateParticipant(checkInData);
 };
 
 export const checkOutParticipant = async (data) => {
