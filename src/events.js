@@ -2370,55 +2370,58 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
     biospecimenData['338570265'] = document.getElementById('collectionAdditionalNotes').value;
 
+    showAnimation();
+
     const baselineVisit = (biospecimenData['331584571'] === 266600170);
     const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
 
-    const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
-    const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
-    const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
+    if(baselineVisit && clinicalResearchSetting) {
 
-    let bloodCollected = false;
-    let urineCollected = false;
-    let mouthwashCollected = false;
+        const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
+        const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
+        const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
 
-    let bloodTime;
-    let urineTime;
-    let mouthwashTime;
+        let bloodCollected = false;
+        let urineCollected = false;
+        let mouthwashCollected = false;
 
-    bloodTubes.forEach(tube => {
-        if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-            bloodCollected = true;
-            bloodTime = biospecimenData['678166505'];
-        }
-    });
+        let bloodTime;
+        let urineTime;
+        let mouthwashTime;
 
-    urineTubes.forEach(tube => {
-        if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-            urineCollected = true;
-            urineTime = biospecimenData['678166505'];
-        }
-    });
+        bloodTubes.forEach(tube => {
+            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
+                bloodCollected = true;
+                bloodTime = biospecimenData['678166505'];
+            }
+        });
 
-    mouthwashTubes.forEach(tube => {
-        if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-            mouthwashCollected = true;
-            mouthwashTime = biospecimenData['678166505'];
-        }
-    });
+        urineTubes.forEach(tube => {
+            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
+                urineCollected = true;
+                urineTime = biospecimenData['678166505'];
+            }
+        });
 
-    showAnimation();
+        mouthwashTubes.forEach(tube => {
+            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
+                mouthwashCollected = true;
+                mouthwashTime = biospecimenData['678166505'];
+            }
+        });
 
-    const baselineData = {
-        '878865966': baselineVisit && clinicalResearchSetting && bloodCollected ? 353358909 : 104430631,
-        '561681068': bloodTime ? bloodTime : '',
-        '167958071': baselineVisit && clinicalResearchSetting && urineCollected ? 353358909 : 104430631, 
-        '847159717': urineTime ? urineTime : '',
-        '684635302': baselineVisit && clinicalResearchSetting && mouthwashCollected ? 353358909 : 104430631,
-        '448660695': mouthwashTime ? mouthwashTime : '',
-        uid: dt.state.uid
-    };
-        
-    await updateParticipant(baselineData);
+        const baselineData = {
+            '878865966': bloodCollected ? 353358909 : 104430631,
+            '561681068': bloodTime ? bloodTime : '',
+            '167958071': urineCollected ? 353358909 : 104430631, 
+            '847159717': urineTime ? urineTime : '',
+            '684635302': mouthwashCollected ? 353358909 : 104430631,
+            '448660695': mouthwashTime ? mouthwashTime : '',
+            uid: dt.state.uid
+        };
+            
+        await updateParticipant(baselineData);
+    }
 
     if (cntd) {
         if (getWorflow() === 'clinical') {
