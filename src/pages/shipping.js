@@ -20,6 +20,89 @@ const conversion = {
     "683613884":"0024",
 }
 
+// Location ID, site specific (560975149) to site Acronym
+const siteSpecificLocationToSiteAcronym = {
+  "HP Research Clinic" : "HP",
+  "Henry Ford Main Campus": "HFHS",
+  "Henry Ford West Bloomfield Hospital": "HFHS",
+  "Henry Ford Medical Center- Fairlane": "HFHS",
+  "KPCO RRL": "KPCO",
+  "KPGA RRL": "KPGA",
+  "KPHI RRL": "KPHI",
+  "KPNW RRL": "KPNW",
+  "Marshfield": "MFC",
+  "SF Cancer Center LL": "SFH",
+  "DCAM": "UCM",
+  "Main Campus": "NCI",
+  "Frederick": "NCI",
+  "UC-DCAM": "NORC", // wont be using biospecimen dashboard
+  "National Institute of Health": "NIH", // wont be using biospecimen dashboard
+}
+
+const siteAcronymToLoginSiteCode = {
+   "HP": 531629870,
+   "HFHS": 548392715,
+   "KPCO": 125001209,
+   "KPGA": 327912200,
+   "KPHI": 300267574,
+   "KPNW": 452412599,
+   "MFC": 303349821,
+   "SFH": 657167265,
+   "UCM": 809703864,
+   "NCI": 13, // does this need to be changed?
+}
+
+const siteAcronymToLoginSiteName = {
+  "HP": "HealthPartners",
+  "HFHS": "Henry Ford Health System",
+  "KPCO": "Kaiser Permanente Colorado",
+  "KPGA": "Kaiser Permanente Georgia",
+  "KPHI": "Kaiser Permanente Hawaii",
+  "KPNW": "Kaiser Permanente Northwest",
+  "MFC": "Marshfield Clinic",
+  "SFH": "Sanford Health",
+  "UCM": "University of Chicago Medicine",
+  "NCI": "National Cancer Institute", 
+}
+
+const siteNameToSiteCode = {
+   "HealthPartners": 531629870,
+   "Henry Ford Health System": 548392715,
+   "Kaiser Permanente Colorado": 125001209,
+   "Kaiser Permanente Georgia": 327912200,
+   "Kaiser Permanente Hawaii": 300267574,
+   "Kaiser Permanente Northwest": 452412599,
+   "Marshfield Clinic": 303349821,
+   "Sanford Health": 657167265,
+   "University of Chicago Medicine": 809703864,
+   "National Cancer Institute": 13, // Used by developers and testing
+}
+
+// {"siteAcronym":"", "siteCode":"", "loginSiteName": ""}
+/*
+Note: 
+NORC, NIH will not use Biospecimen Dashboards
+Main Campus, Frederick are developer site specific location options when person logged in siteCode 13
+Might need to Lake Hallie and separate Marshfield
+*/ 
+const siteSpecificLocation = {
+  "HP Research Clinic" : {"siteAcronym":"HP", "siteCode":531629870, "loginSiteName": "HealthPartners"},
+  "Henry Ford Main Campus": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
+  "Henry Ford West Bloomfield Hospital": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
+  "Henry Ford Medical Center- Fairlane": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
+  "KPCO RRL": {"siteAcronym":"KPCO", "siteCode":125001209, "loginSiteName": "Kaiser Permanente Colorado"},
+  "KPGA RRL":{"siteAcronym":"KPGA", "siteCode":327912200, "loginSiteName": "Kaiser Permanente Georgia"},
+  "KPHI RRL": {"siteAcronym":"KPHI", "siteCode":300267574, "loginSiteName": "Kaiser Permanente Hawaii"},
+  "KPNW RRL": {"siteAcronym":"KPNW", "siteCode":452412599, "loginSiteName": "Kaiser Permanente Northwest"},
+  "Marshfield": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
+  "SF Cancer Center LL": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
+  "DCAM": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
+  "Main Campus": {"siteAcronym":"NCI", "siteCode":13, "loginSiteName": "National Cancer Institute"},
+  "Frederick": {"siteAcronym":"NCI", "siteCode":13, "loginSiteName": "National Cancer Institute"},
+}
+
+
+
 export const shippingDashboard = (auth, route, goToSpecimenSearch) => {  
     auth.onAuthStateChanged(async user => {
         if(user){

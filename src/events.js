@@ -586,7 +586,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
                 toPass['bags'] = hiddenJSON[boxIds[i]]
                 toPass['560975149'] = locations[boxIds[i]]
                 toPass['555611076'] = currTime;
-                // MODIFY API - update box API
+                // MODIFY API - UPDATE box API***
                 await storeBox(toPass);
                 // await modifyBox(toPass)
             }
@@ -1436,6 +1436,7 @@ const addNewBox = async (userName) => {
     // loop through entire hiddenJSON and determine the largest boxid number
     for (let i = 0; i < hiddenJSON.length; i++) {
         let curr = parseInt(hiddenJSON[i]['132929440'].substring(3))
+        // Do a conversion here - "560975149" - Location ID, site specific
         let currLocation = hiddenJSON[i]['560975149']
 
         if (curr > largestOverall) {
@@ -1482,7 +1483,6 @@ const addNewBox = async (userName) => {
                     }
                 }
             }
-            // check if flag needed? 
             // TEST
             await populateBoxSelectList(hiddenJSON, userName)
             return true
