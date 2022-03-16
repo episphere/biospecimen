@@ -769,6 +769,65 @@ export const generateBarCode = (id, connectId) => {
     JsBarcode(`#${id}`, connectId, {height: 30});
 }
 
+export const updateBaselineData = async (siteTubesList, data) => {
+
+    const response = await getParticipantCollections(data.token);
+    const baselineCollections = response.data.filter(collection => collection['331584571'] === 266600170);
+    
+    const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
+    const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
+    const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
+
+    let bloodCollected = (data['878865966'] === 353358909);
+    let urineCollected = (data['167958071'] === 353358909);
+    let mouthwashCollected = (data['684635302'] === 353358909);
+
+    let bloodTime = data['561681068'] ? data['561681068'] : '';
+    let urineTime = data['847159717'] ? data['847159717'] : '';
+    let mouthwashTime = data['448660695'] ? data['448660695'] : '';
+
+    baselineCollections.forEach(collection => {
+
+        if(!bloodCollected) {
+            bloodTubes.forEach(tube => {
+                if(collection[tube.concept]['593843561'] === 353358909) {
+                    bloodCollected = true;
+                    bloodTime = collection['678166505'];
+                }
+            });
+        }
+
+        if(!urineCollected) {
+            urineTubes.forEach(tube => {
+                if(collection[tube.concept]['593843561'] === 353358909) {
+                    urineCollected = true;
+                    urineTime = collection['678166505'];
+                }
+            });
+        }
+        if(!mouthwashCollected) {
+            mouthwashTubes.forEach(tube => {
+                if(collection[tube.concept]['593843561'] === 353358909) {
+                    mouthwashCollected = true;
+                    mouthwashTime = collection['678166505'];
+                }
+            });
+        }
+    });
+
+    const baselineData = {
+        '878865966': bloodCollected ? 353358909 : 104430631,
+        '561681068': bloodTime ? bloodTime : '',
+        '167958071': urineCollected ? 353358909 : 104430631, 
+        '847159717': urineTime ? urineTime : '',
+        '684635302': mouthwashCollected ? 353358909 : 104430631,
+        '448660695': mouthwashTime ? mouthwashTime : '',
+        uid: data.state.uid
+    };
+        
+    await updateParticipant(baselineData);
+}
+
 export const siteFullNames = {
     'NCI': 'National Cancer Institute',
     'KPGA': 'Kaiser Permanente Georgia',
