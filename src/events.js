@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData} from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -2370,70 +2370,28 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
     biospecimenData['338570265'] = document.getElementById('collectionAdditionalNotes').value;
 
-    showAnimation();
-
-    const baselineVisit = (biospecimenData['331584571'] === 266600170);
-    const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
-
-    if(baselineVisit && clinicalResearchSetting) {
-
-        const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
-        const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
-        const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
-
-        let bloodCollected = false;
-        let urineCollected = false;
-        let mouthwashCollected = false;
-
-        let bloodTime;
-        let urineTime;
-        let mouthwashTime;
-
-        bloodTubes.forEach(tube => {
-            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-                bloodCollected = true;
-                bloodTime = biospecimenData['678166505'];
-            }
-        });
-
-        urineTubes.forEach(tube => {
-            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-                urineCollected = true;
-                urineTime = biospecimenData['678166505'];
-            }
-        });
-
-        mouthwashTubes.forEach(tube => {
-            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-                mouthwashCollected = true;
-                mouthwashTime = biospecimenData['678166505'];
-            }
-        });
-
-        const baselineData = {
-            '878865966': bloodCollected ? 353358909 : 104430631,
-            '561681068': bloodTime ? bloodTime : '',
-            '167958071': urineCollected ? 353358909 : 104430631, 
-            '847159717': urineTime ? urineTime : '',
-            '684635302': mouthwashCollected ? 353358909 : 104430631,
-            '448660695': mouthwashTime ? mouthwashTime : '',
-            uid: dt.state.uid
-        };
-            
-        await updateParticipant(baselineData);
-    }
-
     if (cntd) {
         if (getWorflow() === 'clinical') {
             if (biospecimenData['915838974'] === undefined) biospecimenData['915838974'] = new Date().toISOString();
         }
-        await updateSpecimen([biospecimenData]);
+    }
+
+    showAnimation();
+
+    await updateSpecimen([biospecimenData]);
+    
+
+    const baselineVisit = (biospecimenData['331584571'] === 266600170);
+    const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
+
+    if(baselineVisit && clinicalResearchSetting) await updateBaselineData(siteTubesList, dt);
+
+    if (cntd) {
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
         finalizeTemplate(dt, specimenData);
     }
     else {
-        await updateSpecimen([biospecimenData]);
 
         await swal({
             title: "Success",
