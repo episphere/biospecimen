@@ -8,7 +8,7 @@ import { signOut } from "./pages/signIn.js";
 import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
-
+import {default as conceptIds} from './fieldToConceptIdMapping.js';
 
 const conversion = {
     "299553921":"0001",
@@ -503,6 +503,91 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) =
     return response.json();
 }
 
+export const bagConceptIdList = [
+    conceptIds.bag1,
+    conceptIds.bag2,
+    conceptIds.bag3,
+    conceptIds.bag4,
+    conceptIds.bag5,
+    conceptIds.bag6,
+    conceptIds.bag7,
+    conceptIds.bag8,
+    conceptIds.bag9,
+    conceptIds.bag10,
+    conceptIds.bag11,
+    conceptIds.bag12,
+    conceptIds.bag13,
+    conceptIds.bag14,
+    conceptIds.bag15,
+];
+  
+export const convertToOldBox = (inputBox) => {
+  if (inputBox.bags) return inputBox;
+  let bags = {};
+  let outputBox = { ...inputBox };
+ 
+  for (let bagConceptId of bagConceptIdList) {
+    if (!inputBox[bagConceptId]) continue;
+    const inputBag = inputBox[bagConceptId];
+
+    let outputBag = {};
+    const keyList = [
+      conceptIds.shippingFirstName,
+      conceptIds.shippingLastName,
+        conceptIds.containsOrphan,
+    ];
+    for (let k of keyList) {
+      if (inputBag[k]) outputBag[k] = inputBag[k];
+    }
+    outputBag['arrElements'] = inputBag[conceptIds.tubesCollected];
+      let bagId, conceptId;
+      if (inputBag[conceptIds.bagscan_bloodUrine]) {
+          conceptId = conceptIds.bagscan_bloodUrine;
+          bagId = inputBag[conceptId];
+          outputBag["isBlood"] = true;
+      } else if (inputBag[conceptIds.bagscan_mouthWash]) { 
+            conceptId = conceptIds.bagscan_mouthWash;
+          bagId = inputBag[conceptId];
+          outputBag["isBlood"] = false
+      } else if (inputBag[conceptIds.bagscan_orphanTube]) {
+            conceptId = conceptIds.bagscan_orphanTube;
+          bagId = inputBag[conceptId];
+            outputBag["isBlood"] = false
+      }
+    bags[bagId] = outputBag;
+    delete outputBox[bagConceptId];
+  }
+  outputBox['bags'] = bags;
+  return outputBox;
+};
+
+export const convertToFirestoreBox = (inputBox) => {
+  if (!inputBox.bags) return inputBox;
+  let { bags } = inputBox;
+  let outputBox = { ...inputBox };
+  delete outputBox.bags;
+  let bagConceptIdIndex = 0;
+  for (let [bagId, inputBag] of Object.entries(bags)) {
+    if (bagConceptIdIndex >= bagConceptIdList.length) break;
+    let outputBag = {};
+    const bagConceptId = bagConceptIdList[bagConceptIdIndex];
+    const keyList = [
+      conceptIds.shippingFirstName,
+      conceptIds.shippingLastName,
+      conceptIds.containsOrphan,
+    ];
+    for (let k of keyList) {
+      if (inputBag[k]) outputBag[k] = inputBag[k];
+    }
+    inputBox['isBlood']
+      ? (outputBag[conceptIds.bagscan_bloodUrine] = bagId)
+      : (outputBag[conceptIds.bagscan_mouthWash] = bagId);
+    outputBag[conceptIds.tubesCollected] = inputBag['arrElements'];
+    outputBox[bagConceptId] = outputBag;
+    bagConceptIdIndex++;
+  }
+  return outputBox;
+};
 
 export const getBoxes = async (box) =>{
     const idToken = await getIdToken();
@@ -518,8 +603,7 @@ export const getBoxes = async (box) =>{
     let data = res.data;
     for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
-
-        if(!currJSON.hasOwnProperty("145971562") || currJSON["145971562"] != '353358909'){
+        if(!currJSON.hasOwnProperty(conceptIds.submitShipmentFlag) || currJSON[conceptIds.submitShipmentFlag] != conceptIds.booleanOne){ 
             toReturn["data"].push(currJSON);
         }
     }
