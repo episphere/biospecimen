@@ -291,10 +291,13 @@ const participantStatus = (data) => {
                         <span class="full-width">Baseline Specimen Survey</span>
                     </div>
                     <div class="row">
-                        <span class="full-width"><i class="fas fa-2x fa-times"></i></span>
+                        <span class="full-width">${data['265193023'] === 231311385 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}</span>
                     </div>
                     <div class="row">
-                        <br>
+                        <span class="full-width">${surveyConversion[data['265193023']]}</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['265193023'] === 615768760 ? data['822499427'] : data['265193023'] === 231311385 ? data['222161762'] : ''}</span>
                     </div>
                  </div>
             </div>
