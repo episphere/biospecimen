@@ -16,12 +16,19 @@ export const bptlScreen = async (auth, route) => {
   showAnimation();
   const response = await validateUser();
   hideAnimation();
-  if (response.code !== 200) {
+  if (response.code !== 200 ) {
     document.getElementById("contentBody").innerHTML =
       "Authorization failed you lack permissions to use this dashboard!";
     document.getElementById("navbarNavAltMarkup").innerHTML =
       unAuthorizedUser();
     return;
+  }
+  else if ( response.data.isBPTLUser === false ) {
+    document.getElementById("contentBody").innerHTML =
+    "Authorization failed you lack permissions to use this dashboard!";
+  document.getElementById("navbarNavAltMarkup").innerHTML =
+    unAuthorizedUser();
+  return;
   }
   bptlScreenTemplate(name, response.data, auth, route);
   redirectPageToLocation();
