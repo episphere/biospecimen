@@ -828,6 +828,24 @@ export const updateBaselineData = async (siteTubesList, data) => {
     await updateParticipant(baselineData);
 }
 
+export const verifyDefaultConcepts = async (data) => {
+
+    if(!data['265193023']) {
+        const defaultData = {
+            '265193023': 972455046,
+            uid: data.state.uid
+        }
+
+        updateParticipant(defaultData);
+
+        data = await findParticipant(`connectId=${data['Connect_ID']}`).then(
+            (res) => res.data?.[0]
+        );;
+    }
+
+    return data;
+}
+
 export const siteFullNames = {
     'NCI': 'National Cancer Institute',
     'KPGA': 'Kaiser Permanente Georgia',
