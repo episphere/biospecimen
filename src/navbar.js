@@ -75,18 +75,18 @@ export const userNavBar = (name) => {
     `;
 }
 
-export const nonUserNavBar = (name) => {
+export const nonUserNavBar = (name, isBPTLUser) => {
     return `
         <div class="navbar-nav current-page">
             <li class="nav-item">
                 <a class="nav-link" href="#welcome" id="welcome" title="Home"><i class="fas fa-home"></i> Home</a>
             </li>
         </div>
-        <div class="navbar-nav">
+        ${isBPTLUser === true ? `<div class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link" href="#bptl" id="bptl" title="Home"><i class="fa fa-id-badge"></i> BPTL</a>
             </li>
-        </div>
+        </div>` : ``}
         <div class="navbar-nav ml-auto">
             <div class="grid-elements dropdown">
                 <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn"  title="Welcome, ${name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
