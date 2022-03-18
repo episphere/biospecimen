@@ -523,50 +523,58 @@ export const bagConceptIdList = [
   
 export const convertToOldBox = (inputBox) => {
   if (inputBox.bags) return inputBox;
+
   let bags = {};
   let outputBox = { ...inputBox };
- 
+
   for (let bagConceptId of bagConceptIdList) {
     if (!inputBox[bagConceptId]) continue;
-    const inputBag = inputBox[bagConceptId];
 
     let outputBag = {};
+    const inputBag = inputBox[bagConceptId];
     const keyList = [
       conceptIds.shippingFirstName,
       conceptIds.shippingLastName,
-        conceptIds.containsOrphan,
+      conceptIds.containsOrphan,
     ];
+
     for (let k of keyList) {
       if (inputBag[k]) outputBag[k] = inputBag[k];
     }
+
     outputBag['arrElements'] = inputBag[conceptIds.tubesCollected];
-      let bagId, conceptId;
-      if (inputBag[conceptIds.bagscan_bloodUrine]) {
-          conceptId = conceptIds.bagscan_bloodUrine;
-          bagId = inputBag[conceptId];
-          outputBag["isBlood"] = true;
-      } else if (inputBag[conceptIds.bagscan_mouthWash]) { 
-            conceptId = conceptIds.bagscan_mouthWash;
-          bagId = inputBag[conceptId];
-          outputBag["isBlood"] = false
-      } else if (inputBag[conceptIds.bagscan_orphanTube]) {
-            conceptId = conceptIds.bagscan_orphanTube;
-          bagId = inputBag[conceptId];
-            outputBag["isBlood"] = false
-      }
+    let bagId, conceptId;
+
+    if (inputBag[conceptIds.bagscan_bloodUrine]) {
+      conceptId = conceptIds.bagscan_bloodUrine;
+      bagId = inputBag[conceptId];
+      outputBag['isBlood'] = true;
+    } else if (inputBag[conceptIds.bagscan_mouthWash]) {
+      conceptId = conceptIds.bagscan_mouthWash;
+      bagId = inputBag[conceptId];
+      outputBag['isBlood'] = false;
+    } else if (inputBag[conceptIds.bagscan_orphanTube]) {
+      conceptId = conceptIds.bagscan_orphanTube;
+      bagId = inputBag[conceptId];
+      outputBag['isBlood'] = false;
+    }
+
     bags[bagId] = outputBag;
     delete outputBox[bagConceptId];
   }
+
   outputBox['bags'] = bags;
   return outputBox;
 };
 
 export const convertToFirestoreBox = (inputBox) => {
   if (!inputBox.bags) return inputBox;
+
   let { bags } = inputBox;
   let outputBox = { ...inputBox };
   delete outputBox.bags;
   let bagConceptIdIndex = 0;
+
   for (let [bagId, inputBag] of Object.entries(bags)) {
     if (bagConceptIdIndex >= bagConceptIdList.length) break;
     let outputBag = {};
@@ -576,9 +584,11 @@ export const convertToFirestoreBox = (inputBox) => {
       conceptIds.shippingLastName,
       conceptIds.containsOrphan,
     ];
+
     for (let k of keyList) {
       if (inputBag[k]) outputBag[k] = inputBag[k];
     }
+
     inputBox['isBlood']
       ? (outputBag[conceptIds.bagscan_bloodUrine] = bagId)
       : (outputBag[conceptIds.bagscan_mouthWash] = bagId);
@@ -586,6 +596,7 @@ export const convertToFirestoreBox = (inputBox) => {
     outputBox[bagConceptId] = outputBag;
     bagConceptIdIndex++;
   }
+
   return outputBox;
 };
 
