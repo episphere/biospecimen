@@ -350,6 +350,7 @@ export const boxManifest = async (boxId, userName) => {
         }
         hiddenJSON[box['132929440']] = box['bags']
     }
+    // TODO: Access Location Site "560975149" and convert to site Acronym 
     let currInstitute = currBox.siteAcronym;
     let currLocation = currBox['560975149'];
    
@@ -440,6 +441,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
         let box = boxJSONS[i]
         hiddenJSON[box['132929440']] = box['bags']
         locations[box['132929440']] = box['560975149'];
+        // TODO: Access Location Site "560975149" and convert to site Acronym 
         site = box['siteAcronym'];
     }
 
