@@ -8,7 +8,7 @@ import { signOut } from "./pages/signIn.js";
 import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
-
+import conceptIDs from './fieldToConceptIdMapping.js';
 
 const conversion = {
     "299553921":"0001",
@@ -503,6 +503,101 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) =
     return response.json();
 }
 
+export const bagConceptIDList = [
+    conceptIDs.bag1,
+    conceptIDs.bag2,
+    conceptIDs.bag3,
+    conceptIDs.bag4,
+    conceptIDs.bag5,
+    conceptIDs.bag6,
+    conceptIDs.bag7,
+    conceptIDs.bag8,
+    conceptIDs.bag9,
+    conceptIDs.bag10,
+    conceptIDs.bag11,
+    conceptIDs.bag12,
+    conceptIDs.bag13,
+    conceptIDs.bag14,
+    conceptIDs.bag15,
+];
+  
+export const convertToOldBox = (inputBox) => {
+  let bags = {};
+  let outputBox = { ...inputBox };
+
+  for (let bagConceptId of bagConceptIDList) {
+    if (!inputBox[bagConceptId]) continue;
+    let outputBag = {};
+    const inputBag = inputBox[bagConceptId];
+    const keyList = [
+      conceptIDs.shippingFirstName,
+      conceptIDs.shippingLastName,
+      conceptIDs.containsOrphan,
+    ];
+
+    for (let k of keyList) {
+      if (inputBag[k]) outputBag[k] = inputBag[k];
+    }
+
+    outputBag.arrElements = inputBag[conceptIDs.tubesCollected];
+    let bagID;
+
+    if (inputBag[conceptIDs.bagscan_bloodUrine]) {
+      bagID = inputBag[conceptIDs.bagscan_bloodUrine];
+      outputBag.isBlood = true;
+    } else if (inputBag[conceptIDs.bagscan_mouthWash]) {
+      bagID = inputBag[conceptIDs.bagscan_mouthWash];
+      outputBag.isBlood = false;
+    } else if (inputBag[conceptIDs.bagscan_orphanTube]) {
+      bagID = inputBag[conceptIDs.bagscan_orphanTube];
+      outputBag.isBlood = false;
+    }
+
+    bags[bagID] = outputBag;
+    delete outputBox[bagConceptId];
+  }
+
+  outputBox.bags = bags;
+
+  // todo: implement siteAcronym in outputBox
+  outputBox.siteAcronym = 'NCI';
+  return outputBox;
+};
+
+export const convertToFirestoreBox = (inputBox) => {
+  let { bags } = inputBox;
+  let outputBox = { ...inputBox };
+  delete outputBox.bags;
+  let bagConceptIDIndex = 0;
+
+  for (let [bagID, inputBag] of Object.entries(bags)) {
+    if (bagConceptIDIndex >= bagConceptIDList.length) break;
+    let outputBag = {};
+    const bagConceptId = bagConceptIDList[bagConceptIDIndex];
+    const keyList = [
+      conceptIDs.shippingFirstName,
+      conceptIDs.shippingLastName,
+      conceptIDs.containsOrphan,
+    ];
+
+    for (let k of keyList) {
+      if (inputBag[k]) outputBag[k] = inputBag[k];
+    }
+
+    inputBox.isBlood
+      ? (outputBag[conceptIDs.bagscan_bloodUrine] = bagID)
+      : (outputBag[conceptIDs.bagscan_mouthWash] = bagID);
+    outputBag[conceptIDs.tubesCollected] = inputBag.arrElements;
+    outputBox[bagConceptId] = outputBag;
+    bagConceptIDIndex++;
+  }
+
+  for (let k of ['siteAcronym', 'lastUpdatedTiime']) {
+    if (outputBox[k]) delete outputBox[k];
+  }
+
+  return outputBox;
+};
 
 export const getBoxes = async (box) =>{
     const idToken = await getIdToken();
@@ -518,8 +613,7 @@ export const getBoxes = async (box) =>{
     let data = res.data;
     for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
-
-        if(!currJSON.hasOwnProperty("145971562") || currJSON["145971562"] != '353358909'){
+        if(!currJSON.hasOwnProperty(conceptIDs.submitShipmentFlag) || currJSON[conceptIDs.submitShipmentFlag] != conceptIDs.booleanOne){ 
             toReturn["data"].push(currJSON);
         }
     }
