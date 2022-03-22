@@ -72,8 +72,8 @@ export default {
     bag15:147157395,
     bagscan_bloodUrine: 787237543,
     bagscan_mouthWash: 223999569,
-    bagscan_orphanTube: 309516145,
-    bagscan_orphanBag: 512886212,
+    bagscan_orphanBag: 309516145,
+    orphanBag: 512886212,
     containsOrphan: 123456789, 
     tubesCollected: 921684244, 
     hpResearchClinic: 834825425,
@@ -88,6 +88,7 @@ export default {
     sfCancerCenter: 589224449,
     dcam: 333333333,
     nci_mainCampus: 111111111,
-    nci_frederick: 222222222
+    nci_frederick: 222222222,
+    siteCode:789843387,
 };
 
