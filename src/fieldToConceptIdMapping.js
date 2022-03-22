@@ -76,5 +76,18 @@ export default {
     bagscan_orphanBag: 512886212,
     containsOrphan: 123456789, 
     tubesCollected: 921684244, 
-
+    hpResearchClinic: 834825425,
+    hfhs_mainCampus: 752948709,
+    hfhs_westBloomfieldHospital: 570271641,
+    hfhs_fairlane: 838480167,
+    kpco_rrl: 763273112,
+    kpga_rrl: 767775934,
+    kphi_rrl: 531313956,
+    kpnw_rrl: 715632875,
+    marshfield: 692275326,
+    sfCancerCenter: 589224449,
+    dcam: 333333333,
+    nci_mainCampus: 111111111,
+    nci_frederick: 222222222
 };
+

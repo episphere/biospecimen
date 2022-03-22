@@ -27,6 +27,103 @@ const conversion = {
     "677469051":"0014",
     "683613884":"0024"
 }
+export const sites = {
+  HP: { siteCode: '531629870', locations: ['834825425'] },
+  HFHS: {
+    siteCode: '548392715',
+    locations: ['752948709', '570271641', '838480167'],
+  },
+  KPCO: { siteCode: '125001209', locations: ['763273112'] },
+  KPGA: { siteCode: '327912200', locations: ['767775934'] },
+  KPHI: { siteCode: '300267574', locations: ['531313956'] },
+  KPNW: { siteCode: '452412599', locations: ['715632875'] },
+  MFC: { siteCode: '303349821', locations: ['692275326'] },
+  SFH: { siteCode: '657167265', locations: ['589224449'] },
+  UCM: { siteCode: '809703864', locations: ['333333333'] },
+  NCI: { siteCode: '13', locations: ['111111111', '222222222'] },
+};
+
+export const locations = {
+  834825425: {
+    siteSpecificLocation: 'HP Research Clinic',
+    siteAcronym: 'HP',
+    siteCode: '531629870',
+    loginSiteName: 'HealthPartners',
+  },
+  752948709: {
+    siteSpecificLocation: 'Henry Ford Main Campus',
+    siteAcronym: 'HFHS',
+    siteCode: '548392715',
+    loginSiteName: 'Henry Ford Health System',
+  },
+  570271641: {
+    siteSpecificLocation: 'Henry Ford West Bloomfield Hospital',
+    siteAcronym: 'HFHS',
+    siteCode: '548392715',
+    loginSiteName: 'Henry Ford Health System',
+  },
+  838480167: {
+    siteSpecificLocation: 'Henry Ford Medical Center-Fairlane',
+    siteAcronym: 'HFHS',
+    siteCode: '548392715',
+    loginSiteName: 'Henry Ford Health System',
+  },
+  763273112: {
+    siteSpecificLocation: 'KPCO RRL',
+    siteAcronym: 'KPCO',
+    siteCode: '125001209',
+    loginSiteName: 'Kaiser Permanente Colorado',
+  },
+  767775934: {
+    siteSpecificLocation: 'KPGA RRL',
+    siteAcronym: 'KPGA',
+    siteCode: '327912200',
+    loginSiteName: 'Kaiser Permanente Georgia',
+  },
+  531313956: {
+    siteSpecificLocation: 'KPHI RRL',
+    siteAcronym: 'KPHI',
+    siteCode: '300267574',
+    loginSiteName: 'Kaiser Permanente Hawaii',
+  },
+  715632875: {
+    siteSpecificLocation: 'KPNW RRL',
+    siteAcronym: 'KPNW',
+    siteCode: '452412599',
+    loginSiteName: 'Kaiser Permanente Northwest',
+  },
+  692275326: {
+    siteSpecificLocation: 'Marshfield',
+    siteAcronym: 'MFC',
+    siteCode: '303349821',
+    loginSiteName: 'Marshfield Cancer Center',
+  },
+  589224449: {
+    siteSpecificLocation: 'SF Cancer Center LL',
+    siteAcronym: 'SFH',
+    siteCode: '657167265',
+    loginSiteName: 'Sanford Health',
+  },
+  333333333: {
+    siteSpecificLocation: 'DCAM',
+    siteAcronym: 'UCM',
+    siteCode: '809703864',
+    loginSiteName: 'University of Chicago Medicine',
+  },
+  111111111: {
+    siteSpecificLocation: 'Main Campus',
+    siteAcronym: 'NCI',
+    siteCode: '13',
+    loginSiteName: 'National Cancer Institute',
+  },
+  222222222: {
+    siteSpecificLocation: 'Frederick',
+    siteAcronym: 'NCI',
+    siteCode: '13',
+    loginSiteName: 'National Cancer Institute',
+  },
+};
+  
  const api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
 // const api = 'http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
 
@@ -458,7 +555,7 @@ export const storeBox = async (box) =>{
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(box)
+        body: JSON.stringify(convertToFirestoreBox(box))
     }
     const response = await fetch(`${api}api=addBox`, requestObj);
     return response.json();
@@ -522,6 +619,7 @@ export const bagConceptIDList = [
 ];
   
 export const convertToOldBox = (inputBox) => {
+  if (inputBox.bags) return inputBox;
   let bags = {};
   let outputBox = { ...inputBox };
 
@@ -529,13 +627,13 @@ export const convertToOldBox = (inputBox) => {
     if (!inputBox[bagConceptId]) continue;
     let outputBag = {};
     const inputBag = inputBox[bagConceptId];
-    const keyList = [
+    const outputBagKeys = [
       conceptIDs.shippingFirstName,
       conceptIDs.shippingLastName,
       conceptIDs.containsOrphan,
     ];
 
-    for (let k of keyList) {
+    for (let k of outputBagKeys) {
       if (inputBag[k]) outputBag[k] = inputBag[k];
     }
 
@@ -558,9 +656,10 @@ export const convertToOldBox = (inputBox) => {
   }
 
   outputBox.bags = bags;
+  const locationConceptID = inputBox[conceptIDs.shippingLocation];
+  outputBox.siteAcronym =
+    locations[locationConceptID]?.siteAcronym || 'Not Found';
 
-  // todo: implement siteAcronym in outputBox
-  outputBox.siteAcronym = 'NCI';
   return outputBox;
 };
 
@@ -592,45 +691,52 @@ export const convertToFirestoreBox = (inputBox) => {
     bagConceptIDIndex++;
   }
 
-  for (let k of ['siteAcronym', 'lastUpdatedTiime']) {
+  let keysToRomove = ['siteAcronym', 'lastUpdatedTiime'];
+  for (let k of keysToRomove) {
     if (outputBox[k]) delete outputBox[k];
   }
 
   return outputBox;
 };
 
-export const getBoxes = async (box) =>{
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=searchBoxes`, {
-        method: "GET",
-        headers: {
-            Authorization:"Bearer "+idToken
-        }
-    });
-    let res = await response.json();
-    let toReturn  = {};
-    toReturn["data"] = [];
-    let data = res.data;
-    for(let i = 0; i < data.length; i++){
-        let currJSON = data[i];
-        if(!currJSON.hasOwnProperty(conceptIDs.submitShipmentFlag) || currJSON[conceptIDs.submitShipmentFlag] != conceptIDs.booleanOne){ 
-            toReturn["data"].push(currJSON);
-        }
+export const getBoxes = async (box) => {
+  const idToken = await getIdToken();
+  const response = await fetch(`${api}api=searchBoxes`, {
+    method: 'GET',
+    headers: {
+      Authorization: 'Bearer ' + idToken,
+    },
+  });
+  let res = await response.json();
+  let toReturn = {};
+  toReturn['data'] = [];
+  let data = res.data;
+  for (let i = 0; i < data.length; i++) {
+    let currJSON = convertToOldBox(data[i]);
+    if (
+      !currJSON.hasOwnProperty(conceptIDs.submitShipmentFlag) ||
+      currJSON[conceptIDs.submitShipmentFlag] != conceptIDs.booleanOne
+    ) {
+      toReturn['data'].push(currJSON);
     }
-    return toReturn;
-}
+  }
+  return toReturn;
+};
 
-export const getAllBoxes = async (box) =>{
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=searchBoxes`, {
-        method: "GET",
-        headers: {
-            Authorization:"Bearer "+idToken
-        }
-    });
-    let res = await response.json();
-    return res;
-}
+export const getAllBoxes = async (box) => {
+  const idToken = await getIdToken();
+  const response = await fetch(`${api}api=searchBoxes`, {
+    method: 'GET',
+    headers: {
+      Authorization: 'Bearer ' + idToken,
+    },
+  });
+  let res = await response.json();
+  for (let i = 0; i < res.data.length; i++) {
+    res.data[i] = convertToOldBox(res.data[i]);
+  }
+  return res;
+};
 
 export const getBoxesByLocation = async (location) => {
     const idToken = await getIdToken();
@@ -644,6 +750,9 @@ export const getBoxesByLocation = async (location) => {
     });
 
     let res = await response.json();
+    for (let i = 0; i < res.data.length; i++) {
+        res.data[i] = convertToOldBox(res.data[i]);
+    }
     return res;
 }
 
