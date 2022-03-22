@@ -335,8 +335,8 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         }
     }*/
     let currLocation = document.getElementById('selectLocationList').value;
-
-    let response = await getBoxesByLocation(currLocation);
+    let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
+    let response = await getBoxesByLocation(currLocationConceptId);
     let boxJSONS = response.data;
     let hiddenJSON = {};
     for (let i = 0; i < boxJSONS.length; i++) {
@@ -595,11 +595,12 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
                 toPass['bags'] = hiddenJSON[boxIds[i]]
                 toPass['560975149'] = locations[boxIds[i]]
                 // [Note]:Add loginSiteName later
-                toPass['789843387'] = siteSpecificLocation[locations[boxIds[i]]]["siteCode"]
+                // convert number to string location
+                toPass['789843387'] = siteSpecificLocation[conceptIdToSiteSpecificLocation[locations[boxIds[i]]]].siteCode
                 toPass['555611076'] = currTime;
-                /* MODIFY API - UPDATE box API*** */
+                /* UPDATE API - UPDATE box API*** */
                 await storeBox(toPass);
-                // await modifyBox(toPass)
+                // await updateBox(toPass)
             }
         }
 
@@ -1032,7 +1033,9 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                     </tr>`
     let count = 0;
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+    debugger
     for (let i = 0; i < boxes.length; i++) {
+      debugger
         if (Object.keys(hiddenJSON[boxes[i]]).length > 0) {
             let currRow = table.insertRow(count + 1);
             if (count % 2 == 1) {
@@ -1263,7 +1266,7 @@ const compareBoxIds = (a, b) => {
 }
 
 // [MODIFY] - MAKE EDITS 
-export const populateBoxSelectList = async (hiddenJSON, userName, createBoxFlag = false) => {
+export const populateBoxSelectList = async (hiddenJSON, userName,) => {
     let boxList = document.getElementById('selectBoxList');
     let selectBoxList = document.getElementById('selectBoxList');
     let list = ''
@@ -1272,28 +1275,6 @@ export const populateBoxSelectList = async (hiddenJSON, userName, createBoxFlag 
     for (let i = 0; i < keys.length; i++) {
         list += '<option>' + keys[i] + '</option>';
     }
-    // ADD BOX FLAG TO TRIGGER NEW BOX CREATION WHEN LIST IS EMPTY
-
-    // Rewrite Logic addNewBox
-    // REMOVE 
-    // if (list == '' && createBoxFlag) {
-    //     await addNewBox(userName);
-    //     return;
-    // }
-
-  /*  
-  STEPS:
-  When event listener is fired from switching sites
-  - if list is empty auto generate a new Box (current)
-
-  
-  - Prevent adding a new box when empty list and being stored to firestore
-  - 
-
-  */    
-
-    // Find a way to clear all of the values of View Shipping Box Contents
-    // clear Boxes 
 
     boxList.innerHTML = list;
 
@@ -1432,7 +1413,7 @@ export const populateBoxSelectList = async (hiddenJSON, userName, createBoxFlag 
                                     <th style = "border-bottom:1px solid;"></th>
                                 </tr>`;
     }
-
+return
 }
 // [MODIFY] - MAKE EDITS FOR BOX CREATION  
 const addNewBox = async (userName) => {
@@ -1457,7 +1438,7 @@ const addNewBox = async (userName) => {
         // TODO: currLocation (old structure) is using Location's string value instead of conceptID
         // let currLocation = hiddenJSON[i]['560975149'] 
 
-        let currLocation = (typeof hiddenJSON[i]['560975149'] == 'string') ? hiddenJSON[i]['560975149'] : conceptIdToSiteSpecificLocation[hiddenJSON[i]]
+        let currLocation = (typeof hiddenJSON[i]['560975149'] == 'string') ? hiddenJSON[i]['560975149'] : conceptIdToSiteSpecificLocation[hiddenJSON[i]['560975149']]
 
         if (curr > largestOverall) {
             largestOverall = curr;
@@ -1534,7 +1515,7 @@ const addNewBox = async (userName) => {
         toPass['789843387'] = loginSiteCode;
         await storeBox(toPass);
         // await createBox(toPass);
-        console.log(storeBox)
+        // console.log(storeBox)
         hiddenJSON.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocationConversion })
         let boxJSONS = hiddenJSON;
 
@@ -1567,10 +1548,11 @@ export const addEventModalAddBox = (userName) => {
         showAnimation();
         // returns boolean value
         let notifyCreateBox = await addNewBox(userName);
-        // let createBoxFlag = true
         alertState = notifyCreateBox
         let currLocation = document.getElementById('selectLocationList').value;
-        let response = await getBoxesByLocation(currLocation);
+        //convert currLocation to its mapped ConceptId, might be reason why the value is not being pulled corectly
+        let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
+        let response = await getBoxesByLocation(currLocationConceptId);
         let boxJSONS = response.data;
         let hiddenJSONLocation = {};
         for (let i = 0; i < boxJSONS.length; i++) {
@@ -1741,8 +1723,9 @@ export const addEventChangeLocationSelect = (userName) => {
     selectBoxList.addEventListener("change", async () => {
         showAnimation();
         let currLocation = selectBoxList.value;
+        let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
         // This can return an empty [] if no matches
-        let boxJSONS = (await getBoxesByLocation(currLocation)).data;
+        let boxJSONS = (await getBoxesByLocation(currLocationConceptId)).data;
 
         let hiddenJSON = {};
         for (let i = 0; i < boxJSONS.length; i++) {
