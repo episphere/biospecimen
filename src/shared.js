@@ -27,7 +27,7 @@ const conversion = {
     "677469051":"0014",
     "683613884":"0024"
 }
-export const sites = {
+export const siteAcronymToSiteMap = {
   HP: { siteCode: '531629870', locations: ['834825425'] },
   HFHS: {
     siteCode: '548392715',
@@ -43,7 +43,7 @@ export const sites = {
   NCI: { siteCode: '13', locations: ['111111111', '222222222'] },
 };
 
-export const locations = {
+export const locationConceptIDToLocationMap = {
   834825425: {
     siteSpecificLocation: 'HP Research Clinic',
     siteAcronym: 'HP',
@@ -642,13 +642,13 @@ export const convertToOldBox = (inputBox) => {
     if (!inputBox[bagConceptId]) continue;
     let outputBag = {};
     const inputBag = inputBox[bagConceptId];
-    const outputBagKeys = [
+    const keysNeeded = [
       conceptIDs.shippingFirstName,
       conceptIDs.shippingLastName,
       conceptIDs.containsOrphan,
     ];
 
-    for (let k of outputBagKeys) {
+    for (let k of keysNeeded) {
       if (inputBag[k]) outputBag[k] = inputBag[k];
     }
 
@@ -673,7 +673,8 @@ export const convertToOldBox = (inputBox) => {
   outputBox.bags = bags;
   const locationConceptID = inputBox[conceptIDs.shippingLocation];
   outputBox.siteAcronym =
-    locations[locationConceptID]?.siteAcronym || 'Not Found';
+    locationConceptIDToLocationMap[locationConceptID]?.siteAcronym ||
+    'Not Found';
 
   return outputBox;
 };
@@ -688,25 +689,35 @@ export const convertToFirestoreBox = (inputBox) => {
     if (bagConceptIDIndex >= bagConceptIDList.length) break;
     let outputBag = {};
     const bagConceptId = bagConceptIDList[bagConceptIDIndex];
-    const keyList = [
+    const keysNeeded = [
       conceptIDs.shippingFirstName,
       conceptIDs.shippingLastName,
       conceptIDs.containsOrphan,
     ];
 
-    for (let k of keyList) {
+    for (let k of keysNeeded) {
       if (inputBag[k]) outputBag[k] = inputBag[k];
     }
 
-    inputBox.isBlood
-      ? (outputBag[conceptIDs.bagscan_bloodUrine] = bagID)
-      : (outputBag[conceptIDs.bagscan_mouthWash] = bagID);
+    let bagTypeConceptID;
+    const bagIDEndString = bagID.split(' ')[1];
+
+    if (bagIDEndString === '0008') {
+      bagTypeConceptID = conceptIDs.bagscan_bloodUrine;
+    } else if (bagIDEndString === '0009') {
+      bagTypeConceptID = conceptIDs.bagscan_mouthWash;
+    } else {
+        bagTypeConceptID = conceptIDs.bagscan_orphanBag;
+        bagID = inputBag?.arrElements[0] || bagID;
+    }
+
+    outputBag[bagTypeConceptID] = bagID;
     outputBag[conceptIDs.tubesCollected] = inputBag.arrElements;
     outputBox[bagConceptId] = outputBag;
     bagConceptIDIndex++;
   }
 
-  let keysToRomove = ['siteAcronym', 'lastUpdatedTiime'];
+  let keysToRomove = ['siteAcronym'];
   for (let k of keysToRomove) {
     if (outputBox[k]) delete outputBox[k];
   }
