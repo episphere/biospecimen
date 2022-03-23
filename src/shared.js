@@ -547,6 +547,7 @@ export const updateSpecimen = async (array) => {
     return response.json();
 }
 
+//change name to addBox
 export const storeBox = async (box) =>{
     const idToken = await getIdToken();
     let requestObj = {
@@ -561,19 +562,19 @@ export const storeBox = async (box) =>{
     return response.json();
 }
 
-// export const updateBox = async (box) => {
-//   const idToken = await getIdToken();
-//   let requestObj = {
-//       method: "POST",
-//       headers:{
-//           Authorization:"Bearer "+idToken,
-//           "Content-Type": "application/json"
-//       },
-//       body: JSON.stringify(box)
-//   }
-//   const response = await fetch(`${api}api=updateBox`, requestObj);
-//   return response.json();
-// }
+export const updateBox = async (box) => {
+  const idToken = await getIdToken();
+  let requestObj = {
+      method: "POST",
+      headers:{
+          Authorization:"Bearer "+idToken,
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify(box)
+  }
+  const response = await fetch(`${api}api=updateBox`, requestObj);
+  return response.json();
+}
 
 export const updateNewTempDate = async () =>{
     const idToken = await getIdToken();
@@ -1007,7 +1008,7 @@ export const siteSpecificLocationToSiteAcronym = {
   "National Institute of Health": "NIH", // wont be using biospecimen dashboard
 }
 
-export const siteAcronymToLoginSiteCode = {
+export const siteAcronymToLoginSite = {
    "HP": 531629870,
    "HFHS": 548392715,
    "KPCO": 125001209,
@@ -1033,7 +1034,7 @@ export const siteAcronymToLoginSiteCode = {
 //   "NCI": "National Cancer Institute", 
 // }
 
-export const siteNameToSiteCode = {
+export const siteNameToLoginSite = {
    "HealthPartners": 531629870,
    "Henry Ford Health System": 548392715,
    "Kaiser Permanente Colorado": 125001209,

@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, siteFullNames, siteSpecificLocationToSiteAcronym, siteAcronymToLoginSiteCode, siteNameToSiteCode, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation  } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, siteFullNames, siteSpecificLocationToSiteAcronym, siteAcronymToLoginSite, siteNameToLoginSite, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation  } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -1429,7 +1429,7 @@ const addNewBox = async (userName) => {
     let pageLocation = document.getElementById('selectLocationList').value;
 
     let pageLocationConversion = siteSpecificLocationToConceptId[pageLocation];
-    let loginSiteCode = siteSpecificLocation[pageLocation]["siteCode"]
+    let loginSite = siteSpecificLocation[pageLocation]["siteCode"]
     // loop through entire hiddenJSON and determine the largest boxid number
     // hiddenJSON includes in process and shipped boxes
     for (let i = 0; i < hiddenJSON.length; i++) {
@@ -1471,7 +1471,7 @@ const addNewBox = async (userName) => {
             toPass['560975149'] = pageLocationConversion;
             // [Note]: Add LoginSite Concept and value
             // reference conversion to numbers
-            toPass['789843387'] = loginSiteCode
+            toPass['789843387'] = loginSite
             // Create Box API []
             await storeBox(toPass);
             hiddenJSON.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocationConversion })
@@ -1512,7 +1512,7 @@ const addNewBox = async (userName) => {
         // TODO: Conversion Here for Site Location Number
         toPass['560975149'] = pageLocationConversion;
         // CREATE NEW BOX API 
-        toPass['789843387'] = loginSiteCode;
+        toPass['789843387'] = loginSite;
         await storeBox(toPass);
         // await createBox(toPass);
         // console.log(storeBox)
