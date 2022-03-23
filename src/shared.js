@@ -570,7 +570,7 @@ export const updateBox = async (box) => {
           Authorization:"Bearer "+idToken,
           "Content-Type": "application/json"
       },
-      body: JSON.stringify(box)
+      body: JSON.stringify(convertToFirestoreBox(box))
   }
   const response = await fetch(`${api}api=updateBox`, requestObj);
   debugger;
