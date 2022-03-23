@@ -547,8 +547,7 @@ export const updateSpecimen = async (array) => {
     return response.json();
 }
 
-//change name to addBox
-export const storeBox = async (box) =>{
+export const addBox = async (box) =>{
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -559,6 +558,7 @@ export const storeBox = async (box) =>{
         body: JSON.stringify(convertToFirestoreBox(box))
     }
     const response = await fetch(`${api}api=addBox`, requestObj);
+    debugger;
     return response.json();
 }
 
@@ -573,6 +573,7 @@ export const updateBox = async (box) => {
       body: JSON.stringify(box)
   }
   const response = await fetch(`${api}api=updateBox`, requestObj);
+  debugger;
   return response.json();
 }
 
