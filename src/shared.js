@@ -9,6 +9,7 @@ import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
+import { checkDefaultFlags } from "https://episphere.github.io/dashboard/siteManagerDashboard/utils.js"
 
 
 const conversion = {
@@ -829,47 +830,18 @@ export const updateBaselineData = async (siteTubesList, data) => {
 }
 
 export const verifyDefaultConcepts = async (data) => {
+    let defaultConcepts = checkDefaultFlags(data);
+    console.log(Object.entries(defaultConcepts).length);
 
-    const defaultFlags = {
-        948195369: 104430631,
-        919254129: 104430631,
-        821247024: 875007964,
-        828729648: 104430631,
-        699625233: 104430631,
-        912301837: 208325815,
-        253883960: 972455046,
-        547363263: 972455046,
-        949302066: 972455046,
-        536735468: 972455046,
-        976570371: 972455046,
-        663265240: 972455046,
-        265193023: 972455046,
-        311580100: 104430631,
-        914639140: 104430631
-    }
-
-    const defaultData = {};
-
-    Object.entries(defaultFlags).forEach(item => {
-        console.log(item);
-        console.log(data[item[0]] ? true : false);
-
-        if(!data[item[0]]) {
-            defaultData[item[0]] = item[1];
-        }
-    });
-
-    if(Object.keys(defaultData).length != 0) {
-
-        defaultData['uid'] = data.state.uid
-
-        updateParticipant(defaultData);
-
+    if(Object.entries(defaultConcepts).length != 0) {
+        defaultConcepts['uid'] = data.state.uid
+        //updateParticipant(defaultConcepts);
+        /*
         data = await findParticipant(`connectId=${data['Connect_ID']}`).then(
             (res) => res.data?.[0]
         );;
+        */
     }
-
     return data;
 }
 
