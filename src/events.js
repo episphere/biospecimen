@@ -290,8 +290,7 @@ export const addEventAddSpecimenToBox = (userName) => {
         await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan)
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
-        // debugger;
-        // return
+  
 
         /*
         //document.getElementById("shippingModal").modal();
@@ -472,8 +471,6 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         hideAnimation();
         return
     }
-    // debugger;
-    // return
 }
 
 // Modify store box function's shared.js api to update
@@ -627,8 +624,6 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         // clear input field
         specimenSearch.value = ""
         hideAnimation();
-        // debugger;
-        // return
     }, { once: true })
     //ppulateSpecimensList();
 }
@@ -1033,9 +1028,7 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                     </tr>`
     let count = 0;
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
-    debugger
     for (let i = 0; i < boxes.length; i++) {
-      debugger
         if (Object.keys(hiddenJSON[boxes[i]]).length > 0) {
             let currRow = table.insertRow(count + 1);
             if (count % 2 == 1) {
@@ -1526,7 +1519,6 @@ const addNewBox = async (userName) => {
             }
         }
         await populateBoxSelectList(hiddenJSON, userName)
-        // debugger;
         return true
     }
 
@@ -1561,8 +1553,6 @@ export const addEventModalAddBox = (userName) => {
         checkAlertState(alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl)
         // reset alertState
         alertState = ''
-        // debugger;
-        // return
     }
   )}
 
@@ -1728,12 +1718,8 @@ export const addEventChangeLocationSelect = (userName) => {
             hiddenJSON[box['132929440']] = box['bags']
         }
 
-        // MODIFY populateBoxSelectList
-        // hidden JSON can be empty if no matches found from siteAcronym and filter
         await populateBoxSelectList(hiddenJSON, userName)
         hideAnimation();
-        // debugger;
-        // return
     })
 }
 
@@ -2868,9 +2854,6 @@ export const populateSelectLocationList = async () => {
         list = 'remember to add Box'
     }
     currSelect.innerHTML = list;
-
-    // debugger;
-    // return
 }
 
 export const populateBoxManifestTable = (boxId, hiddenJSON) => {
