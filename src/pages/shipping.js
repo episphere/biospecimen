@@ -226,7 +226,7 @@ export const startShipping = async (userName) => {
     await populateSelectLocationList();
     
     await populateSaveTable(hiddenJSON, boxJSONS, userName);
-    debugger;
+    // debugger;
     await populateSpecimensList(hiddenJSON1);
 
     let currLocation = document.getElementById('selectLocationList').value;
@@ -242,7 +242,7 @@ export const startShipping = async (userName) => {
     }
     // ON FIRST INITIAL LOAD 
     await populateBoxSelectList(hiddenJSONLocation,userName);
-    debugger;
+    // debugger;
     await populateTempNotification();
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarShippingManifest(userName, tempMonitorCheckedEl);
@@ -253,7 +253,7 @@ export const startShipping = async (userName) => {
     // addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 14, 0);
     addEventModalAddBox(userName);
     hideAnimation();
-    debugger;
+    // debugger;
     return
     //addEventSubmitAddBag();
 }

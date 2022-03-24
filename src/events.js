@@ -290,8 +290,8 @@ export const addEventAddSpecimenToBox = (userName) => {
         await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan)
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
-        debugger;
-        return
+        // debugger;
+        // return
 
         /*
         //document.getElementById("shippingModal").modal();
@@ -472,8 +472,8 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         hideAnimation();
         return
     }
-    debugger;
-    return
+    // debugger;
+    // return
 }
 
 // Modify store box function's shared.js api to update
@@ -627,8 +627,8 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         // clear input field
         specimenSearch.value = ""
         hideAnimation();
-        debugger;
-        return
+        // debugger;
+        // return
     }, { once: true })
     //ppulateSpecimensList();
 }
@@ -1510,14 +1510,9 @@ const addNewBox = async (userName) => {
         let toPass = {};
         toPass['132929440'] = newBoxId;
         toPass['bags'] = {};
-        // This will pass the string value of site location instead of the concept ID
-        // TODO: Conversion Here for Site Location Number
         toPass['560975149'] = pageLocationConversion;
-        // CREATE NEW BOX API 
         toPass['789843387'] = loginSite;
         await addBox(toPass);
-        // await createBox(toPass);
-        // console.log(storeBox)
         hiddenJSON.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocationConversion })
         let boxJSONS = hiddenJSON;
 
@@ -1531,7 +1526,7 @@ const addNewBox = async (userName) => {
             }
         }
         await populateBoxSelectList(hiddenJSON, userName)
-        debugger;
+        // debugger;
         return true
     }
 
@@ -1552,7 +1547,6 @@ export const addEventModalAddBox = (userName) => {
         let notifyCreateBox = await addNewBox(userName);
         alertState = notifyCreateBox
         let currLocation = document.getElementById('selectLocationList').value;
-        //convert currLocation to its mapped ConceptId, might be reason why the value is not being pulled corectly
         let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
         let response = await getBoxesByLocation(currLocationConceptId);
         let boxJSONS = response.data;
@@ -1562,14 +1556,13 @@ export const addEventModalAddBox = (userName) => {
             hiddenJSONLocation[box['132929440']] = box['bags']
         }
         await populateModalSelect(hiddenJSONLocation)
-        // generate a box if no box exists
         await populateBoxSelectList(hiddenJSONLocation, userName);
         hideAnimation()
         checkAlertState(alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl)
         // reset alertState
         alertState = ''
-        debugger;
-        return
+        // debugger;
+        // return
     }
   )}
 
@@ -1739,8 +1732,8 @@ export const addEventChangeLocationSelect = (userName) => {
         // hidden JSON can be empty if no matches found from siteAcronym and filter
         await populateBoxSelectList(hiddenJSON, userName)
         hideAnimation();
-        debugger;
-        return
+        // debugger;
+        // return
     })
 }
 
@@ -2864,15 +2857,10 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
   })
 }
 
-//[Note]: modify to get create box working and box update working 
 export const populateSelectLocationList = async () => {
     let currSelect = document.getElementById('selectLocationList')
-    // This returns all available locations based on users siteAcronym
-    // [Note]: getLocations api needs to change & make conversion when populating dropdown list
     let response = await getLocationsInstitute();
     let list = ''
-    // [Note]: Add converter from Location ID, site specific Numbers to string value representation (111111111 Main Campus)
-    // This will break original structure
     for (let i = 0; i < response.length; i++) {
         list += '<option>' + response[i] + '</option>';
     }
@@ -2881,8 +2869,8 @@ export const populateSelectLocationList = async () => {
     }
     currSelect.innerHTML = list;
 
-    debugger;
-    return
+    // debugger;
+    // return
 }
 
 export const populateBoxManifestTable = (boxId, hiddenJSON) => {

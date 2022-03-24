@@ -558,7 +558,7 @@ export const addBox = async (box) =>{
         body: JSON.stringify(convertToFirestoreBox(box))
     }
     const response = await fetch(`${api}api=addBox`, requestObj);
-    debugger;
+    // debugger;
     return response.json();
 }
 
