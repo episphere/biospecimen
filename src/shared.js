@@ -831,17 +831,16 @@ export const updateBaselineData = async (siteTubesList, data) => {
 
 export const verifyDefaultConcepts = async (data) => {
     let defaultConcepts = checkDefaultFlags(data);
-    console.log(Object.entries(defaultConcepts).length);
 
     if(Object.entries(defaultConcepts).length != 0) {
         defaultConcepts['uid'] = data.state.uid
-        //updateParticipant(defaultConcepts);
-        /*
+        await updateParticipant(defaultConcepts);
+        
         data = await findParticipant(`connectId=${data['Connect_ID']}`).then(
             (res) => res.data?.[0]
         );;
-        */
     }
+    
     return data;
 }
 
