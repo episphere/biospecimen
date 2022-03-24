@@ -1410,12 +1410,7 @@ const addNewBox = async (userName) => {
     // loop through entire hiddenJSON and determine the largest boxid number
     // hiddenJSON includes in process and shipped boxes
     for (let i = 0; i < hiddenJSON.length; i++) {
-        let curr = parseInt(hiddenJSON[i]['132929440'].substring(3))
-        // Do a conversion here - "560975149" - Location ID, site specific
-        // TODO: currLocation (old structure) is using Location's string value instead of conceptID
-        // let currLocation = hiddenJSON[i]['560975149'] 
-      
-        // let currLocation = (typeof hiddenJSON[i]['560975149'] == 'string') ? hiddenJSON[i]['560975149'] : conceptIdToSiteSpecificLocation[hiddenJSON[i]['560975149']]
+        let curr = parseInt(hiddenJSON[i]['132929440'].substring(3))      
         let currLocation = conceptIdToSiteSpecificLocation[hiddenJSON[i]['560975149']]
 
         if (curr > largestOverall) {
