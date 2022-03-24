@@ -917,10 +917,6 @@ export const getLocationsInstitute = async () => {
         let currJSON = arr[i];
         locations = locations.concat(currJSON['560975149']);
     }
-    // Convert site location to Concept ID
-    // if(locations.length) {
-    //   return locations.map(location => siteSpecificLocationToConceptId[location].toString())
-    // }
     return locations;
 }
 

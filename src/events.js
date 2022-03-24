@@ -464,13 +464,13 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     </table>
     `;
     populateModalSelect(hiddenJSON)
-    
     if (empty) {
         showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' }, true)
         document.getElementById('shippingCloseButton').click();
         hideAnimation();
         return
     }
+
 }
 
 // Modify store box function's shared.js api to update
@@ -483,7 +483,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
 
         showAnimation();
         let hiddenJSON = {};
-        let response = await getBoxes(); // get boxes in process, not shipped
+        let response = await getBoxes();
         let boxJSONS = response.data;
         let locations = {};
         let loginSiteName = {}
@@ -491,13 +491,9 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
             let box = boxJSONS[i]
             // Box ID ("132929440"); Location ID, site specific ("560975149"); Login Site ("789843387")
             // add bags based on Box ID to hidden JSON
-            // This will break if bags is removed
             hiddenJSON[box['132929440']] = box['bags']
             // Location ID's value will be a number
             locations[box['132929440']] = box['560975149'];
-
-            // [Note]: add login site after loginSite is added to store Box
-            // loginSiteName[box['132929440']] = box['789843387']
         }
         let nextBoxNum = Object.keys(hiddenJSON).length + 1;
 
@@ -559,7 +555,6 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
             shippingTable.rows[tableIndex].cells[2].innerText = JSON.stringify(currArr);
             shippingTable.rows[tableIndex].cells[1].innerText = currArr.length;
         }
-        // boxIds is sorted BoxIds
         let boxIds = Object.keys(hiddenJSON).sort(compareBoxIds);
 
         for (let i = 0; i < boxIds.length; i++) {
@@ -591,13 +586,9 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
                 toPass['132929440'] = boxIds[i]; 
                 toPass['bags'] = hiddenJSON[boxIds[i]]
                 toPass['560975149'] = locations[boxIds[i]]
-                // [Note]:Add loginSiteName later
-                // convert number to string location
                 toPass['789843387'] = siteSpecificLocation[conceptIdToSiteSpecificLocation[locations[boxIds[i]]]].siteCode
                 toPass['555611076'] = currTime;
-                /* UPDATE API - UPDATE box API*** */
                 await updateBox(toPass);
-                // await updateBox(toPass)
             }
         }
 
@@ -983,12 +974,10 @@ export const populateModalSelect = (hiddenJSON) => {
         list += '<option>' + keys[i] + '</option>';
     }
     if (list == '') {
-        // list = 'remember to add Box'
         addToBoxButton.setAttribute('disabled','true')
         return 
     }
     boxList.innerHTML = list;
-    
     currSelectBox.value = document.getElementById('selectBoxList').value;
 }
 
@@ -1243,8 +1232,6 @@ export const populateShippingManifestBody = (hiddenJSON) => {
     }
 }
 
-
-// CHANGE LOGIC HERE
 const compareBoxIds = (a, b) => {
     let a1 = parseInt(a.substring(3));
     let b1 = parseInt(b.substring(3));
@@ -1258,21 +1245,18 @@ const compareBoxIds = (a, b) => {
 
 }
 
-// [MODIFY] - MAKE EDITS 
 export const populateBoxSelectList = async (hiddenJSON, userName,) => {
     let boxList = document.getElementById('selectBoxList');
     let selectBoxList = document.getElementById('selectBoxList');
     let list = ''
-    // add filter to remove empty ""
     let keys = Object.keys(hiddenJSON).sort(compareBoxIds);
     for (let i = 0; i < keys.length; i++) {
         list += '<option>' + keys[i] + '</option>';
     }
-
     boxList.innerHTML = list;
 
     let currBoxId = selectBoxList.value;
-    if (currBoxId != '') { 
+    if (currBoxId != '') {
         let currBox = hiddenJSON[currBoxId];
 
 
@@ -1406,9 +1390,9 @@ export const populateBoxSelectList = async (hiddenJSON, userName,) => {
                                     <th style = "border-bottom:1px solid;"></th>
                                 </tr>`;
     }
-return
+  return
 }
-// [MODIFY] - MAKE EDITS FOR BOX CREATION  
+
 const addNewBox = async (userName) => {
     let response = await getAllBoxes();
     let hiddenJSON = response.data;
@@ -1430,8 +1414,9 @@ const addNewBox = async (userName) => {
         // Do a conversion here - "560975149" - Location ID, site specific
         // TODO: currLocation (old structure) is using Location's string value instead of conceptID
         // let currLocation = hiddenJSON[i]['560975149'] 
-
-        let currLocation = (typeof hiddenJSON[i]['560975149'] == 'string') ? hiddenJSON[i]['560975149'] : conceptIdToSiteSpecificLocation[hiddenJSON[i]['560975149']]
+      
+        // let currLocation = (typeof hiddenJSON[i]['560975149'] == 'string') ? hiddenJSON[i]['560975149'] : conceptIdToSiteSpecificLocation[hiddenJSON[i]['560975149']]
+        let currLocation = conceptIdToSiteSpecificLocation[hiddenJSON[i]['560975149']]
 
         if (curr > largestOverall) {
             largestOverall = curr;
@@ -1443,7 +1428,6 @@ const addNewBox = async (userName) => {
         }
 
     }
-
     if (largestLocationIndex != -1) {
       // find index of largest box and assign boxid
         let lastBox = hiddenJSON[largeIndex]['132929440']
@@ -1458,15 +1442,9 @@ const addNewBox = async (userName) => {
             let newBoxId = 'Box' + newBoxNum.toString();
             let toPass = {};
             toPass['132929440'] = newBoxId;
-            // [Note]: Remove bags later, keep for now
             toPass['bags'] = {};
-            // toPass['560975149'] = pageLocation;
             toPass['560975149'] = pageLocationConversion;
-            // [Note]: Add LoginSite Concept and value
-            // reference conversion to numbers
             toPass['789843387'] = loginSite
-            // Create Box API []
-            // Add converter function here
             await addBox(toPass);
 
             hiddenJSON.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocationConversion })
@@ -1476,14 +1454,12 @@ const addNewBox = async (userName) => {
 
             for (let i = 0; i < boxJSONS.length; i++) {
                 let box = boxJSONS[i]
-                // TODO: change to match pageLocation as a number, do a conversion here
                 if (box['560975149'] == pageLocationConversion) {
                     if (!box.hasOwnProperty('145971562') || box['145971562'] !== '353358909') {
                         hiddenJSON[box['132929440']] = box['bags']
                     }
                 }
             }
-            // TEST
             await populateBoxSelectList(hiddenJSON, userName)
             return true
         }
@@ -1524,10 +1500,6 @@ const addNewBox = async (userName) => {
 
 }
 
-/*
-CREATE NEW BOX FOR THE FIRST TIME BY USER 
-CREATE NEW BOX IF PREVIOUS BOX HAS BOX CONTENTS INSIDE
-*/ 
 export const addEventModalAddBox = (userName) => {
     let boxButton = document.getElementById('modalAddBoxButton');
     let createBoxSuccessAlertEl = document.getElementById("create-box-success");
@@ -1702,14 +1674,12 @@ export const addEventBoxSelectListChanged = () => {
     })
 }
 
-// TEST WHY HIDDEN JSON IS RETURNING BOXES FROM DIFFERENT SPECIFIC LOCATIONS
 export const addEventChangeLocationSelect = (userName) => {
     let selectBoxList = document.getElementById('selectLocationList');
     selectBoxList.addEventListener("change", async () => {
         showAnimation();
         let currLocation = selectBoxList.value;
         let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
-        // This can return an empty [] if no matches
         let boxJSONS = (await getBoxesByLocation(currLocationConceptId)).data;
 
         let hiddenJSON = {};

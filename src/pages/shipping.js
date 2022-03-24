@@ -160,9 +160,6 @@ export const startShipping = async (userName) => {
                     <div id="create-box-error" class="alert alert-danger" role="alert" style="display:none;">
                       Please add a specimen or specimens to last box
                     </div>
-                    <div id="update-box-error" class="alert alert-danger" role="alert" style="display:none;">
-                      No Box was selected, create a new box
-                    </div>
                     <select class="selectpicker" id="shippingModalChooseBox" style="font-size:1.4rem;"></select>
                     <button type="button" class="btn btn-primary" id="modalAddBoxButton">Create New Box</button>
                     
@@ -217,7 +214,6 @@ export const startShipping = async (userName) => {
     option.text = "Kiwi";
     x.add(option);*/
     
-
     removeActiveClass('navbar-btn', 'active')
     document.getElementById('contentHeader').innerHTML = `<h2>Connect for Cancer Prevention Study</h2></br>` + shippingNavBar();
     const navBarBtn = document.getElementById('navBarShippingDash');
@@ -239,7 +235,7 @@ export const startShipping = async (userName) => {
         let box = boxJSONS[i]
         hiddenJSONLocation[box['132929440']] = box['bags']
     }
-    // ON FIRST INITIAL LOAD 
+     
     await populateBoxSelectList(hiddenJSONLocation,userName);
     await populateTempNotification();
     addEventNavBarShipment("navBarShippingDash", userName);
@@ -268,7 +264,6 @@ export const boxManifest = async (boxId, userName) => {
         }
         hiddenJSON[box['132929440']] = box['bags']
     }
-    // TODO: Access Location Site "560975149" and convert to site Acronym 
     let currInstitute = currBox.siteAcronym;
     let currLocation = currBox['560975149'];
    
@@ -359,7 +354,6 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
         let box = boxJSONS[i]
         hiddenJSON[box['132929440']] = box['bags']
         locations[box['132929440']] = box['560975149'];
-        // TODO: Access Location Site "560975149" and convert to site Acronym 
         site = box['siteAcronym'];
     }
 
