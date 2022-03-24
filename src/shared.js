@@ -9,6 +9,7 @@ import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
+import { checkDefaultFlags } from "https://episphere.github.io/dashboard/siteManagerDashboard/utils.js"
 
 
 const conversion = {
@@ -829,20 +830,17 @@ export const updateBaselineData = async (siteTubesList, data) => {
 }
 
 export const verifyDefaultConcepts = async (data) => {
+    let defaultConcepts = checkDefaultFlags(data);
 
-    if(!data['265193023']) {
-        const defaultData = {
-            '265193023': 972455046,
-            uid: data.state.uid
-        }
-
-        updateParticipant(defaultData);
-
+    if(Object.entries(defaultConcepts).length != 0) {
+        defaultConcepts['uid'] = data.state.uid
+        await updateParticipant(defaultConcepts);
+        
         data = await findParticipant(`connectId=${data['Connect_ID']}`).then(
             (res) => res.data?.[0]
         );;
     }
-
+    
     return data;
 }
 
