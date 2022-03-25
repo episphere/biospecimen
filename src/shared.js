@@ -667,39 +667,60 @@ export const convertToOldBox = (inputBox) => {
 export const convertToFirestoreBox = (inputBox) => {
   let { bags } = inputBox;
   let outputBox = { ...inputBox };
-  delete outputBox.bags;
   let bagConceptIDIndex = 0;
+  outputBox[conceptIDs.containsOrphanBag] = conceptIDs.no;
+  delete outputBox.bags;
 
   for (let [bagID, inputBag] of Object.entries(bags)) {
     if (bagConceptIDIndex >= bagConceptIDList.length) break;
-    let outputBag = {};
-    const bagConceptId = bagConceptIDList[bagConceptIDIndex];
-    const keysNeeded = [
-      conceptIDs.shippingFirstName,
-      conceptIDs.shippingLastName,
-      conceptIDs.containsOrphan,
-    ];
 
-    for (let k of keysNeeded) {
-      if (inputBag[k]) outputBag[k] = inputBag[k];
-    }
+    if (bagID === 'unlabelled') {
+      outputBox[conceptIDs.containsOrphanBag] = conceptIDs.yes;
+      for (let tubeID of inputBag.arrElements) {
+        let outputBag = {};
+        const bagConceptID = bagConceptIDList[bagConceptIDIndex];
+        const keysNeeded = [
+          conceptIDs.shippingFirstName,
+          conceptIDs.shippingLastName,
+        ];
 
-    let bagTypeConceptID;
-    const bagIDEndString = bagID.split(' ')[1];
+        for (let k of keysNeeded) {
+          if (inputBag[k]) outputBag[k] = inputBag[k];
+        }
 
-    if (bagIDEndString === '0008') {
-      bagTypeConceptID = conceptIDs.bagscan_bloodUrine;
-    } else if (bagIDEndString === '0009') {
-      bagTypeConceptID = conceptIDs.bagscan_mouthWash;
+        outputBag[conceptIDs.bagscan_orphanBag] = tubeID;
+        outputBag[conceptIDs.containsOrphan] = conceptIDs.yes;
+        outputBag[conceptIDs.tubesCollected] = [tubeID];
+        outputBox[bagConceptID] = outputBag;
+        bagConceptIDIndex++;
+      }
     } else {
-        bagTypeConceptID = conceptIDs.bagscan_orphanBag;
-        bagID = inputBag?.arrElements[0] || bagID;
-    }
+      let outputBag = {};
+      const bagConceptID = bagConceptIDList[bagConceptIDIndex];
+      const keysNeeded = [
+        conceptIDs.shippingFirstName,
+        conceptIDs.shippingLastName,
+      ];
 
-    outputBag[bagTypeConceptID] = bagID;
-    outputBag[conceptIDs.tubesCollected] = inputBag.arrElements;
-    outputBox[bagConceptId] = outputBag;
-    bagConceptIDIndex++;
+      for (let k of keysNeeded) {
+        if (inputBag[k]) outputBag[k] = inputBag[k];
+      }
+
+      let bagTypeConceptID;
+      const bagIDEndString = bagID.split(' ')[1];
+
+      if (bagIDEndString === '0008') {
+        bagTypeConceptID = conceptIDs.bagscan_bloodUrine;
+      } else if (bagIDEndString === '0009') {
+        bagTypeConceptID = conceptIDs.bagscan_mouthWash;
+      }
+
+      outputBag[bagTypeConceptID] = bagID;
+      outputBag[conceptIDs.containsOrphan] = conceptIDs.no;
+      outputBag[conceptIDs.tubesCollected] = inputBag.arrElements;
+      outputBox[bagConceptID] = outputBag;
+      bagConceptIDIndex++;
+    }
   }
 
   let keysToRomove = ['siteAcronym'];
