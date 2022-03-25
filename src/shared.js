@@ -646,8 +646,8 @@ export const convertToOldBox = (inputBox) => {
     } else if (inputBag[conceptIDs.bagscan_mouthWash]) {
       bagID = inputBag[conceptIDs.bagscan_mouthWash];
       outputBag.isBlood = false;
-    } else if (inputBag[conceptIDs.bagscan_orphanTube]) {
-      bagID = inputBag[conceptIDs.bagscan_orphanTube];
+    } else if (inputBag[conceptIDs.bagscan_orphanBag]) {
+      bagID = inputBag[conceptIDs.bagscan_orphanBag];
       outputBag.isBlood = false;
     }
 
@@ -682,6 +682,7 @@ export const convertToFirestoreBox = (inputBox) => {
         const keysNeeded = [
           conceptIDs.shippingFirstName,
           conceptIDs.shippingLastName,
+          conceptIDs.containsOrphan,
         ];
 
         for (let k of keysNeeded) {
