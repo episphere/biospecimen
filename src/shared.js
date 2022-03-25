@@ -634,8 +634,11 @@ export const bagConceptIDList = [
   
 export const convertToOldBox = (inputBox) => {
   if (inputBox.bags) return inputBox;
+
   let bags = {};
   let outputBox = { ...inputBox };
+  let hasOrphanBag = false;
+  let orphanBag = { arrElements: [] };
 
   for (let bagConceptId of bagConceptIDList) {
     if (!inputBox[bagConceptId]) continue;
@@ -651,22 +654,30 @@ export const convertToOldBox = (inputBox) => {
       if (inputBag[k]) outputBag[k] = inputBag[k];
     }
 
-    outputBag.arrElements = inputBag[conceptIDs.tubesCollected];
-    let bagID;
+    if (inputBag[conceptIDs.bagscan_orphanBag]) {
+      hasOrphanBag = true;
+      orphanBag = { ...orphanBag, ...outputBag };
+      orphanBag.arrElements.push(...inputBag[conceptIDs.tubesCollected]);
+    } else {
+      outputBag.arrElements = inputBag[conceptIDs.tubesCollected];
+      let bagID;
 
-    if (inputBag[conceptIDs.bagscan_bloodUrine]) {
-      bagID = inputBag[conceptIDs.bagscan_bloodUrine];
-      outputBag.isBlood = true;
-    } else if (inputBag[conceptIDs.bagscan_mouthWash]) {
-      bagID = inputBag[conceptIDs.bagscan_mouthWash];
-      outputBag.isBlood = false;
-    } else if (inputBag[conceptIDs.bagscan_orphanBag]) {
-      bagID = inputBag[conceptIDs.bagscan_orphanBag];
-      outputBag.isBlood = false;
+      if (inputBag[conceptIDs.bagscan_bloodUrine]) {
+        bagID = inputBag[conceptIDs.bagscan_bloodUrine];
+        outputBag.isBlood = true;
+      } else if (inputBag[conceptIDs.bagscan_mouthWash]) {
+        bagID = inputBag[conceptIDs.bagscan_mouthWash];
+        outputBag.isBlood = false;
+      }
+        
+      bags[bagID] = outputBag;
     }
-
-    bags[bagID] = outputBag;
+      
     delete outputBox[bagConceptId];
+  }
+
+  if (hasOrphanBag) {
+    bags['unlabelled'] = orphanBag;
   }
 
   outputBox.bags = bags;
@@ -676,7 +687,7 @@ export const convertToOldBox = (inputBox) => {
     'Not Found';
 
   return outputBox;
-};
+};;
 
 export const convertToFirestoreBox = (inputBox) => {
   let { bags } = inputBox;
