@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, siteFullNames, siteSpecificLocationToSiteAcronym, siteAcronymToLoginSite, siteNameToLoginSite, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation  } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, siteFullNames, siteSpecificLocationToSiteAcronym, siteAcronymToLoginSite, siteNameToLoginSite, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -1061,15 +1061,13 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
 
                     }
                     if (boxJSONS[j].hasOwnProperty('560975149')) {
-                      // TODO: Conversion for Location Site, from number to string
-                        thisLocation = boxJSONS[j]['560975149'];
+                        thisLocation = locationConceptIDToLocationMap[boxJSONS[j]['560975149']]["siteSpecificLocation"];
                     }
                 }
             }
             currRow.insertCell(1).innerHTML = dateStarted;
             currRow.insertCell(2).innerHTML = lastModified;
             currRow.insertCell(3).innerHTML = boxes[i];
-            // TODO: Conversion Here for Site Location Number
             currRow.insertCell(4).innerHTML = thisLocation;
             //get num tubes
             let currBox = hiddenJSON[boxes[i]];
@@ -1166,7 +1164,7 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
     document.getElementById('boxManifestCol3').appendChild(newP);
 
     newP = document.createElement("p");
-    newP.innerHTML = "Location: " + location;
+    newP.innerHTML = "Location: " + locationConceptIDToLocationMap[location]["siteSpecificLocation"];
     document.getElementById('boxManifestCol3').appendChild(newP);
 
 }
