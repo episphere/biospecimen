@@ -1347,7 +1347,11 @@ export const populateBoxSelectList = async (hiddenJSON, userName,) => {
                             }
                         }*/
                         table.deleteRow(index);
-                        let result = await removeBag(boxList.value, [currBagId])
+                        let bagsToRemove = [currBagId];
+                        if (currBagId === "unlabelled") { 
+                            bagsToRemove = currTubes;
+                        }
+                        let result = await removeBag(boxList.value, bagsToRemove)
                         currRow = table.rows[index];
                         while (currRow != undefined && currRow.cells[0].innerText == "") {
                             table.deleteRow(index);
@@ -1625,7 +1629,11 @@ export const populateTubeInBoxList = async (userName) => {
                         }
                     }*/
                     table.deleteRow(index);
-                    let result = await removeBag(boxList.value, [currBagId])
+                    let bagsToRemove = [currBagId];
+                    if (currBagId === "unlabelled") { 
+                        bagsToRemove = currTubes;
+                    }
+                    let result = await removeBag(boxList.value, bagsToRemove)
                     currRow = table.rows[index];
                     while (currRow != undefined && currRow.cells[0].innerText == "") {
                         table.deleteRow(index);
