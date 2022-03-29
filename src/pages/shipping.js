@@ -362,8 +362,6 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
         let currBox = boxesToShip[i];
         toDisplayJSON[currBox] = hiddenJSON[currBox];
         location = locations[currBox];
-        console.log("location",location)
-        console.log("locations",locations)
     }
     let template = `
         </br>
