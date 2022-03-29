@@ -838,7 +838,7 @@ export const getParticipantCollections = async (token) => {
 
 export const removeBag = async(boxId, bags) => {
     let currDate = new Date().toISOString();
-    let toPass = {boxId:boxId, bags:bags, date:currDate.toString()}
+    let toPass = {boxId:boxId, bags:bags, date:currDate}
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=removeBag`, {
         method: "POST",
