@@ -39,7 +39,7 @@ export const siteAcronymToSiteMap = {
   KPNW: { siteCode: '452412599', locations: ['715632875'] },
   MFC: { siteCode: '303349821', locations: ['692275326'] },
   SFH: { siteCode: '657167265', locations: ['589224449'] },
-  UCM: { siteCode: '809703864', locations: ['333333333'] },
+  UCM: { siteCode: '809703864', locations: ['777644826'] },
   NCI: { siteCode: '13', locations: ['111111111', '222222222'] },
 };
 
@@ -104,7 +104,7 @@ export const locationConceptIDToLocationMap = {
     siteCode: '657167265',
     loginSiteName: 'Sanford Health',
   },
-  333333333: {
+  777644826: {
     siteSpecificLocation: 'DCAM',
     siteAcronym: 'UCM',
     siteCode: '809703864',
@@ -837,8 +837,8 @@ export const getParticipantCollections = async (token) => {
 }
 
 export const removeBag = async(boxId, bags) => {
-    let currDate = new Date();
-    let toPass = {boxId:boxId, bags:bags, date:currDate.toString()}
+    let currDate = new Date().toISOString();
+    let toPass = {boxId:boxId, bags:bags, date:currDate}
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=removeBag`, {
         method: "POST",
@@ -1060,19 +1060,6 @@ export const siteAcronymToLoginSite = {
    "NCI": 13, // does this need to be changed?
 }
 
-// export const siteAcronymToLoginSiteName = {
-//   "HP": "HealthPartners",
-//   "HFHS": "Henry Ford Health System",
-//   "KPCO": "Kaiser Permanente Colorado",
-//   "KPGA": "Kaiser Permanente Georgia",
-//   "KPHI": "Kaiser Permanente Hawaii",
-//   "KPNW": "Kaiser Permanente Northwest",
-//   "MFC": "Marshfield Clinic",
-//   "SFH": "Sanford Health",
-//   "UCM": "University of Chicago Medicine",
-//   "NCI": "National Cancer Institute", 
-// }
-
 export const siteNameToLoginSite = {
    "HealthPartners": 531629870,
    "Henry Ford Health System": 548392715,
@@ -1121,7 +1108,7 @@ export const conceptIdToSiteSpecificLocation = {
   715632875: "KPNW RRL",
   692275326: "Marshfield",
   589224449: "SF Cancer Center LL",
-  333333333: "DCAM", // Temporary and needs Concept ID
+  777644826: "DCAM",
   111111111: "Main Campus",
   222222222: "Frederick",
 }
@@ -1137,7 +1124,7 @@ export const siteSpecificLocationToConceptId = {
   "KPNW RRL": 715632875,
   "Marshfield": 692275326,
   "SF Cancer Center LL": 589224449,
-  "DCAM": 333333333, // Temporary and needs Concept ID
+  "DCAM": 777644826, 
   "Main Campus": 111111111,
   "Frederick": 222222222,
 }
