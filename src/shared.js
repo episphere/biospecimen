@@ -9,7 +9,7 @@ import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
-import { checkDefaultFlags } from "https://episphere.github.io/dashboard/siteManagerDashboard/utils.js"
+import { checkDefaultFlags, checkPaymentEligibility } from "https://episphere.github.io/dashboard/siteManagerDashboard/utils.js"
 
 
 const conversion = {
@@ -770,6 +770,12 @@ export const generateBarCode = (id, connectId) => {
     JsBarcode(`#${id}`, connectId, {height: 30});
 }
 
+export const getUpdatedParticipantData = async (data) => {
+    const query = `connectId=${parseInt(data['Connect_ID'])}`;
+    let responseParticipant = await findParticipant(query);
+    return responseParticipant.data[0];
+}
+
 export const updateBaselineData = async (siteTubesList, data) => {
 
     const response = await getParticipantCollections(data.token);
@@ -827,6 +833,27 @@ export const updateBaselineData = async (siteTubesList, data) => {
     };
         
     await updateParticipant(baselineData);
+}
+
+export const verifyPaymentEligibility = async (formData) => {
+
+    if(formData['130371375']['266600170']['731498909'] === 104430631) {
+        const responseCollections = await getParticipantCollections(formData.token);
+        const baselineCollections = responseCollections.data.filter(collection => collection['331584571'] === 266600170);
+
+        const incentiveEligible = await checkPaymentEligibility(formData, baselineCollections);
+
+        if(incentiveEligible) {
+            const incentiveData = {
+                '130371375.266600170.731498909': 353358909,
+                '130371375.266600170.222373868': formData['827220437'] === 809703864 ? 104430631 : 353358909,
+                '130371375.266600170.787567527': new Date().toISOString(),
+                uid: formData.state.uid
+            };
+
+            await updateParticipant(incentiveData);
+        } 
+    }
 }
 
 export const verifyDefaultConcepts = async (data) => {
