@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts} from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, storeBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -2247,7 +2247,7 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
     await updateSpecimen([biospecimenData]);
 }
 
-const collectionSubmission = async (dt, biospecimenData, cntd) => {
+const collectionSubmission = async (formData, biospecimenData, cntd) => {
     
     removeAllErrors();
 
@@ -2262,7 +2262,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
     inputFields.forEach(input => {
         
-        const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
+        const tubes = siteTubesList.filter(tube => tube.concept === input.id.replace('Id', ''));
 
         let value = getValue(`${input.id}`).toUpperCase();
         const masterID = value.substr(0, masterSpecimenIDRequirement.length);
@@ -2387,12 +2387,18 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
     const baselineVisit = (biospecimenData['331584571'] === 266600170);
     const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
 
-    if(baselineVisit && clinicalResearchSetting) await updateBaselineData(siteTubesList, dt);
+    if(baselineVisit && clinicalResearchSetting) {
+        await updateBaselineData(siteTubesList, formData);
+        formData = await getUpdatedParticipantData(formData);
+
+        await verifyPaymentEligibility(formData);
+        formData = await getUpdatedParticipantData(formData);
+    }
 
     if (cntd) {
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
-        finalizeTemplate(dt, specimenData);
+        finalizeTemplate(formData, specimenData);
     }
     else {
 
