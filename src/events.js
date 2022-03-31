@@ -3074,22 +3074,31 @@ export const addEventSaveContinue = (hiddenJSON) => {
 export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked, shipmentCourier) => {
     document.getElementById('finalizeModalSign').addEventListener('click', async () => {
         let finalizeTextField = document.getElementById('finalizeSignInput');
+        let firstNameShipper = userName.split(" ")[0] ? userName.split(' ')[0] : " "
+        let lastNameShipper = userName.split(" ")[1] ? userName.split(" ")[1] : " "
         let conversion = {
             "FedEx": "712278213",
             "World Courier": "149772928"
         }
+        console.log("hiddenJSON", hiddenJSON)
+        console.log("tempchecked",tempChecked)
         let tempCheckedId = "104430631"
         if (tempChecked != false) {
-            tempCheckedId = tempChecked
+          tempCheckedId = tempChecked
         }
         let shippingData = {}
         shippingData["666553960"] = conversion[shipmentCourier]
         shippingData["105891443"] = tempCheckedId;
+        shippingData["948887825"] = firstNameShipper;
+        shippingData["885486943"] = lastNameShipper;
         let trackingNumbers = {}
         let boxNames = Object.keys(hiddenJSON);
         for (let i = 0; i < boxNames.length; i++) {
             trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
         }
+        console.log("Boxes", Object.keys(hiddenJSON).sort(compareBoxIds))
+        console.log("shippingData", shippingData)
+        console.log("trackingNumbers", trackingNumbers)
         if (finalizeTextField.value.toUpperCase() === userName.toUpperCase()) {
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
             let shipSent = await ship(boxes, shippingData, trackingNumbers);
