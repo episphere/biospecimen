@@ -1216,7 +1216,7 @@ export const getCheckedInVisit = (data) => {
     let visitConcept;
 
     Array.from(visitType).forEach(visit => {
-        if(data['331584571'][visit.concept] && data['331584571'][visit.concept]['135591601'] === 353358909) {
+        if(data['331584571'] && data['331584571'][visit.concept] && data['331584571'][visit.concept]['135591601'] === 353358909) {
             visitConcept = visit.concept;
         }
     });

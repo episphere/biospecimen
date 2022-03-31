@@ -1876,7 +1876,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
                 }
             };
 
-            checkInParticipant(data, visitConcept);
+            await checkInParticipant(data, visitConcept);
 
             const confirmVal = await swal({
                 title: "Success",
