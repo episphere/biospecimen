@@ -3080,8 +3080,6 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
             "FedEx": 712278213,
             "World Courier": 149772928
         }
-        console.log("hiddenJSON", hiddenJSON)
-        console.log("tempchecked",tempChecked)
         let tempCheckedId = "104430631"
         if (tempChecked != false) {
           tempCheckedId = tempChecked
@@ -3096,9 +3094,6 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         for (let i = 0; i < boxNames.length; i++) {
             trackingNumbers[boxNames[i]] = hiddenJSON[boxNames[i]]['959708259'];
         }
-        console.log("Boxes", Object.keys(hiddenJSON).sort(compareBoxIds))
-        console.log("shippingData", shippingData)
-        console.log("trackingNumbers", trackingNumbers)
         if (finalizeTextField.value.toUpperCase() === userName.toUpperCase()) {
             let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
             let shipSent = await ship(boxes, shippingData, trackingNumbers);
