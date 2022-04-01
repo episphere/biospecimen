@@ -685,7 +685,6 @@ export const convertToOldBox = (inputBox) => {
   outputBox.siteAcronym =
     locationConceptIDToLocationMap[locationConceptID]?.siteAcronym ||
     'Not Found';
-
   return outputBox;
 };;
 
@@ -863,10 +862,13 @@ export const searchSpecimenInstitute = async () => {
     });
 
     let a = await response.json();
-
+    console.log(a.data)
+    console.log("no ship flag",a.data.filter(item => !item[410912345]))
+    
     /* Filter collections with ShipFlag value yes */
     let data = a.data.filter(item => item[410912345] === 353358909);    
 
+    console.log("shipflag filter", data);
     const conversion = {
         "299553921":"0001",
         "703954371":"0002",

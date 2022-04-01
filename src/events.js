@@ -3077,8 +3077,8 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
         let firstNameShipper = userName.split(" ")[0] ? userName.split(' ')[0] : " "
         let lastNameShipper = userName.split(" ")[1] ? userName.split(" ")[1] : " "
         let conversion = {
-            "FedEx": "712278213",
-            "World Courier": "149772928"
+            "FedEx": 712278213,
+            "World Courier": 149772928
         }
         console.log("hiddenJSON", hiddenJSON)
         console.log("tempchecked",tempChecked)
