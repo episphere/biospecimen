@@ -647,7 +647,7 @@ export const convertToOldBox = (inputBox) => {
     const keysNeeded = [
       conceptIDs.shippingFirstName,
       conceptIDs.shippingLastName,
-      conceptIDs.containsOrphan,
+      conceptIDs.containsOrphanFlag,
     ];
 
     for (let k of keysNeeded) {
@@ -692,21 +692,21 @@ export const convertToFirestoreBox = (inputBox) => {
   let { bags } = inputBox;
   let outputBox = { ...inputBox };
   let bagConceptIDIndex = 0;
-  outputBox[conceptIDs.containsOrphanBag] = conceptIDs.no;
+  outputBox[conceptIDs.orphanBagFlag] = conceptIDs.no;
   delete outputBox.bags;
 
   for (let [bagID, inputBag] of Object.entries(bags)) {
     if (bagConceptIDIndex >= bagConceptIDList.length) break;
 
     if (bagID === 'unlabelled') {
-      outputBox[conceptIDs.containsOrphanBag] = conceptIDs.yes;
+      outputBox[conceptIDs.orphanBagFlag] = conceptIDs.yes;
       for (let tubeID of inputBag.arrElements) {
         let outputBag = {};
         const bagConceptID = bagConceptIDList[bagConceptIDIndex];
         const keysNeeded = [
           conceptIDs.shippingFirstName,
           conceptIDs.shippingLastName,
-          conceptIDs.containsOrphan,
+          conceptIDs.containsOrphanFlag,
         ];
 
         for (let k of keysNeeded) {
@@ -714,7 +714,7 @@ export const convertToFirestoreBox = (inputBox) => {
         }
 
         outputBag[conceptIDs.bagscan_orphanBag] = tubeID;
-        outputBag[conceptIDs.containsOrphan] = conceptIDs.yes;
+        outputBag[conceptIDs.containsOrphanFlag] = conceptIDs.yes;
         outputBag[conceptIDs.tubesCollected] = [tubeID];
         outputBox[bagConceptID] = outputBag;
         bagConceptIDIndex++;
@@ -741,7 +741,7 @@ export const convertToFirestoreBox = (inputBox) => {
       }
 
       outputBag[bagTypeConceptID] = bagID;
-      outputBag[conceptIDs.containsOrphan] = conceptIDs.no;
+      outputBag[conceptIDs.containsOrphanFlag] = conceptIDs.no;
       outputBag[conceptIDs.tubesCollected] = inputBag.arrElements;
       outputBox[bagConceptID] = outputBag;
       bagConceptIDIndex++;
@@ -953,8 +953,7 @@ export const getLocationsInstitute = async () => {
 }
 
 export const getNumPages = async (numPerPage, filter) => {
-    
-    const idToken = await getIdToken();
+  const idToken = await getIdToken();
     const response = await fetch(`${api}api=getNumBoxesShipped`, {
         method: "POST",
         headers: {
