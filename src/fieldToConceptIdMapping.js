@@ -73,8 +73,8 @@ export default {
     bagscan_bloodUrine: 787237543,
     bagscan_mouthWash: 223999569,
     bagscan_orphanBag: 522094118,
-    orphanBagFlag: 842312685, // orphan flag for box
-    containsOrphanFlag: 255283733, // inside bag/container/ thing flag
+    orphanBagFlag: 255283733, // inside bag/container/ thing flag
+    containsOrphanFlag: 842312685, // orphan flag for box 
     tubesCollected: 234868461,
     hpResearchClinic: 834825425,
     hfhs_mainCampus: 752948709,
