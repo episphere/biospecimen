@@ -1005,6 +1005,8 @@ export const populateTempSelect = (boxes) => {
 }
 
 export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
+  console.log(hiddenJSON)
+  console.log(boxJSONS)
     let table = document.getElementById("saveTable");
     table.innerHTML = `<tr>
                         <th style="border-bottom:1px solid;">To Ship</th>
@@ -3103,10 +3105,9 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
                 updateNewTempDate();
             }
             if(shipSent.code === 200) {
-              if (window.confirm("This shipment is now finalized; no other changes can be made")) {
-                localforage.removeItem("shipData")
-                startShipping(userName) 
-              } else startShipping(userName) 
+              alert("This shipment is now finalized; no other changes can be made")
+              localforage.removeItem("shipData")
+              startShipping(userName) 
             }
             // Add error logic here
             else return
