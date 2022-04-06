@@ -8,6 +8,7 @@ import { signOut } from "./pages/signIn.js";
 import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
+import conceptIDs from './fieldToConceptIdMapping.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
 import { checkDefaultFlags, checkPaymentEligibility } from "https://episphere.github.io/dashboard/siteManagerDashboard/utils.js"
 
@@ -29,6 +30,103 @@ const conversion = {
     "677469051":"0014",
     "683613884":"0024"
 }
+export const siteAcronymToSiteMap = {
+  HP: { siteCode: '531629870', locations: ['834825425'] },
+  HFHS: {
+    siteCode: '548392715',
+    locations: ['752948709', '570271641', '838480167'],
+  },
+  KPCO: { siteCode: '125001209', locations: ['763273112'] },
+  KPGA: { siteCode: '327912200', locations: ['767775934'] },
+  KPHI: { siteCode: '300267574', locations: ['531313956'] },
+  KPNW: { siteCode: '452412599', locations: ['715632875'] },
+  MFC: { siteCode: '303349821', locations: ['692275326'] },
+  SFH: { siteCode: '657167265', locations: ['589224449'] },
+  UCM: { siteCode: '809703864', locations: ['777644826'] },
+  NCI: { siteCode: '13', locations: ['111111111', '222222222'] },
+};
+
+export const locationConceptIDToLocationMap = {
+  834825425: {
+    siteSpecificLocation: 'HP Research Clinic',
+    siteAcronym: 'HP',
+    siteCode: '531629870',
+    loginSiteName: 'HealthPartners',
+  },
+  752948709: {
+    siteSpecificLocation: 'Henry Ford Main Campus',
+    siteAcronym: 'HFHS',
+    siteCode: '548392715',
+    loginSiteName: 'Henry Ford Health System',
+  },
+  570271641: {
+    siteSpecificLocation: 'Henry Ford West Bloomfield Hospital',
+    siteAcronym: 'HFHS',
+    siteCode: '548392715',
+    loginSiteName: 'Henry Ford Health System',
+  },
+  838480167: {
+    siteSpecificLocation: 'Henry Ford Medical Center-Fairlane',
+    siteAcronym: 'HFHS',
+    siteCode: '548392715',
+    loginSiteName: 'Henry Ford Health System',
+  },
+  763273112: {
+    siteSpecificLocation: 'KPCO RRL',
+    siteAcronym: 'KPCO',
+    siteCode: '125001209',
+    loginSiteName: 'Kaiser Permanente Colorado',
+  },
+  767775934: {
+    siteSpecificLocation: 'KPGA RRL',
+    siteAcronym: 'KPGA',
+    siteCode: '327912200',
+    loginSiteName: 'Kaiser Permanente Georgia',
+  },
+  531313956: {
+    siteSpecificLocation: 'KPHI RRL',
+    siteAcronym: 'KPHI',
+    siteCode: '300267574',
+    loginSiteName: 'Kaiser Permanente Hawaii',
+  },
+  715632875: {
+    siteSpecificLocation: 'KPNW RRL',
+    siteAcronym: 'KPNW',
+    siteCode: '452412599',
+    loginSiteName: 'Kaiser Permanente Northwest',
+  },
+  692275326: {
+    siteSpecificLocation: 'Marshfield',
+    siteAcronym: 'MFC',
+    siteCode: '303349821',
+    loginSiteName: 'Marshfield Cancer Center',
+  },
+  589224449: {
+    siteSpecificLocation: 'SF Cancer Center LL',
+    siteAcronym: 'SFH',
+    siteCode: '657167265',
+    loginSiteName: 'Sanford Health',
+  },
+  777644826: {
+    siteSpecificLocation: 'DCAM',
+    siteAcronym: 'UCM',
+    siteCode: '809703864',
+    loginSiteName: 'University of Chicago Medicine',
+  },
+  111111111: {
+    siteSpecificLocation: 'Main Campus',
+    siteAcronym: 'NCI',
+    siteCode: '13',
+    loginSiteName: 'National Cancer Institute',
+  },
+  222222222: {
+    siteSpecificLocation: 'Frederick',
+    siteAcronym: 'NCI',
+    siteCode: '13',
+    loginSiteName: 'National Cancer Institute',
+  },
+};
+  
  const api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
 // const api = 'http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
 
@@ -466,7 +564,7 @@ export const updateSpecimen = async (array) => {
     return response.json();
 }
 
-export const storeBox = async (box) =>{
+export const addBox = async (box) =>{
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -474,10 +572,24 @@ export const storeBox = async (box) =>{
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(box)
+        body: JSON.stringify(convertToFirestoreBox(box))
     }
     const response = await fetch(`${api}api=addBox`, requestObj);
     return response.json();
+}
+
+export const updateBox = async (box) => {
+  const idToken = await getIdToken();
+  let requestObj = {
+      method: "POST",
+      headers:{
+          Authorization:"Bearer "+idToken,
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify(convertToFirestoreBox(box))
+  }
+  const response = await fetch(`${api}api=updateBox`, requestObj);
+  return response.json();
 }
 
 export const updateNewTempDate = async () =>{
@@ -519,40 +631,186 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) =
     return response.json();
 }
 
+export const bagConceptIDList = [
+    conceptIDs.bag1,
+    conceptIDs.bag2,
+    conceptIDs.bag3,
+    conceptIDs.bag4,
+    conceptIDs.bag5,
+    conceptIDs.bag6,
+    conceptIDs.bag7,
+    conceptIDs.bag8,
+    conceptIDs.bag9,
+    conceptIDs.bag10,
+    conceptIDs.bag11,
+    conceptIDs.bag12,
+    conceptIDs.bag13,
+    conceptIDs.bag14,
+    conceptIDs.bag15,
+];
+  
+export const convertToOldBox = (inputBox) => {
+  if (inputBox.bags) return inputBox;
 
-export const getBoxes = async (box) =>{
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=searchBoxes`, {
-        method: "GET",
-        headers: {
-            Authorization:"Bearer "+idToken
-        }
-    });
-    let res = await response.json();
-    let toReturn  = {};
-    toReturn["data"] = [];
-    let data = res.data;
-    for(let i = 0; i < data.length; i++){
-        let currJSON = data[i];
+  let bags = {};
+  let outputBox = { ...inputBox };
+  let hasOrphanBag = false;
+  let orphanBag = { arrElements: [] };
 
-        if(!currJSON.hasOwnProperty("145971562") || currJSON["145971562"] != '353358909'){
-            toReturn["data"].push(currJSON);
-        }
+  for (let bagConceptId of bagConceptIDList) {
+    if (!inputBox[bagConceptId]) continue;
+    let outputBag = {};
+    const inputBag = inputBox[bagConceptId];
+    const keysNeeded = [
+      conceptIDs.shippingFirstName,
+      conceptIDs.shippingLastName,
+      conceptIDs.orphanBagFlag,
+    ];
+
+    for (let k of keysNeeded) {
+      if (inputBag[k]) outputBag[k] = inputBag[k];
     }
-    return toReturn;
-}
 
-export const getAllBoxes = async (box) =>{
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=searchBoxes`, {
-        method: "GET",
-        headers: {
-            Authorization:"Bearer "+idToken
+    if (inputBag[conceptIDs.bagscan_orphanBag]) {
+      hasOrphanBag = true;
+      orphanBag = { ...orphanBag, ...outputBag };
+      orphanBag.arrElements.push(...inputBag[conceptIDs.tubesCollected]);
+    } else {
+      outputBag.arrElements = inputBag[conceptIDs.tubesCollected];
+      let bagID;
+
+      if (inputBag[conceptIDs.bagscan_bloodUrine]) {
+        bagID = inputBag[conceptIDs.bagscan_bloodUrine];
+        outputBag.isBlood = true;
+      } else if (inputBag[conceptIDs.bagscan_mouthWash]) {
+        bagID = inputBag[conceptIDs.bagscan_mouthWash];
+        outputBag.isBlood = false;
+      }
+        
+      bags[bagID] = outputBag;
+    }
+      
+    delete outputBox[bagConceptId];
+  }
+
+  if (hasOrphanBag) {
+    bags['unlabelled'] = orphanBag;
+  }
+
+  outputBox.bags = bags;
+  const locationConceptID = inputBox[conceptIDs.shippingLocation];
+  outputBox.siteAcronym =
+    locationConceptIDToLocationMap[locationConceptID]?.siteAcronym ||
+    'Not Found';
+  return outputBox;
+};;
+
+export const convertToFirestoreBox = (inputBox) => {
+  let { bags } = inputBox;
+  let outputBox = { ...inputBox };
+  let bagConceptIDIndex = 0;
+  outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.no;
+  delete outputBox.bags;
+
+  for (let [bagID, inputBag] of Object.entries(bags)) {
+    if (bagConceptIDIndex >= bagConceptIDList.length) break;
+
+    if (bagID === 'unlabelled') {
+      outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.yes;
+      for (let tubeID of inputBag.arrElements) {
+        let outputBag = {};
+        const bagConceptID = bagConceptIDList[bagConceptIDIndex];
+        const keysNeeded = [
+          conceptIDs.shippingFirstName,
+          conceptIDs.shippingLastName,
+          conceptIDs.orphanBagFlag,
+        ];
+
+        for (let k of keysNeeded) {
+          if (inputBag[k]) outputBag[k] = inputBag[k];
         }
-    });
-    let res = await response.json();
-    return res;
-}
+
+        outputBag[conceptIDs.bagscan_orphanBag] = tubeID;
+        outputBag[conceptIDs.orphanBagFlag] = conceptIDs.yes;
+        outputBag[conceptIDs.tubesCollected] = [tubeID];
+        outputBox[bagConceptID] = outputBag;
+        bagConceptIDIndex++;
+      }
+    } else {
+      let outputBag = {};
+      const bagConceptID = bagConceptIDList[bagConceptIDIndex];
+      const keysNeeded = [
+        conceptIDs.shippingFirstName,
+        conceptIDs.shippingLastName,
+      ];
+
+      for (let k of keysNeeded) {
+        if (inputBag[k]) outputBag[k] = inputBag[k];
+      }
+
+      let bagTypeConceptID;
+      const bagIDEndString = bagID.split(' ')[1];
+
+      if (bagIDEndString === '0008') {
+        bagTypeConceptID = conceptIDs.bagscan_bloodUrine;
+      } else if (bagIDEndString === '0009') {
+        bagTypeConceptID = conceptIDs.bagscan_mouthWash;
+      }
+
+      outputBag[bagTypeConceptID] = bagID;
+      outputBag[conceptIDs.orphanBagFlag] = conceptIDs.no;
+      outputBag[conceptIDs.tubesCollected] = inputBag.arrElements;
+      outputBox[bagConceptID] = outputBag;
+      bagConceptIDIndex++;
+    }
+  }
+
+  let keysToRomove = ['siteAcronym'];
+  for (let k of keysToRomove) {
+    if (outputBox[k]) delete outputBox[k];
+  }
+
+  return outputBox;
+};
+
+export const getBoxes = async (box) => {
+  const idToken = await getIdToken();
+  const response = await fetch(`${api}api=searchBoxes`, {
+    method: 'GET',
+    headers: {
+      Authorization: 'Bearer ' + idToken,
+    },
+  });
+  let res = await response.json();
+  let toReturn = {};
+  toReturn['data'] = [];
+  let data = res.data;
+  for (let i = 0; i < data.length; i++) {
+    let currJSON = convertToOldBox(data[i]);
+    if (
+      !currJSON.hasOwnProperty(conceptIDs.submitShipmentFlag) ||
+      currJSON[conceptIDs.submitShipmentFlag] != conceptIDs.booleanOne
+    ) {
+      toReturn['data'].push(currJSON);
+    }
+  }
+  return toReturn;
+};
+
+export const getAllBoxes = async (box) => {
+  const idToken = await getIdToken();
+  const response = await fetch(`${api}api=searchBoxes`, {
+    method: 'GET',
+    headers: {
+      Authorization: 'Bearer ' + idToken,
+    },
+  });
+  let res = await response.json();
+  for (let i = 0; i < res.data.length; i++) {
+    res.data[i] = convertToOldBox(res.data[i]);
+  }
+  return res;
+};
 
 export const getBoxesByLocation = async (location) => {
     const idToken = await getIdToken();
@@ -566,6 +824,9 @@ export const getBoxesByLocation = async (location) => {
     });
 
     let res = await response.json();
+    for (let i = 0; i < res.data.length; i++) {
+        res.data[i] = convertToOldBox(res.data[i]);
+    }
     return res;
 }
 
@@ -592,8 +853,8 @@ export const getParticipantCollections = async (token) => {
 }
 
 export const removeBag = async(boxId, bags) => {
-    let currDate = new Date();
-    let toPass = {boxId:boxId, bags:bags, date:currDate.toString()}
+    let currDate = new Date().toISOString();
+    let toPass = {boxId:boxId, bags:bags, date:currDate}
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=removeBag`, {
         method: "POST",
@@ -618,10 +879,10 @@ export const searchSpecimenInstitute = async () => {
     });
 
     let a = await response.json();
-
+    
     /* Filter collections with ShipFlag value yes */
     let data = a.data.filter(item => item[410912345] === 353358909);    
-
+    
     const conversion = {
         "299553921":"0001",
         "703954371":"0002",
@@ -709,7 +970,6 @@ export const getLocationsInstitute = async () => {
 }
 
 export const getNumPages = async (numPerPage, filter) => {
-    
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getNumBoxesShipped`, {
         method: "POST",
@@ -884,6 +1144,60 @@ export const siteFullNames = {
     'HFHS': 'Henry Ford Health System'
 }
 
+/*
+Note: 
+NORC, NIH will not use Biospecimen Dashboards
+Main Campus, Frederick are developer site specific location options when person logged in siteCode 13
+Might need to Lake Hallie and separate Marshfield
+*/ 
+export const siteSpecificLocation = {
+  "HP Research Clinic" : {"siteAcronym":"HP", "siteCode":531629870, "loginSiteName": "HealthPartners"},
+  "Henry Ford Main Campus": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
+  "Henry Ford West Bloomfield Hospital": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
+  "Henry Ford Medical Center- Fairlane": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
+  "KPCO RRL": {"siteAcronym":"KPCO", "siteCode":125001209, "loginSiteName": "Kaiser Permanente Colorado"},
+  "KPGA RRL":{"siteAcronym":"KPGA", "siteCode":327912200, "loginSiteName": "Kaiser Permanente Georgia"},
+  "KPHI RRL": {"siteAcronym":"KPHI", "siteCode":300267574, "loginSiteName": "Kaiser Permanente Hawaii"},
+  "KPNW RRL": {"siteAcronym":"KPNW", "siteCode":452412599, "loginSiteName": "Kaiser Permanente Northwest"},
+  "Marshfield": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
+  "SF Cancer Center LL": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
+  "DCAM": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
+  "Main Campus": {"siteAcronym":"NCI", "siteCode":13, "loginSiteName": "National Cancer Institute"},
+  "Frederick": {"siteAcronym":"NCI", "siteCode":13, "loginSiteName": "National Cancer Institute"},
+}
+
+export const conceptIdToSiteSpecificLocation = {
+  834825425: "HP Research Clinic",
+  752948709: "Henry Ford Main Campus",
+  570271641: "Henry Ford West Bloomfield Hospital",
+  838480167: "Henry Ford Medical Center- Fairlane",
+  763273112: "KPCO RRL",
+  767775934: "KPGA RRL",
+  531313956: "KPHI RRL",
+  715632875: "KPNW RRL",
+  692275326: "Marshfield",
+  589224449: "SF Cancer Center LL",
+  777644826: "DCAM",
+  111111111: "Main Campus",
+  222222222: "Frederick",
+}
+
+export const siteSpecificLocationToConceptId = {
+  "HP Research Clinic": 834825425,
+  "Henry Ford Main Campus": 752948709,
+  "Henry Ford West Bloomfield Hospital": 570271641,
+  "Henry Ford Medical Center- Fairlane": 838480167,
+  "KPCO RRL": 763273112,
+  "KPGA RRL": 767775934,
+  "KPHI RRL": 531313956,
+  "KPNW RRL": 715632875,
+  "Marshfield": 692275326,
+  "SF Cancer Center LL": 589224449,
+  "DCAM": 777644826, 
+  "Main Campus": 111111111,
+  "Frederick": 222222222,
+}
+
 export const siteContactInformation = {
   "UCM":[{
     "fullName":"Jaime King",
@@ -938,6 +1252,7 @@ export const siteContactInformation = {
     "phone":["248-910-6716"],
   }]
 }
+
 
 export const verificationConversion = {
     '875007964': 'Not Yet Verified',
