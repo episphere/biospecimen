@@ -55,7 +55,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             </div>
         </div>
     `;
-    document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
+    document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name, data.isBPTLUser);
     document.getElementById('contentBody').innerHTML = template;
     document.getElementById('contentBody').dataset.siteAcronym = data.siteAcronym;
     document.getElementById('contentBody').dataset.siteCode = data.siteCode;

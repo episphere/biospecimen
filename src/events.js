@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, siteFullNames, siteSpecificLocationToSiteAcronym, siteAcronymToLoginSite, siteNameToLoginSite, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -1815,9 +1815,12 @@ export const addGoToCheckInEvent = () => {
     const handler = (connectId) => async (_event) => {
         try {
             showAnimation();
-            const data = await findParticipant(`connectId=${connectId}`).then(
+
+            let data = await findParticipant(`connectId=${connectId}`).then(
                 (res) => res.data?.[0]
             );
+            
+            data = await verifyDefaultConcepts(data);
             checkInTemplate(data);
         } catch (error) {
             console.log("Error checking in participant: ", error);
@@ -1914,7 +1917,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
                 }
             };
 
-            checkInParticipant(data, visitConcept);
+            await checkInParticipant(data, visitConcept);
 
             const confirmVal = await swal({
                 title: "Success",
@@ -2285,7 +2288,7 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
     await updateSpecimen([biospecimenData]);
 }
 
-const collectionSubmission = async (dt, biospecimenData, cntd) => {
+const collectionSubmission = async (formData, biospecimenData, cntd) => {
     
     removeAllErrors();
 
@@ -2300,7 +2303,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
     inputFields.forEach(input => {
         
-        const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
+        const tubes = siteTubesList.filter(tube => tube.concept === input.id.replace('Id', ''));
 
         let value = getValue(`${input.id}`).toUpperCase();
         const masterID = value.substr(0, masterSpecimenIDRequirement.length);
@@ -2396,7 +2399,7 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
                 });
             }
     
-            biospecimenData[tube.id]['762124027'] = (biospecimenData[tube.id]['248868659']['472864016'] === 353358909 || biospecimenData[tube.id]['248868659']['956345366'] === 353358909 ? 353358909 : 104430631);
+            biospecimenData[tube.id]['762124027'] = (biospecimenData[tube.id]['248868659']['472864016'] === 353358909 || biospecimenData[tube.id]['248868659']['956345366'] === 353358909 || biospecimenData[tube.id]['248868659']['810960823'] === 353358909 || biospecimenData[tube.id]['248868659']['684617815'] === 353358909) ? 353358909 : 104430631;
     
             if (biospecimenData[tube.id]['248868659']['453343022'] === 353358909 && !comment.value.trim()) { 
                 hasError = true;
@@ -2411,67 +2414,34 @@ const collectionSubmission = async (dt, biospecimenData, cntd) => {
 
     biospecimenData['338570265'] = document.getElementById('collectionAdditionalNotes').value;
 
-    const baselineVisit = (biospecimenData['331584571'] === 266600170);
-    const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
-
-    const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
-    const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
-    const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
-
-    let bloodCollected = false;
-    let urineCollected = false;
-    let mouthwashCollected = false;
-
-    let bloodTime;
-    let urineTime;
-    let mouthwashTime;
-
-    bloodTubes.forEach(tube => {
-        if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-            bloodCollected = true;
-            bloodTime = biospecimenData['678166505'];
-        }
-    });
-
-    urineTubes.forEach(tube => {
-        if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-            urineCollected = true;
-            urineTime = biospecimenData['678166505'];
-        }
-    });
-
-    mouthwashTubes.forEach(tube => {
-        if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-            mouthwashCollected = true;
-            mouthwashTime = biospecimenData['678166505'];
-        }
-    });
-
-    showAnimation();
-
-    const baselineData = {
-        '878865966': baselineVisit && clinicalResearchSetting && bloodCollected ? 353358909 : 104430631,
-        '561681068': bloodTime ? bloodTime : '',
-        '167958071': baselineVisit && clinicalResearchSetting && urineCollected ? 353358909 : 104430631, 
-        '847159717': urineTime ? urineTime : '',
-        '684635302': baselineVisit && clinicalResearchSetting && mouthwashCollected ? 353358909 : 104430631,
-        '448660695': mouthwashTime ? mouthwashTime : '',
-        uid: dt.state.uid
-    };
-        
-    await updateParticipant(baselineData);
-
     if (cntd) {
         if (getWorflow() === 'clinical') {
             if (biospecimenData['915838974'] === undefined) biospecimenData['915838974'] = new Date().toISOString();
         }
-        await updateSpecimen([biospecimenData]);
+    }
+
+    showAnimation();
+
+    await updateSpecimen([biospecimenData]);
+    
+
+    const baselineVisit = (biospecimenData['331584571'] === 266600170);
+    const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
+
+    if(baselineVisit && clinicalResearchSetting) {
+        await updateBaselineData(siteTubesList, formData);
+        formData = await getUpdatedParticipantData(formData);
+
+        await verifyPaymentEligibility(formData);
+        formData = await getUpdatedParticipantData(formData);
+    }
+
+    if (cntd) {
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
-        finalizeTemplate(dt, specimenData);
+        finalizeTemplate(formData, specimenData);
     }
     else {
-        await updateSpecimen([biospecimenData]);
 
         await swal({
             title: "Success",

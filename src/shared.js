@@ -9,6 +9,9 @@ import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
 import conceptIDs from './fieldToConceptIdMapping.js';
+import { baselineEmailTemplate } from "./emailTemplates.js";
+import { checkDefaultFlags, checkPaymentEligibility } from "https://episphere.github.io/dashboard/siteManagerDashboard/utils.js"
+
 
 const conversion = {
     "299553921":"0001",
@@ -210,6 +213,20 @@ export const updateParticipant = async (array) => {
     return await response.json();
 }
 
+export const sendClientEmail = async (array) => {
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(array)
+    }
+    const response = await fetch(`${api}api=sendClientEmail`, requestObj);
+    
+    return response;
+}
 
 export const biospecimenUsers = async () => {
     const idToken = await getIdToken();
@@ -1013,6 +1030,107 @@ export const generateBarCode = (id, connectId) => {
     JsBarcode(`#${id}`, connectId, {height: 30});
 }
 
+export const getUpdatedParticipantData = async (data) => {
+    const query = `connectId=${parseInt(data['Connect_ID'])}`;
+    let responseParticipant = await findParticipant(query);
+    return responseParticipant.data[0];
+}
+
+export const updateBaselineData = async (siteTubesList, data) => {
+
+    const response = await getParticipantCollections(data.token);
+    const baselineCollections = response.data.filter(collection => collection['331584571'] === 266600170);
+    
+    const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
+    const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
+    const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
+
+    let bloodCollected = (data['878865966'] === 353358909);
+    let urineCollected = (data['167958071'] === 353358909);
+    let mouthwashCollected = (data['684635302'] === 353358909);
+
+    let bloodTime = data['561681068'] ? data['561681068'] : '';
+    let urineTime = data['847159717'] ? data['847159717'] : '';
+    let mouthwashTime = data['448660695'] ? data['448660695'] : '';
+
+    baselineCollections.forEach(collection => {
+
+        if(!bloodCollected) {
+            bloodTubes.forEach(tube => {
+                if(collection[tube.concept]['593843561'] === 353358909) {
+                    bloodCollected = true;
+                    bloodTime = collection['678166505'];
+                }
+            });
+        }
+
+        if(!urineCollected) {
+            urineTubes.forEach(tube => {
+                if(collection[tube.concept]['593843561'] === 353358909) {
+                    urineCollected = true;
+                    urineTime = collection['678166505'];
+                }
+            });
+        }
+        if(!mouthwashCollected) {
+            mouthwashTubes.forEach(tube => {
+                if(collection[tube.concept]['593843561'] === 353358909) {
+                    mouthwashCollected = true;
+                    mouthwashTime = collection['678166505'];
+                }
+            });
+        }
+    });
+
+    const baselineData = {
+        '878865966': bloodCollected ? 353358909 : 104430631,
+        '561681068': bloodTime ? bloodTime : '',
+        '167958071': urineCollected ? 353358909 : 104430631, 
+        '847159717': urineTime ? urineTime : '',
+        '684635302': mouthwashCollected ? 353358909 : 104430631,
+        '448660695': mouthwashTime ? mouthwashTime : '',
+        uid: data.state.uid
+    };
+        
+    await updateParticipant(baselineData);
+}
+
+export const verifyPaymentEligibility = async (formData) => {
+
+    if(formData['130371375']['266600170']['731498909'] === 104430631) {
+        const responseCollections = await getParticipantCollections(formData.token);
+        const baselineCollections = responseCollections.data.filter(collection => collection['331584571'] === 266600170);
+
+        const incentiveEligible = await checkPaymentEligibility(formData, baselineCollections);
+
+        if(incentiveEligible) {
+            const incentiveData = {
+                '130371375.266600170.731498909': 353358909,
+                '130371375.266600170.222373868': formData['827220437'] === 809703864 ? 104430631 : 353358909,
+                '130371375.266600170.787567527': new Date().toISOString(),
+                uid: formData.state.uid
+            };
+
+            await updateParticipant(incentiveData);
+        } 
+    }
+}
+
+export const verifyDefaultConcepts = async (data) => {
+    let defaultConcepts = checkDefaultFlags(data);
+
+    if(Object.entries(defaultConcepts).length != 0) {
+        defaultConcepts['uid'] = data.state.uid
+        await updateParticipant(defaultConcepts);
+        
+        data = await findParticipant(`connectId=${data['Connect_ID']}`).then(
+            (res) => res.data?.[0]
+        );;
+    }
+    
+    return data;
+}
+
 export const siteFullNames = {
     'NCI': 'National Cancer Institute',
     'KPGA': 'Kaiser Permanente Georgia',
@@ -1026,53 +1144,6 @@ export const siteFullNames = {
     'HFHS': 'Henry Ford Health System'
 }
 
-// Location ID, site specific (560975149) to site Acronym
-export const siteSpecificLocationToSiteAcronym = {
-  "HP Research Clinic" : "HP",
-  "Henry Ford Main Campus": "HFHS",
-  "Henry Ford West Bloomfield Hospital": "HFHS",
-  "Henry Ford Medical Center- Fairlane": "HFHS",
-  "KPCO RRL": "KPCO",
-  "KPGA RRL": "KPGA",
-  "KPHI RRL": "KPHI",
-  "KPNW RRL": "KPNW",
-  "Marshfield": "MFC",
-  "SF Cancer Center LL": "SFH",
-  "DCAM": "UCM",
-  "Main Campus": "NCI",
-  "Frederick": "NCI",
-  "UC-DCAM": "NORC", // wont be using biospecimen dashboard
-  "National Institute of Health": "NIH", // wont be using biospecimen dashboard
-}
-
-export const siteAcronymToLoginSite = {
-   "HP": 531629870,
-   "HFHS": 548392715,
-   "KPCO": 125001209,
-   "KPGA": 327912200,
-   "KPHI": 300267574,
-   "KPNW": 452412599,
-   "MFC": 303349821,
-   "SFH": 657167265,
-   "UCM": 809703864,
-   "NCI": 13, // does this need to be changed?
-}
-
-export const siteNameToLoginSite = {
-   "HealthPartners": 531629870,
-   "Henry Ford Health System": 548392715,
-   "Kaiser Permanente Colorado": 125001209,
-   "Kaiser Permanente Georgia": 327912200,
-   "Kaiser Permanente Hawaii": 300267574,
-   "Kaiser Permanente Northwest": 452412599,
-   "Marshfield Clinic": 303349821,
-   "Sanford Health": 657167265,
-   "University of Chicago Medicine": 809703864,
-   "National Cancer Institute": 13, // Used by developers and testing
-}
-
-
-// {"siteAcronym":"", "siteCode":"", "loginSiteName": ""}
 /*
 Note: 
 NORC, NIH will not use Biospecimen Dashboards
@@ -1460,7 +1531,7 @@ export const getCheckedInVisit = (data) => {
     let visitConcept;
 
     Array.from(visitType).forEach(visit => {
-        if(data['331584571'][visit.concept] && data['331584571'][visit.concept]['135591601'] === 353358909) {
+        if(data['331584571'] && data['331584571'][visit.concept] && data['331584571'][visit.concept]['135591601'] === 353358909) {
             visitConcept = visit.concept;
         }
     });
@@ -1472,12 +1543,15 @@ export const checkInParticipant = async (data, visitConcept) => {
     
     let visits;
     const user_uid = data.state.uid;
+    let sendBioEmail = false;
 
     if(data['331584571']) {
 
         visits = data['331584571'];
 
         if(!visits[visitConcept]) {
+
+            if(visitConcept === '266600170') sendBioEmail = true;
 
             visits[visitConcept] = {
                 '840048338': new Date()
@@ -1487,6 +1561,7 @@ export const checkInParticipant = async (data, visitConcept) => {
         visits[visitConcept]['135591601'] = 353358909;
     }
     else {
+        sendBioEmail = true;
 
         visits = {
             [visitConcept]: {
@@ -1501,6 +1576,23 @@ export const checkInParticipant = async (data, visitConcept) => {
         uid: user_uid
     };
         
+    if(sendBioEmail) {
+        const emailData = {
+            email: data['421823980'],
+            subject: "Please complete a short survey about your samples",
+            message: baselineEmailTemplate(data),
+            notificationType: "email",
+            time: new Date().toISOString(),
+            attempt: "1st contact",
+            category: "Biospecimen Survey Reminder",
+            token: data.token,
+            uid: data.state.uid,
+            read: false
+        };
+        
+        await(sendClientEmail(emailData));
+    }
+
     await updateParticipant(checkInData);
 };
 
