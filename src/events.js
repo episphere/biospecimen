@@ -473,7 +473,6 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
 
 }
 
-// Modify store box function's shared.js api to update
 export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrphan, userName) => {
     let submitButton = document.getElementById('addToBagButton')
     let specimenSearch = document.getElementById('masterSpecimenId')
@@ -486,7 +485,6 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         let response = await getBoxes();
         let boxJSONS = response.data;
         let locations = {};
-        let loginSiteName = {}
         for (let i = 0; i < boxJSONS.length; i++) {
             let box = boxJSONS[i]
             // Box ID ("132929440"); Location ID, site specific ("560975149"); Login Site ("789843387")
@@ -543,17 +541,22 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         //document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
 
         let shippingTable = document.getElementById('specimenList')
-        let currArr = JSON.parse(shippingTable.rows[tableIndex].cells[2].innerText);
-        for (let i = 0; i < toDelete.length; i++) {
+
+        // handle an orphan tube scanned if currArr is undefined 
+        let currArr = shippingTable.rows[tableIndex].cells[2]?.innerText
+        if(currArr != undefined) {
+          let parseCurrArr = JSON.parse(shippingTable.rows[tableIndex].cells[2].innerText)
+          for (let i = 0; i < toDelete.length; i++) {
             let currDel = toDelete[i];
-            currArr.splice(currArr.indexOf(toDelete[i]), 1);
-        }
-        if (currArr.length == 0) {
+            parseCurrArr.splice(parseCurrArr.indexOf(toDelete[i]), 1);
+          }
+          if (parseCurrArr.length == 0) {
             shippingTable.deleteRow(tableIndex);
-        }
-        else {
-            shippingTable.rows[tableIndex].cells[2].innerText = JSON.stringify(currArr);
-            shippingTable.rows[tableIndex].cells[1].innerText = currArr.length;
+          }
+          else {
+            shippingTable.rows[tableIndex].cells[2].innerText = JSON.stringify(parseCurrArr);
+            shippingTable.rows[tableIndex].cells[1].innerText = parseCurrArr.length;
+          }
         }
         let boxIds = Object.keys(hiddenJSON).sort(compareBoxIds);
 
