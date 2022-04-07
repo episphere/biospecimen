@@ -879,10 +879,12 @@ export const searchSpecimenInstitute = async () => {
     });
 
     let a = await response.json();
-    
+    console.log("unfiltered Data", a.data)
+    // console.log('brokenSpecimenDeviation',conceptIDs.brokenSpecimenDeviation)
     /* Filter collections with ShipFlag value yes */
     let data = a.data.filter(item => item[410912345] === 353358909);    
     
+    console.log('filter data with only shipFlag', data)
     const conversion = {
         "299553921":"0001",
         "703954371":"0002",
@@ -914,25 +916,38 @@ export const searchSpecimenInstitute = async () => {
 
         }
     */
+
+  /*
+  
+  
+  */      
     
+    // loop over filtered data with shipFlag
     for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
         if(currJSON.hasOwnProperty('787237543')){
-            delete currJSON['787237543']
+            delete currJSON['787237543'] // deletes key for blood/urine
         }
         if(currJSON.hasOwnProperty('223999569')){
-            delete currJSON['223999569']
+            delete currJSON['223999569'] // deletes key mouthwash
         }
+        // grab all keys from current data index
         let keys = Object.keys(currJSON);
+        // loop over keys
         for(let i = 0; i < keys.length; i++){
+          // determine true or false if key exists in conversion object
             if(conversion.hasOwnProperty(keys[i])){
+              // current index item and current conversion key
                 let iterateJSON = currJSON[keys[i]];
-                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631'){
+                //tube collected flag key value no or key doesn't exist delete
+                console.log('iterateJSON deviation',iterateJSON,iterateJSON['678857215'] == '353358909')
+                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631' || iterateJSON['678857215'] == '353358909'){
                     delete currJSON[keys[i]]
                 }
             }
         }
     }
+    console.log("end data",data)
     return data;
 }
 
