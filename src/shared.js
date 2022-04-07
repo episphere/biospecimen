@@ -879,7 +879,6 @@ export const searchSpecimenInstitute = async () => {
     });
 
     let a = await response.json();
-    
     /* Filter collections with ShipFlag value yes */
     let data = a.data.filter(item => item[410912345] === 353358909);    
     
@@ -901,33 +900,21 @@ export const searchSpecimenInstitute = async () => {
         "683613884":"0024"
     }
 
-    /*
-
-        {
-            
-            820476880: masterSpecimenId
-            conversion[search]:{
-                shipped:
-                otherstuff:
-            }
-
-
-        }
-    */
-    
+    // loop over filtered data with shipFlag
     for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
         if(currJSON.hasOwnProperty('787237543')){
             delete currJSON['787237543']
         }
         if(currJSON.hasOwnProperty('223999569')){
-            delete currJSON['223999569']
+            delete currJSON['223999569'] 
         }
         let keys = Object.keys(currJSON);
         for(let i = 0; i < keys.length; i++){
             if(conversion.hasOwnProperty(keys[i])){
                 let iterateJSON = currJSON[keys[i]];
-                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631'){
+                // delete specimen key if tube collected key is no or Deviation key is yes
+                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631' || iterateJSON['678857215'] == '353358909'){
                     delete currJSON[keys[i]]
                 }
             }
