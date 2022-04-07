@@ -1,12 +1,17 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates, getWorflow, isDeviceMobile, replaceDateInputWithMaskedInput, checkedIn, verificationConversion } from "./../shared.js"
+import { userAuthorization, removeActiveClass, validateUser, addEventBarCodeScanner, allStates, getWorflow, isDeviceMobile, replaceDateInputWithMaskedInput, checkedIn, verificationConversion } from "./../shared.js"
 import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment, addEventClearAll } from "./../events.js";
-import { homeNavBar, bodyNavBar } from '../navbar.js';
+import { homeNavBar, bodyNavBar, unAuthorizedUser } from '../navbar.js';
 
 export const userDashboard = (auth, route, goToSpecimenSearch) => {
     auth.onAuthStateChanged(async user => {
         if(user){
-            const role = await userAuthorization(route, user.displayName ? user.displayName : user.email);
-            if(!role) return;
+            const response = await userAuthorization(route, user.displayName ? user.displayName : user.email);
+            if ( response.isBiospecimenUser === false ) {
+                document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
+                document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
+                return;
+            }
+            if(!response.role) return;
             searchTemplate(goToSpecimenSearch);
         }
         else {

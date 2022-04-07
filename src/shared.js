@@ -193,12 +193,12 @@ export const userAuthorization = async (route, name) => {
     showAnimation();
     const response = await validateUser();
     if(response.code === 200) {
-        const role = response.data.role;
-        if(role === 'admin' || role === 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name);
-        else if(role === 'user') document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar(name);
+        const userRole = response.data;
+        if(userRole.role === 'admin' || userRole.role === 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name);
+        else if(userRole.role === 'user') document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar(name);
         toggleCurrentPage(route);
         hideAnimation();
-        return role;
+        return userRole;
     }
     else if(response.code === 401) {
         document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);

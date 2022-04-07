@@ -119,7 +119,7 @@ export const adminNavBar = (name) => {
     return `
         <div class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link" href="#welcome" id="welcome" title="Home"><i class="fas fa-home"></i> Home</a>
+                <a class="nav-link" href="#welcome" id="welcome" title="Home"><i class="fas fa-home"></i> Homxxxxe</a>
             </li>
         </div>
         <div class="navbar-nav current-page">

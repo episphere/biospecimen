@@ -1,13 +1,18 @@
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getNumPages} from "./../shared.js"
 import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality, addEventNavBarShipment, addEventFilter} from "./../events.js";
-import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
+import { homeNavBar, bodyNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
 
 
 export const reportsQuery = (auth, route) => {
     auth.onAuthStateChanged(async user => {
         if(user){
-            const role = await userAuthorization(route, user.displayName ? user.displayName : user.email);
-            if(!role) return;
+            const response = await userAuthorization(route, user.displayName ? user.displayName : user.email);
+            if ( response.isBiospecimenUser === false ) {
+                document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
+                document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
+                return;
+            }
+            if(!response.role) return;
             startReport();
         }
         else {

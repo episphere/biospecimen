@@ -1,6 +1,6 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation, shippingPrintManifestReminder} from "./../shared.js"
+import { userAuthorization, validateUser, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation, shippingPrintManifestReminder} from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventSaveContinue, addEventShipPrintManifest, } from "./../events.js";
-import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
+import { homeNavBar, bodyNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
 
 const conversion = {
     "299553921":"0001",
@@ -23,8 +23,13 @@ const conversion = {
 export const shippingDashboard = (auth, route, goToSpecimenSearch) => {  
     auth.onAuthStateChanged(async user => {
         if(user){
-            const role = await userAuthorization(route, user.displayName ? user.displayName : user.email);
-            if(!role) return;
+            const response = await userAuthorization(route, user.displayName ? user.displayName : user.email);
+            if ( response.isBiospecimenUser === false ) {
+                document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
+                document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
+                return;
+            }
+            if(!response.role) return;
             startShipping(user.displayName ? user.displayName : user.email);
         }
         else {
