@@ -37,8 +37,6 @@ export const signIn = () => {
         firebase.auth().tenantId = tenantID;
         firebase.auth().signInWithPopup(saml)
             .then(async (result) => {
-                console.log(result)
-                console.log(await getIdToken());
                 location.hash = '#welcome'
             })
             .catch((error) => {

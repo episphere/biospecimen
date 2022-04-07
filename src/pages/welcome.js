@@ -29,7 +29,8 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
         <div class="row welcome-screen-div">
             <div class="col">Site: ${siteFullNames[data.siteAcronym]}</div>
         </div>
-        <div class="row welcome-screen-div">
+        ${ (data.isBiospecimenUser === true) ?
+       ` <div class="row welcome-screen-div">
             <div class="col div-border" style="margin-right: 1rem;padding-bottom: 1rem;">
                 <div>
                     <label for="dashboardSelection" class="col-form-label">Select dashboard to use </label>
@@ -53,8 +54,13 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
                     <div class="col"><button class="btn btn-outline-warning" id="btnReports">Reports</button></div>
                 </div>
             </div>
-        </div>
-    `;
+        </div>` : ``}
+        <br />
+        ${ (data.isBPTLUser === true) ?
+            `<div class="col align-center d-grid gap-2 col-6 mx-auto">
+                <div class="col"><button class="btn btn-lg btn-outline-primary" id="btnBPTL"><i class="fa fa-id-badge"></i> BPTL</button></div>
+            </div>` : `` }
+        `;
     document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name, data.isBPTLUser);
     document.getElementById('contentBody').innerHTML = template;
     document.getElementById('contentBody').dataset.siteAcronym = data.siteAcronym;
@@ -63,7 +69,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     localStorage.setItem('siteCode',data.siteCode);
     document.getElementById('contentHeader').innerHTML = '';
 
-    document.getElementById('btnParticipantSearch').addEventListener('click', () => {
+    document.getElementById('btnParticipantSearch') && document.getElementById('btnParticipantSearch').addEventListener('click', () => {
         removeAllErrors();
         const selection = document.getElementById('dashboardSelection');
         if(!selection.value) {
@@ -75,7 +81,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
         location.hash = '#dashboard';
     });
 
-    document.getElementById('btnSpecimenSearch').addEventListener('click', () => {
+    document.getElementById('btnSpecimenSearch') && document.getElementById('btnSpecimenSearch').addEventListener('click', () => {
         removeAllErrors();
         const selection = document.getElementById('dashboardSelection');
         if(!selection.value) {
@@ -87,15 +93,18 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
         window.history.replaceState({},'', './#dashboard');
         userDashboard(auth, route, true);
     });
-    document.getElementById('btnShipping').addEventListener('click',  async () => {
+    document.getElementById('btnShipping') && document.getElementById('btnShipping').addEventListener('click',  async () => {
         //window.history.replaceState({},'', './#shipping');
         location.hash = '#shipping';
         //shippingDashboard(auth, route, true);
     });
-    document.getElementById('btnReports').addEventListener('click',  async () => {
+    document.getElementById('btnReports') && document.getElementById('btnReports').addEventListener('click',  async () => {
         //window.history.replaceState({},'', './#shipping');
         location.hash = '#reports';
         //shippingDashboard(auth, route, true);
+    });
+    document.getElementById('btnBPTL') && document.getElementById('btnBPTL').addEventListener('click',  async () => {
+        location.hash = '#bptl';
     });
 }
 
