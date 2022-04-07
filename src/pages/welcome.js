@@ -14,7 +14,6 @@ export const welcomeScreen = async (auth, route) => {
         document.getElementById('navbarNavAltMarkup').innerHTML = unAuthorizedUser();
         return;
     }
-    console.log('res', response.data)
     welcomeScreenTemplate(name, response.data, auth, route);
 }
 

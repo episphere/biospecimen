@@ -1141,7 +1141,8 @@ export const siteFullNames = {
     'KPNW': 'Kaiser Permanente Northwest',
     'KPCO': 'Kaiser Permanente Colorado',
     'HP': 'HealthPartners',
-    'HFHS': 'Henry Ford Health System'
+    'HFHS': 'Henry Ford Health System',
+    'NIH': "National Institutes of Health"
 }
 
 /*
