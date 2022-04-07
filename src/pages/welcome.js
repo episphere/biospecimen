@@ -55,7 +55,12 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
                 </div>
             </div>
         </div>` : ``}
-    `;
+        <br />
+        ${ (data.isBPTLUser === true) ?
+            `<div class="col align-center d-grid gap-2 col-6 mx-auto">
+                <div class="col"><button class="btn btn-lg btn-outline-primary" id="btnBPTL"><i class="fa fa-id-badge"></i> BPTL</button></div>
+            </div>` : `` }
+        `;
     document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name, data.isBPTLUser);
     document.getElementById('contentBody').innerHTML = template;
     document.getElementById('contentBody').dataset.siteAcronym = data.siteAcronym;
@@ -97,6 +102,9 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
         //window.history.replaceState({},'', './#shipping');
         location.hash = '#reports';
         //shippingDashboard(auth, route, true);
+    });
+    document.getElementById('btnBPTL') && document.getElementById('btnBPTL').addEventListener('click',  async () => {
+        location.hash = '#bptl';
     });
 }
 
