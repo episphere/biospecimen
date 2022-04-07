@@ -879,12 +879,9 @@ export const searchSpecimenInstitute = async () => {
     });
 
     let a = await response.json();
-    console.log("unfiltered Data", a.data)
-    // console.log('brokenSpecimenDeviation',conceptIDs.brokenSpecimenDeviation)
     /* Filter collections with ShipFlag value yes */
     let data = a.data.filter(item => item[410912345] === 353358909);    
     
-    console.log('filter data with only shipFlag', data)
     const conversion = {
         "299553921":"0001",
         "703954371":"0002",
@@ -903,25 +900,7 @@ export const searchSpecimenInstitute = async () => {
         "683613884":"0024"
     }
 
-    /*
 
-        {
-            
-            820476880: masterSpecimenId
-            conversion[search]:{
-                shipped:
-                otherstuff:
-            }
-
-
-        }
-    */
-
-  /*
-  
-  
-  */      
-    
     // loop over filtered data with shipFlag
     for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
@@ -941,13 +920,13 @@ export const searchSpecimenInstitute = async () => {
                 let iterateJSON = currJSON[keys[i]];
                 //tube collected flag key value no or key doesn't exist delete
                 console.log('iterateJSON deviation',iterateJSON,iterateJSON['678857215'] == '353358909')
+                // delete specimen key if tube collected key is no or Deviation key is yes
                 if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631' || iterateJSON['678857215'] == '353358909'){
                     delete currJSON[keys[i]]
                 }
             }
         }
     }
-    console.log("end data",data)
     return data;
 }
 
