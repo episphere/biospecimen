@@ -1,5 +1,7 @@
-import { userAuthorization, validateUser, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation, shippingPrintManifestReminder} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventSaveContinue, addEventShipPrintManifest, } from "./../events.js";
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation, shippingPrintManifestReminder, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, conceptIdToSiteSpecificLocation} from "./../shared.js"
+import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, 
+    populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, 
+    addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventSaveContinue, addEventShipPrintManifest, } from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
 
 const conversion = {
@@ -219,7 +221,6 @@ export const startShipping = async (userName) => {
     option.text = "Kiwi";
     x.add(option);*/
     
-    
     removeActiveClass('navbar-btn', 'active')
     document.getElementById('contentHeader').innerHTML = `<h2>Connect for Cancer Prevention Study</h2></br>` + shippingNavBar();
     const navBarBtn = document.getElementById('navBarShippingDash');
@@ -231,15 +232,17 @@ export const startShipping = async (userName) => {
     await populateSpecimensList(hiddenJSON1);
 
     let currLocation = document.getElementById('selectLocationList').value;
+    let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
     let tempMonitorCheckedEl = document.getElementById('tempMonitorChecked')
 
-    response = await getBoxesByLocation(currLocation);
+    response = await getBoxesByLocation(currLocationConceptId);
     boxJSONS = response.data;
     let hiddenJSONLocation = {};
     for(let i = 0; i < boxJSONS.length; i++){
         let box = boxJSONS[i]
         hiddenJSONLocation[box['132929440']] = box['bags']
     }
+     
     await populateBoxSelectList(hiddenJSONLocation,userName);
     await populateTempNotification();
     addEventNavBarShipment("navBarShippingDash", userName);
@@ -269,7 +272,7 @@ export const boxManifest = async (boxId, userName) => {
         hiddenJSON[box['132929440']] = box['bags']
     }
     let currInstitute = currBox.siteAcronym;
-    let currLocation = currBox['560975149'];
+    let currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
    
 
     let template = `
@@ -360,7 +363,6 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
         locations[box['132929440']] = box['560975149'];
         site = box['siteAcronym'];
     }
-
     let toDisplayJSON = {};
     let location = ''
     for(let i = 0; i < boxesToShip.length; i++){

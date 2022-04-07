@@ -54,6 +54,41 @@ export default {
     research: 534621077,
     clinical: 664882224,
     
-
-
+    // shipment id
+    bag1: 650224161,
+    bag2: 136341211,
+    bag3: 503046679,
+    bag4: 313341808,
+    bag5: 668816010,
+    bag6: 754614551,
+    bag7: 174264982,
+    bag8: 550020510,
+    bag9: 673090642,
+    bag10: 492881559,
+    bag11: 536728814,
+    bag12: 309413330,
+    bag13: 357218702,
+    bag14: 945294744,
+    bag15: 741697447,
+    bagscan_bloodUrine: 787237543,
+    bagscan_mouthWash: 223999569,
+    bagscan_orphanBag: 522094118,
+    orphanBagFlag: 255283733, // inside bag/container/ thing flag
+    containsOrphanFlag: 842312685, // orphan flag for box 
+    tubesCollected: 234868461,
+    hpResearchClinic: 834825425,
+    hfhs_mainCampus: 752948709,
+    hfhs_westBloomfieldHospital: 570271641,
+    hfhs_fairlane: 838480167,
+    kpco_rrl: 763273112,
+    kpga_rrl: 767775934,
+    kphi_rrl: 531313956,
+    kpnw_rrl: 715632875,
+    marshfield: 692275326,
+    sfCancerCenter: 589224449,
+    dcam: 777644826,
+    nci_mainCampus: 111111111,
+    nci_frederick: 222222222,
+    siteCode:789843387,
 };
+
