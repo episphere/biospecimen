@@ -817,9 +817,19 @@ export const searchSpecimenInstitute = async () => {
         for(let i = 0; i < keys.length; i++){
             if(conversion.hasOwnProperty(keys[i])){
                 let iterateJSON = currJSON[keys[i]];
-                // delete specimen key if tube collected key is no or Deviation key is yes
-                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631' || iterateJSON['678857215'] == '353358909'){
+                // delete specimen key if tube collected key is no
+                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631'){
                     delete currJSON[keys[i]]
+                }
+                // check and delete if iterateJSON has not shipped specimen deviation concept ID
+                if(iterateJSON.hasOwnProperty('248868659')) {
+                  if(iterateJSON["248868659"][conceptIDs.brokenSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIDs.discardSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIDs.insufficientVolumeSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIDs.mislabelledDiscardSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIDs.notFoundSpecimenDeviation] == '353358909') {
+                    delete currJSON[keys[i]]
+                  }
                 }
             }
         }

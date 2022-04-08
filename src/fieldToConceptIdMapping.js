@@ -54,6 +54,13 @@ export default {
     research: 534621077,
     clinical: 664882224,
     
+    // not shipped specimen deviation id
+    brokenSpecimenDeviation: 472864016,
+    discardSpecimenDeviation: 810960823,
+    insufficientVolumeSpecimenDeviation: 956345366, 
+    mislabelledDiscardSpecimenDeviation: 684617815,
+    notFoundSpecimenDeviation: 982885431,
+
     // shipment id
     bag1: 650224161,
     bag2: 136341211,
