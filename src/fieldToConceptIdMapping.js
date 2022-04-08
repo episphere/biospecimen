@@ -55,12 +55,6 @@ export default {
     clinical: 664882224,
     
     // not shipped specimen deviation id
-//     Broken (Discard do not ship) Deviation: Concept ID = 472864016
-// Discard Deviation: Concept ID = 810960823
-// Insufficient volume - not enough volume to transfer to urine tube (discard) Deviation: Concept ID = 956345366
-// Mislabeled- Discard Deviation: Concept ID = 684617815
-// Not Found: Concept ID = 982885431
-
     brokenSpecimenDeviation: 472864016,
     discardSpecimenDeviation: 810960823,
     insufficientVolumeSpecimenDeviation: 956345366, 
