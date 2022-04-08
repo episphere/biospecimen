@@ -265,7 +265,7 @@ export const siteSpecificTubeRequirements = {
         'research': workflows.research,
         'clinical': workflows.clinical
     },
-    'NCI': {
+    'NIH': {
         'research': workflows.research,
         'clinical': workflows.clinical
     },
