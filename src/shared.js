@@ -30,102 +30,6 @@ const conversion = {
     "677469051":"0014",
     "683613884":"0024"
 }
-export const siteAcronymToSiteMap = {
-  HP: { siteCode: '531629870', locations: ['834825425'] },
-  HFHS: {
-    siteCode: '548392715',
-    locations: ['752948709', '570271641', '838480167'],
-  },
-  KPCO: { siteCode: '125001209', locations: ['763273112'] },
-  KPGA: { siteCode: '327912200', locations: ['767775934'] },
-  KPHI: { siteCode: '300267574', locations: ['531313956'] },
-  KPNW: { siteCode: '452412599', locations: ['715632875'] },
-  MFC: { siteCode: '303349821', locations: ['692275326'] },
-  SFH: { siteCode: '657167265', locations: ['589224449'] },
-  UCM: { siteCode: '809703864', locations: ['777644826'] },
-  NCI: { siteCode: '13', locations: ['111111111', '222222222'] },
-};
-
-export const locationConceptIDToLocationMap = {
-  834825425: {
-    siteSpecificLocation: 'HP Research Clinic',
-    siteAcronym: 'HP',
-    siteCode: '531629870',
-    loginSiteName: 'HealthPartners',
-  },
-  752948709: {
-    siteSpecificLocation: 'Henry Ford Main Campus',
-    siteAcronym: 'HFHS',
-    siteCode: '548392715',
-    loginSiteName: 'Henry Ford Health System',
-  },
-  570271641: {
-    siteSpecificLocation: 'Henry Ford West Bloomfield Hospital',
-    siteAcronym: 'HFHS',
-    siteCode: '548392715',
-    loginSiteName: 'Henry Ford Health System',
-  },
-  838480167: {
-    siteSpecificLocation: 'Henry Ford Medical Center-Fairlane',
-    siteAcronym: 'HFHS',
-    siteCode: '548392715',
-    loginSiteName: 'Henry Ford Health System',
-  },
-  763273112: {
-    siteSpecificLocation: 'KPCO RRL',
-    siteAcronym: 'KPCO',
-    siteCode: '125001209',
-    loginSiteName: 'Kaiser Permanente Colorado',
-  },
-  767775934: {
-    siteSpecificLocation: 'KPGA RRL',
-    siteAcronym: 'KPGA',
-    siteCode: '327912200',
-    loginSiteName: 'Kaiser Permanente Georgia',
-  },
-  531313956: {
-    siteSpecificLocation: 'KPHI RRL',
-    siteAcronym: 'KPHI',
-    siteCode: '300267574',
-    loginSiteName: 'Kaiser Permanente Hawaii',
-  },
-  715632875: {
-    siteSpecificLocation: 'KPNW RRL',
-    siteAcronym: 'KPNW',
-    siteCode: '452412599',
-    loginSiteName: 'Kaiser Permanente Northwest',
-  },
-  692275326: {
-    siteSpecificLocation: 'Marshfield',
-    siteAcronym: 'MFC',
-    siteCode: '303349821',
-    loginSiteName: 'Marshfield Cancer Center',
-  },
-  589224449: {
-    siteSpecificLocation: 'SF Cancer Center LL',
-    siteAcronym: 'SFH',
-    siteCode: '657167265',
-    loginSiteName: 'Sanford Health',
-  },
-  777644826: {
-    siteSpecificLocation: 'DCAM',
-    siteAcronym: 'UCM',
-    siteCode: '809703864',
-    loginSiteName: 'University of Chicago Medicine',
-  },
-  111111111: {
-    siteSpecificLocation: 'Main Campus',
-    siteAcronym: 'NCI',
-    siteCode: '13',
-    loginSiteName: 'National Cancer Institute',
-  },
-  222222222: {
-    siteSpecificLocation: 'Frederick',
-    siteAcronym: 'NCI',
-    siteCode: '13',
-    loginSiteName: 'National Cancer Institute',
-  },
-};
   
  const api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
 // const api = 'http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
@@ -1150,9 +1054,90 @@ export const siteSpecificLocation = {
   "Marshfield": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "SF Cancer Center LL": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
   "DCAM": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
-  "Main Campus": {"siteAcronym":"NCI", "siteCode":13, "loginSiteName": "National Cancer Institute"},
-  "Frederick": {"siteAcronym":"NCI", "siteCode":13, "loginSiteName": "National Cancer Institute"},
+  "Main Campus": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
+  "Frederick": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
 }
+
+export const locationConceptIDToLocationMap = {
+  834825425: {
+    siteSpecificLocation: 'HP Research Clinic',
+    siteAcronym: 'HP',
+    siteCode: '531629870',
+    loginSiteName: 'HealthPartners',
+  },
+  752948709: {
+    siteSpecificLocation: 'Henry Ford Main Campus',
+    siteAcronym: 'HFHS',
+    siteCode: '548392715',
+    loginSiteName: 'Henry Ford Health System',
+  },
+  570271641: {
+    siteSpecificLocation: 'Henry Ford West Bloomfield Hospital',
+    siteAcronym: 'HFHS',
+    siteCode: '548392715',
+    loginSiteName: 'Henry Ford Health System',
+  },
+  838480167: {
+    siteSpecificLocation: 'Henry Ford Medical Center-Fairlane',
+    siteAcronym: 'HFHS',
+    siteCode: '548392715',
+    loginSiteName: 'Henry Ford Health System',
+  },
+  763273112: {
+    siteSpecificLocation: 'KPCO RRL',
+    siteAcronym: 'KPCO',
+    siteCode: '125001209',
+    loginSiteName: 'Kaiser Permanente Colorado',
+  },
+  767775934: {
+    siteSpecificLocation: 'KPGA RRL',
+    siteAcronym: 'KPGA',
+    siteCode: '327912200',
+    loginSiteName: 'Kaiser Permanente Georgia',
+  },
+  531313956: {
+    siteSpecificLocation: 'KPHI RRL',
+    siteAcronym: 'KPHI',
+    siteCode: '300267574',
+    loginSiteName: 'Kaiser Permanente Hawaii',
+  },
+  715632875: {
+    siteSpecificLocation: 'KPNW RRL',
+    siteAcronym: 'KPNW',
+    siteCode: '452412599',
+    loginSiteName: 'Kaiser Permanente Northwest',
+  },
+  692275326: {
+    siteSpecificLocation: 'Marshfield',
+    siteAcronym: 'MFC',
+    siteCode: '303349821',
+    loginSiteName: 'Marshfield Cancer Center',
+  },
+  589224449: {
+    siteSpecificLocation: 'SF Cancer Center LL',
+    siteAcronym: 'SFH',
+    siteCode: '657167265',
+    loginSiteName: 'Sanford Health',
+  },
+  777644826: {
+    siteSpecificLocation: 'DCAM',
+    siteAcronym: 'UCM',
+    siteCode: '809703864',
+    loginSiteName: 'University of Chicago Medicine',
+  },
+  111111111: {
+    siteSpecificLocation: 'Main Campus',
+    siteAcronym: 'NIH',
+    siteCode: '13',
+    loginSiteName: 'National Cancer Institute',
+  },
+  222222222: {
+    siteSpecificLocation: 'Frederick',
+    siteAcronym: 'NIH',
+    siteCode: '13',
+    loginSiteName: 'National Cancer Institute',
+  },
+};
 
 export const conceptIdToSiteSpecificLocation = {
   834825425: "HP Research Clinic",
@@ -1428,7 +1413,7 @@ export const siteLocations = {
         'HP': [{location: 'HP Research Clinic', concept: 834825425}],
         'HFHS': [{location: 'HFHS Research Clinic (Main Campus)', concept: 736183094}],
         'SFH': [{location: 'SF Cancer Center LL', concept: 589224449}],
-        'NCI': [{location: 'NCI-1', concept: 111111111}, {location: 'NCI-2', concept: 222222222}]
+        'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}]
     },
     'clinical': {
         'KPHI': [{location:'KPHI RRL', concept: 531313956}]
