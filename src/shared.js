@@ -808,29 +808,21 @@ export const searchSpecimenInstitute = async () => {
     for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
         if(currJSON.hasOwnProperty('787237543')){
-            delete currJSON['787237543'] // deletes key for blood/urine
+            delete currJSON['787237543']
         }
         if(currJSON.hasOwnProperty('223999569')){
-            delete currJSON['223999569'] // deletes key mouthwash
+            delete currJSON['223999569'] 
         }
-         // grab all keys from current data index
         let keys = Object.keys(currJSON);
         for(let i = 0; i < keys.length; i++){
-          // determine true or false if key exists in conversion object
             if(conversion.hasOwnProperty(keys[i])){
-              // current index item and current conversion key
                 let iterateJSON = currJSON[keys[i]];
-                //tube collected flag key value no or key doesn't exist delete
-                // console.log('iterateJSON deviation',iterateJSON,iterateJSON['678857215'] == '353358909')
-                // delete specimen key if tube collected key is no or Deviation key is yes
+                // delete specimen key if tube collected key is no
                 if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631'){
                     delete currJSON[keys[i]]
                 }
-                // check if iterateJSON has deviation concept ID
-                // if(!iterateJSON.hasOwnProperty('248868659')) continue
+                // check and delete if iterateJSON has not shipped specimen deviation concept ID
                 if(iterateJSON.hasOwnProperty('248868659')) {
-                  // console.log('iterateJSON.hasOwnProperty[248868659] searchSpecimenInstitute',iterateJSON.hasOwnProperty('248868659'))
-                  // console.log("iterateJSON['248868659']",iterateJSON['248868659'])
                   if(iterateJSON["248868659"][conceptIDs.brokenSpecimenDeviation] == '353358909' || 
                      iterateJSON["248868659"][conceptIDs.discardSpecimenDeviation] == '353358909' || 
                      iterateJSON["248868659"][conceptIDs.insufficientVolumeSpecimenDeviation] == '353358909' || 
@@ -842,7 +834,6 @@ export const searchSpecimenInstitute = async () => {
             }
         }
     }
-    console.log("filtered no ship data",data)
     return data;
 }
 
