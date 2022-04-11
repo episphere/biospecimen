@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getAllBoxes } from "../../shared.js";
+import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -74,23 +74,28 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     // // Returns an array --> nested array of grouped samples by index
     const bagSamplesArr = groupSamplesArr(bagsArr);
 
-    // // Returns an array -->  nested array of grouped names by index
-    const namesArr = groupNamesArr(bagsArr, fieldToConceptIdMapping);
+    // // Returns an array -->  nested array of grouped scanned by names by index
+    const scannedByArr = groupScannedByArr(bagsArr, fieldToConceptIdMapping);
+    
+    // // Returns an array -->  nested array of grouped shipped by
+    const shippedByArr = groupShippedByArr(allBoxes)
 
     // // Returns an array -->  nested array of bag Ids names by index
     const bagIdArr = groupBagIdArr(bagsArr);
 
     // Object Property Value Shorthand
     // Example: bagsArr and bagsArr:bagsArr are equivalent
-    console.log('bagsArr',bagsArr)
-    console.log('sumSamplesArr',sumSamplesArr)
-    console.log('bagSamplesArr',bagSamplesArr)
-    console.log('namesArr',namesArr)
-    console.log('bagIdArr',bagIdArr)
+    // console.log('bagsArr',bagsArr)
+    // console.log('sumSamplesArr',sumSamplesArr)
+    // console.log('bagSamplesArr',bagSamplesArr)
+    // console.log('scannedByArr',scannedByArr)
+    // console.log('bagIdArr',bagIdArr)
+    console.log(shippedByArr)
     const dataObj = {
         sumSamplesArr,
         bagSamplesArr,
-        namesArr,
+        scannedByArr,
+        shippedByArr,
         bagIdArr,
     };
     manifestButton([...allBoxes], dataObj, manifestModalBodyEl);
@@ -98,15 +103,11 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 
 const filterShipped = (boxes) => {
   // boxes are from searchBoxes endpoint
-  console.log("filteredShipped not filtered yet",boxes)
   if(boxes.length === 0) {
     return []
   } 
   let filteredBoxes = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]])
-  console.log("filteredShipped filteredBoxes",filteredBoxes)
-  // let sortShipped = filteredBoxes.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]] - a[fieldToConceptIdMapping["shippingShipDate"]])
   let sortShipped = filteredBoxes.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
-  console.log("filteredShipped filteredBoxes & sorted", sortShipped)
   return sortShipped
 }
 
@@ -148,9 +149,10 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
     const buttons = document.getElementsByClassName("manifest-button");
 
     // DESTRUCTURING dataObj and fieldToConceptIdMapping
-    console.log('manifestButton allBoxes',allBoxes)
-    console.log('manifestButton dataObj',dataObj)
-    const { sumSamplesArr, bagSamplesArr, namesArr, bagIdArr } = dataObj;
+
+    // console.log('manifestButton allBoxes',allBoxes)
+    // console.log('manifestButton dataObj',dataObj)
+    const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr } = dataObj;
 
     const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
 
@@ -160,13 +162,14 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
             site: "",
             date: "",
             location: "",
-            namesArr,
+            scannedByArr,
             boxNumber: "",
             sumSamplesArr,
             bagSamplesArr,
             bagIdArr,
             groupSamples: "",
             groupScannedBy:"",
+            groupShippedBy:""
         };
 
         modalData.site = allBoxes[index].siteAcronym;
@@ -174,7 +177,8 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
         modalData.location = allBoxes[index][shippingLocation];
         modalData.boxNumber = allBoxes[index][shippingBoxId];
         modalData.groupSamples = bagSamplesArr[index];
-        modalData.groupScannedBy = namesArr[index]; 
+        modalData.groupScannedBy = scannedByArr[index];
+        modalData.groupShippedBy = scannedByArr[index];
         // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
         button.dataset.buttonIndex = `manifest-button-${index}`;
@@ -185,11 +189,12 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                 site,
                 date,
                 location,
-                namesArr,
+                scannedByArr,
                 boxNumber,
                 bagIdArr,
                 groupSamples,
-                groupScannedBy
+                groupScannedBy,
+                groupShippedBy
             } = parsedModalData;
 
             let modalBody = `<div class="container-fluid">
@@ -206,12 +211,12 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                     <p><strong>Shipped Date and Time:</strong> ${date ? convertTime(date) : ""}</p>
                 </div>
                 <div class="col-md-4 ml-auto">
-                    <p><strong>Location:</strong> ${location ? location : ""}</p>
+                    <p><strong>Location:</strong> ${location ? conceptIdToSiteSpecificLocation[location] : ""}</p>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <p><strong>Sender:</strong><br/>${namesArr[index] ? namesArr[index].toString().replaceAll("," ,`<br/>`) : ""}</p>
+                    <p><strong>Sender:</strong><br/>${groupShippedBy[index] ? groupShippedBy[index] : ""}</p>
                 </div>
             </div>
             <div class="row">
@@ -287,37 +292,78 @@ const groupSamplesArr = (bagsArr) => {
     return arrSamples;
 };
 
-// NESTED GROUP NAMES BY INDEX***
-const groupNamesArr = (bagsArr, fieldToConceptIdMapping) => {
+// NESTED GROUP SCANNED BY INDEX***
+const groupScannedByArr = (bagsArr, fieldToConceptIdMapping) => {
     const arrNames = [];
-    const { shippingFirstName, shippingLastName } = fieldToConceptIdMapping;
+    const { scannedByFirstName, scannedByLastName } = fieldToConceptIdMapping;
+    console.log(scannedByFirstName,scannedByLastName)
     bagsArr.forEach((bag) => {
         //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
         if (Object.keys(bag).length) {
             let groupNames = [];
             for (let j = 0; j < Object.keys(bag).length; j++) {
+              // First name and last name exist
+              if(bag[Object.keys(bag)[j]][scannedByFirstName] && bag[Object.keys(bag)[j]][scannedByLastName]){
                 groupNames.push([
-                    bag[Object.keys(bag)[j]][shippingFirstName] +
-                        " " +
-                        bag[Object.keys(bag)[j]][shippingLastName],
-                ]);
-
+                  bag[Object.keys(bag)[j]][scannedByFirstName] +
+                  " " +
+                  bag[Object.keys(bag)[j]][scannedByLastName],]);
                 if (j === Object.keys(bag).length - 1) {
-                    // COMBINE TWO SEPARATE ARRAYS OF FULL NAME INTO ONE ARRAY
-                    groupNames.concat([
-                        bag[Object.keys(bag)[j]][shippingFirstName] +
-                        " " +
-                        bag[Object.keys(bag)[j]][shippingLastName],
-                    ]);
-                    arrNames.push(groupNames);
+                  // COMBINE TWO SEPARATE ARRAYS OF FULL NAME INTO ONE ARRAY
+                  groupNames.concat([
+                      bag[Object.keys(bag)[j]][scannedByFirstName] +
+                      " " +
+                      bag[Object.keys(bag)[j]][scannedByLastName],]);
+                  arrNames.push(groupNames);
                 }
+              }
+              // only First name exists
+              else if(bag[Object.keys(bag)[j]][scannedByFirstName]) {
+                groupNames.push([
+                  bag[Object.keys(bag)[j]][scannedByFirstName],
+                ]);
+                if (j === Object.keys(bag).length - 1) {
+                  // COMBINE TWO SEPARATE ARRAYS OF FULL NAME INTO ONE ARRAY
+                  groupNames.concat([
+                      bag[Object.keys(bag)[j]][scannedByFirstName],
+                  ]);
+                  arrNames.push(groupNames);
+                }
+              } 
             }
         } else {
             arrNames.push([]);
         }
     });
+    console.log('test', arrNames)
+    debugger;
     return arrNames;
 };
+
+const groupShippedByArr = (allBoxes) => {
+  console.log('groupShippedByArr',allBoxes)
+  const arrShippedBy = []
+  // check if each box has first name and last name concept with length
+  // check length of last name and sanitize using trim 
+  allBoxes.forEach(box => {
+    console.log(box)
+    let shippedByFirstName = box[fieldToConceptIdMapping.shippedByFirstName].trim()
+    let shippedByLastName = box[fieldToConceptIdMapping.shippedByLastName]?.trim() ?? ''
+    if(shippedByFirstName.length > 0 && shippedByLastName > 0) {
+      arrShippedBy.push(shippedByFirstName + " " + shippedByLastName)
+    }
+    else if (shippedByFirstName.length > 0) {
+      arrShippedBy.push(shippedByFirstName)
+    }
+    else arrShippedBy.push("")
+  })
+  console.log(arrShippedBy)
+  return arrShippedBy
+  // check if each box has first name and last name concept with length
+  // check length of last name and sanitize using trim 
+  // push the shippedBy
+
+}
 
 // NESTED GROUP BAGS BY INDEX***
 const groupBagIdArr = (bagsArr) => {
@@ -382,17 +428,4 @@ const tempProbeFound = (tempProbe) => {
   }
   else return ""
 }
-
-// // Returns Shipment Submitted Boolean Value --> Yes or No
-// const shipmentSubmittedStatus = (booleanValue) => {
-//     let { booleanZero, booleanOne } = fieldToConceptIdMapping;
-//     const convertBoolToNumType = parseInt(booleanValue);
-//     if (convertBoolToNumType === booleanZero) {
-//         return "No";
-//     } else if (convertBoolToNumType === booleanOne) {
-//         return "Yes";
-//     } else {
-//         return "";
-//     }
-// };
 

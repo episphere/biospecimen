@@ -566,8 +566,8 @@ export const convertToOldBox = (inputBox) => {
     let outputBag = {};
     const inputBag = inputBox[bagConceptId];
     const keysNeeded = [
-      conceptIDs.shippingFirstName,
-      conceptIDs.shippingLastName,
+      conceptIDs.scannedByFirstName,
+      conceptIDs.scannedByLastName,
       conceptIDs.orphanBagFlag,
     ];
 
@@ -625,8 +625,8 @@ export const convertToFirestoreBox = (inputBox) => {
         let outputBag = {};
         const bagConceptID = bagConceptIDList[bagConceptIDIndex];
         const keysNeeded = [
-          conceptIDs.shippingFirstName,
-          conceptIDs.shippingLastName,
+          conceptIDs.scannedByFirstName,
+          conceptIDs.scannedByLastName,
           conceptIDs.orphanBagFlag,
         ];
 
@@ -644,8 +644,8 @@ export const convertToFirestoreBox = (inputBox) => {
       let outputBag = {};
       const bagConceptID = bagConceptIDList[bagConceptIDIndex];
       const keysNeeded = [
-        conceptIDs.shippingFirstName,
-        conceptIDs.shippingLastName,
+        conceptIDs.scannedByFirstName,
+        conceptIDs.scannedByLastName,
       ];
 
       for (let k of keysNeeded) {
