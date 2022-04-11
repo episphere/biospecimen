@@ -3055,7 +3055,7 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
             "FedEx": 712278213,
             "World Courier": 149772928
         }
-        let tempCheckedId = "104430631"
+        let tempCheckedId = 104430631
         if (tempChecked != false) {
           tempCheckedId = tempChecked
         }

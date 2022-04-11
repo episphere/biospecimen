@@ -82,6 +82,11 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 
     // Object Property Value Shorthand
     // Example: bagsArr and bagsArr:bagsArr are equivalent
+    console.log('bagsArr',bagsArr)
+    console.log('sumSamplesArr',sumSamplesArr)
+    console.log('bagSamplesArr',bagSamplesArr)
+    console.log('namesArr',namesArr)
+    console.log('bagIdArr',bagIdArr)
     const dataObj = {
         sumSamplesArr,
         bagSamplesArr,
@@ -93,11 +98,15 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 
 const filterShipped = (boxes) => {
   // boxes are from searchBoxes endpoint
+  console.log("filteredShipped not filtered yet",boxes)
   if(boxes.length === 0) {
     return []
   } 
   let filteredBoxes = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]])
-  let sortShipped = filteredBoxes.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]] - a[fieldToConceptIdMapping["shippingShipDate"]])
+  console.log("filteredShipped filteredBoxes",filteredBoxes)
+  // let sortShipped = filteredBoxes.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]] - a[fieldToConceptIdMapping["shippingShipDate"]])
+  let sortShipped = filteredBoxes.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
+  console.log("filteredShipped filteredBoxes & sorted", sortShipped)
   return sortShipped
 }
 
@@ -110,26 +119,21 @@ const createPackagesInTransitRows = (boxes) => {
 
             // Returns an array of summed and grouped bag samples
             const sumSamplesArr = countSamplesArr(bagsArr);
-
             // Populate Cells with Data
-            allBoxes.forEach((i, index) => {
-                if (i[fieldToConceptIdMapping.siteShipmentReceived] != fieldToConceptIdMapping.yes) {
+            allBoxes.forEach((box, index) => {
+                if (box[fieldToConceptIdMapping.siteShipmentReceived] != fieldToConceptIdMapping.yes) {
                 template += `
                       <tr class="packageInTransitRow">
                       <td style="text-align:center;">${
-                          i[fieldToConceptIdMapping.shippingShipDate]
-                              ? convertTime(i[fieldToConceptIdMapping.shippingShipDate]).split(",")[0] : ""
+                          box[fieldToConceptIdMapping.shippingShipDate]
+                              ? convertTime(box[fieldToConceptIdMapping.shippingShipDate]).split(",")[0] : ""
                       }</td>
                       <td style="text-align:center;">${
-                          i[fieldToConceptIdMapping.shippingTrackingNumber] ? i[ fieldToConceptIdMapping.shippingTrackingNumber] : ""
+                          box[fieldToConceptIdMapping.shippingTrackingNumber] ? box[fieldToConceptIdMapping.shippingTrackingNumber] : ""
                       }</td>
-                      <td style="text-align:center;">${i.siteAcronym ? i.siteAcronym : ""}</td>
-                      <td style="text-align:center;">${
-                          sumSamplesArr[index]
-                      }</td>
-                      <td style="text-align:center;">${
-                        tempProbeFound(i[fieldToConceptIdMapping["tempProbe"]])
-                      }</td>
+                      <td style="text-align:center;">${box.siteAcronym ? box.siteAcronym : ""}</td>
+                      <td style="text-align:center;">${sumSamplesArr[index]}</td>
+                      <td style="text-align:center;">${tempProbeFound(box[fieldToConceptIdMapping["tempProbe"]])}</td>
                       <td>
                         <button class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
                             Manifest
@@ -144,11 +148,13 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
     const buttons = document.getElementsByClassName("manifest-button");
 
     // DESTRUCTURING dataObj and fieldToConceptIdMapping
-
+    console.log('manifestButton allBoxes',allBoxes)
+    console.log('manifestButton dataObj',dataObj)
     const { sumSamplesArr, bagSamplesArr, namesArr, bagIdArr } = dataObj;
 
     const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
 
+    
     Array.from(buttons).forEach((button, index) => {
         let modalData = {
             site: "",
@@ -174,6 +180,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
         button.dataset.buttonIndex = `manifest-button-${index}`;
         button.addEventListener("click", (e) => {
             let parsedModalData = JSON.parse(e.target.getAttribute("data-modal"));
+            // console.log(parsedModalData)
             let {
                 site,
                 date,
@@ -367,10 +374,10 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupSca
 };
 
 const tempProbeFound = (tempProbe) => {
-  if(tempProbe === '104430631') {
+  if(tempProbe == '104430631') {
     return "No"
   }
-  else if(tempProbe === '353358909') {
+  else if(tempProbe == '353358909') {
     return "Yes"
   }
   else return ""
