@@ -621,7 +621,7 @@ export const convertToFirestoreBox = (inputBox) => {
 
     if (bagID === 'unlabelled') {
       outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.yes;
-      for (let tubeID of inputBag.arrElements) {
+      for (let tubeID of [...new set(inputBag.arrElements)]) {
         let outputBag = {};
         const bagConceptID = bagConceptIDList[bagConceptIDIndex];
         const keysNeeded = [
@@ -663,7 +663,7 @@ export const convertToFirestoreBox = (inputBox) => {
 
       outputBag[bagTypeConceptID] = bagID;
       outputBag[conceptIDs.orphanBagFlag] = conceptIDs.no;
-      outputBag[conceptIDs.tubesCollected] = inputBag.arrElements;
+      outputBag[conceptIDs.tubesCollected] = [...new Set(inputBag.arrElements)];
       outputBox[bagConceptID] = outputBag;
       bagConceptIDIndex++;
     }
