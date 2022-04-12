@@ -85,12 +85,6 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 
     // Object Property Value Shorthand
     // Example: bagsArr and bagsArr:bagsArr are equivalent
-    // console.log('bagsArr',bagsArr)
-    // console.log('sumSamplesArr',sumSamplesArr)
-    // console.log('bagSamplesArr',bagSamplesArr)
-    // console.log('scannedByArr',scannedByArr)
-    // console.log('bagIdArr',bagIdArr)
-    console.log(shippedByArr)
     const dataObj = {
         sumSamplesArr,
         bagSamplesArr,
@@ -147,16 +141,11 @@ const createPackagesInTransitRows = (boxes) => {
 
 const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
     const buttons = document.getElementsByClassName("manifest-button");
-
+    
     // DESTRUCTURING dataObj and fieldToConceptIdMapping
-
-    // console.log('manifestButton allBoxes',allBoxes)
-    // console.log('manifestButton dataObj',dataObj)
     const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr } = dataObj;
-
     const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
 
-    
     Array.from(buttons).forEach((button, index) => {
         let modalData = {
             site: "",
@@ -168,8 +157,8 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
             bagSamplesArr,
             bagIdArr,
             groupSamples: "",
-            groupScannedBy:"",
-            groupShippedBy:""
+            groupScannedBy: "",
+            groupShippedBy: ""
         };
 
         modalData.site = allBoxes[index].siteAcronym;
@@ -178,18 +167,17 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
         modalData.boxNumber = allBoxes[index][shippingBoxId];
         modalData.groupSamples = bagSamplesArr[index];
         modalData.groupScannedBy = scannedByArr[index];
-        modalData.groupShippedBy = scannedByArr[index];
+        modalData.groupShippedBy = shippedByArr;
+
         // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
         button.dataset.buttonIndex = `manifest-button-${index}`;
         button.addEventListener("click", (e) => {
             let parsedModalData = JSON.parse(e.target.getAttribute("data-modal"));
-            // console.log(parsedModalData)
             let {
                 site,
                 date,
                 location,
-                scannedByArr,
                 boxNumber,
                 bagIdArr,
                 groupSamples,
@@ -335,13 +323,10 @@ const groupScannedByArr = (bagsArr, fieldToConceptIdMapping) => {
             arrNames.push([]);
         }
     });
-    console.log('test', arrNames)
-    debugger;
     return arrNames;
 };
 
 const groupShippedByArr = (allBoxes) => {
-  console.log('groupShippedByArr',allBoxes)
   const arrShippedBy = []
   // check if each box has first name and last name concept with length
   // check length of last name and sanitize using trim 
@@ -357,12 +342,7 @@ const groupShippedByArr = (allBoxes) => {
     }
     else arrShippedBy.push("")
   })
-  console.log(arrShippedBy)
   return arrShippedBy
-  // check if each box has first name and last name concept with length
-  // check length of last name and sanitize using trim 
-  // push the shippedBy
-
 }
 
 // NESTED GROUP BAGS BY INDEX***
