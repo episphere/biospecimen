@@ -19,8 +19,11 @@ export default {
     shippingTrackingNumber: 959708259,
     shippingBoxId: 132929440,
     shippingLocation: 560975149,
-    shippingFirstName: 469819603,
-    shippingLastName: 618036638,
+    scannedByFirstName: 469819603,
+    scannedByLastName: 618036638,
+    shippedByFirstName: 948887825,
+    shippedByLastName: 885486943,
+
     shippingShipDate: 656548982,
     packageCondition: 421016519,
     coldPacksNone: 694392646,
