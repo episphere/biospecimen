@@ -607,7 +607,7 @@ export const convertToOldBox = (inputBox) => {
     locationConceptIDToLocationMap[locationConceptID]?.siteAcronym ||
     'Not Found';
   return outputBox;
-};;
+};
 
 export const convertToFirestoreBox = (inputBox) => {
   let { bags } = inputBox;
@@ -618,7 +618,7 @@ export const convertToFirestoreBox = (inputBox) => {
 
   for (let [bagID, inputBag] of Object.entries(bags)) {
     if (bagConceptIDIndex >= bagConceptIDList.length) break;
-
+    inputBag.arrElements = Array.from(new Set(inputBag.arrElements))
     if (bagID === 'unlabelled') {
       outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.yes;
       for (let tubeID of inputBag.arrElements) {
