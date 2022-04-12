@@ -937,6 +937,10 @@ export const getUpdatedParticipantData = async (data) => {
     return responseParticipant.data[0];
 }
 
+export const updateCollectionLocationData = async () => {
+    
+}
+
 export const updateBaselineData = async (siteTubesList, data) => {
 
     const response = await getParticipantCollections(data.token);
