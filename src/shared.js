@@ -607,7 +607,7 @@ export const convertToOldBox = (inputBox) => {
     locationConceptIDToLocationMap[locationConceptID]?.siteAcronym ||
     'Not Found';
   return outputBox;
-};;
+};
 
 export const convertToFirestoreBox = (inputBox) => {
   let { bags } = inputBox;
