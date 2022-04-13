@@ -59,14 +59,14 @@ const packageReceiptTemplate = async (name, auth, route) => {
                              <div style="display:inline-block; max-width:90%;"> 
                                 <select required class="col form-control" id="packageCondition" style="width:100%" multiple="multiple" data-selected="[]">
                                     <option id="select-dashboard" value="">-- Select Package Condition --</option>
-                                    <option id="select-noIcePack" value=${fieldMapping.packageGood}>Package in good condition</option>
+                                    <option id="select-packageGoodCondition" value=${fieldMapping.packageGood}>Package in good condition</option>
                                     <option id="select-noIcePack" value=${fieldMapping.coldPacksNone}>No Ice Pack</option>
                                     <option id="select-warmIcePack" value=${fieldMapping.coldPacksWarm}>Warm Ice Pack</option>
                                     <option id="select-incorrectMaterialTypeSent" value=${fieldMapping.vialsIncorrectMaterialType}>Vials - Incorrect Material Type Sent</option>
                                     <option id="select-noLabelonVials" value=${fieldMapping.vialsMissingLabels}>No Label on Vials</option>
                                     <option id="select-returnedEmptyVials" value=${fieldMapping.vialsEmpty}>Returned Empty Vials</option>
                                     <option id="select-participantRefusal" value=${fieldMapping.participantRefusal}>Participant Refusal</option>
-                                    <option id="select-crushed" value=${fieldMapping.other}>Crushed</option>
+                                    <option id="select-crushed" value=${fieldMapping.crushed}>Crushed</option>
                                     <option id="select-damagedContainer" value=${fieldMapping.damagedContainer}>Damaged Container (outer and inner)</option>
                                     <option id="select-materialThawed" value=${fieldMapping.other}>Material Thawed</option>
                                     <option id="select-insufficientIce" value=${fieldMapping.coldPacksInsufficient}>Insufficient Ice</option>
@@ -326,7 +326,7 @@ const storeDateReceivedinISO = (date) => { // ("YYYY-MM-DD" to ISO format DateTi
 const storePackageReceipt = async (data) => {
     showAnimation();
     const idToken = await getIdToken();
-    const response = await await fetch(
+    const response = await fetch(
         `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=storeReceipt`,
         {
             method: "POST",
