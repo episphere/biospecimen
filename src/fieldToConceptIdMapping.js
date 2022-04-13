@@ -76,9 +76,9 @@ export default {
     noRefrigerant: '???',
 
     
-    siteShipmentComments: 869218574,
-    siteShipmentDateReceived: 259439191,
-    siteShipmentReceived: 434049748,
+    siteShipmentComments: 870456401,
+    siteShipmentDateReceived: 926457119,
+    siteShipmentReceived: 333524031,
     tempProbe: 105891443,
     */  
 

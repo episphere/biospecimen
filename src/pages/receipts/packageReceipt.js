@@ -13,13 +13,13 @@ export const packageReceiptScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  packageReceiptTemplate(username, auth, route);
-  defaultDateReceived(getCurrentDate);
-  checkCourierType();
+  packageReceiptTemplate(username, auth, route); // revisit later?
+  addDefaultDateReceived(getCurrentDate);
+  checkAndDisplayCourierType();
   checkCardIncluded();
   disableCollectionCardFields();
   enableCollectionCardFields();
-  formSubmit();
+  formSubmit(); // Current
   targetAnchorTagEl();
   addListenersOnPageLoad();
   dropdownTrigger();
@@ -129,25 +129,24 @@ const packageReceiptTemplate = async (name, auth, route) => {
                     </form>
                    
                 </div>`;
-  template += ` <div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content sub-div-shadow">
-            <div class="modal-header" id="modalHeader"></div>
-            <div class="modal-body" id="modalBody"></div>
-        </div>
-    </div>
-  </div>`
-document.getElementById("contentBody").innerHTML = template;
-    document.getElementById("navbarNavAltMarkup").innerHTML =
-        nonUserNavBar(name);
+    template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                        <div class="modal-content sub-div-shadow">
+                            <div class="modal-header" id="modalHeader"></div>
+                            <div class="modal-body" id="modalBody"></div>
+                        </div>
+                    </div>
+                </div>`
+    document.getElementById("contentBody").innerHTML = template;
+    document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
     activeReceiptsNavbar();
 };
 
-const checkCourierType = () => {
+const checkAndDisplayCourierType = () => {
   const a = document.getElementById("scannedBarcode");
   let input = ""
   if (a) {
-    a.addEventListener("change", (e) => {
+    a.addEventListener("input", (e) => {
       input = e.target.value.trim()
       // None
       if(input.length === 0){
@@ -177,7 +176,8 @@ const checkCourierType = () => {
       }
       // FEDEX
       else if (input.length === 34) {
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
+        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX`
+        e.target.value = input.slice(-12)
         // document.getElementById('collectionCheckBox').checked = false;
         // document.getElementById('collectionCheckBox').disabled = true;
         // checkCardIncluded();
@@ -219,7 +219,7 @@ const triggerErrorModal = () => {
 }
 
 const checkCardIncluded = () => {
-  const a = document.getElementById('collectionCheckBox')
+  const a = document.getElementById('collectionCheckBox') // TODO: make this checkbox bigger
   if (a) {
     a.addEventListener("change", () => {
       a.checked ? disableCollectionCardFields() : enableCollectionCardFields()
@@ -255,7 +255,7 @@ const formSubmit = () => {
         if (option.selected) {packageConditions.push(option.value)}
       }
       obj[`${fieldMapping.packageCondition}`] = packageConditions;
-      if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode) && scannedBarcode.length === 34)) {  
+      if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode))) {  
         obj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
         obj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
         obj[`${fieldMapping.siteShipmentDateReceived}`] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
@@ -273,7 +273,10 @@ const formSubmit = () => {
       }
       window.removeEventListener("beforeunload",beforeUnloadMessage)
       targetAnchorTagEl()
-      const receiptStatus = storePackageReceipt(obj);
+      //[POST] - request
+      // const receiptStatus = storePackageReceipt(obj);
+      console.log(obj)
+      // check what is being passed into 
       if (receiptStatus) {
         document.getElementById("courierType").innerHTML = ``;
         document.getElementById("scannedBarcode").value = "";
@@ -307,7 +310,7 @@ const formSubmit = () => {
     } } else {
       triggerErrorModal()
     }
-})
+  })
 }
 
 const identifyCourierType = (scannedBarcode) => {
@@ -639,7 +642,7 @@ const parseDataSelected = (value) => {
   return false
 }
 
-const defaultDateReceived = (getCurrentDate) => {
+const addDefaultDateReceived = (getCurrentDate) => {
   const dateReceivedEl = document.getElementById("dateReceived")
   if(getCurrentDate()){
     dateReceivedEl.value = getCurrentDate()
@@ -648,10 +651,7 @@ const defaultDateReceived = (getCurrentDate) => {
 }
 
 // returns current date in english canada format ("YYYY-MM-DD")
-const getCurrentDate = () => {
-  const currentDate = new Date().toLocaleDateString('en-CA');
-  return currentDate
-}
+const getCurrentDate = () => new Date().toLocaleDateString('en-CA');
 
 const uspsFirstThreeNumbersCheck = (input) => {
   const regExp = /^420[0-9]{31}$/
