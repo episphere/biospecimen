@@ -937,55 +937,59 @@ export const getUpdatedParticipantData = async (data) => {
     return responseParticipant.data[0];
 }
 
-export const updateCollectionSettingData = async (visit, setting, tubes, data) => {
+export const updateCollectionSettingData = async (biospecimenData, tubes, data) => {
     
-    const response = await getParticipantCollections(data.token);
-    const visitCollections = response.data.filter(collection => collection['331584571'] === visit);
+    let settings;
 
-    const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
-    const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
-    const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
+    const bloodTubes = tubes.filter(tube => tube.tubeType === "Blood tube");
+    const urineTubes = tubes.filter(tube => tube.tubeType === "Urine");
+    const mouthwashTubes = tubes.filter(tube => tube.tubeType === "Mouthwash");
 
-    /*
 
-    let settings = data['331584571'];
+    if(data['COLLECTION_TOPIC']) {
+        settings = data['COLLECTION_TOPIC'];
 
-    visitCollections.forEach(collection => {
-
-        if(!settings[visit][BLOOD CID]) {
-            bloodTubes.forEach(tube => {
-                if(collection[tube.concept]['593843561'] === 353358909) {
-                    settings[visit][BLOOD CID] = collection['650516960'];
-                }
-            });
+        if(!settings[visit]) {
+            settings[visit] = {};
         }
+    }
+    else {
+        settings = {
+            [visit]: {}
+        }
+    }
+
+    if(!settings[visit]['BLOOD_SETTING']) {
+        bloodTubes.forEach(tube => {
+            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
+                settings[visit]['BLOOD_SETTING'] = biospecimenData['650516960'];
+            }
+        });
+    }
         
-        if(!settings[visit][URINE CID]) {
-            urineTubes.forEach(tube => {
-                if(collection[tube.concept]['593843561'] === 353358909) {
-                    settings[visit][URINE CID] = collection['650516960'];
-                }
-            });
-        }
+    if(!settings[visit]['URINE_SETTING']) {
+        urineTubes.forEach(tube => {
+            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
+                settings[visit]['URINE_SETTING'] = biospecimenData['650516960'];
+            }
+        });
+    }
 
-        if(!settings[visit][MW CID]) {
-            mouthwashTubes.forEach(tube => {
-                if(collection[tube.concept]['593843561'] === 353358909) {
-                    settings[visit][MW CID] = collection['650516960'];
-                }
-            });
-        }
-
+    if(!settings[visit]['MOUTHWASH_SETTING']) {
+        mouthwashTubes.forEach(tube => {
+            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
+                settings[visit]['MOUTHWASH_SETTING'] = biospecimenData['650516960'];
+            }
+        });
     }
 
     const settingData = {
-        'collectionSettings': settings,
+        'COLLECTION_TOPIC': settings,
         uid: data.state.uid
     };
         
     await updateParticipant(settingData);
 
-    */
 }
 
 export const updateBaselineData = async (siteTubesList, data) => {
