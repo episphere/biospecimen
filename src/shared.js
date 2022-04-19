@@ -940,6 +940,7 @@ export const getUpdatedParticipantData = async (data) => {
 export const updateCollectionSettingData = async (biospecimenData, tubes, data) => {
     
     let settings;
+    let visit = biospecimenData['331584571'];
 
     const bloodTubes = tubes.filter(tube => tube.tubeType === "Blood tube");
     const urineTubes = tubes.filter(tube => tube.tubeType === "Urine");
