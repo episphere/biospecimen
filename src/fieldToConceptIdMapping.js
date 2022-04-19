@@ -25,36 +25,7 @@ export default {
     shippedByLastName: 885486943,
 
     shippingShipDate: 656548982,
-    packageCondition: 421016519,
-    coldPacksNone: 694392646,
-    coldPacksInsufficient: 665883282,
-    coldPacksWarm: 669336526,
-    damagedContainer: 659684779,
-    damagedVials: 958386677,
-    improperPackaging: 967674331,
-    manifestNotProvided: 352744555,
-    manifestDoNotMatch: 229360386,
-    noPreNotification: 188332319,
-    participantRefusal: 470977257,
-    shipmentDelay: 200647000,
-    vialsEmpty: 790986868,
-    vialsIncorrectMaterialType: 564936650,
-    vialsMissingLabels: 242271549,
-    other: 121720893,
-    packageGood: 123456789,
-    crushed: 121149986,
-    siteShipmentComments: 869218574,
-    siteShipmentDateReceived: 259439191,
-    siteShipmentReceived: 434049748,
-    tempProbe: 105891443,
-    yes: 353358909,
-    no: 104430631,
-
-    // CURRENT BPTL Concepts  - update replace with Old
-
-    /*    
-    shippingShipDate: 656548982,
-    packageCondition: 421016519,
+    packageCondition: 238268405,
     coldPacksNone: 405513630,
     coldPacksInsufficient: 909529446,
     coldPacksWarm: 595987358,
@@ -72,16 +43,15 @@ export default {
     other: 933646000,
     packageGood: 679749262,
     crushed: 121149986,
-    materialThawed: '???', 
-    noRefrigerant: '???',
-
-    
+    materialThawed: 289322354, 
+    noRefrigerant: 613022284,
     siteShipmentComments: 870456401,
     siteShipmentDateReceived: 926457119,
     siteShipmentReceived: 333524031,
     tempProbe: 105891443,
-    */  
-
+    yes: 353358909,
+    no: 104430631,
+    
     // collection id
     collectionId: 825582494,
     dateReceived: 259439191,

@@ -284,7 +284,6 @@ const groupSamplesArr = (bagsArr) => {
 const groupScannedByArr = (bagsArr, fieldToConceptIdMapping) => {
     const arrNames = [];
     const { scannedByFirstName, scannedByLastName } = fieldToConceptIdMapping;
-    console.log(scannedByFirstName,scannedByLastName)
     bagsArr.forEach((bag) => {
         //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
         if (Object.keys(bag).length) {
@@ -331,7 +330,6 @@ const groupShippedByArr = (allBoxes) => {
   // check if each box has first name and last name concept with length
   // check length of last name and sanitize using trim 
   allBoxes.forEach(box => {
-    console.log(box)
     let shippedByFirstName = box[fieldToConceptIdMapping.shippedByFirstName].trim()
     let shippedByLastName = box[fieldToConceptIdMapping.shippedByLastName]?.trim() ?? ''
     if(shippedByFirstName.length > 0 && shippedByLastName > 0) {

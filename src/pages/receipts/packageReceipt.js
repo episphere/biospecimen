@@ -13,13 +13,13 @@ export const packageReceiptScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  packageReceiptTemplate(username, auth, route); // revisit later?
+  packageReceiptTemplate(username, auth, route);
   addDefaultDateReceived(getCurrentDate);
   checkAndDisplayCourierType();
   checkCardIncluded();
   disableCollectionCardFields();
   enableCollectionCardFields();
-  formSubmit(); // Current
+  formSubmit(); 
   targetAnchorTagEl();
   addListenersOnPageLoad();
   dropdownTrigger();
@@ -68,13 +68,13 @@ const packageReceiptTemplate = async (name, auth, route) => {
                                     <option id="select-participantRefusal" value=${fieldMapping.participantRefusal}>Participant Refusal</option>
                                     <option id="select-crushed" value=${fieldMapping.crushed}>Crushed</option>
                                     <option id="select-damagedContainer" value=${fieldMapping.damagedContainer}>Damaged Container (outer and inner)</option>
-                                    <option id="select-materialThawed" value=${fieldMapping.other}>Material Thawed</option>
+                                    <option id="select-materialThawed" value=${fieldMapping.materialThawed}>Material Thawed</option>
                                     <option id="select-insufficientIce" value=${fieldMapping.coldPacksInsufficient}>Insufficient Ice</option>
                                     <option id="select-improperPackaging" value=${fieldMapping.improperPackaging}>Improper Packaging</option>
                                     <option id="select-damagedVials" value=${fieldMapping.damagedVials}>Damaged Vials</option>
                                     <option id="select-other" value=${fieldMapping.other}>Other</option>
                                     <option id="select-noPreNotification" value=${fieldMapping.noPreNotification}>No Pre-notification</option>
-                                    <option id="select-noRefrigerant" value=${fieldMapping.other}>No Refrigerant</option>
+                                    <option id="select-noRefrigerant" value=${fieldMapping.noRefrigerant}>No Refrigerant</option>
                                     <option id="select-infoDoNotMatch" value=${fieldMapping.manifestDoNotMatch}>Manifest/Vial/Paperwork info do not match</option>
                                     <option id="select-shipmentDelay" value=${fieldMapping.shipmentDelay}>Shipment Delay</option>
                                     <option id="select-noManifestProvided" value=${fieldMapping.manifestNotProvided}>No Manifest provided</option>
@@ -273,11 +273,10 @@ const formSubmit = () => {
       }
       window.removeEventListener("beforeunload",beforeUnloadMessage)
       targetAnchorTagEl()
-      //[POST] - request
-      // const receiptStatus = storePackageReceipt(obj);
-      console.log(obj)
-      // check what is being passed into 
+      const receiptStatus = storePackageReceipt(obj);
+    
       if (receiptStatus) {
+        const clearButtonEl = document.getElementById("clearForm");
         document.getElementById("courierType").innerHTML = ``;
         document.getElementById("scannedBarcode").value = "";
         document.getElementById("packageCondition").value = "";
@@ -291,6 +290,7 @@ const formSubmit = () => {
         document.getElementById("packageCondition").setAttribute("data-selected","[]")
         targetAnchorTagEl()
         clearButtonEl !== undefined ? clearButtonEl.removeEventListener("click",cancelConfirm) : ``
+        
         window.removeEventListener("beforeunload",beforeUnloadMessage)
       
       if (document.getElementById("collectionId").value) {
