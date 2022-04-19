@@ -65,7 +65,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                         template += `
                             <tr>
                                 <td>
-                                    ${obj.specimenType}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}
+                                    ${obj.specimenType} ${obj.id ? '(' + obj.id + ')' : ''}</br>${obj.image ? `<img src="${obj.image}" alt="${obj.readableValue} image">` : ``}
                                 </td>
 
                                 <td class="align-left">${obj.collectionChkBox === true ? `
