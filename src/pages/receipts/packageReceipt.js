@@ -219,7 +219,7 @@ const triggerErrorModal = () => {
 }
 
 const checkCardIncluded = () => {
-  const a = document.getElementById('collectionCheckBox') // TODO: make this checkbox bigger
+  const a = document.getElementById('collectionCheckBox')
   if (a) {
     a.addEventListener("change", () => {
       a.checked ? disableCollectionCardFields() : enableCollectionCardFields()
