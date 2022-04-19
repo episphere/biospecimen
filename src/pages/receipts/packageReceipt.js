@@ -14,12 +14,12 @@ export const packageReceiptScreen = async (auth, route) => {
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
   packageReceiptTemplate(username, auth, route);
-  defaultDateReceived(getCurrentDate);
-  checkCourierType();
+  addDefaultDateReceived(getCurrentDate);
+  checkAndDisplayCourierType();
   checkCardIncluded();
   disableCollectionCardFields();
   enableCollectionCardFields();
-  formSubmit();
+  formSubmit(); 
   targetAnchorTagEl();
   addListenersOnPageLoad();
   dropdownTrigger();
@@ -59,22 +59,22 @@ const packageReceiptTemplate = async (name, auth, route) => {
                              <div style="display:inline-block; max-width:90%;"> 
                                 <select required class="col form-control" id="packageCondition" style="width:100%" multiple="multiple" data-selected="[]">
                                     <option id="select-dashboard" value="">-- Select Package Condition --</option>
-                                    <option id="select-noIcePack" value=${fieldMapping.packageGood}>Package in good condition</option>
+                                    <option id="select-packageGoodCondition" value=${fieldMapping.packageGood}>Package in good condition</option>
                                     <option id="select-noIcePack" value=${fieldMapping.coldPacksNone}>No Ice Pack</option>
                                     <option id="select-warmIcePack" value=${fieldMapping.coldPacksWarm}>Warm Ice Pack</option>
                                     <option id="select-incorrectMaterialTypeSent" value=${fieldMapping.vialsIncorrectMaterialType}>Vials - Incorrect Material Type Sent</option>
                                     <option id="select-noLabelonVials" value=${fieldMapping.vialsMissingLabels}>No Label on Vials</option>
                                     <option id="select-returnedEmptyVials" value=${fieldMapping.vialsEmpty}>Returned Empty Vials</option>
                                     <option id="select-participantRefusal" value=${fieldMapping.participantRefusal}>Participant Refusal</option>
-                                    <option id="select-crushed" value=${fieldMapping.other}>Crushed</option>
+                                    <option id="select-crushed" value=${fieldMapping.crushed}>Crushed</option>
                                     <option id="select-damagedContainer" value=${fieldMapping.damagedContainer}>Damaged Container (outer and inner)</option>
-                                    <option id="select-materialThawed" value=${fieldMapping.other}>Material Thawed</option>
+                                    <option id="select-materialThawed" value=${fieldMapping.materialThawed}>Material Thawed</option>
                                     <option id="select-insufficientIce" value=${fieldMapping.coldPacksInsufficient}>Insufficient Ice</option>
                                     <option id="select-improperPackaging" value=${fieldMapping.improperPackaging}>Improper Packaging</option>
                                     <option id="select-damagedVials" value=${fieldMapping.damagedVials}>Damaged Vials</option>
                                     <option id="select-other" value=${fieldMapping.other}>Other</option>
                                     <option id="select-noPreNotification" value=${fieldMapping.noPreNotification}>No Pre-notification</option>
-                                    <option id="select-noRefrigerant" value=${fieldMapping.other}>No Refrigerant</option>
+                                    <option id="select-noRefrigerant" value=${fieldMapping.noRefrigerant}>No Refrigerant</option>
                                     <option id="select-infoDoNotMatch" value=${fieldMapping.manifestDoNotMatch}>Manifest/Vial/Paperwork info do not match</option>
                                     <option id="select-shipmentDelay" value=${fieldMapping.shipmentDelay}>Shipment Delay</option>
                                     <option id="select-noManifestProvided" value=${fieldMapping.manifestNotProvided}>No Manifest provided</option>
@@ -129,25 +129,24 @@ const packageReceiptTemplate = async (name, auth, route) => {
                     </form>
                    
                 </div>`;
-  template += ` <div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content sub-div-shadow">
-            <div class="modal-header" id="modalHeader"></div>
-            <div class="modal-body" id="modalBody"></div>
-        </div>
-    </div>
-  </div>`
-document.getElementById("contentBody").innerHTML = template;
-    document.getElementById("navbarNavAltMarkup").innerHTML =
-        nonUserNavBar(name);
+    template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                        <div class="modal-content sub-div-shadow">
+                            <div class="modal-header" id="modalHeader"></div>
+                            <div class="modal-body" id="modalBody"></div>
+                        </div>
+                    </div>
+                </div>`
+    document.getElementById("contentBody").innerHTML = template;
+    document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
     activeReceiptsNavbar();
 };
 
-const checkCourierType = () => {
+const checkAndDisplayCourierType = () => {
   const a = document.getElementById("scannedBarcode");
   let input = ""
   if (a) {
-    a.addEventListener("change", (e) => {
+    a.addEventListener("input", (e) => {
       input = e.target.value.trim()
       // None
       if(input.length === 0){
@@ -177,7 +176,8 @@ const checkCourierType = () => {
       }
       // FEDEX
       else if (input.length === 34) {
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
+        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX`
+        e.target.value = input.slice(-12)
         // document.getElementById('collectionCheckBox').checked = false;
         // document.getElementById('collectionCheckBox').disabled = true;
         // checkCardIncluded();
@@ -255,7 +255,7 @@ const formSubmit = () => {
         if (option.selected) {packageConditions.push(option.value)}
       }
       obj[`${fieldMapping.packageCondition}`] = packageConditions;
-      if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode) && scannedBarcode.length === 34)) {  
+      if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode))) {  
         obj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
         obj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
         obj[`${fieldMapping.siteShipmentDateReceived}`] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
@@ -274,7 +274,9 @@ const formSubmit = () => {
       window.removeEventListener("beforeunload",beforeUnloadMessage)
       targetAnchorTagEl()
       const receiptStatus = storePackageReceipt(obj);
+    
       if (receiptStatus) {
+        const clearButtonEl = document.getElementById("clearForm");
         document.getElementById("courierType").innerHTML = ``;
         document.getElementById("scannedBarcode").value = "";
         document.getElementById("packageCondition").value = "";
@@ -288,6 +290,7 @@ const formSubmit = () => {
         document.getElementById("packageCondition").setAttribute("data-selected","[]")
         targetAnchorTagEl()
         clearButtonEl !== undefined ? clearButtonEl.removeEventListener("click",cancelConfirm) : ``
+        
         window.removeEventListener("beforeunload",beforeUnloadMessage)
       
       if (document.getElementById("collectionId").value) {
@@ -307,7 +310,7 @@ const formSubmit = () => {
     } } else {
       triggerErrorModal()
     }
-})
+  })
 }
 
 const identifyCourierType = (scannedBarcode) => {
@@ -326,7 +329,7 @@ const storeDateReceivedinISO = (date) => { // ("YYYY-MM-DD" to ISO format DateTi
 const storePackageReceipt = async (data) => {
     showAnimation();
     const idToken = await getIdToken();
-    const response = await await fetch(
+    const response = await fetch(
         `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=storeReceipt`,
         {
             method: "POST",
@@ -639,7 +642,7 @@ const parseDataSelected = (value) => {
   return false
 }
 
-const defaultDateReceived = (getCurrentDate) => {
+const addDefaultDateReceived = (getCurrentDate) => {
   const dateReceivedEl = document.getElementById("dateReceived")
   if(getCurrentDate()){
     dateReceivedEl.value = getCurrentDate()
@@ -648,10 +651,7 @@ const defaultDateReceived = (getCurrentDate) => {
 }
 
 // returns current date in english canada format ("YYYY-MM-DD")
-const getCurrentDate = () => {
-  const currentDate = new Date().toLocaleDateString('en-CA');
-  return currentDate
-}
+const getCurrentDate = () => new Date().toLocaleDateString('en-CA');
 
 const uspsFirstThreeNumbersCheck = (input) => {
   const regExp = /^420[0-9]{31}$/
