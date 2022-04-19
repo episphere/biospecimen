@@ -1861,7 +1861,9 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-
+        const btnCheckIn = document.getElementById('checkInComplete');
+        btnCheckIn.disabled = true;
+        
         let query = `connectId=${parseInt(form.dataset.connectId)}`;
         
         const response = await findParticipant(query);
