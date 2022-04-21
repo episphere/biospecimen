@@ -10,12 +10,12 @@ export const finalizeTemplate = (data, specimenData) => {
 
     template += `
         <div class="row">
-            <h5>Finalize Collection Data Entry</h5>
+            <h5>Review Collection Data Entry</h5>
         </div>
         </br>
         <div class="row">
             <div class="col">
-                <div class="row">${data['996038075']}, ${data['399159511']}</div>
+                <div class="row"><h5>${data['996038075']}, ${data['399159511']}</h5></div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${specimenData['820476880']}</div>
                 <div class="row">Collection ID Link Date/Time: ${new Date(specimenData['678166505']).toLocaleString()}</div>
@@ -98,4 +98,5 @@ export const finalizeTemplate = (data, specimenData) => {
     addEventFinalizeForm(specimenData);
     addEventFinalizeFormCntd(specimenData);
     addEventReturnToCollectProcess();
+    document.querySelector('body').scrollIntoView(true);
 }
