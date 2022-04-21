@@ -968,7 +968,6 @@ export const populateModalSelect = (hiddenJSON) => {
     let currBoxId = currSelectBox.value;
     let boxList = document.getElementById('shippingModalChooseBox');
     let addToBoxButton =  document.getElementById('addToBagButton');
-    console.log(currBoxId)
     // reset box list options
     boxList.innerHTML = ''
     addToBoxButton.removeAttribute("disabled")
