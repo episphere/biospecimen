@@ -1018,7 +1018,7 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                         <th style="border-bottom:1px solid;">Box Number</th>
                         <th style="border-bottom:1px solid;">Location</th>
                         <th style="border-bottom:1px solid;">Contents</th>
-                        <th style="border-bottom:1px solid;">View/Print Box Manifest</th>
+                        <th style="border-bottom:1px solid;text-align:center;"><p style="margin-bottom:0">View/Print Box Manifest</p><p style="margin-bottom:0">(to be included in shipment)</p></th>
                     </tr>`
     let count = 0;
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
@@ -1082,7 +1082,7 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                 numTubes += currBox[boxKeys[j]]['arrElements'].length;
             }
             currRow.insertCell(5).innerHTML = numTubes.toString() + " tubes";
-            currRow.insertCell(6).innerHTML = '<input type="button" class="boxManifestButton" value = "Box Manifest"/>';
+            currRow.insertCell(6).innerHTML = '<input type="button" style="display:block;margin:0 auto;" class="boxManifestButton" value = "Box Manifest"/>';
 
             //boxes[i]
 
