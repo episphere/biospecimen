@@ -937,6 +937,65 @@ export const getUpdatedParticipantData = async (data) => {
     return responseParticipant.data[0];
 }
 
+export const updateCollectionSettingData = async (biospecimenData, tubes, data) => {
+    
+    let settings;
+    let visit = biospecimenData['331584571'];
+
+    const bloodTubes = tubes.filter(tube => tube.tubeType === "Blood tube");
+    const urineTubes = tubes.filter(tube => tube.tubeType === "Urine");
+    const mouthwashTubes = tubes.filter(tube => tube.tubeType === "Mouthwash");
+
+
+    if(data['173836415']) {
+        settings = data['173836415'];
+
+        if(!settings[visit]) {
+            settings[visit] = {};
+        }
+    }
+    else {
+        settings = {
+            [visit]: {}
+        }
+    }
+
+    if(!settings[visit]['592099155']) {
+        bloodTubes.forEach(tube => {
+            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
+                settings[visit]['592099155'] = biospecimenData['650516960'];
+                settings[visit]['561681068'] = biospecimenData['678166505'];
+            }
+        });
+    }
+        
+    if(!settings[visit]['718172863']) {
+        urineTubes.forEach(tube => {
+            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
+                settings[visit]['718172863'] = biospecimenData['650516960'];
+                settings[visit]['847159717'] = biospecimenData['678166505'];
+            }
+        });
+    }
+
+    if(!settings[visit]['915179629']) {
+        mouthwashTubes.forEach(tube => {
+            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
+                settings[visit]['915179629'] = biospecimenData['650516960'];
+                settings[visit]['448660695'] = biospecimenData['678166505'];
+            }
+        });
+    }
+
+    const settingData = {
+        '173836415': settings,
+        uid: data.state.uid
+    };
+        
+    await updateParticipant(settingData);
+
+}
+
 export const updateBaselineData = async (siteTubesList, data) => {
 
     const response = await getParticipantCollections(data.token);
@@ -950,17 +1009,12 @@ export const updateBaselineData = async (siteTubesList, data) => {
     let urineCollected = (data['167958071'] === 353358909);
     let mouthwashCollected = (data['684635302'] === 353358909);
 
-    let bloodTime = data['561681068'] ? data['561681068'] : '';
-    let urineTime = data['847159717'] ? data['847159717'] : '';
-    let mouthwashTime = data['448660695'] ? data['448660695'] : '';
-
     baselineCollections.forEach(collection => {
 
         if(!bloodCollected) {
             bloodTubes.forEach(tube => {
                 if(collection[tube.concept]['593843561'] === 353358909) {
                     bloodCollected = true;
-                    bloodTime = collection['678166505'];
                 }
             });
         }
@@ -969,7 +1023,6 @@ export const updateBaselineData = async (siteTubesList, data) => {
             urineTubes.forEach(tube => {
                 if(collection[tube.concept]['593843561'] === 353358909) {
                     urineCollected = true;
-                    urineTime = collection['678166505'];
                 }
             });
         }
@@ -977,7 +1030,6 @@ export const updateBaselineData = async (siteTubesList, data) => {
             mouthwashTubes.forEach(tube => {
                 if(collection[tube.concept]['593843561'] === 353358909) {
                     mouthwashCollected = true;
-                    mouthwashTime = collection['678166505'];
                 }
             });
         }
@@ -985,11 +1037,8 @@ export const updateBaselineData = async (siteTubesList, data) => {
 
     const baselineData = {
         '878865966': bloodCollected ? 353358909 : 104430631,
-        '561681068': bloodTime ? bloodTime : '',
         '167958071': urineCollected ? 353358909 : 104430631, 
-        '847159717': urineTime ? urineTime : '',
         '684635302': mouthwashCollected ? 353358909 : 104430631,
-        '448660695': mouthwashTime ? mouthwashTime : '',
         uid: data.state.uid
     };
         
