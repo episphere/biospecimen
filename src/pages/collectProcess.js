@@ -11,7 +11,7 @@ export const tubeCollectedTemplate = (data, formData) => {
         </br>
         <div class="row">
             <div class="col">
-                <div class="row">${data['996038075']}, ${data['399159511']}</div>
+                <div class="row"><h5>${data['996038075']}, ${data['399159511']}</h5></div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${formData['820476880']}</div>
                 <div class="row">Collection ID Link Date/Time: ${new Date(formData['678166505']).toLocaleString()}</div>
