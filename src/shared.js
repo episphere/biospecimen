@@ -947,8 +947,8 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
     const mouthwashTubes = tubes.filter(tube => tube.tubeType === "Mouthwash");
 
 
-    if(data['COLLECTION_TOPIC']) {
-        settings = data['COLLECTION_TOPIC'];
+    if(data['173836415']) {
+        settings = data['173836415'];
 
         if(!settings[visit]) {
             settings[visit] = {};
@@ -960,35 +960,35 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
         }
     }
 
-    if(!settings[visit]['BLOOD_SETTING']) {
+    if(!settings[visit]['592099155']) {
         bloodTubes.forEach(tube => {
             if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-                settings[visit]['BLOOD_SETTING'] = biospecimenData['650516960'];
+                settings[visit]['592099155'] = biospecimenData['650516960'];
                 settings[visit]['561681068'] = biospecimenData['678166505'];
             }
         });
     }
         
-    if(!settings[visit]['URINE_SETTING']) {
+    if(!settings[visit]['718172863']) {
         urineTubes.forEach(tube => {
             if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-                settings[visit]['URINE_SETTING'] = biospecimenData['650516960'];
+                settings[visit]['718172863'] = biospecimenData['650516960'];
                 settings[visit]['847159717'] = biospecimenData['678166505'];
             }
         });
     }
 
-    if(!settings[visit]['MOUTHWASH_SETTING']) {
+    if(!settings[visit]['915179629']) {
         mouthwashTubes.forEach(tube => {
             if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-                settings[visit]['MOUTHWASH_SETTING'] = biospecimenData['650516960'];
+                settings[visit]['915179629'] = biospecimenData['650516960'];
                 settings[visit]['448660695'] = biospecimenData['678166505'];
             }
         });
     }
 
     const settingData = {
-        'COLLECTION_TOPIC': settings,
+        '173836415': settings,
         uid: data.state.uid
     };
         
