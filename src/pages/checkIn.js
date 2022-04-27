@@ -103,7 +103,7 @@ const participantStatus = (data) => {
             <div class="col-md-4">
                 <div class="col-md-12 info-box">
                     <div class="row">
-                        <span class="full-width">Participation Status</span>
+                        <span class="full-width">Participation Status 1</span>
                     </div>
                     <div class="row">
                         <span class="full-width">${data['912301837'] === 208325815 ? `<i class="fas fa-2x fa-check"></i>` : `<i class="fas fa-2x fa-times"></i>`}</span>
