@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -957,7 +957,7 @@ export const populateBoxManifestHeader = (boxId, hiddenJSON, currInstitute) => {
     newP.innerHTML = "Number of Sleeves/Bags: " + numBags;
     document.getElementById('boxManifestCol3').appendChild(newP);
     newP = document.createElement("p");
-    newP.innerHTML = "Number of Tubes:  " + numTubes;
+    newP.innerHTML = "Number of Specimens:  " + numTubes;
     document.getElementById('boxManifestCol3').appendChild(newP);
 
 
@@ -1018,7 +1018,7 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                         <th style="border-bottom:1px solid;">Box Number</th>
                         <th style="border-bottom:1px solid;">Location</th>
                         <th style="border-bottom:1px solid;">Contents</th>
-                        <th style="border-bottom:1px solid;">View/Print Box Manifest</th>
+                        <th style="border-bottom:1px solid;text-align:center;"><p style="margin-bottom:0">View/Print Box Manifest</p><p style="margin-bottom:0">(to be included in shipment)</p></th>
                     </tr>`
     let count = 0;
     let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
@@ -1082,7 +1082,7 @@ export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
                 numTubes += currBox[boxKeys[j]]['arrElements'].length;
             }
             currRow.insertCell(5).innerHTML = numTubes.toString() + " tubes";
-            currRow.insertCell(6).innerHTML = '<input type="button" class="boxManifestButton" value = "Box Manifest"/>';
+            currRow.insertCell(6).innerHTML = '<input type="button" style="display:block;margin:0 auto;" class="boxManifestButton" value = "Box Manifest"/>';
 
             //boxes[i]
 
@@ -1861,7 +1861,9 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-
+        const btnCheckIn = document.getElementById('checkInComplete');
+        btnCheckIn.disabled = true;
+        
         let query = `connectId=${parseInt(form.dataset.connectId)}`;
         
         const response = await findParticipant(query);
@@ -2430,6 +2432,9 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
 
     const baselineVisit = (biospecimenData['331584571'] === 266600170);
     const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
+
+    await updateCollectionSettingData(biospecimenData, siteTubesList, formData);
+    formData = await getUpdatedParticipantData(formData);
 
     if(baselineVisit && clinicalResearchSetting) {
         await updateBaselineData(siteTubesList, formData);
@@ -3055,7 +3060,7 @@ export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked
             "FedEx": 712278213,
             "World Courier": 149772928
         }
-        let tempCheckedId = "104430631"
+        let tempCheckedId = 104430631
         if (tempChecked != false) {
           tempCheckedId = tempChecked
         }
