@@ -54,11 +54,13 @@ export default {
     
     // collection id
     collectionId: 825582494,
-    dateReceived: 259439191,
+    dateReceived: 926457119,
     dateWithdrawn: 678166505,
     collectionType: 650516960,
     research: 534621077,
     clinical: 664882224,
+    loginSite: 789843387,
+    healthcareProvider: 827220437,
     
     // not shipped specimen deviation id
     brokenSpecimenDeviation: 472864016,
@@ -102,6 +104,7 @@ export default {
     dcam: 777644826,
     nci_mainCampus: 111111111,
     nci_frederick: 222222222,
-    siteCode:789843387,
+    siteCode:789843387
+    
 };
 

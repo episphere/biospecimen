@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getAllBoxes, getIdToken } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToNameObj } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -51,8 +51,6 @@ const csvFileButtonSubmit = () => {
     document.getElementById("csvDateInput").value = ``;
     let modifiedResults = modifyBSIQueryResults(results.data);
     generateBSIqueryCSVData(modifiedResults);
-    
-
   })
 }
 
@@ -84,154 +82,154 @@ const getBSIQueryData = async (filter) => {
 
 
 const modifyBSIQueryResults = (results) => {
-  results.forEach( i => {
-    let vialMappings = getVialTypesMappings(i)
-    updateResultMappings(i, vialMappings)
+  let filteredResults = results.filter(result => result[fieldToConceptIdMapping.collectionId] !== undefined)
+  filteredResults.forEach( i => {
+      let vialMappings = getVialTypesMappings(i)
+      updateResultMappings(i, vialMappings)
   })
-  return results
+  return filteredResults
 }
 
 const getVialTypesMappings = (i) => {
   let vialMappingsHolder = []
-  if (i[fieldToConceptIdMapping.collectionId] !== undefined) {
-    if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research  && i['siteAcronym'] === '' && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' )) {
+  
+    if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research  && i[fieldToConceptIdMapping.healthcareProvider] === '' && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' )) {
       vialMappingsHolder.push('10 mL Serum separator tube', 'SST', 'Serum', '10')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i['siteAcronym'] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003') {
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.healthcareProvider] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003') {
       vialMappingsHolder.push('10 ml Vacutainer', 'Lithium Heparin', 'Whole Bl', '10')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i['siteAcronym'] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004') {
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.healthcareProvider] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004') {
       vialMappingsHolder.push('10 ml Vacutainer', 'EDTA', 'Whole Bl', '10')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i['siteAcronym'] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005') {
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.healthcareProvider] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005') {
       vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole Bl', '6')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i['siteAcronym'] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0006') {
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.healthcareProvider] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0006') {
       vialMappingsHolder.push('10 ml Vacutainer', 'No Additive', 'Urine', '10')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i['siteAcronym'] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0007') {
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.healthcareProvider] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0007') {
       vialMappingsHolder.push('15ml Nalgene jar', 'Crest Alcohol Free', 'Saliva', '15')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Colorado'
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpCO"]
         && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0011'
         || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0012' )) {
       vialMappingsHolder.push('5 mL Serum separator tube', 'SST', 'Serum', '5')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Colorado'
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpCO"]
     && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0013' )) {
       vialMappingsHolder.push('4 ml Vacutainer', 'Lithium Heparin', 'Whole Bl', '4')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Colorado'
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpCO"]
     && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014' )) {
       vialMappingsHolder.push('4 ml Vacutainer', 'EDTA', 'Whole Bl', '4')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Colorado'
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpCO"]
     && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005')) {
       vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole Bl', '6')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Colorado'
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpCO"]
     && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001')) {
       vialMappingsHolder.push('6 ml Vacutainer', 'No Additive', 'Urine', '6')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Northwest' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpNW"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' 
     || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0011' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0012' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0021' )) {
       vialMappingsHolder.push('3.5 mL Serum separator tube', 'SST', 'Serum', '3.5')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Northwest' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpNW"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0013' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003')) {
       vialMappingsHolder.push('4 mL Serum separator tube', 'Lithium Heparin', 'Whole BI', '4')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Northwest' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpNW"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004')) {
       vialMappingsHolder.push('4 mL Serum separator tube', 'EDTA', 'Whole BI', '4')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Northwest' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpNW"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005')) {
       vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole BI', '6')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Northwest' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpNW"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0006')) {
       vialMappingsHolder.push('10 ml Vacutainer', 'No Additive', 'Urine', '10')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Hawaii' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpHI"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' 
     || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0011' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0012')) {
       vialMappingsHolder.push('5 ml Serum separator tube', 'SST', 'Serum', '5')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Hawaii' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpHI"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0013')) {
       vialMappingsHolder.push('4 mL Vacutainer', 'Lithium Heparin', 'Whole BI', '4')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Hawaii' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpHI"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014' 
     || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0024')) {
       vialMappingsHolder.push('3 mL Vacutainer', 'EDTA', 'Whole BI', '3')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Hawaii' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpHI"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014' 
     || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0024')) {
       vialMappingsHolder.push('3 mL Vacutainer', 'EDTA', 'Whole BI', '3')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Hawaii' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpHI"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005')) {
       vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole BI', '6')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Hawaii' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpHI"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0006')) {
       vialMappingsHolder.push('15 ml Nalgene jar', 'No Additive', 'Urine', '10')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Georgia' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpGA"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' 
     || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0011' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0012' )) {
       vialMappingsHolder.push('5 ml Serum separator tube', 'SST', 'Serum', '5')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Georgia' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpGA"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0013')) {
       vialMappingsHolder.push('4.5 mL Vacutainer', 'Lithium Heparin', 'Whole BI', '4.5')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Georgia' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpGA"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014')) {
       vialMappingsHolder.push('4 mL Vacutainer', 'EDTA', 'Whole BI', '4')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Georgia' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpGA"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005')) {
       vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole BI', '6')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Kaiser Permanente Georgia' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpGA"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0006')) {
       vialMappingsHolder.push('15 ml Nalgene jar', 'No Additive', 'Urine', '10')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Henry Ford Health System' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' 
     || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0011' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0012' )) {
       vialMappingsHolder.push('5 ml Serum separator tube', 'SST', 'Serum', '5')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Henry Ford Health System' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003')) {
       vialMappingsHolder.push('10 mL Vacutainer', 'Lithium Heparin', 'Whole BI', '10')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Henry Ford Health System' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004')) {
       vialMappingsHolder.push('10 mL Vacutainer', 'EDTA', 'Whole BI', '10')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Henry Ford Health System' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005')) {
       vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole BI', '6')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i['siteAcronym'] === 'Henry Ford Health System' && 
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0006')) {
       vialMappingsHolder.push('15 ml Nalgene jar', 'No Additive', 'Urine', '10')
     }
     else{}
-  }
 
   return vialMappingsHolder
 }
 
 const updateResultMappings = (i, vialMappings) => {
   i['Study ID'] = 'Connect Study'
-  i['Sample Collection Center'] = i.siteAcronym
+  i['Sample Collection Center'] = keyToNameObj[i[fieldToConceptIdMapping.healthcareProvider]]
   i['Sample ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[0] : ``
   i['Sequence #'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[1] : ``
   i['BSI ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId] : ``
@@ -248,7 +246,7 @@ const updateResultMappings = (i, vialMappings) => {
   i['Hermolyzed'] = ''
   i['Label Status'] = 'Barcoded'
   i['Visit'] = 'BL'
-  delete i['siteAcronym']
+  delete i[fieldToConceptIdMapping.healthcareProvider]
   delete i['Connect_ID']
   delete i[fieldToConceptIdMapping.collectionId]
   delete i[fieldToConceptIdMapping.dateWithdrawn]
