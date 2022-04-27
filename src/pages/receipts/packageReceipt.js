@@ -273,7 +273,8 @@ const formSubmit = () => {
       }
       window.removeEventListener("beforeunload",beforeUnloadMessage)
       targetAnchorTagEl()
-      const receiptStatus = storePackageReceipt(obj);
+      console.log('oj', obj)
+  //    const receiptStatus = storePackageReceipt(obj);
       if (receiptStatus) {
         document.getElementById("courierType").innerHTML = ``;
         document.getElementById("scannedBarcode").value = "";
