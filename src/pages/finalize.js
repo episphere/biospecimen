@@ -198,7 +198,7 @@ export const finalizeTemplate = (data, specimenData) => {
             openedModal = modalWrapper;
             openedModalId = modalId;
         }
-        };
+        }
         
     function closeModal() {
         if (openedModal) {
@@ -206,5 +206,5 @@ export const finalizeTemplate = (data, specimenData) => {
             openedModal = null;
             openedModalId = null;
         }
-    };  
+    }  
 }
