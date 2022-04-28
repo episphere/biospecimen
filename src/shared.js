@@ -615,20 +615,22 @@ export const convertToFirestoreBox = (inputBox) => {
   let bagConceptIDIndex = 0;
   outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.no;
   delete outputBox.bags;
-
+  const defaultOutputBag = { [conceptIDs.bagscan_bloodUrine]: '', [conceptIDs.bagscan_mouthWash]: '', [conceptIDs.bagscan_orphanBag]: '' };
+    
   for (let [bagID, inputBag] of Object.entries(bags)) {
-    if (bagConceptIDIndex >= bagConceptIDList.length) break;
-    inputBag.arrElements = Array.from(new Set(inputBag.arrElements))
+      if (bagConceptIDIndex >= bagConceptIDList.length) break;      
+      inputBag.arrElements = Array.from(new Set(inputBag.arrElements));
+
     if (bagID === 'unlabelled') {
-      outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.yes;
+        outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.yes;       
       for (let tubeID of inputBag.arrElements) {
-        let outputBag = {};
-        const bagConceptID = bagConceptIDList[bagConceptIDIndex];
-        const keysNeeded = [
-          conceptIDs.scannedByFirstName,
-          conceptIDs.scannedByLastName,
-          conceptIDs.orphanBagFlag,
-        ];
+          let outputBag = {...defaultOutputBag};          
+          const bagConceptID = bagConceptIDList[bagConceptIDIndex];
+          const keysNeeded = [            
+              conceptIDs.scannedByFirstName,              
+              conceptIDs.scannedByLastName,        
+              conceptIDs.orphanBagFlag,
+          ];
 
         for (let k of keysNeeded) {
           if (inputBag[k]) outputBag[k] = inputBag[k];
@@ -641,7 +643,7 @@ export const convertToFirestoreBox = (inputBox) => {
         bagConceptIDIndex++;
       }
     } else {
-      let outputBag = {};
+      let outputBag = {...defaultOutputBag};
       const bagConceptID = bagConceptIDList[bagConceptIDIndex];
       const keysNeeded = [
         conceptIDs.scannedByFirstName,
@@ -652,16 +654,13 @@ export const convertToFirestoreBox = (inputBox) => {
         if (inputBag[k]) outputBag[k] = inputBag[k];
       }
 
-      let bagTypeConceptID;
       const bagIDEndString = bagID.split(' ')[1];
-
-      if (bagIDEndString === '0008') {
-        bagTypeConceptID = conceptIDs.bagscan_bloodUrine;
-      } else if (bagIDEndString === '0009') {
-        bagTypeConceptID = conceptIDs.bagscan_mouthWash;
+        if (bagIDEndString === '0008') {  
+          outputBag[conceptIDs.bagscan_bloodUrine] = bagID;
+        } else if (bagIDEndString === '0009') {
+            outputBag[conceptIDs.bagscan_mouthWash] = bagID;
       }
 
-      outputBag[bagTypeConceptID] = bagID;
       outputBag[conceptIDs.orphanBagFlag] = conceptIDs.no;
       outputBag[conceptIDs.tubesCollected] = inputBag.arrElements;
       outputBox[bagConceptID] = outputBag;
