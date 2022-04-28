@@ -138,6 +138,24 @@ const participantStatus = (data) => {
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="col-md-12 info-box">
+                    <div class="row">
+                        <span class="full-width">SSN Survey Status</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${surveyConversion[data['129084651']]}</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['129084651'] === 972455046 ? 'Not Started' : data['129084651'] === 615768760 ? 'Started' : 'Submitted'}</span>
+                    </div>
+                    <div class="row">
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </div>
             
         <br/>
 
