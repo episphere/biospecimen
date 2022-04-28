@@ -537,7 +537,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
 
 
 
-        // document.getElementById('selectBoxList').value = boxId;
+        document.getElementById('selectBoxList').value = boxId;
         //document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
 
         let shippingTable = document.getElementById('specimenList')
