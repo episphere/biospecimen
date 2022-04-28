@@ -537,7 +537,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
 
 
 
-        document.getElementById('selectBoxList').value = boxId;
+        // document.getElementById('selectBoxList').value = boxId;
         //document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
 
         let shippingTable = document.getElementById('specimenList')
@@ -965,7 +965,8 @@ export const populateBoxManifestHeader = (boxId, hiddenJSON, currInstitute) => {
 
 export const populateModalSelect = (hiddenJSON) => {
     let currSelectBox = document.getElementById('selectBoxList');
-    let currBoxId = currSelectBox.value;
+    let currBoxId = currSelectBox.value; // This value is getting changed from selectBoxList value
+    console.log('populateModalSelect currBoxId',currBoxId , typeof(currBoxId))
     let boxList = document.getElementById('shippingModalChooseBox');
     let addToBoxButton =  document.getElementById('addToBagButton');
     // reset box list options
@@ -977,12 +978,16 @@ export const populateModalSelect = (hiddenJSON) => {
     for (let i = 0; i < keyOptions.length; i++) {
         list += '<option>' + keyOptions[i] + '</option>';
     }
+    console.log('populateModalSelect list',list )
     if (list == '') {
         addToBoxButton.setAttribute('disabled','true')
         return 
     }
     boxList.innerHTML = list;
-    currSelectBox.value = document.getElementById('selectBoxList').value;
+    console.log('populateModalSelect currSelectBox.value',document.getElementById('selectBoxList').value )
+    // currSelectBox.value = document.getElementById('selectBoxList').value;
+    debugger;
+    return
 }
 
 export const populateTempSelect = (boxes) => {
@@ -1249,17 +1254,19 @@ const compareBoxIds = (a, b) => {
 
 }
 
-export const populateBoxSelectList = async (hiddenJSON, userName,) => {
+export const populateBoxSelectList = async (hiddenJSON, userName) => {
     let boxList = document.getElementById('selectBoxList');
     let selectBoxList = document.getElementById('selectBoxList');
     let list = ''
+    console.log('populateBoxSelectList hiddeJSON', hiddenJSON) // hiddenJSON is everything from site
     let keys = Object.keys(hiddenJSON).sort(compareBoxIds);
+    console.log('populateBoxSelectList keys',keys)
     for (let i = 0; i < keys.length; i++) {
         list += '<option>' + keys[i] + '</option>';
     }
     boxList.innerHTML = list;
 
-    let currBoxId = selectBoxList.value;
+    let currBoxId = selectBoxList.value; // Select current selectBoxList value, cause of addBox
     if (currBoxId != '') {
         let currBox = hiddenJSON[currBoxId];
 
@@ -1463,10 +1470,14 @@ const addNewBox = async (userName) => {
                     }
                 }
             }
+            console.log('addNewBox if != -1 hiddenJSON', hiddenJSON)
+            console.log('addNewBox if != -1 boxJSONS', boxJSONS)
             await populateBoxSelectList(hiddenJSON, userName)
+            debugger;
             return true
         }
         else {
+            debugger;
             return false
         }
     }
@@ -1497,7 +1508,9 @@ const addNewBox = async (userName) => {
                 }
             }
         }
+        console.log('addNewBox else', hiddenJSON)
         await populateBoxSelectList(hiddenJSON, userName)
+        debugger;
         return true
     }
 
@@ -1522,10 +1535,12 @@ export const addEventModalAddBox = (userName) => {
             let box = boxJSONS[i]
             hiddenJSONLocation[box['132929440']] = box['bags']
         }
-        await populateModalSelect(hiddenJSONLocation)
+        
         await populateBoxSelectList(hiddenJSONLocation, userName);
         hideAnimation()
         checkAlertState(alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl)
+        console.log('box created and selectBoxList value',document.getElementById('selectBoxList').value)
+        populateModalSelect(hiddenJSONLocation) // change here
         // reset alertState
         alertState = ''
     }
