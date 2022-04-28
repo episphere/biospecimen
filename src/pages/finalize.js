@@ -1,5 +1,6 @@
-import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorflow, getCheckedInVisit } from "./../shared.js";
+import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorflow, getCheckedInVisit, updateSpecimen } from "./../shared.js";
 import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollectProcess } from "./../events.js";
+import {searchTemplate} from "./dashboard.js";
 
 export const finalizeTemplate = (data, specimenData) => {
     removeActiveClass('navbar-btn', 'active')
@@ -87,16 +88,123 @@ export const finalizeTemplate = (data, specimenData) => {
                         <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['820476880']}" type="button" id="finalizedSaveExit">Exit</button>
                     </div>
                     <div class="col-auto">
-                        <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['820476880']}" type="submit" id="finalizedContinue">Review Complete</button>
+                        <button class="btn btn-outline-primary modal-open" data-modal-id="modal1" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['820476880']}" type="submit" id="finalizedContinue">Review Complete</button>
                     </div>
                 </div>
             </form>
+            <div class="modal-wrapper" id="modal1">
+                <div class="modal-dialog model-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title">Confirm
+                        Collection</h5>
+                    <button type="button" class="close modal-close"><span>&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                    Once “Confirm” is clicked, the collection data entered will be
+                    finalized and will NOT be editable.
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button"
+                        class="btn btn-outline-secondary modal-close">Close</button>
+                    <button type="button" class="btn btn-outline-primary modal-open" id="finalizedConfirmButton" data-modal-id="modal2">Confirm</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="modal-wrapper" id="modal2">
+                <div class="modal-dialog model-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title">Specimen
+                        Finalized</h5>
+                        <button type="button" class="close modal-close"><span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                    Collection Finalized Successfully!
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button"
+                        class="btn btn-outline-secondary modal-close" id="model2CloseButton" >Close</button>
+                    </div>
+                </div>
+                </div>
+            </div>
         </div>
     `;
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
-    addEventFinalizeForm(specimenData);
-    addEventFinalizeFormCntd(specimenData);
+
+    document.getElementById('finalizedSaveExit').addEventListener('click', () => {
+        searchTemplate();
+    });
+
+    document.getElementById('finalizeForm').addEventListener('submit', (e) => { 
+        e.preventDefault();
+        const modalId = e.target.getAttribute('data-modal-id');
+        openModal(modalId);
+    });
+
+    document.getElementById('finalizedConfirmButton').addEventListener('click', async (e) => { 
+        specimenData['410912345'] = 353358909;
+        specimenData['556788178'] = new Date().toISOString();
+        await updateSpecimen([specimenData]);
+    });
+
+    document.querySelectorAll('#modal2 .modal-close').forEach(element => { 
+        element.addEventListener('click', () => { 
+            searchTemplate();
+        });
+    });
+
+    // addEventFinalizeForm(specimenData);
+    // addEventFinalizeFormCntd(specimenData);
     addEventReturnToCollectProcess();
     document.querySelector('body').scrollIntoView(true);
+
+    // Handle transition between modals:
+    document.querySelectorAll('.modal-open').forEach((modalTrigger) => {
+    modalTrigger.addEventListener('click', (clickEvent) => {
+        const trigger = clickEvent.target;
+        const modalId = trigger.getAttribute('data-modal-id');
+        openModal(modalId);
+    });
+    });
+
+    document.querySelectorAll('.modal-close').forEach((modalClose) => {
+    modalClose.addEventListener('click', () => {
+        closeModal();
+    });
+    });
+
+    document.body.addEventListener('keyup', (keyEvent) => {
+    if (keyEvent.key === 'Escape') {
+        closeModal();
+    }
+    });
+
+    let openedModalId = null;
+    let openedModal = null;
+
+    function openModal(modalId) {
+        if (openedModalId === modalId) return;
+        
+        const modalWrapper = document.getElementById(modalId);
+        if (modalWrapper) {
+            closeModal();
+            modalWrapper.classList.add('visible');
+            openedModal = modalWrapper;
+            openedModalId = modalId;
+        }
+        }
+        
+    function closeModal() {
+        if (openedModal) {
+            openedModal.classList.remove('visible');
+            openedModal = null;
+            openedModalId = null;
+        }
+    }  
 }

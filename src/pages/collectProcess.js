@@ -1,7 +1,9 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormEditAll, addEventBiospecimenCollectionFormText } from './../events.js'
-import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow, getCheckedInVisit } from '../shared.js';
+import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow, getCheckedInVisit, findParticipant, verifyDefaultConcepts, checkedIn } from '../shared.js';
+import { checkInTemplate } from './checkIn.js';
 
 export const tubeCollectedTemplate = (data, formData) => {
+    const isCheckedIn = checkedIn(data);
 
     let template = `
         </br>
@@ -194,6 +196,10 @@ export const tubeCollectedTemplate = (data, formData) => {
                 <div class="col-auto">
                     <button class="btn btn-outline-danger" type="button" id="backToSearch">Return to Search</button>
                 </div>
+                ${isCheckedIn ?
+                `<div class="ml-auto">
+                    <button class="btn btn-outline-primary text-nowrap" data-connect-id=${data.Connect_ID} id="collectionCheckout">Go to Check-Out</button>
+                </div>` : ``}               
                 <div class="ml-auto">
                     <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="button" id="collectionSave">Save</button>
                 </div>
@@ -220,4 +226,17 @@ export const tubeCollectedTemplate = (data, formData) => {
     addEventBiospecimenCollectionFormEdit();
     addEventBiospecimenCollectionFormEditAll();
     addEventBiospecimenCollectionFormText(data, formData);
+    
+    document.getElementById('collectionCheckout')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const connectId = e.target.getAttribute('data-connect-id');
+        try {
+            let data = await findParticipant(`connectId=${connectId}`).then(res => res.data?.[0]);
+            data = await verifyDefaultConcepts(data);
+            checkInTemplate(data);
+            document.body.scrollIntoView();
+        } catch (error) {
+            console.log("Error occured while trying to check out.");
+        }
+     });
 }
