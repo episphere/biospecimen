@@ -145,10 +145,10 @@ const participantStatus = (data) => {
                         <span class="full-width">SSN Survey Status</span>
                     </div>
                     <div class="row">
-                        <span class="full-width">${surveyConversion[data['129084651']]}</span>
+                        <span class="full-width">${surveyConversion[data['126331570']]}</span>
                     </div>
                     <div class="row">
-                        <span class="full-width">${data['129084651'] === 972455046 ? 'Not Started' : data['129084651'] === 615768760 ? 'Started' : 'Submitted'}</span>
+                        <span class="full-width">${data['126331570'] === 615768760 ? data['943232079'] : data['126331570'] === 231311385 ? data['315032037'] : '<br>'}</span>
                     </div>
                     <div class="row">
                         <br>
