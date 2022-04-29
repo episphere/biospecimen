@@ -2287,6 +2287,8 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
             dt.deviationOptions.forEach(dev => {
                 biospecimenData[dt.concept]['248868659'][dev.concept] = 104430631;
             });
+            biospecimenData[dt.concept]['678857215'] = 104430631;
+            biospecimenData[dt.concept]['762124027'] = 104430631;
         }
     });
 
