@@ -964,24 +964,20 @@ export const populateBoxManifestHeader = (boxId, hiddenJSON, currInstitute) => {
 }
 
 export const populateModalSelect = (hiddenJSON) => {
-    let currSelectBox = document.getElementById('selectBoxList');
-    let toFocus = currSelectBox.value;
+    let selectedBox = document.getElementById('selectBoxList').value;
     let boxList = document.getElementById('shippingModalChooseBox');
     let addToBoxButton =  document.getElementById('addToBagButton');
-    // reset box list options
-    boxList.innerHTML = ''
     addToBoxButton.removeAttribute("disabled")
     let list = ''
-    let keys = Object.keys(hiddenJSON).sort(compareBoxIds);
-    for (let i = 0; i < keys.length; i++) {
-        list += '<option>' + keys[i] + '</option>';
+    let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+    for (let i = 0; i < boxes.length; i++) {
+        list += '<option>' + boxes[i] + '</option>';
     }
     if (list == '') {
-        addToBoxButton.setAttribute('disabled','true')
-        return 
+        addToBoxButton.setAttribute('disabled', 'true');
     }
     boxList.innerHTML = list;
-    currSelectBox.value = document.getElementById('selectBoxList').value;
+    boxList.value = selectedBox;
 }
 
 export const populateTempSelect = (boxes) => {
