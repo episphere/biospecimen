@@ -1878,6 +1878,12 @@ export const sortBiospecimensList = (biospecimensList, tubeOrder) => {
 export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl) => {
   if (typeof alertState === "boolean") {
     if (alertState) {
+        const boxSelectEle = document.getElementById('shippingModalChooseBox');
+        const newBox = boxSelectEle.getAttribute('data-new-box');
+        if (newBox) { 
+            createBoxSuccessAlertEl.textContent = `New box (${newBox}) has been created`;
+            boxSelectEle.setAttribute('data-new-box', '');
+        }
       createBoxSuccessAlertEl.style.display = createBoxSuccessAlertEl.style.display === "none" ? "" : "none";
       delay(3000).then(() => createBoxSuccessAlertEl.style.display = "none") 
     }
