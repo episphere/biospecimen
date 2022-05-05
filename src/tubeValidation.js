@@ -30,8 +30,9 @@ const tubeNotCollectedReason1 = {'concept': 234139565, 'label': 'Short draw'};
 const tubeNotCollectedReason2 = {'concept': 681745422, 'label': 'Participant refusal'};
 const tubeNotCollectedReason3 = {'concept': 745205161, 'label': 'Participant attempted'};
 const tubeNotCollectedReason4 = {'concept': 181769837, 'label': 'Other (record in comments)'};
+const tubeNotCollectedReason5 = {'concept': 889386523, 'label': 'Supply Unavailable'};
 
-const tubeNotCollectedOptions1 = [tubeNotCollectedReason1, tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason4];
+const tubeNotCollectedOptions1 = [tubeNotCollectedReason1, tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason5, tubeNotCollectedReason4];
 const tubeNotCollectedOptions2 = [tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason4];
 
 const tube0001 = {
