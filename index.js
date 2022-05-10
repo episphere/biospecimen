@@ -33,6 +33,7 @@ window.onload = () => {
     }
     !firebase.apps.length ? firebase.initializeApp(firebaseConfig()) : firebase.app();
     auth = firebase.auth();
+    console.log('auth', auth)
     auth.onAuthStateChanged(async user => {
         if(user){
             inactivityTime();

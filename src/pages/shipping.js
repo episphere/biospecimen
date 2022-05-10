@@ -25,6 +25,8 @@ const conversion = {
 export const shippingDashboard = (auth, route, goToSpecimenSearch) => {  
     auth.onAuthStateChanged(async user => {
         if(user){
+            console.log('user', user)
+            console.log('email', user.email)
             const response = await userAuthorization(route, user.displayName ? user.displayName : user.email);
             if ( response.isBiospecimenUser === false ) {
                 document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
@@ -35,6 +37,7 @@ export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
             startShipping(user.displayName ? user.displayName : user.email);
         }
         else {
+            console.log('userElse', user)
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
             window.location.hash = '#';
         }
