@@ -33,7 +33,7 @@ const tubeNotCollectedReason4 = {'concept': 181769837, 'label': 'Other (record i
 const tubeNotCollectedReason5 = {'concept': 889386523, 'label': 'Supply Unavailable'};
 
 const tubeNotCollectedOptions1 = [tubeNotCollectedReason1, tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason5, tubeNotCollectedReason4];
-const tubeNotCollectedOptions2 = [tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason4];
+const tubeNotCollectedOptions2 = [tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason5, tubeNotCollectedReason4];
 
 const tube0001 = {
     'specimenType': 'Serum Separator Tube',
