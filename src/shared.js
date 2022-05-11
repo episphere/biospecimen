@@ -676,10 +676,9 @@ export const convertToFirestoreBox = (inputBox) => {
   return outputBox;
 };
 
-export const getBoxes = async (flag) => {
+export const getBoxes = async (box) => {
   const idToken = await getIdToken();
-  if (flag !== `bptl`) flag = ``
-  const response = await fetch(`${api}api=searchBoxes?source=${flag}`, {
+  const response = await fetch(`${api}api=searchBoxes`, {
     method: 'GET',
     headers: {
       Authorization: 'Bearer ' + idToken,
@@ -701,9 +700,10 @@ export const getBoxes = async (flag) => {
   return toReturn;
 };
 
-export const getAllBoxes = async (box) => {
+export const getAllBoxes = async (flag) => {
   const idToken = await getIdToken();
-  const response = await fetch(`${api}api=searchBoxes&source=bptl`, {
+  if (flag !== `bptl`) flag = ``
+  const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
     method: 'GET',
     headers: {
       Authorization: 'Bearer ' + idToken,
