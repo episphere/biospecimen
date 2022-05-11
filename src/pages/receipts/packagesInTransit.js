@@ -14,7 +14,7 @@ export const packagesInTransitScreen = async (auth, route) => {
 
 const packagesInTransitTemplate = async (username, auth, route) => {
     showAnimation();
-    const response = await getAllBoxes();
+    const response = await getAllBoxes(`bptl`);
     hideAnimation();
     const allShipped = filterShipped(response.data)
 

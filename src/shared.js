@@ -83,7 +83,6 @@ export const inactivityTime = () => {
 
 export const validateUser = async () => {
     const idToken = await getIdToken();
-    console.log('idToken', idToken)
     const response = await fetch(`${api}api=validateUsers`, {
         method: "GET",
         headers: {
@@ -701,13 +700,14 @@ export const getBoxes = async (box) => {
   return toReturn;
 };
 
-export const getAllBoxes = async (box) => {
+export const getAllBoxes = async (flag) => {
   const idToken = await getIdToken();
-  const response = await fetch(`${api}api=searchBoxes`, {
+  if (flag !== `bptl`) flag = ``
+  const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
     method: 'GET',
     headers: {
       Authorization: 'Bearer ' + idToken,
-    },
+    }
   });
   let res = await response.json();
   for (let i = 0; i < res.data.length; i++) {
