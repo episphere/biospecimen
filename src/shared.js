@@ -523,6 +523,7 @@ export const ship = async (boxes, shippingData, trackingNumbers) => {
 
 export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) => {
     const idToken = await getIdToken();
+    console.log('getPage Body',{"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy, "filters":filters})
     let requestObj = {
         method: "POST",
         headers:{
@@ -871,17 +872,19 @@ export const getLocationsInstitute = async () => {
 
 export const getNumPages = async (numPerPage, filter) => {
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=getNumBoxesShipped`, {
-        method: "POST",
-        headers: {
-            Authorization:"Bearer "+idToken,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(filter)
-    });
-    let res = await response.json();
-    let numBoxes = res.data;
-    return Math.ceil(numBoxes/numPerPage);
+    // console.log("idToken",idToken)
+    console.log("filter",filter)
+    // const response = await fetch(`${api}api=getNumBoxesShipped`, {
+    //     method: "POST",
+    //     headers: {
+    //         Authorization:"Bearer "+idToken,
+    //         "Content-Type": "application/json"
+    //     },
+    //     body: JSON.stringify(filter)
+    // });
+    // let res = await response.json();
+    // let numBoxes = res.data;
+    // return Math.ceil(numBoxes/numPerPage);
 }
 
 export const getSiteCouriers = async () => {
@@ -1878,12 +1881,6 @@ export const sortBiospecimensList = (biospecimensList, tubeOrder) => {
 export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl) => {
   if (typeof alertState === "boolean") {
     if (alertState) {
-        const boxSelectEle = document.getElementById('shippingModalChooseBox');
-        const newBox = boxSelectEle.getAttribute('data-new-box');
-        if (newBox) { 
-            createBoxSuccessAlertEl.textContent = `New box (${newBox}) has been created`;
-            boxSelectEle.setAttribute('data-new-box', '');
-        }
       createBoxSuccessAlertEl.style.display = createBoxSuccessAlertEl.style.display === "none" ? "" : "none";
       delay(3000).then(() => createBoxSuccessAlertEl.style.display = "none") 
     }
