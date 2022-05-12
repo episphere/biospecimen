@@ -24,15 +24,15 @@ const conversion = {
 
 export const shippingDashboard = (auth, route, goToSpecimenSearch) => {  
     auth.onAuthStateChanged(async user => {
-        if(user){
-            const response = await userAuthorization(route, user.displayName ? user.displayName : user.email);
-            if ( response.isBiospecimenUser === false ) {
+        if (user) {
+            const responseData = await userAuthorization(route, user.displayName ? user.displayName : user.email);
+            if ( responseData.isBiospecimenUser === false ) {
                 document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
                 document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
                 return;
             }
-            if (!response.role) return;
-            startShipping(user.displayName || user.email || response.email);
+            if (!responseData.role) return;
+            startShipping(user.displayName || user.email || responseData.email);
         }
         else {
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
