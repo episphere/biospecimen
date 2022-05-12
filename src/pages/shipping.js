@@ -31,8 +31,8 @@ export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
                 document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
                 return;
             }
-            if(!response.role) return;
-            startShipping(user.displayName ? user.displayName : user.email);
+            if (!response.role) return;
+            startShipping(user.displayName || user.email || response.email);
         }
         else {
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();

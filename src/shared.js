@@ -195,13 +195,14 @@ export const hideAnimation = () => {
 export const userAuthorization = async (route, name) => {
     showAnimation();
     const response = await validateUser();
+    console.log('resonese from validateUser', response);
     if(response.code === 200) {
-        const userRole = response.data;
-        if(userRole.role === 'admin' || userRole.role === 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name);
-        else if(userRole.role === 'user') document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar(name);
+        const responseData = response.data;
+        if(responseData.role === 'admin' || responseData.role === 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name || responseData.email);
+        else if(responseData.role === 'user') document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar(name || responseData.email);
         toggleCurrentPage(route);
         hideAnimation();
-        return userRole;
+        return responseData;
     }
     else if(response.code === 401) {
         document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
