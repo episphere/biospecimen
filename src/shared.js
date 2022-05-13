@@ -195,7 +195,6 @@ export const hideAnimation = () => {
 export const userAuthorization = async (route, name) => {
     showAnimation();
     const response = await validateUser();
-    console.log('resonese from validateUser', response);
     if(response.code === 200) {
         const responseData = response.data;
         if(responseData.role === 'admin' || responseData.role === 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name || responseData.email);
