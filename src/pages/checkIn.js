@@ -35,7 +35,7 @@ export const checkInTemplate = async (data) => {
                                         <option value=""> -- Select Visit -- </option>`;
                                         
                         Array.from(visitType).forEach(option => {
-                            template += `<option value=${option.concept}>${option.visitType}</option>`;
+                            template += option.visitType === "Baseline" ? `<option value=${option.concept}>${option.visitType}</option>` : `<option value=${option.concept} disabled>${option.visitType}</option>`;
                         })
 
                         template += `</select>`;
