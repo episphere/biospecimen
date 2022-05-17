@@ -196,12 +196,12 @@ export const userAuthorization = async (route, name) => {
     showAnimation();
     const response = await validateUser();
     if(response.code === 200) {
-        const userRole = response.data;
-        if(userRole.role === 'admin' || userRole.role === 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name);
-        else if(userRole.role === 'user') document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar(name);
+        const responseData = response.data;
+        if(responseData.role === 'admin' || responseData.role === 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name || responseData.email);
+        else if(responseData.role === 'user') document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar(name || responseData.email);
         toggleCurrentPage(route);
         hideAnimation();
-        return userRole;
+        return responseData;
     }
     else if(response.code === 401) {
         document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
@@ -701,13 +701,14 @@ export const getBoxes = async (box) => {
   return toReturn;
 };
 
-export const getAllBoxes = async (box) => {
+export const getAllBoxes = async (flag) => {
   const idToken = await getIdToken();
-  const response = await fetch(`${api}api=searchBoxes`, {
+  if (flag !== `bptl`) flag = ``
+  const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
     method: 'GET',
     headers: {
       Authorization: 'Bearer ' + idToken,
-    },
+    }
   });
   let res = await response.json();
   for (let i = 0; i < res.data.length; i++) {
@@ -1501,7 +1502,7 @@ export const siteLocations = {
         'UCM': [{location: 'UC-DCAM', concept: 777644826}],
         'MFC': [{location: 'Marshfield', concept: 692275326}, {location: 'Lake Hallie', concept: 698283667}],
         'HP': [{location: 'HP Research Clinic', concept: 834825425}],
-        'HFHS': [{location: 'HFHS Research Clinic (Main Campus)', concept: 736183094}],
+        'HFHS': [{location: 'HFHS Research Clinic (Main Campus)', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332}],
         'SFH': [{location: 'SF Cancer Center LL', concept: 589224449}],
         'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}]
     },

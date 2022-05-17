@@ -982,8 +982,6 @@ export const populateTempSelect = (boxes) => {
 }
 
 export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
-  console.log(hiddenJSON)
-  console.log(boxJSONS)
     let table = document.getElementById("saveTable");
     table.innerHTML = `<tr>
                         <th style="border-bottom:1px solid;">To Ship</th>

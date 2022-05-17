@@ -30,7 +30,7 @@ export const bptlScreen = async (auth, route) => {
     unAuthorizedUser();
   return;
   }
-  bptlScreenTemplate(name, response.data, auth, route);
+  bptlScreenTemplate(name || response.data.email, response.data, auth, route);
   redirectPageToLocation();
 };
 

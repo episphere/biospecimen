@@ -35,7 +35,7 @@ export const checkInTemplate = async (data) => {
                                         <option value=""> -- Select Visit -- </option>`;
                                         
                         Array.from(visitType).forEach(option => {
-                            template += `<option value=${option.concept}>${option.visitType}</option>`;
+                            template += option.visitType === "Baseline" ? `<option value=${option.concept}>${option.visitType}</option>` : `<option value=${option.concept} disabled>${option.visitType}</option>`;
                         })
 
                         template += `</select>`;
@@ -131,6 +131,24 @@ const participantStatus = (data) => {
                     </div>
                     <div class="row">
                         <span class="full-width">${data['311580100'] === 353358909 ? 'Full SSN Received' : data['914639140'] === 353358909 ? 'Partial SSN Received' : 'No SSN Entered'}</span>
+                    </div>
+                    <div class="row">
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="col-md-12 info-box">
+                    <div class="row">
+                        <span class="full-width">SSN Survey Status</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${surveyConversion[data['126331570']]}</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['126331570'] === 615768760 ? data['943232079'] : data['126331570'] === 231311385 ? data['315032037'] : '<br>'}</span>
                     </div>
                     <div class="row">
                         <br>
