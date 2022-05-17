@@ -3325,8 +3325,8 @@ export const populateReportManifestTable = (currPage) => {
     }
 
 }
-// Review addPaginationFunctionality
-export const addPaginationFunctionality = (lastPage, filter) => { 
+
+export const addPaginationFunctionality = (lastPage, filter) => {
     let paginationButtons = document.getElementById('paginationButtons');
     paginationButtons.innterHTML = ""
     paginationButtons.innerHTML = `<ul class="pagination">
