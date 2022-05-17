@@ -523,7 +523,6 @@ export const ship = async (boxes, shippingData, trackingNumbers) => {
 
 export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) => {
     const idToken = await getIdToken();
-    console.log('getPage Body',{"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy, "filters":filters})
     let requestObj = {
         method: "POST",
         headers:{
@@ -873,8 +872,6 @@ export const getLocationsInstitute = async () => {
 
 export const getNumPages = async (numPerPage, filter) => {
     const idToken = await getIdToken();
-    // console.log("idToken",idToken)
-    console.log("filter",filter)
     const response = await fetch(`${api}api=getNumBoxesShipped`, {
         method: "POST",
         headers: {
@@ -1900,7 +1897,6 @@ export const convertNumsToCondition = (packagedCondition, packageConversion) => 
   for(let i = 0; i < packagedCondition.length; i++) {
     let isLastItem = false;
     if(i+1 === packagedCondition.length) { // if last item equals the final item
-      console.log("last item", i+1, packagedCondition.length)
       isLastItem = true
       if(isLastItem) listConditions += `<p>${packageConversion[packagedCondition[i]]}</p>`
     }

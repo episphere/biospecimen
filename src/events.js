@@ -469,7 +469,6 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
             // Location ID's value will be a number
             locations[box['132929440']] = box['560975149'];
         }
-        // console.log("boxObjects", boxObjects)
         let nextBoxNum = Object.keys(boxObjects).length + 1;
 
         //push the things into the right box
@@ -535,7 +534,6 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
           }
         }
         let boxIds = Object.keys(boxObjects).sort(compareBoxIds);
-        console.log("boxIds",boxIds)
 
         for (let i = 0; i < boxIds.length; i++) {
             let currTime = new Date().toISOString();
@@ -568,7 +566,6 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
                 toPass['560975149'] = locations[boxIds[i]]
                 toPass['789843387'] = siteSpecificLocation[conceptIdToSiteSpecificLocation[locations[boxIds[i]]]].siteCode
                 toPass['555611076'] = currTime;
-                console.log("to Pass",toPass)
                 await updateBox(toPass);
             }
         }
@@ -3213,7 +3210,6 @@ export const populateBoxTable = async (page, filter) => {
         }
 
         if(currPage.hasOwnProperty('238268405')) {
-          console.log("currPage 238268405",currPage)
           packagedCondition = currPage['238268405']
         }
 
@@ -3378,19 +3374,15 @@ export const addEventFilter = () => {
 
         let startDate = document.getElementById('startDate').value;
         let endDate = document.getElementById('endDate').value;
-        console.log("startDate",startDate, "typeOf startDate",typeof startDate)
-        console.log("endDate", endDate, "typeOf endDate",typeof endDate)
         let filter = {};
         if (trackingId !== "") {
             filter['trackingId'] = trackingId;
         }
         if (startDate !== "") {
-            // filter['startDate'] = Date.parse(startDate + ' 00:00')
             let startDateUnix = Date.parse(startDate + ' 00:00')
             filter['startDate'] = new Date(startDateUnix).toISOString()
         }
         if (endDate !== "") {
-            // filter['endDate'] = Date.parse(endDate + ' 23:59')
             let endDateUnix = Date.parse(endDate + ' 23:59')
             filter['endDate'] = new Date(endDateUnix).toISOString()
             if (startDate !== "") {
@@ -3401,10 +3393,9 @@ export const addEventFilter = () => {
             }
 
         }
-        console.log("addEventFilter", filter)
         populateBoxTable(0, filter);
         let numPages = await getNumPages(5, filter);
-        // addPaginationFunctionality(numPages, filter);
+        addPaginationFunctionality(numPages, filter);
 
     })
 

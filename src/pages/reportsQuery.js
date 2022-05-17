@@ -71,7 +71,6 @@ export const startReport = async () => {
     removeActiveClass('navbar-btn', 'active')
     addEventFilter();
     populateBoxTable(0, {});
-    console.log("numPages",numPages)
     addPaginationFunctionality(numPages, {});
     hideAnimation();
     
