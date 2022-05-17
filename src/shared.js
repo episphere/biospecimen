@@ -1836,7 +1836,7 @@ export const displayContactInformation = (site, siteContactInformation) => {
         contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
       }
     }
-    else contactStr+= `<p>Phone:</p>`
+    else contactStr += `<p>Phone:</p>`
   }
     return contactStr
   }
@@ -1879,12 +1879,6 @@ export const sortBiospecimensList = (biospecimensList, tubeOrder) => {
 export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl) => {
   if (typeof alertState === "boolean") {
     if (alertState) {
-        const boxSelectEle = document.getElementById('shippingModalChooseBox');
-        const newBox = boxSelectEle.getAttribute('data-new-box');
-        if (newBox) { 
-            createBoxSuccessAlertEl.textContent = `New box (${newBox}) has been created`;
-            boxSelectEle.setAttribute('data-new-box', '');
-        }
       createBoxSuccessAlertEl.style.display = createBoxSuccessAlertEl.style.display === "none" ? "" : "none";
       delay(3000).then(() => createBoxSuccessAlertEl.style.display = "none") 
     }
@@ -1899,13 +1893,18 @@ export const delay = ms => new Promise(res => setTimeout(res, ms));
 
 export const convertNumsToCondition = (packagedCondition, packageConversion) => {
   let listConditions = ''
-  if(!packagedCondition) {
-    return listConditions
+  if(!packagedCondition) return listConditions
+  for(let i = 0; i < packagedCondition.length; i++) {
+    let isLastItem = false;
+    if(i+1 === packagedCondition.length) { // if last item equals the final item
+      isLastItem = true
+      if(isLastItem) listConditions += `<p>${packageConversion[packagedCondition[i]]}</p>`
+    }
+    else {
+      listConditions += `<p>${packageConversion[packagedCondition[i]]},</p>`
+    }
+
   }
-  packagedCondition.forEach(condition => {
-    listConditions +=`<p>${packageConversion[condition]}</p>`}
-  )
-  
   return listConditions
 }
 
@@ -1932,3 +1931,28 @@ export const checkNonAlphanumericStr = (boxes) => {
     }
   }
 }
+
+export const translateNumToType = {
+  "0001": "SST/Gold or Red",
+  "0002": "SST/Gold or Red",
+  "0003": "Heparin/Green",
+  "0004": "EDTA/Lavender",
+  "0005": "ACD/Yellow",
+  "0006": "Urine/Yellow",
+  "0007": "Mouthwash Container",
+  "0011": "SST/Gold or Red",
+  "0012": "SST/Gold or Red",
+  "0013": "Heparin/Green",
+  "0014": "EDTA/Lavender",
+  "0016": "Urine Cup",
+  "0021": "SST/Gold or Red",
+  "0022": "SST/Gold or Red",
+  "0031": "SST/Gold or Red",
+  "0032": "SST/Gold or Red",
+  "0024": "EDTA/Lavender",
+  "0050": "NA",
+  "0051": "NA",
+  "0052": "NA",
+  "0053": "NA",
+  "0054": "NA"
+};
