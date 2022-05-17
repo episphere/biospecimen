@@ -4,10 +4,8 @@ import { nonUserNavBar, unAuthorizedUser } from './../navbar.js'
 
 export const welcomeScreen = async (auth, route) => {
     const user = auth.currentUser;
-    console.log("WelcomeScreen user",user)
     if(!user) return;
     const name = user.displayName ? user.displayName : user.email;
-    // console.log("user.displayName", user.displayName )
     showAnimation();
     const response = await validateUser();
     hideAnimation();

@@ -874,17 +874,17 @@ export const getNumPages = async (numPerPage, filter) => {
     const idToken = await getIdToken();
     // console.log("idToken",idToken)
     console.log("filter",filter)
-    // const response = await fetch(`${api}api=getNumBoxesShipped`, {
-    //     method: "POST",
-    //     headers: {
-    //         Authorization:"Bearer "+idToken,
-    //         "Content-Type": "application/json"
-    //     },
-    //     body: JSON.stringify(filter)
-    // });
-    // let res = await response.json();
-    // let numBoxes = res.data;
-    // return Math.ceil(numBoxes/numPerPage);
+    const response = await fetch(`${api}api=getNumBoxesShipped`, {
+        method: "POST",
+        headers: {
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(filter)
+    });
+    let res = await response.json();
+    let numBoxes = res.data;
+    return Math.ceil(numBoxes/numPerPage);
 }
 
 export const getSiteCouriers = async () => {
@@ -1838,7 +1838,7 @@ export const displayContactInformation = (site, siteContactInformation) => {
         contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
       }
     }
-    else contactStr+= `<p>Phone:</p>`
+    else contactStr += `<p>Phone:</p>`
   }
     return contactStr
   }
@@ -1895,13 +1895,19 @@ export const delay = ms => new Promise(res => setTimeout(res, ms));
 
 export const convertNumsToCondition = (packagedCondition, packageConversion) => {
   let listConditions = ''
-  if(!packagedCondition) {
-    return listConditions
+  if(!packagedCondition) return listConditions
+  for(let i = 0; i < packagedCondition.length; i++) {
+    let isLastItem = false;
+    if(i+1 === packagedCondition.length) { // if last item equals the final item
+      console.log("last item", i+1, packagedCondition.length)
+      isLastItem = true
+      if(isLastItem) listConditions += `<p>${packageConversion[packagedCondition[i]]}</p>`
+    }
+    else {
+      listConditions += `<p>${packageConversion[packagedCondition[i]]},</p>`
+    }
+
   }
-  packagedCondition.forEach(condition => {
-    listConditions +=`<p>${packageConversion[condition]}</p>`}
-  )
-  
   return listConditions
 }
 
@@ -1928,3 +1934,28 @@ export const checkNonAlphanumericStr = (boxes) => {
     }
   }
 }
+
+export const translateNumToType = {
+  "0001": "SST/Gold or Red",
+  "0002": "SST/Gold or Red",
+  "0003": "Heparin/Green",
+  "0004": "EDTA/Lavender",
+  "0005": "ACD/Yellow",
+  "0006": "Urine/Yellow",
+  "0007": "Mouthwash Container",
+  "0011": "SST/Gold or Red",
+  "0012": "SST/Gold or Red",
+  "0013": "Heparin/Green",
+  "0014": "EDTA/Lavender",
+  "0016": "Urine Cup",
+  "0021": "SST/Gold or Red",
+  "0022": "SST/Gold or Red",
+  "0031": "SST/Gold or Red",
+  "0032": "SST/Gold or Red",
+  "0024": "EDTA/Lavender",
+  "0050": "NA",
+  "0051": "NA",
+  "0052": "NA",
+  "0053": "NA",
+  "0054": "NA"
+};
