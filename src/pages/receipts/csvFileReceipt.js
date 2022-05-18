@@ -58,11 +58,12 @@ const getCurrentDate = () => {
   const currentDate = new Date().toLocaleDateString('en-CA');
   return currentDate;
 }
-// http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=queryBsiData&type=${filter}`, {
+// `, {
+  // https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=queryBsiData&type=${filter}
 
 const getBSIQueryData = async (filter) => {
   const idToken = await getIdToken();
-  const response = await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=queryBsiData&type=${filter}`, {
+  const response = await fetch(`http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=queryBsiData&type=${filter}`, {
     method: "GET",
     headers: {
       Authorization: "Bearer" + idToken,
@@ -82,10 +83,12 @@ const getBSIQueryData = async (filter) => {
 
 
 const modifyBSIQueryResults = (results) => {
-  let filteredResults = results.filter(result => result[fieldToConceptIdMapping.collectionId] !== undefined)
+  let filteredResults = results.filter(result => (result[fieldToConceptIdMapping.collectionId] !== undefined && 
+                        result[fieldToConceptIdMapping.collectionId].split(' ')[1] !== '0008' && result[fieldToConceptIdMapping.collectionId].split(' ')[1] !== '0009')
+                        && result[fieldToConceptIdMapping.discardFlag] !== fieldToConceptIdMapping.yes && result[fieldToConceptIdMapping.deviationNotFound] !== fieldToConceptIdMapping.yes)
   filteredResults.forEach( i => {
       let vialMappings = getVialTypesMappings(i)
-      updateResultMappings(i, vialMappings)
+       updateResultMappings(i, vialMappings)
   })
   return filteredResults
 }
@@ -93,22 +96,22 @@ const modifyBSIQueryResults = (results) => {
 const getVialTypesMappings = (i) => {
   let vialMappingsHolder = []
   
-    if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research  && i[fieldToConceptIdMapping.healthcareProvider] === '' && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' )) {
+    if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' )) {
       vialMappingsHolder.push('10 mL Serum separator tube', 'SST', 'Serum', '10')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.healthcareProvider] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003') {
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003') {
       vialMappingsHolder.push('10 ml Vacutainer', 'Lithium Heparin', 'Whole Bl', '10')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.healthcareProvider] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004') {
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004') {
       vialMappingsHolder.push('10 ml Vacutainer', 'EDTA', 'Whole Bl', '10')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.healthcareProvider] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005') {
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005') {
       vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole Bl', '6')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.healthcareProvider] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0006') {
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0006') {
       vialMappingsHolder.push('10 ml Vacutainer', 'No Additive', 'Urine', '10')
     }
-    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.healthcareProvider] === '' && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0007') {
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0007') {
       vialMappingsHolder.push('15ml Nalgene jar', 'Crest Alcohol Free', 'Saliva', '15')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpCO"]
@@ -252,6 +255,8 @@ const updateResultMappings = (i, vialMappings) => {
   delete i[fieldToConceptIdMapping.dateWithdrawn]
   delete i[fieldToConceptIdMapping.dateReceived]
   delete i[fieldToConceptIdMapping.collectionType]
+  delete i[fieldToConceptIdMapping.discardFlag]
+  delete i[fieldToConceptIdMapping.deviationNotFound]
 }
 
 const generateBSIqueryCSVData = (items) => {
