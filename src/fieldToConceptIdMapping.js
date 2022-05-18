@@ -61,6 +61,10 @@ export default {
     clinical: 664882224,
     loginSite: 789843387,
     healthcareProvider: 827220437,
+    discardFlag: 762124027,
+    deviationNotFound: 982885431,
+
+
     
     // not shipped specimen deviation id
     brokenSpecimenDeviation: 472864016,
