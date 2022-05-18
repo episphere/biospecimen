@@ -96,7 +96,7 @@ const getVialTypesMappings = (i) => {
   let vialMappingsHolder = []
   
     if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' )) {
-      vialMappingsHolder.push('10 mL Serum separator tube', 'SST', 'Serum', '10')
+      vialMappingsHolder.push('8.5 mL Serum separator tube', 'SST', 'Serum', '8.5')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003') {
       vialMappingsHolder.push('10 ml Vacutainer', 'Lithium Heparin', 'Whole Bl', '10')
