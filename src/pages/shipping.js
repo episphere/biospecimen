@@ -604,7 +604,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
                         
                     </div>
                     <div class="modal-body"> 
-                        <h4>Please enter your name here to indicate this shipment is finalized. Once signed, no changes can be made to the shipment details.<h4>
+                        <h4>Please enter your email here to indicate this shipment is finalized. Once signed, no changes can be made to the shipment details.<h4>
                         <input type="text" id="finalizeSignInput">
                         </input>
                         <p id="finalizeModalError" style="color:red;display:none;">
