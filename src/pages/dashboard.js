@@ -188,8 +188,7 @@ export const searchResults = (result) => {
                 <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
                 <td>${data.Connect_ID}</td>
                 <td>${verificationConversion[[data['821247024']]]}</td>
-                <td>${data['773707518'] === 353358909 || data['831041022'] === 353358909 || data['747006172'] === 353358909 ? `<i class="fas fa-2x fa-times"></i>` : `<i class="fas fa-2x fa-check"></i>`}</td>
-        
+                <td>${data['912301837'] === 208325815 || data['912301837'] === 622008261 || data['912301837'] === 458508122 ? `<i class="fas fa-2x fa-check"></i>` :  `<i class="fas fa-2x fa-times"></i>`}</td>
                 <td>
                     <button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>${!isCheckedIn ? `Go to Check-In` : `Go to Check-Out`}</button>
                 </td>

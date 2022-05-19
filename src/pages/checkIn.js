@@ -106,7 +106,7 @@ const participantStatus = (data) => {
                         <span class="full-width">Participation Status</span>
                     </div>
                     <div class="row">
-                        <span class="full-width">${data['912301837'] === 208325815 ? `<i class="fas fa-2x fa-check"></i>` : `<i class="fas fa-2x fa-times"></i>`}</span>
+                        <span class="full-width">${data['912301837'] === 208325815 || data['912301837'] === 622008261 || data['912301837'] === 458508122 ? `<i class="fas fa-2x fa-check"></i>` :  `<i class="fas fa-2x fa-times"></i>`}</span>
                     </div>
                     <div class="row">
                         <span class="full-width">${participationConversion[data['912301837']]}</span>
