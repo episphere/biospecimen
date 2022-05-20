@@ -1,4 +1,5 @@
 export const firebaseConfig = () => {
+    /*
     return {
         apiKey: "AIzaSyCoz1UxNYE53ujAkXysPTSEA-IDU9utcNQ",
         authDomain: "nih-nci-dceg-connect-dev.firebaseapp.com",
@@ -8,5 +9,11 @@ export const firebaseConfig = () => {
         messagingSenderId: "1061430463455",
         appId: "1:1061430463455:web:948e929b4b47dd0909926a",
         measurementId: "G-HNEN7DH59R"
+    };
+    */
+
+    return {
+        apiKey: "AIzaSyDjFzceC2w6e9SPrSgx8_jDWnOpHdJbTGs",
+        authDomain: "nih-nci-dceg-connect-stg-5519.firebaseapp.com"
     };
 };
