@@ -1,4 +1,4 @@
-import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getCollectionsByVisit } from "./../shared.js";
+import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getCollectionsByVisit, getParticipantCollections, getBaselineData } from "./../shared.js";
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 
 export const checkInTemplate = async (data) => {
@@ -65,7 +65,9 @@ export const checkInTemplate = async (data) => {
 }
 
 const participantStatus = (data) => {
-    
+let baselinedata = getBaselineData(data);
+console.log(baselinedata);
+
     return `
         <div class="row">
             <div class="col-md-12">

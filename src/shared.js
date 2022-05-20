@@ -1000,6 +1000,7 @@ export const updateBaselineData = async (siteTubesList, data) => {
 
     const response = await getParticipantCollections(data.token);
     const baselineCollections = response.data.filter(collection => collection['331584571'] === 266600170);
+    getParticipantCollections(data.token).then((res)=> {console.log("data", res.data)}, (err) =>{console.log("err", err)});
     
     const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
     const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
@@ -1897,3 +1898,68 @@ export const checkNonAlphanumericStr = (boxes) => {
     }
   }
 }
+
+export const getBaselineData = async (data) => {
+
+    const response = await getParticipantCollections(data.token);
+    const baselineCollections = response.data.filter(collection => collection['331584571'] === 266600170);
+
+    let baselineData = {
+        bloodCollection: {
+            collected: null,
+            id: null,
+            timeStamp: null,
+            specimenId: null,
+        },
+        urineCollection: {
+            collected: null,
+            id: null,
+            timeStamp: null,
+            specimenId: null,
+        },
+        mouthwashCollection: {
+            collected: null,
+            id: null,
+            timeStamp: null,
+            specimenId: null,
+        },
+        };
+
+        const specimenCodes = {
+            blood: '0003',
+            urine: '0005',
+            mouthwash: '0004',
+        }
+    
+    baselineCollections.forEach(collection => {
+    
+    if(collection[tube.concept]['593843561'] === 353358909) {
+        baselineData.bloodCollection = {
+            collected: true,
+            id: collection['820476880'],
+            timeStamp: collection['678166505'],
+            specimenId: `${collection['820476880']} ${specimenCodes.blood}`,
+        }
+    }
+    
+    if(collection[tube.concept]['593843561'] === 353358909) {
+        baselineData.urineCollection = {
+            collected: true,
+            id: collection['820476880'],
+            timeStamp: collection['678166505'],
+            specimenId: `${collection['820476880']} ${specimenCodes.urine}`,
+        }
+    }
+
+    if(collection[tube.concept]['593843561'] === 353358909) {
+        baselineData.mouthwashCollection = {
+            collected: true,
+            id: collection['820476880'],
+            timeStamp: collection['678166505'],
+            specimenId: `${collection['820476880']} ${specimenCodes.mouthwash}`,
+        }
+    }
+    });
+    
+    return baselineData;
+    }

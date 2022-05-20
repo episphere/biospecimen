@@ -2,7 +2,8 @@ import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEven
 import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow, getCheckedInVisit } from '../shared.js';
 
 export const tubeCollectedTemplate = (data, formData) => {
-
+    console.log('data', data);
+    console.log('formData', formData);
     let template = `
         </br>
         <div class="row">
@@ -46,6 +47,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                     
                     let siteTubesList = getSiteTubesLists(formData);
                     const collectionFinalized = (formData['410912345'] === 353358909);
+                    console.log('siteTubesList', siteTubesList);
                     
                     if(!siteTubesList || siteTubesList?.length === 0) siteTubesList = [];
 
