@@ -64,6 +64,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");
 
     const allBoxes = allShipped;
+    console.log("allBoxes shipped", allBoxes)
 
     // // Return an array of an item of grouped bags from GET request***
     const bagsArr = groupAllBags(allBoxes);
@@ -92,33 +93,37 @@ const packagesInTransitTemplate = async (username, auth, route) => {
         shippedByArr,
         bagIdArr,
     };
+
+    // console.log("passed into manifestButton function allBoxes",allBoxes)
+    // console.log("passed into manifestButton function dataObj",dataObj)
+    // console.log("passed into manifestButton function manifestModalBodyEl",manifestModalBodyEl)
     manifestButton([...allBoxes], dataObj, manifestModalBodyEl);
 };
 
 const filterShipped = (boxes) => {
   // boxes are from searchBoxes endpoint
-  if(boxes.length === 0) {
-    return []
-  } 
-  let filteredBoxes = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]])
-  let sortShipped = filteredBoxes.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
-  return sortShipped
+  if(boxes.length === 0) return []
+  let filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
+  let sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
+  return sortBoxesBySubmitShipmentTime
 }
 
 const createPackagesInTransitRows = (boxes) => {
     let template = "";
             const allBoxes = boxes;
+            console.log("createPackagesInTransitRows allBoxes",allBoxes);
 
             // Return a filtered array of an item of grouped bags from GET request***
             const bagsArr = groupAllBags(allBoxes);
 
             // Returns an array of summed and grouped bag samples
             const sumSamplesArr = countSamplesArr(bagsArr);
+            console.log(sumSamplesArr)
             // Populate Cells with Data
             allBoxes.forEach((box, index) => {
                 if (box[fieldToConceptIdMapping.siteShipmentReceived] != fieldToConceptIdMapping.yes) {
                 template += `
-                      <tr class="packageInTransitRow">
+                      <tr class="packageInTransitRow-${index}">
                       <td style="text-align:center;">${
                           box[fieldToConceptIdMapping.shippingShipDate]
                               ? convertTime(box[fieldToConceptIdMapping.shippingShipDate]).split(",")[0] : ""
@@ -130,8 +135,8 @@ const createPackagesInTransitRows = (boxes) => {
                       <td style="text-align:center;">${sumSamplesArr[index]}</td>
                       <td style="text-align:center;">${tempProbeFound(box[fieldToConceptIdMapping["tempProbe"]])}</td>
                       <td>
-                        <button class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
-                            Manifest
+                        <button id="manifest-button-${index}" class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
+                          Manifest
                         </button>
                       </td>
                       </tr>`;
@@ -141,9 +146,11 @@ const createPackagesInTransitRows = (boxes) => {
 
 const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
     const buttons = document.getElementsByClassName("manifest-button");
-    
+    const packagesInTransitDataTable = document.getElementById("packagesInTransitData")
+    // const button = document.getElementById
     // DESTRUCTURING dataObj and fieldToConceptIdMapping
     const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr } = dataObj;
+    console.log("dataObj",dataObj)
     const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
 
     Array.from(buttons).forEach((button, index) => {
@@ -184,6 +191,8 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                 groupScannedBy,
                 groupShippedBy
             } = parsedModalData;
+
+            console.log("groupScannedBy",groupScannedBy, index)
 
             let modalBody = `<div class="container-fluid">
             <div class="row">
@@ -277,7 +286,10 @@ const groupSamplesArr = (bagsArr) => {
             arrSamples.push([]);
         }
     });
-    return arrSamples;
+    // console.log("arrSamples",arrSamples)
+    // console.log(Object.assign({},arrSamples))
+    // return Object.assign({},arrSamples);
+    return arrSamples
 };
 
 // NESTED GROUP SCANNED BY INDEX***
