@@ -65,7 +65,6 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 
     const allBoxes = allBoxesShippedBySiteAndNotReceived;
 
-
     // // Return an array of an item of grouped bags from GET request***
     const bagsArr = groupAllBags(allBoxes);
 
@@ -107,7 +106,6 @@ const filterShipped = (boxes) => {
 const createPackagesInTransitRows = (boxes) => {
     let template = "";
             const allBoxes = boxes;
-            console.log("createPackagesInTransitRows allBoxes",allBoxes);
 
             // Return a filtered array of an item of grouped bags from GET request***
             const bagsArr = groupAllBags(allBoxes);
@@ -276,7 +274,7 @@ const groupSamplesArr = (bagsArr) => {
             arrSamples.push([]);
         }
     });
-    return arrSamples
+    return arrSamples;
 };
 
 // NESTED GROUP SCANNED BY INDEX***
