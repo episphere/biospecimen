@@ -75,13 +75,18 @@ export const userNavBar = (name) => {
     `;
 }
 
-export const nonUserNavBar = (name) => {
+export const nonUserNavBar = (name, isBPTLUser) => {
     return `
         <div class="navbar-nav current-page">
             <li class="nav-item">
                 <a class="nav-link" href="#welcome" id="welcome" title="Home"><i class="fas fa-home"></i> Home</a>
             </li>
         </div>
+        ${isBPTLUser === true ? `<div class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="#bptl" id="bptl" title="Home"><i class="fa fa-id-badge"></i> BPTL</a>
+            </li>
+        </div>` : ``}
         <div class="navbar-nav ml-auto">
             <div class="grid-elements dropdown">
                 <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn"  title="Welcome, ${name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -175,7 +180,25 @@ export const bodyNavBar = () => {
             <li class="nav-item">
                 <button class="nav-link navbar-btn" id="navBarSpecimenSearch">Specimen Search</button>
             </li>
-            ${workflow && workflow === 'clinical' ? ``:`
+            <li class="nav-item">
+            <button style="display:none" class="nav-link navbar-btn" id="navBarParticipantCheckIn">Check-In/Check-Out</button>
+            </li>
+            <li class="nav-item">
+            <button style="display:none" class="nav-link navbar-btn" id="navBarSpecimenLink">Specimen Link</button>
+            </li>
+            <li class="nav-item">
+            <button style="display:none" class="nav-link navbar-btn" id="navBarTubeCollection">Collection Data Entry</button>
+            </li>
+            <li class="nav-item">
+            <button style="display:none" class="nav-link navbar-btn" id="navBarReview">Collection Review</button>
+            </li>
+        </ul>`;
+        
+        document.getElementById('contentHeader').innerHTML = template;
+}
+
+/**
+ ${workflow && workflow === 'clinical' ? ``:`
                 <li class="nav-item">
                     <button class="nav-link disabled navbar-btn" id="navBarParticipantCheckIn">Participant Check-In</button>
                 </li>
@@ -184,7 +207,7 @@ export const bodyNavBar = () => {
                 <button class="nav-link disabled navbar-btn" id="navBarSpecimenLink">Specimen Link</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link disabled navbar-btn" id="navBarSpecimenProcess">${workflow && workflow === 'clinical' ? `Labeling and Receipt`: `Collect/Process`}</button>
+                <button class="nav-link disabled navbar-btn" id="navBarSpecimenProcess">${workflow && workflow === 'clinical' ? `Labeling and Scanning`: `Collect/Process`}</button>
             </li>
             <li class="nav-item">
                 <button class="nav-link disabled navbar-btn" id="navBarSpecimenFinalize">${workflow && workflow === 'clinical' ? `Receipt Summary`: `Review`}</button>
@@ -194,10 +217,7 @@ export const bodyNavBar = () => {
                     <button class="nav-link disabled navbar-btn" id="participantCheckOut">Participant Check-Out</button>
                 </li>
             `}
-        </ul>`;
-        
-        document.getElementById('contentHeader').innerHTML = template;
-}
+ */
 export const shippingNavBar = () => {
     return `
         <ul class="nav nav-tabs row">
@@ -208,13 +228,13 @@ export const shippingNavBar = () => {
                 <button class="nav-link navbar-btn" id="navBarBoxManifest">Box Manifest</button>
             </li>
             <li class="nav-item col-auto">
-                <button class="nav-link navbar-btn" id="navBarShippingManifest">Shipping Manifest</button>
+                <button class="nav-link navbar-btn" id="navBarReviewShipmentContents">Review Shipment Contents</button>
             </li>
             <li class="nav-item col-auto">
-                <button class="nav-link navbar-btn" id="navBarShipmentTracking">Shipment Tracking Information</button>
+                <button class="nav-link navbar-btn" id="navBarShipmentTracking">Assign Tracking Information</button>
             </li>
             <li class="nav-item col-auto">
-                <button class="nav-link navbar-btn" id="navBarSummaryAndReview">Summary and Review</button>
+                <button class="nav-link navbar-btn" id="navBarFinalizeShipment">Finalize Shipment</button>
             </li>
         </ul>`
 }

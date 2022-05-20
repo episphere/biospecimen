@@ -1,34 +1,39 @@
-const deviationReason1 = {'concept': 472864016, 'label':'Broken'}
-const deviationReason2 = {'concept': 102695484, 'label':'Centrifuge -  did not clot at least 30 minutes'}
-const deviationReason3 = {'concept': 912088602, 'label':'Centrifuge -  clotted for longer than 2 hours'}
-const deviationReason4 = {'concept': 861162895, 'label':'Centrifuge - Improper speed/force setting used (too high)'}
-const deviationReason5 = {'concept': 561005927, 'label':'Centrifuge - Improper speed/force setting used (too low)'}
-const deviationReason6 = {'concept': 654002184, 'label':'Centrifuge - improper time of spinning (too long)'}
-const deviationReason7 = {'concept': 937362785, 'label':'Centrifuge - improper time of spinning (too short)'}
-const deviationReason8 = {'concept': 635875253, 'label':'Failed/broken gel layer'}
-const deviationReason9 = {'concept': 242307474, 'label':'Hemolyzed'}
-const deviationReason10 = {'concept': 550088682, 'label':'Improper temperature - too low/frozen (record time and temperature Deviation in the comments)'}
-const deviationReason11 = {'concept': 690540566, 'label':'Improper temperature - too high (record time and temperature Deviation in the comments)'}
-const deviationReason12 = {'concept': 956345366, 'label':'Insufficient volume - not enough volume to transfer to urine tube (discard)'}
+const deviationReason1 = {'concept': 472864016, 'label':'Broken (discard do not ship)'}
+const deviationReason2 = {'concept': 102695484, 'label':'Cent. clotted <30 minutes'}
+const deviationReason3 = {'concept': 912088602, 'label':'Cent. clotted >2 hours'}
+const deviationReason4 = {'concept': 861162895, 'label':'Cent. speed/force too high'}
+const deviationReason5 = {'concept': 561005927, 'label':'Cent. speed/force too low'}
+const deviationReason6 = {'concept': 654002184, 'label':'Cent. spin time too long'}
+const deviationReason7 = {'concept': 937362785, 'label':'Cent. spin time too short'}
+const deviationReason8 = {'concept': 635875253, 'label':'Gel layer failed/broken'}
+const deviationReason9 = {'concept': 242307474, 'label':'Hemolysis present'}
+const deviationReason10 = {'concept': 550088682, 'label':'Low Temp/frozen (Temp in comments)'}
+const deviationReason11 = {'concept': 690540566, 'label':'High Temp (Temp in comments)'}
+const deviationReason12 = {'concept': 956345366, 'label':'Insufficient volume, discard'}
 const deviationReason13 = {'concept': 757246707, 'label':'Leaked/spilled'}
-const deviationReason14 = {'concept': 262420266, 'label':'Lipemia'}
-const deviationReason15 = {'concept': 728366619, 'label':'Low volume - (tube/container partially filled but still usable)'}
-const deviationReason16 = {'concept': 806820884, 'label':'Mislabeled'}
-const deviationReason17 = {'concept': 468668640, 'label':'Urine hat used'}
-const deviationReason18 = {'concept': 453343022, 'label':'Other'}
+const deviationReason14 = {'concept': 728366619, 'label':'Low volume usable'}
+const deviationReason15 = {'concept': 684617815, 'label':'Mislabeled - discard'}
+const deviationReason16 = {'concept': 453343022, 'label':'Other (record in comments)'}
+const deviationReason17 = {'concept': 810960823, 'label': 'Discard (record in comments)'}
+const deviationReason18 = {'concept': 777486216, 'label': 'Unexpected tube size or type'}
+const deviationReason19 = {'concept': 283900611, 'label': 'Mislabeled - resolved'}
+const deviationReason20 = {'concept': 982885431, 'label': 'Not found'}
+const deviationReason21 = {'concept': 313097539, 'label': 'Outside of tube contaminated'}
+const deviationReason22 = {'concept': 742806035, 'label': 'Less than 30 seconds'}
 
-const deviationCollection1 = [deviationReason1, deviationReason2, deviationReason3, deviationReason4, deviationReason5, deviationReason6, deviationReason7, deviationReason8, deviationReason9, deviationReason10, deviationReason11, deviationReason13, deviationReason14, deviationReason15, deviationReason16, deviationReason18];
-const deviationCollection2 = [deviationReason1, deviationReason9, deviationReason10, deviationReason11, deviationReason13, deviationReason14, deviationReason15, deviationReason16, deviationReason18];
-const deviationCollection3 = [deviationReason1, deviationReason10, deviationReason11, deviationReason12, deviationReason13, deviationReason15, deviationReason16, deviationReason17, deviationReason18];
-const deviationCollection4 = [deviationReason1, deviationReason13, deviationReason15, deviationReason16, deviationReason18];
+const deviationCollection1 = [deviationReason1, deviationReason2, deviationReason3, deviationReason4, deviationReason5, deviationReason6, deviationReason7, deviationReason8, deviationReason9, deviationReason10, deviationReason11, deviationReason13, deviationReason14, deviationReason15, deviationReason16, deviationReason17, deviationReason18, deviationReason19, deviationReason20, deviationReason21];
+const deviationCollection2 = [deviationReason1, deviationReason9, deviationReason10, deviationReason11, deviationReason13, deviationReason14, deviationReason15, deviationReason16, deviationReason17, deviationReason18, deviationReason19, deviationReason20, deviationReason21];
+const deviationCollection3 = [deviationReason1, deviationReason10, deviationReason11, deviationReason12, deviationReason13, deviationReason14, deviationReason15, deviationReason16, deviationReason19, deviationReason20, deviationReason21];
+const deviationCollection4 = [deviationReason1, deviationReason13, deviationReason14, deviationReason15, deviationReason16, deviationReason19, deviationReason20, deviationReason21, deviationReason22];
 
 const tubeNotCollectedReason1 = {'concept': 234139565, 'label': 'Short draw'};
 const tubeNotCollectedReason2 = {'concept': 681745422, 'label': 'Participant refusal'};
-const tubeNotCollectedReason3 = {'concept': 745205161, 'label': 'Participant unable'};
-const tubeNotCollectedReason4 = {'concept': 181769837, 'label': 'Other'};
+const tubeNotCollectedReason3 = {'concept': 745205161, 'label': 'Participant attempted'};
+const tubeNotCollectedReason4 = {'concept': 181769837, 'label': 'Other (record in comments)'};
+const tubeNotCollectedReason5 = {'concept': 889386523, 'label': 'Supply Unavailable'};
 
-const tubeNotCollectedOptions1 = [tubeNotCollectedReason1, tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason4];
-const tubeNotCollectedOptions2 = [tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason4];
+const tubeNotCollectedOptions1 = [tubeNotCollectedReason1, tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason5, tubeNotCollectedReason4];
+const tubeNotCollectedOptions2 = [tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason5, tubeNotCollectedReason4];
 
 const tube0001 = {
     'specimenType': 'Serum Separator Tube',
@@ -98,51 +103,6 @@ const tube0021 = {
     'name': 'tube21',
     'concept': '589588440',
     'id': '0021',
-    'tubeColor': 'Gold',
-    'collectionChkBox': true,
-    'deviationChkBox': true,
-    'deviationOptions': deviationCollection1,
-    'tubeNotCollectedOptions': tubeNotCollectedOptions1
-};
-
-const tube0022 = {
-    'specimenType': 'Serum Separator Tube',
-    'tubeType': 'Blood tube',
-    'readableValue': 'Serum Separator Tube',
-    'image': './static/images/tube1.PNG',
-    'name': 'tube22',
-    'id': '0022',
-    'concept': '746999767',
-    'tubeColor': 'Gold',
-    'collectionChkBox': true,
-    'deviationChkBox': true,
-    'deviationOptions': deviationCollection1,
-    'tubeNotCollectedOptions': tubeNotCollectedOptions1
-};
-
-const tube0031 = {
-    'specimenType': 'Serum Separator Tube',
-    'tubeType': 'Blood tube',
-    'readableValue': 'Serum Separator Tube',
-    'image': './static/images/tube1.PNG',
-    'name': 'tube31',
-    'concept': '857757831',
-    'id': '0031',
-    'tubeColor': 'Gold',
-    'collectionChkBox': true,
-    'deviationChkBox': true,
-    'deviationOptions': deviationCollection1,
-    'tubeNotCollectedOptions': tubeNotCollectedOptions1
-};
-
-const tube0032 = {
-    'specimenType': 'Serum Separator Tube',
-    'tubeType': 'Blood tube',
-    'readableValue': 'Serum Separator Tube',
-    'image': './static/images/tube1.PNG',
-    'name': 'tube32',
-    'concept': '654812257',
-    'id': '0032',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
     'deviationChkBox': true,
@@ -260,7 +220,7 @@ const tube0008 = {
     'name': 'tube8',
     'concept': '787237543',
     'id': '0008',
-    'collectionChkBox': false,
+    'collectionChkBox': true,
     'deviationChkBox': false
 };
 
@@ -271,7 +231,7 @@ const tube0009 = {
     'name': 'tube9',
     'concept': '223999569',
     'id': '0009',
-    'collectionChkBox': false,
+    'collectionChkBox': true,
     'deviationChkBox': false
 };
 
@@ -298,22 +258,6 @@ export const workflows = {
         tube0014,
         tube0005,
         tube0008
-    ],
-    clinical_non_oahu : [
-        tube0001,
-        tube0002,
-        tube0011,
-        tube0012,
-        tube0021,
-        tube0022,
-        tube0031,
-        tube0032,
-        tube0003,
-        tube0013,
-        tube0004,
-        tube0014,
-        tube0005,
-        tube0008
     ]
 };
 
@@ -322,7 +266,7 @@ export const siteSpecificTubeRequirements = {
         'research': workflows.research,
         'clinical': workflows.clinical
     },
-    'NCI': {
+    'NIH': {
         'research': workflows.research,
         'clinical': workflows.clinical
     },
@@ -356,11 +300,7 @@ export const siteSpecificTubeRequirements = {
     },
     'KPHI': {
         'research': workflows.research,
-        'clinical': {
-            'Oahu': workflows.clinical,
-            'non-Oahu': workflows.clinical_non_oahu
-        }
-        
+        'clinical': workflows.clinical
     }
 }
 
