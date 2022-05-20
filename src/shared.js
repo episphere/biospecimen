@@ -83,6 +83,7 @@ export const inactivityTime = () => {
 
 export const validateUser = async () => {
     const idToken = await getIdToken();
+    console.log(idToken);
     const response = await fetch(`${api}api=validateUsers`, {
         method: "GET",
         headers: {
