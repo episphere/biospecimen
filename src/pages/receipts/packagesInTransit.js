@@ -16,7 +16,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     showAnimation();
     const response = await getAllBoxes(`bptl`);
     hideAnimation();
-    const allShipped = filterShipped(response.data)
+    const allBoxesShippedBySiteAndNotReceived = filterShipped(response.data)
 
     let template = "";
     template += receiptsNavbar();
@@ -39,7 +39,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                                     </tr>
                                 </thead>   
                                 <tbody id="contentBodyPackagesInTransit">
-                                    ${createPackagesInTransitRows(allShipped)}
+                                    ${createPackagesInTransitRows(allBoxesShippedBySiteAndNotReceived)}
                                 </tbody>
                         </table>
                     </div>
@@ -63,7 +63,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     activeReceiptsNavbar();
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");
 
-    const allBoxes = allShipped;
+    const allBoxes = allBoxesShippedBySiteAndNotReceived;
 
     // // Return an array of an item of grouped bags from GET request***
     const bagsArr = groupAllBags(allBoxes);
@@ -97,12 +97,10 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 
 const filterShipped = (boxes) => {
   // boxes are from searchBoxes endpoint
-  if(boxes.length === 0) {
-    return []
-  } 
-  let filteredBoxes = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]])
-  let sortShipped = filteredBoxes.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
-  return sortShipped
+  if(boxes.length === 0) return []
+  let filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
+  let sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
+  return sortBoxesBySubmitShipmentTime
 }
 
 const createPackagesInTransitRows = (boxes) => {
@@ -118,7 +116,7 @@ const createPackagesInTransitRows = (boxes) => {
             allBoxes.forEach((box, index) => {
                 if (box[fieldToConceptIdMapping.siteShipmentReceived] != fieldToConceptIdMapping.yes) {
                 template += `
-                      <tr class="packageInTransitRow">
+                      <tr class="packageInTransitRow-${index}">
                       <td style="text-align:center;">${
                           box[fieldToConceptIdMapping.shippingShipDate]
                               ? convertTime(box[fieldToConceptIdMapping.shippingShipDate]).split(",")[0] : ""
@@ -130,8 +128,8 @@ const createPackagesInTransitRows = (boxes) => {
                       <td style="text-align:center;">${sumSamplesArr[index]}</td>
                       <td style="text-align:center;">${tempProbeFound(box[fieldToConceptIdMapping["tempProbe"]])}</td>
                       <td>
-                        <button class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
-                            Manifest
+                        <button id="manifest-button-${index}" class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
+                          Manifest
                         </button>
                       </td>
                       </tr>`;
@@ -141,7 +139,6 @@ const createPackagesInTransitRows = (boxes) => {
 
 const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
     const buttons = document.getElementsByClassName("manifest-button");
-    
     // DESTRUCTURING dataObj and fieldToConceptIdMapping
     const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr } = dataObj;
     const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
