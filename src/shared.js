@@ -31,7 +31,7 @@ const conversion = {
     "683613884":"0024"
 }
   
- const api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
+ const api = 'https://api-myconnect-stage.cancer.gov/app?';
 // const api = 'http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
 
 export const inactivityTime = () => {
