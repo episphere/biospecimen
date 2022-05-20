@@ -31,7 +31,7 @@ const conversion = {
     "683613884":"0024"
 }
   
- const api = 'https://api-myconnect-stage.cancer.gov/app?';
+ const api = 'https://api-myconnect-stage.cancer.gov/biospecimen?';
 // const api = 'http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
 
 export const inactivityTime = () => {
@@ -83,7 +83,6 @@ export const inactivityTime = () => {
 
 export const validateUser = async () => {
     const idToken = await getIdToken();
-    console.log(idToken);
     const response = await fetch(`${api}api=validateUsers`, {
         method: "GET",
         headers: {
