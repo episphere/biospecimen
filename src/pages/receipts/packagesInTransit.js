@@ -16,7 +16,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     showAnimation();
     const response = await getAllBoxes(`bptl`);
     hideAnimation();
-    const allShipped = filterShipped(response.data)
+    const allBoxesShippedBySiteAndNotReceived = filterShipped(response.data)
 
     let template = "";
     template += receiptsNavbar();
@@ -39,7 +39,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                                     </tr>
                                 </thead>   
                                 <tbody id="contentBodyPackagesInTransit">
-                                    ${createPackagesInTransitRows(allShipped)}
+                                    ${createPackagesInTransitRows(allBoxesShippedBySiteAndNotReceived)}
                                 </tbody>
                         </table>
                     </div>
@@ -63,8 +63,8 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     activeReceiptsNavbar();
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");
 
-    const allBoxes = allShipped;
-    console.log("allBoxes shipped", allBoxes)
+    const allBoxes = allBoxesShippedBySiteAndNotReceived;
+
 
     // // Return an array of an item of grouped bags from GET request***
     const bagsArr = groupAllBags(allBoxes);
@@ -93,10 +93,6 @@ const packagesInTransitTemplate = async (username, auth, route) => {
         shippedByArr,
         bagIdArr,
     };
-
-    // console.log("passed into manifestButton function allBoxes",allBoxes)
-    // console.log("passed into manifestButton function dataObj",dataObj)
-    // console.log("passed into manifestButton function manifestModalBodyEl",manifestModalBodyEl)
     manifestButton([...allBoxes], dataObj, manifestModalBodyEl);
 };
 
@@ -118,7 +114,6 @@ const createPackagesInTransitRows = (boxes) => {
 
             // Returns an array of summed and grouped bag samples
             const sumSamplesArr = countSamplesArr(bagsArr);
-            console.log(sumSamplesArr)
             // Populate Cells with Data
             allBoxes.forEach((box, index) => {
                 if (box[fieldToConceptIdMapping.siteShipmentReceived] != fieldToConceptIdMapping.yes) {
@@ -146,11 +141,8 @@ const createPackagesInTransitRows = (boxes) => {
 
 const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
     const buttons = document.getElementsByClassName("manifest-button");
-    const packagesInTransitDataTable = document.getElementById("packagesInTransitData")
-    // const button = document.getElementById
     // DESTRUCTURING dataObj and fieldToConceptIdMapping
     const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr } = dataObj;
-    console.log("dataObj",dataObj)
     const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
 
     Array.from(buttons).forEach((button, index) => {
@@ -191,8 +183,6 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                 groupScannedBy,
                 groupShippedBy
             } = parsedModalData;
-
-            console.log("groupScannedBy",groupScannedBy, index)
 
             let modalBody = `<div class="container-fluid">
             <div class="row">
@@ -286,9 +276,6 @@ const groupSamplesArr = (bagsArr) => {
             arrSamples.push([]);
         }
     });
-    // console.log("arrSamples",arrSamples)
-    // console.log(Object.assign({},arrSamples))
-    // return Object.assign({},arrSamples);
     return arrSamples
 };
 
