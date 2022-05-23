@@ -1327,11 +1327,11 @@ export const verificationConversion = {
 export const participationConversion = {
     '208325815': 'No Refusal',
     '622008261': 'Refused some activities',
-    '906417725': 'Refused all future activities',
     '872012139': 'Revoked HIPAA only',
     '854021266': 'Withdrew consent',
     '241236037': 'Destroy data',
-    '987563196': 'Deceased'
+    '458508122': 'Refused all future activities',
+    '618686157': 'Deceased'
 };
 
 export const surveyConversion = {
