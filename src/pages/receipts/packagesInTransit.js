@@ -14,9 +14,9 @@ export const packagesInTransitScreen = async (auth, route) => {
 
 const packagesInTransitTemplate = async (username, auth, route) => {
     showAnimation();
-    const response = await getAllBoxes();
+    const response = await getAllBoxes(`bptl`);
     hideAnimation();
-    const allShipped = filterShipped(response.data)
+    const allBoxesShippedBySiteAndNotReceived = filterShipped(response.data)
 
     let template = "";
     template += receiptsNavbar();
@@ -39,7 +39,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
                                     </tr>
                                 </thead>   
                                 <tbody id="contentBodyPackagesInTransit">
-                                    ${createPackagesInTransitRows(allShipped)}
+                                    ${createPackagesInTransitRows(allBoxesShippedBySiteAndNotReceived)}
                                 </tbody>
                         </table>
                     </div>
@@ -63,7 +63,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     activeReceiptsNavbar();
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");
 
-    const allBoxes = allShipped;
+    const allBoxes = allBoxesShippedBySiteAndNotReceived;
 
     // // Return an array of an item of grouped bags from GET request***
     const bagsArr = groupAllBags(allBoxes);
@@ -83,6 +83,9 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     // // Returns an array -->  nested array of bag Ids names by index
     const bagIdArr = groupBagIdArr(bagsArr);
 
+    // // Returns an array -->  array of tracking numbers 
+    const trackingNumberArr = groupByTrackingNumber(allBoxes)
+
     // Object Property Value Shorthand
     // Example: bagsArr and bagsArr:bagsArr are equivalent
     const dataObj = {
@@ -91,18 +94,17 @@ const packagesInTransitTemplate = async (username, auth, route) => {
         scannedByArr,
         shippedByArr,
         bagIdArr,
+        trackingNumberArr
     };
     manifestButton([...allBoxes], dataObj, manifestModalBodyEl);
 };
 
 const filterShipped = (boxes) => {
   // boxes are from searchBoxes endpoint
-  if(boxes.length === 0) {
-    return []
-  } 
-  let filteredBoxes = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]])
-  let sortShipped = filteredBoxes.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
-  return sortShipped
+  if(boxes.length === 0) return []
+  let filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
+  let sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
+  return sortBoxesBySubmitShipmentTime
 }
 
 const createPackagesInTransitRows = (boxes) => {
@@ -118,7 +120,7 @@ const createPackagesInTransitRows = (boxes) => {
             allBoxes.forEach((box, index) => {
                 if (box[fieldToConceptIdMapping.siteShipmentReceived] != fieldToConceptIdMapping.yes) {
                 template += `
-                      <tr class="packageInTransitRow">
+                      <tr class="packageInTransitRow-${index}">
                       <td style="text-align:center;">${
                           box[fieldToConceptIdMapping.shippingShipDate]
                               ? convertTime(box[fieldToConceptIdMapping.shippingShipDate]).split(",")[0] : ""
@@ -130,8 +132,8 @@ const createPackagesInTransitRows = (boxes) => {
                       <td style="text-align:center;">${sumSamplesArr[index]}</td>
                       <td style="text-align:center;">${tempProbeFound(box[fieldToConceptIdMapping["tempProbe"]])}</td>
                       <td>
-                        <button class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
-                            Manifest
+                        <button id="manifest-button-${index}" class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
+                          Manifest
                         </button>
                       </td>
                       </tr>`;
@@ -141,9 +143,8 @@ const createPackagesInTransitRows = (boxes) => {
 
 const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
     const buttons = document.getElementsByClassName("manifest-button");
-    
     // DESTRUCTURING dataObj and fieldToConceptIdMapping
-    const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr } = dataObj;
+    const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr, trackingNumberArr  } = dataObj;
     const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
 
     Array.from(buttons).forEach((button, index) => {
@@ -158,7 +159,8 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
             bagIdArr,
             groupSamples: "",
             groupScannedBy: "",
-            groupShippedBy: ""
+            groupShippedBy: "",
+            trackingNumber: "",
         };
 
         modalData.site = allBoxes[index].siteAcronym;
@@ -168,6 +170,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
         modalData.groupSamples = bagSamplesArr[index];
         modalData.groupScannedBy = scannedByArr[index];
         modalData.groupShippedBy = shippedByArr;
+        modalData.trackingNumberArr = trackingNumberArr[index];
 
         // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
@@ -182,49 +185,56 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                 bagIdArr,
                 groupSamples,
                 groupScannedBy,
-                groupShippedBy
+                groupShippedBy,
+                trackingNumberArr
             } = parsedModalData;
 
-            let modalBody = `<div class="container-fluid">
-            <div class="row">
-                <div class="col-md-4">
-                    <p style="font-size:1.3rem;"><strong>Shipping Manifest</strong></p>
-                </div>
-                <div class="col-md-4 ml-auto">
+            let modalBody = 
+            `<div class="container-fluid">
+              <div class="row">
+                  <div class="col-md-4">
+                      <p style="font-size:1.5rem;"><strong>Shipping Manifest</strong></p>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-4">
+                      <p><strong>Tracking Number:</strong> ${trackingNumberArr ? trackingNumberArr : ""} </p>
+                  </div>
+                  <div class="col-md-4 ml-auto">
                     <p><strong>Site:</strong> ${site ? site : ""} </p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <p><strong>Shipped Date and Time:</strong> ${date ? convertTime(date) : ""}</p>
-                </div>
-                <div class="col-md-4 ml-auto">
-                    <p><strong>Location:</strong> ${location ? conceptIdToSiteSpecificLocation[location] : ""}</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <p><strong>Sender:</strong><br/>${groupShippedBy[index] ? groupShippedBy[index] : ""}</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                        <tr>
-                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col-">Box Number</th>
-                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Specimen Bag ID</th>
-                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Full Specimen ID</th>
-                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Scanned By</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, groupScannedBy)}
-                    </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>`;
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-4">
+                      <p><strong>Shipped Date and Time:</strong> ${date ? convertTime(date) : ""}</p>
+                  </div>
+                  <div class="col-md-4 ml-auto">
+                      <p><strong>Location:</strong> ${location ? (conceptIdToSiteSpecificLocation[location].length > 14 ? "<br>" + conceptIdToSiteSpecificLocation[location] : conceptIdToSiteSpecificLocation[location]) : ""}</p>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-4">
+                      <p><strong>Sender:</strong><br/>${groupShippedBy[index] ? groupShippedBy[index] : ""}</p>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="table-responsive">
+                      <table class="table table-striped">
+                          <thead>
+                          <tr>
+                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col-">Box Number</th>
+                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Specimen Bag ID</th>
+                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Full Specimen ID</th>
+                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Scanned By</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          ${addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, groupScannedBy)}
+                      </tbody>
+                      </table>
+                  </div>
+              </div>
+            </div>`;
         manifestModalBodyEl.innerHTML = modalBody;
         });
     });
@@ -351,6 +361,17 @@ const groupBagIdArr = (bagsArr) => {
     });
     return arrBagId;
 };
+
+const groupByTrackingNumber = (allBoxes) => {
+    const arrTrackingNums = []
+    allBoxes.forEach((box,index) => {
+      if(box[fieldToConceptIdMapping["shippingTrackingNumber"]]) {
+        let trackingNumber = box[fieldToConceptIdMapping["shippingTrackingNumber"]]
+        arrTrackingNums.push(trackingNumber)
+      }
+    })
+    return arrTrackingNums;
+}
 
 const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupScannedBy) => {
     let manifestBody = ``;

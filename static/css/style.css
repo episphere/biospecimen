@@ -329,3 +329,28 @@ canvas.drawing, canvas.drawingBuffer {
   border-color: #d39e00;
 }
 
+.modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+    transform: scale(0);
+    transition: all 0.2s ease-in-out;
+    z-index: 1000;
+  }
+  
+  .modal-wrapper.visible {
+    visibility: visible;
+    transform: scale(1);
+  }
+  
+  .modal-content {
+    border-radius: 5px;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+  }

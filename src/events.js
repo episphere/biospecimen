@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -348,30 +348,6 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let currSplit = masterBiospecimenId.split(/\s+/);
     let currBag = [];
     let empty = true;
-    let translateNumToType = {
-        "0001": "SST/Gold or Red",
-        "0002": "SST/Gold or Red",
-        "0003": "Heparin/Green",
-        "0004": "EDTA/Lavender",
-        "0005": "ACD/Yellow",
-        "0006": "Urine/Yellow",
-        "0007": "Mouthwash Container",
-        "0011": "SST/Gold or Red",
-        "0012": "SST/Gold or Red",
-        "0013": "Heparin/Green",
-        "0014": "EDTA/Lavender",
-        "0016": "Urine Cup",
-        "0021": "SST/Gold or Red",
-        "0022": "SST/Gold or Red",
-        "0031": "SST/Gold or Red",
-        "0032": "SST/Gold or Red",
-        "0024": "EDTA/Lavender",
-        "0050": "NA",
-        "0051": "NA",
-        "0052": "NA",
-        "0053": "NA",
-        "0054": "NA"
-    };
     if (!isOrphan) {
         if (currSplit.length >= 2 && currSplit[1] == '0008') {
             //look for all non-moutwash (0007)
@@ -481,31 +457,30 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
 
 
         showAnimation();
-        let hiddenJSON = {};
+        let boxObjects = {};
         let response = await getBoxes();
-        let boxJSONS = response.data;
+        let boxArray = response.data;
         let locations = {};
-        for (let i = 0; i < boxJSONS.length; i++) {
-            let box = boxJSONS[i]
+        for (let i = 0; i < boxArray.length; i++) {
+            let box = boxArray[i]
             // Box ID ("132929440"); Location ID, site specific ("560975149"); Login Site ("789843387")
             // add bags based on Box ID to hidden JSON
-            hiddenJSON[box['132929440']] = box['bags']
+            boxObjects[box['132929440']] = box['bags']
             // Location ID's value will be a number
             locations[box['132929440']] = box['560975149'];
         }
-        let nextBoxNum = Object.keys(hiddenJSON).length + 1;
+        let nextBoxNum = Object.keys(boxObjects).length + 1;
 
         //push the things into the right box
         //first get all elements still left
         let tubeTable = document.getElementById("shippingModalTable");
         let numRows = tubeTable.rows.length;
         let bagSplit = bagid.split(/\s+/);
-        let boxId = ""
+        let boxId = document.getElementById('shippingModalChooseBox').value;
         let nameSplit = userName.split(' ');
         let firstName = nameSplit[0] ? nameSplit[0] : '';
         let lastName = nameSplit[1] ? nameSplit[1] : '';
         let checkedSpecimensArr = Array.from(document.getElementsByClassName("samplePresentCheckbox")).filter(item => item.checked)
-        boxId = document.getElementById('shippingModalChooseBox').value;
 
         if (isOrphan) {
             bagid = 'unlabelled'
@@ -518,18 +493,18 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
             let toAddId = checkedSpecimensArr[i].getAttribute("data-full-specimen-id")
             toDelete.push(toAddId.split(/\s+/)[1]);
 
-            if (hiddenJSON.hasOwnProperty(boxId)) {
-                if (hiddenJSON[boxId].hasOwnProperty(bagid)) {
-                    let arr = hiddenJSON[boxId][bagid]['arrElements'];
+            if (boxObjects.hasOwnProperty(boxId)) {
+                if (boxObjects[boxId].hasOwnProperty(bagid)) {
+                    let arr = boxObjects[boxId][bagid]['arrElements'];
                     arr.push(toAddId);
                 }
                 else {
-                    hiddenJSON[boxId][bagid] = { 'arrElements': [toAddId], '469819603': firstName, '618036638': lastName };
+                    boxObjects[boxId][bagid] = { 'arrElements': [toAddId], '469819603': firstName, '618036638': lastName };
                 }
             }
             else {
-                hiddenJSON[boxId] = {}
-                hiddenJSON[boxId][bagid] = { 'arrElements': [toAddId], '469819603': firstName, '618036638': lastName };
+                boxObjects[boxId] = {}
+                boxObjects[boxId][bagid] = { 'arrElements': [toAddId], '469819603': firstName, '618036638': lastName };
             }
 
         }
@@ -558,22 +533,22 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
             shippingTable.rows[tableIndex].cells[1].innerText = parseCurrArr.length;
           }
         }
-        let boxIds = Object.keys(hiddenJSON).sort(compareBoxIds);
+        let boxIds = Object.keys(boxObjects).sort(compareBoxIds);
 
         for (let i = 0; i < boxIds.length; i++) {
             let currTime = new Date().toISOString();
             let toPass = {};
             let found = false;
             if (boxIds[i] == boxId) {
-                for (let j = 0; j < boxJSONS.length; j++) {
-                    if (boxJSONS[j]['132929440'] == boxIds[i]) {
+                for (let j = 0; j < boxArray.length; j++) {
+                    if (boxArray[j]['132929440'] == boxIds[i]) {
                       // Autogenerated date/time when first bag added to box - 672863981
-                        if (boxJSONS[j].hasOwnProperty('672863981')) {
-                            toPass['672863981'] = boxJSONS[j]['672863981'];
+                        if (boxArray[j].hasOwnProperty('672863981')) {
+                            toPass['672863981'] = boxArray[j]['672863981'];
                             found = true;
                         }
-                        if (boxJSONS[j].hasOwnProperty('555611076')) {
-                            toPass['555611076'] = boxJSONS[j]['555611076'];
+                        if (boxArray[j].hasOwnProperty('555611076')) {
+                            toPass['555611076'] = boxArray[j]['555611076'];
                         }
                     }
                 }
@@ -587,7 +562,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
                 Autogenerated date/time when box last modified (bag added or removed)- 555611076
                 */
                 toPass['132929440'] = boxIds[i]; 
-                toPass['bags'] = hiddenJSON[boxIds[i]]
+                toPass['bags'] = boxObjects[boxIds[i]]
                 toPass['560975149'] = locations[boxIds[i]]
                 toPass['789843387'] = siteSpecificLocation[conceptIdToSiteSpecificLocation[locations[boxIds[i]]]].siteCode
                 toPass['555611076'] = currTime;
@@ -596,25 +571,25 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         }
 
         response = await getAllBoxes();
-        boxJSONS = response.data;
-        hiddenJSON = {};
-        for (let i = 0; i < boxJSONS.length; i++) {
-            let box = boxJSONS[i]
-            hiddenJSON[box['132929440']] = box['bags']
+        boxArray = response.data;
+        boxObjects = {};
+        for (let i = 0; i < boxArray.length; i++) {
+            let box = boxArray[i]
+            boxObjects[box['132929440']] = box['bags']
         }
 
 
         await populateTubeInBoxList(userName);
-        await populateSpecimensList(hiddenJSON);
-        hiddenJSON = {};
-        for (let i = 0; i < boxJSONS.length; i++) {
-            if (!boxJSONS[i].hasOwnProperty('145971562') || boxJSONS[i]['145971562'] != '353358909') {
-                let box = boxJSONS[i]
-                hiddenJSON[box['132929440']] = box['bags']
+        await populateSpecimensList(boxObjects);
+        boxObjects = {};
+        for (let i = 0; i < boxArray.length; i++) {
+            if (!boxArray[i].hasOwnProperty('145971562') || boxArray[i]['145971562'] != '353358909') {
+                let box = boxArray[i]
+                boxObjects[box['132929440']] = box['bags']
             }
 
         }
-        await populateSaveTable(hiddenJSON, boxJSONS, userName)
+        await populateSaveTable(boxObjects, boxArray, userName)
         // clear input field
         specimenSearch.value = ""
         hideAnimation();
@@ -913,7 +888,7 @@ export const populateBoxManifestHeader = (boxId, hiddenJSON, currInstitute) => {
     newP.style.fontSize = "1.5rem";
     newP.innerHTML = boxId + " Manifest";
     document.getElementById('boxManifestCol1').appendChild(newP);
-    let toInsertDate = ''
+    let toInsertDateStarted = ''
     if (currJSON.hasOwnProperty('672863981')) {
         let dateStarted = Date.parse(currJSON['672863981'])
         let currentdate = new Date(dateStarted);
@@ -921,14 +896,14 @@ export const populateBoxManifestHeader = (boxId, hiddenJSON, currInstitute) => {
         let currMins = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes() : currentdate.getMinutes();
         let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
         let hour = parseInt(currentdate.getHours()) % 12;
-        toInsertDate = (currentdate.getMonth() + 1) + "/"
+        toInsertDateStarted = (currentdate.getMonth() + 1) + "/"
             + currentdate.getDate() + "/"
             + currentdate.getFullYear() + " "
             + hour.toString() + ":"
             + currMins + ampm;
 
     }
-    let toInsertDate2 = ''
+    let toInsertDateShipped = ''
     if (currJSON.hasOwnProperty('555611076')) {
         let dateStarted = Date.parse(currJSON['555611076'])
 
@@ -936,7 +911,7 @@ export const populateBoxManifestHeader = (boxId, hiddenJSON, currInstitute) => {
         let currMins = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes() : currentdate.getMinutes();
         let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
         let hour = parseInt(currentdate.getHours()) % 12;
-        toInsertDate2 = (currentdate.getMonth() + 1) + "/"
+        toInsertDateShipped = (currentdate.getMonth() + 1) + "/"
             + currentdate.getDate() + "/"
             + currentdate.getFullYear() + " "
             + hour.toString() + ":"
@@ -944,10 +919,10 @@ export const populateBoxManifestHeader = (boxId, hiddenJSON, currInstitute) => {
 
     }
     newP = document.createElement("p");
-    newP.innerHTML = "Date Started: " + toInsertDate;
+    newP.innerHTML = "Date Started: " + toInsertDateStarted;
     document.getElementById('boxManifestCol1').appendChild(newP);
     newP = document.createElement("p");
-    newP.innerHTML = "Last Modified: " + toInsertDate2;
+    newP.innerHTML = "Last Modified: " + toInsertDateShipped;
     document.getElementById('boxManifestCol1').appendChild(newP);
     newP = document.createElement("p");
     newDiv = document.createElement("div")
@@ -963,25 +938,21 @@ export const populateBoxManifestHeader = (boxId, hiddenJSON, currInstitute) => {
 
 }
 
-export const populateModalSelect = (hiddenJSON) => {
-    let currSelectBox = document.getElementById('selectBoxList');
-    let toFocus = currSelectBox.value;
-    let boxList = document.getElementById('shippingModalChooseBox');
+export const populateModalSelect = (boxObjects) => {
+    let boxSelectEle = document.getElementById('shippingModalChooseBox');
+    let selectedBoxId = boxSelectEle.getAttribute('data-new-box') || document.getElementById('selectBoxList').value;
     let addToBoxButton =  document.getElementById('addToBagButton');
-    // reset box list options
-    boxList.innerHTML = ''
     addToBoxButton.removeAttribute("disabled")
-    let list = ''
-    let keys = Object.keys(hiddenJSON).sort(compareBoxIds);
-    for (let i = 0; i < keys.length; i++) {
-        list += '<option>' + keys[i] + '</option>';
+    let options = '';
+    let boxIds = Object.keys(boxObjects).sort(compareBoxIds);
+    for (let i = 0; i < boxIds.length; i++) {
+        options += `<option>${boxIds[i]}</option>`;
     }
-    if (list == '') {
-        addToBoxButton.setAttribute('disabled','true')
-        return 
+    if (options == '') {
+        addToBoxButton.setAttribute('disabled', 'true');
     }
-    boxList.innerHTML = list;
-    currSelectBox.value = document.getElementById('selectBoxList').value;
+    boxSelectEle.innerHTML = options;
+    boxSelectEle.value = selectedBoxId;
 }
 
 export const populateTempSelect = (boxes) => {
@@ -1008,8 +979,6 @@ export const populateTempSelect = (boxes) => {
 }
 
 export const populateSaveTable = (hiddenJSON, boxJSONS, userName) => {
-  console.log(hiddenJSON)
-  console.log(boxJSONS)
     let table = document.getElementById("saveTable");
     table.innerHTML = `<tr>
                         <th style="border-bottom:1px solid;">To Ship</th>
@@ -1248,19 +1217,18 @@ const compareBoxIds = (a, b) => {
 
 }
 
-export const populateBoxSelectList = async (hiddenJSON, userName,) => {
-    let boxList = document.getElementById('selectBoxList');
-    let selectBoxList = document.getElementById('selectBoxList');
-    let list = ''
-    let keys = Object.keys(hiddenJSON).sort(compareBoxIds);
-    for (let i = 0; i < keys.length; i++) {
-        list += '<option>' + keys[i] + '</option>';
+export const populateBoxSelectList = async (boxObjects, userName,) => {
+    let boxSelectEle = document.getElementById('selectBoxList');
+    let options = ''
+    let boxIds = Object.keys(boxObjects).sort(compareBoxIds);
+    for (let i = 0; i < boxIds.length; i++) {
+        options += '<option>' + boxIds[i] + '</option>';
     }
-    boxList.innerHTML = list;
+    boxSelectEle.innerHTML = options;
 
-    let currBoxId = selectBoxList.value;
+    let currBoxId = boxSelectEle.value;
     if (currBoxId != '') {
-        let currBox = hiddenJSON[currBoxId];
+        let currBox = boxObjects[currBoxId];
 
 
         //document.getElementById('BoxNumBlood').innerText = currBoxId;
@@ -1272,30 +1240,6 @@ export const populateBoxSelectList = async (hiddenJSON, userName,) => {
                                     <th style = "border-bottom:1px solid;">Type/Color</th>
                                     <th style = "border-bottom:1px solid;"></th>
                                 </tr>`;
-        let translateNumToType = {
-            "0001": "SST/Gold or Red",
-            "0002": "SST/Gold or Red",
-            "0003": "Heparin/Green",
-            "0004": "EDTA/Lavender",
-            "0005": "ACD/Yellow",
-            "0006": "Urine/Yellow",
-            "0007": "Mouthwash Container",
-            "0011": "SST/Gold or Red",
-            "0012": "SST/Gold or Red",
-            "0013": "Heparin/Green",
-            "0014": "EDTA/Lavender",
-            "0016": "Urine Cup",
-            "0021": "SST/Gold or Red",
-            "0022": "SST/Gold or Red",
-            "0031": "SST/Gold or Red",
-            "0032": "SST/Gold or Red",
-            "0024": "EDTA/Lavender",
-            "0050": "NA",
-            "0051": "NA",
-            "0052": "NA",
-            "0053": "NA",
-            "0054": "NA"
-        };
         //set the rest of the table up
         for (let j = 0; j < boxKeys.length; j++) {
             let currBagId = boxKeys[j];
@@ -1354,7 +1298,7 @@ export const populateBoxSelectList = async (hiddenJSON, userName,) => {
                         if (currBagId === "unlabelled") { 
                             bagsToRemove = currTubes;
                         }
-                        let result = await removeBag(boxList.value, bagsToRemove)
+                        let result = await removeBag(boxSelectEle.value, bagsToRemove)
                         currRow = table.rows[index];
                         while (currRow != undefined && currRow.cells[0].innerText == "") {
                             table.deleteRow(index);
@@ -1462,6 +1406,7 @@ const addNewBox = async (userName) => {
                     }
                 }
             }
+            document.getElementById('shippingModalChooseBox').setAttribute('data-new-box', newBoxId);
             await populateBoxSelectList(hiddenJSON, userName)
             return true
         }
@@ -1515,14 +1460,14 @@ export const addEventModalAddBox = (userName) => {
         let currLocation = document.getElementById('selectLocationList').value;
         let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
         let response = await getBoxesByLocation(currLocationConceptId);
-        let boxJSONS = response.data;
-        let hiddenJSONLocation = {};
-        for (let i = 0; i < boxJSONS.length; i++) {
-            let box = boxJSONS[i]
-            hiddenJSONLocation[box['132929440']] = box['bags']
+        let boxArray = response.data;
+        let currLocationBoxObjects = {};
+        for (let i = 0; i < boxArray.length; i++) {
+            let box = boxArray[i]
+            currLocationBoxObjects[box['132929440']] = box['bags']
         }
-        await populateModalSelect(hiddenJSONLocation)
-        await populateBoxSelectList(hiddenJSONLocation, userName);
+        await populateModalSelect(currLocationBoxObjects)
+        await populateBoxSelectList(currLocationBoxObjects, userName);
         hideAnimation()
         checkAlertState(alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl)
         // reset alertState
@@ -1681,20 +1626,20 @@ export const addEventBoxSelectListChanged = () => {
 }
 
 export const addEventChangeLocationSelect = (userName) => {
-    let selectBoxList = document.getElementById('selectLocationList');
-    selectBoxList.addEventListener("change", async () => {
+    let locationSelectEle = document.getElementById('selectLocationList');
+    locationSelectEle.addEventListener("change", async () => {
         showAnimation();
-        let currLocation = selectBoxList.value;
+        let currLocation = locationSelectEle.value;
         let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
-        let boxJSONS = (await getBoxesByLocation(currLocationConceptId)).data;
+        let boxArray = (await getBoxesByLocation(currLocationConceptId)).data;
 
-        let hiddenJSON = {};
-        for (let i = 0; i < boxJSONS.length; i++) {
-            let box = boxJSONS[i]
-            hiddenJSON[box['132929440']] = box['bags']
+        let boxObjects = {};
+        for (let i = 0; i < boxArray.length; i++) {
+            let box = boxArray[i]
+            boxObjects[box['132929440']] = box['bags']
         }
 
-        await populateBoxSelectList(hiddenJSON, userName)
+        await populateBoxSelectList(boxObjects, userName)
         hideAnimation();
     })
 }
@@ -2287,6 +2232,8 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
             dt.deviationOptions.forEach(dev => {
                 biospecimenData[dt.concept]['248868659'][dev.concept] = 104430631;
             });
+            biospecimenData[dt.concept]['678857215'] = 104430631;
+            biospecimenData[dt.concept]['762124027'] = 104430631;
         }
     });
 
@@ -2813,30 +2760,6 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
 
     let bags = Object.keys(currBox);
     let rowCount = 1;
-    let translateNumToType = {
-        "0001": "SST/Gold or Red",
-        "0002": "SST/Gold or Red",
-        "0003": "Heparin/Green",
-        "0004": "EDTA/Lavender",
-        "0005": "ACD/Yellow",
-        "0006": "Urine/Yellow",
-        "0007": "Mouthwash Container",
-        "0011": "SST/Gold or Red",
-        "0012": "SST/Gold or Red",
-        "0013": "Heparin/Green",
-        "0014": "EDTA/Lavender",
-        "0016": "Urine Cup",
-        "0021": "SST/Gold or Red",
-        "0022": "SST/Gold or Red",
-        "0031": "SST/Gold or Red",
-        "0032": "SST/Gold or Red",
-        "0024": "EDTA/Lavender",
-        "0050": "NA",
-        "0051": "NA",
-        "0052": "NA",
-        "0053": "NA",
-        "0054": "NA"
-    };
     for (let i = 0; i < bags.length; i++) {
         let tubes = currBox[bags[i]]['arrElements'];
         for (let j = 0; j < tubes.length; j++) {
@@ -2868,7 +2791,6 @@ export const populateBoxManifestTable = (boxId, hiddenJSON) => {
                 currRow.style['background-color'] = "lightgrey";
             }
             rowCount += 1;
-
         }
     }
 
@@ -3054,8 +2976,8 @@ export const addEventSaveContinue = (hiddenJSON) => {
 export const addEventCompleteShippingButton = (hiddenJSON, userName, tempChecked, shipmentCourier) => {
     document.getElementById('finalizeModalSign').addEventListener('click', async () => {
         let finalizeTextField = document.getElementById('finalizeSignInput');
-        let firstNameShipper = userName.split(" ")[0] ? userName.split(' ')[0] : " "
-        let lastNameShipper = userName.split(" ")[1] ? userName.split(" ")[1] : " "
+        let firstNameShipper = userName.split(" ")[0] ? userName.split(" ")[0] : ""
+        let lastNameShipper = userName.split(" ")[1] ? userName.split(" ")[1] : ""
         let conversion = {
             "FedEx": 712278213,
             "World Courier": 149772928
@@ -3217,7 +3139,7 @@ export const populateBoxTable = async (page, filter) => {
     let pageStuff = await getPage(page, 5, '656548982', filter)
     let currTable = document.getElementById('boxTable')
     currTable.innerHTML = ''
-    var rowCount = currTable.rows.length;
+    let rowCount = currTable.rows.length;
     let currRow = currTable.insertRow(rowCount);
     currRow.insertCell(0).innerHTML = "Tracking Number";
     currRow.insertCell(1).innerHTML = "Date Shipped";
@@ -3235,50 +3157,31 @@ export const populateBoxTable = async (page, filter) => {
     }
     
     let packageConversion = {
-        "123456789": "Package in good condition",
-        "694392646": "No Ice Pack",
-        "669336526": "Warm Ice Pack",
-        "564936650": "Vials - Incorrect Material Type Sent",
-        "242271549": "No Label on Vials",
-        "790986868": "Returned Empty Vials",
-        "470977257": "Participant Refusal",
-        "121720893": "Other",
-        "659684779": "Damaged Container (outer and inner)",
-        "665883282": "Insufficient Ice",
-        "967674331": "Improper Packaging",
-        "958386677": "Damaged Vials",
-        "188332319": "No Pre-notification",
-        "229360386": "Manifest/Vial/Paperwork info do not match",
-        "200647000": "Shipment Delay",
-        "352744555": "No Manifest provided"
+        "679749262": "Package in good condition",
+        "405513630": "No Ice Pack",
+        "595987358": "Warm Ice Pack",
+        "200183516": "Vials - Incorrect Material Type Sent",
+        "399948893": "No Label on Vials",
+        "631290535": "Returned Empty Vials",
+        "442684673": "Participant Refusal",
+        "121149986": "Crushed",
+        "678483571": "Damaged Container (outer and inner)",
+        "289322354": "Material Thawed",
+        "909529446": "Insufficient Ice",
+        "847410060": "Improper Packaging",
+        "387564837": "Damaged Vials",
+        "933646000": "Other",
+        "842171722": "No Pre-notification",
+        "613022284": "No Refrigerant",
+        "922995819": "Manifest/Vial/Paperwork info do not match",
+        "958000780": "Shipment Delay",
+        "853876696": "No Manifest provided",
     }
 
-  // TODO: change this map once keys are changed on frontend and concept ids are made
-  //   let packageConversion1 = {
-  //     "123456789": "Package in good condition",
-  //     "694392646": "No Ice Pack",
-  //     "669336526": "Warm Ice Pack",
-  //     "564936650": "Vials - Incorrect Material Type Sent",
-  //     "242271549": "No Label on Vials",
-  //     "790986868": "Returned Empty Vials",
-  //     "470977257": "Participant Refusal",
-  //     "121720893": "Crushed",(SAME KEY)
-  //     "659684779": "Damaged Container (outer and inner)",
-  //     "121720893": "Material Thawed", (SAME KEY)
-  //     "665883282": "Insufficient Ice",
-  //     "967674331": "Improper Packaging",
-  //     "958386677": "Damaged Vials",
-  //     "121720893": "Other", (SAME KEY)
-  //     "188332319": "No Pre-notification",
-  //     "121720893": "No Refrigerant", (SAME KEY)
-  //     "229360386": "Manifest/Vial/Paperwork info do not match",
-  //     "200647000": "Shipment Delay",
-  //     "352744555": "No Manifest provided"
-  // }
     for (let i = 0; i < pageStuff.data.length; i++) {
         rowCount = currTable.rows.length;
         currRow = currTable.insertRow(rowCount);
-        let currPage = pageStuff.data[i];
+        let currPage = convertToOldBox(pageStuff.data[i]);
         let numTubes = 0;
         let keys = Object.keys(currPage['bags']);
         for (let j = 0; j < keys.length; j++) {
@@ -3301,25 +3204,24 @@ export const populateBoxTable = async (page, filter) => {
 */
         }
 
-        if(currPage.hasOwnProperty('259439191')) {
-          let isoFormat = currPage['259439191']
+        if(currPage.hasOwnProperty('926457119')) {
+          let isoFormat = currPage['926457119']
           receivedDate = convertTime(isoFormat).split(',')[0]
         }
 
-        if(currPage.hasOwnProperty('421016519')) {
-          packagedCondition = currPage['421016519']
+        if(currPage.hasOwnProperty('238268405')) {
+          packagedCondition = currPage['238268405']
         }
-        
+
         currRow.insertCell(0).innerHTML = currPage.hasOwnProperty('959708259') ? currPage['959708259'] : '';
         currRow.insertCell(1).innerHTML = shippedDate;
-        // TODO: Conversion Here for Site Location Number
-        currRow.insertCell(2).innerHTML = currPage['560975149'];
+        currRow.insertCell(2).innerHTML = conceptIdToSiteSpecificLocation[currPage['560975149']];
         currRow.insertCell(3).innerHTML = currPage['132929440'];
-        currRow.insertCell(4).innerHTML = '<button type="button" class="button" id="reportsViewManifest' + i + '">View manifest</button>';
-        currRow.insertCell(5).innerHTML = currPage.hasOwnProperty('434049748') ? "Yes" : "No"
+        currRow.insertCell(4).innerHTML = '<button type="button" class="button btn btn-info" id="reportsViewManifest' + i + '">View manifest</button>';
+        currRow.insertCell(5).innerHTML = currPage.hasOwnProperty('333524031') ? "Yes" : "No"
         currRow.insertCell(6).innerHTML = receivedDate;
         currRow.insertCell(7).innerHTML = convertNumsToCondition(packagedCondition, packageConversion);
-        currRow.insertCell(8).innerHTML = currPage.hasOwnProperty('869218574') ? currPage['869218574'] : '' ;
+        currRow.insertCell(8).innerHTML = currPage.hasOwnProperty('870456401') ? currPage['870456401'] : '' ;
         addEventViewManifestButton('reportsViewManifest' + i, currPage);
 
     }
@@ -3344,14 +3246,14 @@ export const populateReportManifestHeader = (currPage) => {
     newP.innerHTML = currPage['132929440'] + " Manifest";
     document.getElementById('boxManifestCol1').appendChild(newP);
 
-    let toInsertDate = ''
-    if (currPage.hasOwnProperty('672863981')) {
+    let toInsertDateStarted = ''
+    if (currPage.hasOwnProperty('672863981')) { // 672863981 - Autogenerated date/time when first bag added to box
         let dateStarted = Date.parse(currPage['672863981'])
 
         let currentdate = new Date(dateStarted);
         let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
         let hour = parseInt(currentdate.getHours()) % 12;
-        toInsertDate = (currentdate.getMonth() + 1) + "/"
+        toInsertDateStarted = (currentdate.getMonth() + 1) + "/"
             + currentdate.getDate() + "/"
             + currentdate.getFullYear()
         /*+ " "  
@@ -3359,14 +3261,14 @@ export const populateReportManifestHeader = (currPage) => {
         + currentdate.getMinutes() + ampm;
 */
     }
-    let toInsertDate2 = ''
-    if (currPage.hasOwnProperty('656548982')) {
+    let toInsertDateShipped = ''
+    if (currPage.hasOwnProperty('656548982')) { // 656548982 - Autogenerated date/time stamp for submit shipment time
         let dateStarted = currPage['656548982']
 
         let currentdate = new Date(dateStarted);
         let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
         let hour = parseInt(currentdate.getHours()) % 12;
-        toInsertDate2 = (currentdate.getMonth() + 1) + "/"
+        toInsertDateShipped = (currentdate.getMonth() + 1) + "/"
             + currentdate.getDate() + "/"
             + currentdate.getFullYear()
         /*+ " "  
@@ -3375,10 +3277,10 @@ export const populateReportManifestHeader = (currPage) => {
 */
     }
     newP = document.createElement("p");
-    newP.innerHTML = "Date Started: " + toInsertDate;
+    newP.innerHTML = "Date Started: " + toInsertDateStarted;
     document.getElementById('boxManifestCol1').appendChild(newP);
     newP = document.createElement("p");
-    newP.innerHTML = "Date Shipped: " + toInsertDate2;
+    newP.innerHTML = "Date Shipped: " + toInsertDateShipped;
     document.getElementById('boxManifestCol1').appendChild(newP);
     newDiv.innerHTML = displayContactInformation(site, siteContactInformation)
     document.getElementById('boxManifestCol1').appendChild(newDiv)
@@ -3389,30 +3291,6 @@ export const populateReportManifestTable = (currPage) => {
 
     let bags = Object.keys(currPage['bags']);
     let rowCount = 1;
-    let translateNumToType = {
-        "0001": "SST/Gold or Red",
-        "0002": "SST/Gold or Red",
-        "0003": "Heparin/Green",
-        "0004": "EDTA/Lavender",
-        "0005": "ACD/Yellow",
-        "0006": "Urine/Yellow",
-        "0007": "Mouthwash Container",
-        "0011": "SST/Gold or Red",
-        "0012": "SST/Gold or Red",
-        "0013": "Heparin/Green",
-        "0014": "EDTA/Lavender",
-        "0016": "Urine Cup",
-        "0021": "SST/Gold or Red",
-        "0022": "SST/Gold or Red",
-        "0031": "SST/Gold or Red",
-        "0032": "SST/Gold or Red",
-        "0024": "EDTA/Lavender",
-        "0050": "NA",
-        "0051": "NA",
-        "0052": "NA",
-        "0053": "NA",
-        "0054": "NA"
-    };
     for (let i = 0; i < bags.length; i++) {
         let tubes = currPage['bags'][bags[i]]['arrElements'];
         for (let j = 0; j < tubes.length; j++) {
@@ -3443,7 +3321,6 @@ export const populateReportManifestTable = (currPage) => {
                 currRow.style['background-color'] = "lightgrey";
             }
             rowCount += 1;
-
         }
     }
 
@@ -3502,12 +3379,14 @@ export const addEventFilter = () => {
             filter['trackingId'] = trackingId;
         }
         if (startDate !== "") {
-            filter['startDate'] = Date.parse(startDate + ' 00:00');
+            let startDateUnix = Date.parse(startDate + ' 00:00')
+            filter['startDate'] = new Date(startDateUnix).toISOString()
         }
         if (endDate !== "") {
-            filter['endDate'] = Date.parse(endDate + ' 23:59');
+            let endDateUnix = Date.parse(endDate + ' 23:59')
+            filter['endDate'] = new Date(endDateUnix).toISOString()
             if (startDate !== "") {
-                if (filter['endDate'] <= filter['startDate']) {
+                if (filter['endDate'] <= filter['startDate']) { // endDate being less than startDate, unix format will be greater the more current date and time 
                     //throw error
                     return;
                 }
