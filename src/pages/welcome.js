@@ -5,6 +5,7 @@ import { nonUserNavBar, unAuthorizedUser } from './../navbar.js'
 export const welcomeScreen = async (auth, route) => {
     const user = auth.currentUser;
     if(!user) return;
+    console.log('userWelcome', user.email)
     const name = user.displayName ? user.displayName : user.email;
     showAnimation();
     const response = await validateUser();
@@ -14,7 +15,7 @@ export const welcomeScreen = async (auth, route) => {
         document.getElementById('navbarNavAltMarkup').innerHTML = unAuthorizedUser();
         return;
     }
-    welcomeScreenTemplate(name, response.data, auth, route);
+    welcomeScreenTemplate(name || response.data.email, response.data, auth, route);
 }
 
 const welcomeScreenTemplate = (name, data, auth, route) => {

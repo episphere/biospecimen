@@ -196,12 +196,12 @@ export const userAuthorization = async (route, name) => {
     showAnimation();
     const response = await validateUser();
     if(response.code === 200) {
-        const userRole = response.data;
-        if(userRole.role === 'admin' || userRole.role === 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name);
-        else if(userRole.role === 'user') document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar(name);
+        const responseData = response.data;
+        if(responseData.role === 'admin' || responseData.role === 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name || responseData.email);
+        else if(responseData.role === 'user') document.getElementById('navbarNavAltMarkup').innerHTML = userNavBar(name || responseData.email);
         toggleCurrentPage(route);
         hideAnimation();
-        return userRole;
+        return responseData;
     }
     else if(response.code === 401) {
         document.getElementById('navbarNavAltMarkup').innerHTML = nonUserNavBar(name);
@@ -615,20 +615,22 @@ export const convertToFirestoreBox = (inputBox) => {
   let bagConceptIDIndex = 0;
   outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.no;
   delete outputBox.bags;
-
+  const defaultOutputBag = { [conceptIDs.bagscan_bloodUrine]: '', [conceptIDs.bagscan_mouthWash]: '', [conceptIDs.bagscan_orphanBag]: '' };
+    
   for (let [bagID, inputBag] of Object.entries(bags)) {
-    if (bagConceptIDIndex >= bagConceptIDList.length) break;
-    inputBag.arrElements = Array.from(new Set(inputBag.arrElements))
+      if (bagConceptIDIndex >= bagConceptIDList.length) break;      
+      inputBag.arrElements = Array.from(new Set(inputBag.arrElements));
+
     if (bagID === 'unlabelled') {
-      outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.yes;
+        outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.yes;       
       for (let tubeID of inputBag.arrElements) {
-        let outputBag = {};
-        const bagConceptID = bagConceptIDList[bagConceptIDIndex];
-        const keysNeeded = [
-          conceptIDs.scannedByFirstName,
-          conceptIDs.scannedByLastName,
-          conceptIDs.orphanBagFlag,
-        ];
+          let outputBag = {...defaultOutputBag};          
+          const bagConceptID = bagConceptIDList[bagConceptIDIndex];
+          const keysNeeded = [            
+              conceptIDs.scannedByFirstName,              
+              conceptIDs.scannedByLastName,        
+              conceptIDs.orphanBagFlag,
+          ];
 
         for (let k of keysNeeded) {
           if (inputBag[k]) outputBag[k] = inputBag[k];
@@ -641,7 +643,7 @@ export const convertToFirestoreBox = (inputBox) => {
         bagConceptIDIndex++;
       }
     } else {
-      let outputBag = {};
+      let outputBag = {...defaultOutputBag};
       const bagConceptID = bagConceptIDList[bagConceptIDIndex];
       const keysNeeded = [
         conceptIDs.scannedByFirstName,
@@ -652,16 +654,13 @@ export const convertToFirestoreBox = (inputBox) => {
         if (inputBag[k]) outputBag[k] = inputBag[k];
       }
 
-      let bagTypeConceptID;
       const bagIDEndString = bagID.split(' ')[1];
-
-      if (bagIDEndString === '0008') {
-        bagTypeConceptID = conceptIDs.bagscan_bloodUrine;
-      } else if (bagIDEndString === '0009') {
-        bagTypeConceptID = conceptIDs.bagscan_mouthWash;
+        if (bagIDEndString === '0008') {  
+          outputBag[conceptIDs.bagscan_bloodUrine] = bagID;
+        } else if (bagIDEndString === '0009') {
+            outputBag[conceptIDs.bagscan_mouthWash] = bagID;
       }
 
-      outputBag[bagTypeConceptID] = bagID;
       outputBag[conceptIDs.orphanBagFlag] = conceptIDs.no;
       outputBag[conceptIDs.tubesCollected] = inputBag.arrElements;
       outputBox[bagConceptID] = outputBag;
@@ -701,13 +700,14 @@ export const getBoxes = async (box) => {
   return toReturn;
 };
 
-export const getAllBoxes = async (box) => {
+export const getAllBoxes = async (flag) => {
   const idToken = await getIdToken();
-  const response = await fetch(`${api}api=searchBoxes`, {
+  if (flag !== `bptl`) flag = ``
+  const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
     method: 'GET',
     headers: {
       Authorization: 'Bearer ' + idToken,
-    },
+    }
   });
   let res = await response.json();
   for (let i = 0; i < res.data.length; i++) {
@@ -1231,6 +1231,35 @@ export const siteSpecificLocationToConceptId = {
   "Frederick": 222222222,
 }
 
+export const nameToKeyObj = 
+{
+    "kpNW": 452412599,
+    "hPartners" : 531629870,
+    "snfrdHealth": 657167265,
+    "hfHealth": 548392715,
+    "maClinic": 303349821,
+    "kpCO": 125001209,
+    "uChiM": 809703864,
+    "nci": 13,
+    "kpHI": 300267574,
+    "kpGA": 327912200,
+    "allResults": 1000
+}
+
+export const keyToNameObj = 
+{
+    452412599 : "Kaiser Permanente Northwest",
+    531629870 : "HealthPartners",
+    657167265 : "Sanford Health",
+    548392715 : "Henry Ford Health System",
+    303349821 : "Marshfield Clinic",
+    125001209 : "Kaiser Permanente Colorado",
+    809703864 : "University of Chicago Medicine",
+    13 : "National Cancer Institute",
+    300267574 : "Kaiser Permanente Hawaii",
+    327912200 : "Kaiser Permanente Georgia"
+}
+
 export const siteContactInformation = {
   "UCM":[{
     "fullName":"Jaime King",
@@ -1471,7 +1500,7 @@ export const siteLocations = {
         'UCM': [{location: 'UC-DCAM', concept: 777644826}],
         'MFC': [{location: 'Marshfield', concept: 692275326}, {location: 'Lake Hallie', concept: 698283667}],
         'HP': [{location: 'HP Research Clinic', concept: 834825425}],
-        'HFHS': [{location: 'HFHS Research Clinic (Main Campus)', concept: 736183094}],
+        'HFHS': [{location: 'HFHS Research Clinic (Main Campus)', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332}],
         'SFH': [{location: 'SF Cancer Center LL', concept: 589224449}],
         'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}]
     },
@@ -1808,7 +1837,7 @@ export const displayContactInformation = (site, siteContactInformation) => {
         contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
       }
     }
-    else contactStr+= `<p>Phone:</p>`
+    else contactStr += `<p>Phone:</p>`
   }
     return contactStr
   }
@@ -1865,13 +1894,18 @@ export const delay = ms => new Promise(res => setTimeout(res, ms));
 
 export const convertNumsToCondition = (packagedCondition, packageConversion) => {
   let listConditions = ''
-  if(!packagedCondition) {
-    return listConditions
+  if(!packagedCondition) return listConditions
+  for(let i = 0; i < packagedCondition.length; i++) {
+    let isLastItem = false;
+    if(i+1 === packagedCondition.length) { // if last item equals the final item
+      isLastItem = true
+      if(isLastItem) listConditions += `<p>${packageConversion[packagedCondition[i]]}</p>`
+    }
+    else {
+      listConditions += `<p>${packageConversion[packagedCondition[i]]},</p>`
+    }
+
   }
-  packagedCondition.forEach(condition => {
-    listConditions +=`<p>${packageConversion[condition]}</p>`}
-  )
-  
   return listConditions
 }
 
@@ -1931,3 +1965,27 @@ export const getBaselineData = async (data) => {
     
     return baselineData;
     }
+export const translateNumToType = {
+  "0001": "SST/Gold or Red",
+  "0002": "SST/Gold or Red",
+  "0003": "Heparin/Green",
+  "0004": "EDTA/Lavender",
+  "0005": "ACD/Yellow",
+  "0006": "Urine/Yellow",
+  "0007": "Mouthwash Container",
+  "0011": "SST/Gold or Red",
+  "0012": "SST/Gold or Red",
+  "0013": "Heparin/Green",
+  "0014": "EDTA/Lavender",
+  "0016": "Urine Cup",
+  "0021": "SST/Gold or Red",
+  "0022": "SST/Gold or Red",
+  "0031": "SST/Gold or Red",
+  "0032": "SST/Gold or Red",
+  "0024": "EDTA/Lavender",
+  "0050": "NA",
+  "0051": "NA",
+  "0052": "NA",
+  "0053": "NA",
+  "0054": "NA"
+};

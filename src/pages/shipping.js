@@ -24,15 +24,15 @@ const conversion = {
 
 export const shippingDashboard = (auth, route, goToSpecimenSearch) => {  
     auth.onAuthStateChanged(async user => {
-        if(user){
-            const response = await userAuthorization(route, user.displayName ? user.displayName : user.email);
-            if ( response.isBiospecimenUser === false ) {
+        if (user) {
+            const responseData = await userAuthorization(route, user.displayName ? user.displayName : user.email);
+            if ( responseData.isBiospecimenUser === false ) {
                 document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
                 document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
                 return;
             }
-            if(!response.role) return;
-            startShipping(user.displayName ? user.displayName : user.email);
+            if (!responseData.role) return;
+            startShipping(user.displayName || user.email || responseData.email);
         }
         else {
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
@@ -162,12 +162,12 @@ export const startShipping = async (userName) => {
                 <div class="modal-body"> 
                     <h4 style="margin-bottom:0.8rem">Select Box or Create New Box</h4>
                     <div id="create-box-success" class="alert alert-success" role="alert" style="display:none;">
-                      New Box has been created
+                      New box has been created
                     </div>
                     <div id="create-box-error" class="alert alert-danger" role="alert" style="display:none;">
                       Please add a specimen or specimens to last box
                     </div>
-                    <select class="selectpicker" id="shippingModalChooseBox" style="font-size:1.4rem;"></select>
+                    <select class="selectpicker" id="shippingModalChooseBox" data-new-box="" style="font-size:1.4rem;"></select>
                     <button type="button" class="btn btn-primary" id="modalAddBoxButton">Create New Box</button>
                     
                 </div>
@@ -604,7 +604,7 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
                         
                     </div>
                     <div class="modal-body"> 
-                        <h4>Please enter your name here to indicate this shipment is finalized. Once signed, no changes can be made to the shipment details.<h4>
+                        <h4>Please enter your email here to indicate this shipment is finalized. Once signed, no changes can be made to the shipment details.<h4>
                         <input type="text" id="finalizeSignInput">
                         </input>
                         <p id="finalizeModalError" style="color:red;display:none;">
