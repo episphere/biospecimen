@@ -1904,61 +1904,29 @@ export const getBaselineData = async (data) => {
     const response = await getParticipantCollections(data.token);
     const baselineCollections = response.data.filter(collection => collection['331584571'] === 266600170);
 
-    let baselineData = {
-        bloodCollection: {
-            collected: null,
-            id: null,
-            timeStamp: null,
-            specimenId: null,
-        },
-        urineCollection: {
-            collected: null,
-            id: null,
-            timeStamp: null,
-            specimenId: null,
-        },
-        mouthwashCollection: {
-            collected: null,
-            id: null,
-            timeStamp: null,
-            specimenId: null,
-        },
-        };
-
-        const specimenCodes = {
-            blood: '0003',
-            urine: '0005',
-            mouthwash: '0004',
-        }
+    let baselineData = {};
     
     baselineCollections.forEach(collection => {
-    
-    if(collection[tube.concept]['593843561'] === 353358909) {
-        baselineData.bloodCollection = {
-            collected: true,
-            id: collection['820476880'],
-            timeStamp: collection['678166505'],
-            specimenId: `${collection['820476880']} ${specimenCodes.blood}`,
-        }
-    }
-    
-    if(collection[tube.concept]['593843561'] === 353358909) {
-        baselineData.urineCollection = {
-            collected: true,
-            id: collection['820476880'],
-            timeStamp: collection['678166505'],
-            specimenId: `${collection['820476880']} ${specimenCodes.urine}`,
-        }
-    }
 
-    if(collection[tube.concept]['593843561'] === 353358909) {
-        baselineData.mouthwashCollection = {
-            collected: true,
-            id: collection['820476880'],
-            timeStamp: collection['678166505'],
-            specimenId: `${collection['820476880']} ${specimenCodes.mouthwash}`,
+        if(collection['650516960']) {
+            const tubes = workflows[collectionSettings[collection['650516960']]];
+            tubes.forEach(tube => {
+
+                if(collection[tube.concept]['593843561'] === 353358909) {
+                    baselineData = {
+                        [collection['650516960']]: {
+                            [tube.concept]: {
+                                collectionId: collection['820476880'],
+                                collectionTimeStamp: collection['678166505'],
+                                specimenId: `${collection['820476880']} ${tube.id}`,
+                            } 
+                        } 
+                    }
+                }
+                
+            });
         }
-    }
+    
     });
     
     return baselineData;
