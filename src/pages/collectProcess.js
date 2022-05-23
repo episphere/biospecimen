@@ -48,6 +48,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                     
                     let siteTubesList = getSiteTubesLists(formData);
                     const collectionFinalized = (formData['410912345'] === 353358909);
+                    console.log('siteTubesList', siteTubesList);
                     
                     if(!siteTubesList || siteTubesList?.length === 0) siteTubesList = [];
 
