@@ -1297,11 +1297,13 @@ export const verificationConversion = {
 export const participationConversion = {
     '208325815': 'No Refusal',
     '622008261': 'Refused some activities',
-    '906417725': 'Refused all future activities',
+    '906417725': 'Refusing all future activities - was refused',
     '872012139': 'Revoked HIPAA only',
     '854021266': 'Withdrew consent',
     '241236037': 'Destroy data',
-    '987563196': 'Deceased'
+    '987563196': 'Participant Deceased - was initially',
+    '458508122': 'Refused all future activities - new addition',
+    '618686157': 'Deceased - new addition'
 };
 
 export const surveyConversion = {
