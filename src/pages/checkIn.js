@@ -51,7 +51,7 @@ export const checkInTemplate = async (data) => {
             </div>
             <hr/>`
             
-        template += participantStatus(data) + 
+        template += participantStatus(data);
 
         `</form>
     `;
