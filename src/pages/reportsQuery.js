@@ -37,12 +37,12 @@ export const startReport = async () => {
             
             <div class="col-lg" style="margin-bottom:20px">
                 <h4>Filters</h4>
-                <label for="trackingIdInput">Tracking ID: </label>
-                <input type="text" id="trackingIdInput" style="margin-right:30px" placeholder="Tracking ID"></input>
-                <label for="startDate">Start Date: </label>
-                <input type="date" id="startDate"  style="margin-right:30px"></input>
-                <label for="endDate">End Date: </label>
-                <input type="date" id="endDate" style="margin-right:30px"></input>
+                <label for="trackingIdInput" style="margin-right:0.5rem;">Tracking ID: </label>
+                <input type="text" id="trackingIdInput" style="margin-right:30px; height:38px; padding:5px;" placeholder="Tracking ID"></input>
+                <span style="display:inline-block; margin-right:.5rem;">Date Shipped:</span>
+                <input type="date" id="startDate"  style="height:38px; padding:5px;"></input>
+                <span style="display:inline-block; margin:0 .75rem">to</span>
+                <input type="date" id="endDate" style="margin-right:30px; height:38px; padding:5px";></input>
                 <button id="submitFilter" class="btn btn-primary">Apply filter</button>
             </div>
         </div>

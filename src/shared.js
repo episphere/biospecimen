@@ -1000,6 +1000,7 @@ export const updateBaselineData = async (siteTubesList, data) => {
 
     const response = await getParticipantCollections(data.token);
     const baselineCollections = response.data.filter(collection => collection['331584571'] === 266600170);
+    getParticipantCollections(data.token).then((res)=> {console.log("data", res.data)}, (err) =>{console.log("err", err)});
     
     const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
     const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
@@ -1932,6 +1933,38 @@ export const checkNonAlphanumericStr = (boxes) => {
   }
 }
 
+export const getBaselineData = async (data) => {
+
+    const response = await getParticipantCollections(data.token);
+    const baselineCollections = response.data.filter(collection => collection['331584571'] === 266600170);
+
+    let baselineData = {};
+    
+    baselineCollections.forEach(collection => {
+
+        if(collection['650516960']) {
+            const tubes = workflows[collectionSettings[collection['650516960']]];
+            tubes.forEach(tube => {
+
+                if(collection[tube.concept]['593843561'] === 353358909) {
+                    baselineData = {
+                        [collection['650516960']]: {
+                            [tube.concept]: {
+                                collectionId: collection['820476880'],
+                                collectionTimeStamp: collection['678166505'],
+                                specimenId: `${collection['820476880']} ${tube.id}`,
+                            } 
+                        } 
+                    }
+                }
+                
+            });
+        }
+    
+    });
+    
+    return baselineData;
+    }
 export const translateNumToType = {
   "0001": "SST/Gold or Red",
   "0002": "SST/Gold or Red",
