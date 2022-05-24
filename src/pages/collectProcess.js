@@ -198,7 +198,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                 </div>
                 ${isCheckedIn ?
                 `<div class="ml-auto">
-                    <button class="btn btn-outline-primary text-nowrap" data-connect-id=${data.Connect_ID} id="collectionCheckout">Go to Check-Out</button>
+                    <button class="btn btn-outline-primary text-nowrap" data-connect-id=${data.Connect_ID} type="button" id="collectionCheckout">Go to Check-Out</button>
                 </div>` : ``}               
                 <div class="ml-auto">
                     <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="button" id="collectionSave">Save</button>
