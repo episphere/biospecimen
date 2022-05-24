@@ -27,5 +27,9 @@ export const stageSSOConfig = (tenantID, provider, inputValue) => {
         tenantID = 'HFHS-SSO-eq1fj';
         provider = 'saml.connect-hfhs';
     };
+    if(/marshfieldresearch.org/i.test(inputValue) || /marshfieldclinic.org/i.test(inputValue)) {
+        tenantID = 'MFC-SSO-6x4zy';
+        provider = 'saml.connect-mfc'
+    };
     return {tenantID, provider}
 }
