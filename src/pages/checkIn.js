@@ -1,4 +1,4 @@
-import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getCollectionsByVisit, getParticipantCollections, getBaselineData } from "./../shared.js";
+import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getCollectionsByVisit } from "./../shared.js";
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 
 export const checkInTemplate = async (data) => {
@@ -51,7 +51,7 @@ export const checkInTemplate = async (data) => {
             </div>
             <hr/>`
             
-        template += await participantStatus(data) + 
+        template += participantStatus(data) + 
 
         `</form>
     `;
@@ -65,8 +65,7 @@ export const checkInTemplate = async (data) => {
 }
 
 const participantStatus = (data) => {
-return getBaselineData(data).then(baselinedata => {
-    console.log("baselinedata", baselinedata);
+    
     return `
         <div class="row">
             <div class="col-md-12">
@@ -241,38 +240,18 @@ return getBaselineData(data).then(baselinedata => {
                     <div class="row">
                         <span class="full-width">${data['878865966'] === 353358909 ? 'Collected' : 'Not Collected'}</span>
                     </div>
-                    <div class="row">
-                        ${baselinedata['534621077'] && baselinedata['534621077']['299553921'] && baselinedata['534621077']['299553921'].specimenId ? `<span class="full-width"> ${baselinedata['534621077']['299553921'].specimenId} </span>` : ''}
-                        ${baselinedata['534621077'] && baselinedata['534621077']['703954371'] && baselinedata['534621077']['703954371'].specimenId ? `<span class="full-width"> ${baselinedata['534621077']['703954371'].specimenId} </span>` : ''}
-                        ${baselinedata['534621077'] && baselinedata['534621077']['838567176'] && baselinedata['534621077']['838567176'].specimenId ? `<span class="full-width"> ${baselinedata['534621077']['838567176'].specimenId} </span>` : ''}
-                        ${baselinedata['534621077'] && baselinedata['534621077']['454453939'] && baselinedata['534621077']['454453939'].specimenId ? `<span class="full-width"> ${baselinedata['534621077']['454453939'].specimenId} </span>` : ''}
-                        ${baselinedata['534621077'] && baselinedata['534621077']['652357376'] && baselinedata['534621077']['652357376'].specimenId ? `<span class="full-width"> ${baselinedata['534621077']['652357376'].specimenId} </span>` : ''}
-                    </div>
-                    <div class="row">
-                        ${baselinedata['534621077'] && baselinedata['534621077']['299553921'] && baselinedata['534621077']['299553921'].collectionTimeStamp ? `<span class="full-width"> ${baselinedata['534621077']['299553921'].collectionTimeStamp} </span>` : ''}
-                        ${baselinedata['534621077'] && baselinedata['534621077']['703954371'] && baselinedata['534621077']['703954371'].collectionTimeStamp ? `<span class="full-width"> ${baselinedata['534621077']['703954371'].collectionTimeStamp} </span>` : ''}
-                        ${baselinedata['534621077'] && baselinedata['534621077']['838567176'] && baselinedata['534621077']['838567176'].collectionTimeStamp ? `<span class="full-width"> ${baselinedata['534621077']['838567176'].collectionTimeStamp} </span>` : ''}
-                        ${baselinedata['534621077'] && baselinedata['534621077']['454453939'] && baselinedata['534621077']['454453939'].collectionTimeStamp ? `<span class="full-width"> ${baselinedata['534621077']['454453939'].collectionTimeStamp} </span>` : ''}
-                        ${baselinedata['534621077'] && baselinedata['534621077']['652357376'] && baselinedata['534621077']['652357376'].collectionTimeStamp ? `<span class="full-width"> ${baselinedata['534621077']['652357376'].collectionTimeStamp} </span>` : ''}
-                    </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="col-md-12 info-box">
                     <div class="row">
                         <span class="full-width">Baseline Mouthwash</span>
-                    </div>    
+                    </div>
                     <div class="row">
                         <span class="full-width">${data['684635302'] === 353358909 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}</span>
                     </div>
                     <div class="row">
                         <span class="full-width">${data['684635302'] === 353358909 ? 'Collected' : 'Not Collected'}</span>
-                    </div>
-                    <div class="row">
-                        ${baselinedata['534621077'] && baselinedata['534621077']['143615646'] && baselinedata['534621077']['143615646'].specimenId ? `<span class="full-width"> ${baselinedata['534621077']['143615646'].specimenId} </span>` : ''}
-                    </div>
-                    <div class="row">
-                        ${baselinedata['534621077'] && baselinedata['534621077']['143615646'] && baselinedata['534621077']['143615646'].collectionTimeStamp ? `<span class="full-width"> ${baselinedata['534621077']['143615646'].collectionTimeStamp} </span>` : ''}
                     </div>
                 </div>
             </div>
@@ -286,12 +265,6 @@ return getBaselineData(data).then(baselinedata => {
                     </div>
                     <div class="row">
                         <span class="full-width">${data['167958071'] === 353358909 ? 'Collected' : 'Not Collected' }</span>
-                    </div>
-                    <div class="row">
-                        ${baselinedata['534621077'] && baselinedata['534621077']['973670172'] && baselinedata['534621077']['973670172'].specimenId ? `<span class="full-width"> ${baselinedata['534621077']['973670172'].specimenId} </span>` : ''}
-                    </div>
-                    <div class="row">
-                        ${baselinedata['534621077'] && baselinedata['534621077']['973670172'] && baselinedata['534621077']['973670172'].collectionTimeStamp ? `<span class="full-width"> ${baselinedata['534621077']['973670172'].collectionTimeStamp} </span>` : ''}
                     </div>
                 </div>
             </div>
@@ -355,5 +328,5 @@ return getBaselineData(data).then(baselinedata => {
             <button type="button" class="btn btn-outline-primary" id="contactInformationModal" data-target="#biospecimenModal" data-toggle="modal">Contact Information</button>
         </div>
     `;
-}, (err) => {console.log("err", err)});
+    
 }
