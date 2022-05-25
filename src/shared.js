@@ -30,9 +30,17 @@ const conversion = {
     "677469051":"0014",
     "683613884":"0024"
 }
-  
- const api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
-// const api = 'http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
+
+export const urls = {
+    'stage': 'biospecimen-myconnect-stage.cancer.gov',
+    'prod': 'biospecimen-myconnect.cancer.gov'
+}
+
+let api = '';
+
+if(location.host === urls.prod) api = 'https://api-myconnect.cancer.gov/biospecimen';
+else if(location.host === urls.stage) api = 'https://api-myconnect-stage.cancer.gov/biospecimen';
+else api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
 
 export const inactivityTime = () => {
     let time;
@@ -1914,11 +1922,6 @@ export const checkFedexShipDuplicate = (boxes) => {
   let filteredArr = new Set(arr)
   return arr.length !== filteredArr.size
 }
-
-export const urls = {
-    'stage': 'biospecimen-myconnect-stage.cancer.gov',
-    'prod': 'biospecimen-myconnect.cancer.gov'
-  }
   
 export const checkNonAlphanumericStr = (boxes) => {
   let regExp = /^[a-z0-9]+$/i
