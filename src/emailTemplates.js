@@ -1,13 +1,31 @@
+import { urls } from "./shared.js";
+
 export const baselineEmailTemplate = (data) => {
   
+    let appLocation = '';
+    let supportLocation = '';
+
+    if(location.host === urls.prod) {
+        appLocation = "https://myconnect.cancer.gov/";
+        supportLocation = "https://myconnect.cancer.gov/support";
+    }
+    else if(location.host === urls.stage) {
+        appLocation = "https://myconnect-stage.cancer.gov/";
+        supportLocation = "https://myconnect-stage.cancer.gov/support";
+    }
+    else {
+        appLocation = "https://episphere.github.io/connectApp/";
+        supportLocation = "https://episphere.github.io/connectApp/support";
+    }
+
     return `
         Dear ${data['399159511']},
         <br/>
         <br/>
-        Thank you for donating your samples for the Connect for Cancer Prevention Study! Next, please visit the <a href="https://episphere.github.io/connectApp/">MyConnect app</a> to answer the Baseline Blood, Urine, and Mouthwash Sample Survey. This short survey asks questions about the day that you donated samples, so it is important to complete it as soon as you can.
+        Thank you for donating your samples for the Connect for Cancer Prevention Study! Next, please visit the <a href=${appLocation}>MyConnect app</a> to answer the Baseline Blood, Urine, and Mouthwash Sample Survey. This short survey asks questions about the day that you donated samples, so it is important to complete it as soon as you can.
         <br/>
         <br/>
-        Have questions? Please contact the <a href="https://episphere.github.io/connectApp/support">Connect Support Center.</a>
+        Have questions? Please contact the <a href=${supportLocation}>Connect Support Center.</a>
         <br/>
         <br/>
         Thank you for your commitment to helping us learn how to better prevent cancer.
