@@ -1924,11 +1924,6 @@ export const checkFedexShipDuplicate = (boxes) => {
   return arr.length !== filteredArr.size
 }
 
-export const urls = {
-    'stage': 'biospecimen-myconnect-stage.cancer.gov',
-    'prod': 'biospecimen-myconnect.cancer.gov'
-  }
-  
 export const checkNonAlphanumericStr = (boxes) => {
   let regExp = /^[a-z0-9]+$/i
   let arr = []
