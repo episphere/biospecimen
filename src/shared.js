@@ -1705,11 +1705,13 @@ export const getCollectionsByVisit = async (data) => {
     return collections;
 };
 
-export const getWorflow = () => document.getElementById('contentBody').dataset.workflow;
+export const getWorflow = () => document.getElementById('contentBody').dataset.workflow ?? localStorage.getItem('workflow');
+export const getSiteAcronym = () => document.getElementById('contentBody').dataset.siteAcronym ?? localStorage.getItem('siteAcronym');
+export const getSiteCode = () => document.getElementById('contentBody').dataset.siteCode ?? localStorage.getItem('siteCode');
 
 export const getSiteTubesLists = (specimenData) => {
-    const dashboardType = document.getElementById('contentBody').dataset.workflow;
-    const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym;
+    const dashboardType = getWorflow();
+    const siteAcronym = getSiteAcronym();
     const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === specimenData['951355211'])[0]?.location : undefined;
     const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
     return siteTubesList;
