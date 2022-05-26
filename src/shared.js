@@ -30,9 +30,18 @@ const conversion = {
     "677469051":"0014",
     "683613884":"0024"
 }
-  
- const api = 'https://api-myconnect-stage.cancer.gov/biospecimen?';
-// const api = 'http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
+
+export const urls = {
+    'stage': 'biospecimen-myconnect-stage.cancer.gov',
+    'prod': 'biospecimen-myconnect.cancer.gov'
+}
+
+let api = '';
+
+if(location.host === urls.prod) api = 'https://api-myconnect.cancer.gov/biospecimen?';
+else if(location.host === urls.stage) api = 'https://api-myconnect-stage.cancer.gov/biospecimen?';
+else api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
+export const baseAPI = api;
 
 export const inactivityTime = () => {
     let time;

@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToNameObj } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToNameObj, baseAPI } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -62,7 +62,7 @@ const getCurrentDate = () => {
 
 const getBSIQueryData = async (filter) => {
   const idToken = await getIdToken();
-  const response = await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=queryBsiData&type=${filter}`, {
+  const response = await fetch(`${baseAPI}api=queryBsiData&type=${filter}`, {
     method: "GET",
     headers: {
       Authorization: "Bearer" + idToken,
