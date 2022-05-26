@@ -204,7 +204,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                     <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" type="button" id="collectionSave">Save</button>
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="button" id="collectionNext">Save and Review</button>
+                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="button" id="collectionNext">Go to Review</button>
                 </div>
             </div>
         </form>
