@@ -1,5 +1,5 @@
 import { userDashboard } from "../dashboard.js";
-import { getIdToken, showAnimation, hideAnimation } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, baseAPI } from "../../shared.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
@@ -329,8 +329,7 @@ const storeDateReceivedinISO = (date) => { // ("YYYY-MM-DD" to ISO format DateTi
 const storePackageReceipt = async (data) => {
     showAnimation();
     const idToken = await getIdToken();
-    const response = await fetch(
-        `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=storeReceipt`,
+    const response = await fetch(`${baseAPI}api=storeReceipt`,
         {
             method: "POST",
             body: JSON.stringify(data),
@@ -342,7 +341,6 @@ const storePackageReceipt = async (data) => {
     );
     hideAnimation();
     if (response.status === 200) {
-      console.log('res',response)
         let alertList = document.getElementById("alert_placeholder");
         let template = ``;
         template += `
