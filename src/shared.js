@@ -1099,7 +1099,7 @@ export const siteFullNames = {
     'MFC': 'Marshfield Clinic',
     'KPNW': 'Kaiser Permanente Northwest',
     'KPCO': 'Kaiser Permanente Colorado',
-    'HP': 'HealthPartners',
+    'HP': 'HealthPartners Research Clinic',
     'HFHS': 'Henry Ford Health System',
     'NIH': "National Institutes of Health"
 }
@@ -1111,7 +1111,7 @@ Main Campus, Frederick are developer site specific location options when person 
 Might need to Lake Hallie and separate Marshfield
 */ 
 export const siteSpecificLocation = {
-  "HP Research Clinic" : {"siteAcronym":"HP", "siteCode":531629870, "loginSiteName": "HealthPartners"},
+  "HP Research Clinic" : {"siteAcronym":"HP", "siteCode":531629870, "loginSiteName": "HealthPartners Research Clinic"},
   "Henry Ford Main Campus": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
   "Henry Ford West Bloomfield Hospital": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
   "Henry Ford Medical Center- Fairlane": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
@@ -1131,7 +1131,7 @@ export const locationConceptIDToLocationMap = {
     siteSpecificLocation: 'HP Research Clinic',
     siteAcronym: 'HP',
     siteCode: '531629870',
-    loginSiteName: 'HealthPartners',
+    loginSiteName: 'HealthPartners Research Clinic',
   },
   752948709: {
     siteSpecificLocation: 'Henry Ford Main Campus',
@@ -1257,7 +1257,7 @@ export const nameToKeyObj =
 export const keyToNameObj = 
 {
     452412599 : "Kaiser Permanente Northwest",
-    531629870 : "HealthPartners",
+    531629870 : "HealthPartners Research Clinic",
     657167265 : "Sanford Health",
     548392715 : "Henry Ford Health System",
     303349821 : "Marshfield Clinic",
