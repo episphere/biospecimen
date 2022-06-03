@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToNameObj, baseAPI } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToLocationObj, baseAPI } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -231,13 +231,13 @@ const getVialTypesMappings = (i) => {
 
 const updateResultMappings = (i, vialMappings) => {
   i['Study ID'] = 'Connect Study'
-  i['Sample Collection Center'] = keyToNameObj[i[fieldToConceptIdMapping.healthcareProvider]]
+  i['Sample Collection Center'] = keyToLocationObj[i[fieldToConceptIdMapping.healthcareProvider]]
   i['Sample ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[0] : ``
   i['Sequence #'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[1] : ``
   i['BSI ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId] : ``
   i['Subject ID'] = i['Connect_ID']
   i['Date Received'] = i[fieldToConceptIdMapping.dateReceived].split('T')[0]
-  i['Date Drawn'] =  i[fieldToConceptIdMapping.dateWithdrawn] != undefined ? i[fieldToConceptIdMapping.dateWithdrawn].split('T')[0] : `` 
+  i['Date Drawn'] =  i[fieldToConceptIdMapping.dateWithdrawn] != undefined ? i[fieldToConceptIdMapping.dateWithdrawn] : `` 
   i['Vial Type'] = vialMappings[0]
   i['Additive/Preservative'] = vialMappings[1]
   i['Material Type'] = vialMappings[2]
