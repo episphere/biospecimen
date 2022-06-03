@@ -272,12 +272,8 @@ export const boxManifest = async (boxId, userName) => {
         hiddenJSON[box['132929440']] = box['bags']
     }
     let currInstitute = currBox.siteAcronym;
-    console.log("currBox",currBox)
-    console.log("currInstitute",currInstitute)
     let currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
-    // replace currInstitute reference to currLocation on the paramters
-    let currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute]
-    console.log("currContactInfo",currContactInfo)
+    let currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute];
 
     let template = `
         </br>

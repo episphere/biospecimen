@@ -3244,7 +3244,7 @@ export const populateReportManifestHeader = (currPage) => {
     console.log("populateReportManifestHeader currPage",currPage)
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
-    let site = currPage["siteAcronym"]
+    let siteAcronym = currPage["siteAcronym"]
 
     let currShippingLocationNumber = currPage['560975149']
     const currContactInfo = locationConceptIDToLocationMap[currShippingLocationNumber]["contactInfo"][siteAcronym]

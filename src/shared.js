@@ -1105,12 +1105,6 @@ export const siteFullNames = {
     'NIH': "National Institutes of Health"
 }
 
-/*
-Note: 
-NORC, NIH will not use Biospecimen Dashboards
-Main Campus, Frederick are developer site specific location options when person logged in siteCode 13
-Might need to Lake Hallie and separate Marshfield
-*/ 
 export const siteSpecificLocation = {
   "HP Research Clinic" : {"siteAcronym":"HP", "siteCode":531629870, "loginSiteName": "HealthPartners Research Clinic"},
   "Henry Ford Main Campus": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
@@ -1298,16 +1292,7 @@ export const locationConceptIDToLocationMap = {
     siteCode: '13',
     loginSiteName: 'National Cancer Institute',
     contactInfo: {
-      "NIH":[{
-        "fullName":"Test Main Campus",
-        "email":"Main Campus@mail.com",
-        "phone":["888"],
-      },
-      {
-        "fullName":"Test Main Campus2",
-        "email":"Main Campus2@mail.com",
-        "phone":["888 2"],
-      },],
+      "NIH":[],
     },
   },
   222222222: {
@@ -1316,11 +1301,7 @@ export const locationConceptIDToLocationMap = {
     siteCode: '13',
     loginSiteName: 'National Cancer Institute',
     contactInfo: {
-      "NIH":[{
-        "fullName":"Test Frederick",
-        "email":"Frederick@mail.com",
-        "phone":["999"],
-      }],
+      "NIH":[],
     },
   },
 };
@@ -1892,11 +1873,9 @@ export const allTubesCollected = (data) => {
 
 export const displayContactInformation = (currContactInfo) => {
   console.log("displayContactInformation",currContactInfo)
-  //reference specific location instead of site in logic
-
   if(currContactInfo.length){
     let contactStr = ""
-    contactStr += `<p>Site Contact Information:</p>`
+    contactStr += `<p style="font-weight:bold">Site Contact Information:</p>`
     // iterate over length of existing site's contact array
     for(let i= 0; i < currContactInfo.length; i++) {
     contactStr += `<p>Full Name: ${currContactInfo[i].fullName}</p>`
@@ -1914,7 +1893,6 @@ export const displayContactInformation = (currContactInfo) => {
     }
     else contactStr += `<p>Phone:</p>`
   }
-    debugger;
     return contactStr
   }
   else return ""
