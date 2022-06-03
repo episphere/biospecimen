@@ -1302,7 +1302,12 @@ export const locationConceptIDToLocationMap = {
         "fullName":"Test Main Campus",
         "email":"Main Campus@mail.com",
         "phone":["888"],
-      }],
+      },
+      {
+        "fullName":"Test Main Campus2",
+        "email":"Main Campus2@mail.com",
+        "phone":["888 2"],
+      },],
     },
   },
   222222222: {
@@ -2014,11 +2019,9 @@ export const displayContactInformation = (currContactInfo) => {
   if(currContactInfo.length){
     let contactStr = ""
     contactStr += `<p>Site Contact Information:</p>`
-    let numContacts = currContactInfo.length
     // iterate over length of existing site's contact array
-    for(let i= 0; i < numContacts; i++) {
-    contactStr += `${numContacts > 1 ? "<p>Contact ${i+1}</p>": ""}`
-    contactStr += `<p>${currContactInfo[i].fullName}</p>`
+    for(let i= 0; i < currContactInfo.length; i++) {
+    contactStr += `<p>Full Name: ${currContactInfo[i].fullName}</p>`
     contactStr += `<p>Email: ${currContactInfo[i].email}</p>`
     
     let numPhones = currContactInfo[i].phone.length
@@ -2033,6 +2036,7 @@ export const displayContactInformation = (currContactInfo) => {
     }
     else contactStr += `<p>Phone:</p>`
   }
+    debugger;
     return contactStr
   }
   else return ""

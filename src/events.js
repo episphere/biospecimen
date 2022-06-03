@@ -3296,7 +3296,7 @@ export const populateReportManifestHeader = (currPage) => {
     newP = document.createElement("p");
     newP.innerHTML = "Date Shipped: " + toInsertDateShipped;
     document.getElementById('boxManifestCol1').appendChild(newP);
-    newDiv.innerHTML = displayContactInformation(currContactInfo) // Change here
+    newDiv.innerHTML = displayContactInformation(currContactInfo)
     document.getElementById('boxManifestCol1').appendChild(newDiv)
 }
 
