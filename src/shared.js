@@ -1268,6 +1268,17 @@ export const keyToNameObj =
     327912200 : "Kaiser Permanente Georgia"
 }
 
+export const keyToLocationObj = 
+{
+    777644826: "UC-DCAM",
+    692275326: "Marshfield",
+    698283667: "Lake Hallie",
+    834825425: "HP Research Clinic",
+    736183094: "HFHS Research Clinic (Main Campus)",
+    589224449: "SF Cancer Center LL",
+    111111111: "NIH"
+}
+
 export const siteContactInformation = {
   "UCM":[{
     "fullName":"Jaime King",
