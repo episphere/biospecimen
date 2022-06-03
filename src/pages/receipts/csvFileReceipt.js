@@ -249,6 +249,7 @@ const updateResultMappings = (i, vialMappings) => {
   i['Label Status'] = 'Barcoded'
   i['Visit'] = 'BL'
   delete i[fieldToConceptIdMapping.healthcareProvider]
+  delete i[fieldToConceptIdMapping.collectionLocation]
   delete i['Connect_ID']
   delete i[fieldToConceptIdMapping.collectionId]
   delete i[fieldToConceptIdMapping.dateWithdrawn]
