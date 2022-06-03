@@ -79,7 +79,6 @@ export const startReport = async () => {
 }
 
 export const showReportsManifest = async (currPage) => {
-  console.log("showReportsManifest",currPage) // do this later
     let template = `
         <div class="row">
             <div style="float: left;width: 33%;" id="boxManifestCol1">

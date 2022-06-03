@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -866,8 +866,6 @@ export const populateSpecimensList = async (hiddenJSON) => {
 }
 
 export const populateBoxManifestHeader = (boxId, hiddenJSON, currContactInfo) => {
-  console.log("populateBoxManifestHeader", currContactInfo)
-  console.log("populateBoxManifestHeader currLocation",currContactInfo)
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
 
@@ -1101,13 +1099,10 @@ export const populateTempCheck = async () => {
 }
 
 export const populateShippingManifestHeader = (hiddenJSON, userName, locationNumber, siteAcronym, currShippingLocationNumber) => {
-  console.log("populateShippingManifestHeader location site", locationNumber, siteAcronym)
+  console.log("populateShippingManifestHeader locationNumber, siteAcronym, currShippingLocationNumber", locationNumber, siteAcronym,currShippingLocationNumber)
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
-    console.log("populateShippingManifestHeader location",locationNumber)
-    console.log("populateShippingManifestHeader currShippingLocationNumber", currShippingLocationNumber)
     const currContactInfo = locationConceptIDToLocationMap[currShippingLocationNumber]["contactInfo"][siteAcronym]
-    console.log("populateShippingManifestHeader currContactInfo", currContactInfo)
     let newP = document.createElement("p");
     let newDiv = document.createElement("div")
     newP.innerHTML = "Shipment Manifest";
@@ -1144,7 +1139,7 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, locationNum
     document.getElementById('boxManifestCol3').appendChild(newP);
 
     newP = document.createElement("p");
-    newP.innerHTML = "Location: " + locationConceptIDToLocationMap[locationNumber]["siteSpecificLocation"];
+    newP.innerHTML = "Location: " + locationConceptIDToLocationMap[currShippingLocationNumber]["siteSpecificLocation"];
     document.getElementById('boxManifestCol3').appendChild(newP);
 
 }
@@ -2573,7 +2568,6 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
         let tempCheckStatus = ""
         const currSiteSpecificName = document.getElementById('selectLocationList').value
         const currShippingLocationNumber = siteSpecificLocationToConceptId[currSiteSpecificName]
-        console.log(currShippingLocationNumber)
         for (var r = 1; r < currTable.rows.length; r++) {
 
             let currCheck = currTable.rows[r].cells[0]
@@ -3231,7 +3225,7 @@ export const populateBoxTable = async (page, filter) => {
         currRow.insertCell(6).innerHTML = receivedDate;
         currRow.insertCell(7).innerHTML = convertNumsToCondition(packagedCondition, packageConversion);
         currRow.insertCell(8).innerHTML = currPage.hasOwnProperty('870456401') ? currPage['870456401'] : '' ;
-        console.log(currPage)
+        console.log("populateBoxTable currPage",currPage)
         addEventViewManifestButton('reportsViewManifest' + i, currPage);
 
     }
@@ -3247,7 +3241,7 @@ export const addEventViewManifestButton = (buttonId, currPage) => {
 
 
 export const populateReportManifestHeader = (currPage) => {
-    console.log("populateReportManifestHeader currPage",currPage) // Do this later
+    console.log("populateReportManifestHeader currPage",currPage)
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
     let site = currPage["siteAcronym"]
