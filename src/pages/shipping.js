@@ -272,8 +272,12 @@ export const boxManifest = async (boxId, userName) => {
         hiddenJSON[box['132929440']] = box['bags']
     }
     let currInstitute = currBox.siteAcronym;
+    console.log("currBox",currBox)
+    console.log("currInstitute",currInstitute)
     let currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
-   
+    // replace currInstitute reference to currLocation on the paramters
+    let currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute]
+    console.log("currContactInfo",currContactInfo)
 
     let template = `
         </br>
@@ -331,7 +335,7 @@ export const boxManifest = async (boxId, userName) => {
     
     //addEventNavBarShipment("returnToPackaging");
     //document.getElementById('boxManifestTable').appendChild(result);
-    populateBoxManifestHeader(boxId,boxJSONS,currInstitute);
+    populateBoxManifestHeader(boxId,boxJSONS,currContactInfo);
     populateBoxManifestTable(boxId,hiddenJSON);
     addEventNavBarShipment("returnToPackaging", userName);
     document.getElementById('printBox').addEventListener('click', e => {
@@ -346,9 +350,9 @@ export const boxManifest = async (boxId, userName) => {
 
 
 
-export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) => {    
+export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, currShippingLocationNumber) => {    
 
-
+console.log("shippingManifest", currShippingLocationNumber)
     //let tempMonitorThere = document.getElementById('tempMonitorChecked').checked;
     
 
@@ -408,7 +412,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
                 <button type="button" class="btn btn-primary print-manifest" data-dismiss="modal" id="printBox">Optional: Print Shipment Manifest</button>
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging">Continue to Assign Tracking Number</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="assignTrackingNumberPage">Continue to Assign Tracking Number</button>
             </div>
         </div>
         
@@ -439,17 +443,17 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
     
     //document.getElementById('boxManifestTable').appendChild(result);
     
-    populateShippingManifestHeader(toDisplayJSON, userName, location, site);
+    populateShippingManifestHeader(toDisplayJSON, userName, location, site, currShippingLocationNumber); // populate shipping header via site specfiic location selected from shipping page
     populateShippingManifestBody(toDisplayJSON);
     addEventNavBarShipment("navBarShippingDash", userName);
     await populateTempCheck();
-    const btn = document.getElementById('completePackaging');
+    const btn = document.getElementById('assignTrackingNumberPage'); // assignTracking
     addEventShipPrintManifest('printBox')
     addEventNavBarShipment('returnToPackaging', userName);
 
     
 
-    document.getElementById('completePackaging').addEventListener('click', e => {
+    document.getElementById('assignTrackingNumberPage').addEventListener('click', e => {
         e.stopPropagation();
         if(btn.classList.contains('active')) return;
         if(tempMonitorThere && document.getElementById('tempBox').value == '') {
