@@ -892,7 +892,7 @@ export const populateBoxManifestHeader = (boxId, hiddenJSON, currContactInfo) =>
     if (currJSON.hasOwnProperty('672863981')) {
         let dateStarted = Date.parse(currJSON['672863981'])
         let currentdate = new Date(dateStarted);
-        // console.group(currentdate.getMinutes())
+        console.group(currentdate.getMinutes())
         let currMins = currentdate.getMinutes() < 10 ? '0' + currentdate.getMinutes() : currentdate.getMinutes();
         let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
         let hour = parseInt(currentdate.getHours()) % 12;
@@ -1099,7 +1099,7 @@ export const populateTempCheck = async () => {
 }
 
 export const populateShippingManifestHeader = (hiddenJSON, userName, locationNumber, siteAcronym, currShippingLocationNumber) => {
-  console.log("populateShippingManifestHeader locationNumber, siteAcronym, currShippingLocationNumber", locationNumber, siteAcronym,currShippingLocationNumber)
+  console.log("populateShippingManifestHeader locationNumber, siteAcronym, currShippingLocationNumber", locationNumber, siteAcronym,currShippingLocationNumber) // REMOVE - After Site Dev Test
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
     const currContactInfo = locationConceptIDToLocationMap[currShippingLocationNumber]["contactInfo"][siteAcronym]
@@ -3225,7 +3225,7 @@ export const populateBoxTable = async (page, filter) => {
         currRow.insertCell(6).innerHTML = receivedDate;
         currRow.insertCell(7).innerHTML = convertNumsToCondition(packagedCondition, packageConversion);
         currRow.insertCell(8).innerHTML = currPage.hasOwnProperty('870456401') ? currPage['870456401'] : '' ;
-        console.log("populateBoxTable currPage",currPage)
+        console.log("populateBoxTable currPage",currPage) // REMOVE - After Site Dev Test
         addEventViewManifestButton('reportsViewManifest' + i, currPage);
 
     }
@@ -3241,7 +3241,7 @@ export const addEventViewManifestButton = (buttonId, currPage) => {
 
 
 export const populateReportManifestHeader = (currPage) => {
-    console.log("populateReportManifestHeader currPage",currPage)
+    console.log("populateReportManifestHeader currPage",currPage) // REMOVE - After Site Dev Test
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
     let siteAcronym = currPage["siteAcronym"]
