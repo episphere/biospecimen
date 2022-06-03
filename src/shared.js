@@ -325,7 +325,7 @@ export const errorMessage = (id, msg, focus, offset) => {
     if(focus) currentElement.focus();
 }
 
-export const shippingPrintManifestReminder = (boxesToShip, userName, tempCheckStatus) => {
+export const shippingPrintManifestReminder = (boxesToShip, userName, tempCheckStatus, currShippingLocationNumber) => {
   const button = document.createElement('button');
     button.dataset.target = '#biospecimenModal';
     button.dataset.toggle = 'modal';
@@ -356,7 +356,7 @@ export const shippingPrintManifestReminder = (boxesToShip, userName, tempCheckSt
 `;
   const shipManifestConfirmButton = document.getElementById("shipManifestConfirm")
   shipManifestConfirmButton.addEventListener("click", async () => {
-    await shippingManifest(boxesToShip, userName, tempCheckStatus);
+    await shippingManifest(boxesToShip, userName, tempCheckStatus, currShippingLocationNumber);
   })
 }
 
@@ -1104,12 +1104,6 @@ export const siteFullNames = {
     'NIH': "National Institutes of Health"
 }
 
-/*
-Note: 
-NORC, NIH will not use Biospecimen Dashboards
-Main Campus, Frederick are developer site specific location options when person logged in siteCode 13
-Might need to Lake Hallie and separate Marshfield
-*/ 
 export const siteSpecificLocation = {
   "HP Research Clinic" : {"siteAcronym":"HP", "siteCode":531629870, "loginSiteName": "HealthPartners Research Clinic"},
   "Henry Ford Main Campus": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
@@ -1120,6 +1114,7 @@ export const siteSpecificLocation = {
   "KPHI RRL": {"siteAcronym":"KPHI", "siteCode":300267574, "loginSiteName": "Kaiser Permanente Hawaii"},
   "KPNW RRL": {"siteAcronym":"KPNW", "siteCode":452412599, "loginSiteName": "Kaiser Permanente Northwest"},
   "Marshfield": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
+  "Lake Hallie": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "SF Cancer Center LL": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
   "DCAM": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "Main Campus": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
@@ -1132,78 +1127,181 @@ export const locationConceptIDToLocationMap = {
     siteAcronym: 'HP',
     siteCode: '531629870',
     loginSiteName: 'HealthPartners Research Clinic',
+    contactInfo: {
+      "HP":[{
+        "fullName":"Erin Schwartz",
+        "email":"Erin.C.Schwartz@HealthPartners.com",
+        "phone":[
+         "Office: (651) 495-6371",
+         "Cell: (612) 836-7885"
+        ]
+      }],
+    },
   },
   752948709: {
-    siteSpecificLocation: 'Henry Ford Main Campus',
+    siteSpecificLocation: 'Henry Ford Main Campus', // Note: should this be changed to "Henry Ford One Place"?
     siteAcronym: 'HFHS',
     siteCode: '548392715',
     loginSiteName: 'Henry Ford Health System',
+    contactInfo: {
+      "HFHS":[{
+        "fullName":"Kathleen Dawson",
+        "email":"kdawson7@hfhs.org",
+        "phone":["248-910-6716"],
+      }]
+    },
   },
   570271641: {
     siteSpecificLocation: 'Henry Ford West Bloomfield Hospital',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
     loginSiteName: 'Henry Ford Health System',
+    contactInfo: {
+      "HFHS":[{
+        "fullName":"Kathleen Dawson",
+        "email":"kdawson7@hfhs.org",
+        "phone":["248-910-6716"],
+      }]
+    },
   },
   838480167: {
     siteSpecificLocation: 'Henry Ford Medical Center-Fairlane',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
     loginSiteName: 'Henry Ford Health System',
+    contactInfo: {
+      "HFHS":[{
+        "fullName":"Kathleen Dawson",
+        "email":"kdawson7@hfhs.org",
+        "phone":["248-910-6716"],
+      }]
+    },
   },
   763273112: {
     siteSpecificLocation: 'KPCO RRL',
     siteAcronym: 'KPCO',
     siteCode: '125001209',
     loginSiteName: 'Kaiser Permanente Colorado',
+    contactInfo: {
+      "KPCO":[{
+        "fullName":"Brooke Thompson",
+        "email":"Brooke.x.thompson@kp.org",
+        "phone":["720-369-4316"],
+      }],
+    },
   },
   767775934: {
     siteSpecificLocation: 'KPGA RRL',
     siteAcronym: 'KPGA',
     siteCode: '327912200',
     loginSiteName: 'Kaiser Permanente Georgia',
+    contactInfo: {
+      "KPGA":[{
+        "fullName":"Brandi Robinson",
+        "email":"brandi.e.robinson@kp.org",
+        "phone":["470-217-2993"],
+      }],
+    },
   },
   531313956: {
     siteSpecificLocation: 'KPHI RRL',
     siteAcronym: 'KPHI',
     siteCode: '300267574',
     loginSiteName: 'Kaiser Permanente Hawaii',
+    contactInfo: {
+      "KPHI":[{
+        "fullName":"Cyndee Yonehara",
+        "email":"Cyndee.H.Yonehara@kp.org",
+        "phone":["Mobile: 808-341-5736"],
+      }],
+    },
   },
   715632875: {
     siteSpecificLocation: 'KPNW RRL',
     siteAcronym: 'KPNW',
     siteCode: '452412599',
     loginSiteName: 'Kaiser Permanente Northwest',
+    contactInfo: {
+      "KPNW":[{
+        "fullName":"Sarah Vertrees",
+        "email":"sarah.vertrees@kpchr.org",
+        "phone":["503-261-4144"],
+      }],
+    },
   },
   692275326: {
     siteSpecificLocation: 'Marshfield',
     siteAcronym: 'MFC',
     siteCode: '303349821',
     loginSiteName: 'Marshfield Cancer Center',
+    contactInfo: {
+      "MFC":[{
+        "fullName":"Terry Foss",
+        "email":"Foss.terry@marshfieldresearch.org",
+        "phone":["715-898-9444"],
+      }],
+    },
+  },
+  698283667:{
+    siteSpecificLocation: 'Lake Hallie',
+    siteAcronym: 'MFC',
+    siteCode: '303349821',
+    loginSiteName: 'Marshfield Cancer Center',
+    contactInfo: {
+      "MFC":[{
+        "fullName":"Anna Zachow",
+        "email":"Zachow.anna@marshfieldresearch.org",
+        "phone":["715-898-9444"],
+      }],
+    },
   },
   589224449: {
     siteSpecificLocation: 'SF Cancer Center LL',
     siteAcronym: 'SFH',
     siteCode: '657167265',
     loginSiteName: 'Sanford Health',
+    contactInfo: {
+      "SFH":[{
+        "fullName":"Kimberly (Kay) Spellmeyer",
+        "email":"kimberly.spellmeyer@sanfordhealth.org",
+        "phone":["605-312-6100"],
+      },{
+        "fullName":"DeAnn Witte",
+        "email":"deann.witte@sanfordhealth.org",
+        "phone":["701-234-6718"],
+      }],
+    },
   },
   777644826: {
     siteSpecificLocation: 'DCAM',
     siteAcronym: 'UCM',
     siteCode: '809703864',
     loginSiteName: 'University of Chicago Medicine',
+    contactInfo: {
+      "UCM":[{
+        "fullName":"Jaime King",
+        "email":"jaimeking@bsd.uchicago.edu",
+        "phone":["(773) 702-5073"],
+      }],
+    },
   },
   111111111: {
     siteSpecificLocation: 'Main Campus',
     siteAcronym: 'NIH',
     siteCode: '13',
     loginSiteName: 'National Cancer Institute',
+    contactInfo: {
+      "NIH":[],
+    },
   },
   222222222: {
     siteSpecificLocation: 'Frederick',
     siteAcronym: 'NIH',
     siteCode: '13',
     loginSiteName: 'National Cancer Institute',
+    contactInfo: {
+      "NIH":[],
+    },
   },
 };
 
@@ -1217,6 +1315,7 @@ export const conceptIdToSiteSpecificLocation = {
   531313956: "KPHI RRL",
   715632875: "KPNW RRL",
   692275326: "Marshfield",
+  698283667: "Lake Hallie",
   589224449: "SF Cancer Center LL",
   777644826: "DCAM",
   111111111: "Main Campus",
@@ -1233,6 +1332,7 @@ export const siteSpecificLocationToConceptId = {
   "KPHI RRL": 531313956,
   "KPNW RRL": 715632875,
   "Marshfield": 692275326,
+  "Lake Hallie": 698283667,
   "SF Cancer Center LL": 589224449,
   "DCAM": 777644826, 
   "Main Campus": 111111111,
@@ -1279,62 +1379,6 @@ export const keyToLocationObj =
     589224449: "SF Cancer Center LL",
     111111111: "NIH"
 }
-
-export const siteContactInformation = {
-  "UCM":[{
-    "fullName":"Jaime King",
-    "email":"jaimeking@bsd.uchicago.edu",
-    "phone":["(773) 702-5073"],
-  }],
-  "MFC":[{
-    "fullName":"Jacob Johnston",
-    "email":"johnston.jacob@marshfieldclinic.org",
-    "phone":["715-898-9444"],
-  }],
-  "HP":[{
-    "fullName":"Erin Schwartz",
-    "email":"Erin.C.Schwartz@HealthPartners.com",
-    "phone":[
-     "Office: (651) 495-6371",
-     "Cell: (612) 836-7885"
-    ]
-  }],
-  "SFH":[{
-    "fullName":"Kimberly (Kay) Spellmeyer",
-    "email":"kimberly.spellmeyer@sanfordhealth.org",
-    "phone":["605-312-6100"],
-  },{
-    "fullName":"DeAnn Witte",
-    "email":"deann.witte@sanfordhealth.org",
-    "phone":["701-234-6718"],
-  }],
-  "KPCO":[{
-    "fullName":"Brooke Thompson",
-    "email":"Brooke.x.thompson@kp.org",
-    "phone":["720-369-4316"],
-  }],
-  "KPHI":[{
-    "fullName":"Cyndee Yonehara",
-    "email":"Cyndee.H.Yonehara@kp.org",
-    "phone":["Mobile: 808-341-5736"],
-  }],
-  "KPNW":[{
-    "fullName":"Sarah Vertrees",
-    "email":"sarah.vertrees@kpchr.org",
-    "phone":["503-261-4144"],
-  }],
-  "KPGA":[{
-    "fullName":"Brandi Robinson",
-    "email":"brandi.e.robinson@kp.org",
-    "phone":["470-217-2993"],
-  }],
-  "HFHS":[{
-    "fullName":"Kathleen Dawson",
-    "email":"kdawson7@hfhs.org",
-    "phone":["248-910-6716"],
-  }]
-}
-
 
 export const verificationConversion = {
     '875007964': 'Not Yet Verified',
@@ -1838,25 +1882,23 @@ export const allTubesCollected = (data) => {
     return flag;
 };
 
-export const displayContactInformation = (site, siteContactInformation) => {
-  if(siteContactInformation.hasOwnProperty(site)){
+export const displayContactInformation = (currContactInfo) => {
+  if(currContactInfo.length){
     let contactStr = ""
-    contactStr += `<p>Site Contact Information:</p>`
-    let numContacts = siteContactInformation[site].length
+    contactStr += `<p style="font-weight:bold">Site Contact Information:</p>`
     // iterate over length of existing site's contact array
-    for(let i= 0; i < numContacts;i++) {
-    contactStr += `${numContacts > 1 ? "<p>Contact ${i+1}</p>": ""}`
-    contactStr += `<p>${siteContactInformation[site][i].fullName}</p>`
-    contactStr += `<p>Email: ${siteContactInformation[site][i].email}</p>`
+    for(let i= 0; i < currContactInfo.length; i++) {
+    contactStr += `<p>Full Name: ${currContactInfo[i].fullName}</p>`
+    contactStr += `<p>Email: ${currContactInfo[i].email}</p>`
     
-    let numPhones = siteContactInformation[site][i].phone.length
+    let numPhones = currContactInfo[i].phone.length
     if(numPhones === 1){
-      contactStr += `<p>Phone: ${siteContactInformation[site][i].phone}</p>`  
+      contactStr += `<p>Phone: ${currContactInfo[i].phone}</p>`  
     }
     else if(numPhones > 1){
       contactStr += `<p>Phone:</p>`
       for(let j = 0; j < numPhones; j++){
-        contactStr += `<p>${siteContactInformation[site][i].phone[j]}</p>`
+        contactStr += `<p>${currContactInfo[i].phone[j]}</p>`
       }
     }
     else contactStr += `<p>Phone:</p>`

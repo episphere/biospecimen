@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, siteContactInformation, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -865,7 +865,7 @@ export const populateSpecimensList = async (hiddenJSON) => {
 
 }
 
-export const populateBoxManifestHeader = (boxId, hiddenJSON, currInstitute) => {
+export const populateBoxManifestHeader = (boxId, hiddenJSON, currContactInfo) => {
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
 
@@ -926,7 +926,7 @@ export const populateBoxManifestHeader = (boxId, hiddenJSON, currInstitute) => {
     document.getElementById('boxManifestCol1').appendChild(newP);
     newP = document.createElement("p");
     newDiv = document.createElement("div")
-    newDiv.innerHTML = displayContactInformation(currInstitute, siteContactInformation)
+    newDiv.innerHTML = displayContactInformation(currContactInfo)
     document.getElementById('boxManifestCol1').appendChild(newDiv);
 
     newP.innerHTML = "Number of Sleeves/Bags: " + numBags;
@@ -1098,10 +1098,11 @@ export const populateTempCheck = async () => {
     }
 }
 
-export const populateShippingManifestHeader = (hiddenJSON, userName, location, site) => {
+export const populateShippingManifestHeader = (hiddenJSON, userName, locationNumber, siteAcronym, currShippingLocationNumber) => {
+  console.log("populateShippingManifestHeader locationNumber, siteAcronym, currShippingLocationNumber", locationNumber, siteAcronym,currShippingLocationNumber) // REMOVE - After Site Dev Test
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
-
+    const currContactInfo = locationConceptIDToLocationMap[currShippingLocationNumber]["contactInfo"][siteAcronym]
     let newP = document.createElement("p");
     let newDiv = document.createElement("div")
     newP.innerHTML = "Shipment Manifest";
@@ -1130,15 +1131,15 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, location, s
     document.getElementById('boxManifestCol1').appendChild(newP);
 
     newDiv = document.createElement("div");
-    newDiv.innerHTML = displayContactInformation(site, siteContactInformation)
+    newDiv.innerHTML = displayContactInformation(currContactInfo)
     document.getElementById('boxManifestCol1').appendChild(newDiv);
 
     newP = document.createElement("p");
-    newP.innerHTML = "Site: " + site;
+    newP.innerHTML = "Site: " + siteAcronym;
     document.getElementById('boxManifestCol3').appendChild(newP);
 
     newP = document.createElement("p");
-    newP.innerHTML = "Location: " + locationConceptIDToLocationMap[location]["siteSpecificLocation"];
+    newP.innerHTML = "Location: " + locationConceptIDToLocationMap[currShippingLocationNumber]["siteSpecificLocation"];
     document.getElementById('boxManifestCol3').appendChild(newP);
 
 }
@@ -2565,6 +2566,8 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
         let shipSetForage = []
         let currTable = document.getElementById('saveTable')
         let tempCheckStatus = ""
+        const currSiteSpecificName = document.getElementById('selectLocationList').value
+        const currShippingLocationNumber = siteSpecificLocationToConceptId[currSiteSpecificName]
         for (var r = 1; r < currTable.rows.length; r++) {
 
             let currCheck = currTable.rows[r].cells[0]
@@ -2600,7 +2603,7 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
         boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
         checkShipForage(shipSetForage,boxesToShip)
         //return box 1 info
-        shippingPrintManifestReminder(boxesToShip, userName, tempCheckStatus);
+        shippingPrintManifestReminder(boxesToShip, userName, tempCheckStatus, currShippingLocationNumber);
     });
 }
 
@@ -3222,6 +3225,7 @@ export const populateBoxTable = async (page, filter) => {
         currRow.insertCell(6).innerHTML = receivedDate;
         currRow.insertCell(7).innerHTML = convertNumsToCondition(packagedCondition, packageConversion);
         currRow.insertCell(8).innerHTML = currPage.hasOwnProperty('870456401') ? currPage['870456401'] : '' ;
+        console.log("populateBoxTable currPage",currPage) // REMOVE - After Site Dev Test
         addEventViewManifestButton('reportsViewManifest' + i, currPage);
 
     }
@@ -3237,9 +3241,13 @@ export const addEventViewManifestButton = (buttonId, currPage) => {
 
 
 export const populateReportManifestHeader = (currPage) => {
+    console.log("populateReportManifestHeader currPage",currPage) // REMOVE - After Site Dev Test
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
-    let site = currPage["siteAcronym"]
+    let siteAcronym = currPage["siteAcronym"]
+
+    let currShippingLocationNumber = currPage['560975149']
+    const currContactInfo = locationConceptIDToLocationMap[currShippingLocationNumber]["contactInfo"][siteAcronym]
 
     let newDiv = document.createElement("div")
     let newP = document.createElement("p");
@@ -3282,7 +3290,7 @@ export const populateReportManifestHeader = (currPage) => {
     newP = document.createElement("p");
     newP.innerHTML = "Date Shipped: " + toInsertDateShipped;
     document.getElementById('boxManifestCol1').appendChild(newP);
-    newDiv.innerHTML = displayContactInformation(site, siteContactInformation)
+    newDiv.innerHTML = displayContactInformation(currContactInfo)
     document.getElementById('boxManifestCol1').appendChild(newDiv)
 }
 
