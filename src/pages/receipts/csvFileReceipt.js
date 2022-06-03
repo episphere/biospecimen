@@ -231,7 +231,7 @@ const getVialTypesMappings = (i) => {
 
 const updateResultMappings = (i, vialMappings) => {
   i['Study ID'] = 'Connect Study'
-  i['Sample Collection Center'] = keyToLocationObj[i[fieldToConceptIdMapping.healthcareProvider]]
+  i['Sample Collection Center'] = keyToLocationObj[i[fieldToConceptIdMapping.collectionLocation]]
   i['Sample ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[0] : ``
   i['Sequence #'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[1] : ``
   i['BSI ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId] : ``
