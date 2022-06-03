@@ -347,11 +347,7 @@ export const boxManifest = async (boxId, userName) => {
 
 
 export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, currShippingLocationNumber) => {    
-
-console.log("shippingManifest", currShippingLocationNumber)
     //let tempMonitorThere = document.getElementById('tempMonitorChecked').checked;
-    
-
     let response = await  getBoxes();
     let boxJSONS = response.data;
     let hiddenJSON = {};

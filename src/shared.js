@@ -1872,7 +1872,6 @@ export const allTubesCollected = (data) => {
 };
 
 export const displayContactInformation = (currContactInfo) => {
-  console.log("displayContactInformation",currContactInfo)
   if(currContactInfo.length){
     let contactStr = ""
     contactStr += `<p style="font-weight:bold">Site Contact Information:</p>`
