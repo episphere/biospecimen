@@ -326,7 +326,6 @@ export const errorMessage = (id, msg, focus, offset) => {
 }
 
 export const shippingPrintManifestReminder = (boxesToShip, userName, tempCheckStatus, currShippingLocationNumber) => {
-  console.log("shippingPrintManifestReminder currShippingLocationNumber", currShippingLocationNumber)
   const button = document.createElement('button');
     button.dataset.target = '#biospecimenModal';
     button.dataset.toggle = 'modal';
