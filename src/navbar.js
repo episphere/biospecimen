@@ -7,21 +7,6 @@ export const homeNavBar = () => {
                 <a class="nav-link" href="#" id="home" title="Home"><i class="fas fa-home"></i> Home</a>
             </li>
         </div>
-        <div class="navbar-nav">
-            <li class="nav-item">
-                <a target="_blank" class="nav-link" href="https://github.com/episphere/connect/issues/new" title="Please create an issue if you encounter any"><i class="fas fa-bug"></i> Report issue</a>
-            </li>
-        </div>
-        <div class="navbar-nav">
-            <li class="nav-item">
-                <a target="_blank" class="nav-link" href="https://github.com/episphere/connect/projects/6" title="GitHub Projects page"><i class="fas fa-tasks"></i> GitHub Projects</a>
-            </li>
-        </div>
-        <div class="navbar-nav">
-            <li class="nav-item">
-                <a target="_blank" class="nav-link" href="https://gitter.im/episphere/biospecimen" title="Chat with us"><i class="fas fa-comments"></i> Chat with us</a>
-            </li>
-        </div>
     `;
 }
 
@@ -45,21 +30,6 @@ export const userNavBar = (name) => {
         <div class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link" href="#reports" id="reports" title="Reports"><i class="fa fa-table"></i> Reports</a>
-            </li>
-        </div>
-        <div class="navbar-nav">
-            <li class="nav-item">
-                <a target="_blank" class="nav-link" href="https://github.com/episphere/connect/issues" title="Please create an issue if you encounter any"><i class="fas fa-bug"></i> Report issue</a>
-            </li>
-        </div>
-        <div class="navbar-nav">
-            <li class="nav-item">
-                <a target="_blank" class="nav-link" href="https://github.com/episphere/connect/projects/6" title="GitHub Projects page"><i class="fas fa-tasks"></i> GitHub Projects</a>
-            </li>
-        </div>
-        <div class="navbar-nav">
-            <li class="nav-item">
-                <a target="_blank" class="nav-link" href="https://gitter.im/episphere/biospecimen" title="Chat with us"><i class="fas fa-comments"></i> Chat with us</a>
             </li>
         </div>
         <div class="navbar-nav ml-auto">
@@ -140,21 +110,6 @@ export const adminNavBar = (name) => {
         <div class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link" href="#manage_users" id="manageUsers" title="Manage users"><i class="fas fa-users"></i> Manage users</a>
-            </li>
-        </div>
-        <div class="navbar-nav">
-            <li class="nav-item">
-                <a target="_blank" class="nav-link" href="https://github.com/episphere/connect/issues" title="Please create an issue if you encounter any"><i class="fas fa-bug"></i> Report issue</a>
-            </li>
-        </div>
-        <div class="navbar-nav">
-            <li class="nav-item">
-                <a target="_blank" class="nav-link" href="https://github.com/episphere/connect/projects/6" title="GitHub Projects page"><i class="fas fa-tasks"></i> GitHub Projects</a>
-            </li>
-        </div>
-        <div class="navbar-nav">
-            <li class="nav-item">
-                <a target="_blank" class="nav-link" href="https://gitter.im/episphere/biospecimen" title="Chat with us"><i class="fas fa-comments"></i> Chat with us</a>
             </li>
         </div>
         <div class="navbar-nav ml-auto">
