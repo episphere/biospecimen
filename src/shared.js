@@ -2016,3 +2016,17 @@ export const translateNumToType = {
   "0053": "NA",
   "0054": "NA"
 };
+
+export const getCollectionsByVisitType = async (connectId, visitType) => {
+    let collections = [];
+    try {
+        const query = `connectId=${parseInt(connectId)}`;
+        const participant  = await findParticipant(query);
+        const participantData = participant.data[0];
+        const collectionsResponse = await getParticipantCollections(participantData.token);
+        collections = collectionsResponse.data.filter(res => res['331584571']== visitType);
+    } catch(e) {
+        console.log("e", e)
+    }
+    return collections;
+}
