@@ -1938,12 +1938,11 @@ export const addEventSpecimenLinkForm = (formData) => {
 };
 
 const existingCollectionAlert = async (collections, connectId, formData) => {
-    console.log(collections)
     const confirmVal = await swal({
         title: "Warning",
         icon: "warning",
         text: `The Following ${collections.length} Collection ID(s) already exist for this participant: 
-        ${collections.map(collection => collection['820476880']).join('/n')}`,
+        ${collections.map(collection => collection['820476880']).join(', ')}`,
         buttons: {
             cancel: {
                 text: "Close",
