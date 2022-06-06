@@ -108,7 +108,9 @@ export default {
     dcam: 777644826,
     nci_mainCampus: 111111111,
     nci_frederick: 222222222,
-    siteCode:789843387
+    siteCode:789843387,
+
+    collectionLocation: 951355211,
     
 };
 
