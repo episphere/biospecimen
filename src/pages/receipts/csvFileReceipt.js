@@ -236,7 +236,7 @@ const updateResultMappings = (i, vialMappings) => {
   i['Sequence #'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[1] : ``
   i['BSI ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId] : ``
   i['Subject ID'] = i['Connect_ID']
-  i['Date Received'] = convertTime(i[fieldToConceptIdMapping.dateReceived])
+  i['Date Received'] = convertTime(i[fieldToConceptIdMapping.dateReceived]).replace(/,/g,'') 
   i['Date Drawn'] =  i[fieldToConceptIdMapping.dateWithdrawn] != undefined ? i[fieldToConceptIdMapping.dateWithdrawn] : `` 
   i['Vial Type'] = vialMappings[0]
   i['Additive/Preservative'] = vialMappings[1]
