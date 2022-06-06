@@ -50,7 +50,7 @@ const csvFileButtonSubmit = () => {
     hideAnimation();
     document.getElementById("csvDateInput").value = ``;
     let modifiedResults = modifyBSIQueryResults(results.data);
-    //generateBSIqueryCSVData(modifiedResults);
+    generateBSIqueryCSVData(modifiedResults);
   })
 }
 
