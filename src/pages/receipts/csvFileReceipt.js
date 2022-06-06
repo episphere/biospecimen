@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToNameObj, baseAPI } from "../../shared.js";
+=======
+import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToLocationObj, baseAPI } from "../../shared.js";
+>>>>>>> dev
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -102,7 +106,7 @@ const getVialTypesMappings = (i) => {
       vialMappingsHolder.push('10 ml Vacutainer', 'Lithium Heparin', 'Whole Bl', '10')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004') {
-      vialMappingsHolder.push('10 ml Vacutainer', 'EDTA', 'Whole Bl', '10')
+      vialMappingsHolder.push('10 ml Vacutainer', 'EDTA = K2', 'Whole Bl', '10')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005') {
       vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole Bl', '6')
@@ -124,7 +128,7 @@ const getVialTypesMappings = (i) => {
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpCO"]
     && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014' )) {
-      vialMappingsHolder.push('4 ml Vacutainer', 'EDTA', 'Whole Bl', '4')
+      vialMappingsHolder.push('4 ml Vacutainer', 'EDTA = K2', 'Whole Bl', '4')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpCO"]
     && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005')) {
@@ -145,7 +149,7 @@ const getVialTypesMappings = (i) => {
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpNW"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004')) {
-      vialMappingsHolder.push('4 mL Serum separator tube', 'EDTA', 'Whole BI', '4')
+      vialMappingsHolder.push('4 mL Serum separator tube', 'EDTA = K2', 'Whole BI', '4')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpNW"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005')) {
@@ -167,12 +171,12 @@ const getVialTypesMappings = (i) => {
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpHI"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014' 
     || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0024')) {
-      vialMappingsHolder.push('3 mL Vacutainer', 'EDTA', 'Whole BI', '3')
+      vialMappingsHolder.push('3 mL Vacutainer', 'EDTA = K2', 'Whole BI', '3')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpHI"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014' 
     || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0024')) {
-      vialMappingsHolder.push('3 mL Vacutainer', 'EDTA', 'Whole BI', '3')
+      vialMappingsHolder.push('3 mL Vacutainer', 'EDTA = K2', 'Whole BI', '3')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpHI"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005')) {
@@ -193,7 +197,7 @@ const getVialTypesMappings = (i) => {
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpGA"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014')) {
-      vialMappingsHolder.push('4 mL Vacutainer', 'EDTA', 'Whole BI', '4')
+      vialMappingsHolder.push('4 mL Vacutainer', 'EDTA = K2', 'Whole BI', '4')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpGA"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005')) {
@@ -214,7 +218,7 @@ const getVialTypesMappings = (i) => {
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004')) {
-      vialMappingsHolder.push('10 mL Vacutainer', 'EDTA', 'Whole BI', '10')
+      vialMappingsHolder.push('10 mL Vacutainer', 'EDTA = K2', 'Whole BI', '10')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005')) {
@@ -231,13 +235,13 @@ const getVialTypesMappings = (i) => {
 
 const updateResultMappings = (i, vialMappings) => {
   i['Study ID'] = 'Connect Study'
-  i['Sample Collection Center'] = keyToNameObj[i[fieldToConceptIdMapping.healthcareProvider]]
+  i['Sample Collection Center'] = keyToLocationObj[i[fieldToConceptIdMapping.collectionLocation]]
   i['Sample ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[0] : ``
   i['Sequence #'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[1] : ``
   i['BSI ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId] : ``
   i['Subject ID'] = i['Connect_ID']
   i['Date Received'] = i[fieldToConceptIdMapping.dateReceived].split('T')[0]
-  i['Date Drawn'] =  i[fieldToConceptIdMapping.dateWithdrawn] != undefined ? i[fieldToConceptIdMapping.dateWithdrawn].split('T')[0] : `` 
+  i['Date Drawn'] =  i[fieldToConceptIdMapping.dateWithdrawn] != undefined ? i[fieldToConceptIdMapping.dateWithdrawn] : `` 
   i['Vial Type'] = vialMappings[0]
   i['Additive/Preservative'] = vialMappings[1]
   i['Material Type'] = vialMappings[2]
@@ -249,6 +253,7 @@ const updateResultMappings = (i, vialMappings) => {
   i['Label Status'] = 'Barcoded'
   i['Visit'] = 'BL'
   delete i[fieldToConceptIdMapping.healthcareProvider]
+  delete i[fieldToConceptIdMapping.collectionLocation]
   delete i['Connect_ID']
   delete i[fieldToConceptIdMapping.collectionId]
   delete i[fieldToConceptIdMapping.dateWithdrawn]

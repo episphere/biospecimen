@@ -1,4 +1,4 @@
-import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit } from "./../shared.js";
+import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, getSiteCode } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
@@ -11,8 +11,8 @@ export const specimenTemplate = async (data) => {
 
     // get rid of all this
     let formData = {};
-    formData['siteAcronym'] = document.getElementById('contentBody').dataset.siteAcronym;
-    formData['827220437'] = parseInt(document.getElementById('contentBody').dataset.siteCode);
+    formData['siteAcronym'] = getSiteAcronym();
+    formData['827220437'] = parseInt(getSiteCode());
 
     let template = `
         </br>
@@ -37,7 +37,7 @@ export const specimenTemplate = async (data) => {
 
         <form id="specimenLinkForm" method="POST" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">
             <div class="form-group row">`
-                const siteAcronym = document.getElementById('contentBody').dataset.siteAcronym ?? localStorage.getItem('siteAcronym');
+                const siteAcronym = getSiteAcronym();
                 const workflow = getWorflow() ?? localStorage.getItem('workflow');
                 if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {
                     template +=`<label class="col-md-4 col-form-label" for="collectionLocation">Select Collection Location</label>
