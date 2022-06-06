@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToNameObj, baseAPI } from "../../shared.js";
-=======
 import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToLocationObj, baseAPI } from "../../shared.js";
->>>>>>> dev
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
