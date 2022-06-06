@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, siteContactInformation, shippingPrintManifestReminder, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, conceptIdToSiteSpecificLocation} from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, shippingPrintManifestReminder, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, conceptIdToSiteSpecificLocation} from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, 
     populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, 
     addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventSaveContinue, addEventShipPrintManifest, } from "./../events.js";
@@ -273,7 +273,7 @@ export const boxManifest = async (boxId, userName) => {
     }
     let currInstitute = currBox.siteAcronym;
     let currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
-   
+    let currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute];
 
     let template = `
         </br>
@@ -331,7 +331,7 @@ export const boxManifest = async (boxId, userName) => {
     
     //addEventNavBarShipment("returnToPackaging");
     //document.getElementById('boxManifestTable').appendChild(result);
-    populateBoxManifestHeader(boxId,boxJSONS,currInstitute);
+    populateBoxManifestHeader(boxId,boxJSONS,currContactInfo);
     populateBoxManifestTable(boxId,hiddenJSON);
     addEventNavBarShipment("returnToPackaging", userName);
     document.getElementById('printBox').addEventListener('click', e => {
@@ -346,12 +346,8 @@ export const boxManifest = async (boxId, userName) => {
 
 
 
-export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) => {    
-
-
+export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, currShippingLocationNumber) => {    
     //let tempMonitorThere = document.getElementById('tempMonitorChecked').checked;
-    
-
     let response = await  getBoxes();
     let boxJSONS = response.data;
     let hiddenJSON = {};
@@ -408,7 +404,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
                 <button type="button" class="btn btn-primary print-manifest" data-dismiss="modal" id="printBox">Optional: Print Shipment Manifest</button>
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging">Continue to Assign Tracking Number</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="assignTrackingNumberPage">Continue to Assign Tracking Number</button>
             </div>
         </div>
         
@@ -439,17 +435,17 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere) 
     
     //document.getElementById('boxManifestTable').appendChild(result);
     
-    populateShippingManifestHeader(toDisplayJSON, userName, location, site);
+    populateShippingManifestHeader(toDisplayJSON, userName, location, site, currShippingLocationNumber); // populate shipping header via site specfiic location selected from shipping page
     populateShippingManifestBody(toDisplayJSON);
     addEventNavBarShipment("navBarShippingDash", userName);
     await populateTempCheck();
-    const btn = document.getElementById('completePackaging');
+    const btn = document.getElementById('assignTrackingNumberPage'); // assignTracking
     addEventShipPrintManifest('printBox')
     addEventNavBarShipment('returnToPackaging', userName);
 
     
 
-    document.getElementById('completePackaging').addEventListener('click', e => {
+    document.getElementById('assignTrackingNumberPage').addEventListener('click', e => {
         e.stopPropagation();
         if(btn.classList.contains('active')) return;
         if(tempMonitorThere && document.getElementById('tempBox').value == '') {
