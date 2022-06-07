@@ -1919,7 +1919,7 @@ export const goToParticipantSearch = () => {
     document.getElementById('navBarSearch').click();
 }
 
-export const addEventSpecimenLinkForm = (formData) => {
+export const addEventSpecimenLinkForm = (formData, visitConcept) => {
     const form = document.getElementById('specimenLinkForm');
     const connectId = document.getElementById('specimenContinue').dataset.connectId;
 
@@ -1927,7 +1927,7 @@ export const addEventSpecimenLinkForm = (formData) => {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const collections = await getCollectionsByVisitType(connectId, '266600170');
+        const collections = await getCollectionsByVisitType(connectId, visitConcept);
         if (collections.length) {
             existingCollectionAlert(collections, connectId, formData);
         } else {
