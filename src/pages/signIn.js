@@ -6,9 +6,6 @@ export const signIn = () => {
     const root = document.getElementById('contentBody');
     if(!root) return;
     root.innerHTML = '';
-    const signInDiv = document.createElement('div');
-    signInDiv.id = 'signInDiv';
-    signInDiv.className = 'row inherit-width';
     const signInDiv2 = document.createElement('div');
     signInDiv2.id = 'signInDiv2';
     signInDiv2.className = 'row inherit-width';
@@ -23,10 +20,7 @@ export const signIn = () => {
             </div>
         </form>
     `;
-    root.appendChild(signInDiv);
-    root.appendChild(signInDiv2);
-    const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebase.auth());
-    ui.start('#signInDiv', signInConfig());
+    root.appendChild(signInDiv2); 
     document.getElementById('signInForm').addEventListener('submit', e => {
         e.preventDefault();
         const inputValue = document.getElementById('signInEmail').value;
@@ -44,16 +38,6 @@ export const signIn = () => {
             });
     });
     document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
-}
-
-const signInConfig = () => {
-    return {
-        signInSuccessUrl: '#welcome',
-        signInOptions: [
-            firebase.auth.EmailAuthProvider.PROVIDER_ID
-        ],
-        credentialHelper: 'none'
-    }
 }
 
 export const signOut = () => {
