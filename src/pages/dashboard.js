@@ -1,13 +1,17 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, allStates, getWorflow } from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSelectParticipantForm, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment } from "./../events.js";
-import { homeNavBar, bodyNavBar } from '../navbar.js';
-import { masterSpecimenIDRequirement } from "../tubeValidation.js";
+import { userAuthorization, removeActiveClass, validateUser, addEventBarCodeScanner, allStates, getWorflow, isDeviceMobile, replaceDateInputWithMaskedInput, checkedIn, verificationConversion } from "./../shared.js"
+import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment, addEventClearAll } from "./../events.js";
+import { homeNavBar, bodyNavBar, unAuthorizedUser } from '../navbar.js';
 
 export const userDashboard = (auth, route, goToSpecimenSearch) => {
     auth.onAuthStateChanged(async user => {
         if(user){
-            const role = await userAuthorization(route, user.displayName ? user.displayName : user.email);
-            if(!role) return;
+            const response = await userAuthorization(route, user.displayName ? user.displayName : user.email);
+            if ( response.isBiospecimenUser === false ) {
+                document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
+                document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
+                return;
+            }
+            if(!response.role) return;
             searchTemplate(goToSpecimenSearch);
         }
         else {
@@ -45,6 +49,12 @@ export const searchTemplate = (goToSpecimenSearch) => {
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary">Search</button>
                         </div>
+                        <div class="form-group">
+                            <br/>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" id="btnClearAll" class="btn btn-outline-danger">Clear All</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -78,7 +88,7 @@ export const searchTemplate = (goToSpecimenSearch) => {
                         <form id="search3" method="POST">
                             <div class="form-group">
                                 <label class="col-form-label search-label">Phone no.</label>
-                                <input class="form-control" autocomplete="off" required type="text" maxlength="10" id="phone" placeholder="Enter Phone No."/>
+                                <input class="form-control" autocomplete="off" required type="text" maxlength="12" id="phone" placeholder="XXX-XXX-XXXX" pattern="\\d{3}-\\d{3}-\\d{4}"/>
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-outline-primary">Search</button>
@@ -96,7 +106,11 @@ export const searchTemplate = (goToSpecimenSearch) => {
     addEventSearchForm2();
     addEventSearchForm3();
     addEventSearchForm4();
+    addEventClearAll();
     addEventNavBarSpecimenSearch();
+    if(isDeviceMobile) {
+    replaceDateInputWithMaskedInput(document.getElementById('dob'));
+    }
     //addEventNavBarShipment();
     if(goToSpecimenSearch) document.getElementById('navBarSpecimenSearch').click();
 }
@@ -136,6 +150,7 @@ export const searchBiospecimenTemplate = () => {
 }
 
 export const searchResults = (result) => {
+
     let template = `
         </br>
         <div class="row">
@@ -143,51 +158,50 @@ export const searchResults = (result) => {
         </div>
         </br>
         
-        <div class="row allow-overflow">
-            <form method="POST" id="selectParticipant">
+        <div class="row">
             <table class="table table-borderless table-striped">
                 <thead>
                     <tr>
-                        <th>Select</th>
                         <th>Last name</th>
                         <th>First name</th>
                         <th>Middle name</th>
                         <th>Date of birth</th>
                         <th>Address</th>
                         <th>Connect ID</th>
+                        <th>Verification Status</th>
+                        <th>Participation Status</th>
+                        <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>`
     result.forEach(data => {
+
+        if(data['821247024'] === 922622075) return;
+        const isCheckedIn = checkedIn(data);
         template += `
             <tr>
-                <td><input type="radio" name="selectParticipantRadio" required data-token=${data.token} value="${data.Connect_ID}"></td>
                 <td>${data['996038075']}</td>
                 <td>${data['399159511']}</td>
                 <td>${data['231676651']}</td>
                 <td>${data['564964481']}/${data['795827569']}/${data['544150384']}</td>
                 <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
                 <td>${data.Connect_ID}</td>
+                <td>${verificationConversion[[data['821247024']]]}</td>
+                <td>${data['912301837'] === 208325815 || data['912301837'] === 622008261 || data['912301837'] === 458508122 ? `<i class="fas fa-2x fa-check"></i>` :  `<i class="fas fa-2x fa-times"></i>`}</td>
+                <td>
+                    <button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID}>${!isCheckedIn ? `Go to Check-In` : `Go to Check-Out`}</button>
+                </td>
+                <td>
+                    ${isCheckedIn ? `<button class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>` : ``}
+                </td>
             </tr>
         `
     });
-    template += `</tbody></table>
-        <div class="row remove-margin">
-            <div>
-                <button type="button" class="btn btn-outline-dark" id="backToSearch"><i class="fas fa-arrow-left"></i> Return to search</button>
-            </div>
-            <div class="ml-auto">
-                <button type="Submit" class="btn btn-outline-primary">${getWorflow() === 'clinical' ? `Go to Specimen Link`:`Go to participant check-in`}</button>
-            </div>
-        </div>
-    </form></div>`;
+    template += `</tbody></table></div>`;
 
     document.getElementById('contentBody').innerHTML = template;
-    if(getWorflow() === 'clinical') {
-        addEventSelectParticipantForm(true);
-    }
-    else {
-        addEventSelectParticipantForm();
-    }
-    addEventBackToSearch('backToSearch');
+    addEventBackToSearch('navBarSearch');
+    addGoToCheckInEvent();
+    addGoToSpecimenLinkEvent();
 }

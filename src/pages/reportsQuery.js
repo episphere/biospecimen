@@ -1,13 +1,18 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, storeBox, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getNumPages} from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getNumPages, conceptIdToSiteSpecificLocation} from "./../shared.js"
 import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality, addEventNavBarShipment, addEventFilter} from "./../events.js";
-import { homeNavBar, bodyNavBar, shippingNavBar} from '../navbar.js';
+import { homeNavBar, bodyNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
 
 
 export const reportsQuery = (auth, route) => {
     auth.onAuthStateChanged(async user => {
         if(user){
-            const role = await userAuthorization(route, user.displayName ? user.displayName : user.email);
-            if(!role) return;
+            const response = await userAuthorization(route, user.displayName ? user.displayName : user.email);
+            if ( response.isBiospecimenUser === false ) {
+                document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
+                document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
+                return;
+            }
+            if(!response.role) return;
             startReport();
         }
         else {
@@ -31,14 +36,14 @@ export const startReport = async () => {
         <div class="row">
             
             <div class="col-lg" style="margin-bottom:20px">
-                <h5>Filters</h5>
-                <label for="trackingIdInput">Tracking ID: </label>
-                <input type="text" id="trackingIdInput" style="margin-right:30px" placeholder="Tracking ID"></input>
-                <label for="startDate">Start Date: </label>
-                <input type="date" id="startDate"  style="margin-right:30px"></input>
-                <label for="endDate">End Date: </label>
-                <input type="date" id="endDate" style="margin-right:30px"></input>
-                <button id="submitFilter">Filter!</button>
+                <h4>Filters</h4>
+                <label for="trackingIdInput" style="margin-right:0.5rem;">Tracking ID: </label>
+                <input type="text" id="trackingIdInput" style="margin-right:30px; height:38px; padding:5px;" placeholder="Tracking ID"></input>
+                <span style="display:inline-block; margin-right:.5rem;">Date Shipped:</span>
+                <input type="date" id="startDate"  style="height:38px; padding:5px;"></input>
+                <span style="display:inline-block; margin:0 .75rem">to</span>
+                <input type="date" id="endDate" style="margin-right:30px; height:38px; padding:5px";></input>
+                <button id="submitFilter" class="btn btn-primary">Apply filter</button>
             </div>
         </div>
         <div class="row">
@@ -67,7 +72,6 @@ export const startReport = async () => {
     addEventFilter();
     populateBoxTable(0, {});
     addPaginationFunctionality(numPages, {});
-    
     hideAnimation();
     
     //addEventSubmitAddBag();
@@ -82,7 +86,7 @@ export const showReportsManifest = async (currPage) => {
             <div style="float: left;width: 33%;"></div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
                 <p>Site: ` + currPage['siteAcronym'] + `</p>
-                <p>Location: ` + currPage['560975149'] + `</p>
+                <p>Location: ` + conceptIdToSiteSpecificLocation[currPage['560975149']] + `</p>
             </div>
         </div>
         <div class="row">

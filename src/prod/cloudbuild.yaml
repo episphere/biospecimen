@@ -1,0 +1,5 @@
+steps:
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: ['cp', '-r', '*', 'gs://myconnect_biospecimen_prod']
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: ['-m', 'setmeta', '-h', 'cache-control: public, max-age=360', '-r', 'gs://myconnect_biospecimen_prod/*']
