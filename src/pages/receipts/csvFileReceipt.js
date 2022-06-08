@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToLocationObj, baseAPI, convertTime } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToLocationObj, baseAPI, convertISODateTime, formatISODateTime } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -236,8 +236,8 @@ const updateResultMappings = (i, vialMappings) => {
   i['Sequence #'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[1] : ``
   i['BSI ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId] : ``
   i['Subject ID'] = i['Connect_ID']
-  i['Date Received'] = convertTime(i[fieldToConceptIdMapping.dateReceived]).replace(/,/g,'') 
-  i['Date Drawn'] =  i[fieldToConceptIdMapping.dateWithdrawn] != undefined ? i[fieldToConceptIdMapping.dateWithdrawn] : `` 
+  i['Date Received'] = i[fieldToConceptIdMapping.dateReceived] != undefined ? formatISODateTime(i[fieldToConceptIdMapping.dateReceived]) : ``
+  i['Date Drawn'] =  i[fieldToConceptIdMapping.dateWithdrawn] != undefined ? convertISODateTime(i[fieldToConceptIdMapping.dateWithdrawn]) : `` 
   i['Vial Type'] = vialMappings[0]
   i['Additive/Preservative'] = vialMappings[1]
   i['Material Type'] = vialMappings[2]
