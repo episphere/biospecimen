@@ -1,5 +1,7 @@
-import { inactivityTime } from "./src/shared.js";
-import { firebaseConfig } from "./src/config.js";
+import { inactivityTime, urls } from "./src/shared.js";
+import { firebaseConfig as devFirebaseConfig } from "./src/dev/config.js";
+import { firebaseConfig as stageFirebaseConfig } from "./src/stage/config.js";
+import { firebaseConfig as prodFirebaseConfig } from "./src/prod/config.js";
 import { manageUsers } from "./src/pages/users.js";
 import { userDashboard } from "./src/pages/dashboard.js";
 import { shippingDashboard } from "./src/pages/shipping.js";
@@ -21,7 +23,7 @@ import { csvFileReceiptScreen } from "./src/pages/receipts/csvFileReceipt.js";
 import { kitReportsScreen } from "./src/pages/reports/kitReports.js";
 
 
-let auth = "";
+let auth = '';
 
 window.onload = () => {
     if ("serviceWorker" in navigator) {
@@ -31,14 +33,24 @@ window.onload = () => {
             console.log(error);
         }
     }
-    !firebase.apps.length ? firebase.initializeApp(firebaseConfig()) : firebase.app();
+
+    if(location.host === urls.prod) {
+        !firebase.apps.length ? firebase.initializeApp(prodFirebaseConfig()) : firebase.app();
+    }
+    else if(location.host === urls.stage) {
+        !firebase.apps.length ? firebase.initializeApp(stageFirebaseConfig()) : firebase.app();
+    }
+    else {
+        !firebase.apps.length ? firebase.initializeApp(devFirebaseConfig()) : firebase.app();
+    }
+
     auth = firebase.auth();
     auth.onAuthStateChanged(async user => {
         if(user){
             inactivityTime();
         }
     });
-    // location.hash = '#welcome';
+    
     manageRoutes();
 };
 
