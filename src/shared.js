@@ -10,7 +10,6 @@ import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
 import conceptIDs from './fieldToConceptIdMapping.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
-import { checkDefaultFlags, checkPaymentEligibility } from "https://episphere.github.io/dashboard/siteManagerDashboard/utils.js"
 
 
 const conversion = {
@@ -1089,6 +1088,76 @@ export const verifyDefaultConcepts = async (data) => {
     
     return data;
 }
+
+const checkDefaultFlags = (data) => {
+  
+  if(!data) return {};
+  
+  const defaultFlags = {
+    948195369: 104430631,
+    919254129: 104430631,
+    821247024: 875007964,
+    828729648: 104430631,
+    699625233: 104430631,
+    912301837: 208325815,
+    253883960: 972455046,
+    547363263: 972455046,
+    949302066: 972455046,
+    536735468: 972455046,
+    976570371: 972455046,
+    663265240: 972455046,
+    265193023: 972455046,
+    459098666: 972455046,
+    126331570: 972455046,
+    311580100: 104430631,
+    914639140: 104430631,
+    878865966: 104430631,
+    167958071: 104430631,
+    684635302: 104430631,
+    100767870: 104430631
+  }
+
+  let missingDefaults = {};
+
+  Object.entries(defaultFlags).forEach(item => {
+    if(!data[item[0]]) {
+      missingDefaults[item[0]] = item[1];
+    }
+  });
+
+  return missingDefaults;
+}
+
+const checkPaymentEligibility = async (data, baselineCollections) => {
+  
+    if(baselineCollections.length === 0) return false;
+  
+    const module1 = (data['949302066'] && data['949302066'] === 231311385);
+    const module2 = (data['536735468'] && data['536735468'] === 231311385);
+    const module3 = (data['976570371'] && data['976570371'] === 231311385);
+    const module4 = (data['663265240'] && data['663265240'] === 231311385);
+    const bloodCollected = (data['878865966'] && data['878865966'] === 353358909);
+    const tubes = baselineCollections[0]['650516960'] === 534621077 ? workflows.research.filter(tube => tube.tubeType === 'Blood tube') : workflows.clinical.filter(tube => tube.tubeType === 'Blood tube');
+  
+    let eligible = false;
+  
+    if(module1 && module2 && module3 && module4) {
+      if(bloodCollected) {
+        eligible = true;
+      }    
+      else {
+        baselineCollections.forEach(collection => {
+          tubes.forEach(tube => {
+            if(collection[tube.concept] && collection[tube.concept]['883732523'] && collection[tube.concept]['883732523'] != 681745422) {
+              eligible = true;
+            }
+          });
+        });
+      }
+    }
+  
+    return eligible;
+  }
 
 export const siteFullNames = {
     'NCI': 'National Cancer Institute',
