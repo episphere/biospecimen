@@ -496,9 +496,9 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
 
             if (!isOrphan) {
                 if (tubeID === '0007') {
-                    bagid = collectionID + '0009';
+                    bagid = collectionID + ' 0009';
                 } else {
-                    bagid = collectionID + '0008';
+                    bagid = collectionID + ' 0008';
                 }
             }
 
