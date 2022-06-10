@@ -2097,7 +2097,7 @@ export const convertISODateTime = (dateWithdrawn) => {
 
 export const formatISODateTime = (dateReceived) => {
     let extractDate = dateReceived.split("T")[0]
-    let extracTime = dateReceived.split("T")[1].substring(0,5)
+    const extracTime = '00:00'
     extractDate = extractDate.split('-')
     const formattedDateTimeStamp = extractDate[1]+'/'+extractDate[2]+'/'+extractDate[0]+' '+extracTime
     return formattedDateTimeStamp
