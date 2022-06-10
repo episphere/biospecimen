@@ -492,7 +492,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
             // data-full-specimen-id (Ex. "CXA444444 0007")
             let toAddId = checkedSpecimensArr[i].getAttribute("data-full-specimen-id")
             const [collectionID, tubeID] = toAddId.split(/\s+/);
-            toDelete.push(toAddId.split(/\s+/)[1]);
+            toDelete.push(tubeID);
 
             if (!isOrphan) {
                 if (tubeID === '0007') {
