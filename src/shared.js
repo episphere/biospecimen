@@ -2085,3 +2085,20 @@ export const translateNumToType = {
   "0053": "NA",
   "0054": "NA"
 };
+
+export const convertISODateTime = (dateWithdrawn) => {
+    let date = new Date(dateWithdrawn);
+    let formattedMonth = date.getMonth() + 1
+    if (formattedMonth < 10) formattedMonth = '0' + formattedMonth; // append 0 before month if single digit month
+    let formattedDate = date.getDate()
+    if (formattedDate < 10) formattedDate = '0' + formattedDate; // append 0 before date if single digit date
+    return formattedMonth + '/' + formattedDate + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + date.getMinutes()
+}
+
+export const formatISODateTime = (dateReceived) => {
+    let extractDate = dateReceived.split("T")[0]
+    extractDate = extractDate.split('-')
+    const formattedDateTimeStamp = extractDate[1]+'/'+extractDate[2]+'/'+extractDate[0]
+    return formattedDateTimeStamp
+
+}
