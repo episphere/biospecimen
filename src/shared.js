@@ -1773,7 +1773,7 @@ export const checkInParticipant = async (data, visitConcept) => {
         
     if(sendBioEmail) {
         const emailData = {
-            email: data['421823980'],
+            email: data['869588347'],
             subject: "Please complete a short survey about your samples",
             message: baselineEmailTemplate(data),
             notificationType: "email",
