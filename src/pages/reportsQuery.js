@@ -87,6 +87,7 @@ export const showReportsManifest = async (currPage) => {
             <div style="float:left;width: 33%;" id="boxManifestCol3">
                 <p>Site: ` + currPage['siteAcronym'] + `</p>
                 <p>Location: ` + conceptIdToSiteSpecificLocation[currPage['560975149']] + `</p>
+                <p>Tracking Number: ${currPage['959708259'] ? currPage['959708259'] : ""} </p>
             </div>
         </div>
         <div class="row">
