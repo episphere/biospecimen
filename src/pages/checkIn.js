@@ -2,7 +2,6 @@ import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInV
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 
 export const checkInTemplate = async (data) => {
-    console.log("data", data)
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarParticipantCheckIn');
     navBarBtn.style.display = 'block';
