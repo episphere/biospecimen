@@ -477,7 +477,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         let numRows = tubeTable.rows.length;
         let bagSplit = bagid.split(/\s+/);
         let boxId = document.getElementById('shippingModalChooseBox').value;
-        let nameSplit = userName.split(/\s+/);
+        let nameSplit = userName.split(' ');
         let firstName = nameSplit[0] ? nameSplit[0] : '';
         let lastName = nameSplit[1] ? nameSplit[1] : '';
         let checkedSpecimensArr = Array.from(document.getElementsByClassName("samplePresentCheckbox")).filter(item => item.checked)
@@ -491,16 +491,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         for (let i = 0; i < checkedSpecimensArr.length; i++) {
             // data-full-specimen-id (Ex. "CXA444444 0007")
             let toAddId = checkedSpecimensArr[i].getAttribute("data-full-specimen-id")
-            const [collectionID, tubeID] = toAddId.split(/\s+/);
-            toDelete.push(tubeID);
-
-            if (!isOrphan) {
-                if (tubeID === '0007') {
-                    bagid = collectionID + ' 0009';
-                } else {
-                    bagid = collectionID + ' 0008';
-                }
-            }
+            toDelete.push(toAddId.split(/\s+/)[1]);
 
             if (boxObjects.hasOwnProperty(boxId)) {
                 if (boxObjects[boxId].hasOwnProperty(bagid)) {
