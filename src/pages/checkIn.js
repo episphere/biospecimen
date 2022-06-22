@@ -2,6 +2,7 @@ import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInV
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 
 export const checkInTemplate = async (data) => {
+    console.log("data", data)
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarParticipantCheckIn');
     navBarBtn.style.display = 'block';
@@ -22,6 +23,8 @@ export const checkInTemplate = async (data) => {
                 <div class="col-md-12">
                     <h5>${data['996038075']}, ${data['399159511']}</h5>
                     <h5>Login Method: ${data['995036844']}</h5>
+                    ${data['421823980'] ? `<h5>User Email: ${data['421823980']}</h5>` : ''}
+                    ${data['348474836'] ? `<h5>User Phone: ${data['348474836']}</h5>`: '' }
                 </div>
             </div>
             <div class="row">
