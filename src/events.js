@@ -1951,6 +1951,7 @@ const btnsClicked = async (connectId, formData) => {
     const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value.toUpperCase();
     const accessionID1 = document.getElementById('accessionID1');
     const accessionID2 = document.getElementById('accessionID2');
+    const collectionLocation = document.getElementById('collectionLocation').value;
 
     let hasError = false;
     let focus = true;
@@ -1994,6 +1995,11 @@ const btnsClicked = async (connectId, formData) => {
             hasError = true;
             errorMessage('enterSpecimenID2', 'Does not match with Manually Entered Collection ID', focus, true);
         }
+    }
+    if (collectionLocation === 'none') {
+        hasError = true;
+        errorMessage('collectionLocation', `Please Select Collection Location.`, focus, true);
+        focus = false;
     }
 
     if (hasError) return;
