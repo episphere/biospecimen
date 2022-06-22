@@ -41,8 +41,7 @@ export const specimenTemplate = async (data) => {
                 const workflow = getWorflow() ?? localStorage.getItem('workflow');
                 if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {
                     template +=`<label class="col-md-4 col-form-label" for="collectionLocation">Select Collection Location</label>
-                    <select class="form-control col-md-5" id="collectionLocation">
-                    <option value='none'>Please Select Location</option>`
+                    <select class="form-control col-md-5" id="collectionLocation">`
                     siteLocations[workflow][siteAcronym].forEach(site => {
                         template +=`<option value='${site.concept}'>${site.location}</option>`
                     })
