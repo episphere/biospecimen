@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -1927,19 +1927,58 @@ export const goToParticipantSearch = () => {
     document.getElementById('navBarSearch').click();
 }
 
-export const addEventSpecimenLinkForm = (formData) => {
+export const addEventSpecimenLinkForm = (formData, visitConcept) => {
     const form = document.getElementById('specimenLinkForm');
     const connectId = document.getElementById('specimenContinue').dataset.connectId;
 
     if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
 
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        btnsClicked(connectId, formData);
+        const query = `connectId=${parseInt(connectId)}`;
+        const participant  = await findParticipant(query);
+        const data = participant.data[0];
+        const collections = await getCollectionsByVisit(data);
+        if (collections.length) {
+            existingCollectionAlert(collections, connectId, formData);
+        } else {
+            btnsClicked(connectId, formData);
+
+        }
     });
 };
 
-const btnsClicked = async (connectId, formData) => {
+const existingCollectionAlert = async (collections, connectId, formData) => {
+    const confirmVal = await swal({
+        title: "Warning",
+        icon: "warning",
+        text: `The Following ${collections.length} Collection ID(s) already exist for this participant: 
+        ${collections.map(collection => collection['820476880']).join(', ')}`,
+        buttons: {
+            cancel: {
+                text: "Close",
+                value: "cancel",
+                visible: true,
+                className: "btn btn-default",
+                closeModal: true,
+            },
+            confirm: {
+                text: "Add New Collection",
+                value: 'confirmed',
+                visible: true,
+                className: "",
+                closeModal: true,
+                className: "btn btn-success",
+            }
+        },
+    });
+
+    if (confirmVal === "confirmed") {
+        btnsClicked(connectId, formData);
+    }
+}
+
+const btnsClicked = async (connectId, formData) => { 
 
     removeAllErrors();
 
