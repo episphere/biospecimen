@@ -1637,19 +1637,21 @@ export const addEventBoxSelectListChanged = () => {
 export const addEventChangeLocationSelect = (userName) => {
     let locationSelectEle = document.getElementById('selectLocationList');
     locationSelectEle.addEventListener("change", async () => {
-        showAnimation();
         let currLocation = locationSelectEle.value;
-        let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
-        let boxArray = (await getBoxesByLocation(currLocationConceptId)).data;
+        if (currLocation !== 'none') {
+            showAnimation();
+            let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
+            let boxArray = (await getBoxesByLocation(currLocationConceptId)).data;
 
-        let boxObjects = {};
-        for (let i = 0; i < boxArray.length; i++) {
-            let box = boxArray[i]
-            boxObjects[box['132929440']] = box['bags']
+            let boxObjects = {};
+            for (let i = 0; i < boxArray.length; i++) {
+                let box = boxArray[i]
+                boxObjects[box['132929440']] = box['bags']
+            }
+
+            await populateBoxSelectList(boxObjects, userName)
+            hideAnimation();
         }
-
-        await populateBoxSelectList(boxObjects, userName)
-        hideAnimation();
     })
 }
 
@@ -2761,7 +2763,8 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
 export const populateSelectLocationList = async () => {
     let currSelect = document.getElementById('selectLocationList')
     let response = await getLocationsInstitute();
-    let list = ''
+    let list = '<option value="none">Select Shipping Location</option>'
+    //let list = '';
     for (let i = 0; i < response.length; i++) {
         list += '<option>' + response[i] + '</option>';
     }
