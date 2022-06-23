@@ -1637,19 +1637,21 @@ export const addEventBoxSelectListChanged = () => {
 export const addEventChangeLocationSelect = (userName) => {
     let locationSelectEle = document.getElementById('selectLocationList');
     locationSelectEle.addEventListener("change", async () => {
-        showAnimation();
         let currLocation = locationSelectEle.value;
-        let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
-        let boxArray = (await getBoxesByLocation(currLocationConceptId)).data;
+        if (currLocation !== 'none') {
+            showAnimation();
+            let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
+            let boxArray = (await getBoxesByLocation(currLocationConceptId)).data;
 
-        let boxObjects = {};
-        for (let i = 0; i < boxArray.length; i++) {
-            let box = boxArray[i]
-            boxObjects[box['132929440']] = box['bags']
+            let boxObjects = {};
+            for (let i = 0; i < boxArray.length; i++) {
+                let box = boxArray[i]
+                boxObjects[box['132929440']] = box['bags']
+            }
+
+            await populateBoxSelectList(boxObjects, userName)
+            hideAnimation();
         }
-
-        await populateBoxSelectList(boxObjects, userName)
-        hideAnimation();
     })
 }
 
@@ -2612,6 +2614,7 @@ export const addEventNavBarBoxManifest = (id, userName) => {
 export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
     const btn = document.getElementById('completePackaging');
     document.getElementById('completePackaging').addEventListener('click', async e => {
+        let selectedLocation = document.getElementById('selectLocationList').value;
         e.stopPropagation();
         if (btn.classList.contains('active')) return;
         //get table info
@@ -2629,6 +2632,25 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
                 boxesToShip.push(currBoxId)
             }
 
+        }
+
+        if (selectedLocation === 'none') {
+            await swal({
+                title: "Reminder",
+                icon: "warning",
+                text: "Please Select 'Shipping Location'",
+                className: "swal-no-box",
+                buttons: {
+                  confirm: {
+                    text: "OK",
+                    value: true,
+                    visible: true,
+                    closeModal: true,
+                    className: "swal-no-box-button",
+                  },
+                },
+              });
+              return
         }
 
         if(!boxesToShip.length) {
@@ -2800,7 +2822,7 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
 export const populateSelectLocationList = async () => {
     let currSelect = document.getElementById('selectLocationList')
     let response = await getLocationsInstitute();
-    let list = ''
+    let list = '<option value="none">Select Shipping Location</option>'
     for (let i = 0; i < response.length; i++) {
         list += '<option>' + response[i] + '</option>';
     }
