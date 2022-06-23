@@ -2575,6 +2575,7 @@ export const addEventNavBarBoxManifest = (id, userName) => {
 export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
     const btn = document.getElementById('completePackaging');
     document.getElementById('completePackaging').addEventListener('click', async e => {
+        let selectedLocation = document.getElementById('selectLocationList').value;
         e.stopPropagation();
         if (btn.classList.contains('active')) return;
         //get table info
@@ -2592,6 +2593,25 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
                 boxesToShip.push(currBoxId)
             }
 
+        }
+
+        if (selectedLocation === 'none') {
+            await swal({
+                title: "Reminder",
+                icon: "warning",
+                text: "Please Select 'Shipping Location'",
+                className: "swal-no-box",
+                buttons: {
+                  confirm: {
+                    text: "OK",
+                    value: true,
+                    visible: true,
+                    closeModal: true,
+                    className: "swal-no-box-button",
+                  },
+                },
+              });
+              return
         }
 
         if(!boxesToShip.length) {
