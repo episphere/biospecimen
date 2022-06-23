@@ -2823,7 +2823,6 @@ export const populateSelectLocationList = async () => {
     let currSelect = document.getElementById('selectLocationList')
     let response = await getLocationsInstitute();
     let list = '<option value="none">Select Shipping Location</option>'
-    //let list = '';
     for (let i = 0; i < response.length; i++) {
         list += '<option>' + response[i] + '</option>';
     }
