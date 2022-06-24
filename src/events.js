@@ -153,6 +153,11 @@ export const addEventAddSpecimenToBox = (userName) => {
     form.addEventListener('submit', async e => {
         e.preventDefault();
         const masterSpecimenId = document.getElementById('masterSpecimenId').value;
+        const shippingLocationValue = document.getElementById('selectLocationList').value;
+        if(shippingLocationValue === 'none') {
+          showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' }, true)
+          return
+        }
         if (masterSpecimenId == '') {
             showNotifications({ title: 'Not found', body: 'The submited bag or tube could not be found!' }, true)
             return
@@ -1649,7 +1654,13 @@ export const addEventChangeLocationSelect = (userName) => {
                 boxObjects[box['132929440']] = box['bags']
             }
 
-            await populateBoxSelectList(boxObjects, userName)
+            await populateBoxSelectList(boxObjects, userName);
+            hideAnimation();
+        }
+        else {
+            showAnimation();
+            let boxObjects = {};
+            await populateBoxSelectList(boxObjects, userName);
             hideAnimation();
         }
     })
