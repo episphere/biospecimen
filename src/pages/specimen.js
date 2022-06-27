@@ -13,6 +13,8 @@ export const specimenTemplate = async (data) => {
     let formData = {};
     formData['siteAcronym'] = getSiteAcronym();
     formData['827220437'] = parseInt(getSiteCode());
+    let visit = visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0];
+
 
     let template = `
         </br>
@@ -32,7 +34,7 @@ export const specimenTemplate = async (data) => {
 
         <div class="">
             <h4>Link a new Collection ID</h4><br/>
-            <h4> Visit: ${visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0].visitType}</h4>
+            <h4> Visit: ${visit.visitType}</h4>
         </div>
 
         <form id="specimenLinkForm" method="POST" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">
@@ -41,7 +43,8 @@ export const specimenTemplate = async (data) => {
                 const workflow = getWorflow() ?? localStorage.getItem('workflow');
                 if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {
                     template +=`<label class="col-md-4 col-form-label" for="collectionLocation">Select Collection Location</label>
-                    <select class="form-control col-md-5" id="collectionLocation">`
+                    <select class="form-control col-md-5" id="collectionLocation">
+                    <option value='none'>Please Select Location</option>`
                     siteLocations[workflow][siteAcronym].forEach(site => {
                         template +=`<option value='${site.concept}'>${site.location}</option>`
                     })
@@ -90,7 +93,7 @@ export const specimenTemplate = async (data) => {
     // addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, masterSpecimenIDRequirement.length);
     // if(document.getElementById('scanAccessionIDBarCodeBtn')) addEventBarCodeScanner('scanAccessionIDBarCodeBtn');
     generateBarCode('connectIdBarCode', data.Connect_ID);
-    addEventSpecimenLinkForm(formData);
+    addEventSpecimenLinkForm(formData, visit.concept);
     addEventBackToSearch('navBarSearch');
     addEventNavBarParticipantCheckIn();
 }
