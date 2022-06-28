@@ -1929,7 +1929,7 @@ export const goToParticipantSearch = () => {
     document.getElementById('navBarSearch').click();
 }
 
-export const addEventSpecimenLinkForm = (formData, visitConcept) => {
+export const addEventSpecimenLinkForm = (formData) => {
     const form = document.getElementById('specimenLinkForm');
     const connectId = document.getElementById('specimenContinue').dataset.connectId;
 
