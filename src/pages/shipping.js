@@ -232,18 +232,19 @@ export const startShipping = async (userName) => {
     await populateSpecimensList(hiddenJSON1);
 
     let currLocation = document.getElementById('selectLocationList').value;
-    let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
+    if (currLocation !== 'none') { 
+        let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
+        response = await getBoxesByLocation(currLocationConceptId);
+        boxJSONS = response.data;
+        let hiddenJSONLocation = {};
+        for(let i = 0; i < boxJSONS.length; i++){
+            let box = boxJSONS[i]
+            hiddenJSONLocation[box['132929440']] = box['bags']
+        }
+        await populateBoxSelectList(hiddenJSONLocation,userName);
+    };
     let tempMonitorCheckedEl = document.getElementById('tempMonitorChecked')
-
-    response = await getBoxesByLocation(currLocationConceptId);
-    boxJSONS = response.data;
-    let hiddenJSONLocation = {};
-    for(let i = 0; i < boxJSONS.length; i++){
-        let box = boxJSONS[i]
-        hiddenJSONLocation[box['132929440']] = box['bags']
-    }
-     
-    await populateBoxSelectList(hiddenJSONLocation,userName);
+    
     await populateTempNotification();
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarShippingManifest(userName, tempMonitorCheckedEl);
