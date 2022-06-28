@@ -93,7 +93,7 @@ export const specimenTemplate = async (data) => {
     // addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, masterSpecimenIDRequirement.length);
     // if(document.getElementById('scanAccessionIDBarCodeBtn')) addEventBarCodeScanner('scanAccessionIDBarCodeBtn');
     generateBarCode('connectIdBarCode', data.Connect_ID);
-    addEventSpecimenLinkForm(formData, visit.concept);
+    addEventSpecimenLinkForm(formData);
     addEventBackToSearch('navBarSearch');
     addEventNavBarParticipantCheckIn();
 }
