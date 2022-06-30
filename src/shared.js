@@ -125,6 +125,20 @@ export const updateParticipant = async (array) => {
     return await response.json();
 }
 
+export const getUserProfile = async (uid) => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=getUserProfile`, {
+        method: "POST",
+        headers: {
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body:  JSON.stringify(uid)
+    });
+    
+    return await response.json();
+}
+
 export const sendClientEmail = async (array) => {
     const idToken = await getIdToken();
     let requestObj = {
