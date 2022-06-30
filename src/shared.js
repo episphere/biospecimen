@@ -1088,60 +1088,6 @@ export const verifyPaymentEligibility = async (formData) => {
     }
 }
 
-export const verifyDefaultConcepts = async (data) => {
-    let defaultConcepts = checkDefaultFlags(data);
-
-    if(Object.entries(defaultConcepts).length != 0) {
-        defaultConcepts['uid'] = data.state.uid
-        await updateParticipant(defaultConcepts);
-        
-        data = await findParticipant(`connectId=${data['Connect_ID']}`).then(
-            (res) => res.data?.[0]
-        );;
-    }
-    
-    return data;
-}
-
-const checkDefaultFlags = (data) => {
-  
-  if(!data) return {};
-  
-  const defaultFlags = {
-    948195369: 104430631,
-    919254129: 104430631,
-    821247024: 875007964,
-    828729648: 104430631,
-    699625233: 104430631,
-    912301837: 208325815,
-    253883960: 972455046,
-    547363263: 972455046,
-    949302066: 972455046,
-    536735468: 972455046,
-    976570371: 972455046,
-    663265240: 972455046,
-    265193023: 972455046,
-    459098666: 972455046,
-    126331570: 972455046,
-    311580100: 104430631,
-    914639140: 104430631,
-    878865966: 104430631,
-    167958071: 104430631,
-    684635302: 104430631,
-    100767870: 104430631
-  }
-
-  let missingDefaults = {};
-
-  Object.entries(defaultFlags).forEach(item => {
-    if(!data[item[0]]) {
-      missingDefaults[item[0]] = item[1];
-    }
-  });
-
-  return missingDefaults;
-}
-
 const checkPaymentEligibility = async (data, baselineCollections) => {
   
     if(baselineCollections.length === 0) return false;
