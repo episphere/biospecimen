@@ -1,5 +1,5 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormEditAll, addEventBiospecimenCollectionFormText } from './../events.js'
-import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow, getCheckedInVisit, findParticipant, verifyDefaultConcepts, checkedIn } from '../shared.js';
+import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow, getCheckedInVisit, findParticipant, checkedIn } from '../shared.js';
 import { checkInTemplate } from './checkIn.js';
 
 export const tubeCollectedTemplate = (data, formData) => {
@@ -232,7 +232,6 @@ export const tubeCollectedTemplate = (data, formData) => {
         const connectId = e.target.getAttribute('data-connect-id');
         try {
             let data = await findParticipant(`connectId=${connectId}`).then(res => res.data?.[0]);
-            data = await verifyDefaultConcepts(data);
             checkInTemplate(data);
             document.body.scrollIntoView();
         } catch (error) {
