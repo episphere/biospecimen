@@ -1406,7 +1406,8 @@ export const keyToLocationObj =
     736183094: "Henry Ford Health Main Campus",
     886364332: "Henry Ford Health Pavilion",
     589224449: "SF Cancer Center LL",
-    111111111: "NIH"
+    111111111: "NIH",
+    13:"NCI"
 }
 
 export const verificationConversion = {
@@ -2048,11 +2049,12 @@ export const translateNumToType = {
 
 export const convertISODateTime = (dateWithdrawn) => {
     let date = new Date(dateWithdrawn);
-    let formattedMonth = date.getMonth() + 1
-    if (formattedMonth < 10) formattedMonth = '0' + formattedMonth; // append 0 before month if single digit month
-    let formattedDate = date.getDate()
-    if (formattedDate < 10) formattedDate = '0' + formattedDate; // append 0 before date if single digit date
-    return formattedMonth + '/' + formattedDate + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + date.getMinutes()
+    return setZeroDateTime(date.getMonth() + 1)+ '/' + setZeroDateTime(date.getDate()) + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + setZeroDateTime(date.getMinutes())
+}
+
+const setZeroDateTime = (dateTimeInput) => { // append 0 before min if single digit min
+    if (dateTimeInput < 10) dateTimeInput = '0' + dateTimeInput;
+    return dateTimeInput
 }
 
 export const formatISODateTime = (dateReceived) => {
