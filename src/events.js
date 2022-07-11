@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -153,6 +153,11 @@ export const addEventAddSpecimenToBox = (userName) => {
     form.addEventListener('submit', async e => {
         e.preventDefault();
         const masterSpecimenId = document.getElementById('masterSpecimenId').value;
+        const shippingLocationValue = document.getElementById('selectLocationList').value;
+        if(shippingLocationValue === 'none') {
+          showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' }, true)
+          return
+        }
         if (masterSpecimenId == '') {
             showNotifications({ title: 'Not found', body: 'The submited bag or tube could not be found!' }, true)
             return
@@ -477,7 +482,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         let numRows = tubeTable.rows.length;
         let bagSplit = bagid.split(/\s+/);
         let boxId = document.getElementById('shippingModalChooseBox').value;
-        let nameSplit = userName.split(' ');
+        let nameSplit = userName.split(/\s+/);
         let firstName = nameSplit[0] ? nameSplit[0] : '';
         let lastName = nameSplit[1] ? nameSplit[1] : '';
         let checkedSpecimensArr = Array.from(document.getElementsByClassName("samplePresentCheckbox")).filter(item => item.checked)
@@ -491,7 +496,16 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         for (let i = 0; i < checkedSpecimensArr.length; i++) {
             // data-full-specimen-id (Ex. "CXA444444 0007")
             let toAddId = checkedSpecimensArr[i].getAttribute("data-full-specimen-id")
-            toDelete.push(toAddId.split(/\s+/)[1]);
+            const [collectionID, tubeID] = toAddId.split(/\s+/);
+            toDelete.push(tubeID);
+
+            if (!isOrphan) {
+                if (tubeID === '0007') {
+                    bagid = collectionID + ' 0009';
+                } else {
+                    bagid = collectionID + ' 0008';
+                }
+            }
 
             if (boxObjects.hasOwnProperty(boxId)) {
                 if (boxObjects[boxId].hasOwnProperty(bagid)) {
@@ -1099,7 +1113,6 @@ export const populateTempCheck = async () => {
 }
 
 export const populateShippingManifestHeader = (hiddenJSON, userName, locationNumber, siteAcronym, currShippingLocationNumber) => {
-  console.log("populateShippingManifestHeader locationNumber, siteAcronym, currShippingLocationNumber", locationNumber, siteAcronym,currShippingLocationNumber) // REMOVE - After Site Dev Test
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
     const currContactInfo = locationConceptIDToLocationMap[currShippingLocationNumber]["contactInfo"][siteAcronym]
@@ -1629,19 +1642,27 @@ export const addEventBoxSelectListChanged = () => {
 export const addEventChangeLocationSelect = (userName) => {
     let locationSelectEle = document.getElementById('selectLocationList');
     locationSelectEle.addEventListener("change", async () => {
-        showAnimation();
         let currLocation = locationSelectEle.value;
-        let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
-        let boxArray = (await getBoxesByLocation(currLocationConceptId)).data;
+        if (currLocation !== 'none') {
+            showAnimation();
+            let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
+            let boxArray = (await getBoxesByLocation(currLocationConceptId)).data;
 
-        let boxObjects = {};
-        for (let i = 0; i < boxArray.length; i++) {
-            let box = boxArray[i]
-            boxObjects[box['132929440']] = box['bags']
+            let boxObjects = {};
+            for (let i = 0; i < boxArray.length; i++) {
+                let box = boxArray[i]
+                boxObjects[box['132929440']] = box['bags']
+            }
+
+            await populateBoxSelectList(boxObjects, userName);
+            hideAnimation();
         }
-
-        await populateBoxSelectList(boxObjects, userName)
-        hideAnimation();
+        else {
+            showAnimation();
+            let boxObjects = {};
+            await populateBoxSelectList(boxObjects, userName);
+            hideAnimation();
+        }
     })
 }
 
@@ -1761,15 +1782,14 @@ export const addEventRemoveUser = () => {
 }
 
 export const addGoToCheckInEvent = () => {
-    const handler = (connectId) => async (_event) => {
+    const handler = (uid) => async (_event) => {
         try {
             showAnimation();
 
-            let data = await findParticipant(`connectId=${connectId}`).then(
-                (res) => res.data?.[0]
+            let data = await getUserProfile({uid}).then(
+                (res) => res.data
             );
-            
-            data = await verifyDefaultConcepts(data);
+
             checkInTemplate(data);
         } catch (error) {
             console.log("Error checking in participant: ", error);
@@ -1783,7 +1803,7 @@ export const addGoToCheckInEvent = () => {
     );
 
     Array.from(checkInButtons).forEach((btn) => {
-        btn.addEventListener("click", handler(Number(btn.dataset.checkInBtnConnectId)));
+        btn.addEventListener("click", handler(btn.dataset.checkInBtnUid));
     });
 };
 
@@ -1925,13 +1945,52 @@ export const addEventSpecimenLinkForm = (formData) => {
 
     if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
 
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        btnsClicked(connectId, formData);
+        const query = `connectId=${parseInt(connectId)}`;
+        const participant  = await findParticipant(query);
+        const data = participant.data[0];
+        const collections = await getCollectionsByVisit(data);
+        if (collections.length) {
+            existingCollectionAlert(collections, connectId, formData);
+        } else {
+            btnsClicked(connectId, formData);
+
+        }
     });
 };
 
-const btnsClicked = async (connectId, formData) => {
+const existingCollectionAlert = async (collections, connectId, formData) => {
+    const confirmVal = await swal({
+        title: "Warning",
+        icon: "warning",
+        text: `The Following ${collections.length} Collection ID(s) already exist for this participant: 
+        ${collections.map(collection => collection['820476880']).join(', ')}`,
+        buttons: {
+            cancel: {
+                text: "Close",
+                value: "cancel",
+                visible: true,
+                className: "btn btn-default",
+                closeModal: true,
+            },
+            confirm: {
+                text: "Add New Collection",
+                value: 'confirmed',
+                visible: true,
+                className: "",
+                closeModal: true,
+                className: "btn btn-success",
+            }
+        },
+    });
+
+    if (confirmVal === "confirmed") {
+        btnsClicked(connectId, formData);
+    }
+}
+
+const btnsClicked = async (connectId, formData) => { 
 
     removeAllErrors();
 
@@ -1943,6 +2002,7 @@ const btnsClicked = async (connectId, formData) => {
     const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value.toUpperCase();
     const accessionID1 = document.getElementById('accessionID1');
     const accessionID2 = document.getElementById('accessionID2');
+    const collectionLocation = document.getElementById('collectionLocation').value;
 
     let hasError = false;
     let focus = true;
@@ -1986,6 +2046,11 @@ const btnsClicked = async (connectId, formData) => {
             hasError = true;
             errorMessage('enterSpecimenID2', 'Does not match with Manually Entered Collection ID', focus, true);
         }
+    }
+    if (collectionLocation === 'none') {
+        hasError = true;
+        errorMessage('collectionLocation', `Please Select Collection Location.`, focus, true);
+        focus = false;
     }
 
     if (hasError) return;
@@ -2559,6 +2624,7 @@ export const addEventNavBarBoxManifest = (id, userName) => {
 export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
     const btn = document.getElementById('completePackaging');
     document.getElementById('completePackaging').addEventListener('click', async e => {
+        let selectedLocation = document.getElementById('selectLocationList').value;
         e.stopPropagation();
         if (btn.classList.contains('active')) return;
         //get table info
@@ -2576,6 +2642,25 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
                 boxesToShip.push(currBoxId)
             }
 
+        }
+
+        if (selectedLocation === 'none') {
+            await swal({
+                title: "Reminder",
+                icon: "warning",
+                text: "Please Select 'Shipping Location'",
+                className: "swal-no-box",
+                buttons: {
+                  confirm: {
+                    text: "OK",
+                    value: true,
+                    visible: true,
+                    closeModal: true,
+                    className: "swal-no-box-button",
+                  },
+                },
+              });
+              return
         }
 
         if(!boxesToShip.length) {
@@ -2747,7 +2832,7 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
 export const populateSelectLocationList = async () => {
     let currSelect = document.getElementById('selectLocationList')
     let response = await getLocationsInstitute();
-    let list = ''
+    let list = '<option value="none">Select Shipping Location</option>'
     for (let i = 0; i < response.length; i++) {
         list += '<option>' + response[i] + '</option>';
     }
@@ -3225,7 +3310,6 @@ export const populateBoxTable = async (page, filter) => {
         currRow.insertCell(6).innerHTML = receivedDate;
         currRow.insertCell(7).innerHTML = convertNumsToCondition(packagedCondition, packageConversion);
         currRow.insertCell(8).innerHTML = currPage.hasOwnProperty('870456401') ? currPage['870456401'] : '' ;
-        console.log("populateBoxTable currPage",currPage) // REMOVE - After Site Dev Test
         addEventViewManifestButton('reportsViewManifest' + i, currPage);
 
     }
@@ -3241,7 +3325,6 @@ export const addEventViewManifestButton = (buttonId, currPage) => {
 
 
 export const populateReportManifestHeader = (currPage) => {
-    console.log("populateReportManifestHeader currPage",currPage) // REMOVE - After Site Dev Test
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
     let siteAcronym = currPage["siteAcronym"]
@@ -3252,6 +3335,7 @@ export const populateReportManifestHeader = (currPage) => {
     let newDiv = document.createElement("div")
     let newP = document.createElement("p");
     newP.innerHTML = currPage['132929440'] + " Manifest";
+    newP.setAttribute("style", "font-size: 1.5rem; font-weight:bold;")
     document.getElementById('boxManifestCol1').appendChild(newP);
 
     let toInsertDateStarted = ''
