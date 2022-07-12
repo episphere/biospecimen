@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getAllBoxesWithoutConversion } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -148,65 +148,89 @@ export const getCurrBoxNumber = (j) => {
     return keys.length;
 }
 
-export const addEventAddSpecimenToBox = (userName) => {
+export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUNCTION */
     const form = document.getElementById('addSpecimenForm');
+    /* NOTES: Rely on two API calls  */
+    showAnimation();
+    // NOTES: Break into another function call if needed
+    const getBoxesResponse = await getBoxes()
+    console.log("getBoxesResponse.data",getBoxesResponse.data)
+    const getAllBoxesWithoutConversionResponse = await getAllBoxesWithoutConversion();
+    console.log("getAllBoxesWithoutConversionResponse.data",getAllBoxesWithoutConversionResponse.data);
+    const getAllBoxesResponse = await getAllBoxes();
+    console.log("getAllBoxesResponse.data",getAllBoxesResponse.data);
+    hideAnimation();
+
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        const masterSpecimenId = document.getElementById('masterSpecimenId').value;
+
+        const masterSpecimenId = document.getElementById('masterSpecimenId').value.trim();
         const shippingLocationValue = document.getElementById('selectLocationList').value;
-        if(shippingLocationValue === 'none') {
+        let currLocation = document.getElementById('selectLocationList').value;
+        let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
+
+        if(shippingLocationValue === 'none') { // NOTES: No Shipping Location Selected from dropdown
           showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' }, true)
           return
         }
-        if (masterSpecimenId == '') {
+        if (masterSpecimenId == '') { // NOTES: HTML attribute "required" prevents a case of an empty string being submitted  
             showNotifications({ title: 'Not found', body: 'The submited bag or tube could not be found!' }, true)
             return
         }
         let masterIdSplit = masterSpecimenId.split(/\s+/);
         let foundInOrphan = false;
         //get all ids from the hidden
-        let shippingTable = document.getElementById('specimenList')
-        let orphanTable = document.getElementById('orphansList')
+        let shippingTable = document.getElementById('specimenList') //NOTES: Available Collections table
+        let orphanTable = document.getElementById('orphansList') // NOTES: Orphan Table hidden
         let biospecimensList = []
         let tableIndex = -1;
         let foundInShipping = false;
-        for (let i = 1; i < shippingTable.rows.length; i++) {
-            let currRow = shippingTable.rows[i];
-            if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) {
-                tableIndex = i;
-                biospecimensList = JSON.parse(currRow.cells[2].innerText)
+        for (let i = 1; i < shippingTable.rows.length; i++) { // NOTES: Iterate Available Collections table; length of children element rows inside table element (find colllection Id input from the tr's), index 0 is the header information; (Side Note: An extra tr is being generated)
+            let currRow = shippingTable.rows[i]; // NOTES: current row element with information
+            if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) { // NOTES: Access td elements, currRow.cells --> [td, td, td] ; currRow.cells[0] -->[CXA000126 008] ; masterSpecimenId is scanned value in input field, first tr must match masterSpecimendId
+                tableIndex = i; // NOTES: becomes 1 from loop and replaces initial -1, grabs the index location of the masterSpecimenId if found
+                biospecimensList = JSON.parse(currRow.cells[2].innerText) // NOTES: Access the 2nd td value (# specimen in bag value), assign to biospecimensList -- > (Ex. ["0001","0004","0005","0002","0003","0006"])
                 foundInShipping = true;
             }
 
         }
 
-        for (let i = 1; i < orphanTable.rows.length; i++) {
-            let currRow = orphanTable.rows[i];
-            if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) {
+        for (let i = 1; i < orphanTable.rows.length; i++) { // NOTES: Loop checks if scanned id is found in orphan table; first index is actual orphan tr tds if any
+            let currRow = orphanTable.rows[i]; // NOTES: orphanTable.rows[0]--> [td (stray tubes), td ("# value" of stray tubes), td (array of orphan tubes)]
+            if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) { // NOTES: check to match scanned specimen Id from indiviudal first item in cell
                 tableIndex = i;
-                let currTubeNum = currRow.cells[0].innerText.split(' ')[1];
-                biospecimensList = [currTubeNum];
+                let currTubeNum = currRow.cells[0].innerText.split(' ')[1]; // NOTES: remove extra numbers, CXA000135 0001 --> 0001
+                biospecimensList = [currTubeNum]; 
                 foundInOrphan = true;
             }
 
         }
-
-        if (biospecimensList.length == 0) {
+        /* 
+        NOTES: Below is where to add different display messages (should this be broken to a new function?)
+        Can this be done with one API call or multiple?
+        1. ID is scanned that has not been entered into the system as having been collected: "Item not reported as collected. Go to the Collection Dashboard to add specimen."
+        2. ID is scanned that the system shows as already being in a box, the box number the bag should be in should show: "Item has already been recorded as being placed in box 5"  
+        3. ID scanned that the system shows as already shipped: “Item reported as already shipped." (FIRST CHECK)
+        */
+        if (biospecimensList.length == 0) { /* NOTES: This can be left as an || condition */ 
             showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' }, true)
             return
         }
-        else {
+        else { // NOTES: Success if found!
             document.getElementById('submitMasterSpecimenId').click();
+            console.log("click event for else conditionals was triggered")
         }
     });
-    const submitButtonSpecimen = document.getElementById('submitMasterSpecimenId');
-    submitButtonSpecimen.addEventListener('click', async e => {
+    /*Halfway point IN PROGRESS*/
+    const submitButtonSpecimen = document.getElementById('submitMasterSpecimenId'); /* NOTES: This button has display none; has type submit */
+    submitButtonSpecimen.addEventListener('click', async e => { /* NOTES: Adds content to modal header (on click), all conditions are met */
         e.preventDefault();
         showAnimation();
         //getCurrBoxNumber
 
-        const masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase();
-        let mouthwashList = document.getElementById("mouthwashList")
+        const masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase().trim();
+        console.log("submitButtonSpecimen masterSpecimenId value ", masterSpecimenId)
+        let mouthwashList = document.getElementById("mouthwashList") 
         let currTubeTable = document.getElementById("currTubeTable")
 
         const header = document.getElementById('shippingModalHeader');
@@ -292,11 +316,12 @@ export const addEventAddSpecimenToBox = (userName) => {
         }
 
         const biospecimensListByType = sortBiospecimensList(biospecimensList, tubeOrder)
-        await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan)
+        // debugger
+        await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan) /* NOTES: SAVE POINT READ UP TO HERE: Returns custom array of sorted tubes ids by type; 1. ordered array of tube numbers, 2. user collection input scanned Id, 3. orphan flag (boolean)*/
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
-  
-
+        // debugger
+        // return
         /*
         //document.getElementById("shippingModal").modal();
         var specimenList = document.getElementById("specimenList");
@@ -328,7 +353,7 @@ export const addEventAddSpecimenToBox = (userName) => {
     })
 }
 
-export const createShippingModalBody = async (biospecimensList, masterBiospecimenId, isOrphan) => {
+export const createShippingModalBody = async (biospecimensList, masterBiospecimenId, isOrphan) => { //NOTE: biospecimens list example --> ['0001', '0004', '0005', '0002', '0003', '0006']
     //let keys = Object.keys(biospecimenData)
     /*let tubes = [];
     for(let i = 0; i < biospecimensList.length; i++){
@@ -341,23 +366,24 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let currLocation = document.getElementById('selectLocationList').value;
     let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
     let response = await getBoxesByLocation(currLocationConceptId);
-    let boxJSONS = response.data;
+    let boxJSONS = response.data;/* // NOTES: Returns array of All boxes (boxId and information w/ old box structre) without a submit shipment flag */
     let hiddenJSON = {};
     for (let i = 0; i < boxJSONS.length; i++) {
         let box = boxJSONS[i]
-        hiddenJSON[box['132929440']] = box['bags']
+        hiddenJSON[box['132929440']] = box['bags'] // NOTES: 132929440 -> boxid 
     }
+    console.log("hiddenJSON",hiddenJSON) /* // NOTES:{box#: bags} */
 
     //let tubeTable = document.getElementById("shippingModalTable")
     let tubeTable = document.createElement('table');
-    let currSplit = masterBiospecimenId.split(/\s+/);
+    let currSplit = masterBiospecimenId.split(/\s+/); /* Ex. ['CXA000133', '0008']*/
     let currBag = [];
     let empty = true;
-    if (!isOrphan) {
-        if (currSplit.length >= 2 && currSplit[1] == '0008') {
+    if (!isOrphan) { // orphan flag is determined in the orphan table flag
+        if (currSplit.length >= 2 && currSplit[1] == '0008') { /* // NOTES: blood/urine --> 0008 */
             //look for all non-moutwash (0007)
             for (let i = 0; i < biospecimensList.length; i++) {
-                if (biospecimensList[i] != '0007' && biospecimensList[i] != '0008') {
+                if (biospecimensList[i] != '0007' && biospecimensList[i] != '0008') { // NOTES: push everything to currBag without 0007 and 0008 ending
                     empty = false;
                     currBag.push(biospecimensList[i])
                     var rowCount = tubeTable.rows.length;
@@ -630,7 +656,8 @@ export const getInstituteSpecimensList = async (hiddenJSON) => {
         "677469051": "0014",
         "683613884": "0024"
     }
-    let specimenData = await searchSpecimenInstitute();
+    let isBioRec_ShipFlag = true
+    let specimenData = await searchSpecimenInstitute(isBioRec_ShipFlag);
     //let specimenData = response.data;
     let toReturn = {};
     let checkedOrphans = false;
@@ -758,8 +785,9 @@ export const getInstituteSpecimensList = async (hiddenJSON) => {
 }
 
 export const populateSpecimensList = async (hiddenJSON) => {
+    let isBioRec_ShipFlag = true
     let specimenObject = await getInstituteSpecimensList(hiddenJSON);
-    let specimenData = await searchSpecimenInstitute();
+    let specimenData = await searchSpecimenInstitute(isBioRec_ShipFlag);
     //let specimenData = response.data
     for (let i = 0; i < specimenData.length; i++) {
         //let specimenData = 
