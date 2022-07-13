@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getAllBoxesWithoutConversion } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getAllBoxesWithoutConversion, bagConceptIDList } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -150,17 +150,6 @@ export const getCurrBoxNumber = (j) => {
 
 export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUNCTION */
     const form = document.getElementById('addSpecimenForm');
-    /* NOTES: Rely on two API calls  */
-    showAnimation();
-    // NOTES: Break into another function call if needed
-    const getBoxesResponse = await getBoxes()
-    console.log("getBoxesResponse.data",getBoxesResponse.data)
-    const getAllBoxesWithoutConversionResponse = await getAllBoxesWithoutConversion();
-    console.log("getAllBoxesWithoutConversionResponse.data",getAllBoxesWithoutConversionResponse.data);
-    const getAllBoxesResponse = await getAllBoxes();
-    console.log("getAllBoxesResponse.data",getAllBoxesResponse.data);
-    hideAnimation();
-
     form.addEventListener('submit', async e => {
         e.preventDefault();
 
@@ -173,10 +162,20 @@ export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUN
           showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' }, true)
           return
         }
-        if (masterSpecimenId == '') { // NOTES: HTML attribute "required" prevents a case of an empty string being submitted  
-            showNotifications({ title: 'Not found', body: 'The submited bag or tube could not be found!' }, true)
+        if (masterSpecimenId == '') { // NOTES: Add a message when whitespace is removed and input is empty string
+            showNotifications({ title: 'Empty Entry or Scan', body: 'Please enter or scan a specimen bag ID or Full Specimen ID.' }, true)
             return
         }
+        /* NOTES: Rely on two API calls  */
+        showAnimation();
+        // NOTES: Break into another function call if needed
+        // const getBoxesResponse = await getBoxes()
+        // console.log("getBoxesResponse.data",getBoxesResponse.data)
+        const getAllBoxesWithoutConversionResponse = await getAllBoxesWithoutConversion(); // get and search all boxes from a login site
+        console.log("getAllBoxesWithoutConversionResponse.data",getAllBoxesWithoutConversionResponse.data);
+        // const getAllBoxesResponse = await getAllBoxes();
+        // console.log("getAllBoxesResponse.data",getAllBoxesResponse.data);
+        hideAnimation();
         let masterIdSplit = masterSpecimenId.split(/\s+/);
         let foundInOrphan = false;
         //get all ids from the hidden
@@ -184,13 +183,16 @@ export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUN
         let orphanTable = document.getElementById('orphansList') // NOTES: Orphan Table hidden
         let biospecimensList = []
         let tableIndex = -1;
-        let foundInShipping = false;
+        let foundinShippingTable = false;
+        let foundScannedIdShipped = isScannedIdShipped(getAllBoxesWithoutConversionResponse, masterSpecimenId) 
+        console.log("foundScannedIdShipped",foundScannedIdShipped)
+
         for (let i = 1; i < shippingTable.rows.length; i++) { // NOTES: Iterate Available Collections table; length of children element rows inside table element (find colllection Id input from the tr's), index 0 is the header information; (Side Note: An extra tr is being generated)
             let currRow = shippingTable.rows[i]; // NOTES: current row element with information
             if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) { // NOTES: Access td elements, currRow.cells --> [td, td, td] ; currRow.cells[0] -->[CXA000126 008] ; masterSpecimenId is scanned value in input field, first tr must match masterSpecimendId
                 tableIndex = i; // NOTES: becomes 1 from loop and replaces initial -1, grabs the index location of the masterSpecimenId if found
                 biospecimensList = JSON.parse(currRow.cells[2].innerText) // NOTES: Access the 2nd td value (# specimen in bag value), assign to biospecimensList -- > (Ex. ["0001","0004","0005","0002","0003","0006"])
-                foundInShipping = true;
+                foundinShippingTable = true;
             }
 
         }
@@ -205,6 +207,7 @@ export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUN
             }
 
         }
+
         /* 
         NOTES: Below is where to add different display messages (should this be broken to a new function?)
         Can this be done with one API call or multiple?
@@ -212,16 +215,25 @@ export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUN
         2. ID is scanned that the system shows as already being in a box, the box number the bag should be in should show: "Item has already been recorded as being placed in box 5"  
         3. ID scanned that the system shows as already shipped: “Item reported as already shipped." (FIRST CHECK)
         */
-        if (biospecimensList.length == 0) { /* NOTES: This can be left as an || condition */ 
-            showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' }, true)
+       
+        if (foundScannedIdShipped){ // DETERMINE IF ITEM SCANNED IS ALREADY SHIPPED
+          showNotifications({ title:'Item reported as already shipped.', body: 'Please enter or scan a specimen bag ID or Full Specimen ID.'}, true)
+          return
+        }
+       
+        if (biospecimensList.length == 0 && !foundinShippingTable) { /* NOTES: This will be the last else if; might need to add found in orphanTable */ 
+            showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found in available collection!' }, true)
             return
         }
-        else { // NOTES: Success if found!
+        if (biospecimensList.length == 0 && !foundInOrphan) { /* NOTES: This will be the last else if; might need to add found in orphanTable */ 
+            showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found in orphan!' }, true)
+            return
+        }
+        else { // NOTES: Success if found!; Replace with --> if (biospecimensList.length)
             document.getElementById('submitMasterSpecimenId').click();
             console.log("click event for else conditionals was triggered")
         }
     });
-    /*Halfway point IN PROGRESS*/
     const submitButtonSpecimen = document.getElementById('submitMasterSpecimenId'); /* NOTES: This button has display none; has type submit */
     submitButtonSpecimen.addEventListener('click', async e => { /* NOTES: Adds content to modal header (on click), all conditions are met */
         e.preventDefault();
@@ -258,7 +270,7 @@ export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUN
         let orphanTable = document.getElementById('orphansList')
         let biospecimensList = []
         let tableIndex = -1;
-        let foundInShipping = false;
+        let foundinShippingTable = false;
 
         // Modify to change tube order, tube ordered by color
         let tubeOrder = [      
@@ -290,7 +302,7 @@ export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUN
             if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId) {
                 tableIndex = i;
                 biospecimensList = JSON.parse(currRow.cells[2].innerText)
-                foundInShipping = true;
+                foundinShippingTable = true;
             }
 
         }
@@ -3520,4 +3532,44 @@ export const addEventFilter = () => {
 
     })
 
+}
+
+export const isScannedIdShipped = (getAllBoxesWithoutConversionResponse, masterSpecimendId) => {
+  const bagConceptIdList = bagConceptIDList;
+  const getAllBoxesWithoutConversionData = getAllBoxesWithoutConversionResponse.data;
+  console.log("getAllBoxesWithoutConversionData", getAllBoxesWithoutConversionData)
+  const inputScanned = masterSpecimendId;
+  if(!getAllBoxesWithoutConversionData.length) return false;
+  const allBoxesShippedFilter = getAllBoxesWithoutConversionData.filter(box => box.hasOwnProperty('145971562')) // Submit shipment flag - '145971562'
+  console.log("getAllBoxesWithoutConversionData Filter", allBoxesShippedFilter)
+  let matchFound = false
+  // CLEAN UP BELOW LATER 
+  for (let box of allBoxesShippedFilter) {
+   if(matchFound) break;
+   for(let [index,conceptId] of bagConceptIdList.entries()) {
+    if(box[conceptId]) { // concept id exists
+      // console.log(`box`,`${conceptId}`,box[conceptId])
+      // console.log(box[conceptId]["787237543"])
+      console.log("box input scanned",index, box[conceptId]["787237543"], inputScanned, box[conceptId]["787237543"] == inputScanned)
+      console.log(index)
+      if(box[conceptId]["223999569"] && box[conceptId]["223999569"] == inputScanned) { // mouthwash scan
+        console.log("match found", box[conceptId]["223999569"]) 
+        matchFound = true;
+        break;
+      }
+      if(box[conceptId]["522094118"] && box[conceptId]["522094118"] == inputScanned) { //orphan scan
+        console.log("match found", box[conceptId]["522094118"]) 
+        matchFound = true;
+        break;
+      }
+      if (box[conceptId]["787237543"] && box[conceptId]["787237543"] == inputScanned) { // blood/urine scan
+        console.log("match found", box[conceptId]["787237543"]) 
+        matchFound = true;
+        break;
+      }
+    }
+   }
+  }
+  console.log(matchFound);
+  return matchFound;
 }
