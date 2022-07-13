@@ -3011,6 +3011,11 @@ export const addEventSaveButton = async (hiddenJSON) => {
             }  
         }
         
+        if(checkFedexShipDuplicate(boxes) && boxes.length > 1){
+            shippingDuplicateMessage()
+            return
+          }
+          
         let shippingData = []
 
         for(let i = 0; i < boxes.length; i++){
