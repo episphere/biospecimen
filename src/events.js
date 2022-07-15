@@ -1466,7 +1466,11 @@ export const addEventModalAddBox = (userName) => {
     let createBoxSuccessAlertEl = document.getElementById("create-box-success");
     let createBoxErrorAlertEl = document.getElementById("create-box-error");
     boxButton.addEventListener('click', async () => {
+        // Check whether a box is being added. If so, return.
+        if (document.body.getAttribute('data-adding-box')) return;
+
         let alertState = ''
+        document.body.setAttribute('data-adding-box', 'true');
         showAnimation();
         // returns boolean value
         let notifyCreateBox = await addNewBox(userName);
@@ -1486,6 +1490,7 @@ export const addEventModalAddBox = (userName) => {
         checkAlertState(alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl)
         // reset alertState
         alertState = ''
+        document.body.removeAttribute('data-adding-box');
     }
   )}
 
