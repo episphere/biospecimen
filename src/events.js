@@ -185,8 +185,10 @@ export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUN
         let tableIndex = -1;
         let foundinShippingTable = false;
         let foundScannedIdShipped = isScannedIdShipped(getAllBoxesWithoutConversionResponse, masterSpecimenId) 
-        console.log("foundScannedIdShipped",foundScannedIdShipped)
-
+        // console.log("foundScannedIdShipped",foundScannedIdShipped)
+        let scannedIdInBoxesNotShippedObject = findScannedIdInBoxesNotShippedObject(getAllBoxesWithoutConversionResponse, masterSpecimenId)
+        console.log("scannedIdInBoxesNotShippedObject", scannedIdInBoxesNotShippedObject)
+        let isScannedIdInBoxesNotShipped = scannedIdInBoxesNotShippedObject['foundMatch'] 
         for (let i = 1; i < shippingTable.rows.length; i++) { // NOTES: Iterate Available Collections table; length of children element rows inside table element (find colllection Id input from the tr's), index 0 is the header information; (Side Note: An extra tr is being generated)
             let currRow = shippingTable.rows[i]; // NOTES: current row element with information
             if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) { // NOTES: Access td elements, currRow.cells --> [td, td, td] ; currRow.cells[0] -->[CXA000126 008] ; masterSpecimenId is scanned value in input field, first tr must match masterSpecimendId
@@ -213,12 +215,21 @@ export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUN
         Can this be done with one API call or multiple?
         1. ID is scanned that has not been entered into the system as having been collected: "Item not reported as collected. Go to the Collection Dashboard to add specimen."
         2. ID is scanned that the system shows as already being in a box, the box number the bag should be in should show: "Item has already been recorded as being placed in box 5"  
-        3. ID scanned that the system shows as already shipped: “Item reported as already shipped." (FIRST CHECK)
+        3. ID scanned that the system shows as already shipped: “Item reported as already shipped." (COMPLETED)
         */
        
         if (foundScannedIdShipped){ // DETERMINE IF ITEM SCANNED IS ALREADY SHIPPED
-          showNotifications({ title:'Item reported as already shipped.', body: 'Please enter or scan a specimen bag ID or Full Specimen ID.'}, true)
-          return
+            showNotifications({ title:'Item reported as already shipped.', body: 'Please enter or scan a specimen bag ID or Full Specimen ID.'}, true)
+            return
+        }
+
+        if(isScannedIdInBoxesNotShipped) {
+            let boxNum = scannedIdInBoxesNotShippedObject['132929440']
+            let siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInBoxesNotShippedObject['560975149']]
+            let siteSpecificLocationText = siteSpecificLocation ? (`in ${siteSpecificLocation } and`) : ``
+            let scannedInput = scannedIdInBoxesNotShippedObject['inputScanned']
+            showNotifications({ title:`${scannedInput} has already been recorded ${siteSpecificLocationText} as being placed ${boxNum}`, body: 'Please enter or scan a specimen bag ID or Full Specimen ID.'}, true)
+            return
         }
        
         if (biospecimensList.length == 0 && !foundinShippingTable) { /* NOTES: This will be the last else if; might need to add found in orphanTable */ 
@@ -3535,41 +3546,100 @@ export const addEventFilter = () => {
 }
 
 export const isScannedIdShipped = (getAllBoxesWithoutConversionResponse, masterSpecimendId) => {
-  const bagConceptIdList = bagConceptIDList;
   const getAllBoxesWithoutConversionData = getAllBoxesWithoutConversionResponse.data;
-  console.log("getAllBoxesWithoutConversionData", getAllBoxesWithoutConversionData)
   const inputScanned = masterSpecimendId;
+  const bagConceptIdList = bagConceptIDList;
+    // console.log("getAllBoxesWithoutConversionData", getAllBoxesWithoutConversionData)
   if(!getAllBoxesWithoutConversionData.length) return false;
   const allBoxesShippedFilter = getAllBoxesWithoutConversionData.filter(box => box.hasOwnProperty('145971562')) // Submit shipment flag - '145971562'
-  console.log("getAllBoxesWithoutConversionData Filter", allBoxesShippedFilter)
+  // console.log("getAllBoxesWithoutConversionData Filter", allBoxesShippedFilter)
   let matchFound = false
-  // CLEAN UP BELOW LATER 
   for (let box of allBoxesShippedFilter) {
-   if(matchFound) break;
-   for(let [index,conceptId] of bagConceptIdList.entries()) {
-    if(box[conceptId]) { // concept id exists
-      // console.log(`box`,`${conceptId}`,box[conceptId])
-      // console.log(box[conceptId]["787237543"])
-      console.log("box input scanned",index, box[conceptId]["787237543"], inputScanned, box[conceptId]["787237543"] == inputScanned)
-      console.log(index)
-      if(box[conceptId]["223999569"] && box[conceptId]["223999569"] == inputScanned) { // mouthwash scan
-        console.log("match found", box[conceptId]["223999569"]) 
-        matchFound = true;
-        break;
-      }
-      if(box[conceptId]["522094118"] && box[conceptId]["522094118"] == inputScanned) { //orphan scan
-        console.log("match found", box[conceptId]["522094118"]) 
-        matchFound = true;
-        break;
-      }
-      if (box[conceptId]["787237543"] && box[conceptId]["787237543"] == inputScanned) { // blood/urine scan
-        console.log("match found", box[conceptId]["787237543"]) 
-        matchFound = true;
-        break;
+      if(matchFound) break;
+      for(let [index,conceptId] of bagConceptIdList.entries()) {
+        if(box[conceptId]) {
+          if(box[conceptId]["223999569"] && box[conceptId]["223999569"] == inputScanned) { // mouthwash scan
+            console.log("match found", box[conceptId]["223999569"]) 
+            matchFound = true;
+            break;
+          }
+          if(box[conceptId]["522094118"] && box[conceptId]["522094118"] == inputScanned) { //orphan scan
+            console.log("match found", box[conceptId]["522094118"]) 
+            matchFound = true;
+            break;
+          }
+          if (box[conceptId]["787237543"] && box[conceptId]["787237543"] == inputScanned) { // blood/urine scan
+            console.log("match found", box[conceptId]["787237543"]) 
+            matchFound = true;
+            break;
+          }
+          if(box[conceptId]['234868461'] && box[conceptId]["234868461"].includes(inputScanned) ) {
+            console.log("match found in array",box[conceptId]["234868461"].includes(inputScanned))
+            foundMatch = true
+            console.log("Match found", index, box[conceptId]["223999569"], inputScanned)
+            break;
+          }
+        }
       }
     }
-   }
-  }
   console.log(matchFound);
   return matchFound;
+}
+
+const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionResponse, masterSpecimenId) => {
+  const getAllBoxesWithoutConversionData = getAllBoxesWithoutConversionResponse.data
+  const allBoxesNotShippedFilter = getAllBoxesWithoutConversionData.filter(box => !box.hasOwnProperty('145971562'))
+  // console.log("allBoxesNotShippedFilter", allBoxesNotShippedFilter)
+  const inputScanned = masterSpecimenId;
+  const bagConceptIdList = bagConceptIDList;
+  // console.log("inputScanned",inputScanned)
+  let foundMatch = false
+  let boxNumber
+  let siteSpecificLocationId
+  let dataObj = {"inputScanned": inputScanned}
+
+  for(let [index, box] of allBoxesNotShippedFilter.entries()) {
+
+    console.log("index,box", index, box)
+    if(foundMatch) break;
+    for(let bagConceptId of bagConceptIdList ) {
+      if(box.hasOwnProperty(bagConceptId)) {
+        console.log("pass", box.hasOwnProperty[bagConceptId])
+        if(box[bagConceptId]["223999569"] && box[bagConceptId]["223999569"] == inputScanned) {
+          foundMatch = true
+          boxNumber = box['132929440']
+          siteSpecificLocationId = box['560975149']
+          // console.log("Match found", index, box[bagConceptId]["223999569"])
+          dataObj['foundMatch'] = foundMatch
+          dataObj['560975149'] = siteSpecificLocationId
+          dataObj['132929440'] = boxNumber
+          break;
+        }
+        if(box[bagConceptId]["522094118"] && box[bagConceptId]["522094118"] == inputScanned) {
+          foundMatch = true
+          boxNumber = box['132929440']
+          siteSpecificLocationId = box['560975149']
+          // console.log("Match found", index, box[bagConceptId]["223999569"])
+          dataObj['foundMatch'] = foundMatch
+          dataObj['560975149'] = siteSpecificLocationId
+          dataObj['132929440'] = boxNumber
+          break;
+        }
+        if(box[bagConceptId]["787237543"] && box[bagConceptId]["787237543"] == inputScanned) {
+          foundMatch = true
+          boxNumber = box['132929440']
+          siteSpecificLocationId = box['560975149']
+          dataObj['foundMatch'] = foundMatch
+          dataObj['560975149'] = siteSpecificLocationId
+          dataObj['132929440'] = boxNumber
+          // console.log("Match found", index, box[bagConceptId]["223999569"])
+          break;
+        }
+      }
+    }
+  }
+  console.log("dataObj",dataObj)
+  return dataObj
+
+
 }
