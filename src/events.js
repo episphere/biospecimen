@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -2937,7 +2937,7 @@ export const populateTrackingQuery = async (hiddenJSON) => {
 }
 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
-    document.getElementById('completeTracking').addEventListener('click', () => {
+    document.getElementById('completeTracking').addEventListener('click', async () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         let emptyField = false;
         let trackingNumConfirmEls = Array.from(document.getElementsByClassName("invalid"))
@@ -2973,10 +2973,11 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
             }  
         }
 
-        if(checkFedexShipDuplicate(boxes) && boxes.length > 1){
-          shippingDuplicateMessage()
-          return
-        }
+        let isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxes);
+        if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxes) && boxes.length > 1)){
+            shippingDuplicateMessage()
+            return
+          }
 
         if(checkNonAlphanumericStr(boxes)) {
           shippingNonAlphaNumericStrMessage()
@@ -3015,7 +3016,12 @@ export const addEventSaveButton = async (hiddenJSON) => {
               hiddenJSON[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: hiddenJSON[boxes[i]] }
             }  
         }
-        
+        let isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxes);
+        if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxes) && boxes.length > 1)){
+            shippingDuplicateMessage()
+            return
+          }
+          
         let shippingData = []
 
         for(let i = 0; i < boxes.length; i++){
