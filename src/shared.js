@@ -11,7 +11,6 @@ import { prodSSOConfig } from './prod/identityProvider.js';
 import conceptIDs from './fieldToConceptIdMapping.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
 
-
 const conversion = {
     "299553921":"0001",
     "703954371":"0002",
@@ -2010,6 +2009,22 @@ export const checkFedexShipDuplicate = (boxes) => {
   return arr.length !== filteredArr.size
 }
   
+export const checkDuplicateTrackingIdFromDb = async (boxes) => {
+    let isExistingTrackingId = false;
+    
+    for (const boxId of boxes) {
+    
+        let trackingId = document.getElementById(`${boxId}trackingId`).value;
+        let numBoxesShipped = await getNumPages(5, {trackingId});
+        if (numBoxesShipped > 0) {
+            isExistingTrackingId = true;
+            break;
+        }
+    }
+    return isExistingTrackingId;
+}
+
+
 export const checkNonAlphanumericStr = (boxes) => {
   let regExp = /^[a-z0-9]+$/i
   let arr = []
