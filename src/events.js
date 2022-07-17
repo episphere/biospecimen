@@ -2932,7 +2932,7 @@ export const populateTrackingQuery = async (hiddenJSON) => {
 }
 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
-    document.getElementById('completeTracking').addEventListener('click', () => {
+    document.getElementById('completeTracking').addEventListener('click', async () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         let emptyField = false;
         let trackingNumConfirmEls = Array.from(document.getElementsByClassName("invalid"))
@@ -2968,10 +2968,11 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
             }  
         }
 
-        if(checkFedexShipDuplicate(boxes) && boxes.length > 1){
-          shippingDuplicateMessage()
-          return
-        }
+        let isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxes);
+        if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxes) && boxes.length > 1)){
+            shippingDuplicateMessage()
+            return
+          }
 
         if(checkNonAlphanumericStr(boxes)) {
           shippingNonAlphaNumericStrMessage()
