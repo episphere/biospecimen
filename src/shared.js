@@ -806,7 +806,7 @@ export const removeBag = async(boxId, bags) => {
     
 }
 
-export const searchSpecimenInstitute = async (isBioRec_ShipFlag) => {
+export const searchSpecimenInstitute = async () => {
     //https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen`, {
@@ -816,61 +816,56 @@ export const searchSpecimenInstitute = async (isBioRec_ShipFlag) => {
         }
     });
     let a = await response.json();
-    console.log("searchSpecimenInstitute a",a)
-    console.log("searchSpecimenInstitute filter with isBioRec_ShipFlag true",a.data.filter(item => item[410912345] === 353358909)); /* Filter collections with ShipFlag value yes */
+    let data = a.data.filter(item => item[410912345] === 353358909); /* Filter collections with ShipFlag value yes */
+    
+    const conversion = {
+        "299553921":"0001",
+        "703954371":"0002",
+        "838567176":"0003",
+        "454453939":"0004",
+        "652357376":"0005",
+        "973670172":"0006",
+        "143615646":"0007",
+        "787237543":"0008",
+        "223999569":"0009",
+        "376960806":"0011",
+        "232343615":"0012",
+        "589588440":"0021",
+        "958646668":"0013",
+        "677469051":"0014",
+        "683613884":"0024"
+    }
 
-    if(isBioRec_ShipFlag) {        
-        let data = a.data.filter(item => item[410912345] === 353358909); /* Filter collections with ShipFlag value yes */
-        
-        const conversion = {
-            "299553921":"0001",
-            "703954371":"0002",
-            "838567176":"0003",
-            "454453939":"0004",
-            "652357376":"0005",
-            "973670172":"0006",
-            "143615646":"0007",
-            "787237543":"0008",
-            "223999569":"0009",
-            "376960806":"0011",
-            "232343615":"0012",
-            "589588440":"0021",
-            "958646668":"0013",
-            "677469051":"0014",
-            "683613884":"0024"
+    for(let i = 0; i < data.length; i++){ // loop over filtered data with shipFlag
+        let currJSON = data[i];
+        if(currJSON.hasOwnProperty('787237543')){
+            delete currJSON['787237543']
         }
-
-        for(let i = 0; i < data.length; i++){ // loop over filtered data with shipFlag
-            let currJSON = data[i];
-            if(currJSON.hasOwnProperty('787237543')){
-                delete currJSON['787237543']
-            }
-            if(currJSON.hasOwnProperty('223999569')){
-                delete currJSON['223999569'] 
-            }
-            let keys = Object.keys(currJSON);
-            for(let i = 0; i < keys.length; i++){
-                if(conversion.hasOwnProperty(keys[i])){
-                    let iterateJSON = currJSON[keys[i]];
-                    // delete specimen key if tube collected key is no
-                    if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631'){ // 593843561 - Object Collected (Indicates whether a given sample tube or biohazard bag has been collected.)
-                        delete currJSON[keys[i]]
-                    }
-                    // check and delete if iterateJSON has not shipped specimen deviation concept ID
-                    if(iterateJSON.hasOwnProperty('248868659')) {
-                      if(iterateJSON["248868659"][conceptIDs.brokenSpecimenDeviation] == '353358909' || 
-                        iterateJSON["248868659"][conceptIDs.discardSpecimenDeviation] == '353358909' || 
-                        iterateJSON["248868659"][conceptIDs.insufficientVolumeSpecimenDeviation] == '353358909' || 
-                        iterateJSON["248868659"][conceptIDs.mislabelledDiscardSpecimenDeviation] == '353358909' || 
-                        iterateJSON["248868659"][conceptIDs.notFoundSpecimenDeviation] == '353358909') {
-                        delete currJSON[keys[i]]
-                      }
-                    }
+        if(currJSON.hasOwnProperty('223999569')){
+            delete currJSON['223999569'] 
+        }
+        let keys = Object.keys(currJSON);
+        for(let i = 0; i < keys.length; i++){
+            if(conversion.hasOwnProperty(keys[i])){
+                let iterateJSON = currJSON[keys[i]];
+                // delete specimen key if tube collected key is no
+                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631'){ // 593843561 - Object Collected (Indicates whether a given sample tube or biohazard bag has been collected.)
+                    delete currJSON[keys[i]]
+                }
+                // check and delete if iterateJSON has not shipped specimen deviation concept ID
+                if(iterateJSON.hasOwnProperty('248868659')) {
+                  if(iterateJSON["248868659"][conceptIDs.brokenSpecimenDeviation] == '353358909' || 
+                    iterateJSON["248868659"][conceptIDs.discardSpecimenDeviation] == '353358909' || 
+                    iterateJSON["248868659"][conceptIDs.insufficientVolumeSpecimenDeviation] == '353358909' || 
+                    iterateJSON["248868659"][conceptIDs.mislabelledDiscardSpecimenDeviation] == '353358909' || 
+                    iterateJSON["248868659"][conceptIDs.notFoundSpecimenDeviation] == '353358909') {
+                    delete currJSON[keys[i]]
+                  }
                 }
             }
         }
-      return data;
     }
+  return data;
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
@@ -1983,7 +1978,6 @@ export const sortBiospecimensList = (biospecimensList, tubeOrder) => {
   biospecimensList.forEach(id => { bioArr.push({"tubeId": id}) })
   // sort unordered id list with custom tube order sort
   bioArr.sort((a, b) => tubeOrder.indexOf(a.tubeId) - tubeOrder.indexOf(b.tubeId))
-  debugger;
   return bioArr.map(item => item.tubeId)
 }
 export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl) => {

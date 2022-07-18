@@ -148,7 +148,7 @@ export const getCurrBoxNumber = (j) => {
     return keys.length;
 }
 
-export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUNCTION */
+export const addEventAddSpecimenToBox = async (userName) => {
     const form = document.getElementById('addSpecimenForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
@@ -158,63 +158,55 @@ export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUN
         let currLocation = document.getElementById('selectLocationList').value;
         let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
 
-        if(shippingLocationValue === 'none') { // NOTES: No Shipping Location Selected from dropdown
-          showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' }, true)
-          return
+        if(shippingLocationValue === 'none') { // No Shipping Location Selected from dropdown
+            showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' }, true)
+            return
         }
-        if (masterSpecimenId == '') { // NOTES: Add a message when whitespace is removed and input is empty string
+        if (masterSpecimenId == '') { // Message when whitespace is removed and input is empty string
             showNotifications({ title: 'Empty Entry or Scan', body: 'Please enter or scan a specimen bag ID or Full Specimen ID.' }, true)
             return
         }
-        /* NOTES: Rely on two API calls  */
+
         showAnimation();
-        // NOTES: Break into another function call if needed
-        // const getBoxesResponse = await getBoxes()
-        // console.log("getBoxesResponse.data",getBoxesResponse.data)
         const getAllBoxesWithoutConversionResponse = await getAllBoxesWithoutConversion(); // get and search all boxes from a login site
         console.log("getAllBoxesWithoutConversionResponse.data",getAllBoxesWithoutConversionResponse.data);
-        // const getAllBoxesResponse = await getAllBoxes();
-        // console.log("getAllBoxesResponse.data",getAllBoxesResponse.data);
         hideAnimation();
         let masterIdSplit = masterSpecimenId.split(/\s+/);
         let foundInOrphan = false;
         //get all ids from the hidden
-        let shippingTable = document.getElementById('specimenList') //NOTES: Available Collections table
-        let orphanTable = document.getElementById('orphansList') // NOTES: Orphan Table hidden
+        let shippingTable = document.getElementById('specimenList') // Available Collections table
+        let orphanTable = document.getElementById('orphansList') // Hidden Orphan Table 
         let biospecimensList = []
         let tableIndex = -1;
         let foundinShippingTable = false;
-        let foundScannedIdShipped = isScannedIdShipped(getAllBoxesWithoutConversionResponse, masterSpecimenId) 
-        // console.log("foundScannedIdShipped",foundScannedIdShipped)
+        let foundScannedIdShipped = isScannedIdShipped(getAllBoxesWithoutConversionResponse, masterSpecimenId)
         let scannedIdInBoxesNotShippedObject = findScannedIdInBoxesNotShippedObject(getAllBoxesWithoutConversionResponse, masterSpecimenId)
-        console.log("scannedIdInBoxesNotShippedObject", scannedIdInBoxesNotShippedObject)
-        let isScannedIdInBoxesNotShipped = scannedIdInBoxesNotShippedObject['foundMatch'] 
-        for (let i = 1; i < shippingTable.rows.length; i++) { // NOTES: Iterate Available Collections table; length of children element rows inside table element (find colllection Id input from the tr's), index 0 is the header information; (Side Note: An extra tr is being generated)
-            let currRow = shippingTable.rows[i]; // NOTES: current row element with information
-            if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) { // NOTES: Access td elements, currRow.cells --> [td, td, td] ; currRow.cells[0] -->[CXA000126 008] ; masterSpecimenId is scanned value in input field, first tr must match masterSpecimendId
-                tableIndex = i; // NOTES: becomes 1 from loop and replaces initial -1, grabs the index location of the masterSpecimenId if found
-                biospecimensList = JSON.parse(currRow.cells[2].innerText) // NOTES: Access the 2nd td value (# specimen in bag value), assign to biospecimensList -- > (Ex. ["0001","0004","0005","0002","0003","0006"])
+        let isScannedIdInBoxesNotShipped = scannedIdInBoxesNotShippedObject['foundMatch']
+
+        for (let i = 1; i < shippingTable.rows.length; i++) {
+            let currRow = shippingTable.rows[i];
+            if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) {
+                tableIndex = i;
+                biospecimensList = JSON.parse(currRow.cells[2].innerText)
                 foundinShippingTable = true;
             }
-
         }
 
-        for (let i = 1; i < orphanTable.rows.length; i++) { // NOTES: Loop checks if scanned id is found in orphan table; first index is actual orphan tr tds if any
-            let currRow = orphanTable.rows[i]; // NOTES: orphanTable.rows[0]--> [td (stray tubes), td ("# value" of stray tubes), td (array of orphan tubes)]
-            if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) { // NOTES: check to match scanned specimen Id from indiviudal first item in cell
+        for (let i = 1; i < orphanTable.rows.length; i++) {
+            let currRow = orphanTable.rows[i];
+            if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) {
                 tableIndex = i;
-                let currTubeNum = currRow.cells[0].innerText.split(' ')[1]; // NOTES: remove extra numbers, CXA000135 0001 --> 0001
-                biospecimensList = [currTubeNum]; 
+                let currTubeNum = currRow.cells[0].innerText.split(' ')[1];
+                biospecimensList = [currTubeNum];
                 foundInOrphan = true;
             }
-
         }
         
-        if (foundScannedIdShipped){ // CHECK IF ITEM SCANNED IS ALREADY SHIPPED
+        if (foundScannedIdShipped){ // Check if item scanned is already shipped
             showNotifications({ title:'Item reported as already shipped.', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.'}, true)
             return
         }
-        // CXA000101 0009 is recorded as being in Box24 in shipping location Frederick
+        
         if(isScannedIdInBoxesNotShipped) { // Check if item scanned appears in current boxes
             let boxNum = scannedIdInBoxesNotShippedObject['132929440']
             let siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInBoxesNotShippedObject['560975149']]
@@ -224,27 +216,17 @@ export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUN
             return
         }
 
-        // if (biospecimensList.length == 0 && !foundInOrphan) { /* NOTES: This will be the last else if; might need to add found in orphanTable */ 
-        // showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found in orphan!' }, true)
-        // return
-        // }
-       
-        // if (biospecimensList.length == 0 && !foundinShippingTable) { /* NOTES: This will be the last else if; might need to add found in orphanTable */ 
-        //     showNotifications({ title: 'Not found', body: 'Item not reported as collected. Go to the Collection Dashboard to add specimen.' }, true)
-        //     return
-        // }
-
         if (biospecimensList.length == 0) {
-            showNotifications({ title: 'Not found', body: `Item not reported as collected. Go to the Collection Dashboard to add specimen.` }, true)
+            showNotifications({ title: 'Item not found', body: `Item not reported as collected. Go to the Collection Dashboard to add specimen.` }, true)
             return
         }
-        else { // NOTES: Success if found!; Replace with --> if (biospecimensList.length)
+        else {
             document.getElementById('submitMasterSpecimenId').click();
             console.log("click event for else conditionals was triggered")
         }
     });
-    const submitButtonSpecimen = document.getElementById('submitMasterSpecimenId'); /* NOTES: This button has display none; has type submit */
-    submitButtonSpecimen.addEventListener('click', async e => { /* NOTES: Adds content to modal header (on click), all conditions are met */
+    const submitButtonSpecimen = document.getElementById('submitMasterSpecimenId');
+    submitButtonSpecimen.addEventListener('click', async e => {
         e.preventDefault();
         showAnimation();
         //getCurrBoxNumber
@@ -337,12 +319,10 @@ export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUN
         }
 
         const biospecimensListByType = sortBiospecimensList(biospecimensList, tubeOrder)
-        // debugger
         await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan) /* NOTES: SAVE POINT READ UP TO HERE: Returns custom array of sorted tubes ids by type; 1. ordered array of tube numbers, 2. user collection input scanned Id, 3. orphan flag (boolean)*/
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
-        // debugger
-        // return
+
         /*
         //document.getElementById("shippingModal").modal();
         var specimenList = document.getElementById("specimenList");
@@ -391,9 +371,8 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let hiddenJSON = {};
     for (let i = 0; i < boxJSONS.length; i++) {
         let box = boxJSONS[i]
-        hiddenJSON[box['132929440']] = box['bags'] // NOTES: 132929440 -> boxid 
+        hiddenJSON[box['132929440']] = box['bags'] // 132929440 -> boxid 
     }
-    console.log("hiddenJSON",hiddenJSON) /* // NOTES:{box#: bags} */
 
     //let tubeTable = document.getElementById("shippingModalTable")
     let tubeTable = document.createElement('table');
@@ -677,8 +656,7 @@ export const getInstituteSpecimensList = async (hiddenJSON) => {
         "677469051": "0014",
         "683613884": "0024"
     }
-    let isBioRec_ShipFlag = true
-    let specimenData = await searchSpecimenInstitute(isBioRec_ShipFlag);
+    let specimenData = await searchSpecimenInstitute();
     //let specimenData = response.data;
     let toReturn = {};
     let checkedOrphans = false;
@@ -806,9 +784,8 @@ export const getInstituteSpecimensList = async (hiddenJSON) => {
 }
 
 export const populateSpecimensList = async (hiddenJSON) => {
-    let isBioRec_ShipFlag = true
     let specimenObject = await getInstituteSpecimensList(hiddenJSON);
-    let specimenData = await searchSpecimenInstitute(isBioRec_ShipFlag);
+    let specimenData = await searchSpecimenInstitute();
     //let specimenData = response.data
     for (let i = 0; i < specimenData.length; i++) {
         //let specimenData = 
@@ -3555,52 +3532,43 @@ export const addEventFilter = () => {
 
 export const isScannedIdShipped = (getAllBoxesWithoutConversionResponse, masterSpecimendId) => {
   const getAllBoxesWithoutConversionData = getAllBoxesWithoutConversionResponse.data;
+  if(!getAllBoxesWithoutConversionData.length) return false;
   const inputScanned = masterSpecimendId;
   const bagConceptIdList = bagConceptIDList;
-    // console.log("getAllBoxesWithoutConversionData", getAllBoxesWithoutConversionData)
-  if(!getAllBoxesWithoutConversionData.length) return false;
   const allBoxesShippedFilter = getAllBoxesWithoutConversionData.filter(box => box.hasOwnProperty('145971562')) // Submit shipment flag - '145971562'
-  // console.log("getAllBoxesWithoutConversionData Filter", allBoxesShippedFilter)
   let foundMatch = false
+
   for (let box of allBoxesShippedFilter) {
       if(foundMatch) break;
       for(let [index,bagConceptId] of bagConceptIdList.entries()) {
         if(box[bagConceptId]) {
-          if(box[bagConceptId]["223999569"] && box[bagConceptId]["223999569"] == inputScanned) { // mouthwash scan
-            console.log("match found", box[bagConceptId]["223999569"]) 
+          if(box[bagConceptId]["223999569"] && box[bagConceptId]["223999569"] == inputScanned) { // Biohazard Bag (mouthwash) scan
             foundMatch = true;
             break;
           }
-          if(box[bagConceptId]["522094118"] && box[bagConceptId]["522094118"] == inputScanned) { //orphan scan
-            console.log("match found", box[bagConceptId]["522094118"]) 
+          if(box[bagConceptId]["522094118"] && box[bagConceptId]["522094118"] == inputScanned) { // Orphan Bag/Container Scan
             foundMatch = true;
             break;
           }
-          if (box[bagConceptId]["787237543"] && box[bagConceptId]["787237543"] == inputScanned) { // blood/urine scan
-            console.log("match found", box[bagConceptId]["787237543"]) 
+          if (box[bagConceptId]["787237543"] && box[bagConceptId]["787237543"] == inputScanned) { // Biohazard Bag (Blood or Blood/Urine) ID
             foundMatch = true;
             break;
           }
-          if(box[bagConceptId]['234868461'] && box[bagConceptId]["234868461"].includes(inputScanned) ) {
-            console.log("match found in array",box[bagConceptId]["234868461"].includes(inputScanned))
+          if(box[bagConceptId]['234868461'] && box[bagConceptId]["234868461"].includes(inputScanned) ) { // Check if input is found in (Samples Within - "234868461") array
             foundMatch = true
-            console.log("Match found", index, box[bagConceptId]["223999569"], inputScanned)
             break;
           }
         }
       }
     }
-  console.log(foundMatch);
   return foundMatch;
 }
 
 const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionResponse, masterSpecimenId) => {
   const getAllBoxesWithoutConversionData = getAllBoxesWithoutConversionResponse.data
   const allBoxesNotShippedFilter = getAllBoxesWithoutConversionData.filter(box => !box.hasOwnProperty('145971562'))
-  // console.log("allBoxesNotShippedFilter", allBoxesNotShippedFilter)
   const inputScanned = masterSpecimenId;
   const bagConceptIdList = bagConceptIDList;
-  // console.log("inputScanned",inputScanned)
   let foundMatch = false
   let boxNumber
   let siteSpecificLocationId
@@ -3611,43 +3579,37 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
 
     for(let bagConceptId of bagConceptIdList ) {
       if(box.hasOwnProperty(bagConceptId)) {
-        // console.log("pass", box.hasOwnProperty[bagConceptId])
-        if(box[bagConceptId]["223999569"] && box[bagConceptId]["223999569"] == inputScanned) {
-          foundMatch = true
-          boxNumber = box['132929440']
-          siteSpecificLocationId = box['560975149']
-          // console.log("Match found", index, box[bagConceptId]["223999569"])
-          dataObj['foundMatch'] = foundMatch
-          dataObj['560975149'] = siteSpecificLocationId
-          dataObj['132929440'] = boxNumber
-          break;
-        }
-        if(box[bagConceptId]["522094118"] && box[bagConceptId]["522094118"] == inputScanned) {
-          foundMatch = true
-          boxNumber = box['132929440']
-          siteSpecificLocationId = box['560975149']
-          // console.log("Match found", index, box[bagConceptId]["223999569"])
-          dataObj['foundMatch'] = foundMatch
-          dataObj['560975149'] = siteSpecificLocationId
-          dataObj['132929440'] = boxNumber
-          break;
-        }
-        if(box[bagConceptId]["787237543"] && box[bagConceptId]["787237543"] == inputScanned) {
+        if(box[bagConceptId]["223999569"] && box[bagConceptId]["223999569"] == inputScanned) { // Biohazard Bag (mouthwash) scan
           foundMatch = true
           boxNumber = box['132929440']
           siteSpecificLocationId = box['560975149']
           dataObj['foundMatch'] = foundMatch
           dataObj['560975149'] = siteSpecificLocationId
           dataObj['132929440'] = boxNumber
-          // console.log("Match found", index, box[bagConceptId]["223999569"])
           break;
         }
-        if(box[bagConceptId]['234868461'] && box[bagConceptId]["234868461"].includes(inputScanned) ) {
-          console.log("match found in array",box[bagConceptId]["234868461"].includes(inputScanned))
+        if(box[bagConceptId]["522094118"] && box[bagConceptId]["522094118"] == inputScanned) { // Orphan Bag/Container Scan
           foundMatch = true
           boxNumber = box['132929440']
           siteSpecificLocationId = box['560975149']
-          console.log("Match found",box[bagConceptId]["223999569"], inputScanned)
+          dataObj['foundMatch'] = foundMatch
+          dataObj['560975149'] = siteSpecificLocationId
+          dataObj['132929440'] = boxNumber
+          break;
+        }
+        if(box[bagConceptId]["787237543"] && box[bagConceptId]["787237543"] == inputScanned) { // Biohazard Bag (Blood or Blood/Urine) ID
+          foundMatch = true
+          boxNumber = box['132929440']
+          siteSpecificLocationId = box['560975149']
+          dataObj['foundMatch'] = foundMatch
+          dataObj['560975149'] = siteSpecificLocationId
+          dataObj['132929440'] = boxNumber
+          break;
+        }
+        if(box[bagConceptId]['234868461'] && box[bagConceptId]["234868461"].includes(inputScanned)) { // Check if input is found in (Samples Within - "234868461") array
+          foundMatch = true
+          boxNumber = box['132929440']
+          siteSpecificLocationId = box['560975149']
           dataObj['foundMatch'] = foundMatch
           dataObj['560975149'] = siteSpecificLocationId
           dataObj['132929440'] = boxNumber
@@ -3656,8 +3618,5 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
       }
     }
   }
-  console.log("dataObj",dataObj)
   return dataObj
-
-
 }
