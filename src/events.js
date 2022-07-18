@@ -148,7 +148,7 @@ export const getCurrBoxNumber = (j) => {
     return keys.length;
 }
 
-export const addEventAddSpecimenToBox = async (userName) => {
+export const addEventAddSpecimenToBox = (userName) => {
     const form = document.getElementById('addSpecimenForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
@@ -169,7 +169,6 @@ export const addEventAddSpecimenToBox = async (userName) => {
 
         showAnimation();
         const getAllBoxesWithoutConversionResponse = await getAllBoxesWithoutConversion(); // get and search all boxes from a login site
-        console.log("getAllBoxesWithoutConversionResponse.data",getAllBoxesWithoutConversionResponse.data);
         hideAnimation();
         let masterIdSplit = masterSpecimenId.split(/\s+/);
         let foundInOrphan = false;
@@ -222,7 +221,6 @@ export const addEventAddSpecimenToBox = async (userName) => {
         }
         else {
             document.getElementById('submitMasterSpecimenId').click();
-            console.log("click event for else conditionals was triggered")
         }
     });
     const submitButtonSpecimen = document.getElementById('submitMasterSpecimenId');
@@ -232,7 +230,6 @@ export const addEventAddSpecimenToBox = async (userName) => {
         //getCurrBoxNumber
 
         const masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase().trim();
-        console.log("submitButtonSpecimen masterSpecimenId value ", masterSpecimenId)
         let mouthwashList = document.getElementById("mouthwashList") 
         let currTubeTable = document.getElementById("currTubeTable")
 
@@ -319,7 +316,7 @@ export const addEventAddSpecimenToBox = async (userName) => {
         }
 
         const biospecimensListByType = sortBiospecimensList(biospecimensList, tubeOrder)
-        await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan) /* NOTES: SAVE POINT READ UP TO HERE: Returns custom array of sorted tubes ids by type; 1. ordered array of tube numbers, 2. user collection input scanned Id, 3. orphan flag (boolean)*/
+        await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan)
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
 
@@ -354,7 +351,7 @@ export const addEventAddSpecimenToBox = async (userName) => {
     })
 }
 
-export const createShippingModalBody = async (biospecimensList, masterBiospecimenId, isOrphan) => { //NOTE: biospecimens list example --> ['0001', '0004', '0005', '0002', '0003', '0006']
+export const createShippingModalBody = async (biospecimensList, masterBiospecimenId, isOrphan) => {
     //let keys = Object.keys(biospecimenData)
     /*let tubes = [];
     for(let i = 0; i < biospecimensList.length; i++){
@@ -367,7 +364,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let currLocation = document.getElementById('selectLocationList').value;
     let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
     let response = await getBoxesByLocation(currLocationConceptId);
-    let boxJSONS = response.data;/* // NOTES: Returns array of All boxes (boxId and information w/ old box structre) without a submit shipment flag */
+    let boxJSONS = response.data; /* Returns array of All boxes (boxId and information w/ old box structre) without a submit shipment flag */
     let hiddenJSON = {};
     for (let i = 0; i < boxJSONS.length; i++) {
         let box = boxJSONS[i]
@@ -379,11 +376,11 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let currSplit = masterBiospecimenId.split(/\s+/); /* Ex. ['CXA000133', '0008']*/
     let currBag = [];
     let empty = true;
-    if (!isOrphan) { // orphan flag is determined in the orphan table flag
-        if (currSplit.length >= 2 && currSplit[1] == '0008') { /* // NOTES: blood/urine --> 0008 */
+    if (!isOrphan) {
+        if (currSplit.length >= 2 && currSplit[1] == '0008') {
             //look for all non-moutwash (0007)
             for (let i = 0; i < biospecimensList.length; i++) {
-                if (biospecimensList[i] != '0007' && biospecimensList[i] != '0008') { // NOTES: push everything to currBag without 0007 and 0008 ending
+                if (biospecimensList[i] != '0007' && biospecimensList[i] != '0008') {
                     empty = false;
                     currBag.push(biospecimensList[i])
                     var rowCount = tubeTable.rows.length;
