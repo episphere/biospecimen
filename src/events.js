@@ -209,35 +209,33 @@ export const addEventAddSpecimenToBox = async (userName) => { /* CHANGE THIS FUN
             }
 
         }
-
-        /* 
-        NOTES: Below is where to add different display messages (should this be broken to a new function?)
-        Can this be done with one API call or multiple?
-        1. ID is scanned that has not been entered into the system as having been collected: "Item not reported as collected. Go to the Collection Dashboard to add specimen."
-        2. ID is scanned that the system shows as already being in a box, the box number the bag should be in should show: "Item has already been recorded as being placed in box 5"  
-        3. ID scanned that the system shows as already shipped: “Item reported as already shipped." (COMPLETED)
-        */
-       
-        if (foundScannedIdShipped){ // DETERMINE IF ITEM SCANNED IS ALREADY SHIPPED
-            showNotifications({ title:'Item reported as already shipped.', body: 'Please enter or scan a specimen bag ID or Full Specimen ID.'}, true)
+        
+        if (foundScannedIdShipped){ // CHECK IF ITEM SCANNED IS ALREADY SHIPPED
+            showNotifications({ title:'Item reported as already shipped.', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.'}, true)
             return
         }
-
-        if(isScannedIdInBoxesNotShipped) {
+        // CXA000101 0009 is recorded as being in Box24 in shipping location Frederick
+        if(isScannedIdInBoxesNotShipped) { // Check if item scanned appears in current boxes
             let boxNum = scannedIdInBoxesNotShippedObject['132929440']
             let siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInBoxesNotShippedObject['560975149']]
-            let siteSpecificLocationText = siteSpecificLocation ? (`in ${siteSpecificLocation } and`) : ``
+            let siteSpecificLocationName = siteSpecificLocation ? siteSpecificLocation : ''
             let scannedInput = scannedIdInBoxesNotShippedObject['inputScanned']
-            showNotifications({ title:`${scannedInput} has already been recorded ${siteSpecificLocationText} as being placed ${boxNum}`, body: 'Please enter or scan a specimen bag ID or Full Specimen ID.'}, true)
+            showNotifications({ title:`${scannedInput} has already been recorded`, body: `${scannedInput} is recorded as being in ${boxNum} in ${siteSpecificLocationName}`}, true)
             return
         }
+
+        // if (biospecimensList.length == 0 && !foundInOrphan) { /* NOTES: This will be the last else if; might need to add found in orphanTable */ 
+        // showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found in orphan!' }, true)
+        // return
+        // }
        
-        if (biospecimensList.length == 0 && !foundinShippingTable) { /* NOTES: This will be the last else if; might need to add found in orphanTable */ 
-            showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found in available collection!' }, true)
-            return
-        }
-        if (biospecimensList.length == 0 && !foundInOrphan) { /* NOTES: This will be the last else if; might need to add found in orphanTable */ 
-            showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found in orphan!' }, true)
+        // if (biospecimensList.length == 0 && !foundinShippingTable) { /* NOTES: This will be the last else if; might need to add found in orphanTable */ 
+        //     showNotifications({ title: 'Not found', body: 'Item not reported as collected. Go to the Collection Dashboard to add specimen.' }, true)
+        //     return
+        // }
+
+        if (biospecimensList.length == 0) {
+            showNotifications({ title: 'Not found', body: `Item not reported as collected. Go to the Collection Dashboard to add specimen.` }, true)
             return
         }
         else { // NOTES: Success if found!; Replace with --> if (biospecimensList.length)
@@ -3553,37 +3551,37 @@ export const isScannedIdShipped = (getAllBoxesWithoutConversionResponse, masterS
   if(!getAllBoxesWithoutConversionData.length) return false;
   const allBoxesShippedFilter = getAllBoxesWithoutConversionData.filter(box => box.hasOwnProperty('145971562')) // Submit shipment flag - '145971562'
   // console.log("getAllBoxesWithoutConversionData Filter", allBoxesShippedFilter)
-  let matchFound = false
+  let foundMatch = false
   for (let box of allBoxesShippedFilter) {
-      if(matchFound) break;
-      for(let [index,conceptId] of bagConceptIdList.entries()) {
-        if(box[conceptId]) {
-          if(box[conceptId]["223999569"] && box[conceptId]["223999569"] == inputScanned) { // mouthwash scan
-            console.log("match found", box[conceptId]["223999569"]) 
-            matchFound = true;
+      if(foundMatch) break;
+      for(let [index,bagConceptId] of bagConceptIdList.entries()) {
+        if(box[bagConceptId]) {
+          if(box[bagConceptId]["223999569"] && box[bagConceptId]["223999569"] == inputScanned) { // mouthwash scan
+            console.log("match found", box[bagConceptId]["223999569"]) 
+            foundMatch = true;
             break;
           }
-          if(box[conceptId]["522094118"] && box[conceptId]["522094118"] == inputScanned) { //orphan scan
-            console.log("match found", box[conceptId]["522094118"]) 
-            matchFound = true;
+          if(box[bagConceptId]["522094118"] && box[bagConceptId]["522094118"] == inputScanned) { //orphan scan
+            console.log("match found", box[bagConceptId]["522094118"]) 
+            foundMatch = true;
             break;
           }
-          if (box[conceptId]["787237543"] && box[conceptId]["787237543"] == inputScanned) { // blood/urine scan
-            console.log("match found", box[conceptId]["787237543"]) 
-            matchFound = true;
+          if (box[bagConceptId]["787237543"] && box[bagConceptId]["787237543"] == inputScanned) { // blood/urine scan
+            console.log("match found", box[bagConceptId]["787237543"]) 
+            foundMatch = true;
             break;
           }
-          if(box[conceptId]['234868461'] && box[conceptId]["234868461"].includes(inputScanned) ) {
-            console.log("match found in array",box[conceptId]["234868461"].includes(inputScanned))
+          if(box[bagConceptId]['234868461'] && box[bagConceptId]["234868461"].includes(inputScanned) ) {
+            console.log("match found in array",box[bagConceptId]["234868461"].includes(inputScanned))
             foundMatch = true
-            console.log("Match found", index, box[conceptId]["223999569"], inputScanned)
+            console.log("Match found", index, box[bagConceptId]["223999569"], inputScanned)
             break;
           }
         }
       }
     }
-  console.log(matchFound);
-  return matchFound;
+  console.log(foundMatch);
+  return foundMatch;
 }
 
 const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionResponse, masterSpecimenId) => {
@@ -3598,13 +3596,12 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
   let siteSpecificLocationId
   let dataObj = {"inputScanned": inputScanned}
 
-  for(let [index, box] of allBoxesNotShippedFilter.entries()) {
-
-    console.log("index,box", index, box)
+  for(let box of allBoxesNotShippedFilter) {
     if(foundMatch) break;
+
     for(let bagConceptId of bagConceptIdList ) {
       if(box.hasOwnProperty(bagConceptId)) {
-        console.log("pass", box.hasOwnProperty[bagConceptId])
+        // console.log("pass", box.hasOwnProperty[bagConceptId])
         if(box[bagConceptId]["223999569"] && box[bagConceptId]["223999569"] == inputScanned) {
           foundMatch = true
           boxNumber = box['132929440']
@@ -3633,6 +3630,17 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
           dataObj['560975149'] = siteSpecificLocationId
           dataObj['132929440'] = boxNumber
           // console.log("Match found", index, box[bagConceptId]["223999569"])
+          break;
+        }
+        if(box[bagConceptId]['234868461'] && box[bagConceptId]["234868461"].includes(inputScanned) ) {
+          console.log("match found in array",box[bagConceptId]["234868461"].includes(inputScanned))
+          foundMatch = true
+          boxNumber = box['132929440']
+          siteSpecificLocationId = box['560975149']
+          console.log("Match found",box[bagConceptId]["223999569"], inputScanned)
+          dataObj['foundMatch'] = foundMatch
+          dataObj['560975149'] = siteSpecificLocationId
+          dataObj['132929440'] = boxNumber
           break;
         }
       }
