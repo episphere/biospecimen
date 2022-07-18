@@ -11,7 +11,6 @@ import { prodSSOConfig } from './prod/identityProvider.js';
 import conceptIDs from './fieldToConceptIdMapping.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
 
-
 const conversion = {
     "299553921":"0001",
     "703954371":"0002",
@@ -120,6 +119,20 @@ export const updateParticipant = async (array) => {
             "Content-Type": "application/json"
         },
         body:  JSON.stringify(array),
+    });
+    
+    return await response.json();
+}
+
+export const getUserProfile = async (uid) => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=getUserProfile`, {
+        method: "POST",
+        headers: {
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body:  JSON.stringify(uid)
     });
     
     return await response.json();
@@ -1089,60 +1102,6 @@ export const verifyPaymentEligibility = async (formData) => {
     }
 }
 
-export const verifyDefaultConcepts = async (data) => {
-    let defaultConcepts = checkDefaultFlags(data);
-
-    if(Object.entries(defaultConcepts).length != 0) {
-        defaultConcepts['uid'] = data.state.uid
-        await updateParticipant(defaultConcepts);
-        
-        data = await findParticipant(`connectId=${data['Connect_ID']}`).then(
-            (res) => res.data?.[0]
-        );;
-    }
-    
-    return data;
-}
-
-const checkDefaultFlags = (data) => {
-  
-  if(!data) return {};
-  
-  const defaultFlags = {
-    948195369: 104430631,
-    919254129: 104430631,
-    821247024: 875007964,
-    828729648: 104430631,
-    699625233: 104430631,
-    912301837: 208325815,
-    253883960: 972455046,
-    547363263: 972455046,
-    949302066: 972455046,
-    536735468: 972455046,
-    976570371: 972455046,
-    663265240: 972455046,
-    265193023: 972455046,
-    459098666: 972455046,
-    126331570: 972455046,
-    311580100: 104430631,
-    914639140: 104430631,
-    878865966: 104430631,
-    167958071: 104430631,
-    684635302: 104430631,
-    100767870: 104430631
-  }
-
-  let missingDefaults = {};
-
-  Object.entries(defaultFlags).forEach(item => {
-    if(!data[item[0]]) {
-      missingDefaults[item[0]] = item[1];
-    }
-  });
-
-  return missingDefaults;
-}
-
 const checkPaymentEligibility = async (data, baselineCollections) => {
   
     if(baselineCollections.length === 0) return false;
@@ -1461,7 +1420,8 @@ export const keyToLocationObj =
     736183094: "Henry Ford Health Main Campus",
     886364332: "Henry Ford Health Pavilion",
     589224449: "SF Cancer Center LL",
-    111111111: "NIH"
+    111111111: "NIH",
+    13:"NCI"
 }
 
 export const verificationConversion = {
@@ -2065,6 +2025,22 @@ export const checkFedexShipDuplicate = (boxes) => {
   return arr.length !== filteredArr.size
 }
   
+export const checkDuplicateTrackingIdFromDb = async (boxes) => {
+    let isExistingTrackingId = false;
+    
+    for (const boxId of boxes) {
+    
+        let trackingId = document.getElementById(`${boxId}trackingId`).value;
+        let numBoxesShipped = await getNumPages(5, {trackingId});
+        if (numBoxesShipped > 0) {
+            isExistingTrackingId = true;
+            break;
+        }
+    }
+    return isExistingTrackingId;
+}
+
+
 export const checkNonAlphanumericStr = (boxes) => {
   let regExp = /^[a-z0-9]+$/i
   let arr = []
@@ -2104,11 +2080,12 @@ export const translateNumToType = {
 
 export const convertISODateTime = (dateWithdrawn) => {
     let date = new Date(dateWithdrawn);
-    let formattedMonth = date.getMonth() + 1
-    if (formattedMonth < 10) formattedMonth = '0' + formattedMonth; // append 0 before month if single digit month
-    let formattedDate = date.getDate()
-    if (formattedDate < 10) formattedDate = '0' + formattedDate; // append 0 before date if single digit date
-    return formattedMonth + '/' + formattedDate + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + date.getMinutes()
+    return setZeroDateTime(date.getMonth() + 1)+ '/' + setZeroDateTime(date.getDate()) + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + setZeroDateTime(date.getMinutes())
+}
+
+const setZeroDateTime = (dateTimeInput) => { // append 0 before min if single digit min
+    if (dateTimeInput < 10) dateTimeInput = '0' + dateTimeInput;
+    return dateTimeInput
 }
 
 export const formatISODateTime = (dateReceived) => {

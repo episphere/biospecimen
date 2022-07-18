@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, verifyDefaultConcepts, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getAllBoxesWithoutConversion, bagConceptIDList } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion, bagConceptIDList } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -1515,7 +1515,11 @@ export const addEventModalAddBox = (userName) => {
     let createBoxSuccessAlertEl = document.getElementById("create-box-success");
     let createBoxErrorAlertEl = document.getElementById("create-box-error");
     boxButton.addEventListener('click', async () => {
+        // Check whether a box is being added. If so, return.
+        if (document.body.getAttribute('data-adding-box')) return;
+
         let alertState = ''
+        document.body.setAttribute('data-adding-box', 'true');
         showAnimation();
         // returns boolean value
         let notifyCreateBox = await addNewBox(userName);
@@ -1535,6 +1539,7 @@ export const addEventModalAddBox = (userName) => {
         checkAlertState(alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl)
         // reset alertState
         alertState = ''
+        document.body.removeAttribute('data-adding-box');
     }
   )}
 
@@ -1831,15 +1836,14 @@ export const addEventRemoveUser = () => {
 }
 
 export const addGoToCheckInEvent = () => {
-    const handler = (connectId) => async (_event) => {
+    const handler = (uid) => async (_event) => {
         try {
             showAnimation();
 
-            let data = await findParticipant(`connectId=${connectId}`).then(
-                (res) => res.data?.[0]
+            let data = await getUserProfile({uid}).then(
+                (res) => res.data
             );
-            
-            data = await verifyDefaultConcepts(data);
+
             checkInTemplate(data);
         } catch (error) {
             console.log("Error checking in participant: ", error);
@@ -1853,7 +1857,7 @@ export const addGoToCheckInEvent = () => {
     );
 
     Array.from(checkInButtons).forEach((btn) => {
-        btn.addEventListener("click", handler(Number(btn.dataset.checkInBtnConnectId)));
+        btn.addEventListener("click", handler(btn.dataset.checkInBtnUid));
     });
 };
 
@@ -2982,7 +2986,7 @@ export const populateTrackingQuery = async (hiddenJSON) => {
 }
 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
-    document.getElementById('completeTracking').addEventListener('click', () => {
+    document.getElementById('completeTracking').addEventListener('click', async () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         let emptyField = false;
         let trackingNumConfirmEls = Array.from(document.getElementsByClassName("invalid"))
@@ -3018,10 +3022,11 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
             }  
         }
 
-        if(checkFedexShipDuplicate(boxes) && boxes.length > 1){
-          shippingDuplicateMessage()
-          return
-        }
+        let isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxes);
+        if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxes) && boxes.length > 1)){
+            shippingDuplicateMessage()
+            return
+          }
 
         if(checkNonAlphanumericStr(boxes)) {
           shippingNonAlphaNumericStrMessage()
@@ -3060,7 +3065,12 @@ export const addEventSaveButton = async (hiddenJSON) => {
               hiddenJSON[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: hiddenJSON[boxes[i]] }
             }  
         }
-        
+        let isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxes);
+        if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxes) && boxes.length > 1)){
+            shippingDuplicateMessage()
+            return
+          }
+          
         let shippingData = []
 
         for(let i = 0; i < boxes.length; i++){
