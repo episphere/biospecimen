@@ -226,7 +226,7 @@ export const addEventAddSpecimenToBox = (userName) => {
         //getCurrBoxNumber
 
         const masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase().trim();
-        let mouthwashList = document.getElementById("mouthwashList") 
+        let mouthwashList = document.getElementById("mouthwashList")
         let currTubeTable = document.getElementById("currTubeTable")
 
         const header = document.getElementById('shippingModalHeader');
