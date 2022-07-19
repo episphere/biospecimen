@@ -152,12 +152,8 @@ export const addEventAddSpecimenToBox = (userName) => {
     const form = document.getElementById('addSpecimenForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-
         const masterSpecimenId = document.getElementById('masterSpecimenId').value.trim();
         const shippingLocationValue = document.getElementById('selectLocationList').value;
-        let currLocation = document.getElementById('selectLocationList').value;
-        let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
-
         if(shippingLocationValue === 'none') { // No Shipping Location Selected from dropdown
             showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' }, true)
             return
