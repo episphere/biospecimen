@@ -198,7 +198,7 @@ export const addEventAddSpecimenToBox = (userName) => {
         }
         
         if (foundScannedIdShipped){ // Check if item scanned is already shipped
-            showNotifications({ title:'Item reported as already shipped.', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.'}, true)
+            showNotifications({ title:'Item reported as already shipped', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.'}, true)
             return
         }
         
