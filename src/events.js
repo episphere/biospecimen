@@ -3533,24 +3533,16 @@ export const isScannedIdShipped = (getAllBoxesWithoutConversionResponse, masterS
 
   for (let box of allBoxesShippedFilter) {
       if(foundMatch) break;
-      for(let [index,bagConceptId] of bagConceptIdList.entries()) {
-        if(box[bagConceptId]) {
-          if(box[bagConceptId]["223999569"] && box[bagConceptId]["223999569"] == inputScanned) { // Biohazard Bag (mouthwash) scan
-            foundMatch = true;
-            break;
-          }
-          if(box[bagConceptId]["522094118"] && box[bagConceptId]["522094118"] == inputScanned) { // Orphan Bag/Container Scan
-            foundMatch = true;
-            break;
-          }
-          if (box[bagConceptId]["787237543"] && box[bagConceptId]["787237543"] == inputScanned) { // Biohazard Bag (Blood or Blood/Urine) ID
-            foundMatch = true;
-            break;
-          }
-          if(box[bagConceptId]['234868461'] && box[bagConceptId]["234868461"].includes(inputScanned) ) { // Check if input is found in (Samples Within - "234868461") array
-            foundMatch = true
-            break;
-          }
+      
+      for(let bagConceptId of bagConceptIdList) {
+        const bag = box[bagConceptId];
+        if (
+          bag?.["223999569"] == inputScanned || // Biohazard Bag (mouthwash) scan
+          bag?.["522094118"] == inputScanned || // Orphan Bag/Container Scan
+          bag?.["787237543"] == inputScanned || // Biohazard Bag (Blood or Blood/Urine) ID
+          bag?.["234868461"]?.includes(inputScanned)){ // Check if input is found in (Samples Within - "234868461") array
+          foundMatch = true;
+          break;
         }
       }
     }
@@ -3570,9 +3562,13 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
   for(let box of allBoxesNotShippedFilter) {
     if(foundMatch) break;
 
-    for(let bagConceptId of bagConceptIdList ) {
-      if(box.hasOwnProperty(bagConceptId)) {
-        if(box[bagConceptId]["223999569"] && box[bagConceptId]["223999569"] == inputScanned) { // Biohazard Bag (mouthwash) scan
+    for(let bagConceptId of bagConceptIdList) {
+      const bag = box[bagConceptId];
+      if(
+        bag?.["223999569"] == inputScanned || // Biohazard Bag (mouthwash) scan
+        bag?.["522094118"] == inputScanned || // Orphan Bag/Container Scan
+        bag?.["787237543"] == inputScanned || // Biohazard Bag (Blood or Blood/Urine) ID
+        bag?.["234868461"].includes(inputScanned)){ // Check if input is found in (Samples Within - "234868461") array
           foundMatch = true
           boxNumber = box['132929440']
           siteSpecificLocationId = box['560975149']
@@ -3581,34 +3577,6 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
           dataObj['132929440'] = boxNumber
           break;
         }
-        if(box[bagConceptId]["522094118"] && box[bagConceptId]["522094118"] == inputScanned) { // Orphan Bag/Container Scan
-          foundMatch = true
-          boxNumber = box['132929440']
-          siteSpecificLocationId = box['560975149']
-          dataObj['foundMatch'] = foundMatch
-          dataObj['560975149'] = siteSpecificLocationId
-          dataObj['132929440'] = boxNumber
-          break;
-        }
-        if(box[bagConceptId]["787237543"] && box[bagConceptId]["787237543"] == inputScanned) { // Biohazard Bag (Blood or Blood/Urine) ID
-          foundMatch = true
-          boxNumber = box['132929440']
-          siteSpecificLocationId = box['560975149']
-          dataObj['foundMatch'] = foundMatch
-          dataObj['560975149'] = siteSpecificLocationId
-          dataObj['132929440'] = boxNumber
-          break;
-        }
-        if(box[bagConceptId]['234868461'] && box[bagConceptId]["234868461"].includes(inputScanned)) { // Check if input is found in (Samples Within - "234868461") array
-          foundMatch = true
-          boxNumber = box['132929440']
-          siteSpecificLocationId = box['560975149']
-          dataObj['foundMatch'] = foundMatch
-          dataObj['560975149'] = siteSpecificLocationId
-          dataObj['132929440'] = boxNumber
-          break;
-        }
-      }
     }
   }
   return dataObj
