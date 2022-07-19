@@ -372,7 +372,7 @@ export const shippingPrintManifestReminder = (boxesToShip, userName, tempCheckSt
   })
 }
 
-export const shippingDuplicateMessage = () => {
+export const shippingDuplicateMessage = (duplicateIdNumber) => {
   const button = document.createElement('button');
     button.dataset.target = '#biospecimenModal';
     button.dataset.toggle = 'modal';
@@ -393,7 +393,7 @@ export const shippingDuplicateMessage = () => {
                 <div style="display:flex; justify-content:center; margin-bottom:1rem;">
                   <i class="fas fa-exclamation-triangle fa-5x" style="color:#ffc107"></i>
                 </div>
-                <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; "><span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Duplicate Tracking Numbers</span> Please enter unique Fedex tracking numbers</p>
+                <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; "><span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Duplicate Tracking Numbers${duplicateIdNumber ? `[${duplicateIdNumber}]` : ''}</span> Please enter unique Fedex tracking numbers</p>
             </div>
         </div>
         <div class="row" style="display:flex; justify-content:center;">
@@ -2017,7 +2017,7 @@ export const checkDuplicateTrackingIdFromDb = async (boxes) => {
         let trackingId = document.getElementById(`${boxId}trackingId`).value;
         let numBoxesShipped = await getNumPages(5, {trackingId});
         if (numBoxesShipped > 0) {
-            isExistingTrackingId = true;
+            isExistingTrackingId = trackingId;
             break;
         }
     }
