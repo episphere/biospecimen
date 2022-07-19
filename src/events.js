@@ -3035,7 +3035,7 @@ export const addEventSaveButton = async (hiddenJSON) => {
         }
         let isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxes);
         if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxes) && boxes.length > 1)){
-            shippingDuplicateMessage()
+            shippingDuplicateMessage(isDuplicateTrackingIdInDb)
             return
           }
           

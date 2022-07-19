@@ -468,10 +468,6 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, 
 
 export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) => {
     showAnimation();
-    let res1 = await getPage(1, 5, '656548982', {trackingId: '12345'})
-    console.log({res1});
-    let res2 = await getNumPages(5, {"trackingId": "51165276517"})
-    console.log({res2});
 
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     //store a secret json that has all of the packed ones in it
