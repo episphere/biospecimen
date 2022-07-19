@@ -2997,9 +2997,16 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
 export const addEventSaveButton = async (hiddenJSON) => {
     document.getElementById('saveTracking').addEventListener('click', async () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+        let isMismatch = -1;
         for (let i = 0; i < boxes.length; i++) {
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
             let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+            
+            if (boxi !== boxiConfirm) {
+                isMismatch = i;
+                break;
+            }
+
             // if '959708259' exists update tracking number
             if (hiddenJSON[boxes[i]].hasOwnProperty('959708259')) {
               hiddenJSON[boxes[i]]['959708259'] = boxi
@@ -3015,6 +3022,16 @@ export const addEventSaveButton = async (hiddenJSON) => {
             else {
               hiddenJSON[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: hiddenJSON[boxes[i]] }
             }  
+        }
+
+        if (isMismatch > - 1) {
+            await swal({
+                title: 'Error!',
+                icon: 'error',
+                text: 'Tracking Ids do not match in one of the boxes.',
+                timer: 1600,
+              })           
+            return;
         }
         let isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxes);
         if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxes) && boxes.length > 1)){
