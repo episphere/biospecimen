@@ -721,19 +721,6 @@ export const getBoxes = async (box) => {
   return toReturn;
 };
 
-export const getAllBoxesWithoutConversion =  async (flag) => { // make new function to return filtered boxes
-  const idToken = await getIdToken();
-  if (flag !== `bptl`) flag = ``
-  const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + idToken,
-    }
-  });
-  let res = await response.json();
-  return res;
-};
-
 export const getAllBoxes = async (flag) => {
   const idToken = await getIdToken();
   if (flag !== `bptl`) flag = ``
@@ -815,8 +802,10 @@ export const searchSpecimenInstitute = async () => {
             Authorization:"Bearer "+idToken
         }
     });
+
     let a = await response.json();
-    let data = a.data.filter(item => item[410912345] === 353358909); /* Filter collections with ShipFlag value yes */
+    /* Filter collections with ShipFlag value yes */
+    let data = a.data.filter(item => item[410912345] === 353358909);
     
     const conversion = {
         "299553921":"0001",
@@ -836,7 +825,8 @@ export const searchSpecimenInstitute = async () => {
         "683613884":"0024"
     }
 
-    for(let i = 0; i < data.length; i++){ // loop over filtered data with shipFlag
+    // loop over filtered data with shipFlag
+    for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
         if(currJSON.hasOwnProperty('787237543')){
             delete currJSON['787237543']
@@ -849,23 +839,23 @@ export const searchSpecimenInstitute = async () => {
             if(conversion.hasOwnProperty(keys[i])){
                 let iterateJSON = currJSON[keys[i]];
                 // delete specimen key if tube collected key is no
-                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631'){ // 593843561 - Object Collected (Indicates whether a given sample tube or biohazard bag has been collected.)
+                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631'){
                     delete currJSON[keys[i]]
                 }
                 // check and delete if iterateJSON has not shipped specimen deviation concept ID
                 if(iterateJSON.hasOwnProperty('248868659')) {
                   if(iterateJSON["248868659"][conceptIDs.brokenSpecimenDeviation] == '353358909' || 
-                    iterateJSON["248868659"][conceptIDs.discardSpecimenDeviation] == '353358909' || 
-                    iterateJSON["248868659"][conceptIDs.insufficientVolumeSpecimenDeviation] == '353358909' || 
-                    iterateJSON["248868659"][conceptIDs.mislabelledDiscardSpecimenDeviation] == '353358909' || 
-                    iterateJSON["248868659"][conceptIDs.notFoundSpecimenDeviation] == '353358909') {
+                     iterateJSON["248868659"][conceptIDs.discardSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIDs.insufficientVolumeSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIDs.mislabelledDiscardSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIDs.notFoundSpecimenDeviation] == '353358909') {
                     delete currJSON[keys[i]]
                   }
                 }
             }
         }
     }
-  return data;
+    return data;
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
