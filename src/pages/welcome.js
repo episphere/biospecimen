@@ -117,7 +117,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     document.getElementById('btnBPTL') && document.getElementById('btnBPTL').addEventListener('click',  async () => {
         location.hash = '#bptl';
     });
-    headsupBanner();
+    location.host !== urls.prod ? headsupBanner() : ``
 }
 
 const headsupBanner = () => {
