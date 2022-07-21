@@ -3585,7 +3585,7 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
         bag?.["223999569"] == inputScanned || // Biohazard Bag (mouthwash) scan
         bag?.["522094118"] == inputScanned || // Orphan Bag/Container Scan
         bag?.["787237543"] == inputScanned || // Biohazard Bag (Blood or Blood/Urine) ID
-        bag?.["234868461"].includes(inputScanned)){ // Check if input is found in (Samples Within - "234868461") array
+        bag?.["234868461"]?.includes(inputScanned)){ // Check if input is found in (Samples Within - "234868461") array
           foundMatch = true
           boxNumber = box['132929440']
           siteSpecificLocationId = box['560975149']
