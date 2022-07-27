@@ -20,7 +20,7 @@ export const welcomeScreen = async (auth, route) => {
 
 const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
-    let isDev = !(location.host === (urls.stage || urls.prod));
+    let isDev = !(location.host === urls.stage || location.host === urls.prod);
     template += `
         <div class="row align-center welcome-screen-div">
             <div class="col">WELCOME</div>
