@@ -1516,6 +1516,14 @@ export const addEventBarCodeScanner = (id, start, end) => {
                     document.querySelector('[data-dismiss="modal"]').click();
                     return
                 };
+                if(elementID === 'accessionID3') {
+                    disableInput('accessionID4', true);
+                    // addEventClearScannedBarcode('clearScanAccessionID');
+                    document.getElementById(elementID).value = result.codeResult.code;
+                    Quagga.stop();
+                    document.querySelector('[data-dismiss="modal"]').click();
+                    return
+                };
                 if(elementID === 'masterSpecimenId') {
                     disableInput('masterSpecimenId', true);
                     document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end) : result.codeResult.code;

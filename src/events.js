@@ -5,7 +5,7 @@ import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, sh
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
-//import { clinicalSpecimenTemplate } from './pages/clinicalSpecimen';
+import { clinicalSpecimenTemplate } from './pages/clinicalSpecimen.js';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength } from './tubeValidation.js';
@@ -1857,7 +1857,7 @@ export const addGoToSpecimenLinkEvent = () => {
             const response = await findParticipant(query);
             const data = response.data[0];
     
-            //clinicalSpecimenTemplate(data);
+            clinicalSpecimenTemplate(data);
         });
     });
 };
@@ -1999,6 +1999,26 @@ export const addEventSpecimenLinkForm = (formData) => {
     });
 };
 
+export const addEventClinicalSpecimenLinkForm = (formData) => {
+    const form = document.getElementById('clinicalSpecimenLinkForm');
+    const connectId = document.getElementById('clinicalSpecimenContinue').dataset.connectId;
+
+    if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const query = `connectId=${parseInt(connectId)}`;
+        const participant  = await findParticipant(query);
+        const data = participant.data[0];
+        const collections = await getCollectionsByVisit(data);
+        if (collections.length) {
+            existingCollectionAlert(collections, connectId, formData);
+        } else {
+            clinicalBtnsClicked(connectId, formData);
+        }
+    });
+};
+
 const existingCollectionAlert = async (collections, connectId, formData) => {
     const confirmVal = await swal({
         title: "Warning",
@@ -2054,6 +2074,170 @@ const btnsClicked = async (connectId, formData) => {
     else if (accessionID1 && accessionID1.value && accessionID2.value && accessionID1.value !== accessionID2.value) {
         hasError = true;
         errorMessage('accessionID2', 'Accession ID doesn\'t match', focus, true);
+        focus = false;
+    }
+    if (scanSpecimenID && enterSpecimenID1) {
+        hasError = true;
+        errorMessage('scanSpecimenID', 'Please Provide either Scanned Collection ID or Manually typed.', focus, true);
+        focus = false;
+        errorMessage('enterSpecimenID1', 'Please Provide either Scanned Collection ID or Manually typed.', focus, true);
+    }
+    else if (!scanSpecimenID && !enterSpecimenID1) {
+        hasError = true;
+        errorMessage('scanSpecimenID', 'Please Scan Collection ID or Type in Manually', focus, true);
+        focus = false;
+        errorMessage('enterSpecimenID1', 'Please Scan Collection ID or Type in Manually', focus, true);
+    }
+    else if (scanSpecimenID && !enterSpecimenID1) {
+        if (!masterSpecimenIDRequirement.regExp.test(scanSpecimenID) || scanSpecimenID.length !== masterSpecimenIDRequirement.length) {
+            hasError = true;
+            errorMessage('scanSpecimenID', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, focus, true);
+            focus = false;
+        }
+    }
+    else if (!scanSpecimenID && enterSpecimenID1) {
+        if (!masterSpecimenIDRequirement.regExp.test(enterSpecimenID1) || enterSpecimenID1.length !== masterSpecimenIDRequirement.length) {
+            hasError = true;
+            errorMessage('enterSpecimenID1', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, focus, true);
+            focus = false;
+        }
+        if (enterSpecimenID1 !== enterSpecimenID2) {
+            hasError = true;
+            errorMessage('enterSpecimenID2', 'Does not match with Manually Entered Collection ID', focus, true);
+        }
+    }
+    if (collectionLocation === 'none') {
+        hasError = true;
+        errorMessage('collectionLocation', `Please Select Collection Location.`, focus, true);
+        focus = false;
+    }
+
+    if (hasError) return;
+
+    if (document.getElementById('collectionLocation')) formData['951355211'] = parseInt(document.getElementById('collectionLocation').value);
+
+    const collectionID = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
+    const n = document.getElementById('399159511').innerText || ""
+
+    const confirmVal = await swal({
+        title: "Confirm Collection ID",
+        icon: "info",
+        text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n || ""}`,
+        buttons: {
+            cancel: {
+                text: "Cancel",
+                value: "cancel",
+                visible: true,
+                className: "btn btn-default",
+                closeModal: true,
+            },
+            back: {
+                text: "Confirm and Exit",
+                value: "back",
+                visible: true,
+                className: "btn btn-info",
+            },
+            confirm: {
+                text: "Confirm and Continue",
+                value: 'confirmed',
+                visible: true,
+                className: "",
+                closeModal: true,
+                className: "btn btn-success",
+            }
+        },
+    });
+
+    if (confirmVal === "cancel") return;
+
+    formData['820476880'] = collectionID;
+    formData['650516960'] = getWorflow() === 'research' ? 534621077 : 664882224;
+    formData['387108065'] = enterSpecimenID1 ? 353358909 : 104430631;
+    formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
+    formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
+
+    if (accessionID1 && accessionID1.value) {
+        formData['646899796'] = accessionID1.value;
+        formData['148996099'] = 353358909;
+    }
+
+    let query = `connectId=${parseInt(connectId)}`;
+
+    showAnimation();
+
+    const response = await findParticipant(query);
+    const data = response.data[0];
+    const specimenData = (await searchSpecimen(formData['820476880'])).data;
+
+    hideAnimation();
+
+    if (specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID) {
+        showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.' }, true)
+        return;
+    }
+
+    showAnimation(); 
+
+    formData['331584571'] = parseInt(getCheckedInVisit(data));
+
+    const storeResponse = await storeSpecimen([formData]);  
+    if (storeResponse.code === 400) {
+        hideAnimation();
+        showNotifications({ title: 'Specimen already exists!', body: `Collection ID ${collectionID} is already associated with a different Connect ID` }, true);
+        return;
+    }
+
+    const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
+    await createTubesForCollection(formData, biospecimenData);
+
+    hideAnimation();
+
+    if (confirmVal == "confirmed") {
+        tubeCollectedTemplate(data, biospecimenData);
+    }
+    else {
+        searchTemplate();
+    }
+}
+
+const clinicalBtnsClicked = async (connectId, formData) => { 
+
+    removeAllErrors();
+
+   // let scanSpecimenID = document.getElementById('scanSpecimenID').value;
+
+   // if(scanSpecimenID.length > masterSpecimenIDRequirement.length) scanSpecimenID = scanSpecimenID.substring(0, masterSpecimenIDRequirement.length);
+
+   // const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value.toUpperCase();
+    //const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value.toUpperCase();
+    const accessionID1 = document.getElementById('accessionID1');
+    const accessionID2 = document.getElementById('accessionID2');
+    const accessionID3 = document.getElementById('accessionID3');
+    const accessionID4 = document.getElementById('accessionID4');
+    //const collectionLocation = document.getElementById('collectionLocation').value;
+
+    let hasError = false;
+    let focus = true;
+
+    if (accessionID1 && accessionID1.value && !accessionID2.value && !accessionID2.classList.contains('disabled')) {
+        hasError = true;
+        errorMessage('accessionID2', 'Please re-type Blood Accession ID from tube.', focus, true);
+        focus = false;
+    }
+    else if (accessionID1 && accessionID1.value && accessionID2.value && accessionID1.value !== accessionID2.value) {
+        hasError = true;
+        errorMessage('accessionID2', 'Blood Accession ID doesn\'t match', focus, true);
+        focus = false;
+    }
+    
+    if (accessionID3 && accessionID3.value && !accessionID4.value && !accessionID4.classList.contains('disabled')) {
+        hasError = true;
+        errorMessage('accessionID4', 'Please re-type Urine Accession ID from tube.', focus, true);
+        focus = false;
+    }
+    else if (accessionID3 && accessionID3.value && accessionID4.value && accessionID3.value !== accessionID4.value) {
+        hasError = true;
+        errorMessage('accessionID4', 'Urine Accession ID doesn\'t match', focus, true);
         focus = false;
     }
     if (scanSpecimenID && enterSpecimenID1) {
