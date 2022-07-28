@@ -15,7 +15,6 @@ export const welcomeScreen = async (auth, route) => {
         document.getElementById('navbarNavAltMarkup').innerHTML = unAuthorizedUser();
         return;
     }
-
     welcomeScreenTemplate(name || response.data.email, response.data, auth, route);
 }
 
@@ -23,9 +22,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
     let isDev = !(location.host === urls.stage || location.host === urls.prod);
     template += `
-    <div id="alert_placeholder"></div>
         <div class="row align-center welcome-screen-div">
-            
             <div class="col">WELCOME</div>
         </div>
         <div class="row welcome-screen-div">
@@ -117,18 +114,5 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     document.getElementById('btnBPTL') && document.getElementById('btnBPTL').addEventListener('click',  async () => {
         location.hash = '#bptl';
     });
-    location.host !== urls.prod ? headsupBanner() : ``
 }
 
-const headsupBanner = () => {
-    let template = ``;
-    let alertList = document.getElementById('alert_placeholder');
-    template += `<div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <center> Warning: This is a test environment, <b> do not use real participant data  </b> </center>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                </div>`
-    
-    alertList.innerHTML = template;
-}
