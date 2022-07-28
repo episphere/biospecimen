@@ -5,6 +5,7 @@ import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, sh
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
+//import { clinicalSpecimenTemplate } from './pages/clinicalSpecimen';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength } from './tubeValidation.js';
@@ -1832,9 +1833,9 @@ export const addGoToCheckInEvent = () => {
 };
 
 export const addGoToSpecimenLinkEvent = () => {
-
-    const specimenLinkButtons = document.querySelectorAll('[data-specimen-link-connect-id]');
-    Array.from(specimenLinkButtons).forEach((btn) => {
+    // For research
+    const researchSpecimenLinkButtons = document.querySelectorAll('[data-specimen-link-connect-id]');
+    Array.from(researchSpecimenLinkButtons).forEach((btn) => {
         btn.addEventListener('click', async () => {
 
             let query = `connectId=${parseInt(btn.dataset.specimenLinkConnectId)}`;
@@ -1843,6 +1844,20 @@ export const addGoToSpecimenLinkEvent = () => {
             const data = response.data[0];
     
             specimenTemplate(data);
+        });
+    });
+
+    //For Clinical
+    const clinicalSpecimenLinkButtons = document.querySelectorAll('[data-clinical-specimen-link-connect-id]');
+    Array.from(clinicalSpecimenLinkButtons).forEach((btn) => {
+        btn.addEventListener('click', async () => {
+
+            let query = `connectId=${parseInt(btn.dataset.clinicalSpecimenLinkConnectId)}`;
+        
+            const response = await findParticipant(query);
+            const data = response.data[0];
+    
+            //clinicalSpecimenTemplate(data);
         });
     });
 };
