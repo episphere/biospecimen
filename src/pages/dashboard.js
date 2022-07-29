@@ -150,6 +150,7 @@ export const searchBiospecimenTemplate = () => {
 }
 
 export const searchResults = (result) => {
+
     let template = `
         </br>
         <div class="row">
@@ -170,7 +171,6 @@ export const searchResults = (result) => {
                         <th>Verification Status</th>
                         <th>Participation Status</th>
                         <th></th>
-                        ${getWorflow() === 'research' ? '<th></th>' : ''}
                         <th></th>
                     </tr>
                 </thead>
@@ -189,9 +189,9 @@ export const searchResults = (result) => {
                 <td>${data.Connect_ID}</td>
                 <td>${verificationConversion[[data['821247024']]]}</td>
                 <td>${data['912301837'] === 208325815 || data['912301837'] === 622008261 || data['912301837'] === 458508122 ? `<i class="fas fa-2x fa-check"></i>` :  `<i class="fas fa-2x fa-times"></i>`}</td>
-                ${getWorflow() === 'research' ? `<td>
+                <td>
                     <button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID} data-check-in-btn-uid=${data.state.uid}>${!isCheckedIn ? `Go to Check-In` : `Go to Check-Out`}</button>
-                </td>` : ''}
+                </td>
                 <td>
                     ${isCheckedIn ? `<button class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>` : ``}
                 </td>

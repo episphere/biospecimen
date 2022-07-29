@@ -11,6 +11,7 @@ import { prodSSOConfig } from './prod/identityProvider.js';
 import conceptIDs from './fieldToConceptIdMapping.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
 
+
 const conversion = {
     "299553921":"0001",
     "703954371":"0002",
@@ -372,7 +373,7 @@ export const shippingPrintManifestReminder = (boxesToShip, userName, tempCheckSt
   })
 }
 
-export const shippingDuplicateMessage = (duplicateIdNumber) => {
+export const shippingDuplicateMessage = () => {
   const button = document.createElement('button');
     button.dataset.target = '#biospecimenModal';
     button.dataset.toggle = 'modal';
@@ -393,7 +394,7 @@ export const shippingDuplicateMessage = (duplicateIdNumber) => {
                 <div style="display:flex; justify-content:center; margin-bottom:1rem;">
                   <i class="fas fa-exclamation-triangle fa-5x" style="color:#ffc107"></i>
                 </div>
-                <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; "><span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Duplicate Tracking Numbers${duplicateIdNumber ? `[${duplicateIdNumber}]` : ''}</span> Please enter unique Fedex tracking numbers</p>
+                <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; "><span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Duplicate Tracking Numbers</span> Please enter unique Fedex tracking numbers</p>
             </div>
         </div>
         <div class="row" style="display:flex; justify-content:center;">
@@ -721,19 +722,6 @@ export const getBoxes = async (box) => {
   return toReturn;
 };
 
-export const getAllBoxesWithoutConversion =  async (flag) => { // make new function to return filtered boxes
-  const idToken = await getIdToken();
-  if (flag !== `bptl`) flag = ``
-  const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + idToken,
-    }
-  });
-  let res = await response.json();
-  return res;
-};
-
 export const getAllBoxes = async (flag) => {
   const idToken = await getIdToken();
   if (flag !== `bptl`) flag = ``
@@ -815,8 +803,10 @@ export const searchSpecimenInstitute = async () => {
             Authorization:"Bearer "+idToken
         }
     });
+
     let a = await response.json();
-    let data = a.data.filter(item => item[410912345] === 353358909); /* Filter collections with ShipFlag value yes */
+    /* Filter collections with ShipFlag value yes */
+    let data = a.data.filter(item => item[410912345] === 353358909);
     
     const conversion = {
         "299553921":"0001",
@@ -836,7 +826,8 @@ export const searchSpecimenInstitute = async () => {
         "683613884":"0024"
     }
 
-    for(let i = 0; i < data.length; i++){ // loop over filtered data with shipFlag
+    // loop over filtered data with shipFlag
+    for(let i = 0; i < data.length; i++){
         let currJSON = data[i];
         if(currJSON.hasOwnProperty('787237543')){
             delete currJSON['787237543']
@@ -849,23 +840,23 @@ export const searchSpecimenInstitute = async () => {
             if(conversion.hasOwnProperty(keys[i])){
                 let iterateJSON = currJSON[keys[i]];
                 // delete specimen key if tube collected key is no
-                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631'){ // 593843561 - Object Collected (Indicates whether a given sample tube or biohazard bag has been collected.)
+                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631'){
                     delete currJSON[keys[i]]
                 }
                 // check and delete if iterateJSON has not shipped specimen deviation concept ID
                 if(iterateJSON.hasOwnProperty('248868659')) {
                   if(iterateJSON["248868659"][conceptIDs.brokenSpecimenDeviation] == '353358909' || 
-                    iterateJSON["248868659"][conceptIDs.discardSpecimenDeviation] == '353358909' || 
-                    iterateJSON["248868659"][conceptIDs.insufficientVolumeSpecimenDeviation] == '353358909' || 
-                    iterateJSON["248868659"][conceptIDs.mislabelledDiscardSpecimenDeviation] == '353358909' || 
-                    iterateJSON["248868659"][conceptIDs.notFoundSpecimenDeviation] == '353358909') {
+                     iterateJSON["248868659"][conceptIDs.discardSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIDs.insufficientVolumeSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIDs.mislabelledDiscardSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIDs.notFoundSpecimenDeviation] == '353358909') {
                     delete currJSON[keys[i]]
                   }
                 }
             }
         }
     }
-  return data;
+    return data;
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
@@ -1415,8 +1406,7 @@ export const keyToLocationObj =
     736183094: "Henry Ford Health Main Campus",
     886364332: "Henry Ford Health Pavilion",
     589224449: "SF Cancer Center LL",
-    111111111: "NIH",
-    13:"NCI"
+    111111111: "NIH"
 }
 
 export const verificationConversion = {
@@ -2019,22 +2009,6 @@ export const checkFedexShipDuplicate = (boxes) => {
   return arr.length !== filteredArr.size
 }
   
-export const checkDuplicateTrackingIdFromDb = async (boxes) => {
-    let isExistingTrackingId = false;
-    
-    for (const boxId of boxes) {
-    
-        let trackingId = document.getElementById(`${boxId}trackingId`).value;
-        let numBoxesShipped = await getNumPages(5, {trackingId});
-        if (numBoxesShipped > 0) {
-            isExistingTrackingId = trackingId;
-            break;
-        }
-    }
-    return isExistingTrackingId;
-}
-
-
 export const checkNonAlphanumericStr = (boxes) => {
   let regExp = /^[a-z0-9]+$/i
   let arr = []
@@ -2074,12 +2048,11 @@ export const translateNumToType = {
 
 export const convertISODateTime = (dateWithdrawn) => {
     let date = new Date(dateWithdrawn);
-    return setZeroDateTime(date.getMonth() + 1)+ '/' + setZeroDateTime(date.getDate()) + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + setZeroDateTime(date.getMinutes())
-}
-
-const setZeroDateTime = (dateTimeInput) => { // append 0 before min if single digit min
-    if (dateTimeInput < 10) dateTimeInput = '0' + dateTimeInput;
-    return dateTimeInput
+    let formattedMonth = date.getMonth() + 1
+    if (formattedMonth < 10) formattedMonth = '0' + formattedMonth; // append 0 before month if single digit month
+    let formattedDate = date.getDate()
+    if (formattedDate < 10) formattedDate = '0' + formattedDate; // append 0 before date if single digit date
+    return formattedMonth + '/' + formattedDate + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + date.getMinutes()
 }
 
 export const formatISODateTime = (dateReceived) => {
