@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion, bagConceptIDList } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -152,32 +152,39 @@ export const addEventAddSpecimenToBox = (userName) => {
     const form = document.getElementById('addSpecimenForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        const masterSpecimenId = document.getElementById('masterSpecimenId').value;
+        const masterSpecimenId = document.getElementById('masterSpecimenId').value.trim();
         const shippingLocationValue = document.getElementById('selectLocationList').value;
-        if(shippingLocationValue === 'none') {
-          showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' }, true)
-          return
-        }
-        if (masterSpecimenId == '') {
-            showNotifications({ title: 'Not found', body: 'The submited bag or tube could not be found!' }, true)
+        if(shippingLocationValue === 'none') { // No Shipping Location Selected from dropdown
+            showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' }, true)
             return
         }
+        if (masterSpecimenId == '') { // Message when whitespace is removed and input is empty string
+            showNotifications({ title: 'Empty Entry or Scan', body: 'Please enter or scan a specimen bag ID or Full Specimen ID.' }, true)
+            return
+        }
+
+        showAnimation();
+        const getAllBoxesWithoutConversionResponse = await getAllBoxesWithoutConversion(); // get and search all boxes from a login site
+        hideAnimation();
         let masterIdSplit = masterSpecimenId.split(/\s+/);
         let foundInOrphan = false;
         //get all ids from the hidden
-        let shippingTable = document.getElementById('specimenList')
-        let orphanTable = document.getElementById('orphansList')
+        let shippingTable = document.getElementById('specimenList') // Available Collections table
+        let orphanTable = document.getElementById('orphansList') // Hidden Orphan Table 
         let biospecimensList = []
         let tableIndex = -1;
-        let foundInShipping = false;
+        let foundinShippingTable = false;
+        let foundScannedIdShipped = isScannedIdShipped(getAllBoxesWithoutConversionResponse, masterSpecimenId)
+        let scannedIdInBoxesNotShippedObject = findScannedIdInBoxesNotShippedObject(getAllBoxesWithoutConversionResponse, masterSpecimenId)
+        let isScannedIdInBoxesNotShipped = scannedIdInBoxesNotShippedObject['foundMatch']
+
         for (let i = 1; i < shippingTable.rows.length; i++) {
             let currRow = shippingTable.rows[i];
             if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) {
                 tableIndex = i;
                 biospecimensList = JSON.parse(currRow.cells[2].innerText)
-                foundInShipping = true;
+                foundinShippingTable = true;
             }
-
         }
 
         for (let i = 1; i < orphanTable.rows.length; i++) {
@@ -188,11 +195,24 @@ export const addEventAddSpecimenToBox = (userName) => {
                 biospecimensList = [currTubeNum];
                 foundInOrphan = true;
             }
-
+        }
+        
+        if (foundScannedIdShipped){ // Check if item scanned is already shipped
+            showNotifications({ title:'Item reported as already shipped', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.'}, true)
+            return
+        }
+        
+        if(isScannedIdInBoxesNotShipped) { // Check if item scanned appears in current boxes
+            let boxNum = scannedIdInBoxesNotShippedObject['132929440']
+            let siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInBoxesNotShippedObject['560975149']]
+            let siteSpecificLocationName = siteSpecificLocation ? siteSpecificLocation : ''
+            let scannedInput = scannedIdInBoxesNotShippedObject['inputScanned']
+            showNotifications({ title:`${scannedInput} has already been recorded`, body: `${scannedInput} is recorded as being in ${boxNum} in ${siteSpecificLocationName}`}, true)
+            return
         }
 
         if (biospecimensList.length == 0) {
-            showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' }, true)
+            showNotifications({ title: 'Item not found', body: `Item not reported as collected. Go to the Collection Dashboard to add specimen.` }, true)
             return
         }
         else {
@@ -205,7 +225,7 @@ export const addEventAddSpecimenToBox = (userName) => {
         showAnimation();
         //getCurrBoxNumber
 
-        const masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase();
+        const masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase().trim();
         let mouthwashList = document.getElementById("mouthwashList")
         let currTubeTable = document.getElementById("currTubeTable")
 
@@ -234,7 +254,7 @@ export const addEventAddSpecimenToBox = (userName) => {
         let orphanTable = document.getElementById('orphansList')
         let biospecimensList = []
         let tableIndex = -1;
-        let foundInShipping = false;
+        let foundinShippingTable = false;
 
         // Modify to change tube order, tube ordered by color
         let tubeOrder = [      
@@ -266,7 +286,7 @@ export const addEventAddSpecimenToBox = (userName) => {
             if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId) {
                 tableIndex = i;
                 biospecimensList = JSON.parse(currRow.cells[2].innerText)
-                foundInShipping = true;
+                foundinShippingTable = true;
             }
 
         }
@@ -295,7 +315,6 @@ export const addEventAddSpecimenToBox = (userName) => {
         await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan)
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
-  
 
         /*
         //document.getElementById("shippingModal").modal();
@@ -341,16 +360,16 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let currLocation = document.getElementById('selectLocationList').value;
     let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
     let response = await getBoxesByLocation(currLocationConceptId);
-    let boxJSONS = response.data;
+    let boxJSONS = response.data; /* Returns array of All boxes (boxId and information w/ old box structre) without a submit shipment flag */
     let hiddenJSON = {};
     for (let i = 0; i < boxJSONS.length; i++) {
         let box = boxJSONS[i]
-        hiddenJSON[box['132929440']] = box['bags']
+        hiddenJSON[box['132929440']] = box['bags'] // 132929440 -> boxid 
     }
 
     //let tubeTable = document.getElementById("shippingModalTable")
     let tubeTable = document.createElement('table');
-    let currSplit = masterBiospecimenId.split(/\s+/);
+    let currSplit = masterBiospecimenId.split(/\s+/); /* Ex. ['CXA000133', '0008']*/
     let currBag = [];
     let empty = true;
     if (!isOrphan) {
@@ -1466,7 +1485,11 @@ export const addEventModalAddBox = (userName) => {
     let createBoxSuccessAlertEl = document.getElementById("create-box-success");
     let createBoxErrorAlertEl = document.getElementById("create-box-error");
     boxButton.addEventListener('click', async () => {
+        // Check whether a box is being added. If so, return.
+        if (document.body.getAttribute('data-adding-box')) return;
+
         let alertState = ''
+        document.body.setAttribute('data-adding-box', 'true');
         showAnimation();
         // returns boolean value
         let notifyCreateBox = await addNewBox(userName);
@@ -1486,6 +1509,7 @@ export const addEventModalAddBox = (userName) => {
         checkAlertState(alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl)
         // reset alertState
         alertState = ''
+        document.body.removeAttribute('data-adding-box');
     }
   )}
 
@@ -2932,7 +2956,7 @@ export const populateTrackingQuery = async (hiddenJSON) => {
 }
 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
-    document.getElementById('completeTracking').addEventListener('click', () => {
+    document.getElementById('completeTracking').addEventListener('click', async () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
         let emptyField = false;
         let trackingNumConfirmEls = Array.from(document.getElementsByClassName("invalid"))
@@ -2968,10 +2992,11 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
             }  
         }
 
-        if(checkFedexShipDuplicate(boxes) && boxes.length > 1){
-          shippingDuplicateMessage()
-          return
-        }
+        let isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxes);
+        if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxes) && boxes.length > 1)){
+            shippingDuplicateMessage()
+            return
+          }
 
         if(checkNonAlphanumericStr(boxes)) {
           shippingNonAlphaNumericStrMessage()
@@ -2991,9 +3016,16 @@ export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
 export const addEventSaveButton = async (hiddenJSON) => {
     document.getElementById('saveTracking').addEventListener('click', async () => {
         let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+        let isMismatch = -1;
         for (let i = 0; i < boxes.length; i++) {
             let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
             let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+            
+            if (boxi !== boxiConfirm) {
+                isMismatch = i;
+                break;
+            }
+
             // if '959708259' exists update tracking number
             if (hiddenJSON[boxes[i]].hasOwnProperty('959708259')) {
               hiddenJSON[boxes[i]]['959708259'] = boxi
@@ -3010,7 +3042,22 @@ export const addEventSaveButton = async (hiddenJSON) => {
               hiddenJSON[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: hiddenJSON[boxes[i]] }
             }  
         }
-        
+
+        if (isMismatch > - 1) {
+            await swal({
+                title: 'Error!',
+                icon: 'error',
+                text: 'Tracking Ids do not match in one of the boxes.',
+                timer: 1600,
+              })           
+            return;
+        }
+        let isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxes);
+        if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxes) && boxes.length > 1)){
+            shippingDuplicateMessage(isDuplicateTrackingIdInDb)
+            return
+          }
+          
         let shippingData = []
 
         for(let i = 0; i < boxes.length; i++){
@@ -3491,4 +3538,63 @@ export const addEventFilter = () => {
 
     })
 
+}
+
+export const isScannedIdShipped = (getAllBoxesWithoutConversionResponse, masterSpecimendId) => {
+  const getAllBoxesWithoutConversionData = getAllBoxesWithoutConversionResponse.data;
+  if(!getAllBoxesWithoutConversionData.length) return false;
+  const inputScanned = masterSpecimendId;
+  const bagConceptIdList = bagConceptIDList;
+  const allBoxesShippedFilter = getAllBoxesWithoutConversionData.filter(box => box.hasOwnProperty('145971562')) // Submit shipment flag - '145971562'
+  let foundMatch = false
+
+  for (let box of allBoxesShippedFilter) {
+      if(foundMatch) break;
+      
+      for(let bagConceptId of bagConceptIdList) {
+        const bag = box[bagConceptId];
+        if (
+          bag?.["223999569"] == inputScanned || // Biohazard Bag (mouthwash) scan
+          bag?.["522094118"] == inputScanned || // Orphan Bag/Container Scan
+          bag?.["787237543"] == inputScanned || // Biohazard Bag (Blood or Blood/Urine) ID
+          bag?.["234868461"]?.includes(inputScanned)){ // Check if input is found in (Samples Within - "234868461") array
+          foundMatch = true;
+          break;
+        }
+      }
+    }
+  return foundMatch;
+}
+
+const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionResponse, masterSpecimenId) => {
+  const getAllBoxesWithoutConversionData = getAllBoxesWithoutConversionResponse.data
+  const allBoxesNotShippedFilter = getAllBoxesWithoutConversionData.filter(box => !box.hasOwnProperty('145971562'))
+  const inputScanned = masterSpecimenId;
+  const bagConceptIdList = bagConceptIDList;
+  let foundMatch = false
+  let boxNumber
+  let siteSpecificLocationId
+  let dataObj = {"inputScanned": inputScanned}
+
+  for(let box of allBoxesNotShippedFilter) {
+    if(foundMatch) break;
+
+    for(let bagConceptId of bagConceptIdList) {
+      const bag = box[bagConceptId];
+      if(
+        bag?.["223999569"] == inputScanned || // Biohazard Bag (mouthwash) scan
+        bag?.["522094118"] == inputScanned || // Orphan Bag/Container Scan
+        bag?.["787237543"] == inputScanned || // Biohazard Bag (Blood or Blood/Urine) ID
+        bag?.["234868461"]?.includes(inputScanned)){ // Check if input is found in (Samples Within - "234868461") array
+          foundMatch = true
+          boxNumber = box['132929440']
+          siteSpecificLocationId = box['560975149']
+          dataObj['foundMatch'] = foundMatch
+          dataObj['560975149'] = siteSpecificLocationId
+          dataObj['132929440'] = boxNumber
+          break;
+        }
+    }
+  }
+  return dataObj
 }
