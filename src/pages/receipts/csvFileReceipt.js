@@ -82,9 +82,10 @@ const getBSIQueryData = async (filter) => {
 
 
 const modifyBSIQueryResults = (results) => {
-  let filteredResults = results.filter(result => (result[fieldToConceptIdMapping.collectionId] !== undefined && 
-                        result[fieldToConceptIdMapping.collectionId].split(' ')[1] !== '0008' && result[fieldToConceptIdMapping.collectionId].split(' ')[1] !== '0009')
-                        && result[fieldToConceptIdMapping.discardFlag] !== fieldToConceptIdMapping.yes && result[fieldToConceptIdMapping.deviationNotFound] !== fieldToConceptIdMapping.yes)
+  let filteredResults = results.filter(result =>  result.length !== 0 && (result[0][fieldToConceptIdMapping.collectionId] !== undefined && 
+                        result[0][fieldToConceptIdMapping.collectionId].split(' ')[1] !== '0008' && result[0][fieldToConceptIdMapping.collectionId].split(' ')[1] !== '0009')
+                        && result[0][fieldToConceptIdMapping.discardFlag] !== fieldToConceptIdMapping.yes && result[0][fieldToConceptIdMapping.deviationNotFound] !== fieldToConceptIdMapping.yes)
+  filteredResults = filteredResults.flat()
   filteredResults.forEach( i => {
       let vialMappings = getVialTypesMappings(i)
        updateResultMappings(i, vialMappings)
