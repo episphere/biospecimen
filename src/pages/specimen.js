@@ -13,7 +13,6 @@ export const specimenTemplate = async (data) => {
     let formData = {};
     formData['siteAcronym'] = getSiteAcronym();
     formData['827220437'] = parseInt(getSiteCode());
-    let visit = visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0];
     const workflow = getWorflow() ?? localStorage.getItem('workflow');
 
     let template = `
@@ -32,13 +31,15 @@ export const specimenTemplate = async (data) => {
 
         </br>
 
-        <div class="">
-            <h4>Link a new Collection ID</h4><br/>
-            <h4> Visit: ${visit.visitType}</h4>
-        </div>`
+`
         template += `<form id="specimenLinkForm" method="POST" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">`;
         if(workflow === 'research') {
-        template = `<div class="form-group row">`
+            let visit = visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0];
+            template += `<div class="">
+                            <h4>Link a new Collection ID</h4><br/>
+                            <h4> Visit: ${visit.visitType}</h4>
+                        </div>`;
+        template += `<div class="form-group row">`
                 const siteAcronym = getSiteAcronym();
                 
                 if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {

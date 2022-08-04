@@ -2000,7 +2000,7 @@ export const addEventSpecimenLinkForm = (formData) => {
 };
 
 export const addEventClinicalSpecimenLinkForm = (formData) => {
-    const form = document.getElementById('clinicalSpecimenLinkForm');
+    const form = document.getElementById('SpecimenLinkForm');
     const connectId = document.getElementById('clinicalSpecimenContinue').dataset.connectId;
 
     if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
