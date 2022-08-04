@@ -112,16 +112,23 @@ export const specimenTemplate = async (data) => {
     }
     template += `</form>
     </br>`;
-    
     document.getElementById('contentBody').innerHTML = template;
-    document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
-    document.getElementById('accessionID2').onpaste = e => e.preventDefault();
-    document.getElementById('accessionID4').onpaste = e => e.preventDefault();
+
+    
+    //JS Events logic 
+    if(workflow === 'research') {
+        document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
+        addEventSpecimenLinkForm(formData);
+    } else {
+        document.getElementById('accessionID2').onpaste = e => e.preventDefault();
+        document.getElementById('accessionID4').onpaste = e => e.preventDefault();
+        addEventClinicalSpecimenLinkForm(formData);
+
+    }
+
     // addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, masterSpecimenIDRequirement.length);
     // if(document.getElementById('scanAccessionIDBarCodeBtn')) addEventBarCodeScanner('scanAccessionIDBarCodeBtn');
     generateBarCode('connectIdBarCode', data.Connect_ID);
-    addEventSpecimenLinkForm(formData);
-    addEventClinicalSpecimenLinkForm(formData);
     addEventBackToSearch('navBarSearch');
     addEventNavBarParticipantCheckIn();
 }

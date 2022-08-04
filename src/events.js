@@ -1999,11 +1999,10 @@ export const addEventSpecimenLinkForm = (formData) => {
 };
 
 export const addEventClinicalSpecimenLinkForm = (formData) => {
-    const form = document.getElementById('SpecimenLinkForm');
+    const form = document.getElementById('specimenLinkForm');
     const connectId = document.getElementById('clinicalSpecimenContinue').dataset.connectId;
 
     if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
-
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const query = `connectId=${parseInt(connectId)}`;
