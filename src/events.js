@@ -5,7 +5,6 @@ import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, sh
 import { userListTemplate } from './pages/users.js';
 import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
-import { clinicalSpecimenTemplate } from './pages/clinicalSpecimen.js';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength } from './tubeValidation.js';
@@ -1857,7 +1856,7 @@ export const addGoToSpecimenLinkEvent = () => {
             const response = await findParticipant(query);
             const data = response.data[0];
     
-            clinicalSpecimenTemplate(data);
+            specimenTemplate(data);
         });
     });
 };
@@ -2000,11 +1999,10 @@ export const addEventSpecimenLinkForm = (formData) => {
 };
 
 export const addEventClinicalSpecimenLinkForm = (formData) => {
-    const form = document.getElementById('clinicalSpecimenLinkForm');
+    const form = document.getElementById('specimenLinkForm');
     const connectId = document.getElementById('clinicalSpecimenContinue').dataset.connectId;
 
     if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
-
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const query = `connectId=${parseInt(connectId)}`;
