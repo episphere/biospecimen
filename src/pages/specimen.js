@@ -9,10 +9,6 @@ export const specimenTemplate = async (data) => {
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
 
-    // get rid of all this
-    let formData = {};
-    formData['siteAcronym'] = getSiteAcronym();
-    formData['827220437'] = parseInt(getSiteCode());
     const workflow = getWorflow() ?? localStorage.getItem('workflow');
 
     let template = `
@@ -29,9 +25,8 @@ export const specimenTemplate = async (data) => {
             </div>
         </div>
 
-        </br>
+        </br>`
 
-`
         template += `<form id="specimenLinkForm" method="POST" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">`;
         if(workflow === 'research') {
             let visit = visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0];
@@ -71,7 +66,36 @@ export const specimenTemplate = async (data) => {
                     <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Submit</button>
                 </div>
             </div>`;
-     } else {
+     } else if(data.specimenFormData) {// clinical specimen page 2
+            template += `<div class="row">
+                            <div class="column">
+                                <div class="row">Visit: ${data.specimenFormData.visitType}</div>
+                                <div class="row">Blood Accession ID: ${data.specimenFormData['646899796']}</div>
+                                <div class="row">Urine Accession ID: ${data.specimenFormData['611091485']}</div>
+                                <div class="row">Link a new Collection ID</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan Collection ID from Label Sheet Label</label>
+                            <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan in Collection ID from Label Sheet Label" id="scanSpecimenID"/> 
+                        </div>
+                        </br>
+                        <div class="form-group row">
+                            <label class="col-md-4 col-form-label" for="enterSpecimenID1">Manually Enter Collection ID</label>
+                            <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Manually Enter in Collection ID from Label Sheet Label" id="enterSpecimenID1"/>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-4 col-form-label" for="enterSpecimenID2">Re-enter Collection ID</label>
+                            <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Re-enter Collection ID" id="enterSpecimenID2"/>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col">
+                                <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Submit</button>
+                            </div>
+                        </div>`
+     } else  {// clinical specimen page 1
         template += `<div class="form-group row">`
         const siteAcronym = getSiteAcronym();
         template += `<select class="custom-select" id="visit-select">
@@ -118,11 +142,14 @@ export const specimenTemplate = async (data) => {
     //JS Events logic 
     if(workflow === 'research') {
         document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
-        addEventSpecimenLinkForm(formData);
-    } else {
+        addEventSpecimenLinkForm(data);
+    } else if (data.specimenFormData) {// clinical specimen page 2
+        //Logic goes here...
+
+    } else {//clinical specimen page 1
         document.getElementById('accessionID2').onpaste = e => e.preventDefault();
         document.getElementById('accessionID4').onpaste = e => e.preventDefault();
-        addEventClinicalSpecimenLinkForm(formData);
+        addEventClinicalSpecimenLinkForm(data);
 
     }
 

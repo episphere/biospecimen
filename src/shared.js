@@ -475,6 +475,20 @@ export const storeSpecimen = async (array) => {
     return response.json();
 }
 
+export const checkAccessionId = async (data) => {
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    }
+    const response = await fetch(`${api}api=accessionIdExists`, requestObj);
+    return response.json();
+}
+
 export const updateSpecimen = async (array) => {
     const idToken = await getIdToken();
     let requestObj = {
