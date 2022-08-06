@@ -1,5 +1,5 @@
 import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, getSiteCode } from "./../shared.js";
-import { addEventSpecimenLinkForm, addEventClinicalSpecimenLinkForm, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
+import { addEventSpecimenLinkForm, addEventClinicalSpecimenLinkForm, addEventClinicalSpecimenLinkForm2, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
 export const specimenTemplate = async (data) => {
@@ -137,14 +137,12 @@ export const specimenTemplate = async (data) => {
     template += `</form>
     </br>`;
     document.getElementById('contentBody').innerHTML = template;
-
-    
     //JS Events logic 
     if(workflow === 'research') {
         document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
         addEventSpecimenLinkForm(data);
     } else if (data.specimenFormData) {// clinical specimen page 2
-        //Logic goes here...
+        addEventClinicalSpecimenLinkForm2(data);
 
     } else {//clinical specimen page 1
         document.getElementById('accessionID2').onpaste = e => e.preventDefault();
