@@ -142,6 +142,7 @@ export const specimenTemplate = async (data) => {
         document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
         addEventSpecimenLinkForm(data);
     } else if (data.specimenFormData) {// clinical specimen page 2
+        document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
         addEventClinicalSpecimenLinkForm2(data);
 
     } else {//clinical specimen page 1
