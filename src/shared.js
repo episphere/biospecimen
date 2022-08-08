@@ -475,6 +475,20 @@ export const storeSpecimen = async (array) => {
     return response.json();
 }
 
+export const checkAccessionId = async (data) => {
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    }
+    const response = await fetch(`${api}api=accessionIdExists`, requestObj);
+    return response.json();
+}
+
 export const updateSpecimen = async (array) => {
     const idToken = await getIdToken();
     let requestObj = {
@@ -1808,6 +1822,17 @@ export const getCollectionsByVisit = async (data) => {
     return collections;
 };
 
+export const getCollectionById = async (data, collectionId) => {
+
+    const response = await getParticipantCollections(data.token);
+    console.log("response", response)
+    let collectionExists = false;
+    if(response.code != 404) {
+        collectionExists = response.data.some(col => col.id === collectionId)
+        };
+    
+    return collections;
+};
 export const getWorflow = () => document.getElementById('contentBody').dataset.workflow ?? localStorage.getItem('workflow');
 export const getSiteAcronym = () => document.getElementById('contentBody').dataset.siteAcronym ?? localStorage.getItem('siteAcronym');
 export const getSiteCode = () => document.getElementById('contentBody').dataset.siteCode ?? localStorage.getItem('siteCode');

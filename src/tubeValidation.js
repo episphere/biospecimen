@@ -188,7 +188,7 @@ const tube0005 = {
 const tube0006 = {
     'specimenType': 'Urine Tube',
     'tubeType': 'Urine',
-    'readableValue': 'Urine Tube',
+    'readableValue': 'Urine Tube/Cup',
     'name': 'tube6',
     'concept': '973670172',
     'id': '0006',
@@ -257,6 +257,7 @@ export const workflows = {
         tube0004,
         tube0014,
         tube0005,
+        tube0006,
         tube0008
     ]
 };
