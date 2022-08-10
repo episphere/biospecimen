@@ -485,7 +485,16 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         let nameSplit = userName.split(/\s+/);
         let firstName = nameSplit[0] ? nameSplit[0] : '';
         let lastName = nameSplit[1] ? nameSplit[1] : '';
-        let checkedSpecimensArr = Array.from(document.getElementsByClassName("samplePresentCheckbox")).filter(item => item.checked)
+        let checkedSpecimensArr = [];
+        let unCheckedSpecimenArr = [];
+        document.getElementsByClassName("samplePresentCheckbox").forEach((ele) => {
+            if (ele.checked) {
+                checkedSpecimensArr.push(ele);
+            } else {
+                unCheckedSpecimenArr.push(ele);
+            }
+        })
+        // let checkedSpecimensArr = Array.from(document.getElementsByClassName("samplePresentCheckbox")).filter(item => item.checked)
 
         if (isOrphan) {
             bagid = 'unlabelled'
@@ -611,7 +620,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
     //ppulateSpecimensList();
 }
 
-export const getInstituteSpecimensList = async (hiddenJSON) => {
+export const getInstituteSpecimensList = async (boxObjects) => {
     //const response = await searchSpecimenInstitute();
     const conversion = {
         "299553921": "0001",
@@ -640,17 +649,17 @@ export const getInstituteSpecimensList = async (hiddenJSON) => {
         let toExclude9 = [];
         let toExcludeOrphans = [];
         if (specimenData[i].hasOwnProperty('820476880')) {
-            let boxes = Object.keys(hiddenJSON).sort(compareBoxIds);
+            let boxes = Object.keys(boxObjects).sort(compareBoxIds);
             for (let j = 0; j < boxes.length; j++) {
-                let specimens = Object.keys(hiddenJSON[boxes[j]]);
+                let specimens = Object.keys(boxObjects[boxes[j]]);
                 if (specimens.includes(specimenData[i]['820476880'] + ' 0008')) {
-                    let currList = hiddenJSON[boxes[j]][specimens[specimens.indexOf(specimenData[i]['820476880'] + ' 0008')]]['arrElements']
+                    let currList = boxObjects[boxes[j]][specimens[specimens.indexOf(specimenData[i]['820476880'] + ' 0008')]]['arrElements']
                     for (let k = 0; k < currList.length; k++) {
                         toExclude8.push(currList[k].split(/\s+/)[1]);
                     }
                 }
                 if (specimens.includes(specimenData[i]['820476880'] + ' 0009')) {
-                    let currList = hiddenJSON[boxes[j]][specimens[specimens.indexOf(specimenData[i]['820476880'] + ' 0009')]]['arrElements']
+                    let currList = boxObjects[boxes[j]][specimens[specimens.indexOf(specimenData[i]['820476880'] + ' 0009')]]['arrElements']
                     for (let k = 0; k < currList.length; k++) {
                         toExclude9.push(currList[k].split(/\s+/)[1]);
                     }
@@ -658,7 +667,7 @@ export const getInstituteSpecimensList = async (hiddenJSON) => {
                 }
                 if (checkedOrphans == false) {
                     if (specimens.includes('unlabelled')) {
-                        let currList = hiddenJSON[boxes[j]]['unlabelled']['arrElements']
+                        let currList = boxObjects[boxes[j]]['unlabelled']['arrElements']
                         for (let k = 0; k < currList.length; k++) {
                             toExcludeOrphans.push(currList[k].split(/\s+/)[1]);
                         }
