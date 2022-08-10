@@ -46,7 +46,7 @@ const csvFileButtonSubmit = () => {
     let dateFilter = document.getElementById("csvDateInput").value
     dateFilter = dateFilter+'T00:00:00.000Z'
     showAnimation();
-    const results = await getBSIQueryData(dateFilter);// getFakeResults() 
+    const results = getFakeResults()  // await getBSIQueryData(dateFilter);// 
     hideAnimation();
     document.getElementById("csvDateInput").value = ``;
     let modifiedResults = modifyBSIQueryResults(results.data);
@@ -82,9 +82,8 @@ const getBSIQueryData = async (filter) => {
 
 
 const modifyBSIQueryResults = (results) => {
-  let filteredResults = results.filter(result =>  result.length !== 0 && (result[0][fieldToConceptIdMapping.collectionId] !== undefined && 
-                        result[0][fieldToConceptIdMapping.collectionId].split(' ')[1] !== '0008' && result[0][fieldToConceptIdMapping.collectionId].split(' ')[1] !== '0009')
-                        && result[0][fieldToConceptIdMapping.discardFlag] !== fieldToConceptIdMapping.yes && result[0][fieldToConceptIdMapping.deviationNotFound] !== fieldToConceptIdMapping.yes)
+
+  let filteredResults = results.filter(result => console.log('res', result[0]))
   filteredResults = filteredResults.flat()
   filteredResults.forEach( i => {
       let vialMappings = getVialTypesMappings(i)

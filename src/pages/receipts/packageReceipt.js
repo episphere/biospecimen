@@ -19,7 +19,7 @@ export const packageReceiptScreen = async (auth, route) => {
   checkCardIncluded();
   disableCollectionCardFields();
   enableCollectionCardFields();
-  formSubmit(); 
+  formSubmit(username); 
   targetAnchorTagEl();
   addListenersOnPageLoad();
   dropdownTrigger();
@@ -89,7 +89,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
 
                         <div class="row form-group">
                             <label class="col-form-label col-md-4" for="dateReceived">Date Received</label>
-                            <input autocomplete="off" required class="col-md-8 form-control" type="date" type="text" id="dateReceived">
+                            <input autocomplete="off" required class="col-md-8 form-control" type="date" type="text" id="dateReceived" value=${getCurrentDate()}>
                         </div>
 
                         <div id="collectionCard">
@@ -241,7 +241,7 @@ const enableCollectionCardFields = () => {
 }
 
 
-const formSubmit = () => {
+const formSubmit = (name) => {
   const form = document.getElementById('configForm');
   form.addEventListener('submit', e => {
     e.preventDefault();
@@ -276,38 +276,40 @@ const formSubmit = () => {
       const receiptStatus = storePackageReceipt(obj);
     
       if (receiptStatus) {
-        const clearButtonEl = document.getElementById("clearForm");
-        document.getElementById("courierType").innerHTML = ``;
-        document.getElementById("scannedBarcode").value = "";
-        document.getElementById("packageCondition").value = "";
-        document.getElementById("receivePackageComments").value = "";
-        document.getElementById("dateReceived").value = getCurrentDate();
+        packageReceiptTemplate(name) 
+      //   const clearButtonEl = document.getElementById("clearForm");
+      //   document.getElementById("courierType").innerHTML = ``;
+      // //  document.getElementById("scannedBarcode").value = "";
+      //   document.getElementById("packageCondition").value = "";
+      //   document.getElementById("receivePackageComments").value = "";
+      //   document.getElementById("dateReceived").value = getCurrentDate();
         
-        document.getElementById("collectionComments").value = "";
-        document.getElementById("collectionId").value = "";
-        enableCollectionCardFields()
-        enableCollectionCheckBox()
-        document.getElementById("packageCondition").setAttribute("data-selected","[]")
-        targetAnchorTagEl()
-        clearButtonEl !== undefined ? clearButtonEl.removeEventListener("click",cancelConfirm) : ``
+      //   document.getElementById("collectionComments").value = "";
+      //   document.getElementById("collectionId").value = "";
+      //   enableCollectionCardFields()
+      //   enableCollectionCheckBox()
+      //   document.getElementById("packageCondition").setAttribute("data-selected","[]")
+      //   targetAnchorTagEl()
+        // clearButtonEl !== undefined ? clearButtonEl.removeEventListener("click",cancelConfirm) : ``
         
-        window.removeEventListener("beforeunload",beforeUnloadMessage)
+        // window.removeEventListener("beforeunload",beforeUnloadMessage)
       
-      if (document.getElementById("collectionId").value) {
-        document.getElementById("collectionId").value = "";
-        document.getElementById("dateCollectionCard").value = "";
-        document.getElementById("timeCollectionCard").value = "";
-        document.getElementById("collectionCheckBox").checked = false;
-        document.getElementById("collectionComments").value = "";
+      // if (document.getElementById("collectionId").value) {
+      //   document.getElementById("collectionId").value = "";
+      //   document.getElementById("dateCollectionCard").value = "";
+      //   document.getElementById("timeCollectionCard").value = "";
+      //   document.getElementById("collectionCheckBox").checked = false;
+      //   document.getElementById("collectionComments").value = "";
 
-        enableCollectionCardFields();
-        enableCollectionCheckBox();
-        document.getElementById("packageCondition").setAttribute("data-selected","[]");
-        targetAnchorTagEl()
-        clearButtonEl.removeEventListener("click",cancelConfirm);
-        window.removeEventListener("beforeunload",beforeUnloadMessage);
-      }
-    } } else {
+      //   enableCollectionCardFields();
+      //   enableCollectionCheckBox();
+      //   document.getElementById("packageCondition").setAttribute("data-selected","[]");
+      //   targetAnchorTagEl()
+      //   clearButtonEl.removeEventListener("click",cancelConfirm);
+      //   window.removeEventListener("beforeunload",beforeUnloadMessage);
+      // }
+    } } 
+    else {
       triggerErrorModal()
     }
   })
