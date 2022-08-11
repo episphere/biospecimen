@@ -3437,9 +3437,8 @@ export const populateBoxTable = async (page, filter) => {
         let receivedDate = ''
         let packagedCondition = ''
 
-        if (currPage.hasOwnProperty('656548982')) { // submit ship time - shipped
+        if (currPage.hasOwnProperty('656548982')) {
             let currentdate = new Date(currPage['656548982']);
-            //  console.log("currentdate", currPage['656548982'])
             let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
             let hour = parseInt(currentdate.getHours()) % 12;
             shippedDate = (currentdate.getMonth() + 1) + "/"
@@ -3453,18 +3452,13 @@ export const populateBoxTable = async (page, filter) => {
 
         if(currPage.hasOwnProperty('926457119')) {
             let isoFormat = currPage['926457119']
-            console.log("isoFormat", isoFormat)
-            console.log("before convert",isoFormat, typeof isoFormat )
-          receivedDate = retrieveDateFromIsoString(isoFormat).split(',')[0]
-          console.log("after convert",retrieveDateFromIsoString(isoFormat))
+            receivedDate = retrieveDateFromIsoString(isoFormat).split(',')[0]
         }
 
         if(currPage.hasOwnProperty('238268405')) {
           packagedCondition = currPage['238268405']
         }
 
-        // console.log("shippedDate", shippedDate)
-        // console.log("receivedDate",receivedDate)
         currRow.insertCell(0).innerHTML = currPage.hasOwnProperty('959708259') ? currPage['959708259'] : '';
         currRow.insertCell(1).innerHTML = shippedDate;
         currRow.insertCell(2).innerHTML = conceptIdToSiteSpecificLocation[currPage['560975149']];
