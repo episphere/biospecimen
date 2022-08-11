@@ -2046,7 +2046,7 @@ const existingCollectionAlert = async (collections, connectId, formData) => {
 
 const btnsClicked = async (connectId, formData) => { 
     removeAllErrors();
-    
+
     let scanSpecimenID = document.getElementById('scanSpecimenID').value;
 
     if(scanSpecimenID.length > masterSpecimenIDRequirement.length) scanSpecimenID = scanSpecimenID.substring(0, masterSpecimenIDRequirement.length);
@@ -2212,7 +2212,12 @@ const clinicalBtnsClicked = async (data) => {
     let hasError = false;
     let focus = true;
 
-    if (accessionID1 && accessionID1.value && !accessionID2.value && !accessionID2.classList.contains('disabled')) {
+    if (accessionID1 && !accessionID1.value && accessionID3 && !accessionID3.value) {
+        hasError = true;
+        errorMessage('accessionID1', 'Please type Blood/Urine Accession ID from tube.', focus, true);
+        focus = false;
+    }
+    else if (accessionID1 && accessionID1.value && !accessionID2.value && !accessionID2.classList.contains('disabled')) {
         hasError = true;
         errorMessage('accessionID2', 'Please re-type Blood Accession ID from tube.', focus, true);
         focus = false;
@@ -2240,10 +2245,63 @@ const clinicalBtnsClicked = async (data) => {
     }
 
     if (hasError) return;
+    let confirmVal = '';
+
+    if (accessionID1 && accessionID1.value && accessionID3 && !accessionID3.value) {
+        confirmVal = await swal({
+            title: "Urine Accession Id is Missing",
+            icon: "info",
+            text: `You have not entered a Urine Accession Id. Do you want to continue?`,
+            buttons: {
+                cancel: {
+                    text: "No",
+                    value: "No",
+                    visible: true,
+                    className: "btn btn-default",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "Yes",
+                    value: 'Yes',
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                    className: "btn btn-success",
+                }
+            },
+        });
+    }
+
+    if (accessionID1 && !accessionID1.value && accessionID3 && accessionID3.value) {
+        confirmVal = await swal({
+            title: "Blood Accession Id is Missing",
+            icon: "info",
+            text: `You have not entered a Blood Accession Id. Do you want to continue?`,
+            buttons: {
+                cancel: {
+                    text: "No",
+                    value: "No",
+                    visible: true,
+                    className: "btn btn-default",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "Yes",
+                    value: 'Yes',
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                    className: "btn btn-success",
+                }
+            },
+        });
+        
+    }
+
+    if (confirmVal === 'No') return;
 
     const bloodAccessionId = await checkAccessionId({accessionId: accessionID1, accessionIdType: '646899796'});
     //console.log("bloodAccessionId", bloodAccessionId);
-    let confirmVal = '';
     if (bloodAccessionId.code === 200) {
         hideAnimation();
         confirmVal = await swal({
