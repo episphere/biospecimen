@@ -3327,21 +3327,13 @@ export const populateBoxTable = async (page, filter) => {
         let packagedCondition = ''
 
         if (currPage.hasOwnProperty('656548982')) {
-            let currentdate = new Date(currPage['656548982']);
-            let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
-            let hour = parseInt(currentdate.getHours()) % 12;
-            shippedDate = (currentdate.getMonth() + 1) + "/"
-                + currentdate.getDate() + "/"
-                + currentdate.getFullYear()
-            /*+ " "  
-            + hour.toString()+ ":"  
-            + currentdate.getMinutes() + ampm;
-*/
+            const shippedDateStr = currPage['656548982'];
+            shippedDate = retrieveDateFromIsoString(shippedDateStr)
         }
 
         if(currPage.hasOwnProperty('926457119')) {
-            let isoFormat = currPage['926457119'];
-            receivedDate = retrieveDateFromIsoString(isoFormat);
+            const receivedDateStr = currPage['926457119']
+            receivedDate = retrieveDateFromIsoString(receivedDateStr)
         }
 
         if(currPage.hasOwnProperty('238268405')) {
