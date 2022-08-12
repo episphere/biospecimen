@@ -186,7 +186,7 @@ const tube0005 = {
 };
 
 const tube0006 = {
-    'specimenType': 'Urine Tube',
+    'specimenType': 'Urine Tube/Cup',
     'tubeType': 'Urine',
     'readableValue': 'Urine Tube/Cup',
     'name': 'tube6',

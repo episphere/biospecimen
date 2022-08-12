@@ -2053,23 +2053,11 @@ const btnsClicked = async (connectId, formData) => {
 
     const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value.toUpperCase();
     const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value.toUpperCase();
-    const accessionID1 = document.getElementById('accessionID1');
-    const accessionID2 = document.getElementById('accessionID2');
     const collectionLocation = document.getElementById('collectionLocation');
 
     let hasError = false;
     let focus = true;
 
-    if (accessionID1 && accessionID1.value && !accessionID2.value && !accessionID2.classList.contains('disabled')) {
-        hasError = true;
-        errorMessage('accessionID2', 'Please re-type Accession ID from tube.', focus, true);
-        focus = false;
-    }
-    else if (accessionID1 && accessionID1.value && accessionID2.value && accessionID1.value !== accessionID2.value) {
-        hasError = true;
-        errorMessage('accessionID2', 'Accession ID doesn\'t match', focus, true);
-        focus = false;
-    }
     if (scanSpecimenID && enterSpecimenID1) {
         hasError = true;
         errorMessage('scanSpecimenID', 'Please Provide either Scanned Collection ID or Manually typed.', focus, true);
@@ -2148,13 +2136,18 @@ const btnsClicked = async (connectId, formData) => {
     formData['650516960'] = getWorflow() === 'research' ? 534621077 : 664882224;
     formData['387108065'] = enterSpecimenID1 ? 353358909 : 104430631;
     formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
-    formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
-
-    if (accessionID1 && accessionID1.value) {
-        formData['646899796'] = accessionID1.value;
+    formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;   
+    
+    let bloodAccessionId = formData?.specimenFormData?.['646899796'];
+    if (bloodAccessionId) {
+        formData['646899796'] = bloodAccessionId;
         formData['148996099'] = 353358909;
     }
-
+    let urineAccessionId = formData?.specimenFormData?.['928693120'];
+    if (urineAccessionId) {
+        formData['928693120'] = urineAccessionId;
+        //formData['148996099'] = 353358909;
+    }
     let query = `connectId=${parseInt(connectId)}`;
 
     showAnimation();
@@ -2300,14 +2293,14 @@ const clinicalBtnsClicked = async (data) => {
 
     if (confirmVal === 'No') return;
 
-    const bloodAccessionId = await checkAccessionId({accessionId: accessionID1, accessionIdType: '646899796'});
-    //console.log("bloodAccessionId", bloodAccessionId);
+    const bloodAccessionId = await checkAccessionId({accessionId: accessionID1.value, accessionIdType: '646899796'});
+    
     if (bloodAccessionId.code === 200) {
         hideAnimation();
         confirmVal = await swal({
-            title: "Confirm Collection ID",
+            title: "Existing Accession ID",
             icon: "info",
-            text: `Accession ID entered is already assigned to Collection ID CXA######. Choose and action`,
+            text: `Accession ID entered is already assigned to Collection ID ${bloodAccessionId?.data?.[820476880]}. Choose an action`,
             buttons: {
                 cancel: {
                     text: "Cancel",
@@ -2329,7 +2322,7 @@ const clinicalBtnsClicked = async (data) => {
     }
 
     if (confirmVal === "cancel") return;
-    data['specimenFormData'] = {'646899796': accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631, '611091485': accessionID3.value || '', visitType}
+    data['specimenFormData'] = {'646899796': accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631, '928693120': accessionID3.value || '', visitType}
 
     specimenTemplate(data);
     }
