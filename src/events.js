@@ -2473,7 +2473,7 @@ export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
 export const createTubesForCollection = async (formData, biospecimenData) => {
     
     if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
-
+    if(getWorflow() === 'clinical' && biospecimenData['915838974'] === undefined) biospecimenData['915838974'] = new Date().toISOString();
     let siteTubesList = getSiteTubesLists(formData);
 
     siteTubesList.forEach((dt) => {
