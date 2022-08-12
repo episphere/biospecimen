@@ -3340,11 +3340,8 @@ export const populateBoxTable = async (page, filter) => {
         }
 
         if(currPage.hasOwnProperty('926457119')) {
-            let isoFormat = currPage['926457119']
-            console.log("isoFormat", isoFormat)
-            console.log("before convert",isoFormat, typeof isoFormat )
-          receivedDate = retrieveDateFromIsoString(isoFormat).split(',')[0]
-          console.log("after convert",retrieveDateFromIsoString(isoFormat))
+            let isoFormat = currPage['926457119'];
+            receivedDate = retrieveDateFromIsoString(isoFormat);
         }
 
         if(currPage.hasOwnProperty('238268405')) {
