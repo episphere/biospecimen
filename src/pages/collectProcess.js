@@ -16,7 +16,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                 <div class="row"><h5>${data['996038075']}, ${data['399159511']}</h5></div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${formData['820476880']}</div>
-                <div class="row">Collection ID Link Date/Time: ${new Date(formData['678166505']).toLocaleString()}</div>
+                <div class="row">Collection ID Link Date/Time: ${getWorflow() === 'research' ? new Date(formData['678166505']).toLocaleString(): new Date(formData['915838974']).toLocaleString()}</div>
             </div>
             ${formData['331584571'] ? `
                 <div class="ml-auto form-group">
