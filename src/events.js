@@ -2139,7 +2139,7 @@ const btnsClicked = async (connectId, formData) => {
     formData['650516960'] = getWorflow() === 'research' ? 534621077 : 664882224;
     formData['387108065'] = enterSpecimenID1 ? 353358909 : 104430631;
     formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
-    formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;   
+    formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
     
     let bloodAccessionId = formData?.specimenFormData?.['646899796'];
     if (bloodAccessionId) {
@@ -2182,6 +2182,7 @@ const btnsClicked = async (connectId, formData) => {
 
     const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
     await createTubesForCollection(formData, biospecimenData);
+    biospecimenData['331584571'] = formData?.specimenFormData.visitType;
 
     hideAnimation();
     if (formData?.specimenFormData?.collectionId) {

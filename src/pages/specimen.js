@@ -67,9 +67,10 @@ export const specimenTemplate = async (data) => {
                 </div>
             </div>`;
      } else if(data.specimenFormData) {// clinical specimen page 2
+        let visit = visitType.filter(visit => visit.concept === data.specimenFormData.visitType)[0];
             template += `<div class="row">
                             <div class="column">
-                                <div class="row">Visit: ${data.specimenFormData.visitType}</div>
+                                <div class="row">Visit: ${visit}</div>
                                 <div class="row">Blood Accession ID: ${data.specimenFormData['646899796']}</div>
                                 <div class="row">Urine Accession ID: ${data.specimenFormData['611091485']}</div>
                                 <div class="row">Link a new Collection ID</div>
