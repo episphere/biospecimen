@@ -170,6 +170,21 @@ const tube0014 = {
     'tubeNotCollectedOptions': tubeNotCollectedOptions1
 };
 
+const tube0024 = {
+    'specimenType': 'EDTA Tube',
+    'tubeType': 'Blood tube',
+    'readableValue': 'EDTA Tube',
+    'image': './static/images/tube3.PNG',
+    'name': 'tube24',
+    'concept': '683613884',
+    'id': '0024',
+    'tubeColor': 'Lavendar',
+    'collectionChkBox': true,
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection2,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
+};
+
 const tube0005 = {
     'specimenType': 'ACD Tube',
     'tubeType': 'Blood tube',
@@ -186,9 +201,9 @@ const tube0005 = {
 };
 
 const tube0006 = {
-    'specimenType': 'Urine Tube/Cup',
+    'specimenType': 'Urine Tube/Container',
     'tubeType': 'Urine',
-    'readableValue': 'Urine Tube/Cup',
+    'readableValue': 'Urine Tube/Container',
     'name': 'tube6',
     'concept': '973670172',
     'id': '0006',
@@ -252,10 +267,12 @@ export const workflows = {
         tube0002,
         tube0011,
         tube0012,
+        tube0021,
         tube0003,
         tube0013,
         tube0004,
         tube0014,
+        tube0024,
         tube0005,
         tube0006,
         tube0008
