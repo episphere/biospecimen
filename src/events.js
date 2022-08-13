@@ -2047,12 +2047,12 @@ const existingCollectionAlert = async (collections, connectId, formData) => {
 const btnsClicked = async (connectId, formData) => { 
     removeAllErrors();
 
-    let scanSpecimenID = document.getElementById('scanSpecimenID').value;
+    let scanSpecimenID = document.getElementById('scanSpecimenID')?.value;
 
-    if(scanSpecimenID.length > masterSpecimenIDRequirement.length) scanSpecimenID = scanSpecimenID.substring(0, masterSpecimenIDRequirement.length);
+    if(scanSpecimenID && scanSpecimenID.length > masterSpecimenIDRequirement.length) scanSpecimenID = scanSpecimenID.substring(0, masterSpecimenIDRequirement.length);
 
-    const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value.toUpperCase();
-    const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value.toUpperCase();
+    const enterSpecimenID1 = document.getElementById('enterSpecimenID1')?.value && document.getElementById('enterSpecimenID1')?.value.toUpperCase();
+    const enterSpecimenID2 = document.getElementById('enterSpecimenID2')?.value && document.getElementById('enterSpecimenID2')?.value.toUpperCase();
     const collectionLocation = document.getElementById('collectionLocation');
 
     let hasError = false;
@@ -2064,7 +2064,7 @@ const btnsClicked = async (connectId, formData) => {
         focus = false;
         errorMessage('enterSpecimenID1', 'Please Provide either Scanned Collection ID or Manually typed.', focus, true);
     }
-    else if (!scanSpecimenID && !enterSpecimenID1) {
+    else if (!scanSpecimenID && !enterSpecimenID1 && !formData?.specimenFormData?.collectionId) {
         hasError = true;
         errorMessage('scanSpecimenID', 'Please Scan Collection ID or Type in Manually', focus, true);
         focus = false;
@@ -2098,37 +2098,40 @@ const btnsClicked = async (connectId, formData) => {
 
     if (collectionLocation) formData['951355211'] = parseInt(collectionLocation.value);
 
-    const collectionID = scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
+    const collectionID = formData?.specimenFormData?.collectionId ? formData?.specimenFormData?.collectionId : scanSpecimenID && scanSpecimenID !== "" ? scanSpecimenID : enterSpecimenID1;
     const n = document.getElementById('399159511').innerText || ""
+    let confirmVal = '';
 
-    const confirmVal = await swal({
-        title: "Confirm Collection ID",
-        icon: "info",
-        text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n || ""}`,
-        buttons: {
-            cancel: {
-                text: "Cancel",
-                value: "cancel",
-                visible: true,
-                className: "btn btn-default",
-                closeModal: true,
+    if (!formData?.specimenFormData?.collectionId) {
+        confirmVal = await swal({
+            title: "Confirm Collection ID",
+            icon: "info",
+            text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n || ""}`,
+            buttons: {
+                cancel: {
+                    text: "Cancel",
+                    value: "cancel",
+                    visible: true,
+                    className: "btn btn-default",
+                    closeModal: true,
+                },
+                back: {
+                    text: "Confirm and Exit",
+                    value: "back",
+                    visible: true,
+                    className: "btn btn-info",
+                },
+                confirm: {
+                    text: "Confirm and Continue",
+                    value: 'confirmed',
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                    className: "btn btn-success",
+                }
             },
-            back: {
-                text: "Confirm and Exit",
-                value: "back",
-                visible: true,
-                className: "btn btn-info",
-            },
-            confirm: {
-                text: "Confirm and Continue",
-                value: 'confirmed',
-                visible: true,
-                className: "",
-                closeModal: true,
-                className: "btn btn-success",
-            }
-        },
-    });
+        });
+    }
 
     if (confirmVal === "cancel") return;
 
@@ -2152,10 +2155,13 @@ const btnsClicked = async (connectId, formData) => {
 
     showAnimation();
 
-    const response = await findParticipant(query);
-    const data = response.data[0];
-    const specimenData = (await searchSpecimen(formData['820476880'])).data;
+    let data, specimenData;
+    if (!formData?.specimenFormData?.collectionId) {
 
+        let response = await findParticipant(query);
+        data = response.data[0];
+        specimenData = (await searchSpecimen(formData['820476880'])).data;
+    }
     hideAnimation();
 
     if (specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID) {
@@ -2165,20 +2171,23 @@ const btnsClicked = async (connectId, formData) => {
 
     showAnimation(); 
     if(!formData.specimenFormData) formData['331584571'] = parseInt(getCheckedInVisit(data));
-
-    const storeResponse = await storeSpecimen([formData]);  
-    if (storeResponse.code === 400) {
-        hideAnimation();
-        showNotifications({ title: 'Specimen already exists!', body: `Collection ID ${collectionID} is already associated with a different Connect ID` }, true);
-        return;
+    if (!formData?.specimenFormData?.collectionId) {
+        const storeResponse = await storeSpecimen([formData]);  
+        if (storeResponse.code === 400) {
+            hideAnimation();
+            showNotifications({ title: 'Specimen already exists!', body: `Collection ID ${collectionID} is already associated with a different Connect ID` }, true);
+            return;
+        }
     }
 
     const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
     await createTubesForCollection(formData, biospecimenData);
 
     hideAnimation();
+    if (formData?.specimenFormData?.collectionId) {
+        tubeCollectedTemplate(formData, biospecimenData);
 
-    if (confirmVal == "confirmed") {
+    } else if (confirmVal == "confirmed") {
         tubeCollectedTemplate(data, biospecimenData);
     }
     else {
@@ -2189,13 +2198,8 @@ const btnsClicked = async (connectId, formData) => {
 const clinicalBtnsClicked = async (data) => { 
 
     removeAllErrors();
+    const connectId = document.getElementById('clinicalSpecimenContinue').dataset.connectId;
 
-   // let scanSpecimenID = document.getElementById('scanSpecimenID').value;
-
-   // if(scanSpecimenID.length > masterSpecimenIDRequirement.length) scanSpecimenID = scanSpecimenID.substring(0, masterSpecimenIDRequirement.length);
-
-   // const enterSpecimenID1 = document.getElementById('enterSpecimenID1').value.toUpperCase();
-    //const enterSpecimenID2 = document.getElementById('enterSpecimenID2').value.toUpperCase();
     const accessionID1 = document.getElementById('accessionID1');
     const accessionID2 = document.getElementById('accessionID2');
     const accessionID3 = document.getElementById('accessionID3');
@@ -2296,6 +2300,8 @@ const clinicalBtnsClicked = async (data) => {
     const bloodAccessionId = await checkAccessionId({accessionId: accessionID1.value, accessionIdType: '646899796'});
     
     if (bloodAccessionId.code === 200) {
+
+        data = bloodAccessionId.data;
         hideAnimation();
         confirmVal = await swal({
             title: "Existing Accession ID",
@@ -2322,8 +2328,12 @@ const clinicalBtnsClicked = async (data) => {
     }
 
     if (confirmVal === "cancel") return;
-    data['specimenFormData'] = {'646899796': accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631, '928693120': accessionID3.value || '', visitType}
+    data['specimenFormData'] = {'646899796': accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631, '928693120': accessionID3.value || '', visitType, collectionId: bloodAccessionId?.data?.[820476880]};
 
+    if (confirmVal === "confirmed") {
+        btnsClicked(connectId, data);
+        return
+    }
     specimenTemplate(data);
     }
 
