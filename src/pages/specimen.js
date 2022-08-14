@@ -48,17 +48,13 @@ export const specimenTemplate = async (data) => {
                 }
             template +=`</div>`
             template += `<div class="form-group row">
-                <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan Collection ID from Label Sheet Label</label>
-                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan in Collection ID from Label Sheet Label" id="scanSpecimenID"/> 
+                <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan/Type Collection ID from Label Sheet</label>
+                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type Collection ID from Label Sheet" id="scanSpecimenID" data-isscanned="false" /> 
             </div>
             </br>
             <div class="form-group row">
-                <label class="col-md-4 col-form-label" for="enterSpecimenID1">Manually Enter Collection ID</label>
-                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Manually Enter in Collection ID from Label Sheet Label" id="enterSpecimenID1"/>
-            </div>
-            <div class="form-group row">
-                <label class="col-md-4 col-form-label" for="enterSpecimenID2">Re-enter Collection ID</label>
-                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Re-enter Collection ID" id="enterSpecimenID2"/>
+                <label class="col-md-4 col-form-label" for="scanSpecimenID2">Re-Scan/Type Collection ID from Label Sheet</label>
+                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Re-Scan/Type Collection ID from Label Sheet" id="scanSpecimenID2" data-isscanned="false" />
             </div>
 
             <div class="form-group row">
@@ -78,17 +74,13 @@ export const specimenTemplate = async (data) => {
                         </div>
 
                         <div class="form-group row">
-                            <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan Collection ID from Label Sheet Label</label>
-                            <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan in Collection ID from Label Sheet Label" id="scanSpecimenID"/> 
+                            <label class="col-md-4 col-form-label" for="scanSpecimenID">Scan/Type Collection ID from Label Sheet</label>
+                            <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type Collection ID from Label Sheet" id="scanSpecimenID" data-isscanned="false" /> 
                         </div>
                         </br>
                         <div class="form-group row">
-                            <label class="col-md-4 col-form-label" for="enterSpecimenID1">Manually Enter Collection ID</label>
-                            <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Manually Enter in Collection ID from Label Sheet Label" id="enterSpecimenID1"/>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-md-4 col-form-label" for="enterSpecimenID2">Re-enter Collection ID</label>
-                            <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Re-enter Collection ID" id="enterSpecimenID2"/>
+                            <label class="col-md-4 col-form-label" for="scanSpecimenID2">Re-Scan/Type Collection ID from Label Sheet</label>
+                            <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Re-Scan/Type Collection ID from Label Sheet" id="scanSpecimenID2" data-isscanned="false" />
                         </div>
 
                         <div class="form-group row">
@@ -140,10 +132,10 @@ export const specimenTemplate = async (data) => {
     document.getElementById('contentBody').innerHTML = template;
     //JS Events logic 
     if(workflow === 'research') {
-        document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
+        //document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
         addEventSpecimenLinkForm(data);
     } else if (data.specimenFormData) {// clinical specimen page 2
-        document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
+        //document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
         addEventClinicalSpecimenLinkForm2(data);
 
     } else {//clinical specimen page 1

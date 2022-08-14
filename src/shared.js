@@ -1590,17 +1590,18 @@ export const addEventBarCodeScanner = (id, start, end) => {
                 if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,masterSpecimenIDRequirement.length))) return;
                 if(!elementID) return;
                 if(elementID === 'scanSpecimenID') {
-                    disableInput('enterSpecimenID1', true);
-                    disableInput('enterSpecimenID2', true);
+                    // disableInput('enterSpecimenID1', true);
+                    // disableInput('enterSpecimenID2', true);
                     // addEventClearScannedBarcode('clearScanSpecimenID');
+                    document.getElementById(elementID).dataset.isscanned = 'true';
                 }
                 document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end) : result.codeResult.code;
                 Quagga.stop();
                 document.querySelector('[data-dismiss="modal"]').click();
             }
             else {
-                disableInput('enterSpecimenID1', false);
-                disableInput('enterSpecimenID2', false);
+                // disableInput('enterSpecimenID1', false);
+                // disableInput('enterSpecimenID2', false);
             }
         });
         
