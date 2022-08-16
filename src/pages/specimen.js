@@ -1,4 +1,4 @@
-import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, getSiteCode } from "./../shared.js";
+import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventClinicalSpecimenLinkForm, addEventClinicalSpecimenLinkForm2, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
@@ -142,7 +142,7 @@ export const specimenTemplate = async (data) => {
         document.getElementById('accessionID2').onpaste = e => e.preventDefault();
         document.getElementById('accessionID4').onpaste = e => e.preventDefault();
         addEventClinicalSpecimenLinkForm(data);
-
+        numericInputValidator(['accessionID1', 'accessionID2', 'accessionID3', 'accessionID4']);
     }
 
     // addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, masterSpecimenIDRequirement.length);

@@ -2128,3 +2128,13 @@ export const formatISODateTime = (dateReceived) => {
     return formattedDateTimeStamp
 
 }
+
+export const numericInputValidator = (elemArr) => {
+    elemArr.forEach(elem => {
+        if (document.getElementById(elem)) {
+            document.getElementById(elem).addEventListener('input', (e) => {
+                if (!/^\d+$/g.test(e.target.value)) errorMessage(elem, 'Only integers Allowed', focus, true);
+            })
+        }
+    })
+}
