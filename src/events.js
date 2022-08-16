@@ -2123,7 +2123,7 @@ const btnsClicked = async (connectId, formData) => {
 
     formData['820476880'] = collectionID;
     formData['650516960'] = getWorflow() === 'research' ? 534621077 : 664882224;
-    formData['387108065'] = document.getElementById('scanSpecimenID').dataset.isscanned === 'false' ? 353358909 : 104430631;
+    formData['387108065'] = document.getElementById('scanSpecimenID') && document.getElementById('scanSpecimenID').dataset.isscanned !== 'false' ? 104430631 : 353358909;
     formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
     formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
     
