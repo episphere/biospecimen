@@ -2047,7 +2047,7 @@ const existingCollectionAlert = async (collections, connectId, formData) => {
 const btnsClicked = async (connectId, formData) => { 
     removeAllErrors();
 
-    let scanSpecimenID = document.getElementById('scanSpecimenID')?.value;
+    let scanSpecimenID = document.getElementById('scanSpecimenID')?.value && document.getElementById('scanSpecimenID')?.value.toUpperCase();
 
     if(scanSpecimenID && scanSpecimenID.length > masterSpecimenIDRequirement.length) scanSpecimenID = scanSpecimenID.substring(0, masterSpecimenIDRequirement.length);
 
