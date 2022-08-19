@@ -1,4 +1,4 @@
-import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator } from "./../shared.js";
+import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventClinicalSpecimenLinkForm, addEventClinicalSpecimenLinkForm2, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
@@ -11,7 +11,7 @@ export const specimenTemplate = async (data, formData) => {
 
     // get rid of all this
     const isSpecimenLinkForm2 = !!formData;
-    let formData = formData ? formData : {};
+    formData = formData ? formData : {};
     formData['siteAcronym'] = getSiteAcronym();
     formData['827220437'] = parseInt(getSiteCode());
 
