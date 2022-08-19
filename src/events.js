@@ -2057,13 +2057,13 @@ const btnsClicked = async (connectId, formData) => {
     let hasError = false;
     let focus = true;
 
-    if (!scanSpecimenID && !scanSpecimenID2 && !formData?.specimenFormData?.collectionId) {
+    if (!scanSpecimenID && !scanSpecimenID2 && !formData?.collectionId) {
         hasError = true;
         errorMessage('scanSpecimenID', 'Please Scan Collection ID or Type in Manually', focus, true);
         focus = false;
         errorMessage('scanSpecimenID2', 'Please Scan Collection ID or Type in Manually', focus, true);
     }
-    else if (scanSpecimenID !== scanSpecimenID2 && !formData?.specimenFormData?.collectionId) {
+    else if (scanSpecimenID !== scanSpecimenID2 && !formData?.collectionId) {
         hasError = true;
         errorMessage('scanSpecimenID2', 'Entered Collection ID doesn\'t match.', focus, true);
     }
@@ -2084,11 +2084,11 @@ const btnsClicked = async (connectId, formData) => {
 
     if (collectionLocation) formData['951355211'] = parseInt(collectionLocation.value);
 
-    const collectionID = formData?.specimenFormData?.collectionId ? formData?.specimenFormData?.collectionId : scanSpecimenID;
+    const collectionID = formData?.collectionId || scanSpecimenID;
     const n = document.getElementById('399159511').innerText || ""
     let confirmVal = '';
 
-    if (!formData?.specimenFormData?.collectionId) {
+    if (!formData?.collectionId) {
         confirmVal = await swal({
             title: "Confirm Collection ID",
             icon: "info",
@@ -2127,12 +2127,12 @@ const btnsClicked = async (connectId, formData) => {
     formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
     formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
     
-    let bloodAccessionId = formData?.specimenFormData?.['646899796'];
+    let bloodAccessionId = formData?.['646899796'];
     if (bloodAccessionId) {
         formData['646899796'] = bloodAccessionId;
         formData['148996099'] = 353358909;
     }
-    let urineAccessionId = formData?.specimenFormData?.['928693120'];
+    let urineAccessionId = formData?.['928693120'];
     if (urineAccessionId) {
         formData['928693120'] = urineAccessionId;
         //formData['148996099'] = 353358909;
@@ -2141,23 +2141,20 @@ const btnsClicked = async (connectId, formData) => {
 
     showAnimation();
 
-    let data, specimenData;
-    if (!formData?.specimenFormData?.collectionId) {
-
         let response = await findParticipant(query);
-        data = response.data[0];
-        specimenData = (await searchSpecimen(formData['820476880'])).data;
-    }
+        const data = response.data[0];
+        const specimenData = (await searchSpecimen(formData?.collectionId || formData['820476880'])).data;
     hideAnimation();
 
-    if (specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID) {
+    if (specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID && !formData?.collectionId) {
         showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.' }, true)
         return;
     }
 
-    showAnimation(); 
+    showAnimation();
+    formData['331584571'] = formData?.visitType || parseInt(getCheckedInVisit(data))
     
-    if (!formData?.specimenFormData?.collectionId) {
+    if (!formData?.collectionId) {
         const storeResponse = await storeSpecimen([formData]);  
         if (storeResponse.code === 400) {
             hideAnimation();
@@ -2166,17 +2163,12 @@ const btnsClicked = async (connectId, formData) => {
         }
     }
 
-    const biospecimenData = (await searchSpecimen(formData['820476880'])).data;
+    const biospecimenData = (await searchSpecimen(formData?.collectionId || formData['820476880'])).data;
     await createTubesForCollection(formData, biospecimenData);
-    if (formData?.specimenFormData?.visitType) {
-            biospecimenData['331584571'] = formData?.specimenFormData?.visitType;
-    } else {
-        formData['331584571'] = parseInt(getCheckedInVisit(data))
-    }
 
     hideAnimation();
-    if (formData?.specimenFormData?.collectionId) {
-        tubeCollectedTemplate(formData, biospecimenData);
+    if (formData?.collectionId) {
+        tubeCollectedTemplate(data, biospecimenData);
 
     } else if (confirmVal == "confirmed") {
         tubeCollectedTemplate(data, biospecimenData);
@@ -2186,7 +2178,7 @@ const btnsClicked = async (connectId, formData) => {
     }
 }
 
-const clinicalBtnsClicked = async (data) => { 
+const clinicalBtnsClicked = async (formData) => { 
 
     removeAllErrors();
     const connectId = document.getElementById('clinicalSpecimenContinue').dataset.connectId;
@@ -2291,8 +2283,6 @@ const clinicalBtnsClicked = async (data) => {
     const bloodAccessionId = await checkAccessionId({accessionId: accessionID1.value, accessionIdType: '646899796'});
     
     if (bloodAccessionId.code === 200) {
-
-        data = bloodAccessionId.data;
         hideAnimation();
         confirmVal = await swal({
             title: "Existing Accession ID",
@@ -2319,13 +2309,17 @@ const clinicalBtnsClicked = async (data) => {
     }
 
     if (confirmVal === "cancel") return;
-    data['specimenFormData'] = {'646899796': accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631, '928693120': accessionID3.value || '', visitType, collectionId: bloodAccessionId?.data?.[820476880]};
+    formData = {...formData, '646899796': accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631, '928693120': accessionID3.value || '', visitType};
 
     if (confirmVal === "confirmed") {
-        btnsClicked(connectId, data);
+        formData.collectionId = bloodAccessionId?.data?.[820476880];
+        btnsClicked(connectId, formData);
         return
     }
-    specimenTemplate(data);
+        let query = `connectId=${parseInt(ConnectId)}`;
+        const response = await findParticipant(query);
+        const data = response.data[0];
+        specimenTemplate(data, formData);
     }
 
 export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {

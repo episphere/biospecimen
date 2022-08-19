@@ -1034,7 +1034,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
 
     const settingData = {
         '173836415': settings,
-        uid: data.state.uid
+        uid: data?.state?.uid
     };
         
     await updateParticipant(settingData);

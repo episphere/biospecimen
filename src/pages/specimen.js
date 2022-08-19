@@ -1,13 +1,19 @@
-import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator } from "./../shared.js";
+import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventClinicalSpecimenLinkForm, addEventClinicalSpecimenLinkForm2, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
-export const specimenTemplate = async (data) => {
+export const specimenTemplate = async (data, formData) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenLink');
     navBarBtn.style.display = 'block';
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
+
+    // get rid of all this
+    const isSpecimenLinkForm2 = !!formData;
+    formData = formData ? formData : {};
+    formData['siteAcronym'] = getSiteAcronym();
+    formData['827220437'] = parseInt(getSiteCode());
 
     const workflow = getWorflow() ?? localStorage.getItem('workflow');
 
@@ -62,7 +68,7 @@ export const specimenTemplate = async (data) => {
                     <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Submit</button>
                 </div>
             </div>`;
-     } else if(data.specimenFormData) {// clinical specimen page 2
+     } else if(isSpecimenLinkForm2) {// clinical specimen page 2
         let visit = visitType.filter(visit => visit.concept === data.specimenFormData.visitType)[0];
             template += `<div class="row">
                             <div class="column">
@@ -132,18 +138,17 @@ export const specimenTemplate = async (data) => {
     document.getElementById('contentBody').innerHTML = template;
     //JS Events logic 
     if(workflow === 'research') {
-        //document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
-        addEventSpecimenLinkForm(data);
+        // document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
+        addEventSpecimenLinkForm(formData);
     } else if (data.specimenFormData) {// clinical specimen page 2
-        //document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
-        addEventClinicalSpecimenLinkForm2(data);
-
+        // document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
+        addEventClinicalSpecimenLinkForm2(formData);
     } else {//clinical specimen page 1
         document.getElementById('accessionID2').onpaste = e => e.preventDefault();
         document.getElementById('accessionID4').onpaste = e => e.preventDefault();
-        addEventClinicalSpecimenLinkForm(data);
+        addEventClinicalSpecimenLinkForm(formData);
         numericInputValidator(['accessionID1', 'accessionID2', 'accessionID3', 'accessionID4']);
-    }
+ }
 
     // addEventBarCodeScanner('scanSpecimenIDBarCodeBtn', 0, masterSpecimenIDRequirement.length);
     // if(document.getElementById('scanAccessionIDBarCodeBtn')) addEventBarCodeScanner('scanAccessionIDBarCodeBtn');
