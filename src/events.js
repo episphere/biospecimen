@@ -2186,7 +2186,7 @@ const btnsClicked = async (connectId, formData) => {
     }
 }
 
-const clinicalBtnsClicked = async (data) => { 
+const clinicalBtnsClicked = async (formData) => { 
 
     removeAllErrors();
     const connectId = document.getElementById('clinicalSpecimenContinue').dataset.connectId;
@@ -2291,8 +2291,6 @@ const clinicalBtnsClicked = async (data) => {
     const bloodAccessionId = await checkAccessionId({accessionId: accessionID1.value, accessionIdType: '646899796'});
     
     if (bloodAccessionId.code === 200) {
-
-        data = bloodAccessionId.data;
         hideAnimation();
         confirmVal = await swal({
             title: "Existing Accession ID",
@@ -2319,13 +2317,17 @@ const clinicalBtnsClicked = async (data) => {
     }
 
     if (confirmVal === "cancel") return;
-    data['specimenFormData'] = {'646899796': accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631, '928693120': accessionID3.value || '', visitType, collectionId: bloodAccessionId?.data?.[820476880]};
+    formData = {...formData, '646899796': accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631, '928693120': accessionID3.value || '', visitType};
 
     if (confirmVal === "confirmed") {
-        btnsClicked(connectId, data);
+        formData.collectionId = bloodAccessionId?.data?.[820476880];
+        btnsClicked(connectId, formData);
         return
     }
-    specimenTemplate(data);
+        let query = `connectId=${parseInt(ConnectId)}`;
+        const response = await findParticipant(query);
+        const data = response.data[0];
+        specimenTemplate(data, formData);
     }
 
 export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
