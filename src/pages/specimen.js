@@ -69,12 +69,12 @@ export const specimenTemplate = async (data, formData) => {
                 </div>
             </div>`;
      } else if(isSpecimenLinkForm2) {// clinical specimen page 2
-        let visit = visitType.filter(visit => visit.concept === data.specimenFormData.visitType)[0];
+        let visit = visitType.filter(visit => visit.concept === formData.visitType)[0];
             template += `<div class="row">
                             <div class="column">
                                 <div class="row">Visit: ${visit.visitType}</div>
-                                <div class="row">Blood Accession ID: ${data.specimenFormData['646899796']}</div>
-                                <div class="row">Urine Accession ID: ${data.specimenFormData['611091485']}</div>
+                                <div class="row">Blood Accession ID: ${formData['646899796']}</div>
+                                <div class="row">Urine Accession ID: ${formData['611091485']}</div>
                                 <div class="row">Link a new Collection ID</div>
                             </div>
                         </div>
@@ -140,7 +140,7 @@ export const specimenTemplate = async (data, formData) => {
     if(workflow === 'research') {
         // document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
         addEventSpecimenLinkForm(formData);
-    } else if (data.specimenFormData) {// clinical specimen page 2
+    } else if (isSpecimenLinkForm2) {// clinical specimen page 2
         // document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
         addEventClinicalSpecimenLinkForm2(formData);
     } else {//clinical specimen page 1

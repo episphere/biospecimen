@@ -2140,10 +2140,13 @@ const btnsClicked = async (connectId, formData) => {
     let query = `connectId=${parseInt(connectId)}`;
 
     showAnimation();
-
-        let response = await findParticipant(query);
-        const data = response.data[0];
-        const specimenData = (await searchSpecimen(formData?.collectionId || formData['820476880'])).data;
+    let response = await findParticipant(query);
+    let data = response.data[0];
+    let specimenData;
+    
+    if (!formData?.collectionId) {
+        specimenData = (await searchSpecimen(formData['820476880'])).data;
+    }
     hideAnimation();
 
     if (specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID && !formData?.collectionId) {
@@ -2167,13 +2170,10 @@ const btnsClicked = async (connectId, formData) => {
     await createTubesForCollection(formData, biospecimenData);
 
     hideAnimation();
-    if (formData?.collectionId) {
+    if (formData?.collectionId || confirmVal == "confirmed") {
         tubeCollectedTemplate(data, biospecimenData);
 
-    } else if (confirmVal == "confirmed") {
-        tubeCollectedTemplate(data, biospecimenData);
-    }
-    else {
+    } else {
         searchTemplate();
     }
 }
@@ -2316,7 +2316,7 @@ const clinicalBtnsClicked = async (formData) => {
         btnsClicked(connectId, formData);
         return
     }
-        let query = `connectId=${parseInt(ConnectId)}`;
+        let query = `connectId=${parseInt(connectId)}`;
         const response = await findParticipant(query);
         const data = response.data[0];
         specimenTemplate(data, formData);
