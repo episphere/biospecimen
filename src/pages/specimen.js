@@ -69,7 +69,7 @@ export const specimenTemplate = async (data, formData) => {
                 </div>
             </div>`;
      } else if(isSpecimenLinkForm2) {// clinical specimen page 2
-        let visit = visitType.filter(visit => visit.concept === formData.visitType)[0];
+        let visit = visitType.filter(visit => visit.concept === formData['331584571'])[0];
             template += `<div class="row">
                             <div class="column">
                                 <div class="row">Visit: ${visit.visitType}</div>

@@ -2155,7 +2155,7 @@ const btnsClicked = async (connectId, formData) => {
     }
 
     showAnimation();
-    formData['331584571'] = formData?.visitType || parseInt(getCheckedInVisit(data))
+    formData['331584571'] = formData?.['331584571'] || parseInt(getCheckedInVisit(data))
     
     if (!formData?.collectionId) {
         const storeResponse = await storeSpecimen([formData]);  
@@ -2309,7 +2309,7 @@ const clinicalBtnsClicked = async (formData) => {
     }
 
     if (confirmVal === "cancel") return;
-    formData = {...formData, '646899796': accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631, '928693120': accessionID3.value || '', visitType};
+    formData = {...formData, '646899796': accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631, '928693120': accessionID3.value || '', '331584571': visitType};
 
     if (confirmVal === "confirmed") {
         formData.collectionId = bloodAccessionId?.data?.[820476880];
