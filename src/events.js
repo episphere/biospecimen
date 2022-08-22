@@ -2309,8 +2309,10 @@ const clinicalBtnsClicked = async (formData) => {
     }
 
     if (confirmVal === "cancel") return;
-    formData = {...formData, '646899796': accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631, '928693120': accessionID3.value || '', '331584571': visitType};
-
+    if(accessionID1?.value) formData = {...formData, '646899796': +accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631};
+    if(accessionID3?.value) formData[928693120] = +accessionID3.value || '';
+    if(visitType) formData['331584571'] = {visitType};
+    
     if (confirmVal === "confirmed") {
         formData.collectionId = bloodAccessionId?.data?.[820476880];
         btnsClicked(connectId, formData);
