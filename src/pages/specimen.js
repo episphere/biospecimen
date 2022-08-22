@@ -68,13 +68,15 @@ export const specimenTemplate = async (data, formData) => {
                     <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Submit</button>
                 </div>
             </div>`;
+
      } else if(isSpecimenLinkForm2) {// clinical specimen page 2
-        let visit = visitType.filter(visit => visit.concept === formData['331584571'])[0];
+        let visit = visitType.filter(visit => visit.concept === formData['331584571'].visitType)[0];
+
             template += `<div class="row">
                             <div class="column">
                                 <div class="row">Visit: ${visit.visitType}</div>
-                                <div class="row">Blood Accession ID: ${formData['646899796']}</div>
-                                <div class="row">Urine Accession ID: ${formData['611091485']}</div>
+                                <div class="row">Blood Accession ID: ${formData['646899796'] || 'N/A'}</div>
+                                <div class="row">Urine Accession ID: ${formData['611091485'] || 'N/A'}</div>
                                 <div class="row">Link a new Collection ID</div>
                             </div>
                         </div>
