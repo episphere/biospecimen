@@ -1,8 +1,9 @@
-import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode } from "./../shared.js";
+import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode, searchSpecimen } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventClinicalSpecimenLinkForm, addEventClinicalSpecimenLinkForm2, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
 export const specimenTemplate = async (data, formData) => {
+
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenLink');
     navBarBtn.style.display = 'block';
@@ -70,8 +71,8 @@ export const specimenTemplate = async (data, formData) => {
             </div>`;
 
      } else if(isSpecimenLinkForm2) {// clinical specimen page 2
-        let visit = visitType.filter(visit => visit.concept === formData['331584571'].visitType)[0];
 
+        let visit = visitType.filter(visit => visit.concept === formData['331584571'].toString())[0];
             template += `<div class="row">
                             <div class="column">
                                 <div class="row">Visit: ${visit.visitType}</div>
