@@ -31,15 +31,15 @@ const packageReceiptTemplate = async (name, auth, route) => {
     template += `  <div id="root root-margin" style="padding-top: 25px;">
                       <div id="alert_placeholder"></div>
                       <span> <h3 style="text-align: center; margin: 0 0 1rem;">Package Receipt</h3> </span>
-                      <form method="post" class="mt-3" id="configForm">
+                      <div class="mt-3" >
                         <h5 style="text-align: left;">Receive Packages</h5>
                         <div style=" display:inline-block;" class="dropdown">
                           <button class="btn btn-secondary dropdown-toggle dropdown-toggle-sites" id="dropdownSelection" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                           Select Shipment
                           </button>
                           <ul class="dropdown-menu" id="dropdownMenuButtonSelection" aria-labelledby="dropdownMenuButton">
-                              <li><a class="dropdown-item" data-siteKey="allResults" id="all">Home Collection Shipment</a></li>
-                              <li><a class="dropdown-item" data-siteKey="hfHealth" id="hfHealth">Site Shipment</a></li>
+                              <li><a class="dropdown-item" data-siteKey="homeCollection" id="homeCollection">Home Collection Shipment</a></li>
+                              <li><a class="dropdown-item" data-siteKey="siteShipment" id="siteShipment">Site Shipment</a></li>
                           </ul>
                       </div>
                       <br />
@@ -81,40 +81,32 @@ const packageReceiptTemplate = async (name, auth, route) => {
                                 </select>
                            </div>
                         </div>
-
                         <div class="row form-group">
                             <label class="col-form-label col-md-4" for="receivePackageComments">Comment</label>
                             <textarea class="col-md-8 form-control" id="receivePackageComments" cols="30" rows="3" placeholder="Any comments?"></textarea>
                         </div>
-
                         <div class="row form-group">
                             <label class="col-form-label col-md-4" for="dateReceived">Date Received</label>
-                            <input autocomplete="off" required class="col-md-8 form-control" type="date" type="text" id="dateReceived">
+                            <input autocomplete="off" required class="col-md-8 form-control" type="date" type="text" id="dateReceived" value=${getCurrentDate()}>
                         </div>
-
                         <div id="collectionCard">
                             <h5 style="text-align: left;">Collection Card Data Entry for Home Mouthwash Kits</h5>
-
                             <div class="row form-group">
                                 <label class="col-form-label col-md-4 for="collectionCheckBox">Check if card not included</label>
                                 <input type="checkbox" name="collectionCheckBox" id="collectionCheckBox">
                             </div>
-
                             <div class="row form-group">
                                 <label class="col-form-label col-md-4" for="collectionId">Collection ID</label>
                                 <input autocomplete="off" class="col-md-8 form-control" type="text" id="collectionId" placeholder="Scan or Enter a Collection ID">
                             </div>
-
                             <div class="row form-group">
                                 <label class="col-form-label col-md-4" for="dateCollectionCard">Enter Collection Date from Collection Card</label>
                                 <input autocomplete="off" class="col-md-8 form-control" type="date" id="dateCollectionCard">
                             </div>
-
                             <div class="row form-group">
                                 <label class="col-form-label col-md-4" for="timeCollectionCard">Enter Collection Time from Collection Card</label>
                                 <input autocomplete="off" class="col-md-8 form-control" type="time" step="1" id="timeCollectionCard">
                             </div>
-
                             <div class="row form-group">
                                 <label class="col-form-label col-md-4" for="collectionComments">Comments on Card Returned</label>
                                 <textarea class="col-md-8 form-control" id="collectionComments" cols="30" rows="3" placeholder="Comments on the card?"></textarea>
@@ -123,20 +115,19 @@ const packageReceiptTemplate = async (name, auth, route) => {
                         
                         <div class="mt-4 mb-4" style="display:inline-block;">
                             <button type="button" class="btn btn-danger" id="clearForm">Clear</button>
-                            <button type="submit" class="btn btn-primary" id="save">Save</button>
-                        </div>
-
-                    </form>
-                   
-                </div>`;
-    template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                        <div class="modal-content sub-div-shadow">
-                            <div class="modal-header" id="modalHeader"></div>
-                            <div class="modal-body" id="modalBody"></div>
+                            <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#modalShowMoreData" id="save">Save</button>
                         </div>
                     </div>
-                </div>`
+                </div>`;
+      template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+      <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+          <div class="modal-content sub-div-shadow">
+              <div class="modal-header" id="modalHeader"></div>
+              <div class="modal-body" id="modalBody"></div>
+          </div>
+      </div>
+    </div>`
+        
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
     activeReceiptsNavbar();
@@ -242,75 +233,68 @@ const enableCollectionCardFields = () => {
 
 
 const formSubmit = () => {
-  const form = document.getElementById('configForm');
-  form.addEventListener('submit', e => {
+  const form = document.getElementById('save');
+  form.addEventListener('click', e => {
     e.preventDefault();
-    let obj = {};
-    let packageConditions = [];
-    const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
-    const onlyFedexCourierType = identifyCourierType(scannedBarcode);
-    if (onlyFedexCourierType === true) {
-      obj['scannedBarcode'] = scannedBarcode
-      for (let option of document.getElementById('packageCondition').options) {
-        if (option.selected) {packageConditions.push(option.value)}
-      }
-      obj[`${fieldMapping.packageCondition}`] = packageConditions;
-      if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode))) {  
-        obj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
-        obj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
-        obj[`${fieldMapping.siteShipmentDateReceived}`] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
-      } else { 
-        obj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
-        obj['dateReceived'] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
-        if(document.getElementById('collectionId').value) {
-          obj['collectionId'] = document.getElementById('collectionId').value;
-          obj['dateCollectionCard'] = document.getElementById('dateCollectionCard').value;
-          obj['timeCollectionCard'] = document.getElementById('timeCollectionCard').value;
-          document.getElementById('collectionCheckBox').checked === true ? 
-              obj['collectionCheckBox'] = true : obj['collectionCheckBox'] = false
-          obj['collectionComments'] = document.getElementById('collectionComments').value;
-        }    
-      }
-      window.removeEventListener("beforeunload",beforeUnloadMessage)
-      targetAnchorTagEl()
-      const receiptStatus = storePackageReceipt(obj);
-    
-      if (receiptStatus) {
-        const clearButtonEl = document.getElementById("clearForm");
-        document.getElementById("courierType").innerHTML = ``;
-        document.getElementById("scannedBarcode").value = "";
-        document.getElementById("packageCondition").value = "";
-        document.getElementById("receivePackageComments").value = "";
-        document.getElementById("dateReceived").value = getCurrentDate();
-        
-        document.getElementById("collectionComments").value = "";
-        document.getElementById("collectionId").value = "";
-        enableCollectionCardFields()
-        enableCollectionCheckBox()
-        document.getElementById("packageCondition").setAttribute("data-selected","[]")
-        targetAnchorTagEl()
-        clearButtonEl !== undefined ? clearButtonEl.removeEventListener("click",cancelConfirm) : ``
-        
-        window.removeEventListener("beforeunload",beforeUnloadMessage)
-      
-      if (document.getElementById("collectionId").value) {
-        document.getElementById("collectionId").value = "";
-        document.getElementById("dateCollectionCard").value = "";
-        document.getElementById("timeCollectionCard").value = "";
-        document.getElementById("collectionCheckBox").checked = false;
-        document.getElementById("collectionComments").value = "";
+    const header = document.getElementById('modalHeader');
+    const body = document.getElementById('modalBody');
+    header.innerHTML = `<h5>Confirmation</h5><button type="button" id="closeModal" class="modal-close-btn" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>`
+    let template = '<div>'
+    template += `
+            <span>Confirm package receipt</span>
+            <br >
+        <div style="display:inline-block;">
+            <button type="submit" class="btn btn-primary" data-dismiss="modal" id="confirmReceipt" target="_blank">Confirm</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank">Cancel</button>
+        </div>
 
-        enableCollectionCardFields();
-        enableCollectionCheckBox();
-        document.getElementById("packageCondition").setAttribute("data-selected","[]");
-        targetAnchorTagEl()
-        clearButtonEl.removeEventListener("click",cancelConfirm);
-        window.removeEventListener("beforeunload",beforeUnloadMessage);
-      }
-    } } else {
-      triggerErrorModal()
-    }
+   </div>`
+    body.innerHTML = template;
+    confirmPackageReceipt()
   })
+}
+
+const confirmPackageReceipt = () => {
+  const a = document.getElementById('confirmReceipt');
+  if (a) {
+    a.addEventListener('click',  () => { 
+      let obj = {};
+      let packageConditions = [];
+      const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
+      const onlyFedexCourierType = identifyCourierType(scannedBarcode);
+      if (onlyFedexCourierType === true) {
+        obj['scannedBarcode'] = scannedBarcode
+        for (let option of document.getElementById('packageCondition').options) {
+          if (option.selected) {packageConditions.push(option.value)}
+        }
+        obj[`${fieldMapping.packageCondition}`] = packageConditions;
+        if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode))) {  
+          obj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
+          obj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
+          obj[`${fieldMapping.siteShipmentDateReceived}`] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
+        } else { 
+          obj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
+          obj['dateReceived'] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
+          if(document.getElementById('collectionId').value) {
+            obj['collectionId'] = document.getElementById('collectionId').value;
+            obj['dateCollectionCard'] = document.getElementById('dateCollectionCard').value;
+            obj['timeCollectionCard'] = document.getElementById('timeCollectionCard').value;
+            document.getElementById('collectionCheckBox').checked === true ? 
+                obj['collectionCheckBox'] = true : obj['collectionCheckBox'] = false
+            obj['collectionComments'] = document.getElementById('collectionComments').value;
+          }    
+        }
+        window.removeEventListener("beforeunload",beforeUnloadMessage)
+        targetAnchorTagEl()
+        const receiptStatus = storePackageReceipt(obj);
+      
+        if (receiptStatus) {
+        location.reload(); 
+      } } else {
+        triggerErrorModal()
+      }
+    })
+  }
 }
 
 const identifyCourierType = (scannedBarcode) => {
