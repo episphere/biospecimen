@@ -2187,7 +2187,7 @@ const clinicalBtnsClicked = async (formData) => {
     const accessionID2 = document.getElementById('accessionID2');
     const accessionID3 = document.getElementById('accessionID3');
     const accessionID4 = document.getElementById('accessionID4');
-    const visitType = document.getElementById('visit-select').value;
+    const selectedVisit = document.getElementById('visit-select').value;
     
     let hasError = false;
     let focus = true;
@@ -2218,7 +2218,7 @@ const clinicalBtnsClicked = async (formData) => {
         errorMessage('accessionID4', 'Urine Accession ID doesn\'t match', focus, true);
         focus = false;
     }
-    else if (!visitType) {
+    else if (!selectedVisit) {
         hasError = true;
         errorMessage('visit-select', 'Visit Type is not selected', focus, true);
         focus = false;
@@ -2311,7 +2311,7 @@ const clinicalBtnsClicked = async (formData) => {
     if (confirmVal === "cancel") return;
     if(accessionID1?.value) formData = {...formData, '646899796': +accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631};
     if(accessionID3?.value) formData[928693120] = +accessionID3.value || '';
-    if(visitType) formData['331584571'] = {visitType};
+    if(selectedVisit) formData['331584571'] =  +selectedVisit;
     
     if (confirmVal === "confirmed") {
         formData.collectionId = bloodAccessionId?.data?.[820476880];
