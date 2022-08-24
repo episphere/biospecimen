@@ -286,13 +286,8 @@ const confirmPackageReceipt = () => {
         }
         window.removeEventListener("beforeunload",beforeUnloadMessage)
         targetAnchorTagEl()
-        const receiptStatus = storePackageReceipt(obj);
-      
-        if (receiptStatus) {
-        location.reload(); 
-      } } else {
-        triggerErrorModal()
-      }
+        storePackageReceipt(obj);
+       } 
     })
   }
 }
@@ -335,7 +330,29 @@ const storePackageReceipt = async (data) => {
                         </button>
                 </div>`;
         alertList.innerHTML = template;
-        return true;
+        document.getElementById("courierType").innerHTML = ``;
+        document.getElementById("scannedBarcode").value = "";
+        document.getElementById("packageCondition").value = "";
+        document.getElementById("receivePackageComments").value = "";
+        document.getElementById("dateReceived").value = getCurrentDate();
+        
+        document.getElementById("collectionComments").value = "";
+        document.getElementById("collectionId").value = "";
+        enableCollectionCardFields()
+        enableCollectionCheckBox()
+        document.getElementById("packageCondition").setAttribute("data-selected","[]")
+        if (document.getElementById("collectionId").value) {
+          document.getElementById("collectionId").value = "";
+          document.getElementById("dateCollectionCard").value = "";
+          document.getElementById("timeCollectionCard").value = "";
+          document.getElementById("collectionCheckBox").checked = false;
+          document.getElementById("collectionComments").value = "";
+    
+          enableCollectionCardFields();
+          enableCollectionCheckBox();
+          document.getElementById("packageCondition").setAttribute("data-selected","[]");
+    
+        }
     } else {
         alert("Error");
     }
