@@ -2138,3 +2138,13 @@ export const numericInputValidator = (elemArr) => {
         }
     })
 }
+
+export function addSelectionEventListener(elemId, pageAndElement) {
+    document.getElementById(elemId).addEventListener("change", (event) => {
+        const selection = event.target.value;
+        const prevSelections = JSON.parse(localStorage.getItem('selections'));
+        localStorage.setItem('selections', JSON.stringify({...prevSelections, [pageAndElement] : selection}));
+
+    });
+
+}
