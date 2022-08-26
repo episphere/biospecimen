@@ -153,6 +153,7 @@ const checkAndDisplayCourierType = () => {
         // document.getElementById('collectionCheckBox').checked = false;
         // document.getElementById('collectionCheckBox').removeAttribute("disabled")
         // enableCollectionCardFields();
+        triggerErrorModal();
         return
       }
       // USPS
@@ -162,13 +163,12 @@ const checkAndDisplayCourierType = () => {
         // document.getElementById('collectionCheckBox').checked = false;
         // document.getElementById('collectionCheckBox').removeAttribute("disabled")
         // enableCollectionCardFields();
-        triggerErrorModal()
+        triggerErrorModal();
         return
       }
       // FEDEX
-      else if (input.length === 34) {
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX`
-        e.target.value = input.slice(-12)
+      else if (input.length === 12) {
+        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
         // document.getElementById('collectionCheckBox').checked = false;
         // document.getElementById('collectionCheckBox').disabled = true;
         // checkCardIncluded();
@@ -176,8 +176,9 @@ const checkAndDisplayCourierType = () => {
         return
       }
       // FEDEX
-      else if (input.length === 12) {
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
+      else if (input.length > 12) {
+        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX`
+        e.target.value = input.slice(-12)
         // document.getElementById('collectionCheckBox').checked = false;
         // document.getElementById('collectionCheckBox').disabled = true;
         // checkCardIncluded();
@@ -238,7 +239,7 @@ const formSubmit = () => {
     e.preventDefault();
     const header = document.getElementById('modalHeader');
     const body = document.getElementById('modalBody');
-    header.innerHTML = `<h5>Confirmation</h5><button type="button" id="closeModal" class="modal-close-btn" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>`
+    header.innerHTML = `<h5>Confirmation</h5><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>`
     let template = '<div>'
     template += `
             <span>Confirm package receipt</span>
@@ -285,7 +286,7 @@ const confirmPackageReceipt = () => {
           }    
         }
         window.removeEventListener("beforeunload",beforeUnloadMessage)
-        targetAnchorTagEl()
+        targetAnchorTagEl();
         storePackageReceipt(obj);
        } 
     })
@@ -293,7 +294,7 @@ const confirmPackageReceipt = () => {
 }
 
 const identifyCourierType = (scannedBarcode) => {
- if (scannedBarcode.length === 34 || scannedBarcode.length === 12) {
+ if (scannedBarcode.length === 12 || scannedBarcode.length > 12) {
     return true
   }
   else {
