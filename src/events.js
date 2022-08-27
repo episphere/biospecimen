@@ -2310,7 +2310,7 @@ const clinicalBtnsClicked = async (formData) => {
 
     if (confirmVal === "cancel") return;
     if(accessionID1?.value) formData = {...formData, '646899796': +accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631};
-    if(accessionID3?.value) formData[928693120] = +accessionID3.value || '';
+    if(accessionID3?.value) formData['928693120'] = +accessionID3.value || '';
     if(selectedVisit) formData['331584571'] =  +selectedVisit;
     
     if (confirmVal === "confirmed") {
@@ -3013,18 +3013,16 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
 }
 
 export const populateSelectLocationList = async () => {
-    const locationSelection = JSON.parse(localStorage.getItem('selections'))?.shipping_location;
     let currSelect = document.getElementById('selectLocationList')
     let response = await getLocationsInstitute();
     let list = '<option value="none">Select Shipping Location</option>'
     for (let i = 0; i < response.length; i++) {
-        list += `<option ${locationSelection === response[i] ? 'selected="selected"' : ""}>` + response[i] + '</option>';
+        list += '<option>' + response[i] + '</option>';
     }
     if (list == '') {
         list = 'remember to add Box'
     }
     currSelect.innerHTML = list;
-
 }
 
 export const populateBoxManifestTable = (boxId, hiddenJSON) => {
