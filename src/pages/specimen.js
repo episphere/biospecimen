@@ -1,4 +1,4 @@
-import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode, searchSpecimen } from "./../shared.js";
+import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode, searchSpecimen, collectionInputValidator, addSelectionEventListener } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventClinicalSpecimenLinkForm, addEventClinicalSpecimenLinkForm2, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
@@ -17,6 +17,7 @@ export const specimenTemplate = async (data, formData) => {
     formData['827220437'] = parseInt(getSiteCode());
 
     const workflow = getWorflow() ?? localStorage.getItem('workflow');
+    const locationSelection = JSON.parse(localStorage.getItem('selections'))?.specimenLink_location;
 
     let template = `
         </br>
@@ -49,7 +50,7 @@ export const specimenTemplate = async (data, formData) => {
                     <select class="form-control col-md-5" id="collectionLocation">
                     <option value='none'>Please Select Location</option>`
                     siteLocations[workflow][siteAcronym].forEach(site => {
-                        template +=`<option value='${site.concept}'>${site.location}</option>`
+                        template +=`<option ${locationSelection === site.concept.toString() ? 'selected="selected"' : ""} value='${site.concept}'>${site.location}</option>`
                     })
                     template +=`</select>`
                 }
@@ -142,9 +143,13 @@ export const specimenTemplate = async (data, formData) => {
     if(workflow === 'research') {
         // document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
         addEventSpecimenLinkForm(formData);
+        addSelectionEventListener("collectionLocation", "specimenLink_location");
+        
     } else if (isSpecimenLinkForm2) {// clinical specimen page 2
         // document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
         addEventClinicalSpecimenLinkForm2(formData);
+        collectionInputValidator(['scanSpecimenID', 'scanSpecimenID2']);
+
     } else {//clinical specimen page 1
         document.getElementById('accessionID2').onpaste = e => e.preventDefault();
         document.getElementById('accessionID4').onpaste = e => e.preventDefault();
