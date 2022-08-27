@@ -1525,7 +1525,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                 if(elementID === 'accessionID1') {
                     disableInput('accessionID2', true);
                     // addEventClearScannedBarcode('clearScanAccessionID');
-                    document.getElementById(elementID).value = barcode.replace(/\D/g,'');
+                    document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end-1) : result.codeResult.code;
                     Quagga.stop();
                     document.querySelector('[data-dismiss="modal"]').click();
                     return
@@ -1533,7 +1533,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                 if(elementID === 'accessionID3') {
                     disableInput('accessionID4', true);
                     // addEventClearScannedBarcode('clearScanAccessionID');
-                    document.getElementById(elementID).value = barcode.replace(/\D/g,'');
+                    document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end-1) : result.codeResult.code;
                     Quagga.stop();
                     document.querySelector('[data-dismiss="modal"]').click();
                     return
@@ -2073,7 +2073,6 @@ export const checkDuplicateTrackingIdFromDb = async (boxes) => {
     return isExistingTrackingId;
 }
 
-
 export const checkNonAlphanumericStr = (boxes) => {
   let regExp = /^[a-z0-9]+$/i
   let arr = []
@@ -2134,6 +2133,16 @@ export const numericInputValidator = (elemArr) => {
         if (document.getElementById(elem)) {
             document.getElementById(elem).addEventListener('input', (e) => {
                 document.getElementById(elem).value = e.target.value.replace(/\D+/g, '');
+            })
+        }
+    })
+}
+
+export const collectionInputValidator = (elemArr) => {
+    elemArr.forEach(elem => {
+        if (document.getElementById(elem)) {
+            document.getElementById(elem).addEventListener('input', (e) => {
+                document.getElementById(elem).value = e.target.value.substr(0,9);
             })
         }
     })
