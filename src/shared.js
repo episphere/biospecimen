@@ -2133,7 +2133,7 @@ export const numericInputValidator = (elemArr) => {
     elemArr.forEach(elem => {
         if (document.getElementById(elem)) {
             document.getElementById(elem).addEventListener('input', (e) => {
-                if (!/^\d+$/g.test(e.target.value)) errorMessage(elem, 'This entry can only contain numbers.', focus, true);
+                document.getElementById(elem).value = e.target.value.replace(/\D+/g, '');
             })
         }
     })
