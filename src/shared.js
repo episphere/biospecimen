@@ -1426,7 +1426,7 @@ export const keyToLocationObj =
     692275326: "Marshfield",
     698283667: "Lake Hallie",
     834825425: "HP Research Clinic",
-    736183094: "Henry Ford Health Main Campus",
+    736183094: "HFH K-13 Research Clinic",
     886364332: "Henry Ford Health Pavilion",
     589224449: "SF Cancer Center LL",
     111111111: "NIH",
