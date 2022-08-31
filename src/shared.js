@@ -1626,7 +1626,7 @@ export const siteLocations = {
         'UCM': [{location: 'UC-DCAM', concept: 777644826}],
         'MFC': [{location: 'Marshfield', concept: 692275326}, {location: 'Lake Hallie', concept: 698283667}],
         'HP': [{location: 'HP Research Clinic', concept: 834825425}],
-        'HFHS': [{location: 'HFHS Research Clinic (Main Campus)', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332}],
+        'HFHS': [{location: 'HFH K-13 Research Clinic', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332}],
         'SFH': [{location: 'SF Cancer Center LL', concept: 589224449}],
         'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}]
     },
