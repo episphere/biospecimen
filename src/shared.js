@@ -1119,7 +1119,10 @@ const checkPaymentEligibility = async (data, baselineCollections) => {
     const module2 = (data['536735468'] && data['536735468'] === 231311385);
     const module3 = (data['976570371'] && data['976570371'] === 231311385);
     const module4 = (data['663265240'] && data['663265240'] === 231311385);
-    const bloodCollected = baselineCollections[0]['650516960'] === 534621077 ? (data['878865966'] && data['878865966'] === 353358909) : (data['693370086'] && data['693370086'] === 353358909);
+    const bloodCollected = baselineCollections[0]['650516960'] === 534621077 
+        ? (data['878865966'] && data['878865966'] === 353358909) 
+        : (data['878865966'] && data['878865966'] === 353358909) && (data['693370086'] && data['693370086'] === 353358909);
+
     const tubes = baselineCollections[0]['650516960'] === 534621077 ? workflows.research.filter(tube => tube.tubeType === 'Blood tube') : workflows.clinical.filter(tube => tube.tubeType === 'Blood tube');
   
     let eligible = false;
@@ -1131,7 +1134,7 @@ const checkPaymentEligibility = async (data, baselineCollections) => {
       else {
         baselineCollections.forEach(collection => {
           tubes.forEach(tube => {
-            if(collection[tube.concept] && collection[tube.concept]['883732523'] && collection[tube.concept]['883732523'] != 681745422) {
+            if(collection[tube.concept] && collection[tube.concept]['883732523'] && collection[tube.concept]['883732523'] != 681745422 && collection['650516960'] === 534621077) {
               eligible = true;
             }
           });
