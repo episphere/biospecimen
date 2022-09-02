@@ -2366,6 +2366,14 @@ export const addEventBiospecimenCollectionFormToggles = () => {
                     deviated.dispatchEvent(event);
                 }
             }
+            
+            if (getWorflow() === 'research' && collected.id === '223999569') {
+                const mouthwashContainer = document.getElementById(`143615646Id`);
+                if (!mouthwashContainer.value && collected.checked) {
+                    specimenId.disabled = true;
+                }
+            }
+
         });
     });
 

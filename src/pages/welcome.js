@@ -1,8 +1,11 @@
-import { validateUser, siteFullNames, showAnimation, hideAnimation, errorMessage, removeAllErrors, urls } from "./../shared.js";
+import { validateUser, siteFullNames, showAnimation, hideAnimation, errorMessage, removeAllErrors, urls, searchSpecimen } from "./../shared.js";
 import { userDashboard } from "./dashboard.js";
 import { nonUserNavBar, unAuthorizedUser } from './../navbar.js'
 
 export const welcomeScreen = async (auth, route) => {
+    const biospecimenData = (await searchSpecimen('CXA002644')).data;
+    console.log(biospecimenData)
+
     const user = auth.currentUser;
     if(!user) return;
     console.log('userWelcome', user.email)
