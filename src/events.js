@@ -3128,8 +3128,6 @@ export const populateTrackingQuery = async (hiddenJSON) => {
                         <br>`
     }
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
-    // Scan into another
-    
 }
 
 export const addEventCompleteButton = (hiddenJSON, userName, tempChecked) => {
