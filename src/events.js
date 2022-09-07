@@ -2913,15 +2913,24 @@ export const addEventNavBarTracking = (element, userName, hiddenJSON, tempChecke
     });
 }
 
+export const addEventTrackingNumberScanAutoFocus = () => {
+    let arrInputs = Array.from(document.getElementsByClassName('shippingTrackingInput'))
+    for(let i = 0; i < arrInputs.length - 1; i++ ) { // listener to every input but last element 
+        arrInputs[i].addEventListener("keydown", e => {
+            if(e.keyCode == 13) arrInputs[i+1].focus()
+        })
+    }   
+}
+
 export const addEventTrimTrackingNums = () => {
   let boxTrackingIdEls = Array.from(document.getElementsByClassName("boxTrackingId"))
   let boxTrackingIdConfirmEls = Array.from(document.getElementsByClassName("boxTrackingIdConfirm"))
-  const alphaNumericRegExp = /[^a-zA-Z0-9]/gm;
+  const nonAlphaNumericMatch = /[^a-zA-Z0-9]/gm;
   // Trim Function here
   boxTrackingIdEls.forEach(el => el.addEventListener("input", e => {
     let inputTrack = e.target.value.trim()
     if(inputTrack.length >= 0) {
-      e.target.value = inputTrack.replace(alphaNumericRegExp, '')
+      e.target.value = inputTrack.replace(nonAlphaNumericMatch, '')
     }
     if(inputTrack.length > 12) {
       e.target.value = inputTrack.slice(-12)
@@ -2930,7 +2939,7 @@ export const addEventTrimTrackingNums = () => {
   boxTrackingIdConfirmEls.forEach(el => el.addEventListener("input", e => {
     let inputTrackConfirm = e.target.value.trim()
     if(inputTrackConfirm.length >= 0) {
-      e.target.value = inputTrackConfirm.replace(alphaNumericRegExp, '')
+      e.target.value = inputTrackConfirm.replace(nonAlphaNumericMatch, '')
     }
     if(inputTrackConfirm.length > 12) {
       e.target.value = inputTrackConfirm.slice(-12)
@@ -3101,7 +3110,7 @@ export const populateTrackingQuery = async (hiddenJSON) => {
                                 <label style="float:left;margin-top:5px">`+'Enter / Scan Shipping Tracking Number for ' + `<span style="font-weight:600;display:block;">${boxes[i]}</span>` + `</label>
                                 <br>
                                 <div style="float:left;">
-                                    <input class="form-control boxTrackingId" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${trackNum ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type tracking number" autocomplete="off"/>
+                                    <input class="form-control boxTrackingId shippingTrackingInput" type="text" id="` + boxes[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${trackNum ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type tracking number" autocomplete="off"/>
                                     <p style="font-size:.8rem; margin-top:.5rem;">Ex. 457424072905</p>
                                     <p id="${boxes[i]}trackingIdErrorMsg" class="text-danger"></p>
                                 </div>
@@ -3110,7 +3119,7 @@ export const populateTrackingQuery = async (hiddenJSON) => {
                                 <label style="float:left;margin-top:5px">`+'Confirm Shipping Tracking Number for '+ `<span style="font-weight:600;display:block;">${boxes[i]}</span>` + `</label>
                                 <br>
                                 <div style="float:left;">
-                                    <input class="form-control boxTrackingIdConfirm" type="text" id="` + boxes[i] + 'trackingIdConfirm' + `" placeholder="Enter/Scan Tracking Number" value="${trackNumConfirm ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type to confirm the correct tracking number" autocomplete="off"/>
+                                    <input class="form-control boxTrackingIdConfirm shippingTrackingInput" type="text" id="` + boxes[i] + 'trackingIdConfirm' + `" placeholder="Enter/Scan Tracking Number" value="${trackNumConfirm ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type to confirm the correct tracking number" autocomplete="off"/>
                                     <p style="font-size:.8rem; margin-top:.5rem;">Ex. 457424072905</p>
                                     <p id="${boxes[i]}trackingIdConfirmErrorMsg" class="text-danger"></p>
                                 </div>
@@ -3119,6 +3128,7 @@ export const populateTrackingQuery = async (hiddenJSON) => {
                         <br>`
     }
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
+    // Scan into another
     
 }
 
