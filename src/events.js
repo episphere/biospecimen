@@ -2915,7 +2915,7 @@ export const addEventNavBarTracking = (element, userName, hiddenJSON, tempChecke
 
 export const addEventTrackingNumberScanAutoFocus = () => {
     let arrInputs = Array.from(document.getElementsByClassName('shippingTrackingInput'))
-    for(let i = 0; i < arrInputs.length - 1; i++ ) { // listener to every input but last element 
+    for(let i = 0; i < arrInputs.length - 1; i++ ) {
         arrInputs[i].addEventListener("keydown", e => {
             if(e.keyCode == 13) arrInputs[i+1].focus()
         })
