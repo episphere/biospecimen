@@ -2683,7 +2683,7 @@ export const addEventSelectAllCollection = () => {
     checkbox.addEventListener('click', () => {
         
         Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => {
-            if(!chk.disabled && chk.id !== '787237543') {
+            if(!chk.disabled && chk.id !== '223999569') {
                 chk.checked = checkbox.checked;
 
                 const event = new CustomEvent('change');
