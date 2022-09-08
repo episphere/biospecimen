@@ -194,9 +194,12 @@ body {
     font-size: small;
 }
 
-.error-text {
+.error-text, .helper-text {
     padding-left: 5px !important;
     width: 100%;
+}
+.form-helper-text {
+    font-size: small;
 }
 
 .invalid {

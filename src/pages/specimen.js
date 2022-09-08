@@ -116,6 +116,7 @@ export const specimenTemplate = async (data, formData) => {
                 <input autocomplete="off" type="text" class="form-control col-md-5" ${siteAcronym === 'KPCO' || siteAcronym === 'KPGA' || siteAcronym === 'KPNW' || siteAcronym === 'KPHI' ? 'required': ''} placeholder="Scan/Type in Accession ID from Blood Tube" id="accessionID1"/>
                 
                 <button class="barcode-input-clear" hidden="true" type="button" id="clearScanAccessionID" title="Clear scanned barcode" data-enable-input="accessionID2" data-barcode-input="accessionID1"><i class="fas fa-times"></i></button>
+                <div class="helper-text"><span class="form-helper-text offset-4">This entry can only contain numbers.</span></div>
             </div>
             <div class="form-group row">
                 <input autocomplete="off" type="text" class="form-control col-md-5 offset-4" placeholder="Re-Enter (scan/type) in Accession ID from Blood Tube" id="accessionID2"/>
