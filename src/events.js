@@ -2280,7 +2280,7 @@ const clinicalBtnsClicked = async (formData) => {
 
     if (confirmVal === 'No') return;
 
-    const bloodAccessionId = await checkAccessionId({accessionId: accessionID1.value, accessionIdType: '646899796'});
+    const bloodAccessionId = await checkAccessionId({accessionId: +accessionID1.value, accessionIdType: '646899796'});
     
     if (bloodAccessionId.code === 200) {
         hideAnimation();
