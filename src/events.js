@@ -3030,11 +3030,13 @@ export const addEventCheckValidTrackInputs = (hiddenJSON) => {
 }
 
 export const populateSelectLocationList = async () => {
+    const locationSelection = JSON.parse(localStorage.getItem('selections'))?.shipping_location;
     let currSelect = document.getElementById('selectLocationList')
     let response = await getLocationsInstitute();
     let list = '<option value="none">Select Shipping Location</option>'
+    console.log({locationSelection, response})
     for (let i = 0; i < response.length; i++) {
-        list += '<option>' + response[i] + '</option>';
+        list += `<option ${locationSelection === response[i] ? 'selected="selected"' : ""}>` + response[i] + '</option>';
     }
     if (list == '') {
         list = 'remember to add Box'
