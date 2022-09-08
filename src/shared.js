@@ -1412,7 +1412,7 @@ export const keyToLocationObj =
     692275326: "Marshfield",
     698283667: "Lake Hallie",
     834825425: "HP Research Clinic",
-    736183094: "Henry Ford Health Main Campus",
+    736183094: "HFH K-13 Research Clinic",
     886364332: "Henry Ford Health Pavilion",
     589224449: "SF Cancer Center LL",
     111111111: "NIH",
@@ -1603,7 +1603,7 @@ export const siteLocations = {
         'UCM': [{location: 'UC-DCAM', concept: 777644826}],
         'MFC': [{location: 'Marshfield', concept: 692275326}, {location: 'Lake Hallie', concept: 698283667}],
         'HP': [{location: 'HP Research Clinic', concept: 834825425}],
-        'HFHS': [{location: 'HFHS Research Clinic (Main Campus)', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332}],
+        'HFHS': [{location: 'HFH K-13 Research Clinic', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332}],
         'SFH': [{location: 'SF Cancer Center LL', concept: 589224449}],
         'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}]
     },
