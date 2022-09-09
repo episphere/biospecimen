@@ -143,12 +143,12 @@ export const specimenTemplate = async (data, formData) => {
     document.getElementById('contentBody').innerHTML = template;
     //JS Events logic 
     if(workflow === 'research') {
-        // document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
+        document.getElementById('scanSpecimenID2').onpaste = e => e.preventDefault();
         addEventSpecimenLinkForm(formData);
         addSelectionEventListener("collectionLocation", "specimenLink_location");
         
     } else if (isSpecimenLinkForm2) {// clinical specimen page 2
-        // document.getElementById('enterSpecimenID2').onpaste = e => e.preventDefault();
+        document.getElementById('scanSpecimenID2').onpaste = e => e.preventDefault();
         addEventClinicalSpecimenLinkForm2(formData);
         collectionInputValidator(['scanSpecimenID', 'scanSpecimenID2']);
 
