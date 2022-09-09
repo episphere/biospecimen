@@ -7,7 +7,7 @@ import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
-import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength } from './tubeValidation.js';
+import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength, workflows } from './tubeValidation.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -2374,6 +2374,29 @@ export const addEventBiospecimenCollectionFormToggles = () => {
                 }
             }
 
+            if (getWorflow() === 'research' && collected.id === '143615646') {
+                const mouthwashBagChkb = document.getElementById(`223999569`);
+                const mouthwashBagText = document.getElementById(`223999569Id`);
+                if (collected.checked) {
+                    mouthwashBagChkb.checked = true;
+                    mouthwashBagText.disabled = false;
+                }
+            }
+            
+            const selectionData = workflows[getWorflow()].filter(tube => tube.concept === collected.id)[0];
+
+            if (selectionData.tubeType === 'Blood tube' || selectionData.tubeType === 'Urine') {
+                const biohazardBagChkb = document.getElementById(`787237543`);
+                const biohazardBagText = document.getElementById(`787237543Id`);
+                if (collected.checked) {
+                    biohazardBagChkb.checked = true;
+                    biohazardBagText.disabled = false;
+                } else {
+                    biohazardBagChkb.checked = false;
+                    biohazardBagText.disabled = true;
+                }
+        
+            }
         });
     });
 
@@ -2498,7 +2521,6 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
 }
 
 const collectionSubmission = async (formData, biospecimenData, cntd) => {
-    
     removeAllErrors();
 
     if (getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
