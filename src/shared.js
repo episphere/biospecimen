@@ -2176,7 +2176,7 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
         const emailData = {
             email: data['869588347'],
             subject: "Please complete a short survey about your samples",
-            message: baselineEmailTemplate(data),
+            message: baselineEmailTemplate(data, true),
             notificationType: "email",
             time: new Date().toISOString(),
             attempt: "1st contact",
