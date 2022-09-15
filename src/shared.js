@@ -2160,3 +2160,32 @@ export function addSelectionEventListener(elemId, pageAndElement) {
     });
 
 }
+
+export const checkSurveyEmailTrigger = async (data, visitType) => {
+    
+    const response = await getParticipantCollections(data.token);
+    let sendBaselineEmail = false;
+
+    if(response.code != 404) {
+        const collections = response.data.filter(res => res['331584571'] == visitType && res['650516960'] == 664882224);
+
+        if(collections.length == 1) sendBaselineEmail = true;
+    } 
+    
+    if(sendBaselineEmail) {
+        const emailData = {
+            email: data['869588347'],
+            subject: "Please complete a short survey about your samples",
+            message: baselineEmailTemplate(data, true),
+            notificationType: "email",
+            time: new Date().toISOString(),
+            attempt: "1st contact",
+            category: "Baseline Clinical Biospecimen Survey Reminder",
+            token: data.token,
+            uid: data.state.uid,
+            read: false
+        };
+        
+        await(sendClientEmail(emailData));
+    }
+}
