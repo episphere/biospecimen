@@ -8,7 +8,7 @@ import { signOut } from "./pages/signIn.js";
 import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
-import conceptIDs from './fieldToConceptIdMapping.js';
+import conceptIds from './fieldToConceptIdMapping.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
 
 
@@ -557,22 +557,22 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) =
     return response.json();
 }
 
-export const bagConceptIDList = [
-    conceptIDs.bag1,
-    conceptIDs.bag2,
-    conceptIDs.bag3,
-    conceptIDs.bag4,
-    conceptIDs.bag5,
-    conceptIDs.bag6,
-    conceptIDs.bag7,
-    conceptIDs.bag8,
-    conceptIDs.bag9,
-    conceptIDs.bag10,
-    conceptIDs.bag11,
-    conceptIDs.bag12,
-    conceptIDs.bag13,
-    conceptIDs.bag14,
-    conceptIDs.bag15,
+export const bagConceptIdList = [
+    conceptIds.bag1,
+    conceptIds.bag2,
+    conceptIds.bag3,
+    conceptIds.bag4,
+    conceptIds.bag5,
+    conceptIds.bag6,
+    conceptIds.bag7,
+    conceptIds.bag8,
+    conceptIds.bag9,
+    conceptIds.bag10,
+    conceptIds.bag11,
+    conceptIds.bag12,
+    conceptIds.bag13,
+    conceptIds.bag14,
+    conceptIds.bag15,
 ];
   
 export const convertToOldBox = (inputBox) => {
@@ -583,33 +583,33 @@ export const convertToOldBox = (inputBox) => {
   let hasOrphanBag = false;
   let orphanBag = { arrElements: [] };
 
-  for (let bagConceptId of bagConceptIDList) {
+  for (let bagConceptId of bagConceptIdList) {
     if (!inputBox[bagConceptId]) continue;
     let outputBag = {};
     const inputBag = inputBox[bagConceptId];
     const keysNeeded = [
-      conceptIDs.scannedByFirstName,
-      conceptIDs.scannedByLastName,
-      conceptIDs.orphanBagFlag,
+      conceptIds.scannedByFirstName,
+      conceptIds.scannedByLastName,
+      conceptIds.orphanBagFlag,
     ];
 
     for (let k of keysNeeded) {
       if (inputBag[k]) outputBag[k] = inputBag[k];
     }
 
-    if (inputBag[conceptIDs.bagscan_orphanBag]) {
+    if (inputBag[conceptIds.bagscan_orphanBag]) {
       hasOrphanBag = true;
       orphanBag = { ...orphanBag, ...outputBag };
-      orphanBag.arrElements.push(...inputBag[conceptIDs.tubesCollected]);
+      orphanBag.arrElements.push(...inputBag[conceptIds.tubesCollected]);
     } else {
-      outputBag.arrElements = inputBag[conceptIDs.tubesCollected];
+      outputBag.arrElements = inputBag[conceptIds.tubesCollected];
       let bagID;
 
-      if (inputBag[conceptIDs.bagscan_bloodUrine]) {
-        bagID = inputBag[conceptIDs.bagscan_bloodUrine];
+      if (inputBag[conceptIds.bagscan_bloodUrine]) {
+        bagID = inputBag[conceptIds.bagscan_bloodUrine];
         outputBag.isBlood = true;
-      } else if (inputBag[conceptIDs.bagscan_mouthWash]) {
-        bagID = inputBag[conceptIDs.bagscan_mouthWash];
+      } else if (inputBag[conceptIds.bagscan_mouthWash]) {
+        bagID = inputBag[conceptIds.bagscan_mouthWash];
         outputBag.isBlood = false;
       }
         
@@ -624,7 +624,7 @@ export const convertToOldBox = (inputBox) => {
   }
 
   outputBox.bags = bags;
-  const locationConceptID = inputBox[conceptIDs.shippingLocation];
+  const locationConceptID = inputBox[conceptIds.shippingLocation];
   outputBox.siteAcronym =
     locationConceptIDToLocationMap[locationConceptID]?.siteAcronym ||
     'Not Found';
@@ -635,41 +635,41 @@ export const convertToFirestoreBox = (inputBox) => {
   let { bags } = inputBox;
   let outputBox = { ...inputBox };
   let bagConceptIDIndex = 0;
-  outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.no;
+  outputBox[conceptIds.containsOrphanFlag] = conceptIds.no;
   delete outputBox.bags;
-  const defaultOutputBag = { [conceptIDs.bagscan_bloodUrine]: '', [conceptIDs.bagscan_mouthWash]: '', [conceptIDs.bagscan_orphanBag]: '' };
+  const defaultOutputBag = { [conceptIds.bagscan_bloodUrine]: '', [conceptIds.bagscan_mouthWash]: '', [conceptIds.bagscan_orphanBag]: '' };
     
   for (let [bagID, inputBag] of Object.entries(bags)) {
-      if (bagConceptIDIndex >= bagConceptIDList.length) break;      
+      if (bagConceptIDIndex >= bagConceptIdList.length) break;      
       inputBag.arrElements = Array.from(new Set(inputBag.arrElements));
 
     if (bagID === 'unlabelled') {
-        outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.yes;       
+        outputBox[conceptIds.containsOrphanFlag] = conceptIds.yes;       
       for (let tubeID of inputBag.arrElements) {
           let outputBag = {...defaultOutputBag};          
-          const bagConceptID = bagConceptIDList[bagConceptIDIndex];
+          const bagConceptID = bagConceptIdList[bagConceptIDIndex];
           const keysNeeded = [            
-              conceptIDs.scannedByFirstName,              
-              conceptIDs.scannedByLastName,        
-              conceptIDs.orphanBagFlag,
+              conceptIds.scannedByFirstName,              
+              conceptIds.scannedByLastName,        
+              conceptIds.orphanBagFlag,
           ];
 
         for (let k of keysNeeded) {
           if (inputBag[k]) outputBag[k] = inputBag[k];
         }
 
-        outputBag[conceptIDs.bagscan_orphanBag] = tubeID;
-        outputBag[conceptIDs.orphanBagFlag] = conceptIDs.yes;
-        outputBag[conceptIDs.tubesCollected] = [tubeID];
+        outputBag[conceptIds.bagscan_orphanBag] = tubeID;
+        outputBag[conceptIds.orphanBagFlag] = conceptIds.yes;
+        outputBag[conceptIds.tubesCollected] = [tubeID];
         outputBox[bagConceptID] = outputBag;
         bagConceptIDIndex++;
       }
     } else {
       let outputBag = {...defaultOutputBag};
-      const bagConceptID = bagConceptIDList[bagConceptIDIndex];
+      const bagConceptID = bagConceptIdList[bagConceptIDIndex];
       const keysNeeded = [
-        conceptIDs.scannedByFirstName,
-        conceptIDs.scannedByLastName,
+        conceptIds.scannedByFirstName,
+        conceptIds.scannedByLastName,
       ];
 
       for (let k of keysNeeded) {
@@ -678,13 +678,13 @@ export const convertToFirestoreBox = (inputBox) => {
 
       const bagIDEndString = bagID.split(' ')[1];
         if (bagIDEndString === '0008') {  
-          outputBag[conceptIDs.bagscan_bloodUrine] = bagID;
+          outputBag[conceptIds.bagscan_bloodUrine] = bagID;
         } else if (bagIDEndString === '0009') {
-            outputBag[conceptIDs.bagscan_mouthWash] = bagID;
+            outputBag[conceptIds.bagscan_mouthWash] = bagID;
       }
 
-      outputBag[conceptIDs.orphanBagFlag] = conceptIDs.no;
-      outputBag[conceptIDs.tubesCollected] = inputBag.arrElements;
+      outputBag[conceptIds.orphanBagFlag] = conceptIds.no;
+      outputBag[conceptIds.tubesCollected] = inputBag.arrElements;
       outputBox[bagConceptID] = outputBag;
       bagConceptIDIndex++;
     }
@@ -713,8 +713,8 @@ export const getBoxes = async (box) => {
   for (let i = 0; i < data.length; i++) {
     let currJSON = convertToOldBox(data[i]);
     if (
-      !currJSON.hasOwnProperty(conceptIDs.submitShipmentFlag) ||
-      currJSON[conceptIDs.submitShipmentFlag] != conceptIDs.booleanOne
+      !currJSON.hasOwnProperty(conceptIds.submitShipmentFlag) ||
+      currJSON[conceptIds.submitShipmentFlag] != conceptIds.booleanOne
     ) {
       toReturn['data'].push(currJSON);
     }
@@ -845,11 +845,11 @@ export const searchSpecimenInstitute = async () => {
                 }
                 // check and delete if iterateJSON has not shipped specimen deviation concept ID
                 if(iterateJSON.hasOwnProperty('248868659')) {
-                  if(iterateJSON["248868659"][conceptIDs.brokenSpecimenDeviation] == '353358909' || 
-                     iterateJSON["248868659"][conceptIDs.discardSpecimenDeviation] == '353358909' || 
-                     iterateJSON["248868659"][conceptIDs.insufficientVolumeSpecimenDeviation] == '353358909' || 
-                     iterateJSON["248868659"][conceptIDs.mislabelledDiscardSpecimenDeviation] == '353358909' || 
-                     iterateJSON["248868659"][conceptIDs.notFoundSpecimenDeviation] == '353358909') {
+                  if(iterateJSON["248868659"][conceptIds.brokenSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIds.discardSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIds.insufficientVolumeSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIds.mislabelledDiscardSpecimenDeviation] == '353358909' || 
+                     iterateJSON["248868659"][conceptIds.notFoundSpecimenDeviation] == '353358909') {
                     delete currJSON[keys[i]]
                   }
                 }
