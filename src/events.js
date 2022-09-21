@@ -2123,19 +2123,16 @@ const btnsClicked = async (connectId, formData) => {
 
     formData['820476880'] = collectionID;
     formData['650516960'] = getWorflow() === 'research' ? 534621077 : 664882224;
-    formData['387108065'] = document.getElementById('scanSpecimenID') && document.getElementById('scanSpecimenID').dataset.isscanned !== 'false' ? 104430631 : 353358909;
     formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
     formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
     
     let bloodAccessionId = formData?.['646899796'];
     if (bloodAccessionId) {
         formData['646899796'] = bloodAccessionId;
-        formData['148996099'] = 353358909;
     }
     let urineAccessionId = formData?.['928693120'];
     if (urineAccessionId) {
         formData['928693120'] = urineAccessionId;
-        //formData['148996099'] = 353358909;
     }
     let query = `connectId=${parseInt(connectId)}`;
 
@@ -2313,7 +2310,7 @@ const clinicalBtnsClicked = async (formData) => {
     }
 
     if (confirmVal === "cancel") return;
-    if(accessionID1?.value) formData = {...formData, '646899796': +accessionID1.value || '', '148996099': accessionID1.value ? 353358909: 104430631};
+    if(accessionID1?.value) formData = {...formData, '646899796': +accessionID1.value || ''};
     if(accessionID3?.value) formData['928693120'] = +accessionID3.value || '';
     if(selectedVisit) formData['331584571'] =  +selectedVisit;
     
