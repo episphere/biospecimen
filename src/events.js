@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, specimenCollection } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -8,6 +8,7 @@ import { specimenTemplate } from './pages/specimen.js';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength } from './tubeValidation.js';
+import conceptIds from './fieldToConceptIdMapping.js';
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -295,36 +296,7 @@ export const addEventAddSpecimenToBox = (userName) => {
         await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan)
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
-  
 
-        /*
-        //document.getElementById("shippingModal").modal();
-        var specimenList = document.getElementById("specimenList");
-        let list = [];
-        for (let index = 0; index < specimenList.children.length; index++) {
-            list.push(specimenList.children[index].value);
-        }
-        
-        if(list.includes(masterSpecimenId)){
-            let spl = masterSpecimenId.split(/\s+/);
-            if(spl.length >= 2 && spl[1] == "0008"){
-                var option = document.createElement("option");
-                option.text = masterSpecimenId;
-                mouthwashList.add(option)
-            }
-            else{
-                //go to blood and urine
-                var option = document.createElement("option");
-                option.text = masterSpecimenId;
-                currTubeTable.add(option)
-            }
-        }
-
-        for (var i=0; i<specimenList.length; i++) {
-            if (specimenList.options[i].value == masterSpecimenId)
-                specimenList.remove(i);
-        }
-        */
     })
 }
 
@@ -459,17 +431,15 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
     let specimenSearch = document.getElementById('masterSpecimenId')
     submitButton.addEventListener('click', async e => {
         e.preventDefault();
-
-
         showAnimation();
         let boxIdAndBags = {};
+        // get un-shipped boxes
         let response = await getBoxes();
         let boxList = response.data;
         let locations = {};
         for (let i = 0; i < boxList.length; i++) {
             let box = boxList[i]
             // Box ID ("132929440"); Location ID, site specific ("560975149"); Login Site ("789843387")
-            // add bags based on Box ID to hidden JSON
             boxIdAndBags[box['132929440']] = box['bags']
             // Location ID's value will be a number
             locations[box['132929440']] = box['560975149'];
@@ -488,7 +458,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         let checkedEleList = [];
         let uncheckedEleList = [];
         const allCheckboxEle = document.querySelectorAll(".samplePresentCheckbox");
-        
+
         for (let ele of allCheckboxEle) {
             if (ele.checked) {
                 checkedEleList.push(ele)
@@ -506,39 +476,35 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
 
         for (let i = 0; i < checkedEleList.length; i++) {
             // data-full-specimen-id (Ex. "CXA444444 0007")
-            let toAddId = checkedEleList[i].getAttribute("data-full-specimen-id")
-            const [collectionID, tubeID] = toAddId.split(/\s+/);
-            toDelete.push(tubeID);
+            let idToAdd = checkedEleList[i].getAttribute("data-full-specimen-id")
+            const [collectionId, tubeId] = idToAdd.split(/\s+/);
+            toDelete.push(tubeId);
 
             if (!isOrphan) {
-                if (tubeID === '0007') {
-                    bagid = collectionID + ' 0009';
+                if (tubeId === '0007') {
+                    bagid = collectionId + ' 0009';
                 } else {
-                    bagid = collectionID + ' 0008';
+                    bagid = collectionId + ' 0008';
                 }
             }
 
             if (boxIdAndBags.hasOwnProperty(boxId)) {
                 if (boxIdAndBags[boxId].hasOwnProperty(bagid)) {
                     let arr = boxIdAndBags[boxId][bagid]['arrElements'];
-                    arr.push(toAddId);
+                    arr.push(idToAdd);
                 }
                 else {
-                    boxIdAndBags[boxId][bagid] = { 'arrElements': [toAddId], '469819603': firstName, '618036638': lastName };
+                    boxIdAndBags[boxId][bagid] = { 'arrElements': [idToAdd], '469819603': firstName, '618036638': lastName };
                 }
             }
             else {
                 boxIdAndBags[boxId] = {}
-                boxIdAndBags[boxId][bagid] = { 'arrElements': [toAddId], '469819603': firstName, '618036638': lastName };
+                boxIdAndBags[boxId][bagid] = { 'arrElements': [idToAdd], '469819603': firstName, '618036638': lastName };
             }
 
         }
 
-
-
-
         document.getElementById('selectBoxList').value = boxId;
-        //document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON);
 
         let shippingTable = document.getElementById('specimenList')
 
@@ -622,149 +588,158 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
     //ppulateSpecimensList();
 }
 
+// boxIdAndBags is a dictionary of boxId to bags
 export const getInstituteSpecimensList = async (boxIdAndBags) => {
-    //const response = await searchSpecimenInstitute();
-    const conversion = {
-        "299553921": "0001",
-        "703954371": "0002",
-        "838567176": "0003",
-        "454453939": "0004",
-        "652357376": "0005",
-        "973670172": "0006",
-        "143615646": "0007",
-        "787237543": "0008",
-        "223999569": "0009",
-        "376960806": "0011",
-        "232343615": "0012",
-        "589588440": "0021",
-        "958646668": "0013",
-        "677469051": "0014",
-        "683613884": "0024"
-    }
-    let specimenData = await searchSpecimenInstitute();
-    //let specimenData = response.data;
+    const conversion = specimenCollection.cidToNum;
+    const boxIdList = Object.keys(boxIdAndBags).sort(compareBoxIds);
+    let collectionList = await searchSpecimenInstitute();
     let toReturn = {};
-    let checkedOrphans = false;
+    // let checkedOrphans = false;
+    let stragglerTubeList=[];
 
-    for (let i = 0; i < specimenData.length; i++) {
-        let toExclude8 = [];
-        let toExclude9 = [];
-        let toExcludeOrphans = [];
-        if (specimenData[i].hasOwnProperty('820476880')) {
-            let boxes = Object.keys(boxIdAndBags).sort(compareBoxIds);
-            for (let j = 0; j < boxes.length; j++) {
-                let specimens = Object.keys(boxIdAndBags[boxes[j]]);
-                if (specimens.includes(specimenData[i]['820476880'] + ' 0008')) {
-                    let currList = boxIdAndBags[boxes[j]][specimens[specimens.indexOf(specimenData[i]['820476880'] + ' 0008')]]['arrElements']
-                    for (let k = 0; k < currList.length; k++) {
-                        toExclude8.push(currList[k].split(/\s+/)[1]);
-                    }
-                }
-                if (specimens.includes(specimenData[i]['820476880'] + ' 0009')) {
-                    let currList = boxIdAndBags[boxes[j]][specimens[specimens.indexOf(specimenData[i]['820476880'] + ' 0009')]]['arrElements']
-                    for (let k = 0; k < currList.length; k++) {
-                        toExclude9.push(currList[k].split(/\s+/)[1]);
-                    }
 
-                }
-                if (checkedOrphans == false) {
-                    if (specimens.includes('unlabelled')) {
-                        let currList = boxIdAndBags[boxes[j]]['unlabelled']['arrElements']
+    for (let i = 0; i < collectionList.length; i++) {
+        let tubesInBox_bloodUrine = [];
+        let tubesInBox_mouthWash = [];
+        let tubesInBox_orphan = [];
+        let boxIsShipped = false;
+        const currCollection = collectionList[i];
+        const collectionId = conceptIds.collection.id;
+    console.log('collectionId:==>', collectionId);
+
+        // For each collection, get its blood/urine, mouthwash, and orphan specimens that are in the box already
+        // todo: improve efficiency, by removing box iteration
+        if (currCollection[collectionId]) {
+            for (let j = 0; j < boxIdList.length; j++) {
+                const bagObjects = boxIdAndBags[boxIdList[j]];
+                const bloodUrineBagId = currCollection[collectionId] + ' 0008';
+                // console.log('bloodUrineBagId', bloodUrineBagId);
+                if (bagObjects[bloodUrineBagId]) {
+                    const currList = bagObjects[bloodUrineBagId]['arrElements']
+                    if (currList.length > 0) {
                         for (let k = 0; k < currList.length; k++) {
-                            toExcludeOrphans.push(currList[k].split(/\s+/)[1]);
+                            tubesInBox_bloodUrine.push(currList[k].split(/\s+/)[1]);
                         }
 
+                        if (bagObjects[conceptIds.shipmentIsSubmitted] == conceptIds.yes) {
+                            boxIsShipped = true;
+                        }
+                    }
+                }
+
+                // // Mouthwash bag only has one tube/container, so this is not needed:
+                // const mouthWashBagId = currCollection[collectionId] + ' 0009';
+                // if (bagObjects[mouthWashBagId]) {
+                //     let currList = bagObjects[mouthWashBagId]['arrElements']
+                //     for (let k = 0; k < currList.length; k++) {
+                //         tubesInBox_mouthWash.push(currList[k].split(/\s+/)[1]);
+                //     }
+                // }
+
+                if (bagObjects['unlabelled']) {
+                    let currList = bagObjects['unlabelled']['arrElements']
+
+                    for (let k = 0; k < currList.length; k++) {
+                        const [currCollectionId, currTubeNumber] = currList[k].split(/\s+/);
+                        // console.log('currCollection[collectionId]:', currCollection[collectionId], 'currCollectionId:', currCollectionId, currCollectionId == currCollection[collectionId]? 'true': 'false');
+                        if (currCollectionId == currCollection[collectionId]) {
+                            // console.log('currList====>:', currTubeNumber);
+                            tubesInBox_orphan.push(currTubeNumber);
+                        }
                     }
                 }
             }
         }
-        let list8 = [];
-        let list9 = [];
-        let keys = Object.keys(specimenData[i])
-        for (let j = 0; j < keys.length; j++) {
-
-            let currKey = keys[j];
-            if (conversion.hasOwnProperty(currKey)) {
-                //get number of the tube
-                //let tubeNum = currKey.substring(4, currKey.indexOf("Id"));
-                let shippedKey = '145971562'
-                let missingKey = '258745303'
-                let currJSON = specimenData[i][currKey];
-
-                if (currJSON.hasOwnProperty(shippedKey) && currJSON[shippedKey] == '353358909') {
-                    if (conversion[currKey] != '0007') {
-                        if (toExclude8.indexOf(conversion[currKey]) == -1) {
-                            list8.push(conversion[currKey]);
+        console.log('tubesInBox_orphan:==>', tubesInBox_orphan);
+        let tubesToAdd_bloodUrine = [];
+        let tubesToAdd_mouthwash = [];
+        // const tubeCidList = specimenCollection.tubeCidList;
+        // console.log('collection ID:', currCollection[collectionId])
+        console.log('currCollection', currCollection[collectionId])
+        for (let currCid of specimenCollection.tubeCidList) {
+            // let currTubeCid = tubeCidList[j];
+            const currNumber = specimenCollection.cidToNum[currCid];
+            console.log('currNumber', currNumber)
+            const currSpecimen = currCollection[currCid];
+            if (currSpecimen?.[conceptIds.submitShipmentFlag] == conceptIds.yes) {
+                console.log('======submitted')
+                if (currNumber != '0007') {
+                    if (tubesInBox_bloodUrine.indexOf(currNumber) == -1) {
+                        tubesToAdd_bloodUrine.push(currNumber);
+                    }
+                }
+                else {
+                    if (tubesInBox_mouthWash.indexOf(currNumber) == -1) {
+                        tubesToAdd_mouthwash.push(currNumber);
+                    }
+                }
+            }
+            else {
+                // console.log('not submitted');
+                if (currSpecimen?.[conceptIds.collection.tube.isMissing] == conceptIds.yes) {
+                    if (currNumber != '0007') {
+                        if (tubesInBox_bloodUrine.indexOf(currNumber) == -1) {
+                            tubesInBox_bloodUrine.push(currNumber)
                         }
                     }
                     else {
-                        if (toExclude9.indexOf(conversion[currKey]) == -1) {
-                            list9.push(conversion[currKey]);
+                        if (tubesInBox_mouthWash.indexOf(currNumber) == -1) {
+                            tubesInBox_mouthWash.push(currNumber)
                         }
                     }
                 }
                 else {
-                    if (currJSON.hasOwnProperty(missingKey) && currJSON[missingKey] == '353358909') {
-                        if (conversion[currKey] != '0007') {
-                            if (toExclude8.indexOf(conversion[currKey]) == -1) {
-                                toExclude8.push(conversion[currKey])
-                            }
-                        }
-                        else {
-                            if (toExclude9.indexOf(conversion[currKey]) == -1) {
-                                toExclude9.push(conversion[currKey])
-                            }
+                    if (currNumber != '0007') {
+                        if (tubesInBox_bloodUrine.indexOf(currNumber) == -1) {
+                            tubesToAdd_bloodUrine.push(currNumber);
                         }
                     }
                     else {
-                        if (conversion[currKey] != '0007') {
-                            if (toExclude8.indexOf(conversion[currKey]) == -1) {
-                                list8.push(conversion[currKey]);
-                            }
-                        }
-                        else {
-                            if (toExclude9.indexOf(conversion[currKey]) == -1) {
-                                list9.push(conversion[currKey]);
-                            }
+                        if (tubesInBox_mouthWash.indexOf(currNumber) == -1) {
+                            tubesToAdd_mouthwash.push(currNumber);
                         }
                     }
                 }
             }
         }
-        if (toExclude8.length > 0 && list8.length > 0 && specimenData[i].hasOwnProperty('820476880')) {
+
+        if (tubesInBox_bloodUrine.length > 0 && tubesToAdd_bloodUrine.length > 0 && currCollection[collectionId]) {
             //add orphan tubes
 
             //toInsert[specimenData[i]['masterSpecimenId'] + ' 0008'] = list8
             if (!toReturn.hasOwnProperty('unlabelled')) {
                 toReturn['unlabelled'] = []
             }
-            for (let j = 0; j < list8.length; j++) {
-                if (!toExcludeOrphans.includes(list8[j])) {
-                    toReturn['unlabelled'].push(specimenData[i]['820476880'] + ' ' + list8[j])
+            
+            for (let j = 0; j < tubesToAdd_bloodUrine.length; j++) {
+                if (!tubesInBox_orphan.includes(tubesToAdd_bloodUrine[j])) {
+                    toReturn['unlabelled'].push(collectionList[i]['820476880'] + ' ' + tubesToAdd_bloodUrine[j])
                 }
             }
-
+            console.log('tubesInBox_bloodUrine: ', tubesInBox_bloodUrine, '\ntubeToAdd_bloodUrine: ', tubesToAdd_bloodUrine, '\ntoReturn.unlabelled: ', toReturn.unlabelled)
         }
-        if (toExclude9.length > 0 && list9.length > 0 && specimenData[i].hasOwnProperty('820476880')) {
 
+        if (tubesInBox_mouthWash.length > 0 && tubesToAdd_mouthwash.length > 0 && collectionList[i].hasOwnProperty('820476880')) {
             if (!toReturn.hasOwnProperty('unlabelled')) {
                 toReturn['unlabelled'] = []
             }
-            for (let j = 0; j < list9.length; j++) {
-                if (!toExcludeOrphans.includes(list9[j])) {
-                    toReturn['unlabelled'].push(specimenData[i]['820476880'] + ' ' + list9[j])
+            for (let j = 0; j < tubesToAdd_mouthwash.length; j++) {
+                if (!tubesInBox_orphan.includes(tubesToAdd_mouthwash[j])) {
+                    toReturn['unlabelled'].push(collectionList[i]['820476880'] + ' ' + tubesToAdd_mouthwash[j])
                 }
             }
+        }
 
+        if (tubesInBox_bloodUrine.length == 0 && tubesToAdd_bloodUrine.length > 0 && collectionList[i].hasOwnProperty('820476880')) {
+            toReturn[collectionList[i]['820476880'] + ' 0008'] = tubesToAdd_bloodUrine;
         }
-        if (toExclude8.length == 0 && list8.length > 0 && specimenData[i].hasOwnProperty('820476880')) {
-            toReturn[specimenData[i]['820476880'] + ' 0008'] = list8;
-        }
-        if (toExclude9.length == 0 && list9.length > 0 && specimenData[i].hasOwnProperty('820476880')) {
-            toReturn[specimenData[i]['820476880'] + ' 0009'] = list9;
+
+        if (tubesInBox_mouthWash.length == 0 && tubesToAdd_mouthwash.length > 0 && collectionList[i].hasOwnProperty('820476880')) {
+            toReturn[collectionList[i]['820476880'] + ' 0009'] = tubesToAdd_mouthwash;
         }
     }
-
+    // returnResult={unlabelled:[CXA002654 0005', 'CXA002654 0006'], 'CXA002654 0008':['0001', '0002'], 'CXA002655 0009':['0007']}
+console.log('toReturn data', toReturn);
     return toReturn;
 }
 
@@ -1003,7 +978,7 @@ export const populateTempSelect = (boxes) => {
     }
 }
 
-export const populateSaveTable = (boxIdAndBags, boxJSONS, userName) => {
+export const populateSaveTable = (boxIdAndBags_unshipped, boxList_all, userName) => {
     let table = document.getElementById("saveTable");
     table.innerHTML = `<tr>
                         <th style="border-bottom:1px solid;">To Ship</th>
@@ -1015,9 +990,9 @@ export const populateSaveTable = (boxIdAndBags, boxJSONS, userName) => {
                         <th style="border-bottom:1px solid;text-align:center;"><p style="margin-bottom:0">View/Print Box Manifest</p><p style="margin-bottom:0">(to be included in shipment)</p></th>
                     </tr>`
     let count = 0;
-    let boxIdList = Object.keys(boxIdAndBags).sort(compareBoxIds);
+    let boxIdList = Object.keys(boxIdAndBags_unshipped).sort(compareBoxIds);
     for (let i = 0; i < boxIdList.length; i++) {
-        if (Object.keys(boxIdAndBags[boxIdList[i]]).length > 0) {
+        if (Object.keys(boxIdAndBags_unshipped[boxIdList[i]]).length > 0) {
             let currRow = table.insertRow(count + 1);
             if (count % 2 == 1) {
                 currRow.style['background-color'] = 'lightgrey'
@@ -1028,39 +1003,40 @@ export const populateSaveTable = (boxIdAndBags, boxJSONS, userName) => {
             let lastModified = '';
             let thisLocation = '';
 
-            for (let j = 0; j < boxJSONS.length; j++) {
-                if (boxJSONS[j]['132929440'] == boxIdList[i]) {
-                    if (boxJSONS[j].hasOwnProperty('672863981')) {
-                        let timestamp = Date.parse(boxJSONS[j]['672863981']);
+            // todo: remove this for loop
+            for (let j = 0; j < boxList_all.length; j++) {
+                if (boxList_all[j]['132929440'] == boxIdList[i]) {
+                    if (boxList_all[j].hasOwnProperty('672863981')) {
+                        let timestamp = Date.parse(boxList_all[j]['672863981']);
                         let newDate = new Date(timestamp);
-                        let am = 'AM'
+                        let ampm = 'AM'
                         if (newDate.getHours() >= 12) {
-                            am = 'PM'
+                            ampm = 'PM'
                         }
                         let minutesTag = newDate.getMinutes();
                         if (minutesTag < 10) {
                             minutesTag = '0' + minutesTag;
                         }
-                        dateStarted = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11) % 12 + 1) + ':' + minutesTag + ' ' + am;
+                        dateStarted = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11) % 12 + 1) + ':' + minutesTag + ' ' + ampm;
                         //dateStarted = boxJSONS[j]['672863981'];
                     }
-                    if (boxJSONS[j].hasOwnProperty('555611076')) {
-                        let timestamp = Date.parse(boxJSONS[j]['555611076']);
+                    if (boxList_all[j].hasOwnProperty('555611076')) {
+                        let timestamp = Date.parse(boxList_all[j]['555611076']);
                         let newDate = new Date(timestamp);
-                        let am = 'AM'
+                        let ampm = 'AM'
                         if (newDate.getHours() >= 12) {
-                            am = 'PM'
+                            ampm = 'PM'
                         }
                         let minutesTag = newDate.getMinutes();
                         if (minutesTag < 10) {
                             minutesTag = '0' + minutesTag;
                         }
-                        lastModified = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11) % 12 + 1) + ':' + minutesTag + ' ' + am;
+                        lastModified = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11) % 12 + 1) + ':' + minutesTag + ' ' + ampm;
                         //lastModified = boxJSONS[j]['555611076']
 
                     }
-                    if (boxJSONS[j].hasOwnProperty('560975149')) {
-                        thisLocation = locationConceptIDToLocationMap[boxJSONS[j]['560975149']]["siteSpecificLocation"];
+                    if (boxList_all[j].hasOwnProperty('560975149')) {
+                        thisLocation = locationConceptIDToLocationMap[boxList_all[j]['560975149']]["siteSpecificLocation"];
                     }
                 }
             }
@@ -1069,7 +1045,7 @@ export const populateSaveTable = (boxIdAndBags, boxJSONS, userName) => {
             currRow.insertCell(3).innerHTML = boxIdList[i];
             currRow.insertCell(4).innerHTML = thisLocation;
             //get num tubes
-            let currBox = boxIdAndBags[boxIdList[i]];
+            let currBox = boxIdAndBags_unshipped[boxIdList[i]];
             let numTubes = 0;
             let boxKeys = Object.keys(currBox);
             for (let j = 0; j < boxKeys.length; j++) {
@@ -2846,16 +2822,15 @@ export const addEventCheckValidTrackInputs = (boxIdAndBags) => {
 }
 
 export const populateSelectLocationList = async () => {
-    let currSelect = document.getElementById('selectLocationList')
+    let selectEle = document.getElementById('selectLocationList')
     let response = await getLocationsInstitute();
-    let list = '<option value="none">Select Shipping Location</option>'
+    let options = '<option value="none">Select Shipping Location</option>'
+
     for (let i = 0; i < response.length; i++) {
-        list += '<option>' + response[i] + '</option>';
+        options += '<option>' + response[i] + '</option>';
     }
-    if (list == '') {
-        list = 'remember to add Box'
-    }
-    currSelect.innerHTML = list;
+
+    selectEle.innerHTML = options;
 }
 
 export const populateBoxManifestTable = (boxId, boxIdAndBags) => {

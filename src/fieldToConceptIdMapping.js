@@ -15,6 +15,7 @@ export default {
     booleanOne: 353358909,
     verficationDate: 914594314,
     submitShipmentFlag: 145971562,
+    shipmentIsSubmitted: 145971562,
     shippingShipDateModify: 555611076,
     shippingTrackingNumber: 959708259,
     shippingBoxId: 132929440,
@@ -64,8 +65,32 @@ export default {
     discardFlag: 762124027,
     deviationNotFound: 982885431,
 
+    // biospecimen collection
+    collection:{
+        id:820476880,
+        idIsManuallyEntered: 387108065,
+        accountIdEntered: 148996099,
+        selectedVisit: 331584571,
+        note: 338570265,
+        isFinalized:410912345,
+        shipTime:556788178,
+        accessionId: 646899796,
+        collectionSetting: 650516960,
+        scannedTime: 915838974,
+        receivedDate: 926457119,
+        urineAccessNumber: 928693120,
+        tube:{
+            isCollected: 593843561,
+            isMissing: 258745303,
+            deviation: 248868659,
+            isDeviated: 678857215,
+            isDiscarded: 762124027,
+            isDiscarded: 762124027,
+            scannedId: 825582494,
+            dataReceived: 926457119
+        },
+    },
 
-    
     // not shipped specimen deviation id
     brokenSpecimenDeviation: 472864016,
     discardSpecimenDeviation: 810960823,

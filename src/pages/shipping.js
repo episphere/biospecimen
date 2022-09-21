@@ -46,33 +46,27 @@ export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
 export const startShipping = async (userName) => {
     showAnimation();
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
-    //store a secret json that has all of the packed ones in it
-    //{"Box1":{specimenId:[allTubes], specimenId:[allTubes]}}
-    let response = await  getBoxes();
-    let boxList = response.data;
-    let boxIdAndBags = {};
+    let response = await  getBoxes();  // get un-shipped boxes
+    let boxList_unshipped = response.data;
+    let boxIdAndBags_unshipped = {}; // for transformed box data structure
 
-    for (const box of boxList) {
+    //boxIdAndBags-->{"Box1":{"CXA123423 0008:{...}}, "unlabelled":{...}, "Box2":{...}}
+    for (const box of boxList_unshipped) {
       const boxId = box[conceptIds.shippingBoxId];
-      boxIdAndBags[boxId] = box['bags'];
+      boxIdAndBags_unshipped[boxId] = box['bags'];
     }
 
-    console.log('hiddenJSON', boxIdAndBags)
+    console.log('boxIdAndBags', boxIdAndBags_unshipped)
 
     response = await  getAllBoxes();
-    boxList = response.data;
-    let allBoxIdAndBags = {};
-    for (const box of boxList) {
+    const boxList_all = response.data;
+    let boxIdAndBags_all = {};
+    for (const box of boxList_all) {
         const boxId = box[conceptIds.shippingBoxId];
-        allBoxIdAndBags[boxId] = box['bags']
+        boxIdAndBags_all[boxId] = box['bags']
     }
-    console.log('all boxes', allBoxIdAndBags);
-    
-    /*
-    if(document.getElementById('shippingHiddenTable') != null){
-        hiddenJSON = JSON.parse(document.getElementById('shippingHiddenTable').innerText);
-    }
-*/
+    console.log('all boxes', boxIdAndBags_all);
+
     let template = `
         <div id="shippingHiddenTable" style="display:none">
         {}
@@ -203,16 +197,8 @@ export const startShipping = async (userName) => {
         </div>
         <div style="border: 1px solid black; overflow: auto; margin-bottom: 0.5rem; height: 400px;">
             <table  class="table table-bordered" style="width:100%;border:1px solid;" id = "saveTable">
-                <tr>
-                    <th style="border-bottom:1px solid; ">To Ship</th>
-                    <th style="border-bottom:1px solid; ">Started</th>
-                    <th style="border-bottom:1px solid; ">Last Modified</th>
-                    <th style="border-bottom:1px solid; ">Box Number</th>
-                    <th style="border-bottom:1px solid; ">Contents</th>
-                    <th style="border-bottom:1px solid; ">View/Print Box Manifest</th>
-                </tr>
             </table>
-            </div>
+        </div>
     </div>
     <div class="row" id="checkForTemp">
         <div class="col-lg">
@@ -229,16 +215,16 @@ export const startShipping = async (userName) => {
     document.getElementById('contentBody').innerHTML = template;
     await populateSelectLocationList();
     
-    await populateSaveTable(boxIdAndBags, boxList, userName);
-    await populateSpecimensList(allBoxIdAndBags);
+    await populateSaveTable(boxIdAndBags_unshipped, boxList_all, userName);
+    await populateSpecimensList(boxIdAndBags_all);
 
     let currLocation = document.getElementById('selectLocationList').value;
     if (currLocation !== 'none') { 
         let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
         response = await getBoxesByLocation(currLocationConceptId);
-        boxList = response.data;
+        boxList_all = response.data;
         let boxIdAndBags = {};
-        for (const box of boxList) {
+        for (const box of boxList_all) {
             const boxId = box[conceptIds.shippingBoxId];
             boxIdAndBags[boxId] = box['bags']
         }

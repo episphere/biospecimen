@@ -12,24 +12,6 @@ import conceptIds from './fieldToConceptIdMapping.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
 
 
-const conversion = {
-    "299553921":"0001",
-    "703954371":"0002",
-    "838567176":"0003",
-    "454453939":"0004",
-    "652357376":"0005",
-    "973670172":"0006",
-    "143615646":"0007",
-    "787237543":"0008",
-    "223999569":"0009",
-    "376960806":"0011",
-    "232343615":"0012",
-    "589588440":"0021",
-    "958646668":"0013",
-    "677469051":"0014",
-    "683613884":"0024"
-}
-
 export const urls = {
     'stage': 'biospecimen-myconnect-stage.cancer.gov',
     'prod': 'biospecimen-myconnect.cancer.gov'
@@ -698,6 +680,7 @@ export const convertToFirestoreBox = (inputBox) => {
   return outputBox;
 };
 
+// todo: fetch only the required un-shipped boxes
 export const getBoxes = async (box) => {
   const idToken = await getIdToken();
   const response = await fetch(`${api}api=searchBoxes`, {
@@ -793,7 +776,79 @@ export const removeBag = async(boxId, bags) => {
     return await response.json();
     
 }
+export const specimenCollection = {
+  numToCid: {
+    '0001': '299553921',
+    '0002': '703954371',
+    '0003': '838567176',
+    '0004': '454453939',
+    '0005': '652357376',
+    '0006': '973670172',
+    '0007': '143615646',
+    '0008': '787237543',
+    '0009': '223999569',
+    '0011': '376960806',
+    '0012': '232343615',
+    '0021': '589588440',
+    '0013': '958646668',
+    '0014': '677469051',
+    '0024': '683613884',
+  },
+  cidToNum: {
+    299553921: '0001',
+    703954371: '0002',
+    838567176: '0003',
+    454453939: '0004',
+    652357376: '0005',
+    973670172: '0006',
+    143615646: '0007',
+    787237543: '0008',
+    223999569: '0009',
+    376960806: '0011',
+    232343615: '0012',
+    589588440: '0021',
+    958646668: '0013',
+    677469051: '0014',
+    683613884: '0024',
+  },
+  tubeList: [
+    '0001',
+    '0002',
+    '0003',
+    '0004',
+    '0005',
+    '0006',
+    '0007',
+    // '0008' and '0009' are used as container for tubes
+    '0011',
+    '0012',
+    '0021',
+    '0013',
+    '0014',
+    '0024',
+  ],
+  tubeCidList:[
+    '299553921',
+    '703954371',
+    '838567176',
+    '454453939',
+    '652357376',
+    '973670172',
+    '143615646',
+    // '787237543' and '223999569' are used as container for tubes
+    '376960806',
+    '232343615',
+    '589588440',
+    '958646668',
+    '677469051',
+    '683613884',
+  ]
+};
 
+/**
+ * Fetches biospecimen collection data from the database, and removes '0008', '0009' and deviation tubes from each collection
+ * @returns {Array} List of biospecimen collections
+ */
 export const searchSpecimenInstitute = async () => {
     //https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
     const idToken = await getIdToken();
@@ -805,58 +860,45 @@ export const searchSpecimenInstitute = async () => {
     });
 
     let a = await response.json();
+    console.log('a', a);
     /* Filter collections with ShipFlag value yes */
-    let data = a.data.filter(item => item[410912345] === 353358909);
+    let collectionList = a.data.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
+    console.log('data from searchSpecimenInstitute', collectionList);
     
-    const conversion = {
-        "299553921":"0001",
-        "703954371":"0002",
-        "838567176":"0003",
-        "454453939":"0004",
-        "652357376":"0005",
-        "973670172":"0006",
-        "143615646":"0007",
-        "787237543":"0008",
-        "223999569":"0009",
-        "376960806":"0011",
-        "232343615":"0012",
-        "589588440":"0021",
-        "958646668":"0013",
-        "677469051":"0014",
-        "683613884":"0024"
-    }
-
     // loop over filtered data with shipFlag
-    for(let i = 0; i < data.length; i++){
-        let currJSON = data[i];
-        if(currJSON.hasOwnProperty('787237543')){
-            delete currJSON['787237543']
+    for (let i = 0; i < collectionList.length; i++){
+        let currCollection = collectionList[i];
+
+        if (currCollection.hasOwnProperty('787237543')) {
+            delete currCollection['787237543']
         }
-        if(currJSON.hasOwnProperty('223999569')){
-            delete currJSON['223999569'] 
+
+        if (currCollection.hasOwnProperty('223999569')) {
+            delete currCollection['223999569'] 
         }
-        let keys = Object.keys(currJSON);
-        for(let i = 0; i < keys.length; i++){
-            if(conversion.hasOwnProperty(keys[i])){
-                let iterateJSON = currJSON[keys[i]];
-                // delete specimen key if tube collected key is no
-                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631'){
-                    delete currJSON[keys[i]]
-                }
-                // check and delete if iterateJSON has not shipped specimen deviation concept ID
-                if(iterateJSON.hasOwnProperty('248868659')) {
-                  if(iterateJSON["248868659"][conceptIds.brokenSpecimenDeviation] == '353358909' || 
-                     iterateJSON["248868659"][conceptIds.discardSpecimenDeviation] == '353358909' || 
-                     iterateJSON["248868659"][conceptIds.insufficientVolumeSpecimenDeviation] == '353358909' || 
-                     iterateJSON["248868659"][conceptIds.mislabelledDiscardSpecimenDeviation] == '353358909' || 
-                     iterateJSON["248868659"][conceptIds.notFoundSpecimenDeviation] == '353358909') {
-                    delete currJSON[keys[i]]
-                  }
-                }
+ 
+        for (let tubeCid of specimenCollection.tubeCidList) {
+            if (!currCollection[tubeCid]) continue;
+
+            let currTube = currCollection[tubeCid];
+            // delete specimen key if tube collected key is no
+            if (!currTube[conceptIds.collection.tube.isCollected] || currTube[conceptIds.collection.tube.isCollected] == conceptIds.no){
+                delete currCollection[tubeCid];
+            }
+
+            // check and delete tube if current tube deviation concept ID that disallows shipping
+            const tubeDeviation = currTube[conceptIds.collection.tube.deviation];
+            if (tubeDeviation?.[conceptIds.brokenSpecimenDeviation] == conceptIds.yes || 
+                tubeDeviation?.[conceptIds.discardSpecimenDeviation] == conceptIds.yes || 
+                tubeDeviation?.[conceptIds.insufficientVolumeSpecimenDeviation] == conceptIds.yes|| 
+                tubeDeviation?.[conceptIds.mislabelledDiscardSpecimenDeviation] == conceptIds.yes || 
+                tubeDeviation?.[conceptIds.notFoundSpecimenDeviation] == conceptIds.yes) {
+                    delete currCollection[tubeCid];
             }
         }
     }
-    return data;
+
+    return collectionList;
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
