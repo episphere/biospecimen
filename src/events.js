@@ -440,11 +440,10 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         for (let i = 0; i < boxList.length; i++) {
             let box = boxList[i]
             // Box ID ("132929440"); Location ID, site specific ("560975149"); Login Site ("789843387")
-            boxIdAndBags[box['132929440']] = box['bags']
+            boxIdAndBagsObj[box['132929440']] = box['bags']
             // Location ID's value will be a number
             locations[box['132929440']] = box['560975149'];
         }
-        let nextBoxNum = Object.keys(boxIdAndBags).length + 1;
 
         //push the things into the right box
         //first get all elements still left
@@ -585,12 +584,13 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
 
 
 export const getInstituteSpecimensList = async (boxList) => {
-    // const conversion = specimenCollection.cidToNum;
     boxList = boxList.sort((a,b) => compareBoxIds(a[conceptIds.shippingBoxId], b[conceptIds.shippingBoxId]));
+
+    const collectionId = conceptIds.collection.id;
     let collectionList = await searchSpecimenInstitute();
     let resultBags = {};
 
-    // collections have no mouthwash specimens ???
+    // note: currently collections have no mouthwash specimens (0007)
     for (const currCollection of collectionList) {
         let tubesInBox = {
           shipped: {
@@ -605,11 +605,9 @@ export const getInstituteSpecimensList = async (boxList) => {
           },
         };
 
-        const collectionId = conceptIds.collection.id;
-
         // For each collection, get its blood/urine, mouthwash, and orphan specimens that are in the box already
         if (currCollection[collectionId]) {
-            // todo: save box id and remove box iteration
+            // todo: save box id in collection and remove box iteration
             for (const box of boxList) {
                 let boxIsShipped = false;
                 if (box[conceptIds.submitShipmentFlag] == conceptIds.yes) {
@@ -618,6 +616,7 @@ export const getInstituteSpecimensList = async (boxList) => {
 
                 const bagObjects = box.bags;
                 const bloodUrineBagId = currCollection[collectionId] + ' 0008';
+
                 if (bagObjects[bloodUrineBagId]) {
                     const tubeIdList = bagObjects[bloodUrineBagId]['arrElements']
                     if (tubeIdList.length > 0) {
@@ -652,7 +651,6 @@ export const getInstituteSpecimensList = async (boxList) => {
                         const [collectionIdFromTube, tubeNumber] = tubeId.split(/\s+/);
 
                         if (collectionIdFromTube == currCollection[collectionId]) {
-                            // console.log('currList====>:', currTubeNumber);
                             if (boxIsShipped ) {
                                 tubesInBox.shipped.orphan.push(tubeNumber);
                             } else {
@@ -670,16 +668,11 @@ export const getInstituteSpecimensList = async (boxList) => {
             orphan: [],
           }
 
-        console.log('currCollection', currCollection[collectionId])
-        // let allTubeNum = new Set(specimenCollection.tubeList);
         for (let currCid of specimenCollection.tubeCidList) {
             const currTubeNum = specimenCollection.cidToNum[currCid];
-            console.log('currTubeNum', currTubeNum)
             const currSpecimen = currCollection[currCid];
 
-            if (!currSpecimen) {
-                continue;
-            }
+            if (!currSpecimen) continue;
 
             if (currTubeNum == '0007') {
                 if (tubesInBox.shipped.mouthWash.includes(currTubeNum) || tubesInBox.notShipped.mouthWash.includes(currTubeNum)) {
@@ -716,20 +709,18 @@ export const getInstituteSpecimensList = async (boxList) => {
             resultBags[currCollection[collectionId] + ' 0009'] = tubesToAdd.mouthWash;
         }
     }
-console.log('returned data', resultBags);
     return resultBags;
 }
 
 export const populateSpecimensList = async (boxList) => {
     let bagIdAndtubeIdListObj = await getInstituteSpecimensList(boxList);
-    // let collectionList = await searchSpecimenInstitute();
-    console.log('spemenObject', bagIdAndtubeIdListObj);
     let bagIdList = Object.keys(bagIdAndtubeIdListObj);
     bagIdList.sort();
 
     let tableEle = document.getElementById("specimenList");
     let numRows = 1;
     let orphanBagId = '';
+
     tableEle.innerHTML = `<tr>
                                 <th>Specimen Bag ID</th>
                                 <th># Specimens in Bag</th>
@@ -773,6 +764,7 @@ export const populateSpecimensList = async (boxList) => {
         for (let i = 0; i < orphanTubeIdList.length; i++) {
             const rowCount = orphanTableEle.rows.length;
             let rowEle = orphanTableEle.insertRow();
+
             if (rowCount % 2 == 0) {
                 rowEle.style['background-color'] = 'lightgrey'
             }

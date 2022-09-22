@@ -864,7 +864,6 @@ export const searchSpecimenInstitute = async () => {
     let a = await response.json();
     /* Filter collections with ShipFlag value yes */
     let collectionList = a.data.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
-    console.log('data from searchSpecimenInstitute', collectionList);
     
     // loop over filtered data with shipFlag
     for (let i = 0; i < collectionList.length; i++){
