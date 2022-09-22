@@ -694,10 +694,6 @@ export const getInstituteSpecimensList = async (boxList) => {
             tubesToAdd.bloodUrine=[];
         }
 
-        appState.tubesToAdd = tubesToAdd;
-        appState.tubesInBox = tubesInBox;
-
-console.log('appState', appState);
         for (const tubeNum of tubesToAdd.orphan) {
             if (!resultBags['unlabelled']) {
                 resultBags['unlabelled'] = [];
