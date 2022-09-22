@@ -17,6 +17,8 @@ export const urls = {
     'prod': 'biospecimen-myconnect.cancer.gov'
 }
 
+export const appState = {};
+
 let api = '';
 
 if(location.host === urls.prod) api = 'https://api-myconnect.cancer.gov/biospecimen?';
@@ -860,7 +862,6 @@ export const searchSpecimenInstitute = async () => {
     });
 
     let a = await response.json();
-    console.log('a', a);
     /* Filter collections with ShipFlag value yes */
     let collectionList = a.data.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
     console.log('data from searchSpecimenInstitute', collectionList);
@@ -869,11 +870,11 @@ export const searchSpecimenInstitute = async () => {
     for (let i = 0; i < collectionList.length; i++){
         let currCollection = collectionList[i];
 
-        if (currCollection.hasOwnProperty('787237543')) {
+        if (currCollection['787237543']) {
             delete currCollection['787237543']
         }
 
-        if (currCollection.hasOwnProperty('223999569')) {
+        if (currCollection['223999569']) {
             delete currCollection['223999569'] 
         }
  

@@ -47,16 +47,16 @@ export const startShipping = async (userName) => {
     showAnimation();
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     let response = await  getBoxes();  // get un-shipped boxes
-    let boxList_unshipped = response.data;
-    let boxIdAndBags_unshipped = {}; // for transformed box data structure
+    let boxList = response.data;
+    //boxIdAndBagsObj-->{"Box1":{"CXA123423 0008:{...}, "unlabelled":{...}}, "Box2":{...}}
+    let boxIdAndBagsObj = {}; // for transformed box data structure
 
-    //boxIdAndBags-->{"Box1":{"CXA123423 0008:{...}}, "unlabelled":{...}, "Box2":{...}}
-    for (const box of boxList_unshipped) {
+    for (const box of boxList) {
       const boxId = box[conceptIds.shippingBoxId];
-      boxIdAndBags_unshipped[boxId] = box['bags'];
+      boxIdAndBagsObj[boxId] = box['bags'];
     }
 
-    console.log('boxIdAndBags', boxIdAndBags_unshipped)
+    console.log('boxIdAndBags', boxIdAndBagsObj)
 
     response = await  getAllBoxes();
     const boxList_all = response.data;
@@ -114,10 +114,6 @@ export const startShipping = async (userName) => {
     <h4 style="text-align:center; margin-bottom:1rem;">Available Collections</h4>
     <div class="panel panel-default" style="border-style:solid;height:550px;border-width:1px;overflow:auto;" id="specimenPanel">
             <table class = "table" style="width: 100%;margin-bottom:0px;" id="specimenList" >
-                <tr>
-                    <th>Specimen Bag ID</th>
-                    <th># Specimens in Bag</th>
-                </tr>
             </table>
     </div>
 
@@ -215,8 +211,8 @@ export const startShipping = async (userName) => {
     document.getElementById('contentBody').innerHTML = template;
     await populateSelectLocationList();
     
-    await populateSaveTable(boxIdAndBags_unshipped, boxList_all, userName);
-    await populateSpecimensList(boxIdAndBags_all);
+    await populateSaveTable(boxIdAndBagsObj, boxList_all, userName);
+    await populateSpecimensList(boxList_all);
 
     let currLocation = document.getElementById('selectLocationList').value;
     if (currLocation !== 'none') { 

@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, specimenCollection } from './shared.js'
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, convertTime, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, specimenCollection, appState } from './shared.js'
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -432,7 +432,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
     submitButton.addEventListener('click', async e => {
         e.preventDefault();
         showAnimation();
-        let boxIdAndBags = {};
+        let boxIdAndBagsObj = {};
         // get un-shipped boxes
         let response = await getBoxes();
         let boxList = response.data;
@@ -488,18 +488,18 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
                 }
             }
 
-            if (boxIdAndBags.hasOwnProperty(boxId)) {
-                if (boxIdAndBags[boxId].hasOwnProperty(bagid)) {
-                    let arr = boxIdAndBags[boxId][bagid]['arrElements'];
+            if (boxIdAndBagsObj.hasOwnProperty(boxId)) {
+                if (boxIdAndBagsObj[boxId].hasOwnProperty(bagid)) {
+                    let arr = boxIdAndBagsObj[boxId][bagid]['arrElements'];
                     arr.push(idToAdd);
                 }
                 else {
-                    boxIdAndBags[boxId][bagid] = { 'arrElements': [idToAdd], '469819603': firstName, '618036638': lastName };
+                    boxIdAndBagsObj[boxId][bagid] = { 'arrElements': [idToAdd], '469819603': firstName, '618036638': lastName };
                 }
             }
             else {
-                boxIdAndBags[boxId] = {}
-                boxIdAndBags[boxId][bagid] = { 'arrElements': [idToAdd], '469819603': firstName, '618036638': lastName };
+                boxIdAndBagsObj[boxId] = {}
+                boxIdAndBagsObj[boxId][bagid] = { 'arrElements': [idToAdd], '469819603': firstName, '618036638': lastName };
             }
 
         }
@@ -524,7 +524,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
             shippingTable.rows[tableIndex].cells[1].innerText = parseCurrArr.length;
           }
         }
-        let boxIds = Object.keys(boxIdAndBags).sort(compareBoxIds);
+        let boxIds = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
 
         for (let i = 0; i < boxIds.length; i++) {
             let currTime = new Date().toISOString();
@@ -553,7 +553,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
                 Autogenerated date/time when box last modified (bag added or removed)- 555611076
                 */
                 toPass['132929440'] = boxIds[i]; 
-                toPass['bags'] = boxIdAndBags[boxIds[i]]
+                toPass['bags'] = boxIdAndBagsObj[boxIds[i]]
                 toPass['560975149'] = locations[boxIds[i]]
                 toPass['789843387'] = siteSpecificLocation[conceptIdToSiteSpecificLocation[locations[boxIds[i]]]].siteCode
                 toPass['555611076'] = currTime;
@@ -563,24 +563,19 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
 
         response = await getAllBoxes();
         boxList = response.data;
-        boxIdAndBags = {};
-        for (let i = 0; i < boxList.length; i++) {
-            let box = boxList[i]
-            boxIdAndBags[box['132929440']] = box['bags']
-        }
-
-
         await populateTubeInBoxList(userName);
-        await populateSpecimensList(boxIdAndBags);
-        boxIdAndBags = {};
+        await populateSpecimensList(boxList);
+        boxIdAndBagsObj = {};
+
         for (let i = 0; i < boxList.length; i++) {
             if (!boxList[i].hasOwnProperty('145971562') || boxList[i]['145971562'] != '353358909') {
                 let box = boxList[i]
-                boxIdAndBags[box['132929440']] = box['bags']
+                boxIdAndBagsObj[box['132929440']] = box['bags']
             }
 
         }
-        await populateSaveTable(boxIdAndBags, boxList, userName)
+
+        await populateSaveTable(boxIdAndBagsObj, boxList, userName)
         // clear input field
         specimenSearch.value = ""
         hideAnimation();
@@ -588,281 +583,232 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
     //ppulateSpecimensList();
 }
 
-// boxIdAndBags is a dictionary of boxId to bags
-export const getInstituteSpecimensList = async (boxIdAndBags) => {
-    const conversion = specimenCollection.cidToNum;
-    const boxIdList = Object.keys(boxIdAndBags).sort(compareBoxIds);
+
+export const getInstituteSpecimensList = async (boxList) => {
+    // const conversion = specimenCollection.cidToNum;
+    boxList = boxList.sort((a,b) => compareBoxIds(a[conceptIds.shippingBoxId], b[conceptIds.shippingBoxId]));
     let collectionList = await searchSpecimenInstitute();
-    let toReturn = {};
-    // let checkedOrphans = false;
-    let stragglerTubeList=[];
+    let resultBags = {};
 
+    // collections have no mouthwash specimens ???
+    for (const currCollection of collectionList) {
+        let tubesInBox = {
+          shipped: {
+            bloodUrine: [],
+            mouthWash: [],
+            orphan: [],
+          },
+          notShipped: {
+            bloodUrine: [],
+            mouthWash: [],
+            orphan: [],
+          },
+        };
 
-    for (let i = 0; i < collectionList.length; i++) {
-        let tubesInBox_bloodUrine = [];
-        let tubesInBox_mouthWash = [];
-        let tubesInBox_orphan = [];
-        let boxIsShipped = false;
-        const currCollection = collectionList[i];
         const collectionId = conceptIds.collection.id;
-    console.log('collectionId:==>', collectionId);
 
         // For each collection, get its blood/urine, mouthwash, and orphan specimens that are in the box already
-        // todo: improve efficiency, by removing box iteration
         if (currCollection[collectionId]) {
-            for (let j = 0; j < boxIdList.length; j++) {
-                const bagObjects = boxIdAndBags[boxIdList[j]];
-                const bloodUrineBagId = currCollection[collectionId] + ' 0008';
-                // console.log('bloodUrineBagId', bloodUrineBagId);
-                if (bagObjects[bloodUrineBagId]) {
-                    const currList = bagObjects[bloodUrineBagId]['arrElements']
-                    if (currList.length > 0) {
-                        for (let k = 0; k < currList.length; k++) {
-                            tubesInBox_bloodUrine.push(currList[k].split(/\s+/)[1]);
-                        }
+            // todo: save box id and remove box iteration
+            for (const box of boxList) {
+                let boxIsShipped = false;
+                if (box[conceptIds.submitShipmentFlag] == conceptIds.yes) {
+                    boxIsShipped = true;
+                }
 
-                        if (bagObjects[conceptIds.shipmentIsSubmitted] == conceptIds.yes) {
-                            boxIsShipped = true;
+                const bagObjects = box.bags;
+                const bloodUrineBagId = currCollection[collectionId] + ' 0008';
+                if (bagObjects[bloodUrineBagId]) {
+                    const tubeIdList = bagObjects[bloodUrineBagId]['arrElements']
+                    if (tubeIdList.length > 0) {
+                        for (const tubeId of tubeIdList) {
+                            const tubeNum = tubeId.split(/\s+/)[1]
+                            if (boxIsShipped ) {
+                                tubesInBox.shipped.bloodUrine.push(tubeNum);
+                            } else {
+                                tubesInBox.notShipped.bloodUrine.push(tubeNum);
+                            }
                         }
                     }
                 }
 
-                // // Mouthwash bag only has one tube/container, so this is not needed:
-                // const mouthWashBagId = currCollection[collectionId] + ' 0009';
-                // if (bagObjects[mouthWashBagId]) {
-                //     let currList = bagObjects[mouthWashBagId]['arrElements']
-                //     for (let k = 0; k < currList.length; k++) {
-                //         tubesInBox_mouthWash.push(currList[k].split(/\s+/)[1]);
-                //     }
-                // }
+                const mouthWashBagId = currCollection[collectionId] + ' 0009';
+                if (bagObjects[mouthWashBagId]) {
+                    const tubeIdList = bagObjects[mouthWashBagId]['arrElements']
+                    for (const tubeId of tubeIdList) {
+                        const tubeNum = tubeId.split(/\s+/)[1];
+                        if (boxIsShipped ) {
+                            tubesInBox.shipped.mouthWash.push(tubeNum);
+                        } else {
+                            tubesInBox.notShipped.mouthWash.push(tubeNum);
+                        }
+                    }
+                }
 
                 if (bagObjects['unlabelled']) {
-                    let currList = bagObjects['unlabelled']['arrElements']
+                    let tubeIdList = bagObjects['unlabelled']['arrElements']
 
-                    for (let k = 0; k < currList.length; k++) {
-                        const [currCollectionId, currTubeNumber] = currList[k].split(/\s+/);
-                        // console.log('currCollection[collectionId]:', currCollection[collectionId], 'currCollectionId:', currCollectionId, currCollectionId == currCollection[collectionId]? 'true': 'false');
-                        if (currCollectionId == currCollection[collectionId]) {
+                    for (const tubeId of tubeIdList) {
+                        const [collectionIdFromTube, tubeNumber] = tubeId.split(/\s+/);
+
+                        if (collectionIdFromTube == currCollection[collectionId]) {
                             // console.log('currList====>:', currTubeNumber);
-                            tubesInBox_orphan.push(currTubeNumber);
+                            if (boxIsShipped ) {
+                                tubesInBox.shipped.orphan.push(tubeNumber);
+                            } else {
+                                tubesInBox.notShipped.orphan.push(tubeNumber);
+                            }
                         }
                     }
                 }
             }
         }
-        console.log('tubesInBox_orphan:==>', tubesInBox_orphan);
-        let tubesToAdd_bloodUrine = [];
-        let tubesToAdd_mouthwash = [];
-        // const tubeCidList = specimenCollection.tubeCidList;
-        // console.log('collection ID:', currCollection[collectionId])
+
+        let tubesToAdd={
+            bloodUrine: [],
+            mouthWash: [],
+            orphan: [],
+          }
+
         console.log('currCollection', currCollection[collectionId])
+        // let allTubeNum = new Set(specimenCollection.tubeList);
         for (let currCid of specimenCollection.tubeCidList) {
-            // let currTubeCid = tubeCidList[j];
-            const currNumber = specimenCollection.cidToNum[currCid];
-            console.log('currNumber', currNumber)
+            const currTubeNum = specimenCollection.cidToNum[currCid];
+            console.log('currTubeNum', currTubeNum)
             const currSpecimen = currCollection[currCid];
-            if (currSpecimen?.[conceptIds.submitShipmentFlag] == conceptIds.yes) {
-                console.log('======submitted')
-                if (currNumber != '0007') {
-                    if (tubesInBox_bloodUrine.indexOf(currNumber) == -1) {
-                        tubesToAdd_bloodUrine.push(currNumber);
-                    }
-                }
-                else {
-                    if (tubesInBox_mouthWash.indexOf(currNumber) == -1) {
-                        tubesToAdd_mouthwash.push(currNumber);
-                    }
-                }
+
+            if (!currSpecimen) {
+                continue;
             }
-            else {
-                // console.log('not submitted');
-                if (currSpecimen?.[conceptIds.collection.tube.isMissing] == conceptIds.yes) {
-                    if (currNumber != '0007') {
-                        if (tubesInBox_bloodUrine.indexOf(currNumber) == -1) {
-                            tubesInBox_bloodUrine.push(currNumber)
-                        }
-                    }
-                    else {
-                        if (tubesInBox_mouthWash.indexOf(currNumber) == -1) {
-                            tubesInBox_mouthWash.push(currNumber)
-                        }
-                    }
+
+            if (currTubeNum == '0007') {
+                if (tubesInBox.shipped.mouthWash.includes(currTubeNum) || tubesInBox.notShipped.mouthWash.includes(currTubeNum)) {
+                    continue;
+                } else {
+                    tubesToAdd.mouthWash.push(currTubeNum);
                 }
-                else {
-                    if (currNumber != '0007') {
-                        if (tubesInBox_bloodUrine.indexOf(currNumber) == -1) {
-                            tubesToAdd_bloodUrine.push(currNumber);
-                        }
-                    }
-                    else {
-                        if (tubesInBox_mouthWash.indexOf(currNumber) == -1) {
-                            tubesToAdd_mouthwash.push(currNumber);
-                        }
-                    }
+            } else {
+                if (tubesInBox.shipped.bloodUrine.includes(currTubeNum) || tubesInBox.shipped.orphan.includes(currTubeNum) || tubesInBox.notShipped.bloodUrine.includes(currTubeNum) || tubesInBox.notShipped.orphan.includes(currTubeNum)) {
+                    continue;
+                } else {
+                    tubesToAdd.bloodUrine.push(currTubeNum);
                 }
             }
         }
 
-        if (tubesInBox_bloodUrine.length > 0 && tubesToAdd_bloodUrine.length > 0 && currCollection[collectionId]) {
-            //add orphan tubes
-
-            //toInsert[specimenData[i]['masterSpecimenId'] + ' 0008'] = list8
-            if (!toReturn.hasOwnProperty('unlabelled')) {
-                toReturn['unlabelled'] = []
-            }
-            
-            for (let j = 0; j < tubesToAdd_bloodUrine.length; j++) {
-                if (!tubesInBox_orphan.includes(tubesToAdd_bloodUrine[j])) {
-                    toReturn['unlabelled'].push(collectionList[i]['820476880'] + ' ' + tubesToAdd_bloodUrine[j])
-                }
-            }
-            console.log('tubesInBox_bloodUrine: ', tubesInBox_bloodUrine, '\ntubeToAdd_bloodUrine: ', tubesToAdd_bloodUrine, '\ntoReturn.unlabelled: ', toReturn.unlabelled)
+        if (tubesInBox.shipped.bloodUrine.length > 0 && tubesToAdd.bloodUrine.length > 0) {
+            tubesToAdd.orphan=tubesToAdd.bloodUrine;
+            tubesToAdd.bloodUrine=[];
         }
 
-        if (tubesInBox_mouthWash.length > 0 && tubesToAdd_mouthwash.length > 0 && collectionList[i].hasOwnProperty('820476880')) {
-            if (!toReturn.hasOwnProperty('unlabelled')) {
-                toReturn['unlabelled'] = []
+        for (const tubeNum of tubesToAdd.orphan) {
+            if (!resultBags['unlabelled']) {
+                resultBags['unlabelled'] = [];
             }
-            for (let j = 0; j < tubesToAdd_mouthwash.length; j++) {
-                if (!tubesInBox_orphan.includes(tubesToAdd_mouthwash[j])) {
-                    toReturn['unlabelled'].push(collectionList[i]['820476880'] + ' ' + tubesToAdd_mouthwash[j])
-                }
-            }
+            resultBags['unlabelled'].push(currCollection[collectionId] + ' ' + tubeNum);
         }
 
-        if (tubesInBox_bloodUrine.length == 0 && tubesToAdd_bloodUrine.length > 0 && collectionList[i].hasOwnProperty('820476880')) {
-            toReturn[collectionList[i]['820476880'] + ' 0008'] = tubesToAdd_bloodUrine;
+        if (tubesInBox.shipped.bloodUrine.length === 0 && tubesInBox.notShipped.bloodUrine.length ===0 && tubesToAdd.bloodUrine.length> 0) {
+            resultBags[currCollection[collectionId] + ' 0008'] = tubesToAdd.bloodUrine;
         }
 
-        if (tubesInBox_mouthWash.length == 0 && tubesToAdd_mouthwash.length > 0 && collectionList[i].hasOwnProperty('820476880')) {
-            toReturn[collectionList[i]['820476880'] + ' 0009'] = tubesToAdd_mouthwash;
+        if (tubesInBox.shipped.mouthWash.length === 0 && tubesInBox.notShipped.mouthWash.length ===0 && tubesToAdd.mouthWash.length > 0) {
+            resultBags[currCollection[collectionId] + ' 0009'] = tubesToAdd.mouthWash;
         }
     }
-    // returnResult={unlabelled:[CXA002654 0005', 'CXA002654 0006'], 'CXA002654 0008':['0001', '0002'], 'CXA002655 0009':['0007']}
-console.log('toReturn data', toReturn);
-    return toReturn;
+console.log('returned data', resultBags);
+    return resultBags;
 }
 
-export const populateSpecimensList = async (boxIdAndBags) => {
-    let specimenObject = await getInstituteSpecimensList(boxIdAndBags);
-    let specimenData = await searchSpecimenInstitute();
-    //let specimenData = response.data
-    for (let i = 0; i < specimenData.length; i++) {
-        //let specimenData = 
+export const populateSpecimensList = async (boxList) => {
+    let bagIdAndtubeIdListObj = await getInstituteSpecimensList(boxList);
+    // let collectionList = await searchSpecimenInstitute();
+    console.log('spemenObject', bagIdAndtubeIdListObj);
+    let bagIdList = Object.keys(bagIdAndtubeIdListObj);
+    bagIdList.sort();
 
-    }
-    let list = Object.keys(specimenObject);
-    list.sort();
-
-    var specimenList = document.getElementById("specimenList");
+    let tableEle = document.getElementById("specimenList");
     let numRows = 1;
-    specimenList.innerHTML = `<tr>
+    let orphanBagId = '';
+    tableEle.innerHTML = `<tr>
                                 <th>Specimen Bag ID</th>
                                 <th># Specimens in Bag</th>
                             </th>`;
-    let orphansIndex = -1;
 
+    for (const bagId of bagIdList) {
+        if (bagId != "unlabelled") {
+            let rowEle = tableEle.insertRow();
+            rowEle.insertCell(0).innerHTML = bagId;
+            rowEle.insertCell(1).innerHTML = bagIdAndtubeIdListObj[bagId].length;
 
-    for (let i = 0; i < list.length; i++) {
-        if (list[i] != "unlabelled") {
-            var rowCount = specimenList.rows.length;
-            var row = specimenList.insertRow(rowCount);
-            row.insertCell(0).innerHTML = list[i];
-            row.insertCell(1).innerHTML = specimenObject[list[i]].length;
-
-            let hiddenChannel = row.insertCell(2)
-            hiddenChannel.innerHTML = JSON.stringify(specimenObject[list[i]]);
+            let hiddenChannel = rowEle.insertCell(2)
+            hiddenChannel.innerHTML = JSON.stringify(bagIdAndtubeIdListObj[bagId]);
             hiddenChannel.style.display = "none";
             if (numRows % 2 == 0) {
-                row.style['background-color'] = "lightgrey";
+                rowEle.style['background-color'] = "lightgrey";
             }
             numRows += 1;
-        }
-        else {
-            orphansIndex = i;
+        } else {
+            orphanBagId = bagId;
         }
     }
 
     let orphanPanel = document.getElementById('orphansPanel');
-    let orphanTable = document.getElementById('orphansList')
+    let orphanTableEle = document.getElementById('orphansList')
     let specimenPanel = document.getElementById('specimenPanel')
-    orphanTable.innerHTML = '';
+    orphanTableEle.innerHTML = '';
 
-    if (orphansIndex != -1 && specimenObject['unlabelled'].length > 0) {
+    if (orphanBagId != '' && bagIdAndtubeIdListObj['unlabelled'].length > 0) {
         orphanPanel.style.display = 'block'
         specimenPanel.style.height = '550px'
 
-        let toInsert = specimenObject['unlabelled'];
-        var rowCount = orphanTable.rows.length;
-        var row = orphanTable.insertRow(rowCount);
-        row.insertCell(0).innerHTML = 'Stray tubes';
-        row.insertCell(1).innerHTML = toInsert.length;
-        let hiddenChannel = row.insertCell(2)
-        hiddenChannel.innerHTML = JSON.stringify(toInsert);
+        const orphanTubeIdList = bagIdAndtubeIdListObj['unlabelled'];
+        let rowEle = orphanTableEle.insertRow();
+        rowEle.insertCell(0).innerHTML = 'Stray tubes';
+        rowEle.insertCell(1).innerHTML = orphanTubeIdList.length;
+        let hiddenChannel = rowEle.insertCell(2)
+        hiddenChannel.innerHTML = JSON.stringify(orphanTubeIdList);
         hiddenChannel.style.display = "none";
-        for (let i = 0; i < toInsert.length; i++) {
-            rowCount = orphanTable.rows.length;
-            row = orphanTable.insertRow(rowCount);
+
+        for (let i = 0; i < orphanTubeIdList.length; i++) {
+            const rowCount = orphanTableEle.rows.length;
+            let rowEle = orphanTableEle.insertRow();
             if (rowCount % 2 == 0) {
-                row.style['background-color'] = 'lightgrey'
+                rowEle.style['background-color'] = 'lightgrey'
             }
-            row.insertCell(0).innerHTML = toInsert[i];
-            row.insertCell(1).innerHTML = '<input type="button" class="delButton" value = "Report as Missing"/>';
 
-            //boxes[i]
+            rowEle.insertCell(0).innerHTML = orphanTubeIdList[i];
+            rowEle.insertCell(1).innerHTML = '<input type="button" class="delButton" value = "Report as Missing"/>';
 
-            //let currBoxButton = currRow.cells[5].getElementsByClassName("delButton")[0];
-            let currDeleteButton = row.cells[1].getElementsByClassName("delButton")[0];
+            let currDeleteButton = rowEle.cells[1].getElementsByClassName("delButton")[0];
 
             //This should remove the entrire bag
             currDeleteButton.addEventListener("click", async e => {
                 showAnimation();
-                var index = e.target.parentNode.parentNode.rowIndex;
-                var table = e.target.parentNode.parentNode.parentNode.parentNode;
-
+                let index = e.target.parentNode.parentNode.rowIndex;
+                let table = e.target.parentNode.parentNode.parentNode.parentNode;
                 let currRow = table.rows[index];
                 let currTubeId = table.rows[index].cells[0].innerText;
 
                 table.deleteRow(index);
-                let result = await removeMissingSpecimen(currTubeId);
-
+                await removeMissingSpecimen(currTubeId);
                 currRow = table.rows[index];
+
                 while (currRow != undefined && currRow.cells[0].innerText == "") {
                     table.deleteRow(index);
                     currRow = table.rows[index];
                 }
 
-
                 let response = await getAllBoxes();
-                let boxJSONS = response.data;
-                let boxIdAndBags = {};
-                for (let i = 0; i < boxJSONS.length; i++) {
-                    let box = boxJSONS[i]
-                    boxIdAndBags[box['132929440']] = box['bags']
-                }
-
-                await populateSpecimensList(boxIdAndBags);
-                //delete bag from json
+                let boxList = response.data;
+                await populateSpecimensList(boxList);
                 hideAnimation();
-
             })
         }
-    }
-    else {
+    } else {
         orphanPanel.style.display = 'none'
         specimenPanel.style.height = '550px'
     }
-    var rowCount = specimenList.rows.length;
-    var row = specimenList.insertRow(rowCount);
-
-    //put in orphans
-    /*
-    for(let i = 0; i < list.length; i++){
-        var option = document.createElement("option");
-        option.text = list[i];
-        specimenList.add(option)
-    }*/
-
 }
 
 export const populateBoxManifestHeader = (boxId, boxIdAndBags, currContactInfo) => {
@@ -1282,8 +1228,8 @@ export const populateBoxSelectList = async (boxIdAndBags, userName,) => {
                     //This should remove the entrire bag
                     currDeleteButton.addEventListener("click", async e => {
                         showAnimation();
-                        var index = e.target.parentNode.parentNode.rowIndex;
-                        var table = e.target.parentNode.parentNode.parentNode.parentNode;
+                        let index = e.target.parentNode.parentNode.rowIndex;
+                        let table = e.target.parentNode.parentNode.parentNode.parentNode;
 
                         let currRow = table.rows[index];
                         let currBagId = table.rows[index].cells[0].innerText;
@@ -1296,36 +1242,35 @@ export const populateBoxSelectList = async (boxIdAndBags, userName,) => {
                         }*/
                         table.deleteRow(index);
                         let bagsToRemove = [currBagId];
+
                         if (currBagId === "unlabelled") { 
                             bagsToRemove = currTubes;
                         }
-                        let result = await removeBag(boxSelectEle.value, bagsToRemove)
+
+                        await removeBag(boxSelectEle.value, bagsToRemove)
                         currRow = table.rows[index];
+
                         while (currRow != undefined && currRow.cells[0].innerText == "") {
                             table.deleteRow(index);
                             currRow = table.rows[index];
                         }
-                        let response = await getAllBoxes();
-                        let boxJSONS = response.data;
-                        let boxIdAndBags = {};
-                        for (let i = 0; i < boxJSONS.length; i++) {
-                            let box = boxJSONS[i]
-                            boxIdAndBags[box['132929440']] = box['bags']
-                        }
 
-                        await populateSpecimensList(boxIdAndBags);
-                        boxIdAndBags = {};
-                        for (let i = 0; i < boxJSONS.length; i++) {
-                            if (!boxJSONS[i].hasOwnProperty('145971562') || boxJSONS[i]['145971562'] != '353358909') {
-                                let box = boxJSONS[i]
-                                boxIdAndBags[box['132929440']] = box['bags']
+                        let response = await getAllBoxes();
+                        let boxList = response.data;
+                        let boxIdAndBagsObj = {};
+
+                        await populateSpecimensList(boxList);
+
+                        for (let i = 0; i < boxList.length; i++) {
+                            if (!boxList[i].hasOwnProperty('145971562') || boxList[i]['145971562'] != '353358909') {
+                                let box = boxList[i]
+                                boxIdAndBagsObj[box['132929440']] = box['bags']
                             }
 
                         }
-                        await populateSaveTable(boxIdAndBags, boxJSONS, userName)
-                        hideAnimation();
-                        //delete bag from json
 
+                        await populateSaveTable(boxIdAndBagsObj, boxList, userName)
+                        hideAnimation();
                     })
                 }
 
@@ -1589,31 +1534,27 @@ export const populateTubeInBoxList = async (userName) => {
                     }
                     let result = await removeBag(selectEle.value, bagsToRemove)
                     currRow = table.rows[index];
+
                     while (currRow != undefined && currRow.cells[0].innerText == "") {
                         table.deleteRow(index);
                         currRow = table.rows[index];
                     }
+
                     let response = await getAllBoxes();
                     let boxList = response.data;
-                    let boxIdAndBags = {};
-                    for (let i = 0; i < boxList.length; i++) {
-                        let box = boxList[i]
-                        boxIdAndBags[box['132929440']] = box['bags']
-                    }
+                    let boxIdAndBagsObj = {};
 
-                    await populateSpecimensList(boxIdAndBags);
-                    boxIdAndBags = {};
+                    await populateSpecimensList(boxList);
+
                     for (let i = 0; i < boxList.length; i++) {
                         if (!boxList[i].hasOwnProperty('145971562') || boxList[i]['145971562'] != '353358909') {
                             let box = boxList[i]
-                            boxIdAndBags[box['132929440']] = box['bags']
+                            boxIdAndBagsObj[box['132929440']] = box['bags']
                         }
-
                     }
-                    await populateSaveTable(boxIdAndBags, boxList, userName)
-                    hideAnimation();
-                    //delete bag from json
 
+                    await populateSaveTable(boxIdAndBagsObj, boxList, userName)
+                    hideAnimation();
                 })
             }
 
