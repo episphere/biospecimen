@@ -85,9 +85,8 @@ export default {
             deviation: 248868659,
             isDeviated: 678857215,
             isDiscarded: 762124027,
-            isDiscarded: 762124027,
             scannedId: 825582494,
-            dataReceived: 926457119
+            dateReceived: 926457119
         },
     },
 

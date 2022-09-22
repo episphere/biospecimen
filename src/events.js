@@ -607,7 +607,7 @@ export const getInstituteSpecimensList = async (boxList) => {
 
         // For each collection, get its blood/urine, mouthwash, and orphan specimens that are in the box already
         if (currCollection[collectionId]) {
-            // todo: save box id in collection and remove box iteration
+            // todo: save box id in collection and remove box iteration.
             for (const box of boxList) {
                 let boxIsShipped = false;
                 if (box[conceptIds.submitShipmentFlag] == conceptIds.yes) {
@@ -620,8 +620,8 @@ export const getInstituteSpecimensList = async (boxList) => {
                 if (bagObjects[bloodUrineBagId]) {
                     const tubeIdList = bagObjects[bloodUrineBagId]['arrElements']
                     if (tubeIdList.length > 0) {
-                        for (const tubeId of tubeIdList) {
-                            const tubeNum = tubeId.split(/\s+/)[1]
+                        for (const tubeId of tubeIdList) {          
+                            const tubeNum = tubeId.split(/\s+/)[1] // tubeId (eg 'CXA002655 0001'); tubeNum (eg '0001')
                             if (boxIsShipped ) {
                                 tubesInBox.shipped.bloodUrine.push(tubeNum);
                             } else {
@@ -694,6 +694,10 @@ export const getInstituteSpecimensList = async (boxList) => {
             tubesToAdd.bloodUrine=[];
         }
 
+        appState.tubesToAdd = tubesToAdd;
+        appState.tubesInBox = tubesInBox;
+
+console.log('appState', appState);
         for (const tubeNum of tubesToAdd.orphan) {
             if (!resultBags['unlabelled']) {
                 resultBags['unlabelled'] = [];
