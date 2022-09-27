@@ -61,7 +61,7 @@ export const startShipping = async (userName) => {
     }
 
     response = await  getAllBoxes();
-    const allBoxList = response.data;
+    let allBoxList = response.data;
     let allBoxIdAndBagsObj = {};
 
     for (const box of allBoxList) {
@@ -315,7 +315,7 @@ export const boxManifest = async (boxId, userName) => {
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
    
-// We may not need this anymore:
+// We may not need this anymore for data storage:
     document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(boxIdAndBags);
     
     //addEventNavBarShipment("returnToPackaging");
