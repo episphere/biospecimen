@@ -334,10 +334,10 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
     let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
     let response = await getBoxesByLocation(currLocationConceptId);
     let boxList = response.data;
-    let boxIdAndBags = {};
+    let boxIdAndBagsObj = {};
     for (let i = 0; i < boxList.length; i++) {
         let box = boxList[i]
-        boxIdAndBags[box['132929440']] = box['bags']
+        boxIdAndBagsObj[box['132929440']] = box['bags']
     }
 
     //let tubeTable = document.getElementById("shippingModalTable")
@@ -436,7 +436,7 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         ${tubeTable.innerHTML}
     </table>
     `;
-    populateModalSelect(boxIdAndBags)
+    populateModalSelect(boxIdAndBagsObj)
     if (empty) {
         showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' }, true)
         document.getElementById('shippingCloseButton').click();
@@ -823,14 +823,14 @@ export const populateSpecimensList = async (boxList) => {
     }
 }
 
-export const populateBoxManifestHeader = (boxId, boxIdAndBags, currContactInfo) => {
+export const populateBoxManifestHeader = (boxId, boxList, currContactInfo) => {
     let column1 = document.getElementById("boxManifestCol1")
     let column2 = document.getElementById("boxManifestCol3")
 
     let currBox = {};
-    for (let i = 0; i < boxIdAndBags.length; i++) {
-        if (boxIdAndBags[i]['132929440'] == boxId) {
-            currBox = boxIdAndBags[i]
+    for (let i = 0; i < boxList.length; i++) {
+        if (boxList[i]['132929440'] == boxId) {
+            currBox = boxList[i]
         }
     }
     let currJSONKeys = Object.keys(currBox['bags'])
@@ -896,13 +896,13 @@ export const populateBoxManifestHeader = (boxId, boxIdAndBags, currContactInfo) 
 
 }
 
-export const populateModalSelect = (boxIdAndBags) => {
+export const populateModalSelect = (boxIdAndBagsObj) => {
     let boxSelectEle = document.getElementById('shippingModalChooseBox');
     let selectedBoxId = boxSelectEle.getAttribute('data-new-box') || document.getElementById('selectBoxList').value;
     let addToBoxButton =  document.getElementById('addToBagButton');
     addToBoxButton.removeAttribute("disabled")
     let options = '';
-    let boxIds = Object.keys(boxIdAndBags).sort(compareBoxIds);
+    let boxIds = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
     for (let i = 0; i < boxIds.length; i++) {
         options += `<option>${boxIds[i]}</option>`;
     }
@@ -936,7 +936,7 @@ export const populateTempSelect = (boxes) => {
     }
 }
 
-export const populateSaveTable = (boxIdAndBags_unshipped, boxList_all, userName) => {
+export const populateSaveTable = (boxIdAndBagsObj, boxList, userName) => {
     let table = document.getElementById("saveTable");
     table.innerHTML = `<tr>
                         <th style="border-bottom:1px solid;">To Ship</th>
@@ -948,9 +948,9 @@ export const populateSaveTable = (boxIdAndBags_unshipped, boxList_all, userName)
                         <th style="border-bottom:1px solid;text-align:center;"><p style="margin-bottom:0">View/Print Box Manifest</p><p style="margin-bottom:0">(to be included in shipment)</p></th>
                     </tr>`
     let count = 0;
-    let boxIdList = Object.keys(boxIdAndBags_unshipped).sort(compareBoxIds);
+    let boxIdList = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
     for (let i = 0; i < boxIdList.length; i++) {
-        if (Object.keys(boxIdAndBags_unshipped[boxIdList[i]]).length > 0) {
+        if (Object.keys(boxIdAndBagsObj[boxIdList[i]]).length > 0) {
             let currRow = table.insertRow(count + 1);
             if (count % 2 == 1) {
                 currRow.style['background-color'] = 'lightgrey'
@@ -962,10 +962,10 @@ export const populateSaveTable = (boxIdAndBags_unshipped, boxList_all, userName)
             let thisLocation = '';
 
             // todo: remove this for loop
-            for (let j = 0; j < boxList_all.length; j++) {
-                if (boxList_all[j]['132929440'] == boxIdList[i]) {
-                    if (boxList_all[j].hasOwnProperty('672863981')) {
-                        let timestamp = Date.parse(boxList_all[j]['672863981']);
+            for (let j = 0; j < boxList.length; j++) {
+                if (boxList[j]['132929440'] == boxIdList[i]) {
+                    if (boxList[j].hasOwnProperty('672863981')) {
+                        let timestamp = Date.parse(boxList[j]['672863981']);
                         let newDate = new Date(timestamp);
                         let ampm = 'AM'
                         if (newDate.getHours() >= 12) {
@@ -978,8 +978,8 @@ export const populateSaveTable = (boxIdAndBags_unshipped, boxList_all, userName)
                         dateStarted = (newDate.getMonth() + 1) + '/' + (newDate.getDate()) + '/' + newDate.getFullYear() + ' ' + ((newDate.getHours() + 11) % 12 + 1) + ':' + minutesTag + ' ' + ampm;
                         //dateStarted = boxJSONS[j]['672863981'];
                     }
-                    if (boxList_all[j].hasOwnProperty('555611076')) {
-                        let timestamp = Date.parse(boxList_all[j]['555611076']);
+                    if (boxList[j].hasOwnProperty('555611076')) {
+                        let timestamp = Date.parse(boxList[j]['555611076']);
                         let newDate = new Date(timestamp);
                         let ampm = 'AM'
                         if (newDate.getHours() >= 12) {
@@ -993,8 +993,8 @@ export const populateSaveTable = (boxIdAndBags_unshipped, boxList_all, userName)
                         //lastModified = boxJSONS[j]['555611076']
 
                     }
-                    if (boxList_all[j].hasOwnProperty('560975149')) {
-                        thisLocation = locationConceptIDToLocationMap[boxList_all[j]['560975149']]["siteSpecificLocation"];
+                    if (boxList[j].hasOwnProperty('560975149')) {
+                        thisLocation = locationConceptIDToLocationMap[boxList[j]['560975149']]["siteSpecificLocation"];
                     }
                 }
             }
@@ -1003,7 +1003,7 @@ export const populateSaveTable = (boxIdAndBags_unshipped, boxList_all, userName)
             currRow.insertCell(3).innerHTML = boxIdList[i];
             currRow.insertCell(4).innerHTML = thisLocation;
             //get num tubes
-            let currBox = boxIdAndBags_unshipped[boxIdList[i]];
+            let currBox = boxIdAndBagsObj[boxIdList[i]];
             let numTubes = 0;
             let boxKeys = Object.keys(currBox);
             for (let j = 0; j < boxKeys.length; j++) {
@@ -1102,19 +1102,19 @@ export const populateShippingManifestHeader = (hiddenJSON, userName, locationNum
 
 }
 
-export const populateShippingManifestBody = (boxIdAndBags) => {
+export const populateShippingManifestBody = (boxIdAndBagsObj) => {
     let table = document.getElementById("shippingManifestTable");
-    let boxIdList = Object.keys(boxIdAndBags).sort(compareBoxIds);
+    let boxIdList = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
     let currRowIndex = 1;
     let greyIndex = 0;
     for (let i = 0; i < boxIdList.length; i++) {
         let firstSpec = true;
         let currBoxId = boxIdList[i];
-        let specimens = Object.keys(boxIdAndBags[boxIdList[i]])
+        let specimens = Object.keys(boxIdAndBagsObj[boxIdList[i]])
         for (let j = 0; j < specimens.length; j++) {
             let firstTube = true;
             let specimen = specimens[j];
-            let tubes = boxIdAndBags[boxIdList[i]][specimen]['arrElements'];
+            let tubes = boxIdAndBagsObj[boxIdList[i]][specimen]['arrElements'];
             for (let k = 0; k < tubes.length; k++) {
 
                 let currTube = tubes[k];
@@ -1141,11 +1141,11 @@ export const populateShippingManifestBody = (boxIdAndBags) => {
                 currRow.insertCell(2).innerHTML = currTube;
                 let fullScannerName = ''
 
-                if (boxIdAndBags[boxIdList[i]][specimen].hasOwnProperty('469819603') && k == 0) {
-                    fullScannerName += boxIdAndBags[boxIdList[i]][specimen]['469819603'] + ' '
+                if (boxIdAndBagsObj[boxIdList[i]][specimen].hasOwnProperty('469819603') && k == 0) {
+                    fullScannerName += boxIdAndBagsObj[boxIdList[i]][specimen]['469819603'] + ' '
                 }
-                if (boxIdAndBags[boxIdList[i]][specimen].hasOwnProperty('618036638') && k == 0) {
-                    fullScannerName += boxIdAndBags[boxIdList[i]][specimen]['618036638']
+                if (boxIdAndBagsObj[boxIdList[i]][specimen].hasOwnProperty('618036638') && k == 0) {
+                    fullScannerName += boxIdAndBagsObj[boxIdList[i]][specimen]['618036638']
                 }
                 currRow.insertCell(3).innerHTML = fullScannerName
 
@@ -1176,10 +1176,10 @@ const compareBoxIds = (a, b) => {
 
 }
 
-export const populateBoxSelectList = async (boxIdAndBags, userName,) => {
+export const populateBoxSelectList = async (boxIdAndBagsObj, userName,) => {
     let boxSelectEle = document.getElementById('selectBoxList');
     let options = ''
-    let boxIdList = Object.keys(boxIdAndBags).sort(compareBoxIds);
+    let boxIdList = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
     for (let i = 0; i < boxIdList.length; i++) {
         options += '<option>' + boxIdList[i] + '</option>';
     }
@@ -1187,7 +1187,7 @@ export const populateBoxSelectList = async (boxIdAndBags, userName,) => {
 
     let currBoxId = boxSelectEle.value;
     if (currBoxId != '') {
-        let currBox = boxIdAndBags[currBoxId];
+        let currBox = boxIdAndBagsObj[currBoxId];
 
 
         //document.getElementById('BoxNumBlood').innerText = currBoxId;
@@ -1593,13 +1593,13 @@ export const addEventChangeLocationSelect = (userName) => {
             let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
             let boxArray = (await getBoxesByLocation(currLocationConceptId)).data;
 
-            let boxIdAndBags = {};
+            let boxIdAndBagsObj = {};
             for (let i = 0; i < boxArray.length; i++) {
                 let box = boxArray[i]
-                boxIdAndBags[box['132929440']] = box['bags']
+                boxIdAndBagsObj[box['132929440']] = box['bags']
             }
 
-            await populateBoxSelectList(boxIdAndBags, userName);
+            await populateBoxSelectList(boxIdAndBagsObj, userName);
             hideAnimation();
         }
         else {
@@ -2827,10 +2827,10 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
     });
 }
 
-export const addEventReturnToReviewShipmentContents = (element, boxIdAndBags, userName, tempChecked) => {
+export const addEventReturnToReviewShipmentContents = (element, boxIdAndBagsObj, userName, tempChecked) => {
     const btn = document.getElementById(element);
     document.getElementById(element).addEventListener('click', async e => {
-        let boxListToShip = Object.keys(boxIdAndBags).sort(compareBoxIds)
+        let boxListToShip = Object.keys(boxIdAndBagsObj).sort(compareBoxIds)
         //return box 1 info
         if (tempChecked != false) {
             tempChecked = true;
@@ -2839,21 +2839,21 @@ export const addEventReturnToReviewShipmentContents = (element, boxIdAndBags, us
     });
 }
 
-export const addEventNavBarTracking = (element, userName, boxIdAndBags, tempChecked) => {
+export const addEventNavBarTracking = (element, userName, boxIdAndBagsObj, tempChecked) => {
     let btn = document.getElementById('navBarShipmentTracking');
     document.getElementById(element).addEventListener('click', async e => {
         e.stopPropagation();
         if (btn.classList.contains('active')) return;
-        let boxIdList = Object.keys(boxIdAndBags).sort(compareBoxIds)
+        let boxIdList = Object.keys(boxIdAndBagsObj).sort(compareBoxIds)
         for (let i = 0; i < boxIdList.length; i++) {
             // hiddenJSON[keys[i]] = hiddenJSON[keys[i]]['specimens']
-            boxIdAndBags[boxIdList[i]] = {
-              "959708259" : boxIdAndBags[boxIdList[i]]["959708259"],
-              "specimens" : boxIdAndBags[boxIdList[i]]['specimens']
+            boxIdAndBagsObj[boxIdList[i]] = {
+              "959708259" : boxIdAndBagsObj[boxIdList[i]]["959708259"],
+              "specimens" : boxIdAndBagsObj[boxIdList[i]]['specimens']
           }
         }
         //return box 1 info
-        shipmentTracking(boxIdAndBags, userName, tempChecked);
+        shipmentTracking(boxIdAndBagsObj, userName, tempChecked);
     });
 }
 
@@ -2898,9 +2898,9 @@ export const addEventPreventTrackingConfirmPaste = () => {
   })
 }
 
-export const addEventCheckValidTrackInputs = (boxIdAndBags) => {
+export const addEventCheckValidTrackInputs = (boxIdAndBagsObj) => {
 
-  let boxIdList = Object.keys(boxIdAndBags).sort(compareBoxIds);
+  let boxIdList = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
   /* Check Tracking Numbers - ON SCREEN LOAD */
   boxIdList.forEach(box => {
     let input = document.getElementById(box+"trackingId").value.trim()
@@ -2986,9 +2986,9 @@ export const populateSelectLocationList = async () => {
     selectEle.innerHTML = options;
 }
 
-export const populateBoxManifestTable = (boxId, boxIdAndBags) => {
+export const populateBoxManifestTable = (boxId, boxIdAndBagsObj) => {
     let currTable = document.getElementById('boxManifestTable');
-    let bagObjects = boxIdAndBags[boxId];
+    let bagObjects = boxIdAndBagsObj[boxId];
 
     let bagList = Object.keys(bagObjects);
     let rowCount = 1;
@@ -3028,8 +3028,8 @@ export const populateBoxManifestTable = (boxId, boxIdAndBags) => {
 
 }
 
-export const populateTrackingQuery = async (boxIdAndBags) => {
-    let boxIdList = Object.keys(boxIdAndBags).sort(compareBoxIds);
+export const populateTrackingQuery = async (boxIdAndBagsObj) => {
+    let boxIdList = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
     let toBeInnerHTML = ""
 
     let shipping = {}
@@ -3074,9 +3074,9 @@ export const populateTrackingQuery = async (boxIdAndBags) => {
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
 }
 
-export const addEventCompleteButton = (boxIdAndBags, userName, tempChecked) => {
+export const addEventCompleteButton = (boxIdAndBagsObj, userName, tempChecked) => {
     document.getElementById('completeTracking').addEventListener('click', async () => {
-        let boxIdList = Object.keys(boxIdAndBags).sort(compareBoxIds);
+        let boxIdList = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
         let emptyField = false;
         let trackingNumConfirmEls = Array.from(document.getElementsByClassName("invalid"))
 
@@ -3095,19 +3095,19 @@ export const addEventCompleteButton = (boxIdAndBags, userName, tempChecked) => {
             }
         
             // if '959708259' exists update tracking number
-            if (boxIdAndBags[boxIdList[i]].hasOwnProperty('959708259')) {
-              boxIdAndBags[boxIdList[i]]['959708259'] = boxi
+            if (boxIdAndBagsObj[boxIdList[i]].hasOwnProperty('959708259')) {
+              boxIdAndBagsObj[boxIdList[i]]['959708259'] = boxi
             }
             // if 'confirmTrackNum' exists update tracking number
-            if (boxIdAndBags[boxIdList[i]].hasOwnProperty('confirmTrackNum')) {
-              boxIdAndBags[boxIdList[i]]['confirmTrackNum'] = boxiConfirm 
+            if (boxIdAndBagsObj[boxIdList[i]].hasOwnProperty('confirmTrackNum')) {
+              boxIdAndBagsObj[boxIdList[i]]['confirmTrackNum'] = boxiConfirm 
             }
             // if specimens exists update, else add following key/values
-            if (boxIdAndBags[boxIdList[i]].hasOwnProperty('specimens')) {
-              boxIdAndBags[boxIdList[i]]['specimens'] = boxIdAndBags[boxIdList[i]]['specimens'] 
+            if (boxIdAndBagsObj[boxIdList[i]].hasOwnProperty('specimens')) {
+              boxIdAndBagsObj[boxIdList[i]]['specimens'] = boxIdAndBagsObj[boxIdList[i]]['specimens'] 
             } 
             else {
-              boxIdAndBags[boxIdList[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: boxIdAndBags[boxIdList[i]] }
+              boxIdAndBagsObj[boxIdList[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: boxIdAndBagsObj[boxIdList[i]] }
             }  
         }
 
@@ -3124,23 +3124,23 @@ export const addEventCompleteButton = (boxIdAndBags, userName, tempChecked) => {
         }
 
         if (emptyField == false) {
-            document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBags);
-            addEventSaveContinue(boxIdAndBags)
+            document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBagsObj);
+            addEventSaveContinue(boxIdAndBagsObj)
             let shipmentCourier = document.getElementById('courierSelect').value;
-            finalShipmentTracking(boxIdAndBags, userName, tempChecked, shipmentCourier);
+            finalShipmentTracking(boxIdAndBagsObj, userName, tempChecked, shipmentCourier);
         }
     })
 
 }
 
-export const addEventSaveButton = async (boxIdAndBags) => {
+export const addEventSaveButton = async (boxIdAndBagsObj) => {
     document.getElementById('saveTracking').addEventListener('click', async () => {
-        let boxes = Object.keys(boxIdAndBags).sort(compareBoxIds);
+        let boxIdList = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
         let isMismatch = -1;
 
-        for (let i = 0; i < boxes.length; i++) {
-            let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-            let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+        for (let i = 0; i < boxIdList.length; i++) {
+            let boxi = document.getElementById(boxIdList[i] + "trackingId").value.toUpperCase();
+            let boxiConfirm = document.getElementById(boxIdList[i] + "trackingIdConfirm").value.toUpperCase();
             
             if (boxi !== boxiConfirm) {
                 isMismatch = i;
@@ -3148,19 +3148,19 @@ export const addEventSaveButton = async (boxIdAndBags) => {
             }
 
             // if '959708259' exists update tracking number
-            if (boxIdAndBags[boxes[i]].hasOwnProperty('959708259')) {
-              boxIdAndBags[boxes[i]]['959708259'] = boxi
+            if (boxIdAndBagsObj[boxIdList[i]].hasOwnProperty('959708259')) {
+              boxIdAndBagsObj[boxIdList[i]]['959708259'] = boxi
             }
             // if 'confirmTrackNum' exists update tracking number
-            if (boxIdAndBags[boxes[i]].hasOwnProperty('confirmTrackNum')) {
-              boxIdAndBags[boxes[i]]['confirmTrackNum'] = boxiConfirm 
+            if (boxIdAndBagsObj[boxIdList[i]].hasOwnProperty('confirmTrackNum')) {
+              boxIdAndBagsObj[boxIdList[i]]['confirmTrackNum'] = boxiConfirm 
             }
             // if specimens exists update, else add following key/values
-            if (boxIdAndBags[boxes[i]].hasOwnProperty('specimens')) {
-              boxIdAndBags[boxes[i]]['specimens'] = boxIdAndBags[boxes[i]]['specimens'] 
+            if (boxIdAndBagsObj[boxIdList[i]].hasOwnProperty('specimens')) {
+              boxIdAndBagsObj[boxIdList[i]]['specimens'] = boxIdAndBagsObj[boxIdList[i]]['specimens'] 
             } 
             else {
-              boxIdAndBags[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: boxIdAndBags[boxes[i]] }
+              boxIdAndBagsObj[boxIdList[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: boxIdAndBagsObj[boxIdList[i]] }
             }  
         }
 
@@ -3173,18 +3173,18 @@ export const addEventSaveButton = async (boxIdAndBags) => {
               })           
             return;
         }
-        let isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxes);
-        if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxes) && boxes.length > 1)){
+        let isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxIdList);
+        if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxIdList) && boxIdList.length > 1)){
             shippingDuplicateMessage(isDuplicateTrackingIdInDb)
             return
           }
           
         let shippingData = []
 
-        for(let i = 0; i < boxes.length; i++){
-          let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-          let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
-            shippingData.push({ "959708259": boxi, confirmTrackNum: boxiConfirm, "boxId":boxes[i]})
+        for(let i = 0; i < boxIdList.length; i++){
+          let boxi = document.getElementById(boxIdList[i] + "trackingId").value.toUpperCase();
+          let boxiConfirm = document.getElementById(boxIdList[i] + "trackingIdConfirm").value.toUpperCase();
+            shippingData.push({ "959708259": boxi, confirmTrackNum: boxiConfirm, "boxId":boxIdList[i]})
         }
         localforage.setItem("shipData",shippingData)
 
@@ -3197,39 +3197,39 @@ export const addEventSaveButton = async (boxIdAndBags) => {
     })
 }
 
-export const addEventSaveContinue = (boxIdAndBags) => {
-      let boxes = Object.keys(boxIdAndBags).sort(compareBoxIds);
-      for (let i = 0; i < boxes.length; i++) {
-          let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-          let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
+export const addEventSaveContinue = (boxIdAndBagsObj) => {
+      let boxIdList = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
+      for (let i = 0; i < boxIdList.length; i++) {
+          let boxi = document.getElementById(boxIdList[i] + "trackingId").value.toUpperCase();
+          let boxiConfirm = document.getElementById(boxIdList[i] + "trackingIdConfirm").value.toUpperCase();
           // if '959708259' exists update tracking number
-          if (boxIdAndBags[boxes[i]].hasOwnProperty('959708259')) {
-            boxIdAndBags[boxes[i]]['959708259'] = boxi
+          if (boxIdAndBagsObj[boxIdList[i]].hasOwnProperty('959708259')) {
+            boxIdAndBagsObj[boxIdList[i]]['959708259'] = boxi
           }
           // if 'confirmTrackNum' exists update tracking number
-          if (boxIdAndBags[boxes[i]].hasOwnProperty('confirmTrackNum')) {
-            boxIdAndBags[boxes[i]]['confirmTrackNum'] = boxiConfirm 
+          if (boxIdAndBagsObj[boxIdList[i]].hasOwnProperty('confirmTrackNum')) {
+            boxIdAndBagsObj[boxIdList[i]]['confirmTrackNum'] = boxiConfirm 
           }
           // if specimens exists update, else add following key/values
-          if (boxIdAndBags[boxes[i]].hasOwnProperty('specimens')) {
-            boxIdAndBags[boxes[i]]['specimens'] = boxIdAndBags[boxes[i]]['specimens'] 
+          if (boxIdAndBagsObj[boxIdList[i]].hasOwnProperty('specimens')) {
+            boxIdAndBagsObj[boxIdList[i]]['specimens'] = boxIdAndBagsObj[boxIdList[i]]['specimens'] 
           } 
           else {
-            boxIdAndBags[boxes[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: boxIdAndBags[boxes[i]] }
+            boxIdAndBagsObj[boxIdList[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: boxIdAndBagsObj[boxIdList[i]] }
           }  
       }
       
       let shippingData = []
 
-      for(let i = 0; i < boxes.length; i++){
-        let boxi = document.getElementById(boxes[i] + "trackingId").value.toUpperCase();
-        let boxiConfirm = document.getElementById(boxes[i] + "trackingIdConfirm").value.toUpperCase();
-          shippingData.push({ "959708259": boxi, confirmTrackNum: boxiConfirm, "boxId":boxes[i]})
+      for(let i = 0; i < boxIdList.length; i++){
+        let boxi = document.getElementById(boxIdList[i] + "trackingId").value.toUpperCase();
+        let boxiConfirm = document.getElementById(boxIdList[i] + "trackingIdConfirm").value.toUpperCase();
+          shippingData.push({ "959708259": boxi, confirmTrackNum: boxiConfirm, "boxId":boxIdList[i]})
       }
       localforage.setItem("shipData",shippingData)
 }
 
-export const addEventCompleteShippingButton = (boxIdAndBags, userName, tempChecked, shipmentCourier) => {
+export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, tempChecked, shipmentCourier) => {
     document.getElementById('finalizeModalSign').addEventListener('click', async () => {
         let finalizeTextField = document.getElementById('finalizeSignInput');
         let firstNameShipper = userName.split(" ")[0] ? userName.split(" ")[0] : ""
@@ -3248,12 +3248,12 @@ export const addEventCompleteShippingButton = (boxIdAndBags, userName, tempCheck
         shippingData["948887825"] = firstNameShipper;
         shippingData["885486943"] = lastNameShipper;
         let trackingNumbers = {}
-        let boxIdList = Object.keys(boxIdAndBags);
+        let boxIdList = Object.keys(boxIdAndBagsObj);
         for (let i = 0; i < boxIdList.length; i++) {
-            trackingNumbers[boxIdList[i]] = boxIdAndBags[boxIdList[i]]['959708259'];
+            trackingNumbers[boxIdList[i]] = boxIdAndBagsObj[boxIdList[i]]['959708259'];
         }
         if (finalizeTextField.value.toUpperCase() === userName.toUpperCase()) {
-            let boxes = Object.keys(boxIdAndBags).sort(compareBoxIds);
+            let boxes = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
             let shipSent = await ship(boxes, shippingData, trackingNumbers);
             console.log(shipSent)
             document.getElementById('finalizeModalCancel').click();
@@ -3275,13 +3275,13 @@ export const addEventCompleteShippingButton = (boxIdAndBags, userName, tempCheck
     })
 }
 
-export const populateFinalCheck = (boxIdAndBags) => {
+export const populateFinalCheck = (boxIdAndBagsObj) => {
     let table = document.getElementById('finalCheckTable');
-    let boxIdList = Object.keys(boxIdAndBags).sort(compareBoxIds);
+    let boxIdList = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
     for (let i = 0; i < boxIdList.length; i++) {
         let currBox = boxIdList[i]
-        let currShippingNumber = boxIdAndBags[boxIdList[i]]['959708259']
-        let specimenObj = boxIdAndBags[boxIdList[i]]['specimens'];
+        let currShippingNumber = boxIdAndBagsObj[boxIdList[i]]['959708259']
+        let specimenObj = boxIdAndBagsObj[boxIdList[i]]['specimens'];
         let keys = Object.keys(specimenObj);
         let numTubes = 0;
         let numBags = specimenObj.hasOwnProperty('orphans') ? keys.length - 1 : keys.length;

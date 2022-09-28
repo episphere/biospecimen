@@ -223,12 +223,12 @@ export const startShipping = async (userName) => {
         let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
         response = await getBoxesByLocation(currLocationConceptId);
         allBoxList = response.data;
-        let boxIdAndBags = {};
+        let boxIdAndBagsObj = {};
         for (const box of allBoxList) {
             const boxId = box[conceptIds.shippingBoxId];
-            boxIdAndBags[boxId] = box['bags']
+            boxIdAndBagsObj[boxId] = box['bags']
         }
-        await populateBoxSelectList(boxIdAndBags,userName);
+        await populateBoxSelectList(boxIdAndBagsObj,userName);
     };
 
     let tempMonitorCheckedEl = document.getElementById('tempMonitorChecked')
@@ -252,13 +252,13 @@ export const boxManifest = async (boxId, userName) => {
     let boxList = response.data;
 
     let currBox = {}
-    let boxIdAndBags = {};
+    let boxIdAndBagsObj = {};
     for(let i = 0; i < boxList.length; i++){
         let box = boxList[i]
         if(box['132929440'] == boxId){
             currBox = box;
         }
-        boxIdAndBags[box['132929440']] = box['bags']
+        boxIdAndBagsObj[box['132929440']] = box['bags']
     }
     let currInstitute = currBox.siteAcronym;
     let currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
@@ -316,12 +316,12 @@ export const boxManifest = async (boxId, userName) => {
     document.getElementById('contentBody').innerHTML = template;
    
 // We may not need this anymore for data storage:
-    document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(boxIdAndBags);
+    document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(boxIdAndBagsObj);
     
     //addEventNavBarShipment("returnToPackaging");
     //document.getElementById('boxManifestTable').appendChild(result);
     populateBoxManifestHeader(boxId,boxList,currContactInfo);
-    populateBoxManifestTable(boxId,boxIdAndBags);
+    populateBoxManifestTable(boxId,boxIdAndBagsObj);
     addEventNavBarShipment("returnToPackaging", userName);
     document.getElementById('printBox').addEventListener('click', e => {
         window.print();
@@ -339,22 +339,22 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, 
     //let tempMonitorThere = document.getElementById('tempMonitorChecked').checked;
     let response = await  getBoxes();
     let boxList = response.data;
-    let boxIdAndBags = {};
+    let boxIdAndBagsObj = {};
     let locations = {};
     let site = '';
 
     for (const box of boxList) {
         const boxId= box[conceptIds.shippingBoxId]
-        boxIdAndBags[boxId] = box['bags']
+        boxIdAndBagsObj[boxId] = box['bags']
         locations[boxId] = box[conceptIds.shippingLocation];
         site = box['siteAcronym'];
     }
     
-    let boxIdAndBagsToDisplay = {};
+    let boxIdAndBagsObjToDisplay = {};
     let location = ''
 
     for (const boxId of boxesToShip) {
-        boxIdAndBagsToDisplay[boxId] = boxIdAndBags[boxId];
+        boxIdAndBagsObjToDisplay[boxId] = boxIdAndBagsObj[boxId];
         location = locations[boxId];
     }
 
@@ -422,13 +422,13 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, 
         populateTempSelect(boxesToShip);
     }
 
-    document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(boxIdAndBags);
+    document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(boxIdAndBagsObj);
     
     
     //document.getElementById('boxManifestTable').appendChild(result);
     
-    populateShippingManifestHeader(boxIdAndBagsToDisplay, userName, location, site, currShippingLocationNumber); // populate shipping header via site specfiic location selected from shipping page
-    populateShippingManifestBody(boxIdAndBagsToDisplay);
+    populateShippingManifestHeader(boxIdAndBagsObjToDisplay, userName, location, site, currShippingLocationNumber); // populate shipping header via site specfiic location selected from shipping page
+    populateShippingManifestBody(boxIdAndBagsObjToDisplay);
     addEventNavBarShipment("navBarShippingDash", userName);
     await populateTempCheck();
     const btn = document.getElementById('assignTrackingNumberPage'); // assignTracking
@@ -450,14 +450,14 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, 
             currChecked = document.getElementById('tempBox').value;
         }
         //return box 1 info
-        shipmentTracking(boxIdAndBagsToDisplay, userName, currChecked);
+        shipmentTracking(boxIdAndBagsObjToDisplay, userName, currChecked);
     });
     //addEventNavBarShipment("navBarShippingDash");
     //addEventBackToSearch('backToSearch');
 }
 
 
-export const shipmentTracking = async (boxIdAndBags, userName, tempCheckChecked) => {
+export const shipmentTracking = async (boxIdAndBagsObj, userName, tempCheckChecked) => {
     showAnimation();
 
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
@@ -516,19 +516,19 @@ export const shipmentTracking = async (boxIdAndBags, userName, tempCheckChecked)
     document.getElementById('contentBody').innerHTML = template;
     await populateCourierBox();
     addEventNavBarShipment("returnToPackaging", userName);
-    if(Object.keys(boxIdAndBags).length > 0){
-        document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBags)
+    if(Object.keys(boxIdAndBagsObj).length > 0){
+        document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBagsObj)
     }
     //addEventReturnToShippingManifest('returnToShipping', hiddenJSON, userName, tempCheckChecked)
     addEventNavBarShipment("navBarShippingDash", userName);
-    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBags, userName, tempCheckChecked)
-    await populateTrackingQuery(boxIdAndBags);
+    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName, tempCheckChecked)
+    await populateTrackingQuery(boxIdAndBagsObj);
     addEventTrimTrackingNums()
     addEventTrackingNumberScanAutoFocus()
     addEventPreventTrackingConfirmPaste()
-    addEventCheckValidTrackInputs(boxIdAndBags)
-    addEventSaveButton(boxIdAndBags);
-    addEventCompleteButton(boxIdAndBags, userName, tempCheckChecked);
+    addEventCheckValidTrackInputs(boxIdAndBagsObj)
+    addEventSaveButton(boxIdAndBagsObj);
+    addEventCompleteButton(boxIdAndBagsObj, userName, tempCheckChecked);
     //addEventCompleteShippingButton(hiddenJSON);
     //addEventBackToSearch('navBarShippingDash');
     // addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
@@ -536,7 +536,7 @@ export const shipmentTracking = async (boxIdAndBags, userName, tempCheckChecked)
     //addEventSubmitAddBag();
 }
 
-export const finalShipmentTracking = (boxIdAndBags, userName, tempChecked, shipmentCourier) => {
+export const finalShipmentTracking = (boxIdAndBagsObj, userName, tempChecked, shipmentCourier) => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     let conversion = {
         '712278213': 'FedEx',
@@ -625,14 +625,14 @@ export const finalShipmentTracking = (boxIdAndBags, userName, tempChecked, shipm
     
  
     addEventNavBarShipment("navBarShippingDash", userName);
-    addEventNavBarTracking("returnToTracking", userName, boxIdAndBags, tempChecked)
-    addEventNavBarTracking("navBarFinalizeShipment", userName, boxIdAndBags, tempChecked)
-    if(Object.keys(boxIdAndBags).length > 0){
-        document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBags)
+    addEventNavBarTracking("returnToTracking", userName, boxIdAndBagsObj, tempChecked)
+    addEventNavBarTracking("navBarFinalizeShipment", userName, boxIdAndBagsObj, tempChecked)
+    if(Object.keys(boxIdAndBagsObj).length > 0){
+        document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBagsObj)
     }
-    populateFinalCheck(boxIdAndBags);
-    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBags, userName)
-    addEventCompleteShippingButton(boxIdAndBags, userName, tempChecked, shipmentCourier);
+    populateFinalCheck(boxIdAndBagsObj);
+    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName)
+    addEventCompleteShippingButton(boxIdAndBagsObj, userName, tempChecked, shipmentCourier);
     addEventBackToSearch('navBarShippingDash');
     //addEventBackToSearch('navBarShippingDash');
     //addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);

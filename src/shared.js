@@ -840,7 +840,7 @@ export const specimenCollection = {
     677469051: '0014',
     683613884: '0024',
   },
-  tubeList: [
+  tubeNumList: [
     '0001',
     '0002',
     '0003',
@@ -912,7 +912,7 @@ export const searchSpecimenInstitute = async () => {
                 delete currCollection[tubeCid];
             }
 
-            // check and delete tube if current tube deviation concept ID that disallows shipping
+            // delete tube if it contains deviation concept ID that disallows shipping
             const tubeDeviation = currTube[conceptIds.collection.tube.deviation];
             if (tubeDeviation?.[conceptIds.brokenSpecimenDeviation] == conceptIds.yes || 
                 tubeDeviation?.[conceptIds.discardSpecimenDeviation] == conceptIds.yes || 
