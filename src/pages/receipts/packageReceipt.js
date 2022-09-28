@@ -237,9 +237,19 @@ const formSubmit = () => {
   const form = document.getElementById('save');
   form.addEventListener('click', e => {
     e.preventDefault();
+
     const header = document.getElementById('modalHeader');
     const body = document.getElementById('modalBody');
-    header.innerHTML = `<h5>Confirmation</h5><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>`
+    const isSelectPackageConditionsListEmpty = checkSelectPackageConditionsList() 
+    console.log("isSelectPackageConditionsListEmpty", isSelectPackageConditionsListEmpty)
+    if(isSelectPackageConditionsListEmpty) {
+        // return modal with caution 
+        return console.log("No package selected!")
+    }
+    header.innerHTML = `<h5>Confirmation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>`
     let template = '<div>'
     template += `
             <span>Confirm package receipt</span>
@@ -287,7 +297,8 @@ const confirmPackageReceipt = () => {
         }
         window.removeEventListener("beforeunload",beforeUnloadMessage)
         targetAnchorTagEl();
-        storePackageReceipt(obj);
+        console.log("object",obj)
+        // storePackageReceipt(obj);
        } 
     })
   }
@@ -683,3 +694,14 @@ const controlCollectionCardField = (dropdownSelection) => {
     enableCollectionCardFields() 
   }
 } 
+const checkSelectPackageConditionsList = () => {
+    const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected')
+    const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList)
+    // console.log(parseSelectPackageConditionsList)
+    // console.log(typeof selectPackageConditionsList,selectPackageConditionsList.length)
+    if(parseSelectPackageConditionsList.length === 0) {
+        return true
+    }
+    else return false
+    // (parseSelectPackageConditionsList.length === 0) ? true : false
+}
