@@ -49,9 +49,7 @@ const csvFileButtonSubmit = () => {
     const results = await getBSIQueryData(dateFilter);// getFakeResults() 
     hideAnimation();
     document.getElementById("csvDateInput").value = ``;
-    console.log('results.data', results.data)
     let modifiedResults = modifyBSIQueryResults(results.data);
-
     generateBSIqueryCSVData(modifiedResults);
   })
 }
