@@ -3,7 +3,7 @@ import { searchResults } from "./pages/dashboard.js";
 import { shipmentTracking, shippingManifest } from "./pages/shipping.js"
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
-import { workflows } from "./tubeValidation.js";
+import { workflows, specimenCollection } from "./tubeValidation.js";
 import { signOut } from "./pages/signIn.js";
 import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
@@ -805,74 +805,6 @@ export const removeBag = async(boxId, bags) => {
     return await response.json();
     
 }
-export const specimenCollection = {
-  numToCid: {
-    '0001': '299553921',
-    '0002': '703954371',
-    '0003': '838567176',
-    '0004': '454453939',
-    '0005': '652357376',
-    '0006': '973670172',
-    '0007': '143615646',
-    '0008': '787237543',
-    '0009': '223999569',
-    '0011': '376960806',
-    '0012': '232343615',
-    '0021': '589588440',
-    '0013': '958646668',
-    '0014': '677469051',
-    '0024': '683613884',
-  },
-  cidToNum: {
-    299553921: '0001',
-    703954371: '0002',
-    838567176: '0003',
-    454453939: '0004',
-    652357376: '0005',
-    973670172: '0006',
-    143615646: '0007',
-    787237543: '0008',
-    223999569: '0009',
-    376960806: '0011',
-    232343615: '0012',
-    589588440: '0021',
-    958646668: '0013',
-    677469051: '0014',
-    683613884: '0024',
-  },
-  tubeNumList: [
-    '0001',
-    '0002',
-    '0003',
-    '0004',
-    '0005',
-    '0006',
-    '0007',
-    // '0008' and '0009' are used as container for tubes
-    '0011',
-    '0012',
-    '0021',
-    '0013',
-    '0014',
-    '0024',
-  ],
-  tubeCidList:[
-    '299553921',
-    '703954371',
-    '838567176',
-    '454453939',
-    '652357376',
-    '973670172',
-    '143615646',
-    // '787237543' and '223999569' are used as container for tubes
-    '376960806',
-    '232343615',
-    '589588440',
-    '958646668',
-    '677469051',
-    '683613884',
-  ]
-};
 
 /**
  * Fetches biospecimen collection data from the database, and removes '0008', '0009' and deviation tubes from each collection
