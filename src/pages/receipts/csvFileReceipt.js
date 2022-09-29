@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToLocationObj, baseAPI, convertISODateTime, formatISODateTime } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToLocationObj, baseAPI, keyToNameObj, convertISODateTime, formatISODateTime } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -62,7 +62,7 @@ const getCurrentDate = () => {
 
 const getBSIQueryData = async (filter) => {
   const idToken = await getIdToken();
-  const response = await fetch(`${baseAPI}api=queryBsiData&type=${filter}`, {
+  const response = await fetch(`http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=queryBsiData&type=${filter}`, {
     method: "GET",
     headers: {
       Authorization: "Bearer" + idToken,
@@ -113,6 +113,23 @@ const getVialTypesMappings = (i) => {
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.research && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0007') {
       vialMappingsHolder.push('15ml Nalgene jar', 'Crest Alcohol Free', 'Saliva', '15')
+    }
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' || 
+            i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0011' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0012' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0021')) {
+      vialMappingsHolder.push('5 mL Serum separator tube', 'SST', 'Serum', '5')
+    }
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0013')) {
+      vialMappingsHolder.push('4 ml Vacutainer', 'Lithium Heparin', 'Whole BI', '4')
+    }
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0014')
+      || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0024') {
+      vialMappingsHolder.push('4 ml Vacutainer', 'EDTA = K2', 'Whole BI', '4')
+    }
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005') {
+      vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole BI', '6')
+    }
+    else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0006') {
+      vialMappingsHolder.push('6 ml Vacutainer', 'No Additive', 'Urine', '10')
     }
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["kpCO"]
         && (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0011'
@@ -232,13 +249,13 @@ const getVialTypesMappings = (i) => {
 
 const updateResultMappings = (i, vialMappings) => {
   i['Study ID'] = 'Connect Study'
-  i['Sample Collection Center'] = keyToLocationObj[i[fieldToConceptIdMapping.collectionLocation]]
+  i['Sample Collection Center'] = (i[fieldToConceptIdMapping.collectionType]) === fieldToConceptIdMapping.clinical ? keyToNameObj[i[fieldToConceptIdMapping.healthcareProvider]] : keyToLocationObj[i[fieldToConceptIdMapping.collectionLocation]]
   i['Sample ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[0] : ``
   i['Sequence #'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[1] : ``
   i['BSI ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId] : ``
   i['Subject ID'] = i['Connect_ID']
   i['Date Received'] = i[fieldToConceptIdMapping.dateReceived] != undefined ? formatISODateTime(i[fieldToConceptIdMapping.dateReceived]) : ``
-  i['Date Drawn'] =  i[fieldToConceptIdMapping.dateWithdrawn] != undefined ? convertISODateTime(i[fieldToConceptIdMapping.dateWithdrawn]) : `` 
+  i['Date Drawn'] =  (i[fieldToConceptIdMapping.collectionType]) === fieldToConceptIdMapping.clinical ? (i[fieldToConceptIdMapping.clinicalDateTimeDrawn] != undefined ? convertISODateTime(i[fieldToConceptIdMapping.clinicalDateTimeDrawn]) : ``) : (i[fieldToConceptIdMapping.dateWithdrawn] != undefined ? convertISODateTime(i[fieldToConceptIdMapping.dateWithdrawn]) : ``) 
   i['Vial Type'] = vialMappings[0]
   i['Additive/Preservative'] = vialMappings[1]
   i['Material Type'] = vialMappings[2]
