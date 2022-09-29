@@ -49,7 +49,9 @@ const csvFileButtonSubmit = () => {
     const results = await getBSIQueryData(dateFilter);// getFakeResults() 
     hideAnimation();
     document.getElementById("csvDateInput").value = ``;
+    console.log('results.data', results.data)
     let modifiedResults = modifyBSIQueryResults(results.data);
+
     generateBSIqueryCSVData(modifiedResults);
   })
 }
@@ -271,6 +273,7 @@ const updateResultMappings = (i, vialMappings) => {
   delete i['Connect_ID']
   delete i[fieldToConceptIdMapping.collectionId]
   delete i[fieldToConceptIdMapping.dateWithdrawn]
+  delete i[fieldToConceptIdMapping.clinicalDateTimeDrawn]
   delete i[fieldToConceptIdMapping.dateReceived]
   delete i[fieldToConceptIdMapping.collectionType]
   delete i[fieldToConceptIdMapping.discardFlag]
