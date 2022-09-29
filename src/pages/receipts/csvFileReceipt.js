@@ -62,7 +62,7 @@ const getCurrentDate = () => {
 
 const getBSIQueryData = async (filter) => {
   const idToken = await getIdToken();
-  const response = await fetch(`http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=queryBsiData&type=${filter}`, {
+  const response = await fetch(`${baseAPI}api=queryBsiData&type=${filter}`, {
     method: "GET",
     headers: {
       Authorization: "Bearer" + idToken,
