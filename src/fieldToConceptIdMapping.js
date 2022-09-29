@@ -68,8 +68,6 @@ export default {
     // biospecimen collection
     collection:{
         id:820476880,
-        idIsManuallyEntered: 387108065,
-        accountIdEntered: 148996099,
         selectedVisit: 331584571,
         note: 338570265,
         isFinalized:410912345,
