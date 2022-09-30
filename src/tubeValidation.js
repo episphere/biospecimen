@@ -428,17 +428,9 @@ export const tubesToConcepts = () => ({ ...specimenCollection.numToCid });
 export const conceptsToTubes = () => ({ ...specimenCollection.cidToNum });
 
 export const tubeList = () => {
-  let res = [];
-  for (const tube of tubes) {
-    res.push(tube.id);
-  }
-  return res;
+  return tubes.map((tube) => tube.id);
 };
 
 export const conceptList = () => {
-  let res = [];
-  for (const tube of tubes) {
-    res.push(tube.concept);
-  }
-  return res;
+  return tubes.map((tube) => tube.concept);
 };
