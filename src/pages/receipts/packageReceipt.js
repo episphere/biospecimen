@@ -119,13 +119,14 @@ const packageReceiptTemplate = async (name, auth, route) => {
                         </div>
                     </div>
                 </div>`;
-      template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
-      <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-          <div class="modal-content sub-div-shadow">
-              <div class="modal-header" id="modalHeader"></div>
-              <div class="modal-body" id="modalBody"></div>
-          </div>
-      </div>
+        /*MODAL POPUP*/
+        template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content sub-div-shadow">
+                <div class="modal-header" id="modalHeader"></div>
+                <div class="modal-body" id="modalBody"></div>
+            </div>
+        </div>
     </div>`
         
     document.getElementById("contentBody").innerHTML = template;
@@ -237,16 +238,36 @@ const formSubmit = () => {
   const form = document.getElementById('save');
   form.addEventListener('click', e => {
     e.preventDefault();
-
+    // have one modal be targetted but display needed information
     const header = document.getElementById('modalHeader');
     const body = document.getElementById('modalBody');
     const isSelectPackageConditionsListEmpty = checkSelectPackageConditionsList() 
     console.log("isSelectPackageConditionsListEmpty", isSelectPackageConditionsListEmpty)
-    if(isSelectPackageConditionsListEmpty) {
-        // return modal with caution 
-        return console.log("No package selected!")
+    // if(isSelectPackageConditionsListEmpty) {
+    //     // return modal with caution 
+    //     return console.log("No package selected!")
+    // }
+
+
+    if (isSelectPackageConditionsListEmpty) {
+        header.innerHTML = `<h5></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>`
+        body.innerHTML =  `<div class="row">
+                <div class="col">
+                    <div style="display:flex; justify-content:center; margin-bottom:1rem;">
+                    <i class="fas fa-exclamation-triangle fa-5x" style="color:#ffc107"></i>
+                    </div>
+                    <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; "><span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Print Reminder</span> Have you printed the box manifest(s)?</p>
+                </div>
+            </div>
+            <div class="row" style="display:flex; justify-content:center;">
+            
+        </div>`
     }
-    header.innerHTML = `<h5>Confirmation</h5>
+    else {
+        header.innerHTML = `<h5>Confirmation</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>`
@@ -258,10 +279,11 @@ const formSubmit = () => {
             <button type="submit" class="btn btn-primary" data-dismiss="modal" id="confirmReceipt" target="_blank">Confirm</button>
             <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank">Cancel</button>
         </div>
-
    </div>`
     body.innerHTML = template;
     confirmPackageReceipt()
+    }
+    // everything below here is for moda confirmation
   })
 }
 
