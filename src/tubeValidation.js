@@ -423,14 +423,14 @@ const tubes = [
   tube0024,
 ];
 
-export const tubesToConcepts = () => ({ ...specimenCollection.numToCid });
+export const getTubesToConceptsMap = () => ({ ...specimenCollection.numToCid });
 
-export const conceptsToTubes = () => ({ ...specimenCollection.cidToNum });
+export const getConceptsToTubesMap = () => ({ ...specimenCollection.cidToNum });
 
-export const tubeList = () => {
+export const getTubeList = () => {
   return tubes.map((tube) => tube.id);
 };
 
-export const conceptList = () => {
+export const getConceptList = () => {
   return tubes.map((tube) => tube.concept);
 };
