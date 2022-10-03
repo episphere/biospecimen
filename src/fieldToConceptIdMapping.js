@@ -134,6 +134,35 @@ export default {
     siteCode:789843387,
 
     collectionLocation: 951355211,
-    
+
+    MODULES: {
+        MODULE_1: {
+            STATUS: 949302066
+        },
+        MODULE_2: {
+            STATUS: 536735468
+        },
+        MODULE_3: {
+            STATUS: 976570371
+        },
+        MODULE_4: {
+            STATUS: 663265240
+        }
+    },
+
+    NOT_STARTED: 972455046,
+    STARTED: 615768760,
+    SUBMITTED: 231311385,
+
+    REASON_NOT_COLLECTED: 883732523,
+    REASONS: {
+        PARTICIPANT_REFUSAL: 681745422
+    },
+
+    BASELINE_BLOOD_COLLECTED: 878865966,
+
+    COLLECTION_DETAILS: 173836415,
+    BASELINE: 266600170,
+    CLINICAL_SITE_BLOOD_COLLECTED: 693370086
 };
 
