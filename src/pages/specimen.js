@@ -78,7 +78,7 @@ export const specimenTemplate = async (data, formData) => {
                             <div class="column">
                                 <div class="row">Visit: ${visit.visitType}</div>
                                 <div class="row">Blood Accession ID: ${formData['646899796'] || 'N/A'}</div>
-                                <div class="row">Urine Accession ID: ${formData['928693120'] || 'N/A'}</div>
+                                <div class="row">Urine Accession ID: ${formData['611091485'] || 'N/A'}</div>
                                 <div class="row">Link a new Collection ID</div>
                             </div>
                         </div>

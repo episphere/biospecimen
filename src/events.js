@@ -2051,9 +2051,9 @@ const btnsClicked = async (connectId, formData) => {
     if (bloodAccessionId) {
         formData['646899796'] = bloodAccessionId;
     }
-    let urineAccessionId = formData?.['928693120'];
+    let urineAccessionId = formData?.['611091485'];
     if (urineAccessionId) {
-        formData['928693120'] = urineAccessionId;
+        formData['611091485'] = urineAccessionId;
     }
     let query = `connectId=${parseInt(connectId)}`;
 
@@ -2232,7 +2232,7 @@ const clinicalBtnsClicked = async (formData) => {
 
     if (confirmVal === "cancel") return;
     if(accessionID1?.value) formData = {...formData, '646899796': +accessionID1.value || ''};
-    if(accessionID3?.value) formData['928693120'] = +accessionID3.value || '';
+    if(accessionID3?.value) formData['611091485'] = +accessionID3.value || '';
     if(selectedVisit) formData['331584571'] =  +selectedVisit;
     
     if (confirmVal === "confirmed") {
