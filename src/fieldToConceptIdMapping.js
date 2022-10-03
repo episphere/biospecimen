@@ -77,7 +77,7 @@ export default {
         collectionSetting: 650516960,
         scannedTime: 915838974,
         receivedDate: 926457119,
-        urineAccessNumber: 928693120,
+        urineAccessNumber: 611091485,
         tube:{
             isCollected: 593843561,
             isMissing: 258745303,
