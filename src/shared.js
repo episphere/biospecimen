@@ -1092,15 +1092,18 @@ const checkPaymentEligibility = async (data, baselineCollections) => {
   
     if(baselineCollections.length === 0) return false;
   
-    const module1 = (data['949302066'] && data['949302066'] === 231311385);
-    const module2 = (data['536735468'] && data['536735468'] === 231311385);
-    const module3 = (data['976570371'] && data['976570371'] === 231311385);
-    const module4 = (data['663265240'] && data['663265240'] === 231311385);
-    const bloodCollected = baselineCollections[0]['650516960'] === 534621077 
-        ? (data['878865966'] && data['878865966'] === 353358909) 
-        : (data['878865966'] && data['878865966'] === 353358909) && (data['693370086'] && data['693370086'] === 353358909);
+    const module1 = (data[conceptIds.MODULES.MODULE_1.STATUS] === conceptIds.SUBMITTED);
+    const module2 = (data[conceptIds.MODULES.MODULE_2.STATUS] === conceptIds.SUBMITTED);
+    const module3 = (data[conceptIds.MODULES.MODULE_3.STATUS] === conceptIds.SUBMITTED);
+    const module4 = (data[conceptIds.MODULES.MODULE_4.STATUS] === conceptIds.SUBMITTED);
 
-    const tubes = baselineCollections[0]['650516960'] === 534621077 ? workflows.research.filter(tube => tube.tubeType === 'Blood tube') : workflows.clinical.filter(tube => tube.tubeType === 'Blood tube');
+    const bloodCollected = baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research 
+        ? (data[conceptIds.BASELINE_BLOOD_COLLECTED] && data[conceptIds.BASELINE_BLOOD_COLLECTED] === conceptIds.yes) 
+        : (data[conceptIds.BASELINE_BLOOD_COLLECTED] && data[conceptIds.BASELINE_BLOOD_COLLECTED] === conceptIds.yes) || (data[conceptIds.COLLECTION_DETAILS][conceptIds.BASELINE][conceptIds.CLINICAL_SITE_BLOOD_COLLECTED] === conceptIds.yes);
+
+    const tubes = baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research 
+        ? workflows.research.filter(tube => tube.tubeType === 'Blood tube') 
+        : workflows.clinical.filter(tube => tube.tubeType === 'Blood tube');
   
     let eligible = false;
   
@@ -1111,7 +1114,7 @@ const checkPaymentEligibility = async (data, baselineCollections) => {
       else {
         baselineCollections.forEach(collection => {
           tubes.forEach(tube => {
-            if(collection[tube.concept] && collection[tube.concept]['883732523'] && collection[tube.concept]['883732523'] != 681745422 && collection['650516960'] === 534621077) {
+            if(collection[tube.concept] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] != conceptIds.REASONS.PARTICIPANT_REFUSAL && collection[conceptIds.collection.collectionSetting] === conceptIds.research) {
               eligible = true;
             }
           });
