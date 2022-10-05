@@ -246,8 +246,7 @@ const formSubmit = () => {
         displayPackageConditionListEmptyModal(modalHeaderEl,modalBodyEl)
     }
     else {
-        displayPackageConditionListModal(modalHeaderEl,modalBodyEl)
-        // displayPackageConditionListEmptyModalTest(modalHeaderEl,modalBodyEl)
+        displaySelectedPackageConditionListModal(modalHeaderEl,modalBodyEl)
     }
   })
 }
@@ -284,8 +283,7 @@ const confirmPackageReceipt = () => {
         }
         window.removeEventListener("beforeunload",beforeUnloadMessage)
         targetAnchorTagEl();
-        console.log("obj")
-        // storePackageReceipt(obj);
+        storePackageReceipt(obj);
        } 
     })
   }
@@ -712,7 +710,7 @@ const displayPackageConditionListEmptyModal = (modalHeaderEl,modalBodyEl) => {
     </div>`
 }
 
-const displayPackageConditionListModal = (modalHeaderEl,modalBodyEl) => {
+const displaySelectedPackageConditionListModal = (modalHeaderEl,modalBodyEl) => {
     const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected')
     const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList)
     console.log("parseSelectPackageConditionsList", parseSelectPackageConditionsList)
@@ -737,7 +735,7 @@ const displayPackageConditionListModal = (modalHeaderEl,modalBodyEl) => {
         <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank">Cancel</button>
     </div>
     </div>`
-    displayPackageConditionList(parseSelectPackageConditionsList)
+    displaySelectedPackageConditionList(parseSelectPackageConditionsList)
     clickConfirmPackageConditionListButton(modalHeaderEl,modalBodyEl)
 }
 
@@ -756,7 +754,7 @@ const displayConfirmPackageReceiptModal = (modalHeaderEl,modalBodyEl) => {
     </div>`
 }
 
-const displayPackageConditionList = (parseSelectPackageConditionsList) => {
+const displaySelectedPackageConditionList = (parseSelectPackageConditionsList) => {
     const packageConditionSpanListEl = document.getElementById('packageConditionSpanList')
     for(const packageConditionConceptId of parseSelectPackageConditionsList) {
         if(packageConditonConversion[packageConditionConceptId]) {
