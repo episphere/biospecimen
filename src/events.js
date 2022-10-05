@@ -528,7 +528,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         let shippingTable = document.getElementById('specimenList')
 
         // handle an orphan tube scanned if currArr is undefined 
-        let currArr = shippingTable.rows[tableIndex].cells[2]?.innerText
+        let currArr = shippingTable?.rows[tableIndex]?.cells[2]?.innerText
         if(currArr != undefined) {
           let parseCurrArr = JSON.parse(shippingTable.rows[tableIndex].cells[2].innerText)
           for (let i = 0; i < toDelete.length; i++) {
