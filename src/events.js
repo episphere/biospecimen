@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, retrieveDateFromIsoString, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion,  bagConceptIdList, checkAccessionId, checkSurveyEmailTrigger } from './shared.js';
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, retrieveDateFromIsoString, convertNumsToCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion,  bagConceptIdList, checkAccessionId, checkSurveyEmailTrigger, packageConditonConversion } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -528,7 +528,7 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
         let shippingTable = document.getElementById('specimenList')
 
         // handle an orphan tube scanned if currArr is undefined 
-        let currArr = shippingTable?.rows[tableIndex]?.cells[2]?.innerText
+        let currArr = shippingTable.rows[tableIndex].cells[2]?.innerText
         if(currArr != undefined) {
           let parseCurrArr = JSON.parse(shippingTable.rows[tableIndex].cells[2].innerText)
           for (let i = 0; i < toDelete.length; i++) {
@@ -3412,28 +3412,6 @@ export const populateBoxTable = async (page, filter) => {
         "149772928": "World Courier"
     }
     
-    let packageConversion = {
-        "679749262": "Package in good condition",
-        "405513630": "No Ice Pack",
-        "595987358": "Warm Ice Pack",
-        "200183516": "Vials - Incorrect Material Type Sent",
-        "399948893": "No Label on Vials",
-        "631290535": "Returned Empty Vials",
-        "442684673": "Participant Refusal",
-        "121149986": "Crushed",
-        "678483571": "Damaged Container (outer and inner)",
-        "289322354": "Material Thawed",
-        "909529446": "Insufficient Ice",
-        "847410060": "Improper Packaging",
-        "387564837": "Damaged Vials",
-        "933646000": "Other",
-        "842171722": "No Pre-notification",
-        "613022284": "No Refrigerant",
-        "922995819": "Manifest/Vial/Paperwork info do not match",
-        "958000780": "Shipment Delay",
-        "853876696": "No Manifest provided",
-    }
-
     for (let i = 0; i < pageStuff.data.length; i++) {
         rowCount = currTable.rows.length;
         currRow = currTable.insertRow(rowCount);
@@ -3468,7 +3446,7 @@ export const populateBoxTable = async (page, filter) => {
         currRow.insertCell(4).innerHTML = '<button type="button" class="button btn btn-info" id="reportsViewManifest' + i + '">View manifest</button>';
         currRow.insertCell(5).innerHTML = currPage.hasOwnProperty('333524031') ? "Yes" : "No"
         currRow.insertCell(6).innerHTML = receivedDate;
-        currRow.insertCell(7).innerHTML = convertNumsToCondition(packagedCondition, packageConversion);
+        currRow.insertCell(7).innerHTML = convertNumsToCondition(packagedCondition, packageConditonConversion);
         currRow.insertCell(8).innerHTML = currPage.hasOwnProperty('870456401') ? currPage['870456401'] : '' ;
         addEventViewManifestButton('reportsViewManifest' + i, currPage);
 
