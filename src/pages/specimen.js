@@ -113,7 +113,7 @@ export const specimenTemplate = async (data, formData) => {
         template += `
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="accessionID1">Scan Blood Accession ID:</label>
-                <input autocomplete="off" type="text" class="form-control col-md-5" ${siteAcronym === 'KPCO' || siteAcronym === 'KPGA' || siteAcronym === 'KPNW' || siteAcronym === 'KPHI' ? 'required': ''} placeholder="Scan/Type in Accession ID from Blood Tube" id="accessionID1"/>
+                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type in Accession ID from Blood Tube" id="accessionID1"/>
                 
                 <button class="barcode-input-clear" hidden="true" type="button" id="clearScanAccessionID" title="Clear scanned barcode" data-enable-input="accessionID2" data-barcode-input="accessionID1"><i class="fas fa-times"></i></button>
                 <div class="helper-text"><span class="form-helper-text offset-4">This entry can only contain numbers.</span></div>
@@ -124,7 +124,7 @@ export const specimenTemplate = async (data, formData) => {
             </br>
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="accessionID3">Scan Urine Accession ID:</label>
-                <input autocomplete="off" type="text" class="form-control col-md-5" ${siteAcronym === 'KPCO' || siteAcronym === 'KPGA' || siteAcronym === 'KPNW' || siteAcronym === 'KPHI' ? 'required': ''} placeholder="Scan/Type in Accession ID from Urine Tube" id="accessionID3"/>
+                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type in Accession ID from Urine Tube" id="accessionID3"/>
                 
                 <button class="barcode-input-clear" hidden="true" type="button" id="clearScanAccessionID" title="Clear scanned barcode" data-enable-input="accessionID4" data-barcode-input="accessionID3"><i class="fas fa-times"></i></button>
             </div>
