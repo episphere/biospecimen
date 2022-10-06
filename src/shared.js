@@ -969,8 +969,8 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
     const mouthwashTubes = tubes.filter(tube => tube.tubeType === "Mouthwash");
 
 
-    if(data[conceptIds.COLLECTION_DETAILS]) {
-        settings = data[conceptIds.COLLECTION_DETAILS];
+    if(data[conceptIds.collectionDetails]) {
+        settings = data[conceptIds.collectionDetails];
 
         if(!settings[visit]) {
             settings[visit] = {};
@@ -989,11 +989,11 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
                 settings[visit]['592099155'] = biospecimenData[conceptIds.collection.collectionSetting];
 
                 if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
-                    settings[visit][conceptIds.BASELINE_BLOOD_COLLECTED_TIME] = biospecimenData[conceptIds.collection.collectionTime];
+                    settings[visit][conceptIds.baseline.bloodCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
                 }
                 else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
-                    settings[visit][conceptIds.CLINICAL_DASHBOARD_BLOOD_COLLECTED] = conceptIds.yes;
-                    settings[visit][conceptIds.CLINICAL_DASHBOARD_BLOOD_COLLECTED_TIME] = biospecimenData[conceptIds.collection.scannedTime];
+                    settings[visit][conceptIds.clinicalDashboard.bloodCollected] = conceptIds.yes;
+                    settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
                 }
             }
         });
@@ -1006,11 +1006,11 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
                 settings[visit]['718172863'] = biospecimenData[conceptIds.collection.collectionSetting];
 
                 if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
-                    settings[visit][conceptIds.BASELINE_URINE_COLLECTED_TIME] = biospecimenData[conceptIds.collection.collectionTime];
+                    settings[visit][conceptIds.baseline.urineCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
                 }
                 else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
-                    settings[visit][conceptIds.CLINICAL_DASHBOARD_URINE_COLLECTED] = conceptIds.yes;
-                    settings[visit][conceptIds.CLINICAL_DASHBOARD_URINE_COLLECTED_TIME] = biospecimenData[conceptIds.collection.scannedTime];
+                    settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.yes;
+                    settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
                 }
             }
         });
@@ -1023,7 +1023,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
                 settings[visit]['915179629'] = biospecimenData[conceptIds.collection.collectionSetting];
 
                 if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
-                    settings[visit][conceptIds.BASELINE_MOUTHWASH_COLLECTED_TIME] = biospecimenData[conceptIds.collection.collectionTime];
+                    settings[visit][conceptIds.baseline.mouthwashCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
 
                 }
             }
@@ -1122,14 +1122,14 @@ const checkPaymentEligibility = async (data, baselineCollections) => {
   
     if(baselineCollections.length === 0) return false;
   
-    const module1 = (data[conceptIds.MODULES.MODULE_1.STATUS] === conceptIds.SUBMITTED);
-    const module2 = (data[conceptIds.MODULES.MODULE_2.STATUS] === conceptIds.SUBMITTED);
-    const module3 = (data[conceptIds.MODULES.MODULE_3.STATUS] === conceptIds.SUBMITTED);
-    const module4 = (data[conceptIds.MODULES.MODULE_4.STATUS] === conceptIds.SUBMITTED);
+    const module1 = (data[conceptIds.modules.module1.status] === conceptIds.modules.submitted);
+    const module2 = (data[conceptIds.modules.module2.status] === conceptIds.modules.submitted);
+    const module3 = (data[conceptIds.modules.module3.status] === conceptIds.modules.submitted);
+    const module4 = (data[conceptIds.modules.module4.status] === conceptIds.modules.submitted);
 
     const bloodCollected = baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research 
-        ? (data[conceptIds.BASELINE_BLOOD_COLLECTED] && data[conceptIds.BASELINE_BLOOD_COLLECTED] === conceptIds.yes) 
-        : (data[conceptIds.BASELINE_BLOOD_COLLECTED] && data[conceptIds.BASELINE_BLOOD_COLLECTED] === conceptIds.yes) || (data[conceptIds.COLLECTION_DETAILS][conceptIds.BASELINE][conceptIds.CLINICAL_SITE_BLOOD_COLLECTED] === conceptIds.yes);
+        ? (data[conceptIds.baseline.bloodCollected] === conceptIds.yes) 
+        : (data[conceptIds.baseline.bloodCollected] === conceptIds.yes) || (data[conceptIds.collectionDetails][conceptIds.baseline.visitId][conceptIds.clinicalSite.bloodCollected] === conceptIds.yes);
 
     const tubes = baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research 
         ? workflows.research.filter(tube => tube.tubeType === 'Blood tube') 

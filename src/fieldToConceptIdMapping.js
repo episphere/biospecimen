@@ -136,42 +136,51 @@ export default {
 
     collectionLocation: 951355211,
 
-    MODULES: {
-        MODULE_1: {
-            STATUS: 949302066
+    modules: {
+        module1: {
+            status: 949302066
         },
-        MODULE_2: {
-            STATUS: 536735468
+        module2: {
+            status: 536735468
         },
-        MODULE_3: {
-            STATUS: 976570371
+        module3: {
+            status: 976570371
         },
-        MODULE_4: {
-            STATUS: 663265240
-        }
-    },
+        module4: {
+            status: 663265240
+        },
 
-    NOT_STARTED: 972455046,
-    STARTED: 615768760,
-    SUBMITTED: 231311385,
+        notStarted: 972455046,
+        started: 615768760,
+        submitted: 231311385
+    },
 
     REASON_NOT_COLLECTED: 883732523,
     REASONS: {
         PARTICIPANT_REFUSAL: 681745422
     },
 
-    BASELINE_BLOOD_COLLECTED: 878865966,
-    BASELINE_BLOOD_COLLECTED_TIME: 561681068,
-    BASELINE_URINE_COLLECTED_TIME: 847159717,
-    BASELINE_MOUTHWASH_COLLECTED_TIME: 448660695,
+    baseline: {
+        visitId: 266600170,
+        bloodCollected: 878865966,
+        bloodCollectedTime: 561681068,
+        urineCollected: 167958071,
+        urineCollectedTime: 847159717,
+        mouthwashCollected: 684635302,
+        mouthwashCollectedTime: 448660695
+    },
 
-    COLLECTION_DETAILS: 173836415,
-    BASELINE: 266600170,
-    
-    CLINICAL_SITE_BLOOD_COLLECTED: 693370086,
-    CLINICAL_DASHBOARD_BLOOD_COLLECTED: 534041351,
-    CLINICAL_DASHBOARD_BLOOD_COLLECTED_TIME: 398645039,
-    CLINICAL_DASHBOARD_URINE_COLLECTED: 210921343,
-    CLINICAL_DASHBOARD_URINE_COLLECTED_TIME: 541311218
+    collectionDetails: 173836415,
+
+    clinicalDashboard: {
+        bloodCollected: 534041351,
+        bloodCollectedTime: 398645039,
+        urineCollected: 210921343,
+        urineCollectedTime: 541311218
+    },
+
+    clinicalSite: {
+        bloodCollected: 693370086
+    }
 };
 
