@@ -1,9 +1,10 @@
 import { userDashboard } from "../dashboard.js";
-import { getIdToken, showAnimation, hideAnimation, baseAPI } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, baseAPI , packageConditonConversion} from "../../shared.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 import fieldMapping from "../../fieldToConceptIdMapping.js";
+
 
 const inputObject = {
   inputChange: false
@@ -234,22 +235,20 @@ const enableCollectionCardFields = () => {
 
 
 const formSubmit = () => {
-  const form = document.getElementById('save');
-  form.addEventListener('click', e => {
-    e.preventDefault();
-    const modalHeaderEl = document.getElementById('modalHeader');
-    const modalBodyEl = document.getElementById('modalBody');
-    const isSelectPackageConditionsListEmpty = checkSelectPackageConditionsList() 
+    const form = document.getElementById("save");
+    form.addEventListener("click", (e) => {
+        e.preventDefault();
+        const modalHeaderEl = document.getElementById("modalHeader");
+        const modalBodyEl = document.getElementById("modalBody");
+        const isSelectPackageConditionsListEmpty = checkSelectPackageConditionsList();
 
-    if (isSelectPackageConditionsListEmpty) {
-        displayPackageConditionListEmptyModal(modalHeaderEl,modalBodyEl)
-    }
-    else {
-        displayConfirmPackageReceiptModal(modalHeaderEl,modalBodyEl)
-        confirmPackageReceipt()
-    }
-  })
-}
+        if (isSelectPackageConditionsListEmpty) {
+            displayPackageConditionListEmptyModal(modalHeaderEl, modalBodyEl);
+        } else {
+            displaySelectedPackageConditionListModal(modalHeaderEl, modalBodyEl);
+        }
+    });
+};
 
 const confirmPackageReceipt = () => {
   const a = document.getElementById('confirmReceipt');
@@ -710,6 +709,36 @@ const displayPackageConditionListEmptyModal = (modalHeaderEl,modalBodyEl) => {
     </div>`
 }
 
+const displaySelectedPackageConditionListModal = (modalHeaderEl,modalBodyEl) => {
+    const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected');
+    const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList);
+
+    modalHeaderEl.innerHTML = `
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>`
+    modalBodyEl.innerHTML =  `<div class="row">
+        <div class="col">
+            <div style="display:flex; justify-content:center; margin-bottom:1rem;">
+            <i class="fas fa-exclamation-triangle fa-5x" style="color:#ffc107"></i>
+            </div>
+            <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; ">
+                <span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Package Condition</span> 
+                Confirm selected package condition(s):
+                <ul id="packageConditionSpanList" style="margin:0 30px;"></ul>
+            </p>
+        </div>
+    </div>
+    <div class="row" style="display:flex; justify-content:center;">
+        <button id="confirmPackageConditionButton" type="button" class="btn btn-primary" data-dismiss="modal" target="_blank" style="margin-right: 15px;">Confirm</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank">Cancel</button>
+    </div>
+    </div>`
+    
+    displaySelectedPackageConditionList(parseSelectPackageConditionsList);
+    clickConfirmPackageConditionListButton(modalHeaderEl,modalBodyEl);
+}
+
 const displayConfirmPackageReceiptModal = (modalHeaderEl,modalBodyEl) => {
     modalHeaderEl.innerHTML = `<h5>Confirmation</h5>
     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -723,4 +752,23 @@ const displayConfirmPackageReceiptModal = (modalHeaderEl,modalBodyEl) => {
             <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank">Cancel</button>
         </div>
     </div>`
+}
+
+const displaySelectedPackageConditionList = (parseSelectPackageConditionsList) => {
+    const packageConditionSpanListEl = document.getElementById('packageConditionSpanList');
+    for (const packageConditionConceptId of parseSelectPackageConditionsList) {
+        if (packageConditonConversion[packageConditionConceptId]) {
+            const listEl = document.createElement('li');
+            listEl.textContent = packageConditonConversion[packageConditionConceptId];
+            packageConditionSpanListEl.appendChild(listEl);
+        }
+    }
+}
+
+const clickConfirmPackageConditionListButton = (modalHeaderEl,modalBodyEl) => {
+    const confirmPackageConditionButtondocument = document.getElementById("confirmPackageConditionButton");
+    confirmPackageConditionButtondocument.addEventListener("click", () => {
+        displayConfirmPackageReceiptModal(modalHeaderEl,modalBodyEl);
+        confirmPackageReceipt();
+    })    
 }

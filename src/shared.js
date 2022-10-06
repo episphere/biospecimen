@@ -2014,17 +2014,17 @@ export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxEr
 
 export const delay = ms => new Promise(res => setTimeout(res, ms));
 
-export const convertNumsToCondition = (packagedCondition, packageConversion) => {
+export const convertConceptIdToPackageCondition = (packagedCondition, packageConditonConversion) => {
   let listConditions = ''
   if(!packagedCondition) return listConditions
   for(let i = 0; i < packagedCondition.length; i++) {
     let isLastItem = false;
     if(i+1 === packagedCondition.length) { // if last item equals the final item
       isLastItem = true
-      if(isLastItem) listConditions += `<p>${packageConversion[packagedCondition[i]]}</p>`
+      if(isLastItem) listConditions += `<p>${packageConditonConversion[packagedCondition[i]]}</p>`
     }
     else {
-      listConditions += `<p>${packageConversion[packagedCondition[i]]},</p>`
+      listConditions += `<p>${packageConditonConversion[packagedCondition[i]]},</p>`
     }
 
   }
@@ -2089,6 +2089,28 @@ export const translateNumToType = {
   "0053": "NA",
   "0054": "NA"
 };
+
+export const packageConditonConversion = {
+    "679749262": "Package in good condition",
+    "405513630": "No Ice Pack",
+    "595987358": "Warm Ice Pack",
+    "200183516": "Vials - Incorrect Material Type Sent",
+    "399948893": "No Label on Vials",
+    "631290535": "Returned Empty Vials",
+    "442684673": "Participant Refusal",
+    "121149986": "Crushed",
+    "678483571": "Damaged Container (outer and inner)",
+    "289322354": "Material Thawed",
+    "909529446": "Insufficient Ice",
+    "847410060": "Improper Packaging",
+    "387564837": "Damaged Vials",
+    "933646000": "Other",
+    "842171722": "No Pre-notification",
+    "613022284": "No Refrigerant",
+    "922995819": "Manifest/Vial/Paperwork info do not match",
+    "958000780": "Shipment Delay",
+    "853876696": "No Manifest provided",
+}
 
 export const convertISODateTime = (dateWithdrawn) => {
     let date = new Date(dateWithdrawn);
