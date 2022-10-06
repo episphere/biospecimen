@@ -1229,9 +1229,9 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'Kaiser Permanente Georgia',
     contactInfo: {
       "KPGA":[{
-        "fullName":"Brandi Robinson",
-        "email":"brandi.e.robinson@kp.org",
-        "phone":["470-217-2993"],
+        "fullName":"Laura Gonzalez Paz",
+        "email":"Laura.M.Gonzalezpaz@kp.org",
+        "phone":["561-860-6240"],
       }],
     },
   },
@@ -1268,9 +1268,9 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'Marshfield Cancer Center',
     contactInfo: {
       "MFC":[{
-        "fullName":"Terry Foss",
-        "email":"Foss.terry@marshfieldresearch.org",
-        "phone":["715-898-9444"],
+        "fullName":"Lisa Ott",
+        "email": "ott.lisa@marshfieldclinic.org",
+        "phone":["715-387-9135"],
       }],
     },
   },
@@ -1298,8 +1298,8 @@ export const locationConceptIDToLocationMap = {
         "email":"kimberly.spellmeyer@sanfordhealth.org",
         "phone":["605-312-6100"],
       },{
-        "fullName":"DeAnn Witte",
-        "email":"deann.witte@sanfordhealth.org",
+        "fullName":"Madison (Maddi) Mayer",
+        "email":" Madison.mayer@sanfordhealth.org",
         "phone":["701-234-6718"],
       }],
     },
