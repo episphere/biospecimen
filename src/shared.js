@@ -1079,10 +1079,10 @@ export const updateBaselineData = async (siteTubesList, data) => {
         }
     });
 
-    if(baselineCollections[0][conceptIds.collection.collectionSetting === conceptIds.research]) {
+    if(baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research) {
         allBaselineCollected = bloodCollected && urineCollected && mouthwashCollected;
     }
-    else if(baselineCollections[0][conceptIds.collection.collectionSetting === conceptIds.clinical]) {
+    else if(baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.clinical) {
         allBaselineCollected = bloodCollected && urineCollected;
     }
 
