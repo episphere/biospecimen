@@ -1051,6 +1051,7 @@ export const updateBaselineData = async (siteTubesList, data) => {
     let bloodCollected = (data['878865966'] === 353358909);
     let urineCollected = (data['167958071'] === 353358909);
     let mouthwashCollected = (data['684635302'] === 353358909);
+    let allBaselineCollected = (data['254109640'] === conceptIds.yes);
 
     baselineCollections.forEach(collection => {
 
@@ -1078,10 +1079,18 @@ export const updateBaselineData = async (siteTubesList, data) => {
         }
     });
 
+    if(baselineCollections[0][conceptIds.collection.collectionSetting === conceptIds.research]) {
+        allBaselineCollected = bloodCollected && urineCollected && mouthwashCollected;
+    }
+    else if(baselineCollections[0][conceptIds.collection.collectionSetting === conceptIds.clinical]) {
+        allBaselineCollected = bloodCollected && urineCollected;
+    }
+
     const baselineData = {
         '878865966': bloodCollected ? 353358909 : 104430631,
         '167958071': urineCollected ? 353358909 : 104430631, 
         '684635302': mouthwashCollected ? 353358909 : 104430631,
+        '254109640': allBaselineCollected ? conceptIds.yes : conceptIds.no,
         uid: data.state.uid
     };
         
