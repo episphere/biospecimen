@@ -713,7 +713,7 @@ const displayPackageConditionListEmptyModal = (modalHeaderEl,modalBodyEl) => {
 const displaySelectedPackageConditionListModal = (modalHeaderEl,modalBodyEl) => {
     const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected')
     const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList)
-    console.log("parseSelectPackageConditionsList", parseSelectPackageConditionsList)
+
     modalHeaderEl.innerHTML = `
     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">&times;</span>
@@ -735,6 +735,7 @@ const displaySelectedPackageConditionListModal = (modalHeaderEl,modalBodyEl) => 
         <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank">Cancel</button>
     </div>
     </div>`
+    
     displaySelectedPackageConditionList(parseSelectPackageConditionsList)
     clickConfirmPackageConditionListButton(modalHeaderEl,modalBodyEl)
 }
