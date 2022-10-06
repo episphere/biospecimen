@@ -75,6 +75,7 @@ export default {
         shipTime:556788178,
         accessionId: 646899796,
         collectionSetting: 650516960,
+        collectionTime: 678166505,
         scannedTime: 915838974,
         receivedDate: 926457119,
         urineAccessNumber: 928693120,
@@ -134,6 +135,52 @@ export default {
     siteCode:789843387,
 
     collectionLocation: 951355211,
-    
+
+    modules: {
+        module1: {
+            status: 949302066
+        },
+        module2: {
+            status: 536735468
+        },
+        module3: {
+            status: 976570371
+        },
+        module4: {
+            status: 663265240
+        },
+
+        notStarted: 972455046,
+        started: 615768760,
+        submitted: 231311385
+    },
+
+    REASON_NOT_COLLECTED: 883732523,
+    REASONS: {
+        PARTICIPANT_REFUSAL: 681745422
+    },
+
+    baseline: {
+        visitId: 266600170,
+        bloodCollected: 878865966,
+        bloodCollectedTime: 561681068,
+        urineCollected: 167958071,
+        urineCollectedTime: 847159717,
+        mouthwashCollected: 684635302,
+        mouthwashCollectedTime: 448660695
+    },
+
+    collectionDetails: 173836415,
+
+    clinicalDashboard: {
+        bloodCollected: 534041351,
+        bloodCollectedTime: 398645039,
+        urineCollected: 210921343,
+        urineCollectedTime: 541311218
+    },
+
+    clinicalSite: {
+        bloodCollected: 693370086
+    }
 };
 

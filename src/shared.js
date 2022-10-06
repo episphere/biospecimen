@@ -962,15 +962,15 @@ export const getUpdatedParticipantData = async (data) => {
 export const updateCollectionSettingData = async (biospecimenData, tubes, data) => {
     
     let settings;
-    let visit = biospecimenData['331584571'];
+    let visit = biospecimenData[conceptIds.collection.selectedVisit];
 
     const bloodTubes = tubes.filter(tube => tube.tubeType === "Blood tube");
     const urineTubes = tubes.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = tubes.filter(tube => tube.tubeType === "Mouthwash");
 
 
-    if(data['173836415']) {
-        settings = data['173836415'];
+    if(data[conceptIds.collectionDetails]) {
+        settings = data[conceptIds.collectionDetails];
 
         if(!settings[visit]) {
             settings[visit] = {};
@@ -984,27 +984,48 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
 
     if(!settings[visit]['592099155']) {
         bloodTubes.forEach(tube => {
-            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-                settings[visit]['592099155'] = biospecimenData['650516960'];
-                settings[visit]['561681068'] = biospecimenData['678166505'];
+            if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
+
+                settings[visit]['592099155'] = biospecimenData[conceptIds.collection.collectionSetting];
+
+                if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+                    settings[visit][conceptIds.baseline.bloodCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
+                }
+                else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
+                    settings[visit][conceptIds.clinicalDashboard.bloodCollected] = conceptIds.yes;
+                    settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
+                }
             }
         });
     }
         
     if(!settings[visit]['718172863']) {
         urineTubes.forEach(tube => {
-            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-                settings[visit]['718172863'] = biospecimenData['650516960'];
-                settings[visit]['847159717'] = biospecimenData['678166505'];
+            if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
+
+                settings[visit]['718172863'] = biospecimenData[conceptIds.collection.collectionSetting];
+
+                if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+                    settings[visit][conceptIds.baseline.urineCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
+                }
+                else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
+                    settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.yes;
+                    settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
+                }
             }
         });
     }
 
     if(!settings[visit]['915179629']) {
         mouthwashTubes.forEach(tube => {
-            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-                settings[visit]['915179629'] = biospecimenData['650516960'];
-                settings[visit]['448660695'] = biospecimenData['678166505'];
+            if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
+
+                settings[visit]['915179629'] = biospecimenData[conceptIds.collection.collectionSetting];
+
+                if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+                    settings[visit][conceptIds.baseline.mouthwashCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
+
+                }
             }
         });
     }
@@ -1030,6 +1051,7 @@ export const updateBaselineData = async (siteTubesList, data) => {
     let bloodCollected = (data['878865966'] === 353358909);
     let urineCollected = (data['167958071'] === 353358909);
     let mouthwashCollected = (data['684635302'] === 353358909);
+    let allBaselineCollected = (data['254109640'] === conceptIds.yes);
 
     baselineCollections.forEach(collection => {
 
@@ -1057,10 +1079,18 @@ export const updateBaselineData = async (siteTubesList, data) => {
         }
     });
 
+    if(baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research) {
+        allBaselineCollected = bloodCollected && urineCollected && mouthwashCollected;
+    }
+    else if(baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.clinical) {
+        allBaselineCollected = bloodCollected && urineCollected;
+    }
+
     const baselineData = {
         '878865966': bloodCollected ? 353358909 : 104430631,
         '167958071': urineCollected ? 353358909 : 104430631, 
         '684635302': mouthwashCollected ? 353358909 : 104430631,
+        '254109640': allBaselineCollected ? conceptIds.yes : conceptIds.no,
         uid: data.state.uid
     };
         
@@ -1092,15 +1122,18 @@ const checkPaymentEligibility = async (data, baselineCollections) => {
   
     if(baselineCollections.length === 0) return false;
   
-    const module1 = (data['949302066'] && data['949302066'] === 231311385);
-    const module2 = (data['536735468'] && data['536735468'] === 231311385);
-    const module3 = (data['976570371'] && data['976570371'] === 231311385);
-    const module4 = (data['663265240'] && data['663265240'] === 231311385);
-    const bloodCollected = baselineCollections[0]['650516960'] === 534621077 
-        ? (data['878865966'] && data['878865966'] === 353358909) 
-        : (data['878865966'] && data['878865966'] === 353358909) && (data['693370086'] && data['693370086'] === 353358909);
+    const module1 = (data[conceptIds.modules.module1.status] === conceptIds.modules.submitted);
+    const module2 = (data[conceptIds.modules.module2.status] === conceptIds.modules.submitted);
+    const module3 = (data[conceptIds.modules.module3.status] === conceptIds.modules.submitted);
+    const module4 = (data[conceptIds.modules.module4.status] === conceptIds.modules.submitted);
 
-    const tubes = baselineCollections[0]['650516960'] === 534621077 ? workflows.research.filter(tube => tube.tubeType === 'Blood tube') : workflows.clinical.filter(tube => tube.tubeType === 'Blood tube');
+    const bloodCollected = baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research 
+        ? (data[conceptIds.baseline.bloodCollected] === conceptIds.yes) 
+        : (data[conceptIds.baseline.bloodCollected] === conceptIds.yes) || (data[conceptIds.collectionDetails][conceptIds.baseline.visitId][conceptIds.clinicalSite.bloodCollected] === conceptIds.yes);
+
+    const tubes = baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research 
+        ? workflows.research.filter(tube => tube.tubeType === 'Blood tube') 
+        : workflows.clinical.filter(tube => tube.tubeType === 'Blood tube');
   
     let eligible = false;
   
@@ -1111,7 +1144,7 @@ const checkPaymentEligibility = async (data, baselineCollections) => {
       else {
         baselineCollections.forEach(collection => {
           tubes.forEach(tube => {
-            if(collection[tube.concept] && collection[tube.concept]['883732523'] && collection[tube.concept]['883732523'] != 681745422 && collection['650516960'] === 534621077) {
+            if(collection[tube.concept] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] != conceptIds.REASONS.PARTICIPANT_REFUSAL && collection[conceptIds.collection.collectionSetting] === conceptIds.research) {
               eligible = true;
             }
           });
@@ -1925,8 +1958,8 @@ export const allTubesCollected = (data) => {
 
     let flag = true; 
 
-    if(data['650516960']) {
-        const tubes = workflows[collectionSettings[data['650516960']]];
+    if(data[conceptIds.collection.collectionSetting]) {
+        const tubes = workflows[collectionSettings[data[conceptIds.collection.collectionSetting]]];
         tubes.forEach(tube => {
             if(!data[tube['concept']]['593843561'] || data[tube['concept']]['593843561'] !== 353358909 || !data[tube['concept']]['825582494']) {
                 flag = false;
