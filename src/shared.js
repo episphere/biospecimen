@@ -2014,7 +2014,7 @@ export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxEr
 
 export const delay = ms => new Promise(res => setTimeout(res, ms));
 
-export const convertNumsToCondition = (packagedCondition, packageConditonConversion) => {
+export const convertConceptIdToPackageCondition = (packagedCondition, packageConditonConversion) => {
   let listConditions = ''
   if(!packagedCondition) return listConditions
   for(let i = 0; i < packagedCondition.length; i++) {

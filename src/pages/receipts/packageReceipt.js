@@ -235,21 +235,20 @@ const enableCollectionCardFields = () => {
 
 
 const formSubmit = () => {
-  const form = document.getElementById('save');
-  form.addEventListener('click', e => {
-    e.preventDefault();
-    const modalHeaderEl = document.getElementById('modalHeader');
-    const modalBodyEl = document.getElementById('modalBody');
-    const isSelectPackageConditionsListEmpty = checkSelectPackageConditionsList() 
+    const form = document.getElementById("save");
+    form.addEventListener("click", (e) => {
+        e.preventDefault();
+        const modalHeaderEl = document.getElementById("modalHeader");
+        const modalBodyEl = document.getElementById("modalBody");
+        const isSelectPackageConditionsListEmpty = checkSelectPackageConditionsList();
 
-    if (isSelectPackageConditionsListEmpty) {
-        displayPackageConditionListEmptyModal(modalHeaderEl,modalBodyEl)
-    }
-    else {
-        displaySelectedPackageConditionListModal(modalHeaderEl,modalBodyEl)
-    }
-  })
-}
+        if (isSelectPackageConditionsListEmpty) {
+            displayPackageConditionListEmptyModal(modalHeaderEl, modalBodyEl);
+        } else {
+            displaySelectedPackageConditionListModal(modalHeaderEl, modalBodyEl);
+        }
+    });
+};
 
 const confirmPackageReceipt = () => {
   const a = document.getElementById('confirmReceipt');
@@ -711,8 +710,8 @@ const displayPackageConditionListEmptyModal = (modalHeaderEl,modalBodyEl) => {
 }
 
 const displaySelectedPackageConditionListModal = (modalHeaderEl,modalBodyEl) => {
-    const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected')
-    const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList)
+    const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected');
+    const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList);
 
     modalHeaderEl.innerHTML = `
     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -736,8 +735,8 @@ const displaySelectedPackageConditionListModal = (modalHeaderEl,modalBodyEl) => 
     </div>
     </div>`
     
-    displaySelectedPackageConditionList(parseSelectPackageConditionsList)
-    clickConfirmPackageConditionListButton(modalHeaderEl,modalBodyEl)
+    displaySelectedPackageConditionList(parseSelectPackageConditionsList);
+    clickConfirmPackageConditionListButton(modalHeaderEl,modalBodyEl);
 }
 
 const displayConfirmPackageReceiptModal = (modalHeaderEl,modalBodyEl) => {
@@ -756,20 +755,20 @@ const displayConfirmPackageReceiptModal = (modalHeaderEl,modalBodyEl) => {
 }
 
 const displaySelectedPackageConditionList = (parseSelectPackageConditionsList) => {
-    const packageConditionSpanListEl = document.getElementById('packageConditionSpanList')
-    for(const packageConditionConceptId of parseSelectPackageConditionsList) {
-        if(packageConditonConversion[packageConditionConceptId]) {
-            const listEl = document.createElement('li')
-            listEl.textContent = packageConditonConversion[packageConditionConceptId]
-            packageConditionSpanListEl.appendChild(listEl)
+    const packageConditionSpanListEl = document.getElementById('packageConditionSpanList');
+    for (const packageConditionConceptId of parseSelectPackageConditionsList) {
+        if (packageConditonConversion[packageConditionConceptId]) {
+            const listEl = document.createElement('li');
+            listEl.textContent = packageConditonConversion[packageConditionConceptId];
+            packageConditionSpanListEl.appendChild(listEl);
         }
     }
 }
 
 const clickConfirmPackageConditionListButton = (modalHeaderEl,modalBodyEl) => {
-    const confirmPackageConditionButtondocument = document.getElementById("confirmPackageConditionButton")
+    const confirmPackageConditionButtondocument = document.getElementById("confirmPackageConditionButton");
     confirmPackageConditionButtondocument.addEventListener("click", () => {
-        displayConfirmPackageReceiptModal(modalHeaderEl,modalBodyEl)
-        confirmPackageReceipt()       
+        displayConfirmPackageReceiptModal(modalHeaderEl,modalBodyEl);
+        confirmPackageReceipt();
     })    
 }
