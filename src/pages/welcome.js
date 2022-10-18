@@ -75,7 +75,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     document.getElementById('contentHeader').innerHTML = '';
     
     let dashboardSelector = document.getElementById('dashboardSelection');
-    if(!isDev) {
+    if(dashboardSelector && !isDev) {
         dashboardSelector.disabled = true;
         dashboardSelector.selectedIndex = 2;
     }
