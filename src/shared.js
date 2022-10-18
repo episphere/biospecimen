@@ -1138,18 +1138,20 @@ const checkPaymentEligibility = async (data, baselineCollections) => {
     let eligible = false;
   
     if(module1 && module2 && module3 && module4) {
-      if(bloodCollected) {
-        eligible = true;
-      }    
-      else {
-        baselineCollections.forEach(collection => {
-          tubes.forEach(tube => {
-            if(collection[tube.concept] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] != conceptIds.REASONS.PARTICIPANT_REFUSAL && collection[conceptIds.collection.collectionSetting] === conceptIds.research) {
-              eligible = true;
-            }
-          });
-        });
-      }
+        if(bloodCollected) {
+            eligible = true;
+        }    
+        else {
+            baselineCollections.forEach(collection => {
+                if(collection[conceptIds.collection.collectionSetting] === conceptIds.research) {
+                    tubes.forEach(tube => {
+                        if(collection[tube.concept] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] != conceptIds.REASONS.PARTICIPANT_REFUSAL) {
+                            eligible = true;
+                        }
+                    });
+                }
+            });
+        }
     }
   
     return eligible;
