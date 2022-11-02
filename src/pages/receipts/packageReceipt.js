@@ -117,6 +117,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
                         <div class="mt-4 mb-4" style="display:inline-block;">
                             <button type="button" class="btn btn-danger" id="clearForm">Clear</button>
                             <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#modalShowMoreData" id="save">Save</button>
+<<<<<<< HEAD
                         </div>
                     </div>
                 </div>`;
@@ -128,6 +129,19 @@ const packageReceiptTemplate = async (name, auth, route) => {
                         </div>
                     </div>
                 </div>`
+=======
+                        </div>
+                    </div>
+                </div>`;
+      template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+      <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+          <div class="modal-content sub-div-shadow">
+              <div class="modal-header" id="modalHeader"></div>
+              <div class="modal-body" id="modalBody"></div>
+          </div>
+      </div>
+    </div>`
+>>>>>>> stage
         
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
@@ -249,6 +263,44 @@ const formSubmit = () => {
         }
     });
 };
+
+const confirmPackageReceipt = () => {
+  const a = document.getElementById('confirmReceipt');
+  if (a) {
+    a.addEventListener('click',  () => { 
+      let obj = {};
+      let packageConditions = [];
+      const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
+      const onlyFedexCourierType = identifyCourierType(scannedBarcode);
+      if (onlyFedexCourierType === true) {
+        obj['scannedBarcode'] = scannedBarcode
+        for (let option of document.getElementById('packageCondition').options) {
+          if (option.selected) {packageConditions.push(option.value)}
+        }
+        obj[`${fieldMapping.packageCondition}`] = packageConditions;
+        if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode))) {  
+          obj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
+          obj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
+          obj[`${fieldMapping.siteShipmentDateReceived}`] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
+        } else { 
+          obj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
+          obj['dateReceived'] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
+          if(document.getElementById('collectionId').value) {
+            obj['collectionId'] = document.getElementById('collectionId').value;
+            obj['dateCollectionCard'] = document.getElementById('dateCollectionCard').value;
+            obj['timeCollectionCard'] = document.getElementById('timeCollectionCard').value;
+            document.getElementById('collectionCheckBox').checked === true ? 
+                obj['collectionCheckBox'] = true : obj['collectionCheckBox'] = false
+            obj['collectionComments'] = document.getElementById('collectionComments').value;
+          }    
+        }
+        window.removeEventListener("beforeunload",beforeUnloadMessage)
+        targetAnchorTagEl();
+        storePackageReceipt(obj);
+       } 
+    })
+  }
+}
 
 const confirmPackageReceipt = () => {
   const a = document.getElementById('confirmReceipt');

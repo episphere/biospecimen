@@ -34,6 +34,7 @@ registerRoute(
     'GET'
 );
 
+
 const bgSyncPlugin = new BackgroundSyncPlugin('connectBiospecimen', {
     maxRetentionTime: 24 * 60 // Retry for max of 24 Hours (specified in minutes)
 });
@@ -45,4 +46,6 @@ registerRoute(
     }),
     'POST'
 );
+
+
 workbox.precaching.precacheAndRoute([{url: 'index.html', revision: `1`}]);
