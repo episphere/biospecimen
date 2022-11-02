@@ -117,7 +117,6 @@ const packageReceiptTemplate = async (name, auth, route) => {
                         <div class="mt-4 mb-4" style="display:inline-block;">
                             <button type="button" class="btn btn-danger" id="clearForm">Clear</button>
                             <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#modalShowMoreData" id="save">Save</button>
-<<<<<<< HEAD
                         </div>
                     </div>
                 </div>`;
@@ -129,19 +128,6 @@ const packageReceiptTemplate = async (name, auth, route) => {
                         </div>
                     </div>
                 </div>`
-=======
-                        </div>
-                    </div>
-                </div>`;
-      template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
-      <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-          <div class="modal-content sub-div-shadow">
-              <div class="modal-header" id="modalHeader"></div>
-              <div class="modal-body" id="modalBody"></div>
-          </div>
-      </div>
-    </div>`
->>>>>>> stage
         
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
