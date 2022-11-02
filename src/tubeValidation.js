@@ -35,13 +35,82 @@ const tubeNotCollectedReason5 = {'concept': 889386523, 'label': 'Supply Unavaila
 const tubeNotCollectedOptions1 = [tubeNotCollectedReason1, tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason5, tubeNotCollectedReason4];
 const tubeNotCollectedOptions2 = [tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason5, tubeNotCollectedReason4];
 
+export const specimenCollection = {
+  numToCid: {
+    '0001': '299553921',
+    '0002': '703954371',
+    '0003': '838567176',
+    '0004': '454453939',
+    '0005': '652357376',
+    '0006': '973670172',
+    '0007': '143615646',
+    '0008': '787237543',
+    '0009': '223999569',
+    '0011': '376960806',
+    '0012': '232343615',
+    '0021': '589588440',
+    '0013': '958646668',
+    '0014': '677469051',
+    '0024': '683613884',
+  },
+  cidToNum: {
+    299553921: '0001',
+    703954371: '0002',
+    838567176: '0003',
+    454453939: '0004',
+    652357376: '0005',
+    973670172: '0006',
+    143615646: '0007',
+    787237543: '0008',
+    223999569: '0009',
+    376960806: '0011',
+    232343615: '0012',
+    589588440: '0021',
+    958646668: '0013',
+    677469051: '0014',
+    683613884: '0024',
+  },
+  tubeNumList: [
+    '0001',
+    '0002',
+    '0003',
+    '0004',
+    '0005',
+    '0006',
+    '0007',
+    // '0008' and '0009' are used as containers for tubes
+    '0011',
+    '0012',
+    '0021',
+    '0013',
+    '0014',
+    '0024',
+  ],
+  tubeCidList: [
+    '299553921',
+    '703954371',
+    '838567176',
+    '454453939',
+    '652357376',
+    '973670172',
+    '143615646',
+    // '787237543' and '223999569' are used as containers for tubes
+    '376960806',
+    '232343615',
+    '589588440',
+    '958646668',
+    '677469051',
+    '683613884',
+  ],
+};
+
 const tube0001 = {
     'specimenType': 'Serum Separator Tube',
     'tubeType': 'Blood tube',
     'readableValue': 'Serum Separator Tube',
     'image': './static/images/tube1.PNG',
     'name': 'tube1',
-    'concept': '299553921',
+    'concept': specimenCollection.numToCid['0001'],
     'id': '0001',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
@@ -56,7 +125,7 @@ const tube0002 = {
     'readableValue': 'Serum Separator Tube',
     'image': './static/images/tube1.PNG',
     'name': 'tube2',
-    'concept': '703954371',
+    'concept': specimenCollection.numToCid['0002'],
     'id': '0002',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
@@ -71,7 +140,7 @@ const tube0011 = {
     'readableValue': 'Serum Separator Tube',
     'image': './static/images/tube1.PNG',
     'name': 'tube11',
-    'concept': '376960806',
+    'concept': specimenCollection.numToCid['0011'],
     'id': '0011',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
@@ -86,7 +155,7 @@ const tube0012 = {
     'readableValue': 'Serum Separator Tube',
     'image': './static/images/tube1.PNG',
     'name': 'tube12',
-    'concept': '232343615',
+    'concept': specimenCollection.numToCid['0012'],
     'id': '0012',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
@@ -101,7 +170,7 @@ const tube0021 = {
     'readableValue': 'Serum Separator Tube',
     'image': './static/images/tube1.PNG',
     'name': 'tube21',
-    'concept': '589588440',
+    'concept': specimenCollection.numToCid['0021'],
     'id': '0021',
     'tubeColor': 'Gold',
     'collectionChkBox': true,
@@ -116,7 +185,7 @@ const tube0003 = {
     'readableValue': 'Heparin Tube',
     'image': './static/images/tube2.PNG',
     'name': 'tube3',
-    'concept': '838567176',
+    'concept': specimenCollection.numToCid['0003'],
     'id': '0003',
     'tubeColor': 'Green',
     'collectionChkBox': true,
@@ -131,7 +200,7 @@ const tube0013 = {
     'readableValue': 'Heparin Tube',
     'image': './static/images/tube2.PNG',
     'name': 'tube13',
-    'concept': '958646668',
+    'concept': specimenCollection.numToCid['0013'],
     'id': '0013',
     'tubeColor': 'Green',
     'collectionChkBox': true,
@@ -146,7 +215,7 @@ const tube0004 = {
     'readableValue': 'EDTA Tube',
     'image': './static/images/tube3.PNG',
     'name': 'tube4',
-    'concept': '454453939',
+    'concept': specimenCollection.numToCid['0004'],
     'id': '0004',
     'tubeColor': 'Lavendar',
     'collectionChkBox': true,
@@ -161,8 +230,23 @@ const tube0014 = {
     'readableValue': 'EDTA Tube',
     'image': './static/images/tube3.PNG',
     'name': 'tube14',
-    'concept': '677469051',
+    'concept': specimenCollection.numToCid['0014'],
     'id': '0014',
+    'tubeColor': 'Lavendar',
+    'collectionChkBox': true,
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection2,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
+};
+
+const tube0024 = {
+    'specimenType': 'EDTA Tube',
+    'tubeType': 'Blood tube',
+    'readableValue': 'EDTA Tube',
+    'image': './static/images/tube3.PNG',
+    'name': 'tube24',
+    'concept': specimenCollection.numToCid['0024'],
+    'id': '0024',
     'tubeColor': 'Lavendar',
     'collectionChkBox': true,
     'deviationChkBox': true,
@@ -176,7 +260,7 @@ const tube0005 = {
     'readableValue': 'ACD Tube',
     'image': './static/images/tube4.PNG',
     'name': 'tube5',
-    'concept': '652357376',
+    'concept': specimenCollection.numToCid['0005'],
     'id': '0005',
     'tubeColor': 'Yellow',
     'collectionChkBox': true,
@@ -186,11 +270,11 @@ const tube0005 = {
 };
 
 const tube0006 = {
-    'specimenType': 'Urine Tube',
+    'specimenType': 'Urine Tube/Container',
     'tubeType': 'Urine',
-    'readableValue': 'Urine Tube',
+    'readableValue': 'Urine Tube/Container',
     'name': 'tube6',
-    'concept': '973670172',
+    'concept': specimenCollection.numToCid['0006'],
     'id': '0006',
     'tubeColor': 'Yellow',
     'collectionChkBox': true,
@@ -204,7 +288,7 @@ const tube0007 = {
     'tubeType': 'Mouthwash',
     'readableValue': 'Mouthwash Container',
     'name': 'tube7',
-    'concept': '143615646',
+    'concept': specimenCollection.numToCid['0007'],
     'id': '0007',
     'collectionChkBox': true,
     'deviationChkBox': true,
@@ -218,7 +302,7 @@ const tube0008 = {
     'readableValue': 'Biohazard bag - blood',
     'image': '',
     'name': 'tube8',
-    'concept': '787237543',
+    'concept': specimenCollection.numToCid['0008'],
     'id': '0008',
     'collectionChkBox': true,
     'deviationChkBox': false
@@ -229,7 +313,7 @@ const tube0009 = {
     'tubeType': 'Biohazard bag for mouthwash',
     'readableValue': 'Biohazard bag - mouthwash',
     'name': 'tube9',
-    'concept': '223999569',
+    'concept': specimenCollection.numToCid['0009'],
     'id': '0009',
     'collectionChkBox': true,
     'deviationChkBox': false
@@ -252,11 +336,14 @@ export const workflows = {
         tube0002,
         tube0011,
         tube0012,
+        tube0021,
         tube0003,
         tube0013,
         tube0004,
         tube0014,
+        tube0024,
         tube0005,
+        tube0006,
         tube0008
     ]
 };
@@ -317,3 +404,33 @@ export const additionalTubeIDRequirement = {
     regExp: /^00+5[0-4]$/,
     length: 4
 }
+
+const tubes = [
+  tube0001,
+  tube0002,
+  tube0003,
+  tube0004,
+  tube0005,
+  tube0006,
+  tube0007,
+  tube0008,
+  tube0009,
+  tube0011,
+  tube0012,
+  tube0013,
+  tube0014,
+  tube0021,
+  tube0024,
+];
+
+export const getTubesToConceptsMap = () => ({ ...specimenCollection.numToCid });
+
+export const getConceptsToTubesMap = () => ({ ...specimenCollection.cidToNum });
+
+export const getTubeList = () => {
+  return tubes.map((tube) => tube.id);
+};
+
+export const getConceptList = () => {
+  return tubes.map((tube) => tube.concept);
+};

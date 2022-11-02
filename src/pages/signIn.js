@@ -41,6 +41,7 @@ export const signIn = () => {
 }
 
 export const signOut = () => {
+    localStorage.removeItem('selections');
     firebase.auth().signOut();
     // window.location.hash = '#';
     location.reload();

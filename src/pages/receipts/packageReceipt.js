@@ -1,9 +1,10 @@
 import { userDashboard } from "../dashboard.js";
-import { getIdToken, showAnimation, hideAnimation, baseAPI } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, baseAPI , packageConditonConversion} from "../../shared.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 import fieldMapping from "../../fieldToConceptIdMapping.js";
+
 
 const inputObject = {
   inputChange: false
@@ -119,14 +120,14 @@ const packageReceiptTemplate = async (name, auth, route) => {
                         </div>
                     </div>
                 </div>`;
-      template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
-      <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-          <div class="modal-content sub-div-shadow">
-              <div class="modal-header" id="modalHeader"></div>
-              <div class="modal-body" id="modalBody"></div>
-          </div>
-      </div>
-    </div>`
+    template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+                    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+                        <div class="modal-content sub-div-shadow">
+                            <div class="modal-header" id="modalHeader"></div>
+                            <div class="modal-body" id="modalBody"></div>
+                        </div>
+                    </div>
+                </div>`
         
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
@@ -234,25 +235,57 @@ const enableCollectionCardFields = () => {
 
 
 const formSubmit = () => {
-  const form = document.getElementById('save');
-  form.addEventListener('click', e => {
-    e.preventDefault();
-    const header = document.getElementById('modalHeader');
-    const body = document.getElementById('modalBody');
-    header.innerHTML = `<h5>Confirmation</h5><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>`
-    let template = '<div>'
-    template += `
-            <span>Confirm package receipt</span>
-            <br >
-        <div style="display:inline-block;">
-            <button type="submit" class="btn btn-primary" data-dismiss="modal" id="confirmReceipt" target="_blank">Confirm</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank">Cancel</button>
-        </div>
+    const form = document.getElementById("save");
+    form.addEventListener("click", (e) => {
+        e.preventDefault();
+        const modalHeaderEl = document.getElementById("modalHeader");
+        const modalBodyEl = document.getElementById("modalBody");
+        const isSelectPackageConditionsListEmpty = checkSelectPackageConditionsList();
 
-   </div>`
-    body.innerHTML = template;
-    confirmPackageReceipt()
-  })
+        if (isSelectPackageConditionsListEmpty) {
+            displayPackageConditionListEmptyModal(modalHeaderEl, modalBodyEl);
+        } else {
+            displaySelectedPackageConditionListModal(modalHeaderEl, modalBodyEl);
+        }
+    });
+};
+
+const confirmPackageReceipt = () => {
+  const a = document.getElementById('confirmReceipt');
+  if (a) {
+    a.addEventListener('click',  () => { 
+      let obj = {};
+      let packageConditions = [];
+      const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
+      const onlyFedexCourierType = identifyCourierType(scannedBarcode);
+      if (onlyFedexCourierType === true) {
+        obj['scannedBarcode'] = scannedBarcode
+        for (let option of document.getElementById('packageCondition').options) {
+          if (option.selected) {packageConditions.push(option.value)}
+        }
+        obj[`${fieldMapping.packageCondition}`] = packageConditions;
+        if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode))) {  
+          obj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
+          obj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
+          obj[`${fieldMapping.siteShipmentDateReceived}`] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
+        } else { 
+          obj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
+          obj['dateReceived'] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
+          if(document.getElementById('collectionId').value) {
+            obj['collectionId'] = document.getElementById('collectionId').value;
+            obj['dateCollectionCard'] = document.getElementById('dateCollectionCard').value;
+            obj['timeCollectionCard'] = document.getElementById('timeCollectionCard').value;
+            document.getElementById('collectionCheckBox').checked === true ? 
+                obj['collectionCheckBox'] = true : obj['collectionCheckBox'] = false
+            obj['collectionComments'] = document.getElementById('collectionComments').value;
+          }    
+        }
+        window.removeEventListener("beforeunload",beforeUnloadMessage)
+        targetAnchorTagEl();
+        storePackageReceipt(obj);
+       } 
+    })
+  }
 }
 
 const confirmPackageReceipt = () => {
@@ -683,3 +716,97 @@ const controlCollectionCardField = (dropdownSelection) => {
     enableCollectionCardFields() 
   }
 } 
+const checkSelectPackageConditionsList = () => {
+    const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected')
+    const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList)
+    if(parseSelectPackageConditionsList.length === 0) {
+        return true
+    }
+    else return false
+}
+
+const displayPackageConditionListEmptyModal = (modalHeaderEl,modalBodyEl) => {
+    modalHeaderEl.innerHTML = `
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>`
+    modalBodyEl.innerHTML =  `<div class="row">
+        <div class="col">
+            <div style="display:flex; justify-content:center; margin-bottom:1rem;">
+            <i class="fas fa-exclamation-triangle fa-5x" style="color:#ffc107"></i>
+            </div>
+            <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; ">
+                <span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Package Condition</span> 
+                Please select package condition(s).
+            </p>
+        </div>
+    </div>
+    <div class="row" style="display:flex; justify-content:center;">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" target="_blank">Close</button>
+    </div>
+    </div>`
+}
+
+const displaySelectedPackageConditionListModal = (modalHeaderEl,modalBodyEl) => {
+    const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected');
+    const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList);
+
+    modalHeaderEl.innerHTML = `
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>`
+    modalBodyEl.innerHTML =  `<div class="row">
+        <div class="col">
+            <div style="display:flex; justify-content:center; margin-bottom:1rem;">
+            <i class="fas fa-exclamation-triangle fa-5x" style="color:#ffc107"></i>
+            </div>
+            <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; ">
+                <span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Package Condition</span> 
+                Confirm selected package condition(s):
+                <ul id="packageConditionSpanList" style="margin:0 30px;"></ul>
+            </p>
+        </div>
+    </div>
+    <div class="row" style="display:flex; justify-content:center;">
+        <button id="confirmPackageConditionButton" type="button" class="btn btn-primary" data-dismiss="modal" target="_blank" style="margin-right: 15px;">Confirm</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank">Cancel</button>
+    </div>
+    </div>`
+    
+    displaySelectedPackageConditionList(parseSelectPackageConditionsList);
+    clickConfirmPackageConditionListButton(modalHeaderEl,modalBodyEl);
+}
+
+const displayConfirmPackageReceiptModal = (modalHeaderEl,modalBodyEl) => {
+    modalHeaderEl.innerHTML = `<h5>Confirmation</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>`
+    modalBodyEl.innerHTML = `<div>
+        <span>Confirm package receipt</span>
+        <br >
+        <div style="display:inline-block;">
+            <button type="submit" class="btn btn-primary" data-dismiss="modal" id="confirmReceipt" target="_blank">Confirm</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank">Cancel</button>
+        </div>
+    </div>`
+}
+
+const displaySelectedPackageConditionList = (parseSelectPackageConditionsList) => {
+    const packageConditionSpanListEl = document.getElementById('packageConditionSpanList');
+    for (const packageConditionConceptId of parseSelectPackageConditionsList) {
+        if (packageConditonConversion[packageConditionConceptId]) {
+            const listEl = document.createElement('li');
+            listEl.textContent = packageConditonConversion[packageConditionConceptId];
+            packageConditionSpanListEl.appendChild(listEl);
+        }
+    }
+}
+
+const clickConfirmPackageConditionListButton = (modalHeaderEl,modalBodyEl) => {
+    const confirmPackageConditionButtondocument = document.getElementById("confirmPackageConditionButton");
+    confirmPackageConditionButtondocument.addEventListener("click", () => {
+        displayConfirmPackageReceiptModal(modalHeaderEl,modalBodyEl);
+        confirmPackageReceipt();
+    })    
+}

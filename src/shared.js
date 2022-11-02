@@ -3,36 +3,21 @@ import { searchResults } from "./pages/dashboard.js";
 import { shipmentTracking, shippingManifest } from "./pages/shipping.js"
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
-import { workflows } from "./tubeValidation.js";
+import { workflows, specimenCollection } from "./tubeValidation.js";
 import { signOut } from "./pages/signIn.js";
 import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
-import conceptIDs from './fieldToConceptIdMapping.js';
+import conceptIds from './fieldToConceptIdMapping.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
 
-const conversion = {
-    "299553921":"0001",
-    "703954371":"0002",
-    "838567176":"0003",
-    "454453939":"0004",
-    "652357376":"0005",
-    "973670172":"0006",
-    "143615646":"0007",
-    "787237543":"0008",
-    "223999569":"0009",
-    "376960806":"0011",
-    "232343615":"0012",
-    "589588440":"0021",
-    "958646668":"0013",
-    "677469051":"0014",
-    "683613884":"0024"
-}
 
 export const urls = {
     'stage': 'biospecimen-myconnect-stage.cancer.gov',
     'prod': 'biospecimen-myconnect.cancer.gov'
 }
+
+export const appState = {};
 
 let api = '';
 
@@ -475,6 +460,20 @@ export const storeSpecimen = async (array) => {
     return response.json();
 }
 
+export const checkAccessionId = async (data) => {
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    }
+    const response = await fetch(`${api}api=accessionIdExists`, requestObj);
+    return response.json();
+}
+
 export const updateSpecimen = async (array) => {
     const idToken = await getIdToken();
     let requestObj = {
@@ -556,22 +555,22 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) =
     return response.json();
 }
 
-export const bagConceptIDList = [
-    conceptIDs.bag1,
-    conceptIDs.bag2,
-    conceptIDs.bag3,
-    conceptIDs.bag4,
-    conceptIDs.bag5,
-    conceptIDs.bag6,
-    conceptIDs.bag7,
-    conceptIDs.bag8,
-    conceptIDs.bag9,
-    conceptIDs.bag10,
-    conceptIDs.bag11,
-    conceptIDs.bag12,
-    conceptIDs.bag13,
-    conceptIDs.bag14,
-    conceptIDs.bag15,
+export const bagConceptIdList = [
+    conceptIds.bag1,
+    conceptIds.bag2,
+    conceptIds.bag3,
+    conceptIds.bag4,
+    conceptIds.bag5,
+    conceptIds.bag6,
+    conceptIds.bag7,
+    conceptIds.bag8,
+    conceptIds.bag9,
+    conceptIds.bag10,
+    conceptIds.bag11,
+    conceptIds.bag12,
+    conceptIds.bag13,
+    conceptIds.bag14,
+    conceptIds.bag15,
 ];
   
 export const convertToOldBox = (inputBox) => {
@@ -582,33 +581,33 @@ export const convertToOldBox = (inputBox) => {
   let hasOrphanBag = false;
   let orphanBag = { arrElements: [] };
 
-  for (let bagConceptId of bagConceptIDList) {
+  for (let bagConceptId of bagConceptIdList) {
     if (!inputBox[bagConceptId]) continue;
     let outputBag = {};
     const inputBag = inputBox[bagConceptId];
     const keysNeeded = [
-      conceptIDs.scannedByFirstName,
-      conceptIDs.scannedByLastName,
-      conceptIDs.orphanBagFlag,
+      conceptIds.scannedByFirstName,
+      conceptIds.scannedByLastName,
+      conceptIds.orphanBagFlag,
     ];
 
     for (let k of keysNeeded) {
       if (inputBag[k]) outputBag[k] = inputBag[k];
     }
 
-    if (inputBag[conceptIDs.bagscan_orphanBag]) {
+    if (inputBag[conceptIds.bagscan_orphanBag]) {
       hasOrphanBag = true;
       orphanBag = { ...orphanBag, ...outputBag };
-      orphanBag.arrElements.push(...inputBag[conceptIDs.tubesCollected]);
+      orphanBag.arrElements.push(...inputBag[conceptIds.tubesCollected]);
     } else {
-      outputBag.arrElements = inputBag[conceptIDs.tubesCollected];
+      outputBag.arrElements = inputBag[conceptIds.tubesCollected];
       let bagID;
 
-      if (inputBag[conceptIDs.bagscan_bloodUrine]) {
-        bagID = inputBag[conceptIDs.bagscan_bloodUrine];
+      if (inputBag[conceptIds.bagscan_bloodUrine]) {
+        bagID = inputBag[conceptIds.bagscan_bloodUrine];
         outputBag.isBlood = true;
-      } else if (inputBag[conceptIDs.bagscan_mouthWash]) {
-        bagID = inputBag[conceptIDs.bagscan_mouthWash];
+      } else if (inputBag[conceptIds.bagscan_mouthWash]) {
+        bagID = inputBag[conceptIds.bagscan_mouthWash];
         outputBag.isBlood = false;
       }
         
@@ -623,7 +622,7 @@ export const convertToOldBox = (inputBox) => {
   }
 
   outputBox.bags = bags;
-  const locationConceptID = inputBox[conceptIDs.shippingLocation];
+  const locationConceptID = inputBox[conceptIds.shippingLocation];
   outputBox.siteAcronym =
     locationConceptIDToLocationMap[locationConceptID]?.siteAcronym ||
     'Not Found';
@@ -634,41 +633,41 @@ export const convertToFirestoreBox = (inputBox) => {
   let { bags } = inputBox;
   let outputBox = { ...inputBox };
   let bagConceptIDIndex = 0;
-  outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.no;
+  outputBox[conceptIds.containsOrphanFlag] = conceptIds.no;
   delete outputBox.bags;
-  const defaultOutputBag = { [conceptIDs.bagscan_bloodUrine]: '', [conceptIDs.bagscan_mouthWash]: '', [conceptIDs.bagscan_orphanBag]: '' };
+  const defaultOutputBag = { [conceptIds.bagscan_bloodUrine]: '', [conceptIds.bagscan_mouthWash]: '', [conceptIds.bagscan_orphanBag]: '' };
     
   for (let [bagID, inputBag] of Object.entries(bags)) {
-      if (bagConceptIDIndex >= bagConceptIDList.length) break;      
+      if (bagConceptIDIndex >= bagConceptIdList.length) break;      
       inputBag.arrElements = Array.from(new Set(inputBag.arrElements));
 
     if (bagID === 'unlabelled') {
-        outputBox[conceptIDs.containsOrphanFlag] = conceptIDs.yes;       
+        outputBox[conceptIds.containsOrphanFlag] = conceptIds.yes;       
       for (let tubeID of inputBag.arrElements) {
           let outputBag = {...defaultOutputBag};          
-          const bagConceptID = bagConceptIDList[bagConceptIDIndex];
+          const bagConceptID = bagConceptIdList[bagConceptIDIndex];
           const keysNeeded = [            
-              conceptIDs.scannedByFirstName,              
-              conceptIDs.scannedByLastName,        
-              conceptIDs.orphanBagFlag,
+              conceptIds.scannedByFirstName,              
+              conceptIds.scannedByLastName,        
+              conceptIds.orphanBagFlag,
           ];
 
         for (let k of keysNeeded) {
           if (inputBag[k]) outputBag[k] = inputBag[k];
         }
 
-        outputBag[conceptIDs.bagscan_orphanBag] = tubeID;
-        outputBag[conceptIDs.orphanBagFlag] = conceptIDs.yes;
-        outputBag[conceptIDs.tubesCollected] = [tubeID];
+        outputBag[conceptIds.bagscan_orphanBag] = tubeID;
+        outputBag[conceptIds.orphanBagFlag] = conceptIds.yes;
+        outputBag[conceptIds.tubesCollected] = [tubeID];
         outputBox[bagConceptID] = outputBag;
         bagConceptIDIndex++;
       }
     } else {
       let outputBag = {...defaultOutputBag};
-      const bagConceptID = bagConceptIDList[bagConceptIDIndex];
+      const bagConceptID = bagConceptIdList[bagConceptIDIndex];
       const keysNeeded = [
-        conceptIDs.scannedByFirstName,
-        conceptIDs.scannedByLastName,
+        conceptIds.scannedByFirstName,
+        conceptIds.scannedByLastName,
       ];
 
       for (let k of keysNeeded) {
@@ -677,13 +676,13 @@ export const convertToFirestoreBox = (inputBox) => {
 
       const bagIDEndString = bagID.split(' ')[1];
         if (bagIDEndString === '0008') {  
-          outputBag[conceptIDs.bagscan_bloodUrine] = bagID;
+          outputBag[conceptIds.bagscan_bloodUrine] = bagID;
         } else if (bagIDEndString === '0009') {
-            outputBag[conceptIDs.bagscan_mouthWash] = bagID;
+            outputBag[conceptIds.bagscan_mouthWash] = bagID;
       }
 
-      outputBag[conceptIDs.orphanBagFlag] = conceptIDs.no;
-      outputBag[conceptIDs.tubesCollected] = inputBag.arrElements;
+      outputBag[conceptIds.orphanBagFlag] = conceptIds.no;
+      outputBag[conceptIds.tubesCollected] = inputBag.arrElements;
       outputBox[bagConceptID] = outputBag;
       bagConceptIDIndex++;
     }
@@ -697,6 +696,7 @@ export const convertToFirestoreBox = (inputBox) => {
   return outputBox;
 };
 
+// todo: fetch only the required un-shipped boxes
 export const getBoxes = async (box) => {
   const idToken = await getIdToken();
   const response = await fetch(`${api}api=searchBoxes`, {
@@ -712,8 +712,8 @@ export const getBoxes = async (box) => {
   for (let i = 0; i < data.length; i++) {
     let currJSON = convertToOldBox(data[i]);
     if (
-      !currJSON.hasOwnProperty(conceptIDs.submitShipmentFlag) ||
-      currJSON[conceptIDs.submitShipmentFlag] != conceptIDs.booleanOne
+      !currJSON.hasOwnProperty(conceptIds.submitShipmentFlag) ||
+      currJSON[conceptIds.submitShipmentFlag] != conceptIds.booleanOne
     ) {
       toReturn['data'].push(currJSON);
     }
@@ -806,6 +806,10 @@ export const removeBag = async(boxId, bags) => {
     
 }
 
+/**
+ * Fetches biospecimen collection data from the database, and removes '0008', '0009' and deviation tubes from each collection
+ * @returns {Array} List of biospecimen collections
+ */
 export const searchSpecimenInstitute = async () => {
     //https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
     const idToken = await getIdToken();
@@ -816,56 +820,43 @@ export const searchSpecimenInstitute = async () => {
         }
     });
     let a = await response.json();
-    let data = a.data.filter(item => item[410912345] === 353358909); /* Filter collections with ShipFlag value yes */
+    /* Filter collections with ShipFlag value yes */
+    let collectionList = a.data.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
     
-    const conversion = {
-        "299553921":"0001",
-        "703954371":"0002",
-        "838567176":"0003",
-        "454453939":"0004",
-        "652357376":"0005",
-        "973670172":"0006",
-        "143615646":"0007",
-        "787237543":"0008",
-        "223999569":"0009",
-        "376960806":"0011",
-        "232343615":"0012",
-        "589588440":"0021",
-        "958646668":"0013",
-        "677469051":"0014",
-        "683613884":"0024"
-    }
+    // loop over filtered data with shipFlag
+    for (let i = 0; i < collectionList.length; i++){
+        let currCollection = collectionList[i];
 
-    for(let i = 0; i < data.length; i++){ // loop over filtered data with shipFlag
-        let currJSON = data[i];
-        if(currJSON.hasOwnProperty('787237543')){
-            delete currJSON['787237543']
+        if (currCollection['787237543']) {
+            delete currCollection['787237543']
         }
-        if(currJSON.hasOwnProperty('223999569')){
-            delete currJSON['223999569'] 
+
+        if (currCollection['223999569']) {
+            delete currCollection['223999569'] 
         }
-        let keys = Object.keys(currJSON);
-        for(let i = 0; i < keys.length; i++){
-            if(conversion.hasOwnProperty(keys[i])){
-                let iterateJSON = currJSON[keys[i]];
-                // delete specimen key if tube collected key is no
-                if(!iterateJSON.hasOwnProperty('593843561') || iterateJSON['593843561'] == '104430631'){ // 593843561 - Object Collected (Indicates whether a given sample tube or biohazard bag has been collected.)
-                    delete currJSON[keys[i]]
-                }
-                // check and delete if iterateJSON has not shipped specimen deviation concept ID
-                if(iterateJSON.hasOwnProperty('248868659')) {
-                  if(iterateJSON["248868659"][conceptIDs.brokenSpecimenDeviation] == '353358909' || 
-                    iterateJSON["248868659"][conceptIDs.discardSpecimenDeviation] == '353358909' || 
-                    iterateJSON["248868659"][conceptIDs.insufficientVolumeSpecimenDeviation] == '353358909' || 
-                    iterateJSON["248868659"][conceptIDs.mislabelledDiscardSpecimenDeviation] == '353358909' || 
-                    iterateJSON["248868659"][conceptIDs.notFoundSpecimenDeviation] == '353358909') {
-                    delete currJSON[keys[i]]
-                  }
-                }
+ 
+        for (let tubeCid of specimenCollection.tubeCidList) {
+            if (!currCollection[tubeCid]) continue;
+
+            let currTube = currCollection[tubeCid];
+            // delete specimen key if tube collected key is no
+            if (!currTube[conceptIds.collection.tube.isCollected] || currTube[conceptIds.collection.tube.isCollected] == conceptIds.no){
+                delete currCollection[tubeCid];
+            }
+
+            // delete tube if it contains deviation concept ID that disallows shipping
+            const tubeDeviation = currTube[conceptIds.collection.tube.deviation];
+            if (tubeDeviation?.[conceptIds.brokenSpecimenDeviation] == conceptIds.yes || 
+                tubeDeviation?.[conceptIds.discardSpecimenDeviation] == conceptIds.yes || 
+                tubeDeviation?.[conceptIds.insufficientVolumeSpecimenDeviation] == conceptIds.yes|| 
+                tubeDeviation?.[conceptIds.mislabelledDiscardSpecimenDeviation] == conceptIds.yes || 
+                tubeDeviation?.[conceptIds.notFoundSpecimenDeviation] == conceptIds.yes) {
+                    delete currCollection[tubeCid];
             }
         }
     }
-  return data;
+
+    return collectionList;
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
@@ -971,15 +962,15 @@ export const getUpdatedParticipantData = async (data) => {
 export const updateCollectionSettingData = async (biospecimenData, tubes, data) => {
     
     let settings;
-    let visit = biospecimenData['331584571'];
+    let visit = biospecimenData[conceptIds.collection.selectedVisit];
 
     const bloodTubes = tubes.filter(tube => tube.tubeType === "Blood tube");
     const urineTubes = tubes.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = tubes.filter(tube => tube.tubeType === "Mouthwash");
 
 
-    if(data['173836415']) {
-        settings = data['173836415'];
+    if(data[conceptIds.collectionDetails]) {
+        settings = data[conceptIds.collectionDetails];
 
         if(!settings[visit]) {
             settings[visit] = {};
@@ -993,34 +984,55 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
 
     if(!settings[visit]['592099155']) {
         bloodTubes.forEach(tube => {
-            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-                settings[visit]['592099155'] = biospecimenData['650516960'];
-                settings[visit]['561681068'] = biospecimenData['678166505'];
+            if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
+
+                settings[visit]['592099155'] = biospecimenData[conceptIds.collection.collectionSetting];
+
+                if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+                    settings[visit][conceptIds.baseline.bloodCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
+                }
+                else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
+                    settings[visit][conceptIds.clinicalDashboard.bloodCollected] = conceptIds.yes;
+                    settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
+                }
             }
         });
     }
         
     if(!settings[visit]['718172863']) {
         urineTubes.forEach(tube => {
-            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-                settings[visit]['718172863'] = biospecimenData['650516960'];
-                settings[visit]['847159717'] = biospecimenData['678166505'];
+            if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
+
+                settings[visit]['718172863'] = biospecimenData[conceptIds.collection.collectionSetting];
+
+                if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+                    settings[visit][conceptIds.baseline.urineCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
+                }
+                else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
+                    settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.yes;
+                    settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
+                }
             }
         });
     }
 
     if(!settings[visit]['915179629']) {
         mouthwashTubes.forEach(tube => {
-            if(biospecimenData[tube.concept]['593843561'] === 353358909) {
-                settings[visit]['915179629'] = biospecimenData['650516960'];
-                settings[visit]['448660695'] = biospecimenData['678166505'];
+            if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
+
+                settings[visit]['915179629'] = biospecimenData[conceptIds.collection.collectionSetting];
+
+                if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+                    settings[visit][conceptIds.baseline.mouthwashCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
+
+                }
             }
         });
     }
 
     const settingData = {
         '173836415': settings,
-        uid: data.state.uid
+        uid: data?.state?.uid
     };
         
     await updateParticipant(settingData);
@@ -1039,6 +1051,7 @@ export const updateBaselineData = async (siteTubesList, data) => {
     let bloodCollected = (data['878865966'] === 353358909);
     let urineCollected = (data['167958071'] === 353358909);
     let mouthwashCollected = (data['684635302'] === 353358909);
+    let allBaselineCollected = (data['254109640'] === conceptIds.yes);
 
     baselineCollections.forEach(collection => {
 
@@ -1066,10 +1079,18 @@ export const updateBaselineData = async (siteTubesList, data) => {
         }
     });
 
+    if(baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research) {
+        allBaselineCollected = bloodCollected && urineCollected && mouthwashCollected;
+    }
+    else if(baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.clinical) {
+        allBaselineCollected = bloodCollected && urineCollected;
+    }
+
     const baselineData = {
         '878865966': bloodCollected ? 353358909 : 104430631,
         '167958071': urineCollected ? 353358909 : 104430631, 
         '684635302': mouthwashCollected ? 353358909 : 104430631,
+        '254109640': allBaselineCollected ? conceptIds.yes : conceptIds.no,
         uid: data.state.uid
     };
         
@@ -1101,28 +1122,36 @@ const checkPaymentEligibility = async (data, baselineCollections) => {
   
     if(baselineCollections.length === 0) return false;
   
-    const module1 = (data['949302066'] && data['949302066'] === 231311385);
-    const module2 = (data['536735468'] && data['536735468'] === 231311385);
-    const module3 = (data['976570371'] && data['976570371'] === 231311385);
-    const module4 = (data['663265240'] && data['663265240'] === 231311385);
-    const bloodCollected = (data['878865966'] && data['878865966'] === 353358909);
-    const tubes = baselineCollections[0]['650516960'] === 534621077 ? workflows.research.filter(tube => tube.tubeType === 'Blood tube') : workflows.clinical.filter(tube => tube.tubeType === 'Blood tube');
+    const module1 = (data[conceptIds.modules.module1.status] === conceptIds.modules.submitted);
+    const module2 = (data[conceptIds.modules.module2.status] === conceptIds.modules.submitted);
+    const module3 = (data[conceptIds.modules.module3.status] === conceptIds.modules.submitted);
+    const module4 = (data[conceptIds.modules.module4.status] === conceptIds.modules.submitted);
+
+    const bloodCollected = baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research 
+        ? (data[conceptIds.baseline.bloodCollected] === conceptIds.yes) 
+        : (data[conceptIds.baseline.bloodCollected] === conceptIds.yes) || (data[conceptIds.collectionDetails][conceptIds.baseline.visitId][conceptIds.clinicalSite.bloodCollected] === conceptIds.yes);
+
+    const tubes = baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research 
+        ? workflows.research.filter(tube => tube.tubeType === 'Blood tube') 
+        : workflows.clinical.filter(tube => tube.tubeType === 'Blood tube');
   
     let eligible = false;
   
     if(module1 && module2 && module3 && module4) {
-      if(bloodCollected) {
-        eligible = true;
-      }    
-      else {
-        baselineCollections.forEach(collection => {
-          tubes.forEach(tube => {
-            if(collection[tube.concept] && collection[tube.concept]['883732523'] && collection[tube.concept]['883732523'] != 681745422) {
-              eligible = true;
-            }
-          });
-        });
-      }
+        if(bloodCollected) {
+            eligible = true;
+        }    
+        else {
+            baselineCollections.forEach(collection => {
+                if(collection[conceptIds.collection.collectionSetting] === conceptIds.research) {
+                    tubes.forEach(tube => {
+                        if(collection[tube.concept] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] != conceptIds.REASONS.PARTICIPANT_REFUSAL) {
+                            eligible = true;
+                        }
+                    });
+                }
+            });
+        }
     }
   
     return eligible;
@@ -1511,7 +1540,15 @@ export const addEventBarCodeScanner = (id, start, end) => {
                 if(elementID === 'accessionID1') {
                     disableInput('accessionID2', true);
                     // addEventClearScannedBarcode('clearScanAccessionID');
-                    document.getElementById(elementID).value = result.codeResult.code;
+                    document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end-1) : result.codeResult.code;
+                    Quagga.stop();
+                    document.querySelector('[data-dismiss="modal"]').click();
+                    return
+                };
+                if(elementID === 'accessionID3') {
+                    disableInput('accessionID4', true);
+                    // addEventClearScannedBarcode('clearScanAccessionID');
+                    document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end-1) : result.codeResult.code;
                     Quagga.stop();
                     document.querySelector('[data-dismiss="modal"]').click();
                     return
@@ -1568,17 +1605,18 @@ export const addEventBarCodeScanner = (id, start, end) => {
                 if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,masterSpecimenIDRequirement.length))) return;
                 if(!elementID) return;
                 if(elementID === 'scanSpecimenID') {
-                    disableInput('enterSpecimenID1', true);
-                    disableInput('enterSpecimenID2', true);
+                    // disableInput('enterSpecimenID1', true);
+                    // disableInput('enterSpecimenID2', true);
                     // addEventClearScannedBarcode('clearScanSpecimenID');
+                    document.getElementById(elementID).dataset.isscanned = 'true';
                 }
-                document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end) : result.codeResult.code;
+                document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end-1) : result.codeResult.code;
                 Quagga.stop();
                 document.querySelector('[data-dismiss="modal"]').click();
             }
             else {
-                disableInput('enterSpecimenID1', false);
-                disableInput('enterSpecimenID2', false);
+                // disableInput('enterSpecimenID1', false);
+                // disableInput('enterSpecimenID2', false);
             }
         });
         
@@ -1800,6 +1838,17 @@ export const getCollectionsByVisit = async (data) => {
     return collections;
 };
 
+export const getCollectionById = async (data, collectionId) => {
+
+    const response = await getParticipantCollections(data.token);
+    console.log("response", response)
+    let collectionExists = false;
+    if(response.code != 404) {
+        collectionExists = response.data.some(col => col.id === collectionId)
+        };
+    
+    return collections;
+};
 export const getWorflow = () => document.getElementById('contentBody').dataset.workflow ?? localStorage.getItem('workflow');
 export const getSiteAcronym = () => document.getElementById('contentBody').dataset.siteAcronym ?? localStorage.getItem('siteAcronym');
 export const getSiteCode = () => document.getElementById('contentBody').dataset.siteCode ?? localStorage.getItem('siteCode');
@@ -1911,8 +1960,8 @@ export const allTubesCollected = (data) => {
 
     let flag = true; 
 
-    if(data['650516960']) {
-        const tubes = workflows[collectionSettings[data['650516960']]];
+    if(data[conceptIds.collection.collectionSetting]) {
+        const tubes = workflows[collectionSettings[data[conceptIds.collection.collectionSetting]]];
         tubes.forEach(tube => {
             if(!data[tube['concept']]['593843561'] || data[tube['concept']]['593843561'] !== 353358909 || !data[tube['concept']]['825582494']) {
                 flag = false;
@@ -2000,17 +2049,17 @@ export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxEr
 
 export const delay = ms => new Promise(res => setTimeout(res, ms));
 
-export const convertNumsToCondition = (packagedCondition, packageConversion) => {
+export const convertConceptIdToPackageCondition = (packagedCondition, packageConditonConversion) => {
   let listConditions = ''
   if(!packagedCondition) return listConditions
   for(let i = 0; i < packagedCondition.length; i++) {
     let isLastItem = false;
     if(i+1 === packagedCondition.length) { // if last item equals the final item
       isLastItem = true
-      if(isLastItem) listConditions += `<p>${packageConversion[packagedCondition[i]]}</p>`
+      if(isLastItem) listConditions += `<p>${packageConditonConversion[packagedCondition[i]]}</p>`
     }
     else {
-      listConditions += `<p>${packageConversion[packagedCondition[i]]},</p>`
+      listConditions += `<p>${packageConditonConversion[packagedCondition[i]]},</p>`
     }
 
   }
@@ -2038,7 +2087,6 @@ export const checkDuplicateTrackingIdFromDb = async (boxes) => {
     }
     return isExistingTrackingId;
 }
-
 
 export const checkNonAlphanumericStr = (boxes) => {
   let regExp = /^[a-z0-9]+$/i
@@ -2077,6 +2125,28 @@ export const translateNumToType = {
   "0054": "NA"
 };
 
+export const packageConditonConversion = {
+    "679749262": "Package in good condition",
+    "405513630": "No Ice Pack",
+    "595987358": "Warm Ice Pack",
+    "200183516": "Vials - Incorrect Material Type Sent",
+    "399948893": "No Label on Vials",
+    "631290535": "Returned Empty Vials",
+    "442684673": "Participant Refusal",
+    "121149986": "Crushed",
+    "678483571": "Damaged Container (outer and inner)",
+    "289322354": "Material Thawed",
+    "909529446": "Insufficient Ice",
+    "847410060": "Improper Packaging",
+    "387564837": "Damaged Vials",
+    "933646000": "Other",
+    "842171722": "No Pre-notification",
+    "613022284": "No Refrigerant",
+    "922995819": "Manifest/Vial/Paperwork info do not match",
+    "958000780": "Shipment Delay",
+    "853876696": "No Manifest provided",
+}
+
 export const convertISODateTime = (dateWithdrawn) => {
     let date = new Date(dateWithdrawn);
     return setZeroDateTime(date.getMonth() + 1)+ '/' + setZeroDateTime(date.getDate()) + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + setZeroDateTime(date.getMinutes())
@@ -2093,4 +2163,63 @@ export const formatISODateTime = (dateReceived) => {
     const formattedDateTimeStamp = extractDate[1]+'/'+extractDate[2]+'/'+extractDate[0]
     return formattedDateTimeStamp
 
+}
+
+export const numericInputValidator = (elemArr) => {
+    elemArr.forEach(elem => {
+        if (document.getElementById(elem)) {
+            document.getElementById(elem).addEventListener('input', (e) => {
+                document.getElementById(elem).value = e.target.value.replace(/\D+/g, '');
+            })
+        }
+    })
+}
+
+export const collectionInputValidator = (elemArr) => {
+    elemArr.forEach(elem => {
+        if (document.getElementById(elem)) {
+            document.getElementById(elem).addEventListener('input', (e) => {
+                document.getElementById(elem).value = e.target.value.substr(0,9);
+            })
+        }
+    })
+}
+
+export function addSelectionEventListener(elemId, pageAndElement) {
+    document.getElementById(elemId).addEventListener("change", (event) => {
+        const selection = event.target.value;
+        const prevSelections = JSON.parse(localStorage.getItem('selections'));
+        localStorage.setItem('selections', JSON.stringify({...prevSelections, [pageAndElement] : selection}));
+
+    });
+
+}
+
+export const checkSurveyEmailTrigger = async (data, visitType) => {
+    
+    const response = await getParticipantCollections(data.token);
+    let sendBaselineEmail = false;
+
+    if(response.code != 404) {
+        const collections = response.data.filter(res => res['331584571'] == visitType && res['650516960'] == 664882224);
+
+        if(collections.length == 1) sendBaselineEmail = true;
+    } 
+    
+    if(sendBaselineEmail) {
+        const emailData = {
+            email: data['869588347'],
+            subject: "Please complete a short survey about your samples",
+            message: baselineEmailTemplate(data, true),
+            notificationType: "email",
+            time: new Date().toISOString(),
+            attempt: "1st contact",
+            category: "Baseline Clinical Biospecimen Survey Reminder",
+            token: data.token,
+            uid: data.state.uid,
+            read: false
+        };
+        
+        await(sendClientEmail(emailData));
+    }
 }

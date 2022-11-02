@@ -1,8 +1,9 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, shippingPrintManifestReminder, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, conceptIdToSiteSpecificLocation, getNumPages} from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, shippingPrintManifestReminder, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, conceptIdToSiteSpecificLocation, getNumPages, addSelectionEventListener} from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, 
     populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, 
-    addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventSaveContinue, addEventShipPrintManifest, } from "./../events.js";
+    addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventSaveContinue, addEventShipPrintManifest, addEventTrackingNumberScanAutoFocus } from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
+import conceptIds from '../fieldToConceptIdMapping.js';
 
 const conversion = {
     "299553921":"0001",
@@ -44,30 +45,30 @@ export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
 
 export const startShipping = async (userName) => {
     showAnimation();
-    if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
-    //store a secret json that has all of the packed ones in it
-    //{"Box1":{specimenId:[allTubes], specimenId:[allTubes]}}
-    let response = await  getBoxes();
-    let boxJSONS = response.data;
-    let hiddenJSON = {};
-    for(let i = 0; i < boxJSONS.length; i++){
-        let box = boxJSONS[i]
-        hiddenJSON[box['132929440']] = box['bags']
+
+    if (document.getElementById('navBarParticipantCheckIn')) {
+      document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
+    }
+
+    let response = await  getBoxes();  // get un-shipped boxes
+    let boxList = response.data;
+    //boxIdAndBagsObj-->{"Box1":{"CXA123423 0008:{...}, "unlabelled":{...}}, "Box2":{...}}
+    let boxIdAndBagsObj = {}; // for transformed box data structure
+
+    for (const box of boxList) {
+      const boxId = box[conceptIds.shippingBoxId];
+      boxIdAndBagsObj[boxId] = box['bags'];
     }
 
     response = await  getAllBoxes();
-    boxJSONS = response.data;
-    let hiddenJSON1 = {};
-    for(let i = 0; i < boxJSONS.length; i++){
-        let box = boxJSONS[i]
-        hiddenJSON1[box['132929440']] = box['bags']
+    let allBoxList = response.data;
+    let allBoxIdAndBagsObj = {};
+
+    for (const box of allBoxList) {
+        const boxId = box[conceptIds.shippingBoxId];
+        allBoxIdAndBagsObj[boxId] = box['bags']
     }
-    
-    /*
-    if(document.getElementById('shippingHiddenTable') != null){
-        hiddenJSON = JSON.parse(document.getElementById('shippingHiddenTable').innerText);
-    }
-*/
+
     let template = `
         <div id="shippingHiddenTable" style="display:none">
         {}
@@ -115,10 +116,6 @@ export const startShipping = async (userName) => {
     <h4 style="text-align:center; margin-bottom:1rem;">Available Collections</h4>
     <div class="panel panel-default" style="border-style:solid;height:550px;border-width:1px;overflow:auto;" id="specimenPanel">
             <table class = "table" style="width: 100%;margin-bottom:0px;" id="specimenList" >
-                <tr>
-                    <th>Specimen Bag ID</th>
-                    <th># Specimens in Bag</th>
-                </tr>
             </table>
     </div>
 
@@ -198,16 +195,8 @@ export const startShipping = async (userName) => {
         </div>
         <div style="border: 1px solid black; overflow: auto; margin-bottom: 0.5rem; height: 400px;">
             <table  class="table table-bordered" style="width:100%;border:1px solid;" id = "saveTable">
-                <tr>
-                    <th style="border-bottom:1px solid; ">To Ship</th>
-                    <th style="border-bottom:1px solid; ">Started</th>
-                    <th style="border-bottom:1px solid; ">Last Modified</th>
-                    <th style="border-bottom:1px solid; ">Box Number</th>
-                    <th style="border-bottom:1px solid; ">Contents</th>
-                    <th style="border-bottom:1px solid; ">View/Print Box Manifest</th>
-                </tr>
             </table>
-            </div>
+        </div>
     </div>
     <div class="row" id="checkForTemp">
         <div class="col-lg">
@@ -216,33 +205,32 @@ export const startShipping = async (userName) => {
         </div>
     </div>
     `;
-    /*var x = document.getElementById("specimenList");
-    var option = document.createElement("option");
-    option.text = "Kiwi";
-    x.add(option);*/
-    
+
     removeActiveClass('navbar-btn', 'active')
     document.getElementById('contentHeader').innerHTML = `<h2>Connect for Cancer Prevention Study</h2></br>` + shippingNavBar();
     const navBarBtn = document.getElementById('navBarShippingDash');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
     await populateSelectLocationList();
+    addSelectionEventListener("selectLocationList", "shipping_location");
+
     
-    await populateSaveTable(hiddenJSON, boxJSONS, userName);
-    await populateSpecimensList(hiddenJSON1);
+    await populateSaveTable(boxIdAndBagsObj, allBoxList, userName);
+    await populateSpecimensList(allBoxList);
 
     let currLocation = document.getElementById('selectLocationList').value;
     if (currLocation !== 'none') { 
         let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
         response = await getBoxesByLocation(currLocationConceptId);
-        boxJSONS = response.data;
-        let hiddenJSONLocation = {};
-        for(let i = 0; i < boxJSONS.length; i++){
-            let box = boxJSONS[i]
-            hiddenJSONLocation[box['132929440']] = box['bags']
+        allBoxList = response.data;
+        let boxIdAndBagsObj = {};
+        for (const box of allBoxList) {
+            const boxId = box[conceptIds.shippingBoxId];
+            boxIdAndBagsObj[boxId] = box['bags']
         }
-        await populateBoxSelectList(hiddenJSONLocation,userName);
+        await populateBoxSelectList(boxIdAndBagsObj,userName);
     };
+
     let tempMonitorCheckedEl = document.getElementById('tempMonitorChecked')
     
     await populateTempNotification();
@@ -261,16 +249,16 @@ export const startShipping = async (userName) => {
 export const boxManifest = async (boxId, userName) => {    
     showAnimation();
     let response = await  getBoxes();
-    let boxJSONS = response.data;
+    let boxList = response.data;
 
     let currBox = {}
-    let hiddenJSON = {};
-    for(let i = 0; i < boxJSONS.length; i++){
-        let box = boxJSONS[i]
+    let boxIdAndBagsObj = {};
+    for(let i = 0; i < boxList.length; i++){
+        let box = boxList[i]
         if(box['132929440'] == boxId){
             currBox = box;
         }
-        hiddenJSON[box['132929440']] = box['bags']
+        boxIdAndBagsObj[box['132929440']] = box['bags']
     }
     let currInstitute = currBox.siteAcronym;
     let currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
@@ -327,13 +315,13 @@ export const boxManifest = async (boxId, userName) => {
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
    
-
-    document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(hiddenJSON);
+// We may not need this anymore for data storage:
+    document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(boxIdAndBagsObj);
     
     //addEventNavBarShipment("returnToPackaging");
     //document.getElementById('boxManifestTable').appendChild(result);
-    populateBoxManifestHeader(boxId,boxJSONS,currContactInfo);
-    populateBoxManifestTable(boxId,hiddenJSON);
+    populateBoxManifestHeader(boxId,boxList,currContactInfo);
+    populateBoxManifestTable(boxId,boxIdAndBagsObj);
     addEventNavBarShipment("returnToPackaging", userName);
     document.getElementById('printBox').addEventListener('click', e => {
         window.print();
@@ -350,23 +338,26 @@ export const boxManifest = async (boxId, userName) => {
 export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, currShippingLocationNumber) => {    
     //let tempMonitorThere = document.getElementById('tempMonitorChecked').checked;
     let response = await  getBoxes();
-    let boxJSONS = response.data;
-    let hiddenJSON = {};
+    let boxList = response.data;
+    let boxIdAndBagsObj = {};
     let locations = {};
     let site = '';
-    for(let i = 0; i < boxJSONS.length; i++){
-        let box = boxJSONS[i]
-        hiddenJSON[box['132929440']] = box['bags']
-        locations[box['132929440']] = box['560975149'];
+
+    for (const box of boxList) {
+        const boxId= box[conceptIds.shippingBoxId]
+        boxIdAndBagsObj[boxId] = box['bags']
+        locations[boxId] = box[conceptIds.shippingLocation];
         site = box['siteAcronym'];
     }
-    let toDisplayJSON = {};
+    
+    let boxIdAndBagsObjToDisplay = {};
     let location = ''
-    for(let i = 0; i < boxesToShip.length; i++){
-        let currBox = boxesToShip[i];
-        toDisplayJSON[currBox] = hiddenJSON[currBox];
-        location = locations[currBox];
+
+    for (const boxId of boxesToShip) {
+        boxIdAndBagsObjToDisplay[boxId] = boxIdAndBagsObj[boxId];
+        location = locations[boxId];
     }
+
     let template = `
         </br>
         <div id="shippingHiddenTable" style="display:none">
@@ -431,13 +422,13 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, 
         populateTempSelect(boxesToShip);
     }
 
-    document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(hiddenJSON);
+    document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(boxIdAndBagsObj);
     
     
     //document.getElementById('boxManifestTable').appendChild(result);
     
-    populateShippingManifestHeader(toDisplayJSON, userName, location, site, currShippingLocationNumber); // populate shipping header via site specfiic location selected from shipping page
-    populateShippingManifestBody(toDisplayJSON);
+    populateShippingManifestHeader(boxIdAndBagsObjToDisplay, userName, location, site, currShippingLocationNumber); // populate shipping header via site specfiic location selected from shipping page
+    populateShippingManifestBody(boxIdAndBagsObjToDisplay);
     addEventNavBarShipment("navBarShippingDash", userName);
     await populateTempCheck();
     const btn = document.getElementById('assignTrackingNumberPage'); // assignTracking
@@ -459,14 +450,14 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, 
             currChecked = document.getElementById('tempBox').value;
         }
         //return box 1 info
-        shipmentTracking(toDisplayJSON, userName, currChecked);
+        shipmentTracking(boxIdAndBagsObjToDisplay, userName, currChecked);
     });
     //addEventNavBarShipment("navBarShippingDash");
     //addEventBackToSearch('backToSearch');
 }
 
 
-export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) => {
+export const shipmentTracking = async (boxIdAndBagsObj, userName, tempCheckChecked) => {
     showAnimation();
 
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
@@ -525,18 +516,19 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
     document.getElementById('contentBody').innerHTML = template;
     await populateCourierBox();
     addEventNavBarShipment("returnToPackaging", userName);
-    if(Object.keys(hiddenJSON).length > 0){
-        document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
+    if(Object.keys(boxIdAndBagsObj).length > 0){
+        document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBagsObj)
     }
     //addEventReturnToShippingManifest('returnToShipping', hiddenJSON, userName, tempCheckChecked)
     addEventNavBarShipment("navBarShippingDash", userName);
-    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', hiddenJSON, userName, tempCheckChecked)
-    await populateTrackingQuery(hiddenJSON);
+    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName, tempCheckChecked)
+    await populateTrackingQuery(boxIdAndBagsObj);
     addEventTrimTrackingNums()
+    addEventTrackingNumberScanAutoFocus()
     addEventPreventTrackingConfirmPaste()
-    addEventCheckValidTrackInputs(hiddenJSON)
-    addEventSaveButton(hiddenJSON);
-    addEventCompleteButton(hiddenJSON, userName, tempCheckChecked);
+    addEventCheckValidTrackInputs(boxIdAndBagsObj)
+    addEventSaveButton(boxIdAndBagsObj);
+    addEventCompleteButton(boxIdAndBagsObj, userName, tempCheckChecked);
     //addEventCompleteShippingButton(hiddenJSON);
     //addEventBackToSearch('navBarShippingDash');
     // addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
@@ -544,7 +536,7 @@ export const shipmentTracking = async (hiddenJSON, userName, tempCheckChecked) =
     //addEventSubmitAddBag();
 }
 
-export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmentCourier) => {
+export const finalShipmentTracking = (boxIdAndBagsObj, userName, tempChecked, shipmentCourier) => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     let conversion = {
         '712278213': 'FedEx',
@@ -633,14 +625,14 @@ export const finalShipmentTracking = (hiddenJSON, userName, tempChecked, shipmen
     
  
     addEventNavBarShipment("navBarShippingDash", userName);
-    addEventNavBarTracking("returnToTracking", userName, hiddenJSON, tempChecked)
-    addEventNavBarTracking("navBarFinalizeShipment", userName, hiddenJSON, tempChecked)
-    if(Object.keys(hiddenJSON).length > 0){
-        document.getElementById('shippingHiddenTable').innerText = JSON.stringify(hiddenJSON)
+    addEventNavBarTracking("returnToTracking", userName, boxIdAndBagsObj, tempChecked)
+    addEventNavBarTracking("navBarFinalizeShipment", userName, boxIdAndBagsObj, tempChecked)
+    if(Object.keys(boxIdAndBagsObj).length > 0){
+        document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBagsObj)
     }
-    populateFinalCheck(hiddenJSON);
-    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', hiddenJSON, userName)
-    addEventCompleteShippingButton(hiddenJSON, userName, tempChecked, shipmentCourier);
+    populateFinalCheck(boxIdAndBagsObj);
+    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName)
+    addEventCompleteShippingButton(boxIdAndBagsObj, userName, tempChecked, shipmentCourier);
     addEventBackToSearch('navBarShippingDash');
     //addEventBackToSearch('navBarShippingDash');
     //addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
