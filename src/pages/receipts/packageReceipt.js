@@ -288,43 +288,6 @@ const confirmPackageReceipt = () => {
   }
 }
 
-const confirmPackageReceipt = () => {
-  const a = document.getElementById('confirmReceipt');
-  if (a) {
-    a.addEventListener('click',  () => { 
-      let obj = {};
-      let packageConditions = [];
-      const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
-      const onlyFedexCourierType = identifyCourierType(scannedBarcode);
-      if (onlyFedexCourierType === true) {
-        obj['scannedBarcode'] = scannedBarcode
-        for (let option of document.getElementById('packageCondition').options) {
-          if (option.selected) {packageConditions.push(option.value)}
-        }
-        obj[`${fieldMapping.packageCondition}`] = packageConditions;
-        if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode))) {  
-          obj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
-          obj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
-          obj[`${fieldMapping.siteShipmentDateReceived}`] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
-        } else { 
-          obj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
-          obj['dateReceived'] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
-          if(document.getElementById('collectionId').value) {
-            obj['collectionId'] = document.getElementById('collectionId').value;
-            obj['dateCollectionCard'] = document.getElementById('dateCollectionCard').value;
-            obj['timeCollectionCard'] = document.getElementById('timeCollectionCard').value;
-            document.getElementById('collectionCheckBox').checked === true ? 
-                obj['collectionCheckBox'] = true : obj['collectionCheckBox'] = false
-            obj['collectionComments'] = document.getElementById('collectionComments').value;
-          }    
-        }
-        window.removeEventListener("beforeunload",beforeUnloadMessage)
-        targetAnchorTagEl();
-        storePackageReceipt(obj);
-       } 
-    })
-  }
-}
 
 const identifyCourierType = (scannedBarcode) => {
  if (scannedBarcode.length === 12 || scannedBarcode.length > 12) {
