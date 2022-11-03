@@ -22,7 +22,7 @@ export const welcomeScreen = async (auth, route) => {
 
 const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
-    let isDev = !(location.host === urls.stage || location.host === urls.prod);
+    
     template += `
     <div id="alert_placeholder"></div>
         <div class="row align-center welcome-screen-div">
@@ -76,7 +76,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     document.getElementById('contentHeader').innerHTML = '';
     
     let dashboardSelector = document.getElementById('dashboardSelection');
-    if(dashboardSelector && !isDev) {
+    if(dashboardSelector && location.host === urls.prod) {
         dashboardSelector.disabled = true;
         dashboardSelector.selectedIndex = 2;
     }
