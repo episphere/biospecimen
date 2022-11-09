@@ -1404,6 +1404,8 @@ export const siteSpecificLocationToConceptId = {
   "DCAM": 777644826, 
   "Main Campus": 111111111,
   "Frederick": 222222222,
+  "HFH Livonia Research Clinic": 706927479,
+  "Weston": 813701399
 }
 
 export const nameToKeyObj = 
