@@ -1405,7 +1405,8 @@ export const siteSpecificLocationToConceptId = {
   "Main Campus": 111111111,
   "Frederick": 222222222,
   "HFH Livonia Research Clinic": 706927479,
-  "Weston": 813701399
+  "Weston": 813701399,
+  "Rockville": 333333333
 }
 
 export const nameToKeyObj = 
@@ -1447,6 +1448,7 @@ export const keyToLocationObj =
     886364332: "Henry Ford Health Pavilion",
     706927479: "HFH Livonia Research Clinic",
     813701399: "Weston",
+    333333333: "Rockville",
     589224449: "SF Cancer Center LL",
     111111111: "NIH",
     13:"NCI"
@@ -1648,7 +1650,7 @@ export const siteLocations = {
         'HFHS': [{location: 'HFH K-13 Research Clinic', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332},
                 {location: 'HFH Livonia Research Clinic', concept: 706927479}],
         'SFH': [{location: 'SF Cancer Center LL', concept: 589224449}],
-        'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}]
+        'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}, {location: 'NIH-3', concept: 333333333}]
     },
     'clinical': {
         'KPHI': [{location:'KPHI RRL', concept: 531313956}]
