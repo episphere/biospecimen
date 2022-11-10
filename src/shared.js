@@ -1254,9 +1254,9 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'Henry Ford Health System',
     contactInfo: {
       "HFHS":[{
-        "fullName":"Kathleen Dawson",
-        "email":"kdawson7@hfhs.org",
-        "phone":["248-910-6716"],
+        "fullName":"Attn Kirsti Autio",
+        "email":"kautio1@hfhs.org",
+        "phone":["313-876-7385"],
       }]
     },
   },
