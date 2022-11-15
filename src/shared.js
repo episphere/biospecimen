@@ -24,7 +24,7 @@ let api = '';
 if(location.host === urls.prod) api = 'https://api-myconnect.cancer.gov/biospecimen?';
 else if(location.host === urls.stage) api = 'https://api-myconnect-stage.cancer.gov/biospecimen?';
 else api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
-export const baseAPI = api;
+export const baseAPI = `http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?`;
 
 export const inactivityTime = () => {
     let time;
@@ -1188,7 +1188,6 @@ export const siteSpecificLocation = {
   "DCAM": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "Main Campus": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
   "Frederick": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
-  "Rockville": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
 }
 
 export const locationConceptIDToLocationMap = {
@@ -1398,16 +1397,7 @@ export const locationConceptIDToLocationMap = {
     contactInfo: {
       "NIH":[],
     },
-  },
-  333333333: {
-    siteSpecificLocation: 'Rockville',
-    siteAcronym: 'NIH',
-    siteCode: '13',
-    loginSiteName: 'National Cancer Institute',
-    contactInfo: {
-      "NIH":[],
-    },
-  },
+  }
 };
 
 export const conceptIdToSiteSpecificLocation = {
@@ -1427,7 +1417,6 @@ export const conceptIdToSiteSpecificLocation = {
   777644826: "DCAM",
   111111111: "Main Campus",
   222222222: "Frederick",
-  333333333: "Rockville"
 }
 
 export const siteSpecificLocationToConceptId = {
@@ -1447,7 +1436,6 @@ export const siteSpecificLocationToConceptId = {
   "Frederick": 222222222,
   "HFH Livonia Research Clinic": 706927479,
   "Weston": 813701399,
-  "Rockville": 333333333
 }
 
 export const nameToKeyObj = 
@@ -1489,7 +1477,6 @@ export const keyToLocationObj =
     886364332: "Henry Ford Health Pavilion",
     706927479: "HFH Livonia Research Clinic",
     813701399: "Weston",
-    333333333: "Rockville",
     589224449: "SF Cancer Center LL",
     111111111: "NIH",
     13:"NCI"
