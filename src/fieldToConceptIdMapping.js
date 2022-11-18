@@ -179,6 +179,9 @@ export default {
         urineCollectedTime: 541311218
     },
 
+    anySpecimenCollected: 316824786,
+    anySpecimenCollectedTime: 740582332,
+
     clinicalSite: {
         bloodCollected: 693370086
     }
