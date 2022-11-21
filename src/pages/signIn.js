@@ -13,7 +13,7 @@ export const signIn = () => {
         </br>
         </br>
         <form id="signInForm" class="inherit-width" method="POST">
-            Sign In using SSO(beta)
+            Sign In using SSO
             <div class="form-group">
                 <input class="form-control" autocomplete="off" required type="email" id="signInEmail" placeholder="Enter your organizational email Id">
                 </br><button type="submit" class="btn btn-outline-primary">Sign In</button>

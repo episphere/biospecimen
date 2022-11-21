@@ -994,6 +994,12 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
                 else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
                     settings[visit][conceptIds.clinicalDashboard.bloodCollected] = conceptIds.yes;
                     settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
+
+                    settings[visit][conceptIds.anySpecimenCollected] = conceptIds.yes;
+
+                    if(!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                        settings[visit][conceptIds.anySpecimenCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
+                    }
                 }
             }
         });
@@ -1011,6 +1017,12 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
                 else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
                     settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.yes;
                     settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
+
+                    settings[visit][conceptIds.anySpecimenCollected] = conceptIds.yes;
+
+                    if(!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                        settings[visit][conceptIds.anySpecimenCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
+                    }
                 }
             }
         });
