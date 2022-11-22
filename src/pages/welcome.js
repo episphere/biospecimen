@@ -22,7 +22,7 @@ export const welcomeScreen = async (auth, route) => {
 
 const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
-    
+
     template += `
     <div id="alert_placeholder"></div>
         <div class="row align-center welcome-screen-div">
@@ -74,12 +74,6 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     localStorage.setItem('siteAcronym',data.siteAcronym);
     localStorage.setItem('siteCode',data.siteCode);
     document.getElementById('contentHeader').innerHTML = '';
-    
-    let dashboardSelector = document.getElementById('dashboardSelection');
-    if(dashboardSelector && location.host === urls.prod) {
-        dashboardSelector.disabled = true;
-        dashboardSelector.selectedIndex = 2;
-    }
 
     document.getElementById('btnParticipantSearch') && document.getElementById('btnParticipantSearch').addEventListener('click', () => {
         removeAllErrors();
