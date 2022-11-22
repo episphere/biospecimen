@@ -15,6 +15,7 @@ export default {
     booleanOne: 353358909,
     verficationDate: 914594314,
     submitShipmentFlag: 145971562,
+    shipmentIsSubmitted: 145971562,
     shippingShipDateModify: 555611076,
     shippingTrackingNumber: 959708259,
     shippingBoxId: 132929440,
@@ -63,9 +64,32 @@ export default {
     healthcareProvider: 827220437,
     discardFlag: 762124027,
     deviationNotFound: 982885431,
+    clinicalDateTimeDrawn: 915838974,
 
+    // biospecimen collection
+    collection:{
+        id:820476880,
+        selectedVisit: 331584571,
+        note: 338570265,
+        isFinalized:410912345,
+        shipTime:556788178,
+        accessionId: 646899796,
+        collectionSetting: 650516960,
+        collectionTime: 678166505,
+        scannedTime: 915838974,
+        receivedDate: 926457119,
+        urineAccessNumber: 928693120,
+        tube:{
+            isCollected: 593843561,
+            isMissing: 258745303,
+            deviation: 248868659,
+            isDeviated: 678857215,
+            isDiscarded: 762124027,
+            scannedId: 825582494,
+            dateReceived: 926457119
+        },
+    },
 
-    
     // not shipped specimen deviation id
     brokenSpecimenDeviation: 472864016,
     discardSpecimenDeviation: 810960823,
@@ -111,6 +135,55 @@ export default {
     siteCode:789843387,
 
     collectionLocation: 951355211,
-    
+
+    modules: {
+        module1: {
+            status: 949302066
+        },
+        module2: {
+            status: 536735468
+        },
+        module3: {
+            status: 976570371
+        },
+        module4: {
+            status: 663265240
+        },
+
+        notStarted: 972455046,
+        started: 615768760,
+        submitted: 231311385
+    },
+
+    REASON_NOT_COLLECTED: 883732523,
+    REASONS: {
+        PARTICIPANT_REFUSAL: 681745422
+    },
+
+    baseline: {
+        visitId: 266600170,
+        bloodCollected: 878865966,
+        bloodCollectedTime: 561681068,
+        urineCollected: 167958071,
+        urineCollectedTime: 847159717,
+        mouthwashCollected: 684635302,
+        mouthwashCollectedTime: 448660695
+    },
+
+    collectionDetails: 173836415,
+
+    clinicalDashboard: {
+        bloodCollected: 534041351,
+        bloodCollectedTime: 398645039,
+        urineCollected: 210921343,
+        urineCollectedTime: 541311218
+    },
+
+    anySpecimenCollected: 316824786,
+    anySpecimenCollectedTime: 740582332,
+
+    clinicalSite: {
+        bloodCollected: 693370086
+    }
 };
 

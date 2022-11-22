@@ -1,8 +1,9 @@
-import { validateUser, siteFullNames, showAnimation, hideAnimation, errorMessage, removeAllErrors, urls } from "./../shared.js";
+import { validateUser, siteFullNames, showAnimation, hideAnimation, errorMessage, removeAllErrors, urls, searchSpecimen } from "./../shared.js";
 import { userDashboard } from "./dashboard.js";
 import { nonUserNavBar, unAuthorizedUser } from './../navbar.js'
 
 export const welcomeScreen = async (auth, route) => {
+
     const user = auth.currentUser;
     if(!user) return;
     console.log('userWelcome', user.email)
@@ -21,7 +22,7 @@ export const welcomeScreen = async (auth, route) => {
 
 const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
-    let isDev = !(location.host === urls.stage || location.host === urls.prod);
+
     template += `
     <div id="alert_placeholder"></div>
         <div class="row align-center welcome-screen-div">
@@ -73,12 +74,6 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     localStorage.setItem('siteAcronym',data.siteAcronym);
     localStorage.setItem('siteCode',data.siteCode);
     document.getElementById('contentHeader').innerHTML = '';
-    
-    let dashboardSelector = document.getElementById('dashboardSelection');
-    if(dashboardSelector && !isDev) {
-        dashboardSelector.disabled = true;
-        dashboardSelector.selectedIndex = 2;
-    }
 
     document.getElementById('btnParticipantSearch') && document.getElementById('btnParticipantSearch').addEventListener('click', () => {
         removeAllErrors();

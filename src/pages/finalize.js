@@ -19,7 +19,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 <div class="row"><h5>${data['996038075']}, ${data['399159511']}</h5></div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${specimenData['820476880']}</div>
-                <div class="row">Collection ID Link Date/Time: ${new Date(specimenData['678166505']).toLocaleString()}</div>
+                <div class="row">Collection ID Link Date/Time: ${getWorflow() === 'research' ? new Date(specimenData['678166505']).toLocaleString(): new Date(specimenData['915838974']).toLocaleString()}</div>
             </div>
             ${specimenData['331584571'] ? `
                 <div class="ml-auto form-group">
@@ -82,7 +82,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 </br>
                 <div class="form-group row">
                     <div class="col-auto">
-                        <button class="btn btn-outline-danger" type="button" data-connect-id="${data.Connect_ID}" id="returnToCollectProcess" data-master-specimen-id="${specimenData['820476880']}">${getWorflow() === 'research' ? 'Return to Collection Data Entry' : 'Return to Labeling and Scanning'}</button>
+                        <button class="btn btn-outline-danger" type="button" data-connect-id="${data.Connect_ID}" id="returnToCollectProcess" data-master-specimen-id="${specimenData['820476880']}">${getWorflow() === 'research' ? 'Return to Collection Data Entry' : 'Return to Collection Data Entry'}</button>
                     </div>
                     <div class="ml-auto">
                         <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['820476880']}" type="button" id="finalizedSaveExit">Exit</button>
