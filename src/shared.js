@@ -285,23 +285,6 @@ export const showNotifications = (data, error) => {
             </div>
         </div>
 `;
-
-    // const div = document.createElement('div');
-    // div.classList = ["notification"];
-    // div.innerHTML = `
-    //     <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
-    //         <div class="toast-header">
-    //             <strong class="mr-auto ${error ? 'error-heading': ''}">${data.title}</strong>
-    //             <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">&times;</button>
-    //         </div>
-    //         <div class="toast-body">
-    //             ${data.body}
-    //         </div>
-    //     </div>
-    // `
-    // document.getElementById('showNotification').appendChild(div);
-    // document.getElementsByClassName('container')[0].scrollIntoView(true);
-    // addEventHideNotification(div);
 }
 
 export const errorMessage = (id, msg, focus, offset) => {
@@ -1108,66 +1091,6 @@ export const updateBaselineData = async (siteTubesList, data) => {
         
     await updateParticipant(baselineData);
 }
-
-export const verifyPaymentEligibility = async (formData) => {
-
-    if(formData['130371375']['266600170']['731498909'] === 104430631) {
-        const responseCollections = await getParticipantCollections(formData.token);
-        const baselineCollections = responseCollections.data.filter(collection => collection['331584571'] === 266600170);
-
-        const incentiveEligible = await checkPaymentEligibility(formData, baselineCollections);
-
-        if(incentiveEligible) {
-            const incentiveData = {
-                '130371375.266600170.731498909': 353358909,
-                '130371375.266600170.222373868': formData['827220437'] === 809703864 ? 104430631 : 353358909,
-                '130371375.266600170.787567527': new Date().toISOString(),
-                uid: formData.state.uid
-            };
-
-            await updateParticipant(incentiveData);
-        } 
-    }
-}
-
-const checkPaymentEligibility = async (data, baselineCollections) => {
-  
-    if(baselineCollections.length === 0) return false;
-  
-    const module1 = (data[conceptIds.modules.module1.status] === conceptIds.modules.submitted);
-    const module2 = (data[conceptIds.modules.module2.status] === conceptIds.modules.submitted);
-    const module3 = (data[conceptIds.modules.module3.status] === conceptIds.modules.submitted);
-    const module4 = (data[conceptIds.modules.module4.status] === conceptIds.modules.submitted);
-
-    const bloodCollected = baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research 
-        ? (data[conceptIds.baseline.bloodCollected] === conceptIds.yes) 
-        : (data[conceptIds.baseline.bloodCollected] === conceptIds.yes) || (data[conceptIds.collectionDetails][conceptIds.baseline.visitId][conceptIds.clinicalSite.bloodCollected] === conceptIds.yes);
-
-    const tubes = baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research 
-        ? workflows.research.filter(tube => tube.tubeType === 'Blood tube') 
-        : workflows.clinical.filter(tube => tube.tubeType === 'Blood tube');
-  
-    let eligible = false;
-  
-    if(module1 && module2 && module3 && module4) {
-        if(bloodCollected) {
-            eligible = true;
-        }    
-        else {
-            baselineCollections.forEach(collection => {
-                if(collection[conceptIds.collection.collectionSetting] === conceptIds.research) {
-                    tubes.forEach(tube => {
-                        if(collection[tube.concept] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] != conceptIds.REASONS.PARTICIPANT_REFUSAL) {
-                            eligible = true;
-                        }
-                    });
-                }
-            });
-        }
-    }
-  
-    return eligible;
-  }
 
 export const siteFullNames = {
     'NCI': 'National Cancer Institute',
