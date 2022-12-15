@@ -3,8 +3,6 @@ import { addEventSpecimenLinkForm, addEventClinicalSpecimenLinkForm, addEventCli
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
 export const specimenTemplate = async (data, formData) => {
-    
-    
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenLink');
     navBarBtn.style.display = 'block';
@@ -36,7 +34,7 @@ export const specimenTemplate = async (data, formData) => {
 
         </br>`
 
-    template += `<form id="specimenLinkForm" method="POST" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">`;
+    template += `<div id="specimenLinkForm" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">`;
         
     if(workflow === 'research') {
         let visit = visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0];
@@ -149,13 +147,13 @@ export const specimenTemplate = async (data, formData) => {
             
         <div class="form-group row">
             <div class="col">
-                <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="clinicalSpecimenContinue">Submit</button>
+                <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" data-participant-name="${data['471168198']}" type="submit" id="clinicalSpecimenContinue">Submit</button>
             </div>
         </div>`
     }
 
     template += `
-        </form>
+        </div>
         </br>`;
 
     document.getElementById('contentBody').innerHTML = template;
