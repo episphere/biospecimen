@@ -1930,7 +1930,7 @@ export const addEventClinicalSpecimenLinkForm2 = (formData) => {
     
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        btnsClicked(connectId, formData, participantName);
+        btnsClicked(connectId, formData);
     });
 };
 
@@ -1964,7 +1964,7 @@ const existingCollectionAlert = async (collections, connectId, formData) => {
     }
 }
 
-const btnsClicked = async (connectId, formData, participantName) => { 
+const btnsClicked = async (connectId, formData) => { 
     removeAllErrors();
 
     let scanSpecimenID = document.getElementById('scanSpecimenID')?.value && document.getElementById('scanSpecimenID')?.value.toUpperCase();
