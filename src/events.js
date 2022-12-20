@@ -1917,9 +1917,8 @@ export const addEventSpecimenLinkForm = (formData) => {
 };
 
 export const addEventClinicalSpecimenLinkForm = (formData) => {
-    const form = document.getElementById('specimenLinkForm');
-    
-    form.addEventListener('submit', async (e) => {
+    const form = document.getElementById('clinicalSpecimenContinue');
+    form.addEventListener('click', async (e) => {
         e.preventDefault();
         clinicalBtnsClicked(formData);
     });
@@ -2104,6 +2103,7 @@ const clinicalBtnsClicked = async (formData) => {
 
     removeAllErrors();
     const connectId = document.getElementById('clinicalSpecimenContinue').dataset.connectId;
+    const participantName = document.getElementById('clinicalSpecimenContinue').dataset.participantName;
 
     const accessionID1 = document.getElementById('accessionID1');
     const accessionID2 = document.getElementById('accessionID2');
@@ -2189,6 +2189,34 @@ const clinicalBtnsClicked = async (formData) => {
                 },
                 confirm: {
                     text: "Yes",
+                    value: 'Yes',
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                    className: "btn btn-success",
+                }
+            },
+        });
+        
+    }
+
+    if (!hasError && confirmVal === 'Yes') {
+        confirmVal = await swal({
+            title: "Confirm Accession ID",
+            icon: "info",
+            text: `Blood Accession ID: ${accessionID2.value ? accessionID2.value : 'N/A' }
+            Urine Accession ID: ${accessionID4.value ? accessionID4.value : 'N/A' }
+            Confirm ID is correct for participant: ${participantName}`,
+            buttons: {
+                cancel: {
+                    text: "Cancel",
+                    value: "No",
+                    visible: true,
+                    className: "btn btn-default",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "Confirm & Continue",
                     value: 'Yes',
                     visible: true,
                     className: "",
@@ -2729,7 +2757,6 @@ export const addEventNavBarShipment = (id, userName) => {
 export const addEventShipPrintManifest = (id) => {
   const btn = document.getElementById(id)
   btn.addEventListener('click', e => {
-    console.log('clicked',e)
     window.print()
     if(e.target.classList.contains("print-manifest")) {
       e.target.classList.remove("print-manifest")
