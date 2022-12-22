@@ -1921,6 +1921,7 @@ export const addEventClinicalSpecimenLinkForm = (formData) => {
     form.addEventListener('click', async (e) => {
         e.preventDefault();
         clinicalBtnsClicked(formData);
+     //   yesTriggerModal()
     });
 };
 
@@ -2147,132 +2148,167 @@ const clinicalBtnsClicked = async (formData) => {
     }
 
     if (hasError) return;
-    let confirmVal = '';
+    let confirmVal = 'No';
 
     if (accessionID1 && accessionID1.value && accessionID3 && !accessionID3.value) {
-        confirmVal = await swal({
-            title: "Urine Accession Id is Missing",
-            icon: "info",
-            text: `You have not entered a Urine Accession Id. Do you want to continue?`,
-            buttons: {
-                cancel: {
-                    text: "No",
-                    value: "No",
-                    visible: true,
-                    className: "btn btn-default",
-                    closeModal: true,
-                },
-                confirm: {
-                    text: "Yes",
-                    value: 'Yes',
-                    visible: true,
-                    className: "",
-                    closeModal: true,
-                    className: "btn btn-success",
-                }
-            },
-        });
-    }
-
-    if (accessionID1 && !accessionID1.value && accessionID3 && accessionID3.value) {
-        confirmVal = await swal({
-            title: "Blood Accession Id is Missing",
-            icon: "info",
-            text: `You have not entered a Blood Accession Id. Do you want to continue?`,
-            buttons: {
-                cancel: {
-                    text: "No",
-                    value: "No",
-                    visible: true,
-                    className: "btn btn-default",
-                    closeModal: true,
-                },
-                confirm: {
-                    text: "Yes",
-                    value: 'Yes',
-                    visible: true,
-                    className: "",
-                    closeModal: true,
-                    className: "btn btn-success",
-                }
-            },
-        });
-        
-    }
-
-    if (!hasError && confirmVal === 'Yes') {
-        confirmVal = await swal({
-            title: "Confirm Accession ID",
-            icon: "info",
-            text: `Blood Accession ID: ${accessionID2.value ? accessionID2.value : 'N/A' }
-            Urine Accession ID: ${accessionID4.value ? accessionID4.value : 'N/A' }
-            Confirm ID is correct for participant: ${participantName}`,
-            buttons: {
-                cancel: {
-                    text: "Cancel",
-                    value: "No",
-                    visible: true,
-                    className: "btn btn-default",
-                    closeModal: true,
-                },
-                confirm: {
-                    text: "Confirm & Continue",
-                    value: 'Yes',
-                    visible: true,
-                    className: "",
-                    closeModal: true,
-                    className: "btn btn-success",
-                }
-            },
-        });
-        
-    }
-
-    if (confirmVal === 'No') return;
-
-    const bloodAccessionId = await checkAccessionId({accessionId: +accessionID1.value, accessionIdType: '646899796'});
+        const button = document.createElement('button');
+        button.dataset.target = '#biospecimenModal';
+        button.dataset.toggle = 'modal';
     
+        document.getElementById('root').appendChild(button);
+        button.click();
+        document.getElementById('root').removeChild(button);
+        const header = document.getElementById('biospecimenModalHeader');
+        const body = document.getElementById('biospecimenModalBody');
+        header.innerHTML = `Urine Accession Id is Missing`
+        let template =  `You have not entered a Urine Accession Id. Do you want to continue?`
+        template += `
+        <br />
+        <div style="display:inline-block; margin-top:20px;">
+            <button type="button" class="btn btn-primary" data-dismiss="modal" target="_blank"  data-toggle="modal"  href='#mymodal2'  id="yesTrigger">Yes</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank" id="noTrigger">NO</button>
+            </div>
+        </div>`
+        body.innerHTML = template;
+
+
+        const noBtn = document.getElementById('noTrigger')
+        noBtn.addEventListener("click", async e => {
+            confirmVal = 'No'
+        })
+
+        const yesBtn = document.getElementById('yesTrigger')
+        yesBtn.addEventListener("click", async e => {
+            confirmVal = 'Yes'
+            triggerConfirmationModal(accessionID2, accessionID4, participantName, hasError, confirmVal, selectedVisit, formData, connectId)
+        })
+
+    }
+    
+    
+    if (accessionID1 && !accessionID1.value && accessionID3 && accessionID3.value) {
+        const button = document.createElement('button');
+        button.dataset.target = '#biospecimenModal';
+        button.dataset.toggle = 'modal';
+    
+        document.getElementById('root').appendChild(button);
+        button.click();
+        document.getElementById('root').removeChild(button);
+        const header = document.getElementById('biospecimenModalHeader');
+        const body = document.getElementById('biospecimenModalBody');
+        header.innerHTML = `Blood Accession Id is Missing`
+        let template =  `You have not entered a Blood Accession Id. Do you want to continue?`
+        template += `
+        <br />
+        <div style="display:inline-block; margin-top:20px;">
+            <button type="button" class="btn btn-primary" data-dismiss="modal" target="_blank" id="yesTrigger">Yes</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank" id="noTrigger">NO</button>
+            </div>
+        </div>`
+        body.innerHTML = template;
+
+        const noBtn = document.getElementById('noTrigger')
+        noBtn.addEventListener("click", async e => {
+            confirmVal = 'No'
+        })
+
+        const yesBtn = document.getElementById('yesTrigger')
+        yesBtn.addEventListener("click", async e => {
+            confirmVal = 'Yes'
+            triggerConfirmationModal(accessionID2, accessionID4, participantName, hasError, confirmVal, selectedVisit, formData, connectId)
+        })
+    }
+
+    if (!hasError && accessionID2.value && accessionID4.value) {
+        confirmationModal(accessionID1, accessionID3, participantName, selectedVisit, formData, connectId)
+    }
+}
+
+const triggerConfirmationModal =  (accessionID2, accessionID4, participantName, hasError, confirmVal, selectedVisit, formData, connectId) => {
+    if (!hasError && confirmVal === 'Yes') {
+        confirmationModal(accessionID2, accessionID4, participantName, selectedVisit, formData, connectId)
+}}
+
+const confirmationModal = (accessionID2, accessionID4, participantName, selectedVisit, formData, connectId) => {
+    const button = document.createElement('button');
+    button.dataset.target = '#biospecimenModal1';
+    button.dataset.toggle = 'modal';
+    button.id = 'myModal2';
+    document.getElementById('root').appendChild(button);
+    button.click();
+    document.getElementById('root').removeChild(button);
+    const header = document.getElementById('biospecimenModalHeader1');
+    const body = document.getElementById('biospecimenModalBody1');
+    header.innerHTML = `Confirm Accession ID`
+    let template =  `Blood Accession ID: ${accessionID2.value ? accessionID2.value : 'N/A' }
+    Urine Accession ID: ${accessionID4.value ? accessionID4.value : 'N/A' }
+    Confirm ID is correct for participant: ${participantName}`
+    template += `
+    <br />
+    <div style="display:inline-block; margin-top:20px;">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" target="_blank" id="proceedNextPage">Confirm & Continue</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank" id="cancel">Cancel</button>
+        </div>
+    </div>`
+    body.innerHTML = template;
+    const noBtn = document.getElementById('cancel');
+    noBtn.addEventListener("click", async e => {
+        return
+    })
+
+    const yesBtn = document.getElementById('proceedNextPage');
+    yesBtn.addEventListener("click", async e => {
+        await proccedToSpecimenPage(accessionID2, accessionID4, selectedVisit, formData, connectId)
+    }) 
+}
+
+const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
+    const bloodAccessionId = {code: 200}
     if (bloodAccessionId.code === 200) {
         hideAnimation();
-        confirmVal = await swal({
-            title: "Existing Accession ID",
-            icon: "info",
-            text: `Accession ID entered is already assigned to Collection ID ${bloodAccessionId?.data?.[820476880]}. Choose an action`,
-            buttons: {
-                cancel: {
-                    text: "Cancel",
-                    value: "cancel",
-                    visible: true,
-                    className: "btn btn-default",
-                    closeModal: true,
-                },
-                confirm: {
-                    text: "Add Specimens to existing Collection ID",
-                    value: 'confirmed',
-                    visible: true,
-                    className: "",
-                    closeModal: true,
-                    className: "btn btn-success",
-                }
-            },
-        });
-    }
+        const button = document.createElement('button');
+        button.dataset.target = '#biospecimenModal';
+        button.dataset.toggle = 'modal';
+        document.getElementById('root').appendChild(button);
+        button.click();
+        document.getElementById('root').removeChild(button);
+        const header = document.getElementById('biospecimenModalHeader');
+        const body = document.getElementById('biospecimenModalBody');
+        header.innerHTML = `Existing Accession ID`
+        let template =  `Accession ID entered is already assigned to Collection ID ${bloodAccessionId?.data?.[820476880]}. Choose an action`
+        template += `
+        <br />
+        <div style="display:inline-block; margin-top:20px;">
+            <button type="button" class="btn btn-primary" data-dismiss="modal" target="_blank" id="addCollection">Add Specimens to existing Collection ID</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank" id="cancelSelection">Cancel</button>
+            </div>
+        </div>`
+        body.innerHTML = template;
+        const noBtn = document.getElementById('cancelSelection');
+        noBtn.addEventListener("click", async e => {
+            await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
+            return
+        })
 
-    if (confirmVal === "cancel") return;
+        const yesBtn = document.getElementById('addCollection');
+        yesBtn.addEventListener("click", async e => {
+            formData.collectionId = bloodAccessionId?.data?.[820476880];
+            btnsClicked(connectId, formData);
+            await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
+            return
+        }) 
+    }
+}
+
+const redirectSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
     if(accessionID1?.value) formData = {...formData, '646899796': +accessionID1.value || ''};
     if(accessionID3?.value) formData['928693120'] = +accessionID3.value || '';
     if(selectedVisit) formData['331584571'] =  +selectedVisit;
-    
-    if (confirmVal === "confirmed") {
-        formData.collectionId = bloodAccessionId?.data?.[820476880];
-        btnsClicked(connectId, formData);
-        return
-    }
-        let query = `connectId=${parseInt(connectId)}`;
-        const response = await findParticipant(query);
-        const data = response.data[0];
-        specimenTemplate(data, formData);
-    }
+    let query = `connectId=${parseInt(connectId)}`;
+    const response = await findParticipant(query);
+    const data = response.data[0];
+    specimenTemplate(data, formData);
+}
 
 export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     const collectionSaveExit = document.getElementById('collectionSave');
