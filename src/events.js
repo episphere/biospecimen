@@ -2263,7 +2263,7 @@ const confirmationModal = (accessionID2, accessionID4, participantName, selected
 }
 
 const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
-    const bloodAccessionId = {code: 200}
+    const bloodAccessionId = await checkAccessionId({accessionId: +accessionID1.value, accessionIdType: '646899796'});
     if (bloodAccessionId.code === 200) {
         hideAnimation();
         const button = document.createElement('button');
