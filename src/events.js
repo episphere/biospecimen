@@ -2165,7 +2165,7 @@ const clinicalBtnsClicked = async (formData) => {
         template += `
         <br />
         <div style="display:inline-block; margin-top:20px;">
-            <button type="button" class="btn btn-primary" data-dismiss="modal" target="_blank"  data-toggle="modal"  href='#mymodal2'  id="yesTrigger">Yes</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" target="_blank"  data-toggle="modal" id="yesTrigger">Yes</button>
             <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank" id="noTrigger">NO</button>
             </div>
         </div>`
@@ -2231,14 +2231,13 @@ const triggerConfirmationModal =  (accessionID2, accessionID4, participantName, 
 
 const confirmationModal = (accessionID2, accessionID4, participantName, selectedVisit, formData, connectId) => {
     const button = document.createElement('button');
-    button.dataset.target = '#biospecimenModal1';
+    button.dataset.target = '#modalShowMoreData';
     button.dataset.toggle = 'modal';
-    button.id = 'myModal2';
     document.getElementById('root').appendChild(button);
     button.click();
     document.getElementById('root').removeChild(button);
-    const header = document.getElementById('biospecimenModalHeader1');
-    const body = document.getElementById('biospecimenModalBody1');
+    const header = document.getElementById('modalHeader');
+    const body = document.getElementById('modalBody');
     header.innerHTML = `Confirm Accession ID`
     let template =  `Blood Accession ID: ${accessionID2.value ? accessionID2.value : 'N/A' }
     Urine Accession ID: ${accessionID4.value ? accessionID4.value : 'N/A' }

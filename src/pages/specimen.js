@@ -126,23 +126,23 @@ export const specimenTemplate = async (data, formData) => {
         template += `
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="accessionID1">Scan Blood Accession ID:</label>
-                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type in Accession ID from Blood Tube" id="accessionID1"/>
+                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type in Accession ID from Blood Tube" id="accessionID1" maxlength="11"/>
                 
                 <button class="barcode-input-clear" hidden="true" type="button" id="clearScanAccessionID" title="Clear scanned barcode" data-enable-input="accessionID2" data-barcode-input="accessionID1"><i class="fas fa-times"></i></button>
                 <div class="helper-text"><span class="form-helper-text offset-4">This entry can only contain numbers.</span></div>
             </div>
             <div class="form-group row">
-                <input autocomplete="off" type="text" class="form-control col-md-5 offset-4" placeholder="Re-Enter (scan/type) in Accession ID from Blood Tube" id="accessionID2"/>
+                <input autocomplete="off" type="text" class="form-control col-md-5 offset-4" placeholder="Re-Enter (scan/type) in Accession ID from Blood Tube" id="accessionID2" maxlength="11"/>
             </div>
             </br>
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="accessionID3">Scan Urine Accession ID:</label>
-                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type in Accession ID from Urine Tube" id="accessionID3"/>
+                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type in Accession ID from Urine Tube" id="accessionID3" maxlength="11"/>
                 
                 <button class="barcode-input-clear" hidden="true" type="button" id="clearScanAccessionID" title="Clear scanned barcode" data-enable-input="accessionID4" data-barcode-input="accessionID3"><i class="fas fa-times"></i></button>
             </div>
             <div class="form-group row">
-                <input autocomplete="off" type="text" class="form-control col-md-5 offset-4" placeholder="Re-Enter (scan/type) in Accession ID from Urine Tube" id="accessionID4"/>
+                <input autocomplete="off" type="text" class="form-control col-md-5 offset-4" placeholder="Re-Enter (scan/type) in Accession ID from Urine Tube" id="accessionID4"maxlength="11"/>
             </div>
             
         <div class="form-group row">
@@ -174,6 +174,26 @@ export const specimenTemplate = async (data, formData) => {
         addEventClinicalSpecimenLinkForm2(formData);
     } 
     else {//clinical specimen page 1
+
+        document.getElementById('accessionID1').addEventListener('keyup', e => {
+            if (document.getElementById('accessionID1').value.length === 11) {
+                console.log('123423')
+                document.getElementById('accessionID2').focus();
+            }
+        })
+
+        document.getElementById('accessionID2').addEventListener('keyup', e => {
+            if (document.getElementById('accessionID2').value.length === 11) {
+                document.getElementById('accessionID3').focus();
+            }
+        })
+
+        document.getElementById('accessionID3').addEventListener('keyup', e => {
+            if (document.getElementById('accessionID3').value.length === 11) {
+                document.getElementById('accessionID4').focus();
+            }
+        })
+
         document.getElementById('accessionID2').onpaste = e => e.preventDefault();
         document.getElementById('accessionID4').onpaste = e => e.preventDefault();
 
