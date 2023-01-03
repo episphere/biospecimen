@@ -2338,14 +2338,23 @@ export const addEventBiospecimenCollectionFormToggles = () => {
             if (selectionData.tubeType === 'Blood tube' || selectionData.tubeType === 'Urine') {
                 const biohazardBagChkb = document.getElementById(`787237543`);
                 const biohazardBagText = document.getElementById(`787237543Id`);
+                const allTubesCollected = Array.from(document.querySelectorAll('.tube-collected'))
+                const allBloodUrineCheckedArray = allTubesCollected.filter(
+                    item => (item.getAttribute("data-tube-type") === "Blood tube" && item.checked) || (item.getAttribute("data-tube-type") === "Urine" && item.checked)
+                );
+               
                 if (collected.checked) {
                     biohazardBagChkb.checked = true;
                     biohazardBagText.disabled = false;
-                } else {
+                } 
+                else if(collected.checked === false && biohazardBagChkb.checked === true && allBloodUrineCheckedArray.length) {
+                    biohazardBagChkb.checked = true
+                    biohazardBagText.disabled = false;
+                }
+                else {
                     biohazardBagChkb.checked = false;
                     biohazardBagText.disabled = true;
                 }
-        
             }
         });
     });
