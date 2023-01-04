@@ -2298,10 +2298,10 @@ const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, 
                 await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
                 return
             }) 
-    } 
-    else {
-        await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
-        return
+        }
+        else {
+            await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
+            return
         }
     }
 }
