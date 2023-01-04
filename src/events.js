@@ -2264,42 +2264,46 @@ const confirmationModal = (accessionID2, accessionID4, participantName, selected
 
 const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
     const bloodAccessionId = await checkAccessionId({accessionId: +accessionID1.value, accessionIdType: '646899796'});
-    if (bloodAccessionId.data) {
-        hideAnimation();
-        const button = document.createElement('button');
-        button.dataset.target = '#biospecimenModal';
-        button.dataset.toggle = 'modal';
-        document.getElementById('root').appendChild(button);
-        button.click();
-        document.getElementById('root').removeChild(button);
-        const header = document.getElementById('biospecimenModalHeader');
-        const body = document.getElementById('biospecimenModalBody');
-        header.innerHTML = `Existing Accession ID`
-        let template =  `Accession ID entered is already assigned to Collection ID ${bloodAccessionId?.data?.[820476880]}. Choose an action`
-        template += `
-        <br />
-        <div style="display:inline-block; margin-top:20px;">
-            <button type="button" class="btn btn-primary" data-dismiss="modal" target="_blank" id="addCollection">Add Specimens to existing Collection ID</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank" id="cancelSelection">Cancel</button>
-            </div>
-        </div>`
-        body.innerHTML = template;
-        const noBtn = document.getElementById('cancelSelection');
-        noBtn.addEventListener("click", async e => {
-            await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
-            return
-        })
+    console.log('bl', bloodAccessionId) 
+    if (bloodAccessionId.code == 200) {
+        if (bloodAccessionId.data) {
+            hideAnimation();
+            const button = document.createElement('button');
+            button.dataset.target = '#biospecimenModal';
+            button.dataset.toggle = 'modal';
+            document.getElementById('root').appendChild(button);
+            button.click();
+            document.getElementById('root').removeChild(button);
+            const header = document.getElementById('biospecimenModalHeader');
+            const body = document.getElementById('biospecimenModalBody');
+            header.innerHTML = `Existing Accession ID`
+            let template =  `Accession ID entered is already assigned to Collection ID ${bloodAccessionId?.data?.[820476880]}. Choose an action`
+            template += `
+            <br />
+            <div style="display:inline-block; margin-top:20px;">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" target="_blank" id="addCollection">Add Specimens to existing Collection ID</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank" id="cancelSelection">Cancel</button>
+                </div>
+            </div>`
+            body.innerHTML = template;
+            const noBtn = document.getElementById('cancelSelection');
+            noBtn.addEventListener("click", async e => {
+                await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
+                return
+            })
 
-        const yesBtn = document.getElementById('addCollection');
-        yesBtn.addEventListener("click", async e => {
-            formData.collectionId = bloodAccessionId?.data?.[820476880];
-            btnsClicked(connectId, formData); // needs code reformat/enhancement
-            await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
-            return
-        }) 
-    } else if (bloodAccessionId.message === 'AccessionId doesn\'t exist!'){
+            const yesBtn = document.getElementById('addCollection');
+            yesBtn.addEventListener("click", async e => {
+                formData.collectionId = bloodAccessionId?.data?.[820476880];
+                btnsClicked(connectId, formData); // needs code reformat/enhancement
+                await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
+                return
+            }) 
+    } 
+    else {
         await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
         return
+        }
     }
 }
 
