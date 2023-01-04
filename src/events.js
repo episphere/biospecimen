@@ -1929,7 +1929,7 @@ export const addEventClinicalSpecimenLinkForm2 = (formData) => {
     const form = document.getElementById('clinicalSpecimenContinueTwo');
     const connectId = document.getElementById('clinicalSpecimenContinueTwo').dataset.connectId;
     
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('click', async (e) => {
         e.preventDefault();
         btnsClicked(connectId, formData);
     });
@@ -2264,7 +2264,7 @@ const confirmationModal = (accessionID2, accessionID4, participantName, selected
 
 const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
     const bloodAccessionId = await checkAccessionId({accessionId: +accessionID1.value, accessionIdType: '646899796'});
-    if (bloodAccessionId.message === 'AccessionId exists!') {
+    if (bloodAccessionId.data) {
         hideAnimation();
         const button = document.createElement('button');
         button.dataset.target = '#biospecimenModal';
@@ -2293,7 +2293,7 @@ const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, 
         const yesBtn = document.getElementById('addCollection');
         yesBtn.addEventListener("click", async e => {
             formData.collectionId = bloodAccessionId?.data?.[820476880];
-           // btnsClicked(connectId, formData);
+            btnsClicked(connectId, formData); // needs to reformat
             await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
             return
         }) 
