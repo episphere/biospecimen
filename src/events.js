@@ -2239,8 +2239,8 @@ const confirmationModal = (accessionID2, accessionID4, participantName, selected
     const header = document.getElementById('modalHeader');
     const body = document.getElementById('modalBody');
     header.innerHTML = `Confirm Accession ID`
-    let template =  `Blood Accession ID: ${accessionID2.value ? accessionID2.value : 'N/A' }
-    Urine Accession ID: ${accessionID4.value ? accessionID4.value : 'N/A' }
+    let template =  `Blood Accession ID: ${accessionID2.value ? accessionID2.value : 'N/A' } <br />
+    Urine Accession ID: ${accessionID4.value ? accessionID4.value : 'N/A' } <br />
     Confirm ID is correct for participant: ${participantName}`
     template += `
     <br />
@@ -2292,7 +2292,7 @@ const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, 
         const yesBtn = document.getElementById('addCollection');
         yesBtn.addEventListener("click", async e => {
             formData.collectionId = bloodAccessionId?.data?.[820476880];
-            btnsClicked(connectId, formData);
+           // btnsClicked(connectId, formData);
             await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
             return
         }) 
