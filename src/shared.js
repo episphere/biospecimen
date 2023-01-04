@@ -453,7 +453,7 @@ export const checkAccessionId = async (data) => {
         },
         body: JSON.stringify(data)
     }
-    const response = await fetch(`http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=accessionIdExists`, requestObj);
+    const response = await fetch(`${api}api=accessionIdExists`, requestObj);
     return response.json();
 }
 
@@ -1811,7 +1811,6 @@ export const getCollectionsByVisit = async (data) => {
 export const getCollectionById = async (data, collectionId) => {
 
     const response = await getParticipantCollections(data.token);
-    console.log("response", response)
     let collectionExists = false;
     if(response.code != 404) {
         collectionExists = response.data.some(col => col.id === collectionId)

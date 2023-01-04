@@ -177,7 +177,6 @@ export const specimenTemplate = async (data, formData) => {
 
         document.getElementById('accessionID1').addEventListener('keyup', e => {
             if (document.getElementById('accessionID1').value.length === 11) {
-                console.log('123423')
                 document.getElementById('accessionID2').focus();
             }
         })
