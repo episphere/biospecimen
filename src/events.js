@@ -2264,7 +2264,6 @@ const confirmationModal = (accessionID2, accessionID4, participantName, selected
 
 const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
     const bloodAccessionId = await checkAccessionId({accessionId: +accessionID1.value, accessionIdType: '646899796'});
-    console.log('bl', bloodAccessionId) 
     if (bloodAccessionId.code == 200) {
         if (bloodAccessionId.data) {
             hideAnimation();
