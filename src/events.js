@@ -2230,7 +2230,6 @@ const triggerConfirmationModal =  (accessionID2, accessionID4, participantName, 
 }}
 
 const confirmationModal = (accessionID2, accessionID4, participantName, selectedVisit, formData, connectId) => {
-    console.log('sss', accessionID2.value)
     const button = document.createElement('button');
     button.dataset.target = '#modalShowMoreData';
     button.dataset.toggle = 'modal';
@@ -2265,7 +2264,6 @@ const confirmationModal = (accessionID2, accessionID4, participantName, selected
 
 const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
     const bloodAccessionId = await checkAccessionId({accessionId: +accessionID1.value, accessionIdType: '646899796'});
-    console.log('bloodAccessionId', bloodAccessionId)
     if (bloodAccessionId.message === 'AccessionId exists!') {
         hideAnimation();
         const button = document.createElement('button');
