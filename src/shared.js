@@ -453,7 +453,7 @@ export const checkAccessionId = async (data) => {
         },
         body: JSON.stringify(data)
     }
-    const response = await fetch(`http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=accessionIdExists`, requestObj);
+    const response = await fetch(`${api}api=accessionIdExists`, requestObj);
     return response.json();
 }
 

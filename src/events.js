@@ -2293,7 +2293,7 @@ const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, 
         const yesBtn = document.getElementById('addCollection');
         yesBtn.addEventListener("click", async e => {
             formData.collectionId = bloodAccessionId?.data?.[820476880];
-            btnsClicked(connectId, formData); // needs to reformat
+            btnsClicked(connectId, formData); // needs code reformat/enhancement
             await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
             return
         }) 
