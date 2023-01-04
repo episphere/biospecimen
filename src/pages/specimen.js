@@ -79,7 +79,7 @@ export const specimenTemplate = async (data, formData) => {
 
             <div class="form-group row">
                 <div class="col">
-                    <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Submit</button>
+                    <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="researchSpecimenContinue">Submit</button>
                 </div>
             </div>`;
 
@@ -107,7 +107,7 @@ export const specimenTemplate = async (data, formData) => {
 
                         <div class="form-group row">
                             <div class="col">
-                                <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Submit</button>
+                                <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="clinicalSpecimenContinueTwo">Submit</button>
                             </div>
                         </div>`
     } 
