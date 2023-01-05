@@ -174,24 +174,10 @@ export const specimenTemplate = async (data, formData) => {
         addEventClinicalSpecimenLinkForm2(formData);
     } 
     else {//clinical specimen page 1
+        autoTabInputField('accessionID1', 'accessionID2')
+        autoTabInputField('accessionID2', 'accessionID3')
+        autoTabInputField('accessionID3', 'accessionID4')
 
-        document.getElementById('accessionID1').addEventListener('keyup', e => {
-            if (document.getElementById('accessionID1').value.length === 11) {
-                document.getElementById('accessionID2').focus();
-            }
-        })
-
-        document.getElementById('accessionID2').addEventListener('keyup', e => {
-            if (document.getElementById('accessionID2').value.length === 11) {
-                document.getElementById('accessionID3').focus();
-            }
-        })
-
-        document.getElementById('accessionID3').addEventListener('keyup', e => {
-            if (document.getElementById('accessionID3').value.length === 11) {
-                document.getElementById('accessionID4').focus();
-            }
-        })
 
         document.getElementById('accessionID2').onpaste = e => e.preventDefault();
         document.getElementById('accessionID4').onpaste = e => e.preventDefault();
@@ -204,4 +190,12 @@ export const specimenTemplate = async (data, formData) => {
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventBackToSearch('navBarSearch');
     addEventNavBarParticipantCheckIn();
+}
+
+const autoTabInputField = ( inputFieldSource, inputFieldDestination ) => {
+    document.getElementById(inputFieldSource).addEventListener('keyup', e => {
+        if (e.key === 'Enter') {
+            document.getElementById(inputFieldDestination).focus();
+        }
+    })
 }
