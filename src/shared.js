@@ -958,6 +958,8 @@ export const getUpdatedParticipantData = async (data) => {
 
 export const updateCollectionSettingData = async (biospecimenData, tubes, data) => {
     
+    data = await getUpdatedParticipantData(data);
+
     let settings;
     let visit = biospecimenData[conceptIds.collection.selectedVisit];
 
@@ -1049,6 +1051,8 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
 }
 
 export const updateBaselineData = async (siteTubesList, data) => {
+
+    data = await getUpdatedParticipantData(data);
 
     const response = await getParticipantCollections(data.token);
     const baselineCollections = response.data.filter(collection => collection['331584571'] === 266600170);

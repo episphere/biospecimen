@@ -2661,16 +2661,17 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
     const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
 
     await updateCollectionSettingData(biospecimenData, siteTubesList, formData);
-    formData = await getUpdatedParticipantData(formData);
 
     if(baselineVisit && clinicalResearchSetting) {
         await updateBaselineData(siteTubesList, formData);
-        formData = await getUpdatedParticipantData(formData);
     }
 
-    await checkDerivedVariables(formData["token"]);
+    await checkDerivedVariables({"token": formData["token"]});
 
     if (cntd) {
+
+        formData = await getUpdatedParticipantData(formData);
+
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
         finalizeTemplate(formData, specimenData);
