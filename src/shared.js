@@ -471,6 +471,20 @@ export const updateSpecimen = async (array) => {
     return response.json();
 }
 
+export const checkDerivedVariables = async (array) => {
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(array)
+    }
+    const response = await fetch(`${api}api=checkDerivedVariables`, requestObj);
+    return response.json();
+}
+
 export const addBox = async (box) =>{
     const idToken = await getIdToken();
     let requestObj = {
