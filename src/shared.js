@@ -689,7 +689,7 @@ export const convertToFirestoreBox = (inputBox) => {
   for (let k of keysToRomove) {
     if (outputBox[k]) delete outputBox[k];
   }
-
+  console.log('outputBox', outputBox)
   return outputBox;
 };
 
