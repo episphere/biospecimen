@@ -2087,6 +2087,7 @@ const btnsClicked = async (connectId, formData) => {
     const biospecimenData = (await searchSpecimen(formData?.collectionId || formData['820476880'])).data;
     await createTubesForCollection(formData, biospecimenData);
     
+    // if 'clinical', check email trigger based on visit selection (331584571)
     if(formData['650516960'] === 664882224) {
         await checkSurveyEmailTrigger(data, formData['331584571']);
     }

@@ -9,7 +9,6 @@ export const specimenTemplate = async (data, formData) => {
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
 
-    // get rid of all this
     const isSpecimenLinkForm2 = !!formData;
     formData = formData ? formData : {};
     formData['siteAcronym'] = getSiteAcronym();
@@ -122,7 +121,7 @@ export const specimenTemplate = async (data, formData) => {
                 })
 
                 template += `</select>`;
-    template +=`</div>`
+        template += `</div>`;
         template += `
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="accessionID1">Scan Blood Accession ID:</label>

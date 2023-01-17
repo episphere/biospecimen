@@ -2170,6 +2170,7 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
     let sendBaselineEmail = false;
 
     if(response.code != 404) {
+        // filter based on visit type (331584571) match and collection type as 'clinical' (664882224)
         const collections = response.data.filter(res => res['331584571'] == visitType && res['650516960'] == 664882224);
 
         if(collections.length == 1) sendBaselineEmail = true;

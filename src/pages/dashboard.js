@@ -70,9 +70,8 @@ export const searchTemplate = (goToSpecimenSearch) => {
                         </div>
                     </form>
                 </div>
-                ${contentBody.dataset.workflow && contentBody.dataset.workflow === 'clinical' ? `
-                    
-                `:`
+                ${contentBody.dataset.workflow && contentBody.dataset.workflow === 'clinical' ? ``
+                :`
                     <div class="row form-row">
                         <form id="search2" method="POST">
                             <div class="form-group">
