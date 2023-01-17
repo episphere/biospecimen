@@ -68,7 +68,7 @@ export const startShipping = async (userName) => {
         const boxId = box[conceptIds.shippingBoxId];
         allBoxIdAndBagsObj[boxId] = box['bags']
     }
-
+    console.log("🚀 response.data", response.data)
     let template = `
         <div id="shippingHiddenTable" style="display:none">
         {}
