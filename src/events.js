@@ -1337,8 +1337,8 @@ const addNewBox = async (userName) => {
         }
 
     }
-    console.log("🚀 ~ file: events.js:1338 ~ addNewBox ~ largestOverall", largestOverall)
-    console.log("🚀 ~ file: events.js:1339 ~ addNewBox ~ largestLocationIndex", largestLocationIndex)
+    console.log("🚀 ~ file: events.js:1340 ~ addNewBox ~ largestOverall", largestOverall)
+    console.log("🚀 ~ file: events.js:1341 ~ addNewBox ~ largestLocationIndex", largestLocationIndex)
     if (largestLocationIndex != -1) {
       // find index of largest box and assign boxid
         let lastBox = boxList[largeIndex]['132929440']
@@ -1356,9 +1356,9 @@ const addNewBox = async (userName) => {
             toPass['bags'] = {};
             toPass['560975149'] = pageLocationConversion;
             toPass['789843387'] = loginSite
-            console.log("🚀 ~ file: events.js:1357 ~ addNewBox ~ toPass", toPass)
+            console.log("🚀 ~ file: events.js:1359 ~ addNewBox ~ toPass", toPass)
             await addBox(toPass);
-
+            console.log("🚀 ~ file: events.js:1361 ~ addNewBox ~ await addBox(toPass)", await addBox(toPass))
             boxList.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocationConversion })
             let boxJSONS = boxList;
 
@@ -1396,6 +1396,7 @@ const addNewBox = async (userName) => {
         toPass['789843387'] = loginSite;
         console.log("🚀 ~ file: events.js:1395 ~ addNewBox ~ toPass (First Box#)", toPass)
         await addBox(toPass);
+        console.log("🚀 ~ file: events.js:1399 ~ addNewBox ~ await addBox(toPass);", await addBox(toPass);)
         boxList.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocationConversion })
         let boxJSONS = boxList;
 
