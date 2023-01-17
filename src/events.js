@@ -1317,8 +1317,10 @@ const addNewBox = async (userName) => {
     console.log("🚀 ~ file: events.js:1317 ~ addNewBox ~ largestLocationIndex", largestLocationIndex)
     let pageLocation = document.getElementById('selectLocationList').value;
 
-    let pageLocationConversion = siteSpecificLocationToConceptId[pageLocation]; // 145191545
-    let loginSite = siteSpecificLocation[pageLocation]["siteCode"] // 145191545
+    let pageLocationConversion = siteSpecificLocationToConceptId[pageLocation];
+    console.log("🚀 ~ file: events.js:1321 ~ addNewBox ~ pageLocationConversion", pageLocationConversion)
+    let loginSite = siteSpecificLocation[pageLocation]["siteCode"]
+    console.log("🚀 ~ file: events.js:1323 ~ addNewBox ~ loginSite", loginSite)
     // loop through entire hiddenJSON and determine the largest boxid number
     // hiddenJSON includes in process and shipped boxes
     for (let i = 0; i < boxList.length; i++) {
