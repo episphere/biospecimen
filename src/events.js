@@ -1396,7 +1396,7 @@ const addNewBox = async (userName) => {
         toPass['789843387'] = loginSite;
         console.log("🚀 ~ file: events.js:1395 ~ addNewBox ~ toPass (First Box#)", toPass)
         await addBox(toPass);
-        console.log("🚀 ~ file: events.js:1399 ~ addNewBox ~ await addBox(toPass);", await addBox(toPass);)
+        console.log("🚀 ~ file: events.js:1399 ~ addNewBox ~ await addBox(toPass);", await addBox(toPass))
         boxList.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocationConversion })
         let boxJSONS = boxList;
 
