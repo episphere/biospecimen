@@ -1396,7 +1396,7 @@ export const locationConceptIDToLocationMap = {
     },
   },
   467088902: {
-    siteSpecificLocation: '"Fargo South University',
+    siteSpecificLocation: 'Fargo South University',
     siteAcronym: 'SFH',
     siteCode: '657167265',
     loginSiteName: 'Sanford Health',
