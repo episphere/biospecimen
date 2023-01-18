@@ -1,4 +1,4 @@
-import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode, searchSpecimen, collectionInputValidator, addSelectionEventListener } from "./../shared.js";
+import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorkflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode, searchSpecimen, collectionInputValidator, addSelectionEventListener } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventClinicalSpecimenLinkForm, addEventClinicalSpecimenLinkForm2, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
@@ -14,7 +14,7 @@ export const specimenTemplate = async (data, formData) => {
     formData['siteAcronym'] = getSiteAcronym();
     formData['827220437'] = parseInt(getSiteCode());
 
-    const workflow = getWorflow() ?? localStorage.getItem('workflow');
+    const workflow = getWorkflow() ?? localStorage.getItem('workflow');
     const locationSelection = JSON.parse(localStorage.getItem('selections'))?.specimenLink_location;
 
     let template = `

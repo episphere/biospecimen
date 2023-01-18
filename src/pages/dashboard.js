@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, validateUser, addEventBarCodeScanner, allStates, getWorflow, isDeviceMobile, replaceDateInputWithMaskedInput, checkedIn, verificationConversion } from "./../shared.js"
+import { userAuthorization, removeActiveClass, validateUser, addEventBarCodeScanner, allStates, getWorkflow, isDeviceMobile, replaceDateInputWithMaskedInput, checkedIn, verificationConversion } from "./../shared.js"
 import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment, addEventClearAll } from "./../events.js";
 import { homeNavBar, bodyNavBar, unAuthorizedUser } from '../navbar.js';
 
@@ -169,7 +169,7 @@ export const searchResults = (result) => {
                         <th>Verification Status</th>
                         <th>Participation Status</th>
                         <th></th>
-                        ${getWorflow() === 'research' ? '<th></th>' : ''}
+                        ${getWorkflow() === 'research' ? '<th></th>' : ''}
                         <th></th>
                     </tr>
                 </thead>
@@ -190,7 +190,7 @@ export const searchResults = (result) => {
             <td>${data['912301837'] === 208325815 || data['912301837'] === 622008261 || data['912301837'] === 458508122 ? `<i class="fas fa-2x fa-check"></i>` :  `<i class="fas fa-2x fa-times"></i>`}</td>`;
 
         const isCheckedIn = checkedIn(data);
-        if (getWorflow() === 'research') {
+        if (getWorkflow() === 'research') {
         template += `
             <tr>
                 ${tdTemplate}
@@ -202,7 +202,7 @@ export const searchResults = (result) => {
                 </td>
             </tr>
         `
-        } else if (getWorflow() === 'clinical') {
+        } else if (getWorkflow() === 'clinical') {
             template += `
             <tr>
                 ${tdTemplate}
