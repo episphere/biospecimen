@@ -1753,33 +1753,21 @@ export const addGoToCheckInEvent = () => {
 };
 
 export const addGoToSpecimenLinkEvent = () => {
-    // For research
-    const researchSpecimenLinkButtons = document.querySelectorAll('[data-specimen-link-connect-id]');
-    Array.from(researchSpecimenLinkButtons).forEach((btn) => {
-        btn.addEventListener('click', async () => {
+    const workflow = getWorkflow();
 
+    if (workflow === 'research' || workflow === 'clinical') {
+        const specimenLinkButtons = document.querySelectorAll('button[data-specimen-link-connect-id]');
+
+        for (const btn of specimenLinkButtons) {
+            btn.addEventListener('click', async () => {
             let query = `connectId=${parseInt(btn.dataset.specimenLinkConnectId)}`;
-        
             const response = await findParticipant(query);
             const data = response.data[0];
     
             specimenTemplate(data);
-        });
-    });
-
-    //For Clinical
-    const clinicalSpecimenLinkButtons = document.querySelectorAll('[data-clinical-specimen-link-connect-id]');
-    Array.from(clinicalSpecimenLinkButtons).forEach((btn) => {
-        btn.addEventListener('click', async () => {
-
-            let query = `connectId=${parseInt(btn.dataset.clinicalSpecimenLinkConnectId)}`;
-        
-            const response = await findParticipant(query);
-            const data = response.data[0];
-    
-            specimenTemplate(data);
-        });
-    });
+            });
+        }
+    }
 };
 
 export const addEventCheckInCompleteForm = (isCheckedIn) => {

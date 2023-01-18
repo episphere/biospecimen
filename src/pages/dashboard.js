@@ -207,7 +207,7 @@ export const searchResults = (result) => {
             <tr>
                 ${tdTemplate}
                 <td>
-                    <button class="btn btn-outline-primary text-nowrap" data-clinical-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>
+                    <button class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>
                 </td>
             </tr>
         ` 
