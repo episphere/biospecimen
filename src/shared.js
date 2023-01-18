@@ -17,7 +17,28 @@ export const urls = {
     'prod': 'biospecimen-myconnect.cancer.gov'
 }
 
-export const appState = {};
+/**
+ * Creates a store object with setState and getState methods
+ * @param {object} [initialState={}] -initial state of the store
+ */
+function createStore(initialState = {}) {
+    let state = JSON.parse(JSON.stringify(initialState));
+  
+    /** @param {object | function} update - an object or a function to update state */
+    const setState = (update) => {
+      const currSlice = typeof update === 'function' ? update(state) : update;
+      if (currSlice !== state) {
+        state = { ...state, ...currSlice };
+      }
+    };
+  
+    /** @return {object}  */
+    const getState = () => state;
+  
+    return { setState, getState };
+  }
+
+export const appState = createStore();
 
 let api = '';
 
