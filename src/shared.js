@@ -2186,6 +2186,7 @@ export function addSelectionEventListener(elemId, pageAndElement) {
 }
 
 export const checkSurveyEmailTrigger = async (data, visitType) => {
+    console.log("🚀 ~ file: shared.js:2189 ~ data", data)
     
     const response = await getParticipantCollections(data.token);
     let sendBaselineEmail = false;
@@ -2193,6 +2194,7 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
     if(response.code != 404) {
         // filter based on visit type (331584571) match and collection type as 'clinical' (664882224)
         const collections = response.data.filter(res => res['331584571'] == visitType && res['650516960'] == 664882224);
+        console.log("🚀 ~ file: shared.js:2197 ~ collections", collections)
 
         if(collections.length == 1) sendBaselineEmail = true;
     } 
@@ -2211,6 +2213,6 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
             read: false
         };
         
-        await(sendClientEmail(emailData));
+        await sendClientEmail(emailData);
     }
 }

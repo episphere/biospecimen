@@ -1915,7 +1915,7 @@ export const addEventClinicalSpecimenLinkForm = (formData) => {
 
 export const addEventClinicalSpecimenLinkForm2 = (formData) => {
     const form = document.getElementById('clinicalSpecimenContinueTwo');
-    const connectId = document.getElementById('clinicalSpecimenContinueTwo').dataset.connectId;
+    const connectId = form.dataset.connectId;
     
     form.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -2001,7 +2001,7 @@ const btnsClicked = async (connectId, formData) => {
         confirmVal = await swal({
             title: "Confirm Collection ID",
             icon: "info",
-            text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n || ""}`,
+            text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n}`,
             buttons: {
                 cancel: {
                     text: "Cancel",
@@ -2030,19 +2030,21 @@ const btnsClicked = async (connectId, formData) => {
 
     if (confirmVal === "cancel") return;
 
+    // todo: handle "back" case, or remove the button.
+
     formData['820476880'] = collectionID;
     formData['650516960'] = getWorkflow() === 'research' ? 534621077 : 664882224;
     formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
     formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
     
-    let bloodAccessionId = formData?.['646899796'];
-    if (bloodAccessionId) {
-        formData['646899796'] = bloodAccessionId;
-    }
-    let urineAccessionId = formData?.['928693120'];
-    if (urineAccessionId) {
-        formData['928693120'] = urineAccessionId;
-    }
+    // let bloodAccessionId = formData?.['646899796'];
+    // if (bloodAccessionId) {
+    //     formData['646899796'] = bloodAccessionId;
+    // }
+    // let urineAccessionId = formData?.['928693120'];
+    // if (urineAccessionId) {
+    //     formData['928693120'] = urineAccessionId;
+    // }
     let query = `connectId=${parseInt(connectId)}`;
 
     showAnimation();
@@ -2051,12 +2053,12 @@ const btnsClicked = async (connectId, formData) => {
     let specimenData;
     
     if (!formData?.collectionId) {
-        specimenData = (await searchSpecimen(formData['820476880'])).data;
+        specimenData = (await searchSpecimen(formData['820476880'])).data; // search by collection ID (820476880)
     }
     hideAnimation();
 
-    if (specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID && !formData?.collectionId) {
-        showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.' }, true)
+    if (specimenData?.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID) {
+        showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different Connect ID.' }, true)
         return;
     }
 
@@ -2067,6 +2069,7 @@ const btnsClicked = async (connectId, formData) => {
         const storeResponse = await storeSpecimen([formData]);  
         if (storeResponse.code === 400) {
             hideAnimation();
+            // todo: revise the message, since the Connection ID is from the same participant (Connect ID).
             showNotifications({ title: 'Specimen already exists!', body: `Collection ID ${collectionID} is already associated with a different Connect ID` }, true);
             return;
         }
@@ -2077,7 +2080,8 @@ const btnsClicked = async (connectId, formData) => {
     
     // if 'clinical', check email trigger based on visit selection (331584571)
     if(formData['650516960'] === 664882224) {
-        await checkSurveyEmailTrigger(data, formData['331584571']);
+        console.log("🚀 ~ file: events.js:2083 ~ formData", "clinical email trigger")
+        await checkSurveyEmailTrigger(data, formData['331584571']); // if more than 1 baseline results, email won't be sent.
     }
 
     hideAnimation();
@@ -2283,6 +2287,8 @@ const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, 
             const yesBtn = document.getElementById('addCollection');
             yesBtn.addEventListener("click", async e => {
                 formData.collectionId = bloodAccessionId?.data?.[820476880];
+                console.log("🚀 ~ file: events.js:2289 ~ formData", formData)
+                
                 btnsClicked(connectId, formData); // needs code reformat/enhancement
                 await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
                 return

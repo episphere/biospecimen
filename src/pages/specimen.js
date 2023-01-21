@@ -14,7 +14,7 @@ export const specimenTemplate = async (data, formData) => {
     formData['siteAcronym'] = getSiteAcronym();
     formData['827220437'] = parseInt(getSiteCode());
 
-    const workflow = getWorkflow() ?? localStorage.getItem('workflow');
+    const workflow = getWorkflow();
     const locationSelection = JSON.parse(localStorage.getItem('selections'))?.specimenLink_location;
 
     let template = `
