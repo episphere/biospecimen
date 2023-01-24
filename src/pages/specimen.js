@@ -1,10 +1,8 @@
-import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode, searchSpecimen, collectionInputValidator, addSelectionEventListener, verifyPaymentEligibility } from "./../shared.js";
+import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode, searchSpecimen, collectionInputValidator, addSelectionEventListener } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventClinicalSpecimenLinkForm, addEventClinicalSpecimenLinkForm2, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
 export const specimenTemplate = async (data, formData) => {
-    
-    
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarSpecimenLink');
     navBarBtn.style.display = 'block';
@@ -36,7 +34,7 @@ export const specimenTemplate = async (data, formData) => {
 
         </br>`
 
-    template += `<form id="specimenLinkForm" method="POST" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">`;
+    template += `<div id="specimenLinkForm" data-participant-token="${data.token}" data-connect-id="${data.Connect_ID}">`;
         
     if(workflow === 'research') {
         let visit = visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0];
@@ -81,7 +79,7 @@ export const specimenTemplate = async (data, formData) => {
 
             <div class="form-group row">
                 <div class="col">
-                    <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Submit</button>
+                    <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="researchSpecimenContinue">Submit</button>
                 </div>
             </div>`;
 
@@ -109,7 +107,7 @@ export const specimenTemplate = async (data, formData) => {
 
                         <div class="form-group row">
                             <div class="col">
-                                <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="specimenContinue">Submit</button>
+                                <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="clinicalSpecimenContinueTwo">Submit</button>
                             </div>
                         </div>`
     } 
@@ -128,34 +126,34 @@ export const specimenTemplate = async (data, formData) => {
         template += `
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="accessionID1">Scan Blood Accession ID:</label>
-                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type in Accession ID from Blood Tube" id="accessionID1"/>
+                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type in Accession ID from Blood Tube" id="accessionID1" maxlength="11"/>
                 
                 <button class="barcode-input-clear" hidden="true" type="button" id="clearScanAccessionID" title="Clear scanned barcode" data-enable-input="accessionID2" data-barcode-input="accessionID1"><i class="fas fa-times"></i></button>
                 <div class="helper-text"><span class="form-helper-text offset-4">This entry can only contain numbers.</span></div>
             </div>
             <div class="form-group row">
-                <input autocomplete="off" type="text" class="form-control col-md-5 offset-4" placeholder="Re-Enter (scan/type) in Accession ID from Blood Tube" id="accessionID2"/>
+                <input autocomplete="off" type="text" class="form-control col-md-5 offset-4" placeholder="Re-Enter (scan/type) in Accession ID from Blood Tube" id="accessionID2" maxlength="11"/>
             </div>
             </br>
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="accessionID3">Scan Urine Accession ID:</label>
-                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type in Accession ID from Urine Tube" id="accessionID3"/>
+                <input autocomplete="off" type="text" class="form-control col-md-5" placeholder="Scan/Type in Accession ID from Urine Tube" id="accessionID3" maxlength="11"/>
                 
                 <button class="barcode-input-clear" hidden="true" type="button" id="clearScanAccessionID" title="Clear scanned barcode" data-enable-input="accessionID4" data-barcode-input="accessionID3"><i class="fas fa-times"></i></button>
             </div>
             <div class="form-group row">
-                <input autocomplete="off" type="text" class="form-control col-md-5 offset-4" placeholder="Re-Enter (scan/type) in Accession ID from Urine Tube" id="accessionID4"/>
+                <input autocomplete="off" type="text" class="form-control col-md-5 offset-4" placeholder="Re-Enter (scan/type) in Accession ID from Urine Tube" id="accessionID4"maxlength="11"/>
             </div>
             
         <div class="form-group row">
             <div class="col">
-                <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" type="submit" id="clinicalSpecimenContinue">Submit</button>
+                <button class="btn btn-outline-primary float-right" data-connect-id="${data.Connect_ID}" data-participant-name="${data['471168198']}" type="submit" id="clinicalSpecimenContinue">Submit</button>
             </div>
         </div>`
     }
 
     template += `
-        </form>
+        </div>
         </br>`;
 
     document.getElementById('contentBody').innerHTML = template;
@@ -176,6 +174,11 @@ export const specimenTemplate = async (data, formData) => {
         addEventClinicalSpecimenLinkForm2(formData);
     } 
     else {//clinical specimen page 1
+        autoTabInputField('accessionID1', 'accessionID2')
+        autoTabInputField('accessionID2', 'accessionID3')
+        autoTabInputField('accessionID3', 'accessionID4')
+
+
         document.getElementById('accessionID2').onpaste = e => e.preventDefault();
         document.getElementById('accessionID4').onpaste = e => e.preventDefault();
 
@@ -187,4 +190,12 @@ export const specimenTemplate = async (data, formData) => {
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventBackToSearch('navBarSearch');
     addEventNavBarParticipantCheckIn();
+}
+
+const autoTabInputField = ( inputFieldSource, inputFieldDestination ) => {
+    document.getElementById(inputFieldSource).addEventListener('keyup', e => {
+        if (e.key === 'Enter') {
+            document.getElementById(inputFieldDestination).focus();
+        }
+    })
 }

@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, retrieveDateFromIsoString, convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, verifyPaymentEligibility, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion,  bagConceptIdList, checkAccessionId, checkSurveyEmailTrigger, packageConditonConversion } from './shared.js';
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, retrieveDateFromIsoString, convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion,  bagConceptIdList, checkAccessionId, checkSurveyEmailTrigger, packageConditonConversion, checkDerivedVariables } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -1308,11 +1308,11 @@ const addNewBox = async (userName) => {
     let boxList = response.data;
     let locations = {};
     let keys = [];
-    let largestOverall = 0;
+    let largestOverall = 0; /*Largest Box num value if it exists*/
     let largeIndex = -1;
 
     let largestLocation = 0;
-    let largestLocationIndex = -1;
+    let largestLocationIndex = -1; /* If getAllBoxes has box with box# value*/
     let pageLocation = document.getElementById('selectLocationList').value;
 
     let pageLocationConversion = siteSpecificLocationToConceptId[pageLocation];
@@ -1320,7 +1320,7 @@ const addNewBox = async (userName) => {
     // loop through entire hiddenJSON and determine the largest boxid number
     // hiddenJSON includes in process and shipped boxes
     for (let i = 0; i < boxList.length; i++) {
-        let curr = parseInt(boxList[i]['132929440'].substring(3))      
+        let curr = parseInt(boxList[i]['132929440'].substring(3))
         let currLocation = conceptIdToSiteSpecificLocation[boxList[i]['560975149']]
 
         if (curr > largestOverall) {
@@ -1333,6 +1333,7 @@ const addNewBox = async (userName) => {
         }
 
     }
+
     if (largestLocationIndex != -1) {
       // find index of largest box and assign boxid
         let lastBox = boxList[largeIndex]['132929440']
@@ -1351,7 +1352,6 @@ const addNewBox = async (userName) => {
             toPass['560975149'] = pageLocationConversion;
             toPass['789843387'] = loginSite
             await addBox(toPass);
-
             boxList.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocationConversion })
             let boxJSONS = boxList;
 
@@ -1899,12 +1899,12 @@ export const goToParticipantSearch = () => {
 }
 
 export const addEventSpecimenLinkForm = (formData) => {
-    const form = document.getElementById('specimenLinkForm');
-    const connectId = document.getElementById('specimenContinue').dataset.connectId;
+    const form = document.getElementById('researchSpecimenContinue');
+    const connectId = document.getElementById('researchSpecimenContinue').dataset.connectId;
 
     if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('click', async (e) => {
         e.preventDefault();
         const collections = await getCollectionsByVisit(formData);
         if (collections.length) {
@@ -1917,19 +1917,19 @@ export const addEventSpecimenLinkForm = (formData) => {
 };
 
 export const addEventClinicalSpecimenLinkForm = (formData) => {
-    const form = document.getElementById('specimenLinkForm');
-    
-    form.addEventListener('submit', async (e) => {
+    const form = document.getElementById('clinicalSpecimenContinue');
+    form.addEventListener('click', async (e) => {
         e.preventDefault();
         clinicalBtnsClicked(formData);
+     //   yesTriggerModal()
     });
 };
 
 export const addEventClinicalSpecimenLinkForm2 = (formData) => {
-    const form = document.getElementById('specimenLinkForm');
-    const connectId = document.getElementById('specimenContinue').dataset.connectId;
+    const form = document.getElementById('clinicalSpecimenContinueTwo');
+    const connectId = document.getElementById('clinicalSpecimenContinueTwo').dataset.connectId;
     
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('click', async (e) => {
         e.preventDefault();
         btnsClicked(connectId, formData);
     });
@@ -2104,6 +2104,7 @@ const clinicalBtnsClicked = async (formData) => {
 
     removeAllErrors();
     const connectId = document.getElementById('clinicalSpecimenContinue').dataset.connectId;
+    const participantName = document.getElementById('clinicalSpecimenContinue').dataset.participantName;
 
     const accessionID1 = document.getElementById('accessionID1');
     const accessionID2 = document.getElementById('accessionID2');
@@ -2147,104 +2148,173 @@ const clinicalBtnsClicked = async (formData) => {
     }
 
     if (hasError) return;
-    let confirmVal = '';
+    let confirmVal = 'No';
 
     if (accessionID1 && accessionID1.value && accessionID3 && !accessionID3.value) {
-        confirmVal = await swal({
-            title: "Urine Accession Id is Missing",
-            icon: "info",
-            text: `You have not entered a Urine Accession Id. Do you want to continue?`,
-            buttons: {
-                cancel: {
-                    text: "No",
-                    value: "No",
-                    visible: true,
-                    className: "btn btn-default",
-                    closeModal: true,
-                },
-                confirm: {
-                    text: "Yes",
-                    value: 'Yes',
-                    visible: true,
-                    className: "",
-                    closeModal: true,
-                    className: "btn btn-success",
-                }
-            },
-        });
-    }
-
-    if (accessionID1 && !accessionID1.value && accessionID3 && accessionID3.value) {
-        confirmVal = await swal({
-            title: "Blood Accession Id is Missing",
-            icon: "info",
-            text: `You have not entered a Blood Accession Id. Do you want to continue?`,
-            buttons: {
-                cancel: {
-                    text: "No",
-                    value: "No",
-                    visible: true,
-                    className: "btn btn-default",
-                    closeModal: true,
-                },
-                confirm: {
-                    text: "Yes",
-                    value: 'Yes',
-                    visible: true,
-                    className: "",
-                    closeModal: true,
-                    className: "btn btn-success",
-                }
-            },
-        });
-        
-    }
-
-    if (confirmVal === 'No') return;
-
-    const bloodAccessionId = await checkAccessionId({accessionId: +accessionID1.value, accessionIdType: '646899796'});
+        const button = document.createElement('button');
+        button.dataset.target = '#biospecimenModal';
+        button.dataset.toggle = 'modal';
     
-    if (bloodAccessionId.code === 200) {
-        hideAnimation();
-        confirmVal = await swal({
-            title: "Existing Accession ID",
-            icon: "info",
-            text: `Accession ID entered is already assigned to Collection ID ${bloodAccessionId?.data?.[820476880]}. Choose an action`,
-            buttons: {
-                cancel: {
-                    text: "Cancel",
-                    value: "cancel",
-                    visible: true,
-                    className: "btn btn-default",
-                    closeModal: true,
-                },
-                confirm: {
-                    text: "Add Specimens to existing Collection ID",
-                    value: 'confirmed',
-                    visible: true,
-                    className: "",
-                    closeModal: true,
-                    className: "btn btn-success",
-                }
-            },
-        });
+        document.getElementById('root').appendChild(button);
+        button.click();
+        document.getElementById('root').removeChild(button);
+        const header = document.getElementById('biospecimenModalHeader');
+        const body = document.getElementById('biospecimenModalBody');
+        header.innerHTML = `Urine Accession Id is Missing`
+        let template =  `You have not entered a Urine Accession Id. Do you want to continue?`
+        template += `
+        <br />
+        <div style="display:inline-block; margin-top:20px;">
+            <button type="button" class="btn btn-primary" data-dismiss="modal" target="_blank"  data-toggle="modal" id="yesTrigger">Yes</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank" id="noTrigger">NO</button>
+            </div>
+        </div>`
+        body.innerHTML = template;
+
+
+        const noBtn = document.getElementById('noTrigger')
+        noBtn.addEventListener("click", async e => {
+            confirmVal = 'No'
+        })
+
+        const yesBtn = document.getElementById('yesTrigger')
+        yesBtn.addEventListener("click", async e => {
+            confirmVal = 'Yes'
+            triggerConfirmationModal(accessionID2, accessionID4, participantName, hasError, confirmVal, selectedVisit, formData, connectId)
+        })
+
+    }
+    
+    
+    if (accessionID1 && !accessionID1.value && accessionID3 && accessionID3.value) {
+        const button = document.createElement('button');
+        button.dataset.target = '#biospecimenModal';
+        button.dataset.toggle = 'modal';
+    
+        document.getElementById('root').appendChild(button);
+        button.click();
+        document.getElementById('root').removeChild(button);
+        const header = document.getElementById('biospecimenModalHeader');
+        const body = document.getElementById('biospecimenModalBody');
+        header.innerHTML = `Blood Accession Id is Missing`
+        let template =  `You have not entered a Blood Accession Id. Do you want to continue?`
+        template += `
+        <br />
+        <div style="display:inline-block; margin-top:20px;">
+            <button type="button" class="btn btn-primary" data-dismiss="modal" target="_blank" id="yesTrigger">Yes</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank" id="noTrigger">NO</button>
+            </div>
+        </div>`
+        body.innerHTML = template;
+
+        const noBtn = document.getElementById('noTrigger')
+        noBtn.addEventListener("click", async e => {
+            confirmVal = 'No'
+        })
+
+        const yesBtn = document.getElementById('yesTrigger')
+        yesBtn.addEventListener("click", async e => {
+            confirmVal = 'Yes'
+            triggerConfirmationModal(accessionID2, accessionID4, participantName, hasError, confirmVal, selectedVisit, formData, connectId)
+        })
     }
 
-    if (confirmVal === "cancel") return;
+    if (!hasError && accessionID2.value && accessionID4.value) {
+        confirmationModal(accessionID1, accessionID3, participantName, selectedVisit, formData, connectId)
+    }
+}
+
+const triggerConfirmationModal =  (accessionID2, accessionID4, participantName, hasError, confirmVal, selectedVisit, formData, connectId) => {
+    if (!hasError && confirmVal === 'Yes') {
+        confirmationModal(accessionID2, accessionID4, participantName, selectedVisit, formData, connectId)
+}}
+
+const confirmationModal = (accessionID2, accessionID4, participantName, selectedVisit, formData, connectId) => {
+    const button = document.createElement('button');
+    button.dataset.target = '#modalShowMoreData';
+    button.dataset.toggle = 'modal';
+    document.getElementById('root').appendChild(button);
+    button.click();
+    document.getElementById('root').removeChild(button);
+    const header = document.getElementById('modalHeader');
+    const body = document.getElementById('modalBody');
+    header.innerHTML = `Confirm Accession ID`
+    let template =  `Blood Accession ID: ${accessionID2.value ? accessionID2.value : 'N/A' } <br />
+    Urine Accession ID: ${accessionID4.value ? accessionID4.value : 'N/A' } <br />
+    Confirm ID is correct for participant: ${participantName}`
+    template += `
+    <br />
+    <div style="display:inline-block; margin-top:20px;">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" target="_blank" id="proceedNextPage">Confirm & Continue</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank" id="cancel">Cancel</button>
+        </div>
+    </div>`
+    body.innerHTML = template;
+    const noBtn = document.getElementById('cancel');
+    noBtn.addEventListener("click", async e => {
+        return
+    })
+
+    const yesBtn = document.getElementById('proceedNextPage');
+    yesBtn.addEventListener("click", async e => {
+        (accessionID2.value) ? await proccedToSpecimenPage(accessionID2, accessionID4, selectedVisit, formData, connectId) :
+        await redirectSpecimenPage(accessionID2, accessionID4, selectedVisit, formData, connectId)
+    }) 
+}
+
+const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
+    const bloodAccessionId = await checkAccessionId({accessionId: +accessionID1.value, accessionIdType: '646899796'});
+    if (bloodAccessionId.code == 200) {
+        if (bloodAccessionId.data) {
+            hideAnimation();
+            const button = document.createElement('button');
+            button.dataset.target = '#biospecimenModal';
+            button.dataset.toggle = 'modal';
+            document.getElementById('root').appendChild(button);
+            button.click();
+            document.getElementById('root').removeChild(button);
+            const header = document.getElementById('biospecimenModalHeader');
+            const body = document.getElementById('biospecimenModalBody');
+            header.innerHTML = `Existing Accession ID`
+            let template =  `Accession ID entered is already assigned to Collection ID ${bloodAccessionId?.data?.[820476880]}. Choose an action`
+            template += `
+            <br />
+            <div style="display:inline-block; margin-top:20px;">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" target="_blank" id="addCollection">Add Specimens to existing Collection ID</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" target="_blank" id="cancelSelection">Cancel</button>
+                </div>
+            </div>`
+            body.innerHTML = template;
+            const noBtn = document.getElementById('cancelSelection');
+            noBtn.addEventListener("click", async e => {
+                await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
+                return
+            })
+
+            const yesBtn = document.getElementById('addCollection');
+            yesBtn.addEventListener("click", async e => {
+                formData.collectionId = bloodAccessionId?.data?.[820476880];
+                btnsClicked(connectId, formData); // needs code reformat/enhancement
+                await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
+                return
+            }) 
+        }
+        else {
+            await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
+            return
+        }
+    }
+}
+
+const redirectSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
     if(accessionID1?.value) formData = {...formData, '646899796': +accessionID1.value || ''};
     if(accessionID3?.value) formData['928693120'] = +accessionID3.value || '';
     if(selectedVisit) formData['331584571'] =  +selectedVisit;
-    
-    if (confirmVal === "confirmed") {
-        formData.collectionId = bloodAccessionId?.data?.[820476880];
-        btnsClicked(connectId, formData);
-        return
-    }
-        let query = `connectId=${parseInt(connectId)}`;
-        const response = await findParticipant(query);
-        const data = response.data[0];
-        specimenTemplate(data, formData);
-    }
+    let query = `connectId=${parseInt(connectId)}`;
+    const response = await findParticipant(query);
+    const data = response.data[0];
+    specimenTemplate(data, formData);
+}
 
 export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
     const collectionSaveExit = document.getElementById('collectionSave');
@@ -2310,14 +2380,23 @@ export const addEventBiospecimenCollectionFormToggles = () => {
             if (selectionData.tubeType === 'Blood tube' || selectionData.tubeType === 'Urine') {
                 const biohazardBagChkb = document.getElementById(`787237543`);
                 const biohazardBagText = document.getElementById(`787237543Id`);
+                const allTubesCollected = Array.from(document.querySelectorAll('.tube-collected'))
+                const allBloodUrineCheckedArray = allTubesCollected.filter(
+                    item => (item.getAttribute("data-tube-type") === "Blood tube" && item.checked) || (item.getAttribute("data-tube-type") === "Urine" && item.checked)
+                );
+               
                 if (collected.checked) {
                     biohazardBagChkb.checked = true;
                     biohazardBagText.disabled = false;
-                } else {
+                } 
+                else if(collected.checked === false && biohazardBagChkb.checked === true && allBloodUrineCheckedArray.length) {
+                    biohazardBagChkb.checked = true
+                    biohazardBagText.disabled = false;
+                }
+                else {
                     biohazardBagChkb.checked = false;
                     biohazardBagText.disabled = true;
                 }
-        
             }
         });
     });
@@ -2582,17 +2661,17 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
     const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
 
     await updateCollectionSettingData(biospecimenData, siteTubesList, formData);
-    formData = await getUpdatedParticipantData(formData);
 
     if(baselineVisit && clinicalResearchSetting) {
         await updateBaselineData(siteTubesList, formData);
-        formData = await getUpdatedParticipantData(formData);
-
-        await verifyPaymentEligibility(formData);
-        formData = await getUpdatedParticipantData(formData);
     }
 
+    await checkDerivedVariables({"token": formData["token"]});
+
     if (cntd) {
+
+        formData = await getUpdatedParticipantData(formData);
+
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
         finalizeTemplate(formData, specimenData);
@@ -2732,7 +2811,6 @@ export const addEventNavBarShipment = (id, userName) => {
 export const addEventShipPrintManifest = (id) => {
   const btn = document.getElementById(id)
   btn.addEventListener('click', e => {
-    console.log('clicked',e)
     window.print()
     if(e.target.classList.contains("print-manifest")) {
       e.target.classList.remove("print-manifest")
