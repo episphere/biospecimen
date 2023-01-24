@@ -1309,18 +1309,14 @@ const addNewBox = async (userName) => {
     let locations = {};
     let keys = [];
     let largestOverall = 0; /*Largest Box num value if it exists*/
-    console.log("🚀 ~ file: events.js:1312 ~ addNewBox ~ largestOverall", largestOverall)
     let largeIndex = -1;
 
     let largestLocation = 0;
     let largestLocationIndex = -1; /* If getAllBoxes has box with box# value*/
-    console.log("🚀 ~ file: events.js:1317 ~ addNewBox ~ largestLocationIndex", largestLocationIndex)
     let pageLocation = document.getElementById('selectLocationList').value;
 
     let pageLocationConversion = siteSpecificLocationToConceptId[pageLocation];
-    console.log("🚀 ~ file: events.js:1321 ~ addNewBox ~ pageLocationConversion", pageLocationConversion)
     let loginSite = siteSpecificLocation[pageLocation]["siteCode"]
-    console.log("🚀 ~ file: events.js:1323 ~ addNewBox ~ loginSite", loginSite)
     // loop through entire hiddenJSON and determine the largest boxid number
     // hiddenJSON includes in process and shipped boxes
     for (let i = 0; i < boxList.length; i++) {
@@ -1337,8 +1333,7 @@ const addNewBox = async (userName) => {
         }
 
     }
-    console.log("🚀 ~ file: events.js:1340 ~ addNewBox ~ largestOverall", largestOverall)
-    console.log("🚀 ~ file: events.js:1341 ~ addNewBox ~ largestLocationIndex", largestLocationIndex)
+
     if (largestLocationIndex != -1) {
       // find index of largest box and assign boxid
         let lastBox = boxList[largeIndex]['132929440']
@@ -1356,9 +1351,7 @@ const addNewBox = async (userName) => {
             toPass['bags'] = {};
             toPass['560975149'] = pageLocationConversion;
             toPass['789843387'] = loginSite
-            console.log("🚀 ~ file: events.js:1359 ~ addNewBox ~ toPass", toPass)
             await addBox(toPass);
-            console.log("🚀 ~ file: events.js:1361 ~ addNewBox ~ await addBox(toPass)", await addBox(toPass))
             boxList.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocationConversion })
             let boxJSONS = boxList;
 
@@ -1394,9 +1387,7 @@ const addNewBox = async (userName) => {
         toPass['bags'] = {};
         toPass['560975149'] = pageLocationConversion;
         toPass['789843387'] = loginSite;
-        console.log("🚀 ~ file: events.js:1395 ~ addNewBox ~ toPass (First Box#)", toPass)
         await addBox(toPass);
-        console.log("🚀 ~ file: events.js:1399 ~ addNewBox ~ await addBox(toPass);", await addBox(toPass))
         boxList.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocationConversion })
         let boxJSONS = boxList;
 

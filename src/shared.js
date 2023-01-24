@@ -689,7 +689,6 @@ export const convertToFirestoreBox = (inputBox) => {
   for (let k of keysToRomove) {
     if (outputBox[k]) delete outputBox[k];
   }
-  console.log('outputBox', outputBox)
   return outputBox;
 };
 
@@ -1477,15 +1476,6 @@ export const locationConceptIDToLocationMap = {
     contactInfo: {
       "NIH":[],
     },
-  },
-  333333333: {
-    siteSpecificLocation: 'Rockville',
-    siteAcronym: 'NIH',
-    siteCode: '13',
-    loginSiteName: 'National Cancer Institute',
-    contactInfo: {
-      "NIH":[],
-    },
   }
 };
 
@@ -1514,8 +1504,7 @@ export const conceptIdToSiteSpecificLocation = {
   589224449: "Sioux Falls Imagenetics",
   777644826: "DCAM",
   111111111: "Main Campus",
-  222222222: "Frederick",
-  333333333: "Rockville"
+  222222222: "Frederick"
 }
 
 export const siteSpecificLocationToConceptId = {
@@ -1543,8 +1532,7 @@ export const siteSpecificLocationToConceptId = {
   "Colby Abbotsford": 983848564,
   "Minocqua": 261931804,
   "Merrill": 665277300,
-  "Fargo South University": 467088902,
-  "Rockville": 333333333
+  "Fargo South University": 467088902
 }
 
 export const nameToKeyObj = 
@@ -1597,8 +1585,7 @@ export const keyToLocationObj =
     467088902: "Fargo South University",
     589224449: "Sioux Falls Imagenetics",
     111111111: "NIH",
-    13:"NCI",
-    33333333: "Rockville",
+    13:"NCI"
 }
 
 export const verificationConversion = {
@@ -1797,7 +1784,7 @@ export const siteLocations = {
         'HFHS': [{location: 'HFH K-13 Research Clinic', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332},
                 {location: 'HFH Livonia Research Clinic', concept: 706927479}],
         'SFH': [{location: 'Sioux Falls Imagenetics', concept: 589224449}, {location: 'Fargo South University', concept: 467088902}],
-        'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}, {location: 'NIH-3', concept: 333333333}]
+        'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}]
     },
     'clinical': {
         'KPHI': [{location:'KPHI RRL', concept: 531313956}]
