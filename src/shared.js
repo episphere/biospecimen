@@ -1149,7 +1149,6 @@ export const siteSpecificLocation = {
   "South Loop": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "Main Campus": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
   "Frederick": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
-  "Rockville": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
 }
 
 export const locationConceptIDToLocationMap = {
