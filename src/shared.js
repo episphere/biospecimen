@@ -274,9 +274,12 @@ export const performSearch = async (query) => {
     showAnimation();
     const response = await findParticipant(query);
     hideAnimation();
-    const getVerifiedParticipants = response.data.filter(dt => dt['821247024'] === 197316935);
-    if(response.code === 200 && getVerifiedParticipants.length > 0) searchResults(getVerifiedParticipants);
-    else if(response.code === 200 && getVerifiedParticipants.length === 0) showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+    const verifiedParticipants = response.data.filter(dt => dt['821247024'] === 197316935);
+
+    if (response.code === 200 && verifiedParticipants.length > 0) {searchResults(verifiedParticipants);
+    } else if (response.code === 200 && verifiedParticipants.length === 0) {
+        showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true);
+    }
 }
 
 export const showNotifications = (data, error) => {
@@ -2186,16 +2189,12 @@ export function addSelectionEventListener(elemId, pageAndElement) {
 }
 
 export const checkSurveyEmailTrigger = async (data, visitType) => {
-    console.log("🚀 ~ file: shared.js:2189 ~ data", data)
-    
     const response = await getParticipantCollections(data.token);
     let sendBaselineEmail = false;
 
     if(response.code != 404) {
-        // filter based on visit type (331584571) match and collection type as 'clinical' (664882224)
+        // filter based on visit type (331584571) and collection type as 'clinical' (664882224)
         const collections = response.data.filter(res => res['331584571'] == visitType && res['650516960'] == 664882224);
-        console.log("🚀 ~ file: shared.js:2197 ~ collections", collections)
-
         if(collections.length == 1) sendBaselineEmail = true;
     } 
     

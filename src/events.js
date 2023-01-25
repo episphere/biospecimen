@@ -1952,7 +1952,8 @@ const existingCollectionAlert = async (collections, connectId, formData) => {
         btnsClicked(connectId, formData);
     }
 }
-
+// todo: this function handles tangled situations. Needs to be refactored
+// Handle the events after collection id is scanned and "Submit" is clicked
 const btnsClicked = async (connectId, formData) => { 
     removeAllErrors();
 
@@ -2069,7 +2070,6 @@ const btnsClicked = async (connectId, formData) => {
         const storeResponse = await storeSpecimen([formData]);  
         if (storeResponse.code === 400) {
             hideAnimation();
-            // todo: revise the message, since the Connection ID is from the same participant (Connect ID).
             showNotifications({ title: 'Specimen already exists!', body: `Collection ID ${collectionID} is already associated with a different Connect ID` }, true);
             return;
         }
@@ -2078,10 +2078,9 @@ const btnsClicked = async (connectId, formData) => {
     const biospecimenData = (await searchSpecimen(formData?.collectionId || formData['820476880'])).data;
     await createTubesForCollection(formData, biospecimenData);
     
-    // if 'clinical', check email trigger based on visit selection (331584571)
-    if(formData['650516960'] === 664882224) {
-        console.log("🚀 ~ file: events.js:2083 ~ formData", "clinical email trigger")
-        await checkSurveyEmailTrigger(data, formData['331584571']); // if more than 1 baseline results, email won't be sent.
+    // if 'clinical' and no existing collection ID, check email trigger
+    if (formData['650516960'] === 664882224 && !formData?.collectionId) {
+        await checkSurveyEmailTrigger(data, formData['331584571']);
     }
 
     hideAnimation();
@@ -2093,6 +2092,7 @@ const btnsClicked = async (connectId, formData) => {
     }
 }
 
+// Check accession number inputs
 const clinicalBtnsClicked = async (formData) => { 
 
     removeAllErrors();
@@ -2250,12 +2250,12 @@ const confirmationModal = (accessionID2, accessionID4, participantName, selected
 
     const yesBtn = document.getElementById('proceedNextPage');
     yesBtn.addEventListener("click", async e => {
-        (accessionID2.value) ? await proccedToSpecimenPage(accessionID2, accessionID4, selectedVisit, formData, connectId) :
+        (accessionID2.value) ? await proceedToSpecimenPage(accessionID2, accessionID4, selectedVisit, formData, connectId) :
         await redirectSpecimenPage(accessionID2, accessionID4, selectedVisit, formData, connectId)
     }) 
 }
 
-const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
+const proceedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
     const bloodAccessionId = await checkAccessionId({accessionId: +accessionID1.value, accessionIdType: '646899796'});
     if (bloodAccessionId.code == 200) {
         if (bloodAccessionId.data) {
@@ -2287,7 +2287,7 @@ const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, 
             const yesBtn = document.getElementById('addCollection');
             yesBtn.addEventListener("click", async e => {
                 formData.collectionId = bloodAccessionId?.data?.[820476880];
-                console.log("🚀 ~ file: events.js:2289 ~ formData", formData)
+                formData['331584571'] =  selectedVisit;
                 
                 btnsClicked(connectId, formData); // needs code reformat/enhancement
                 await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
