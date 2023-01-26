@@ -1,4 +1,4 @@
-import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorflow, getCheckedInVisit, updateSpecimen } from "./../shared.js";
+import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorkflow, getCheckedInVisit, updateSpecimen } from "./../shared.js";
 import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollectProcess } from "./../events.js";
 import {searchTemplate} from "./dashboard.js";
 
@@ -19,7 +19,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 <div class="row"><h5>${data['996038075']}, ${data['399159511']}</h5></div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${specimenData['820476880']}</div>
-                <div class="row">Collection ID Link Date/Time: ${getWorflow() === 'research' ? new Date(specimenData['678166505']).toLocaleString(): new Date(specimenData['915838974']).toLocaleString()}</div>
+                <div class="row">Collection ID Link Date/Time: ${getWorkflow() === 'research' ? new Date(specimenData['678166505']).toLocaleString(): new Date(specimenData['915838974']).toLocaleString()}</div>
             </div>
             ${specimenData['331584571'] ? `
                 <div class="ml-auto form-group">
@@ -34,8 +34,8 @@ export const finalizeTemplate = (data, specimenData) => {
                 <thead>
                     <tr>
                         <th>Specimen Type</th>
-                        ${getWorflow() === 'clinical' ? `<th>Received</th>`:`<th>Collected</th>`}
-                        ${getWorflow() === 'research' ? `<th>Reason</th>` : ''}
+                        ${getWorkflow() === 'clinical' ? `<th>Received</th>`:`<th>Collected</th>`}
+                        ${getWorkflow() === 'research' ? `<th>Reason</th>` : ''}
                         <th>Full Specimen ID</th>
                         <th>Deviation</th>
                         <th>Deviation Type</th>
@@ -59,7 +59,7 @@ export const finalizeTemplate = (data, specimenData) => {
                         <tr>
                             <td>${obj.specimenType}</td>
                             <td>${obj.collectionChkBox === true ? `${specimenData[`${obj.concept}`]['593843561'] === 353358909 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>'}` : ``}</td>
-                            ${getWorflow() === 'research' ? `<td>${specimenData[`${obj.concept}`]['883732523'] ? notCollectedOptions.filter(option => option.concept == specimenData[`${obj.concept}`]['883732523'])[0].label : ''}</td>` : ''}
+                            ${getWorkflow() === 'research' ? `<td>${specimenData[`${obj.concept}`]['883732523'] ? notCollectedOptions.filter(option => option.concept == specimenData[`${obj.concept}`]['883732523'])[0].label : ''}</td>` : ''}
                             <td>${specimenData[`${obj.concept}`]['593843561'] === 353358909 && specimenData[`${obj.concept}`]['825582494'] ? `${specimenData[`${obj.concept}`]['825582494']}` : '' }</td>
                             <td>${obj.deviationChkBox === true ? `${specimenData[`${obj.concept}`]['678857215'] === 353358909 ? 'Yes' : 'No'}`: ``}</td>
                             <td class="deviation-comments-width">${deviationSelections ? deviationSelections : ''}</td>
@@ -82,7 +82,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 </br>
                 <div class="form-group row">
                     <div class="col-auto">
-                        <button class="btn btn-outline-danger" type="button" data-connect-id="${data.Connect_ID}" id="returnToCollectProcess" data-master-specimen-id="${specimenData['820476880']}">${getWorflow() === 'research' ? 'Return to Collection Data Entry' : 'Return to Collection Data Entry'}</button>
+                        <button class="btn btn-outline-danger" type="button" data-connect-id="${data.Connect_ID}" id="returnToCollectProcess" data-master-specimen-id="${specimenData['820476880']}">${getWorkflow() === 'research' ? 'Return to Collection Data Entry' : 'Return to Collection Data Entry'}</button>
                     </div>
                     <div class="ml-auto">
                         <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['820476880']}" type="button" id="finalizedSaveExit">Exit</button>

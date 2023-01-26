@@ -1,4 +1,4 @@
-import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode, searchSpecimen, collectionInputValidator, addSelectionEventListener } from "./../shared.js";
+import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorkflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode, searchSpecimen, collectionInputValidator, addSelectionEventListener } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventClinicalSpecimenLinkForm, addEventClinicalSpecimenLinkForm2, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
@@ -9,13 +9,12 @@ export const specimenTemplate = async (data, formData) => {
     navBarBtn?.classList.remove('disabled');
     navBarBtn?.classList.add('active');
 
-    // get rid of all this
     const isSpecimenLinkForm2 = !!formData;
     formData = formData ? formData : {};
     formData['siteAcronym'] = getSiteAcronym();
     formData['827220437'] = parseInt(getSiteCode());
 
-    const workflow = getWorflow() ?? localStorage.getItem('workflow');
+    const workflow = getWorkflow();
     const locationSelection = JSON.parse(localStorage.getItem('selections'))?.specimenLink_location;
 
     let template = `
@@ -122,7 +121,7 @@ export const specimenTemplate = async (data, formData) => {
                 })
 
                 template += `</select>`;
-    template +=`</div>`
+        template += `</div>`;
         template += `
             <div class="form-group row">
                 <label class="col-md-4 col-form-label" for="accessionID1">Scan Blood Accession ID:</label>

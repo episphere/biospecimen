@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, validateUser, addEventBarCodeScanner, allStates, getWorflow, isDeviceMobile, replaceDateInputWithMaskedInput, checkedIn, verificationConversion } from "./../shared.js"
+import { userAuthorization, removeActiveClass, validateUser, addEventBarCodeScanner, allStates, getWorkflow, isDeviceMobile, replaceDateInputWithMaskedInput, checkedIn, verificationConversion } from "./../shared.js"
 import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment, addEventClearAll } from "./../events.js";
 import { homeNavBar, bodyNavBar, unAuthorizedUser } from '../navbar.js';
 
@@ -70,9 +70,8 @@ export const searchTemplate = (goToSpecimenSearch) => {
                         </div>
                     </form>
                 </div>
-                ${contentBody.dataset.workflow && contentBody.dataset.workflow === 'clinical' ? `
-                    
-                `:`
+                ${contentBody.dataset.workflow && contentBody.dataset.workflow === 'clinical' ? ``
+                :`
                     <div class="row form-row">
                         <form id="search2" method="POST">
                             <div class="form-group">
@@ -170,26 +169,31 @@ export const searchResults = (result) => {
                         <th>Verification Status</th>
                         <th>Participation Status</th>
                         <th></th>
-                        ${getWorflow() === 'research' ? '<th></th>' : ''}
+                        ${getWorkflow() === 'research' ? '<th></th>' : ''}
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>`
+
     result.forEach(data => {
 
         if(data['821247024'] === 922622075) return;
+
+        let tdTemplate=`
+            <td>${data['996038075']}</td>
+            <td>${data['399159511']}</td>
+            <td>${data['231676651']}</td>
+            <td>${data['564964481']}/${data['795827569']}/${data['544150384']}</td>
+            <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
+            <td>${data.Connect_ID}</td>
+            <td>${verificationConversion[[data['821247024']]]}</td>
+            <td>${data['912301837'] === 208325815 || data['912301837'] === 622008261 || data['912301837'] === 458508122 ? `<i class="fas fa-2x fa-check"></i>` :  `<i class="fas fa-2x fa-times"></i>`}</td>`;
+
         const isCheckedIn = checkedIn(data);
-        if (getWorflow() === 'research') {
+        if (getWorkflow() === 'research') {
         template += `
             <tr>
-                <td>${data['996038075']}</td>
-                <td>${data['399159511']}</td>
-                <td>${data['231676651']}</td>
-                <td>${data['564964481']}/${data['795827569']}/${data['544150384']}</td>
-                <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
-                <td>${data.Connect_ID}</td>
-                <td>${verificationConversion[[data['821247024']]]}</td>
-                <td>${data['912301837'] === 208325815 || data['912301837'] === 622008261 || data['912301837'] === 458508122 ? `<i class="fas fa-2x fa-check"></i>` :  `<i class="fas fa-2x fa-times"></i>`}</td>
+                ${tdTemplate}
                 <td>
                     <button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID} data-check-in-btn-uid=${data.state.uid}>${!isCheckedIn ? `Go to Check-In` : `Go to Check-Out`}</button>
                 </td>
@@ -198,19 +202,12 @@ export const searchResults = (result) => {
                 </td>
             </tr>
         `
-        } else if (getWorflow() === 'clinical') {
+        } else if (getWorkflow() === 'clinical') {
             template += `
             <tr>
-                <td>${data['996038075']}</td>
-                <td>${data['399159511']}</td>
-                <td>${data['231676651']}</td>
-                <td>${data['564964481']}/${data['795827569']}/${data['544150384']}</td>
-                <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
-                <td>${data.Connect_ID}</td>
-                <td>${verificationConversion[[data['821247024']]]}</td>
-                <td>${data['912301837'] === 208325815 || data['912301837'] === 622008261 || data['912301837'] === 458508122 ? `<i class="fas fa-2x fa-check"></i>` :  `<i class="fas fa-2x fa-times"></i>`}</td>
+                ${tdTemplate}
                 <td>
-                    <button class="btn btn-outline-primary text-nowrap" data-clinical-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>
+                    <button class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>
                 </td>
             </tr>
         ` 
