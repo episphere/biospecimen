@@ -1952,8 +1952,13 @@ const existingCollectionAlert = async (collections, connectId, formData) => {
         btnsClicked(connectId, formData);
     }
 }
+
 // todo: this function handles tangled situations. Needs to be refactored
-// Handle the events after collection id is scanned and "Submit" is clicked
+/**
+ * Handles events after collection ID is scanned and "Submit" is clicked
+ * @param {string} connectId 
+ * @param {*} formData 
+ */
 const btnsClicked = async (connectId, formData) => { 
     removeAllErrors();
 
@@ -2031,21 +2036,11 @@ const btnsClicked = async (connectId, formData) => {
 
     if (confirmVal === "cancel") return;
 
-    // todo: handle "back" case, or remove the button.
-
     formData['820476880'] = collectionID;
     formData['650516960'] = getWorkflow() === 'research' ? 534621077 : 664882224;
     formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
     formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
     
-    // let bloodAccessionId = formData?.['646899796'];
-    // if (bloodAccessionId) {
-    //     formData['646899796'] = bloodAccessionId;
-    // }
-    // let urineAccessionId = formData?.['928693120'];
-    // if (urineAccessionId) {
-    //     formData['928693120'] = urineAccessionId;
-    // }
     let query = `connectId=${parseInt(connectId)}`;
 
     showAnimation();
@@ -2092,7 +2087,10 @@ const btnsClicked = async (connectId, formData) => {
     }
 }
 
-// Check accession number inputs
+/**
+ * Check accession number inputs after clicking 'Submit' button
+ * @param {*} formData 
+ */
 const clinicalBtnsClicked = async (formData) => { 
 
     removeAllErrors();
