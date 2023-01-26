@@ -1753,20 +1753,16 @@ export const addGoToCheckInEvent = () => {
 };
 
 export const addGoToSpecimenLinkEvent = () => {
-    const workflow = getWorkflow();
+    const specimenLinkButtons = document.querySelectorAll('button[data-specimen-link-connect-id]');
 
-    if (workflow === 'research' || workflow === 'clinical') {
-        const specimenLinkButtons = document.querySelectorAll('button[data-specimen-link-connect-id]');
+    for (const btn of specimenLinkButtons) {
+        btn.addEventListener('click', async () => {
+        let query = `connectId=${parseInt(btn.dataset.specimenLinkConnectId)}`;
+        const response = await findParticipant(query);
+        const data = response.data[0];
 
-        for (const btn of specimenLinkButtons) {
-            btn.addEventListener('click', async () => {
-            let query = `connectId=${parseInt(btn.dataset.specimenLinkConnectId)}`;
-            const response = await findParticipant(query);
-            const data = response.data[0];
-    
-            specimenTemplate(data);
-            });
-        }
+        specimenTemplate(data);
+        });
     }
 };
 
