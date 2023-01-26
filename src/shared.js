@@ -276,9 +276,16 @@ export const performSearch = async (query) => {
     hideAnimation();
     const verifiedParticipants = response.data.filter(dt => dt['821247024'] === 197316935);
 
-    if (response.code === 200 && verifiedParticipants.length > 0) {searchResults(verifiedParticipants);
+    if (response.code === 200 && verifiedParticipants.length > 0) {
+      searchResults(verifiedParticipants);
     } else if (response.code === 200 && verifiedParticipants.length === 0) {
-        showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true);
+      showNotifications(
+        {
+          title: 'Not found',
+          body: 'The participant with entered search criteria not found!'
+        },
+        true
+      );
     }
 }
 
