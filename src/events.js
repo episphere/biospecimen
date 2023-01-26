@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, retrieveDateFromIsoString, convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion,  bagConceptIdList, checkAccessionId, checkSurveyEmailTrigger, packageConditonConversion, checkDerivedVariables } from './shared.js';
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorkflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, retrieveDateFromIsoString, convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion,  bagConceptIdList, checkAccessionId, checkSurveyEmailTrigger, packageConditonConversion, checkDerivedVariables } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -119,7 +119,7 @@ export const addEventsearchSpecimen = () => {
         }
         const biospecimenData = biospecimen.data;
 
-        if(getWorflow() === 'research') {
+        if(getWorkflow() === 'research') {
             if(biospecimenData['650516960'] != 534621077) {
                 hideAnimation();
                 showNotifications({ title: 'Incorrect Dashboard', body: 'Clinical Collections cannot be viewed on Research Dashboard' }, true);
@@ -1753,33 +1753,17 @@ export const addGoToCheckInEvent = () => {
 };
 
 export const addGoToSpecimenLinkEvent = () => {
-    // For research
-    const researchSpecimenLinkButtons = document.querySelectorAll('[data-specimen-link-connect-id]');
-    Array.from(researchSpecimenLinkButtons).forEach((btn) => {
+    const specimenLinkButtons = document.querySelectorAll('button[data-specimen-link-connect-id]');
+
+    for (const btn of specimenLinkButtons) {
         btn.addEventListener('click', async () => {
+        let query = `connectId=${parseInt(btn.dataset.specimenLinkConnectId)}`;
+        const response = await findParticipant(query);
+        const data = response.data[0];
 
-            let query = `connectId=${parseInt(btn.dataset.specimenLinkConnectId)}`;
-        
-            const response = await findParticipant(query);
-            const data = response.data[0];
-    
-            specimenTemplate(data);
+        specimenTemplate(data);
         });
-    });
-
-    //For Clinical
-    const clinicalSpecimenLinkButtons = document.querySelectorAll('[data-clinical-specimen-link-connect-id]');
-    Array.from(clinicalSpecimenLinkButtons).forEach((btn) => {
-        btn.addEventListener('click', async () => {
-
-            let query = `connectId=${parseInt(btn.dataset.clinicalSpecimenLinkConnectId)}`;
-        
-            const response = await findParticipant(query);
-            const data = response.data[0];
-    
-            specimenTemplate(data);
-        });
-    });
+    }
 };
 
 export const addEventCheckInCompleteForm = (isCheckedIn) => {
@@ -1927,7 +1911,7 @@ export const addEventClinicalSpecimenLinkForm = (formData) => {
 
 export const addEventClinicalSpecimenLinkForm2 = (formData) => {
     const form = document.getElementById('clinicalSpecimenContinueTwo');
-    const connectId = document.getElementById('clinicalSpecimenContinueTwo').dataset.connectId;
+    const connectId = form.dataset.connectId;
     
     form.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -1965,6 +1949,12 @@ const existingCollectionAlert = async (collections, connectId, formData) => {
     }
 }
 
+// todo: this function handles tangled situations. Needs to be refactored
+/**
+ * Handles events after collection ID is scanned and "Submit" is clicked
+ * @param {string} connectId 
+ * @param {*} formData 
+ */
 const btnsClicked = async (connectId, formData) => { 
     removeAllErrors();
 
@@ -2013,7 +2003,7 @@ const btnsClicked = async (connectId, formData) => {
         confirmVal = await swal({
             title: "Confirm Collection ID",
             icon: "info",
-            text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n || ""}`,
+            text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n}`,
             buttons: {
                 cancel: {
                     text: "Cancel",
@@ -2043,18 +2033,10 @@ const btnsClicked = async (connectId, formData) => {
     if (confirmVal === "cancel") return;
 
     formData['820476880'] = collectionID;
-    formData['650516960'] = getWorflow() === 'research' ? 534621077 : 664882224;
+    formData['650516960'] = getWorkflow() === 'research' ? 534621077 : 664882224;
     formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
     formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
     
-    let bloodAccessionId = formData?.['646899796'];
-    if (bloodAccessionId) {
-        formData['646899796'] = bloodAccessionId;
-    }
-    let urineAccessionId = formData?.['928693120'];
-    if (urineAccessionId) {
-        formData['928693120'] = urineAccessionId;
-    }
     let query = `connectId=${parseInt(connectId)}`;
 
     showAnimation();
@@ -2063,12 +2045,12 @@ const btnsClicked = async (connectId, formData) => {
     let specimenData;
     
     if (!formData?.collectionId) {
-        specimenData = (await searchSpecimen(formData['820476880'])).data;
+        specimenData = (await searchSpecimen(formData['820476880'])).data; // search by collection ID (820476880)
     }
     hideAnimation();
 
-    if (specimenData && specimenData.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID && !formData?.collectionId) {
-        showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different connect ID.' }, true)
+    if (specimenData?.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID) {
+        showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different Connect ID.' }, true)
         return;
     }
 
@@ -2087,7 +2069,8 @@ const btnsClicked = async (connectId, formData) => {
     const biospecimenData = (await searchSpecimen(formData?.collectionId || formData['820476880'])).data;
     await createTubesForCollection(formData, biospecimenData);
     
-    if(formData['650516960'] === 664882224) {
+    // if 'clinical' and no existing collection ID, check email trigger
+    if (formData['650516960'] === 664882224 && !formData?.collectionId) {
         await checkSurveyEmailTrigger(data, formData['331584571']);
     }
 
@@ -2100,6 +2083,10 @@ const btnsClicked = async (connectId, formData) => {
     }
 }
 
+/**
+ * Check accession number inputs after clicking 'Submit' button
+ * @param {*} formData 
+ */
 const clinicalBtnsClicked = async (formData) => { 
 
     removeAllErrors();
@@ -2257,12 +2244,12 @@ const confirmationModal = (accessionID2, accessionID4, participantName, selected
 
     const yesBtn = document.getElementById('proceedNextPage');
     yesBtn.addEventListener("click", async e => {
-        (accessionID2.value) ? await proccedToSpecimenPage(accessionID2, accessionID4, selectedVisit, formData, connectId) :
+        (accessionID2.value) ? await proceedToSpecimenPage(accessionID2, accessionID4, selectedVisit, formData, connectId) :
         await redirectSpecimenPage(accessionID2, accessionID4, selectedVisit, formData, connectId)
     }) 
 }
 
-const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
+const proceedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
     const bloodAccessionId = await checkAccessionId({accessionId: +accessionID1.value, accessionIdType: '646899796'});
     if (bloodAccessionId.code == 200) {
         if (bloodAccessionId.data) {
@@ -2294,6 +2281,8 @@ const proccedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, 
             const yesBtn = document.getElementById('addCollection');
             yesBtn.addEventListener("click", async e => {
                 formData.collectionId = bloodAccessionId?.data?.[820476880];
+                formData['331584571'] =  selectedVisit;
+                
                 btnsClicked(connectId, formData); // needs code reformat/enhancement
                 await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
                 return
@@ -2340,12 +2329,12 @@ export const addEventBiospecimenCollectionFormToggles = () => {
 
         collected.addEventListener('change', () => {
             
-            if(getWorflow() === 'research' && reason) reason.disabled = collected.checked;
+            if(getWorkflow() === 'research' && reason) reason.disabled = collected.checked;
             if(deviated) deviated.disabled = !collected.checked;
             specimenId.disabled = !collected.checked;
             
             if(collected.checked) {
-                if(getWorflow() === 'research' && reason) reason.value = '';
+                if(getWorkflow() === 'research' && reason) reason.value = '';
             }
             else {
                 const event = new CustomEvent('change');
@@ -2359,14 +2348,14 @@ export const addEventBiospecimenCollectionFormToggles = () => {
                 }
             }
             
-            if (getWorflow() === 'research' && collected.id === '223999569') {
+            if (getWorkflow() === 'research' && collected.id === '223999569') {
                 const mouthwashContainer = document.getElementById(`143615646Id`);
                 if (!mouthwashContainer.value && collected.checked) {
                     specimenId.disabled = true;
                 }
             }
 
-            if (getWorflow() === 'research' && collected.id === '143615646') {
+            if (getWorkflow() === 'research' && collected.id === '143615646') {
                 const mouthwashBagChkb = document.getElementById(`223999569`);
                 const mouthwashBagText = document.getElementById(`223999569Id`);
                 if (collected.checked) {
@@ -2375,7 +2364,7 @@ export const addEventBiospecimenCollectionFormToggles = () => {
                 }
             }
             
-            const selectionData = workflows[getWorflow()].filter(tube => tube.concept === collected.id)[0];
+            const selectionData = workflows[getWorkflow()].filter(tube => tube.concept === collected.id)[0];
 
             if (selectionData.tubeType === 'Blood tube' || selectionData.tubeType === 'Urine') {
                 const biohazardBagChkb = document.getElementById(`787237543`);
@@ -2501,8 +2490,8 @@ export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
 
 export const createTubesForCollection = async (formData, biospecimenData) => {
     
-    if(getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
-    if(getWorflow() === 'clinical' && biospecimenData['915838974'] === undefined) biospecimenData['915838974'] = new Date().toISOString();
+    if(getWorkflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+    if(getWorkflow() === 'clinical' && biospecimenData['915838974'] === undefined) biospecimenData['915838974'] = new Date().toISOString();
     let siteTubesList = getSiteTubesLists(formData);
 
     siteTubesList.forEach((dt) => {
@@ -2524,7 +2513,7 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
 const collectionSubmission = async (formData, biospecimenData, cntd) => {
     removeAllErrors();
 
-    if (getWorflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+    if (getWorkflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
 
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
     const siteTubesList = getSiteTubesLists(biospecimenData);
@@ -2647,7 +2636,7 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
     biospecimenData['338570265'] = document.getElementById('collectionAdditionalNotes').value;
 
     if (cntd) {
-        if (getWorflow() === 'clinical') {
+        if (getWorkflow() === 'clinical') {
             if (biospecimenData['915838974'] === undefined) biospecimenData['915838974'] = new Date().toISOString();
         }
     }

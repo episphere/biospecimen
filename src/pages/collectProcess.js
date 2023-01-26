@@ -1,5 +1,5 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormEditAll, addEventBiospecimenCollectionFormText } from './../events.js'
-import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorflow, getCheckedInVisit, findParticipant, checkedIn } from '../shared.js';
+import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorkflow, getCheckedInVisit, findParticipant, checkedIn } from '../shared.js';
 import { checkInTemplate } from './checkIn.js';
 
 export const tubeCollectedTemplate = (data, formData) => {
@@ -16,7 +16,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                 <div class="row"><h5>${data['996038075']}, ${data['399159511']}</h5></div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${formData['820476880']}</div>
-                <div class="row">Collection ID Link Date/Time: ${getWorflow() === 'research' ? new Date(formData['678166505']).toLocaleString(): new Date(formData['915838974']).toLocaleString()}</div>
+                <div class="row">Collection ID Link Date/Time: ${getWorkflow() === 'research' ? new Date(formData['678166505']).toLocaleString(): new Date(formData['915838974']).toLocaleString()}</div>
             </div>
             ${formData['331584571'] ? `
                 <div class="ml-auto form-group">
@@ -36,7 +36,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                 <input class="custom-checkbox-size" type="checkbox" id="selectAllCollection">
                                 <label for="selectAllCollection">&nbsp;Check All</label>
                             </th>
-                            ${getWorflow() === 'research' ? `<th class="align-left">Reason Not Collected</th>` : ''}
+                            ${getWorkflow() === 'research' ? `<th class="align-left">Reason Not Collected</th>` : ''}
                             <th class="align-left">Scan Full Specimen ID</th> 
                             <th class="align-left">Select For Deviation</th>
                             <th class="align-left">Deviation Type</th> 
@@ -80,7 +80,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                     :``}
                                 </td>`
 
-                                if(getWorflow() === 'research') {
+                                if(getWorkflow() === 'research') {
 
                                     template += 
                                 

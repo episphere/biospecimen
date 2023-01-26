@@ -1,4 +1,4 @@
-import { getWorflow } from "./shared.js";
+import { getWorkflow } from "./shared.js";
 
 export const homeNavBar = () => {
     return `
@@ -126,7 +126,7 @@ export const adminNavBar = (name) => {
 }
 
 export const bodyNavBar = () => {
-    const workflow = getWorflow();
+    const workflow = getWorkflow();
     let template = `
         <ul class="nav nav-tabs row">
             <li class="nav-item">
