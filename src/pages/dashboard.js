@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, validateUser, addEventBarCodeScanner, allStates, getWorkflow, isDeviceMobile, replaceDateInputWithMaskedInput, checkedIn, verificationConversion } from "./../shared.js"
+import { userAuthorization, removeActiveClass, validateUser, addEventBarCodeScanner, allStates, getWorkflow, checkedIn, verificationConversion } from "./../shared.js"
 import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment, addEventClearAll } from "./../events.js";
 import { homeNavBar, bodyNavBar, unAuthorizedUser } from '../navbar.js';
 
@@ -107,9 +107,6 @@ export const searchTemplate = (goToSpecimenSearch) => {
     addEventSearchForm4();
     addEventClearAll();
     addEventNavBarSpecimenSearch();
-    if(isDeviceMobile) {
-    replaceDateInputWithMaskedInput(document.getElementById('dob'));
-    }
     //addEventNavBarShipment();
     if(goToSpecimenSearch) document.getElementById('navBarSpecimenSearch').click();
 }

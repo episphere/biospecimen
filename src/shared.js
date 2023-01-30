@@ -2072,9 +2072,8 @@ export const getParticipantSelection = async (filter) => {
      
 export const isDeviceMobile = /(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(window.navigator.userAgent) ||
     /Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(window.navigator.userAgent) || window.innerWidth < 1300;
-export const replaceDateInputWithMaskedInput = (dateInput) => {
 
-  if (dateInput.type !== "date") throw new Error(`${dateInput} must be a input type="date"`);
+export const replaceDateInputWithMaskedInput = (dateInput) => {
   dateInput.type = "text";
   dateInput.placeholder = "mm/dd/yyyy";
   dateInput.maxLength = 10;
@@ -2089,7 +2088,7 @@ export const replaceDateInputWithMaskedInput = (dateInput) => {
     
     if (len !== 1 || len !== 3) {
       if (e.keyCode == 47) {
-        dateInput.preventDefault();
+        e.preventDefault();
       }
     }
     
