@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorkflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, retrieveDateFromIsoString, convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion,  bagConceptIdList, checkAccessionId, checkSurveyEmailTrigger, packageConditonConversion, checkDerivedVariables } from './shared.js';
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorkflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, retrieveDateFromIsoString, convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion,  bagConceptIdList, checkAccessionId, checkSurveyEmailTrigger, packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -13,6 +13,11 @@ import conceptIds from './fieldToConceptIdMapping.js';
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
     if (!form) return;
+
+    if (isDeviceMobile) {
+      replaceDateInputWithMaskedInput(document.getElementById('dob'));
+    }
+
     form.addEventListener('submit', e => {
         e.preventDefault();
         const firstName = document.getElementById('firstName').value;
@@ -20,16 +25,22 @@ export const addEventSearchForm1 = () => {
         const dobEl = document.getElementById('dob');
         let dob = dobEl.value;
 
-        if (dobEl.dataset.maskedInputFormat === "mm/dd/yyyy") {
-            const [mm,dd,yyyy] = dob.split('/');
-            dob = `${yyyy}${mm}${dd}`;
+        if (dob.length > 0) {
+            if (dob.length === 10 && dobEl.dataset.maskedInputFormat === "mm/dd/yyyy") {
+                const [mm,dd,yyyy] = dob.split('/');
+                dob = `${yyyy}${mm}${dd}`;
+            } else { // todo: if the dob string is not valid, remind the user to enter a valid date
+                return;
+            }
         }
 
         if (!firstName && !lastName && !dob) return;
+
         let query = '';
         if (firstName) query += `firstName=${firstName}&`;
         if (lastName) query += `lastName=${lastName}&`;
-        if (dob) query += `dob=${dob.replace(/-/g, '')}&`;
+        if (dob) query += `dob=${dob}`;
+        
         performSearch(query);
     })
 };

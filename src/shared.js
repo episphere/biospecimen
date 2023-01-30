@@ -22,7 +22,7 @@ export const urls = {
  * @param {object} [initialState={}] -initial state of the store
  */
 function createStore(initialState = {}) {
-    let state = JSON.parse(JSON.stringify(initialState));
+    let state = initialState;
   
     /** @param {object | function} update - an object or a function to update state */
     const setState = (update) => {
@@ -2072,33 +2072,21 @@ export const getParticipantSelection = async (filter) => {
      
 export const isDeviceMobile = /(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(window.navigator.userAgent) ||
     /Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(window.navigator.userAgent) || window.innerWidth < 1300;
-export const replaceDateInputWithMaskedInput = (dateInput) => {
 
-  if (dateInput.type !== "date") throw new Error(`${dateInput} must be a input type="date"`);
+export const replaceDateInputWithMaskedInput = (dateInput) => {
   dateInput.type = "text";
   dateInput.placeholder = "mm/dd/yyyy";
   dateInput.maxLength = 10;
   dateInput.dataset.maskedInputFormat = "mm/dd/yyyy";
   dateInput.addEventListener("keypress", function (e) {
-    
-    if (e.keyCode < 47 || e.keyCode > 57) {
+    // Only allows number inputs and deletes
+    if (e.keyCode < 48 || e.keyCode > 57) {
       e.preventDefault();
     }
-    
-    const len = dateInput.value.length;
-    
-    if (len !== 1 || len !== 3) {
-      if (e.keyCode == 47) {
-        dateInput.preventDefault();
-      }
-    }
-    
-    if (len === 2 || len === 3) {
-        dateInput.value += '/';
-    }
 
-    if (len === 5) {
-        dateInput.value += '/';
+    const len = dateInput.value.length;
+    if (len === 2 || len === 5) {
+      dateInput.value += '/';
     }
   });
 };
