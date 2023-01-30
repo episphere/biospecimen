@@ -2079,25 +2079,14 @@ export const replaceDateInputWithMaskedInput = (dateInput) => {
   dateInput.maxLength = 10;
   dateInput.dataset.maskedInputFormat = "mm/dd/yyyy";
   dateInput.addEventListener("keypress", function (e) {
-    
-    if (e.keyCode < 47 || e.keyCode > 57) {
+    // Only allows number inputs and deletes
+    if (e.keyCode < 48 || e.keyCode > 57) {
       e.preventDefault();
     }
-    
-    const len = dateInput.value.length;
-    
-    if (len !== 1 || len !== 3) {
-      if (e.keyCode == 47) {
-        e.preventDefault();
-      }
-    }
-    
-    if (len === 2 || len === 3) {
-        dateInput.value += '/';
-    }
 
-    if (len === 5) {
-        dateInput.value += '/';
+    const len = dateInput.value.length;
+    if (len === 2 || len === 5) {
+      dateInput.value += '/';
     }
   });
 };
