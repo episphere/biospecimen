@@ -285,23 +285,6 @@ export const showNotifications = (data, error) => {
             </div>
         </div>
 `;
-
-    // const div = document.createElement('div');
-    // div.classList = ["notification"];
-    // div.innerHTML = `
-    //     <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
-    //         <div class="toast-header">
-    //             <strong class="mr-auto ${error ? 'error-heading': ''}">${data.title}</strong>
-    //             <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">&times;</button>
-    //         </div>
-    //         <div class="toast-body">
-    //             ${data.body}
-    //         </div>
-    //     </div>
-    // `
-    // document.getElementById('showNotification').appendChild(div);
-    // document.getElementsByClassName('container')[0].scrollIntoView(true);
-    // addEventHideNotification(div);
 }
 
 export const errorMessage = (id, msg, focus, offset) => {
@@ -485,6 +468,20 @@ export const updateSpecimen = async (array) => {
         body: JSON.stringify(array)
     }
     const response = await fetch(`${api}api=updateSpecimen`, requestObj);
+    return response.json();
+}
+
+export const checkDerivedVariables = async (array) => {
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(array)
+    }
+    const response = await fetch(`${api}api=checkDerivedVariables`, requestObj);
     return response.json();
 }
 
@@ -692,7 +689,6 @@ export const convertToFirestoreBox = (inputBox) => {
   for (let k of keysToRomove) {
     if (outputBox[k]) delete outputBox[k];
   }
-
   return outputBox;
 };
 
@@ -961,6 +957,8 @@ export const getUpdatedParticipantData = async (data) => {
 
 export const updateCollectionSettingData = async (biospecimenData, tubes, data) => {
     
+    data = await getUpdatedParticipantData(data);
+
     let settings;
     let visit = biospecimenData[conceptIds.collection.selectedVisit];
 
@@ -1053,6 +1051,8 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
 
 export const updateBaselineData = async (siteTubesList, data) => {
 
+    data = await getUpdatedParticipantData(data);
+
     const response = await getParticipantCollections(data.token);
     const baselineCollections = response.data.filter(collection => collection['331584571'] === 266600170);
     
@@ -1109,66 +1109,6 @@ export const updateBaselineData = async (siteTubesList, data) => {
     await updateParticipant(baselineData);
 }
 
-export const verifyPaymentEligibility = async (formData) => {
-
-    if(formData['130371375']['266600170']['731498909'] === 104430631) {
-        const responseCollections = await getParticipantCollections(formData.token);
-        const baselineCollections = responseCollections.data.filter(collection => collection['331584571'] === 266600170);
-
-        const incentiveEligible = await checkPaymentEligibility(formData, baselineCollections);
-
-        if(incentiveEligible) {
-            const incentiveData = {
-                '130371375.266600170.731498909': 353358909,
-                '130371375.266600170.222373868': formData['827220437'] === 809703864 ? 104430631 : 353358909,
-                '130371375.266600170.787567527': new Date().toISOString(),
-                uid: formData.state.uid
-            };
-
-            await updateParticipant(incentiveData);
-        } 
-    }
-}
-
-const checkPaymentEligibility = async (data, baselineCollections) => {
-  
-    if(baselineCollections.length === 0) return false;
-  
-    const module1 = (data[conceptIds.modules.module1.status] === conceptIds.modules.submitted);
-    const module2 = (data[conceptIds.modules.module2.status] === conceptIds.modules.submitted);
-    const module3 = (data[conceptIds.modules.module3.status] === conceptIds.modules.submitted);
-    const module4 = (data[conceptIds.modules.module4.status] === conceptIds.modules.submitted);
-
-    const bloodCollected = baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research 
-        ? (data[conceptIds.baseline.bloodCollected] === conceptIds.yes) 
-        : (data[conceptIds.baseline.bloodCollected] === conceptIds.yes) || (data[conceptIds.collectionDetails][conceptIds.baseline.visitId][conceptIds.clinicalSite.bloodCollected] === conceptIds.yes);
-
-    const tubes = baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research 
-        ? workflows.research.filter(tube => tube.tubeType === 'Blood tube') 
-        : workflows.clinical.filter(tube => tube.tubeType === 'Blood tube');
-  
-    let eligible = false;
-  
-    if(module1 && module2 && module3 && module4) {
-        if(bloodCollected) {
-            eligible = true;
-        }    
-        else {
-            baselineCollections.forEach(collection => {
-                if(collection[conceptIds.collection.collectionSetting] === conceptIds.research) {
-                    tubes.forEach(tube => {
-                        if(collection[tube.concept] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] && collection[tube.concept][conceptIds.REASON_NOT_COLLECTED] != conceptIds.REASONS.PARTICIPANT_REFUSAL) {
-                            eligible = true;
-                        }
-                    });
-                }
-            });
-        }
-    }
-  
-    return eligible;
-  }
-
 export const siteFullNames = {
     'NCI': 'National Cancer Institute',
     'KPGA': 'Kaiser Permanente Georgia',
@@ -1196,8 +1136,17 @@ export const siteSpecificLocation = {
   "Marshfield": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "Lake Hallie": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "Weston": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
-  "SF Cancer Center LL": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
+  "Rice Lake": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
+  "Wisconsin Rapids": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
+  "Colby Abbotsford": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
+  "Minocqua": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
+  "Merrill": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
+  "Sioux Falls Imagenetics": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
+  "Fargo South University": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
   "DCAM": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
+  "Ingalls Harvey": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
+  "River East": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
+  "South Loop": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "Main Campus": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
   "Frederick": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
 }
@@ -1362,8 +1311,73 @@ export const locationConceptIDToLocationMap = {
       }],
     },
   },
+  691714762:{
+    siteSpecificLocation: 'Rice Lake',
+    siteAcronym: 'MFC',
+    siteCode: '303349821',
+    loginSiteName: 'Marshfield Cancer Center',
+    contactInfo: {
+      "MFC":[{
+        "fullName":"N/A",
+        "email":"N/A",
+        "phone":["N/A"],
+      }],
+    },
+  },
+  487512085:{
+    siteSpecificLocation: 'Wisconsin Rapids',
+    siteAcronym: 'MFC',
+    siteCode: '303349821',
+    loginSiteName: 'Marshfield Cancer Center',
+    contactInfo: {
+      "MFC":[{
+        "fullName":"N/A",
+        "email":"N/A",
+        "phone":["N/A"],
+      }],
+    },
+  },
+  983848564:{
+    siteSpecificLocation: 'Colby Abbotsford',
+    siteAcronym: 'MFC',
+    siteCode: '303349821',
+    loginSiteName: 'Marshfield Cancer Center',
+    contactInfo: {
+      "MFC":[{
+        "fullName":"N/A",
+        "email":"N/A",
+        "phone":["N/A"],
+      }],
+    },
+  },
+  261931804:{
+    siteSpecificLocation: 'Minocqua',
+    siteAcronym: 'MFC',
+    siteCode: '303349821',
+    loginSiteName: 'Marshfield Cancer Center',
+    contactInfo: {
+      "MFC":[{
+        "fullName":"N/A",
+        "email":"N/A",
+        "phone":["N/A"],
+      }],
+    },
+  },
+  665277300:{
+    siteSpecificLocation: 'Merrill',
+    siteAcronym: 'MFC',
+    siteCode: '303349821',
+    loginSiteName: 'Marshfield Cancer Center',
+    contactInfo: {
+      "MFC":[{
+        "fullName":"N/A",
+        "email":"N/A",
+        "phone":["N/A"],
+      }],
+    },
+  },
   589224449: {
-    siteSpecificLocation: 'SF Cancer Center LL',
+    siteSpecificLocation: 'Sioux Falls Imagenetics',
     siteAcronym: 'SFH',
     siteCode: '657167265',
     loginSiteName: 'Sanford Health',
@@ -1379,6 +1393,19 @@ export const locationConceptIDToLocationMap = {
       }],
     },
   },
+  467088902: {
+    siteSpecificLocation: 'Fargo South University',
+    siteAcronym: 'SFH',
+    siteCode: '657167265',
+    loginSiteName: 'Sanford Health',
+    contactInfo: {
+      "SFH":[{
+        "fullName":"N/A",
+        "email":"N/A",
+        "phone":["N/A"],
+      }],
+    },
+  },
   777644826: {
     siteSpecificLocation: 'DCAM',
     siteAcronym: 'UCM',
@@ -1389,6 +1416,45 @@ export const locationConceptIDToLocationMap = {
         "fullName":"Jaime King",
         "email":"jaimeking@bsd.uchicago.edu",
         "phone":["(773) 702-5073"],
+      }],
+    },
+  },
+  145191545: {
+    siteSpecificLocation: 'Ingalls Harvey',
+    siteAcronym: 'UCM',
+    siteCode: '809703864',
+    loginSiteName: 'University of Chicago Medicine',
+    contactInfo: {
+      "UCM":[{
+        "fullName":"N/A",
+        "email":"N/A",
+        "phone":["N/A"],
+      }],
+    },
+  },
+  489380324: {
+    siteSpecificLocation: 'River East',
+    siteAcronym: 'UCM',
+    siteCode: '809703864',
+    loginSiteName: 'University of Chicago Medicine',
+    contactInfo: {
+      "UCM":[{
+        "fullName":"N/A",
+        "email":"N/A",
+        "phone":["N/A"],
+      }],
+    },
+  },
+  120264574: {
+    siteSpecificLocation: 'South Loop',
+    siteAcronym: 'UCM',
+    siteCode: '809703864',
+    loginSiteName: 'University of Chicago Medicine',
+    contactInfo: {
+      "UCM":[{
+        "fullName":"N/A",
+        "email":"N/A",
+        "phone":["N/A"],
       }],
     },
   },
@@ -1425,10 +1491,19 @@ export const conceptIdToSiteSpecificLocation = {
   692275326: "Marshfield",
   698283667: "Lake Hallie",
   813701399: "Weston",
-  589224449: "SF Cancer Center LL",
+  145191545: "Ingalls Harvey",
+  489380324: "River East",
+  120264574: "South Loop",
+  691714762: "Rice Lake",
+  487512085: "Wisconsin Rapids",
+  983848564: "Colby Abbotsford",
+  261931804: "Minocqua",
+  665277300: "Merrill",
+  467088902: "Fargo South University",
+  589224449: "Sioux Falls Imagenetics",
   777644826: "DCAM",
   111111111: "Main Campus",
-  222222222: "Frederick",
+  222222222: "Frederick"
 }
 
 export const siteSpecificLocationToConceptId = {
@@ -1442,12 +1517,21 @@ export const siteSpecificLocationToConceptId = {
   "KPNW RRL": 715632875,
   "Marshfield": 692275326,
   "Lake Hallie": 698283667,
-  "SF Cancer Center LL": 589224449,
+  "Sioux Falls Imagenetics": 589224449,
   "DCAM": 777644826, 
   "Main Campus": 111111111,
   "Frederick": 222222222,
   "HFH Livonia Research Clinic": 706927479,
   "Weston": 813701399,
+  "Ingalls Harvey": 145191545,
+  "River East": 489380324,
+  "South Loop": 120264574,
+  "Rice Lake": 691714762,
+  "Wisconsin Rapids": 487512085,
+  "Colby Abbotsford": 983848564,
+  "Minocqua": 261931804,
+  "Merrill": 665277300,
+  "Fargo South University": 467088902
 }
 
 export const nameToKeyObj = 
@@ -1489,7 +1573,16 @@ export const keyToLocationObj =
     886364332: "Henry Ford Health Pavilion",
     706927479: "HFH Livonia Research Clinic",
     813701399: "Weston",
-    589224449: "SF Cancer Center LL",
+    145191545: "Ingalls Harvey",
+    489380324: "River East",
+    120264574: "South Loop",
+    691714762: "Rice Lake",
+    487512085: "Wisconsin Rapids",
+    983848564: "Colby Abbotsford",
+    261931804: "Minocqua",
+    665277300: "Merrill",
+    467088902: "Fargo South University",
+    589224449: "Sioux Falls Imagenetics",
     111111111: "NIH",
     13:"NCI"
 }
@@ -1684,12 +1777,12 @@ export const disableInput = (id, disable) => {
 
 export const siteLocations = {
     'research': {
-        'UCM': [{location: 'UC-DCAM', concept: 777644826}],
-        'MFC': [{location: 'Marshfield', concept: 692275326}, {location: 'Lake Hallie', concept: 698283667}, {location: 'Weston', concept: 813701399}],
+        'UCM': [{location: 'UC-DCAM', concept: 777644826}, {location: 'Ingalls Harvey', concept: 145191545}, {location: 'River East', concept: 489380324}, {location: 'South Loop', concept: 120264574}],
+        'MFC': [{location: 'Marshfield', concept: 692275326}, {location: 'Lake Hallie', concept: 698283667}, {location: 'Weston', concept: 813701399}, {location: 'Rice Lake', concept: 691714762}, {location: 'Wisconsin Rapids', concept: 487512085}, {location: 'Colby Abbotsford', concept: 983848564}, {location: 'Minocqua', concept: 261931804}, {location: 'Merrill', concept: 665277300}],
         'HP': [{location: 'HP Research Clinic', concept: 834825425}],
         'HFHS': [{location: 'HFH K-13 Research Clinic', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332},
                 {location: 'HFH Livonia Research Clinic', concept: 706927479}],
-        'SFH': [{location: 'SF Cancer Center LL', concept: 589224449}],
+        'SFH': [{location: 'Sioux Falls Imagenetics', concept: 589224449}, {location: 'Fargo South University', concept: 467088902}],
         'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}]
     },
     'clinical': {
@@ -1888,7 +1981,6 @@ export const getCollectionsByVisit = async (data) => {
 export const getCollectionById = async (data, collectionId) => {
 
     const response = await getParticipantCollections(data.token);
-    console.log("response", response)
     let collectionExists = false;
     if(response.code != 404) {
         collectionExists = response.data.some(col => col.id === collectionId)
