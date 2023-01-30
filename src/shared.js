@@ -22,7 +22,7 @@ export const urls = {
  * @param {object} [initialState={}] -initial state of the store
  */
 function createStore(initialState = {}) {
-    let state = JSON.parse(JSON.stringify(initialState));
+    let state = initialState;
   
     /** @param {object | function} update - an object or a function to update state */
     const setState = (update) => {
