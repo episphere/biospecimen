@@ -2077,7 +2077,6 @@ export const replaceDateInputWithMaskedInput = (dateInput) => {
   dateInput.type = "text";
   dateInput.placeholder = "mm/dd/yyyy";
   dateInput.maxLength = 10;
-  dateInput.dataset.maskedInputFormat = "mm/dd/yyyy";
   dateInput.addEventListener("keypress", function (e) {
     // Only allows number inputs and deletes
     if (e.keyCode < 48 || e.keyCode > 57) {

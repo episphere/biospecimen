@@ -25,13 +25,19 @@ export const addEventSearchForm1 = () => {
         const dobEl = document.getElementById('dob');
         let dob = dobEl.value;
 
-        if (dob.length > 0) {
-            if (dob.length === 10 && dobEl.dataset.maskedInputFormat === "mm/dd/yyyy") {
+        if (dob.length === 10) {
+            if (isDeviceMobile) {
+                // handle mobile device date input
                 const [mm,dd,yyyy] = dob.split('/');
                 dob = `${yyyy}${mm}${dd}`;
-            } else { // todo: if the dob string is not valid, remind the user to enter a valid date
-                return;
+            } else { 
+                // handle large screen date input
+                const [yyyy,mm,dd] = dob.split('-');
+                dob = `${yyyy}${mm}${dd}`;
             }
+        } else if (dob.length>0) { 
+            // todo: if the dob string is not valid, remind the user to enter a valid date
+            return;
         }
 
         if (!firstName && !lastName && !dob) return;
