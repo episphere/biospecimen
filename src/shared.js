@@ -17,7 +17,28 @@ export const urls = {
     'prod': 'biospecimen-myconnect.cancer.gov'
 }
 
-export const appState = {};
+/**
+ * Creates a store object with setState and getState methods
+ * @param {object} [initialState={}] -initial state of the store
+ */
+function createStore(initialState = {}) {
+    let state = initialState;
+  
+    /** @param {object | function} update - an object or a function to update state */
+    const setState = (update) => {
+      const currSlice = typeof update === 'function' ? update(state) : update;
+      if (currSlice !== state) {
+        state = { ...state, ...currSlice };
+      }
+    };
+  
+    /** @return {object}  */
+    const getState = () => state;
+  
+    return { setState, getState };
+  }
+
+export const appState = createStore();
 
 let api = '';
 
@@ -253,9 +274,19 @@ export const performSearch = async (query) => {
     showAnimation();
     const response = await findParticipant(query);
     hideAnimation();
-    const getVerifiedParticipants = response.data.filter(dt => dt['821247024'] === 197316935);
-    if(response.code === 200 && getVerifiedParticipants.length > 0) searchResults(getVerifiedParticipants);
-    else if(response.code === 200 && getVerifiedParticipants.length === 0) showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+    const verifiedParticipants = response.data.filter(dt => dt['821247024'] === 197316935);
+
+    if (response.code === 200 && verifiedParticipants.length > 0) {
+      searchResults(verifiedParticipants);
+    } else if (response.code === 200 && verifiedParticipants.length === 0) {
+      showNotifications(
+        {
+          title: 'Not found',
+          body: 'The participant with entered search criteria not found!'
+        },
+        true
+      );
+    }
 }
 
 export const showNotifications = (data, error) => {
@@ -1988,12 +2019,12 @@ export const getCollectionById = async (data, collectionId) => {
     
     return collections;
 };
-export const getWorflow = () => document.getElementById('contentBody').dataset.workflow ?? localStorage.getItem('workflow');
+export const getWorkflow = () => document.getElementById('contentBody').dataset.workflow ?? localStorage.getItem('workflow');
 export const getSiteAcronym = () => document.getElementById('contentBody').dataset.siteAcronym ?? localStorage.getItem('siteAcronym');
 export const getSiteCode = () => document.getElementById('contentBody').dataset.siteCode ?? localStorage.getItem('siteCode');
 
 export const getSiteTubesLists = (specimenData) => {
-    const dashboardType = getWorflow();
+    const dashboardType = getWorkflow();
     const siteAcronym = getSiteAcronym();
     const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === specimenData['951355211'])[0]?.location : undefined;
     const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
@@ -2041,33 +2072,20 @@ export const getParticipantSelection = async (filter) => {
      
 export const isDeviceMobile = /(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(window.navigator.userAgent) ||
     /Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(window.navigator.userAgent) || window.innerWidth < 1300;
-export const replaceDateInputWithMaskedInput = (dateInput) => {
 
-  if (dateInput.type !== "date") throw new Error(`${dateInput} must be a input type="date"`);
+export const replaceDateInputWithMaskedInput = (dateInput) => {
   dateInput.type = "text";
   dateInput.placeholder = "mm/dd/yyyy";
   dateInput.maxLength = 10;
-  dateInput.dataset.maskedInputFormat = "mm/dd/yyyy";
   dateInput.addEventListener("keypress", function (e) {
-    
-    if (e.keyCode < 47 || e.keyCode > 57) {
+    // Only allows number inputs and deletes
+    if (e.keyCode < 48 || e.keyCode > 57) {
       e.preventDefault();
     }
-    
-    const len = dateInput.value.length;
-    
-    if (len !== 1 || len !== 3) {
-      if (e.keyCode == 47) {
-        dateInput.preventDefault();
-      }
-    }
-    
-    if (len === 2 || len === 3) {
-        dateInput.value += '/';
-    }
 
-    if (len === 5) {
-        dateInput.value += '/';
+    const len = dateInput.value.length;
+    if (len === 2 || len === 5) {
+      dateInput.value += '/';
     }
   });
 };
@@ -2335,13 +2353,12 @@ export function addSelectionEventListener(elemId, pageAndElement) {
 }
 
 export const checkSurveyEmailTrigger = async (data, visitType) => {
-    
     const response = await getParticipantCollections(data.token);
     let sendBaselineEmail = false;
 
     if(response.code != 404) {
+        // filter based on visit type (331584571) and collection type as 'clinical' (664882224)
         const collections = response.data.filter(res => res['331584571'] == visitType && res['650516960'] == 664882224);
-
         if(collections.length == 1) sendBaselineEmail = true;
     } 
     
@@ -2359,6 +2376,6 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
             read: false
         };
         
-        await(sendClientEmail(emailData));
+        await sendClientEmail(emailData);
     }
 }
