@@ -24,6 +24,19 @@ import { kitReportsScreen } from "./src/pages/reports/kitReports.js";
 
 
 let auth = '';
+const DatadogDevSettings = {
+  clientToken: 'pub7aa9e5da99946b3a91246ac09af1cc45',
+  applicationId: 'd9a6d4bf-1617-4dde-9873-0a7c3eee1388',
+  site: 'ddog-gov.com',
+  service: 'biospecimen',
+  env: 'dev',
+  sessionSampleRate: 100,
+  sessionReplaySampleRate: 20,
+  trackUserInteractions: true,
+  trackResources: true,
+  trackLongTasks: true,
+  defaultPrivacyLevel: 'mask-user-input',
+};
 
 window.onload = () => {
     if ("serviceWorker" in navigator) {
@@ -39,9 +52,13 @@ window.onload = () => {
     }
     else if(location.host === urls.stage) {
         !firebase.apps.length ? firebase.initializeApp(stageFirebaseConfig()) : firebase.app();
+        window.DD_RUM && window.DD_RUM.init({ ...DatadogDevSettings, env: 'stage' });
+        window.DD_RUM && window.DD_RUM.startSessionReplayRecording();
     }
     else {
         !firebase.apps.length ? firebase.initializeApp(devFirebaseConfig()) : firebase.app();
+        window.DD_RUM && window.DD_RUM.init(DatadogDevSettings);
+        window.DD_RUM && window.DD_RUM.startSessionReplayRecording();
     }
 
     auth = firebase.auth();
