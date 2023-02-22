@@ -51,18 +51,17 @@ window.onload = () => {
     if(location.host === urls.prod) {
         !firebase.apps.length ? firebase.initializeApp(prodFirebaseConfig()) : firebase.app();
         window.DD_RUM && window.DD_RUM.init({ ...DatadogDevConfig, env: 'prod' });
-        window.DD_RUM && window.DD_RUM.startSessionReplayRecording();
     }
     else if(location.host === urls.stage) {
         !firebase.apps.length ? firebase.initializeApp(stageFirebaseConfig()) : firebase.app();
         window.DD_RUM && window.DD_RUM.init({ ...DatadogDevConfig, env: 'stage' });
-        window.DD_RUM && window.DD_RUM.startSessionReplayRecording();
     }
     else {
         !firebase.apps.length ? firebase.initializeApp(devFirebaseConfig()) : firebase.app();
         window.DD_RUM && window.DD_RUM.init(DatadogDevConfig);
-        window.DD_RUM && window.DD_RUM.startSessionReplayRecording();
     }
+
+    window.DD_RUM && window.DD_RUM.startSessionReplayRecording();
 
     auth = firebase.auth();
     auth.onAuthStateChanged(async user => {
