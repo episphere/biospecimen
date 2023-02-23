@@ -648,7 +648,12 @@ const addDefaultDateReceived = (getCurrentDate) => {
 // returns current date in default format ("YYYY-MM-DD")
 const getCurrentDate = () => {
   const currentDate = new Date();
-  return currentDate.getFullYear() + "-" + currentDate.getMonth() + 1 + "-" + currentDate.getDate()
+  return currentDate.getFullYear() + "-" + checkForPadding(parseInt(currentDate.getMonth() + 1)) + "-" + checkForPadding(currentDate.getDate())
+}
+
+const checkForPadding = (input) => { // adds 0 before single month & day to adhere to HTML date format
+  if (input < 10) return `0`+input.toString();
+  else return input;
 }
 
 const uspsFirstThreeNumbersCheck = (input) => {
