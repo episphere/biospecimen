@@ -20,8 +20,31 @@ export const welcomeScreen = async (auth, route) => {
     welcomeScreenTemplate(name || response.data.email, response.data, auth, route);
 }
 
+const clinicalSiteArray = ['KPNW', 'KPCO', 'KPHI', 'KPGA'];
+const researchSiteArray = ['MFC', 'UCM', 'HP', 'HFHS', 'SFH'];
+
 const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
+    let dashboardSelectionStr = '';
+
+    if (clinicalSiteArray.includes(data.siteAcronym)) {
+        dashboardSelectionStr = `                    
+            <select required disabled class="col form-control" id="dashboardSelection">
+                <option selected value="clinical">Clinical Dashboard</option>
+            </select>`;
+    } else if (researchSiteArray.includes(data.siteAcronym)) {
+        dashboardSelectionStr = `
+            <select required disabled class="col form-control" id="dashboardSelection">
+                <option selected value="research">Research Dashboard</option>
+            </select>`;
+    } else {
+        dashboardSelectionStr = `
+            <select required class="col form-control" id="dashboardSelection">
+                <option value="">-- Select Dashboard --</option>
+                <option value="clinical">Clinical Dashboard</option>
+                <option value="research">Research Dashboard</option>
+            </select>`;
+    }
 
     template += `
     <div id="alert_placeholder"></div>
@@ -40,11 +63,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
             <div class="col div-border" style="margin-right: 1rem;padding-bottom: 1rem;">
                 <div>
                     <label for="dashboardSelection" class="col-form-label">Select dashboard to use </label>
-                    <select required class="col form-control" id="dashboardSelection">
-                        <option value="">-- Select Dashboard --</option>
-                        <option value="clinical">Clinical Dashboard</option>
-                        <option value="research">Research Dashboard</option>
-                    </select>
+                    ${dashboardSelectionStr}
                 </div>
                 </br>
                 <div class="row">
