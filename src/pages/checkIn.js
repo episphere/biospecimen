@@ -13,11 +13,15 @@ export const checkInTemplate = async (data) => {
     
     let template = `
         </br>
+
         <div class="row">
             ${isCheckedIn ? `<h5>Participant Check-Out</h5>` : `<h5>Participant Check-In</h5>`}
         </div>
+
         </br>
+
         <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
+
             <div class="row">
                 <div class="col-md-12">
                     <h5>${data['996038075']}, ${data['399159511']}</h5>
@@ -26,9 +30,10 @@ export const checkInTemplate = async (data) => {
                     ${data['348474836'] ? `<h5>User Phone: ${data['348474836']}</h5>`: '' }
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-md-5">`
-                    
+            
                     if(isCheckedIn) {
                         template += `<h5>Visit: ${visitType.filter(visit => visit.concept === getCheckedInVisit(data))[0].visitType}</h5>`
                     }
@@ -42,20 +47,23 @@ export const checkInTemplate = async (data) => {
 
                         template += `</select>`;
                     }
-                        
-                template += `
-
+                    template += `
                 </div>
-                <div class="col-md-3">
-                    <button class="btn btn-outline-primary btn-block text-nowrap" ${!isCheckedIn ? `disabled` : visitCollections && visitCollections.length > 0 ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
-                </div>
+                
                 <div class="ml-auto">Connect ID: <svg id="connectIdBarCode"></svg></div>
             </div>
-            <hr/>`
             
-        template += await participantStatus(data);
+            <hr/>
+    `;
 
-        `</form>
+    template += await participantStatus(data);
+
+    template += `
+            <div class="col">
+                <button class="btn btn-outline-primary btn-block text-nowrap" ${!isCheckedIn ? `disabled` : visitCollections && visitCollections.length > 0 ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
+            </div>
+
+        </form>
     `;
 
     document.getElementById('contentBody').innerHTML = template;
@@ -117,6 +125,56 @@ const participantStatus = (data) => {
             </div>
         </div>
             
+        <br/>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h5>Baseline Sample Status</h5>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="col-md-12 info-box">
+                    <div class="row">
+                        <span class="full-width">Baseline Blood</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['878865966'] === 353358909 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['878865966'] === 353358909 ? 'Collected' : 'Not Collected'}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="col-md-12 info-box">
+                    <div class="row">
+                        <span class="full-width">Baseline Mouthwash</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['684635302'] === 353358909 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['684635302'] === 353358909 ? 'Collected' : 'Not Collected'}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="col-md-12 info-box">
+                    <div class="row">
+                        <span class="full-width">Baseline Urine</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['167958071'] === 353358909 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${data['167958071'] === 353358909 ? 'Collected' : 'Not Collected' }</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <br/>
 
         <div class="row">
@@ -217,56 +275,6 @@ const participantStatus = (data) => {
                     </div>
                     <div class="row">
                         <span class="full-width">${data['663265240'] === 615768760 ? data['452942800'] : data['663265240'] === 231311385 ? data['264644252'] : '<br>'}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <br/>
-
-        <div class="row">
-            <div class="col-md-12">
-                <h5>Baseline sample status</h5>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4">
-                <div class="col-md-12 info-box">
-                    <div class="row">
-                        <span class="full-width">Baseline Blood</span>
-                    </div>
-                    <div class="row">
-                        <span class="full-width">${data['878865966'] === 353358909 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}</span>
-                    </div>
-                    <div class="row">
-                        <span class="full-width">${data['878865966'] === 353358909 ? 'Collected' : 'Not Collected'}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="col-md-12 info-box">
-                    <div class="row">
-                        <span class="full-width">Baseline Mouthwash</span>
-                    </div>
-                    <div class="row">
-                        <span class="full-width">${data['684635302'] === 353358909 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}</span>
-                    </div>
-                    <div class="row">
-                        <span class="full-width">${data['684635302'] === 353358909 ? 'Collected' : 'Not Collected'}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="col-md-12 info-box">
-                    <div class="row">
-                        <span class="full-width">Baseline Urine</span>
-                    </div>
-                    <div class="row">
-                        <span class="full-width">${data['167958071'] === 353358909 ? '<i class="fas fa-2x fa-check"></i>' : '<i class="fas fa-2x fa-times"></i>'}</span>
-                    </div>
-                    <div class="row">
-                        <span class="full-width">${data['167958071'] === 353358909 ? 'Collected' : 'Not Collected' }</span>
                     </div>
                 </div>
             </div>
