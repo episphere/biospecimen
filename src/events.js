@@ -2660,7 +2660,7 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
         if (getWorkflow() === 'research') {
             let initials = document.getElementById('collectionInitials')
             if(initials && initials.value.trim().length == 0) {
-                errorMessage(initials.id, 'Please provide more details', focus);
+                errorMessage(initials.id, 'This field is required. Please enter the phlebotomist\'s initials.', focus);
                 focus = false;
                 return;
             }
