@@ -2664,6 +2664,9 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
                 focus = false;
                 return;
             }
+            else {
+                biospecimenData['719427591'] = initials.value.trim();
+            }
         }
     }
 
