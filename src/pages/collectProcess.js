@@ -21,7 +21,8 @@ export const tubeCollectedTemplate = (data, formData) => {
                     <div class="row">
                         <div>Collection Phlebotomist Initials:&nbsp</div>
                         <input 
-                            type="text" 
+                            type="text"
+                            ${formData['719427591'] ? `value=${formData['719427591']}` : ``}
                             id="collectionInitials"
                             style="text-transform:uppercase"
                             onpaste="return false;"
