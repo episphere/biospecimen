@@ -62,7 +62,7 @@ window.onload = () => {
         !isLocalDev && window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'dev' });
     }
 
-        !isLocalDev && window.DD_RUM && window.DD_RUM.startSessionReplayRecording();
+    !isLocalDev && window.DD_RUM && window.DD_RUM.startSessionReplayRecording();
 
     auth = firebase.auth();
     auth.onAuthStateChanged(async user => {
