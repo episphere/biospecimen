@@ -22,7 +22,7 @@ export const finalizeTemplate = (data, specimenData) => {
                 <div class="row">Collection ID Link Date/Time: ${getWorkflow() === 'research' ? new Date(specimenData['678166505']).toLocaleString(): new Date(specimenData['915838974']).toLocaleString()}</div>
                 ${getWorkflow() === 'research' ? `
                     <div class="row">
-                        <div>Collection Phlebotomist Initials: ${specimenData['719427591'] ? `${specimenData['719427591']}` : ``}</div>
+                        <div>Collection Phlebotomist Initials: ${specimenData['719427591'] || ''}</div>
                     </div>` 
                     
                     : ''
