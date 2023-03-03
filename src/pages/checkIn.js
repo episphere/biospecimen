@@ -1,7 +1,6 @@
 import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getCollectionsByVisit, getParticipantCollections, getSiteTubesLists } from "./../shared.js";
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 import conceptIds from '../fieldToConceptIdMapping.js';
-import fieldToConceptIdMapping from "../fieldToConceptIdMapping.js";
 
 export const checkInTemplate = async (data) => {
     removeActiveClass('navbar-btn', 'active')
@@ -137,18 +136,18 @@ const participantStatus = (data, collections) => {
     });
 
     if(bloodCollected.length > 0) {
-        bloodCollection = bloodCollected[0][fieldToConceptIdMapping.collection.id];
-        bloodTime = bloodCollected[0][fieldToConceptIdMapping.collection.collectionTime];
+        bloodCollection = bloodCollected[0][conceptIds.collection.id];
+        bloodTime = bloodCollected[0][conceptIds.collection.collectionTime];
     }
     
     if(urineCollected.length > 0) {
-        urineCollection = urineCollected[0][fieldToConceptIdMapping.collection.id];
-        urineTime = urineCollected[0][fieldToConceptIdMapping.collection.collectionTime];
+        urineCollection = urineCollected[0][conceptIds.collection.id];
+        urineTime = urineCollected[0][conceptIds.collection.collectionTime];
     }
     
     if(mouthwashCollected.length > 0) {
-        mouthwashCollection = mouthwashCollected[0][fieldToConceptIdMapping.collection.id];
-        mouthwashTime = mouthwashCollected[0][fieldToConceptIdMapping.collection.collectionTime];
+        mouthwashCollection = mouthwashCollected[0][conceptIds.collection.id];
+        mouthwashTime = mouthwashCollected[0][conceptIds.collection.collectionTime];
     }
 
     return `
