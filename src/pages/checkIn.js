@@ -11,13 +11,26 @@ export const checkInTemplate = async (data) => {
     navBarBtn?.classList.add('active');
 
     const isCheckedIn = checkedIn(data);
-    const visitCollections = isCheckedIn ? await getCollectionsByVisit(data) : '';
+    const visit = getCheckedInVisit(data);
 
     const response = await getParticipantCollections(data.token);
     let collections = [];
+    let visitCollections = '';
 
     if(response.code != 404) {
         collections = response.data;
+
+        if(isCheckedIn) {
+            collections.forEach(collection => {
+                if(collection['331584571'] == visit) {
+                    if(typeof visitCollections != 'object') {
+                        visitCollections = [];
+                    }
+                    
+                    visitCollections.push(collection);
+                }
+            })
+        }
     }
     
     let template = `
@@ -208,10 +221,10 @@ const participantStatus = (data, collections) => {
                         <span class="full-width">${data['878865966'] === 353358909 ? 'Collected' : 'Not Collected'}</span>
                     </div>
                     <div class="row">
-                        <span class="full-width">${bloodCollection ? bloodCollection : ''}</span>
+                        <span class="full-width">${bloodCollection ? bloodCollection : '&nbsp'}</span>
                     </div>
                     <div class="row">
-                        <span class="full-width">${bloodTime ? bloodTime : ''}</span>
+                        <span class="full-width">${bloodTime ? bloodTime : '&nbsp'}</span>
                     </div>
                 </div>
             </div>
