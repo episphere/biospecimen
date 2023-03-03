@@ -115,6 +115,8 @@ const participantStatus = (data, collections) => {
     const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
 
+    collections = collections.filter(collection => collection[conceptIds.collection.selectedVisit] == conceptIds.baseline.visitId);
+
     collections.forEach(collection => {
         bloodTubes.forEach(tube => {
             if(collection[tube.concept][conceptIds.collection.tube.isCollected] == conceptIds.yes) {
