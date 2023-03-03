@@ -14,21 +14,15 @@ export const checkInTemplate = async (data) => {
 
     const response = await getParticipantCollections(data.token);
     let collections = [];
-    let visitCollections = '';
+    let visitCollections = [];
 
     if(response.code != 404) {
         collections = response.data;
 
         if(isCheckedIn) {
             collections.forEach(collection => {
-                if(collection['331584571'] == visit) {
-                    if(typeof visitCollections != 'object') {
-                        visitCollections = [];
-                    }
-                    
-                    visitCollections.push(collection);
-                }
-            })
+                if(collection['331584571'] == visit) visitCollections.push(collection);
+            });
         }
     }
     
@@ -81,7 +75,7 @@ export const checkInTemplate = async (data) => {
 
     template += `
             <div class="col">
-                <button class="btn btn-outline-primary btn-block text-nowrap" ${!isCheckedIn ? `disabled` : visitCollections && visitCollections.length > 0 ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
+                <button class="btn btn-outline-primary btn-block text-nowrap" ${!isCheckedIn ? `disabled` : visitCollections.length > 0 ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
             </div>
 
         </form>
@@ -222,10 +216,10 @@ const participantStatus = (data, collections) => {
                         <span class="full-width">${data['878865966'] === 353358909 ? 'Collected' : 'Not Collected'}</span>
                     </div>
                     <div class="row">
-                        <span class="full-width">${bloodCollection ? bloodCollection : '&nbsp'}</span>
+                        <span class="full-width">${bloodCollection ? bloodCollection : '&nbsp;'}</span>
                     </div>
                     <div class="row">
-                        <span class="full-width">${bloodTime ? bloodTime : '&nbsp'}</span>
+                        <span class="full-width">${bloodTime ? bloodTime : '&nbsp;'}</span>
                     </div>
                 </div>
             </div>
@@ -241,10 +235,10 @@ const participantStatus = (data, collections) => {
                         <span class="full-width">${data['684635302'] === 353358909 ? 'Collected' : 'Not Collected'}</span>
                     </div>
                     <div class="row">
-                        <span class="full-width">${mouthwashCollection ? mouthwashCollection : '&nbsp'}</span>
+                        <span class="full-width">${mouthwashCollection ? mouthwashCollection : '&nbsp;'}</span>
                     </div>
                     <div class="row">
-                        <span class="full-width">${mouthwashTime ? mouthwashTime : '&nbsp'}</span>
+                        <span class="full-width">${mouthwashTime ? mouthwashTime : '&nbsp;'}</span>
                     </div>
                 </div>
             </div>
@@ -260,10 +254,10 @@ const participantStatus = (data, collections) => {
                         <span class="full-width">${data['167958071'] === 353358909 ? 'Collected' : 'Not Collected' }</span>
                     </div>
                     <div class="row">
-                        <span class="full-width">${urineCollection ? urineCollection : '&nbsp'}</span>
+                        <span class="full-width">${urineCollection ? urineCollection : '&nbsp;'}</span>
                     </div>
                     <div class="row">
-                        <span class="full-width">${urineTime ? urineTime : '&nbsp'}</span>
+                        <span class="full-width">${urineTime ? urineTime : '&nbsp;'}</span>
                     </div>
                 </div>
             </div>
