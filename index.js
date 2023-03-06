@@ -49,11 +49,11 @@ window.onload = () => {
         }
     }
 
-    /*if(location.host === urls.prod) {
+    if(location.host === urls.prod) {
         !firebase.apps.length ? firebase.initializeApp(prodFirebaseConfig()) : firebase.app();
-        window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'prod' });
+        //window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'prod' });
     }
-    else*/ if(location.host === urls.stage) {
+    else if(location.host === urls.stage) {
         !firebase.apps.length ? firebase.initializeApp(stageFirebaseConfig()) : firebase.app();
         window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'stage' });
     }
