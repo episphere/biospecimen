@@ -17,6 +17,21 @@ export const tubeCollectedTemplate = (data, formData) => {
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${formData['820476880']}</div>
                 <div class="row">Collection ID Link Date/Time: ${getWorkflow() === 'research' ? new Date(formData['678166505']).toLocaleString(): new Date(formData['915838974']).toLocaleString()}</div>
+                ${getWorkflow() === 'research' ? `
+                    <div class="row">
+                        <div>Collection Phlebotomist Initials:&nbsp</div>
+                        <input 
+                            type="text"
+                            ${formData['719427591'] ? `value=${formData['719427591']}` : ``}
+                            id="collectionInitials"
+                            style="text-transform:uppercase"
+                            onpaste="return false;"
+                            required
+                        /> 
+                    </div>` 
+                    
+                    : ''
+                }
             </div>
             ${formData['331584571'] ? `
                 <div class="ml-auto form-group">

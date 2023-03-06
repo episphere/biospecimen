@@ -25,6 +25,21 @@ import { kitReportsScreen } from "./src/pages/reports/kitReports.js";
 
 let auth = '';
 
+const datadogConfig = {
+  clientToken: 'pub7aa9e5da99946b3a91246ac09af1cc45',
+  applicationId: 'd9a6d4bf-1617-4dde-9873-0a7c3eee1388',
+  site: 'ddog-gov.com',
+  service: 'biospecimen',
+  sessionSampleRate: 100,
+  sessionReplaySampleRate: 20,
+  trackUserInteractions: true,
+  trackResources: true,
+  trackLongTasks: true,
+  defaultPrivacyLevel: 'mask-user-input',
+};
+
+const isLocalDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
 window.onload = () => {
     if ("serviceWorker" in navigator) {
         try {
@@ -36,13 +51,18 @@ window.onload = () => {
 
     if(location.host === urls.prod) {
         !firebase.apps.length ? firebase.initializeApp(prodFirebaseConfig()) : firebase.app();
+        //window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'prod' });
     }
     else if(location.host === urls.stage) {
         !firebase.apps.length ? firebase.initializeApp(stageFirebaseConfig()) : firebase.app();
+        window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'stage' });
     }
     else {
         !firebase.apps.length ? firebase.initializeApp(devFirebaseConfig()) : firebase.app();
+        !isLocalDev && window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'dev' });
     }
+
+    !isLocalDev && location.host !== urls.prod && window.DD_RUM && window.DD_RUM.startSessionReplayRecording();
 
     auth = firebase.auth();
     auth.onAuthStateChanged(async user => {
