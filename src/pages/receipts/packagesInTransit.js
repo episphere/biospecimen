@@ -4,6 +4,7 @@ import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 import { convertTime } from "../../shared.js";
+import { getSpecimenDeviation, fakeObj} from "../../events.js";
 
 export const packagesInTransitScreen = async (auth, route) => {
     const user = auth.currentUser;
@@ -17,7 +18,8 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     const response = await getAllBoxes(`bptl`);
     hideAnimation();
     const allBoxesShippedBySiteAndNotReceived = filterShipped(response.data)
-
+    const currTube = "CXA333333 0001"
+    console.log("getSpecimenDeviation", getSpecimenDeviation(undefined, currTube))
     let template = "";
     template += receiptsNavbar();
 
@@ -171,6 +173,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
         modalData.groupScannedBy = scannedByArr[index];
         modalData.groupShippedBy = shippedByArr;
         modalData.trackingNumberArr = trackingNumberArr[index];
+        // modal.DeviationType = 
 
         // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
@@ -225,6 +228,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                           <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col-">Box Number</th>
                           <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Specimen Bag ID</th>
                           <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Full Specimen ID</th>
+                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Deviation Type</th>
                           <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Scanned By</th>
                           </tr>
                       </thead>
