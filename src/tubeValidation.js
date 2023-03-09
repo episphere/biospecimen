@@ -35,6 +35,8 @@ const tubeNotCollectedReason5 = {'concept': 889386523, 'label': 'Supply Unavaila
 const tubeNotCollectedOptions1 = [tubeNotCollectedReason1, tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason5, tubeNotCollectedReason4];
 const tubeNotCollectedOptions2 = [tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason5, tubeNotCollectedReason4];
 
+export const allDeviationCollections = [deviationCollection1, deviationCollection2, deviationCollection3, deviationCollection4]
+
 export const specimenCollection = {
   numToCid: {
     '0001': '299553921',
