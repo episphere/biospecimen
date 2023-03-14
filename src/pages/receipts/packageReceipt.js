@@ -332,7 +332,6 @@ const storePackageReceipt = async (data) => {
         document.getElementById("packageCondition").value = "";
         document.getElementById("receivePackageComments").value = "";
         document.getElementById("dateReceived").value = getCurrentDate();
-        
         document.getElementById("collectionComments").value = "";
         document.getElementById("collectionId").value = "";
         enableCollectionCardFields()
@@ -646,8 +645,16 @@ const addDefaultDateReceived = (getCurrentDate) => {
   else dateReceivedEl.value = ""
 }
 
-// returns current date in english canada format ("YYYY-MM-DD")
-const getCurrentDate = () => new Date().toLocaleDateString('en-CA');
+// returns current date in default format ("YYYY-MM-DD")
+const getCurrentDate = () => {
+  const currentDate = new Date();
+  return currentDate.getFullYear() + "-" + checkForPadding(parseInt(currentDate.getMonth() + 1)) + "-" + checkForPadding(currentDate.getDate())
+}
+
+const checkForPadding = (input) => { // adds 0 before single month & day to adhere to HTML date format
+  if (input < 10) return `0`+input.toString();
+  else return input;
+}
 
 const uspsFirstThreeNumbersCheck = (input) => {
   const regExp = /^420[0-9]{31}$/

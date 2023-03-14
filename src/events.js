@@ -2656,6 +2656,18 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
         if (getWorkflow() === 'clinical') {
             if (biospecimenData['915838974'] === undefined) biospecimenData['915838974'] = new Date().toISOString();
         }
+
+        if (getWorkflow() === 'research') {
+            let initials = document.getElementById('collectionInitials')
+            if(initials && initials.value.trim().length == 0) {
+                errorMessage(initials.id, 'This field is required. Please enter the phlebotomist\'s initials.', focus);
+                focus = false;
+                return;
+            }
+            else {
+                biospecimenData['719427591'] = initials.value.trim();
+            }
+        }
     }
 
     showAnimation();
