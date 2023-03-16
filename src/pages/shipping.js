@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, shippingPrintManifestReminder, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, conceptIdToSiteSpecificLocation, getNumPages, addSelectionEventListener, retrieveSpecimenInstituteList} from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, shippingPrintManifestReminder, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, conceptIdToSiteSpecificLocation, getNumPages, addSelectionEventListener, searchSpecimenInstitute} from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, 
     populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, 
     addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventSaveContinue, addEventShipPrintManifest, addEventTrackingNumberScanAutoFocus } from "./../events.js";
@@ -263,7 +263,7 @@ export const boxManifest = async (boxId, userName) => {
     let currInstitute = currBox.siteAcronym;
     let currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
     let currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute];
-    const searchSpecimenInstituteListResponse = await retrieveSpecimenInstituteList()
+    const searchSpecimenInstituteListResponse = await searchSpecimenInstitute()
     const searchSpecimenInstituteList = searchSpecimenInstituteListResponse.data
     console.log("🚀 ~ file: events.js:3087 ~ populateBoxManifestTable ~ searchSpecimenInstituteList:", searchSpecimenInstituteList)
 
@@ -289,9 +289,9 @@ export const boxManifest = async (boxId, userName) => {
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Specimen Bag ID</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Full Specimen ID</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Type/Color</th>
-                        <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Deviation Type</th>
-                        <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Scanned By</th>
-                    </tr>
+                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Deviation Type</th>
+                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Scanned By</th>
+                </tr>
             </table>
         </div>
         <div class="row" style="margin-top:3.125rem">
