@@ -839,7 +839,7 @@ export const removeBag = async(boxId, bags) => {
     
 }
 
-export const retrieveSpecimenInstituteList = async() => {
+export const searchSpecimenInstitute = async() => { // rename to searchSpecimenInstitute
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen`, {
         method: "GET",
@@ -854,12 +854,13 @@ export const retrieveSpecimenInstituteList = async() => {
  * Fetches biospecimen collection data from the database, and removes '0008', '0009' and deviation tubes from each collection
  * @returns {Array} List of biospecimen collections
  */
-export const searchSpecimenInstitute = async () => {
+export const filterSpecimenCollectionList = async () => {
     //https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
-    const searchSpecimenInstituteList = await retrieveSpecimenInstituteList()
-    console.log("🚀 ~ file: shared.js:856 ~ searchSpecimenInstitute ~ searchSpecimenInstituteList:", searchSpecimenInstituteList)
+    const searchSpecimenInstituteResponse = await searchSpecimenInstitute()
+    const searchSpecimenInstituteList = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : []
+    
     /* Filter collections with ShipFlag value yes */
-    let collectionList = searchSpecimenInstituteList.data.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
+    let collectionList = searchSpecimenInstituteList.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
     
     // loop over filtered data with shipFlag
     for (let i = 0; i < collectionList.length; i++){
@@ -893,7 +894,6 @@ export const searchSpecimenInstitute = async () => {
             }
         }
     }
-
     return collectionList;
 }
 

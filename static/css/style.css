@@ -414,3 +414,13 @@ box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
     border-radius: 5px;
     box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
   }
+
+  #boxManifestTable tbody
+  {
+    vertical-align: top;
+    /* text-align: center; */
+  }
+
+#saveTable tbody tr td:first-child {
+    text-align: center;
+}
