@@ -361,7 +361,6 @@ canvas.drawing, canvas.drawingBuffer {
   #boxManifestTable tbody
   {
     vertical-align: top;
-    /* text-align: center; */
   }
 
 #saveTable tbody tr td:first-child {

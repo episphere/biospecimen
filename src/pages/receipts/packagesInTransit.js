@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation } from "../../shared.js";
+import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, ship, searchSpecimenInstitute } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -16,10 +16,14 @@ export const packagesInTransitScreen = async (auth, route) => {
 const packagesInTransitTemplate = async (username, auth, route) => {
     showAnimation();
     const response = await getAllBoxes(`bptl`);
+    const searchSpecimenInstituteResponse = await searchSpecimenInstitute()
     hideAnimation();
+    
     const allBoxesShippedBySiteAndNotReceived = filterShipped(response.data)
+    const searchSpecimenInstituteList = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : []
     const currTube = "CXA333333 0001"
-    console.log("getSpecimenDeviation", getSpecimenDeviation(undefined, currTube))
+    // console.log("getSpecimenDeviation", getSpecimenDeviation(undefined, currTube))
+
     let template = "";
     template += receiptsNavbar();
 
@@ -66,6 +70,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");
 
     const allBoxes = allBoxesShippedBySiteAndNotReceived;
+    console.log("🚀 ~ file: packagesInTransit.js:70 ~ packagesInTransitTemplate ~ allBoxes:", allBoxes)
 
     // // Return an array of an item of grouped bags from GET request***
     const bagsArr = groupAllBags(allBoxes);
@@ -88,6 +93,10 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     // // Returns an array -->  array of tracking numbers 
     const trackingNumberArr = groupByTrackingNumber(allBoxes)
 
+    // // Returns an array -->  array of siteSpecificLocation
+
+    const siteSpecificLocationArr = groupBySiteSpecificLocation(allBoxes)
+
     // Object Property Value Shorthand
     // Example: bagsArr and bagsArr:bagsArr are equivalent
     const dataObj = {
@@ -96,9 +105,10 @@ const packagesInTransitTemplate = async (username, auth, route) => {
         scannedByArr,
         shippedByArr,
         bagIdArr,
-        trackingNumberArr
+        trackingNumberArr,
+        siteSpecificLocationArr
     };
-    manifestButton([...allBoxes], dataObj, manifestModalBodyEl);
+    manifestButton([...allBoxes], dataObj, manifestModalBodyEl, searchSpecimenInstituteList);
 };
 
 const filterShipped = (boxes) => {
@@ -122,32 +132,37 @@ const createPackagesInTransitRows = (boxes) => {
             allBoxes.forEach((box, index) => {
                 if (box[fieldToConceptIdMapping.siteShipmentReceived] != fieldToConceptIdMapping.yes) {
                 template += `
-                      <tr class="packageInTransitRow-${index}">
-                      <td style="text-align:center;">${
-                          box[fieldToConceptIdMapping.shippingShipDate]
-                              ? convertTime(box[fieldToConceptIdMapping.shippingShipDate]).split(",")[0] : ""
-                      }</td>
-                      <td style="text-align:center;">${
-                          box[fieldToConceptIdMapping.shippingTrackingNumber] ? box[fieldToConceptIdMapping.shippingTrackingNumber] : ""
-                      }</td>
-                      <td style="text-align:center;">${box.siteAcronym ? box.siteAcronym : ""}</td>
-                      <td style="text-align:center;">${sumSamplesArr[index]}</td>
-                      <td style="text-align:center;">${tempProbeFound(box[fieldToConceptIdMapping["tempProbe"]])}</td>
-                      <td>
-                        <button id="manifest-button-${index}" class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
-                          Manifest
-                        </button>
-                      </td>
-                      </tr>`;
-            }});
-            return template;
+                    <tr class="packageInTransitRow-${index}">
+                    <td style="text-align:center;">${
+                        box[fieldToConceptIdMapping.shippingShipDate]
+                            ? convertTime(box[fieldToConceptIdMapping.shippingShipDate]).split(",")[0] : ""
+                    }</td>
+                    <td style="text-align:center;">${
+                        box[fieldToConceptIdMapping.shippingTrackingNumber] ? box[fieldToConceptIdMapping.shippingTrackingNumber] : ""
+                    }</td>
+                    <td style="text-align:center;">${box.siteAcronym ? box.siteAcronym : ""}</td>
+                    <td style="text-align:center;">${sumSamplesArr[index]}</td>
+                    <td style="text-align:center;">${tempProbeFound(box[fieldToConceptIdMapping["tempProbe"]])}</td>
+                    <td>
+                    <button id="manifest-button-${index}" class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
+                        Manifest
+                    </button>
+                    </td>
+                    </tr>`;
+                }
+            });
+
+    return template;
 }
 
-const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
+const manifestButton = (allBoxes, dataObj, manifestModalBodyEl, searchSpecimenInstituteList) => {
+    console.log("🚀 ~ file: packagesInTransit.js:150 ~ manifestButton ~ dataObj:", dataObj)
     const buttons = document.getElementsByClassName("manifest-button");
     // DESTRUCTURING dataObj and fieldToConceptIdMapping
-    const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr, trackingNumberArr  } = dataObj;
+    const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr, trackingNumberArr, siteSpecificLocationArr } = dataObj;
     const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
+
+    console.log("shippingLocation", shippingLocation)
 
     Array.from(buttons).forEach((button, index) => {
         let modalData = {
@@ -163,6 +178,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
             groupScannedBy: "",
             groupShippedBy: "",
             trackingNumber: "",
+            siteSpecificLocation: "",
         };
 
         modalData.site = allBoxes[index].siteAcronym;
@@ -172,15 +188,16 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
         modalData.groupSamples = bagSamplesArr[index];
         modalData.groupScannedBy = scannedByArr[index];
         modalData.groupShippedBy = shippedByArr;
-        modalData.trackingNumberArr = trackingNumberArr[index];
-        // modal.DeviationType = 
+        modalData.trackingNumber = trackingNumberArr[index];
+        modalData.siteSpecificLocation = siteSpecificLocationArr[index]
 
         // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
         button.dataset.buttonIndex = `manifest-button-${index}`;
         button.addEventListener("click", (e) => {
-            let parsedModalData = JSON.parse(e.target.getAttribute("data-modal"));
-            let {
+            console.log("modalData", modalData)
+            const parsedModalData = JSON.parse(e.target.getAttribute("data-modal"));
+            const {
                 site,
                 date,
                 location,
@@ -189,10 +206,11 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                 groupSamples,
                 groupScannedBy,
                 groupShippedBy,
-                trackingNumberArr
+                trackingNumber,
+                siteSpecificLocation
             } = parsedModalData;
 
-            let modalBody = 
+            const modalBody = 
             `<div class="container-fluid">
               <div class="row">
                   <div class="col-md-4">
@@ -201,7 +219,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
               </div>
               <div class="row">
                   <div class="col-md-4">
-                      <p><strong>Tracking Number:</strong> ${trackingNumberArr ? trackingNumberArr : ""} </p>
+                      <p><strong>Tracking Number:</strong> ${trackingNumber ? trackingNumber : ""} </p>
                   </div>
                   <div class="col-md-4 ml-auto">
                     <p><strong>Site:</strong> ${site ? site : ""} </p>
@@ -233,7 +251,7 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
                           </tr>
                       </thead>
                       <tbody>
-                          ${addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, groupScannedBy)}
+                          ${addManifestTableRows(site, boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteList)}
                       </tbody>
                       </table>
                   </div>
@@ -377,44 +395,79 @@ const groupByTrackingNumber = (allBoxes) => {
     return arrTrackingNums;
 }
 
-const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupScannedBy) => {
+const groupBySiteSpecificLocation = (allBoxes) => {
+    const siteSpecificLocationArr = [];
+    allBoxes.forEach(box => {
+        const siteSpecificLocation = box[fieldToConceptIdMapping["shippingLocation"]];
+        if (siteSpecificLocation) siteSpecificLocationArr.push(siteSpecificLocation);
+    })
+    return siteSpecificLocationArr
+}
+
+const addManifestTableRows = (site, boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteList) => {
+    console.log("🚀 ~ file: packagesInTransit.js:407 ~ addManifestTableRows ~ searchSpecimenInstituteList:", searchSpecimenInstituteList)
+    // console.log("🚀 ~ file: packagesInTransit.js:383 ~ addManifestTableRows ~ groupSamples:", groupSamples, site)
     let manifestBody = ``;
     let rows = ``;
-    if (!bagIdArr[index].length) {
-        return manifestBody;
-    } else {
+
+    // Needs siteSpecificLocation
+    if (!bagIdArr[index].length) return manifestBody;
+
+    else {
         bagIdArr[index].forEach((id, indexNum) => {
+            const currGroupSamples = groupSamples[indexNum]
+            console.log("🚀 ~ file: packagesInTransit.js:414 ~ bagIdArr[index].forEach ~ currGroupSamples:", currGroupSamples)
             // If the current index of the bagIds is 0 insert # of samples
             if (indexNum === 0) {
-                rows += `<tr>
-                <td style="text-align:center">
-                <p>${boxNumber ? boxNumber.replace("Box", "") : ""}</p>
-                </td>
-                <td style="text-align:center">
-                    <p>${id ? id : "N//A"}</p>
-                </td>
-                <td style="text-align:center">
-                    ${groupSamples[indexNum].toString().replaceAll(",", `<br>`)}
-                </td>
-                <td style="text-align:center">
-                    ${groupScannedBy[indexNum].toString().replaceAll(",", `<br>`)}
-                </td>
-                </tr>`;
-            } else {
-                rows += `<tr>
-                <td style="text-align:center">
-                <p></p>
-                </td>
-                <td style="text-align:center">
-                    <p>${id ? id : ""}</p>
-                </td>
-                <td style="text-align:center">
-                    ${groupSamples[indexNum].toString().replaceAll(",", `<br>`)}
-                </td>
-                <td style="text-align:center">
-                    ${groupScannedBy[indexNum].toString().replaceAll(",", `<br>`)}
-                </td>
-                </tr>`;
+                rows += `
+                <tr>
+                    <td style="text-align:center">
+                        <p>${boxNumber ? boxNumber.replace("Box", "") : ""}</p>
+                    </td>
+                
+                    <td style="text-align:center">
+                        <p>${id ? id : "N//A"}</p>
+                    </td>
+                
+                    <td style="text-align:center">
+                        ${currGroupSamples.toString().replaceAll(",", `<br>`)}
+                    </td>
+                
+                    <td style="text-align:center">
+                        ${translateNumToDeviation(searchSpecimenInstituteList, currGroupSamples)}
+                    </td>
+                
+                    <td style="text-align:center">
+                        ${groupScannedBy[indexNum].toString().replaceAll(",", `<br>`)}
+                    </td>
+                </tr>`
+            } 
+            else {
+                rows += `
+                    <tr>
+                        <td style="text-align:center">
+                        <p></p>
+                        </td>
+                    
+                    
+                        <td style="text-align:center">
+                        <p>${id ? id : ""}</p>
+                        </td>
+                    
+                        <td style="text-align:center">
+                        ${currGroupSamples.toString().replaceAll(",", `<br>`)}
+                        </td>
+
+                    
+                        <td style="text-align:center">
+                        ${translateNumToDeviation(searchSpecimenInstituteList, currGroupSamples)}
+                        </td>
+
+                    
+                        <td style="text-align:center">
+                                ${groupScannedBy[indexNum].toString().replaceAll(",", `<br>`)}
+                        </td>
+                    </tr>`
             }
         });
         manifestBody = rows;
@@ -432,3 +485,22 @@ const tempProbeFound = (tempProbe) => {
   else return ""
 }
 
+
+// make a function that takes in acceptedDeviationList
+
+const translateNumToDeviation = (searchSpecimenInstituteList, currGroupSamples) => {
+    // ${currTube.toString().replaceAll(",", `<br>`)}
+    // Pass groupSamplesArr
+    // Extract single tube and pass into getSpecimenDevitaion
+    // using list of acceptedDeviationList display entire deviations
+    let textContent = ''
+    for(const currTube of currGroupSamples) {
+        console.log("currTube", currTube)
+        const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube)
+        console.log("🚀 ~ file: packagesInTransit.js:488 ~ translateNumToDeviation ~ acceptedDeviationList:", acceptedDeviationList)
+        for(const deviation of acceptedDeviationList) {
+            textContent += `${deviation}</br>`
+        }
+    }
+    return textContent
+}

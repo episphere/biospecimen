@@ -1,5 +1,5 @@
 import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getNumPages, conceptIdToSiteSpecificLocation, searchSpecimenInstitute} from "./../shared.js"
-import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality, addEventNavBarShipment, addEventFilter} from "./../events.js";
+import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality, addEventNavBarShipment, addEventFilter, fakeObj} from "./../events.js";
 import { homeNavBar, bodyNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
 
 
@@ -79,9 +79,9 @@ export const startReport = async () => {
 }
 
 export const showReportsManifest = async (currPage) => {
-    
-    const searchSpecimenInstituteListReponse = await searchSpecimenInstitute()
-    const searchSpecimenInstituteList = searchSpecimenInstituteListReponse.data
+    showAnimation()
+    const searchSpecimenInstituteResponse = await searchSpecimenInstitute()
+    const searchSpecimenInstituteList = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : []
     console.log("🚀 ~ file: reportsQuery.js:85 ~ showReportsManifest ~ searchSpecimenInstituteList:", searchSpecimenInstituteList)
     let template = `
         <div class="row">
@@ -119,6 +119,8 @@ export const showReportsManifest = async (currPage) => {
         document.getElementById('contentBody').innerHTML = template;
         removeActiveClass('navbar-btn', 'active')
         populateReportManifestHeader(currPage)
+        
+        console.log("🚀 ~ file: reportsQuery.js:124 ~ showReportsManifest ~ searchSpecimenInstituteList:", searchSpecimenInstituteList)
         populateReportManifestTable(currPage, searchSpecimenInstituteList)
         document.getElementById('printBox').addEventListener('click', e => {
             window.print();
