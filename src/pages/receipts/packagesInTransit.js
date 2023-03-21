@@ -13,6 +13,8 @@ export const packagesInTransitScreen = async (auth, route) => {
     packagesInTransitTemplate(username, auth, route);
 };
 
+let modalData = {}
+
 const packagesInTransitTemplate = async (username, auth, route) => {
     showAnimation();
     const response = await getAllBoxes(`bptl`);
@@ -20,54 +22,59 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     hideAnimation();
     
     const allBoxesShippedBySiteAndNotReceived = filterShipped(response.data)
+    console.log("🚀 ~ file: packagesInTransit.js:23 ~ packagesInTransitTemplate ~ allBoxesShippedBySiteAndNotReceived:", allBoxesShippedBySiteAndNotReceived)
+    
     const searchSpecimenInstituteList = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : []
-    const currTube = "CXA333333 0001"
+
     // console.log("getSpecimenDeviation", getSpecimenDeviation(undefined, currTube))
 
-    let template = "";
-    template += receiptsNavbar();
+    let template = '';
 
-    template += `<div class="container-fluid">
-                <div id="root root-margin">
-                    <div class="table-responsive">
-                    <span> <h3 style="text-align: center; margin: 1rem 0;">Packages In Transit</h3> </span>
-                    <div class="sticky-header" style="overflow:auto;">
-                            <table class="table table-bordered" id="packagesInTransitData" 
-                                style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
-                                <thead> 
-                                    <tr style="top: 0; position: sticky;">
-                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Ship Date</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Tracking Number</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipped from Site</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Expected Number of Samples</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Temperature Monitor</th>
-                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Manifest</th>
-                                    </tr>
-                                </thead>   
-                                <tbody id="contentBodyPackagesInTransit">
-                                    ${createPackagesInTransitRows(allBoxesShippedBySiteAndNotReceived)}
-                                </tbody>
-                        </table>
-                    </div>
-                </div>`;
-
-    template += `<div class="modal fade" id="manifestModal" tabindex="-1" aria-labelledby="manifestModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content">
-        <div>
-          <button style="font-size:2.5rem;padding:1rem;" type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+    template += `
+    ${receiptsNavbar()}
+    <div class="container-fluid">
+        <div id="root root-margin">
+            <div class="table-responsive">
+                <span> <h3 style="text-align: center; margin: 1rem 0;">Packages In Transit</h3> </span>
+                <div class="sticky-header" style="overflow:auto;">
+                    <table class="table table-bordered" id="packagesInTransitTable"
+                        style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
+                        <thead> 
+                            <tr style="top: 0; position: sticky;" id="packagesInTransitTableHeaderRow">
+                                <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Ship Date</th>
+                                <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Tracking Number</th>
+                                <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipped from Site</th>
+                                <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Expected Number of Samples</th>
+                                <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Temperature Monitor</th>
+                                <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Manifest</th>
+                            </tr>
+                        </thead>   
+                        <tbody id="tableBodyPackagesInTransit" style="text-align: center; vertical-align: middle;"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div id="manifest-modal-body" class="modal-body"></div>  
-      </div>
     </div>
-  </div>`;
 
+    <div class="modal fade" id="manifestModal" tabindex="-1" aria-labelledby="manifestModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div>
+                    <button style="font-size:2.5rem;padding:1rem;" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="manifest-modal-body" class="modal-body"></div>  
+            </div>
+        </div>
+    </div>`;
+    // ${createPackagesInTransitRows(allBoxesShippedBySiteAndNotReceived)}
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
     activeReceiptsNavbar();
+    createPackagesInTransitRows(allBoxesShippedBySiteAndNotReceived)
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");
+    console.log("🚀 ~ file: packagesInTransit.js:73 ~ packagesInTransitTemplate ~ manifestModalBodyEl:", manifestModalBodyEl)
 
     const allBoxes = allBoxesShippedBySiteAndNotReceived;
     console.log("🚀 ~ file: packagesInTransit.js:70 ~ packagesInTransitTemplate ~ allBoxes:", allBoxes)
@@ -114,50 +121,86 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 export const filterShipped = (boxes) => {
   // boxes are from searchBoxes endpoint
   if(boxes.length === 0) return []
-  let filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
-  let sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
+  const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
+  const sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
   return sortBoxesBySubmitShipmentTime
 }
 
 const createPackagesInTransitRows = (boxes) => {
     let template = "";
-            const allBoxes = boxes;
+    // const allBoxes = boxes;
+    const boxesShippedNotReceived = boxes
+    const bagsArr = groupAllBags(boxesShippedNotReceived);
+    const sumSamplesArr = countSamplesArr(bagsArr);
+    const tableBodyPackagesInTransit = document.getElementById("tableBodyPackagesInTransit");
+    const packagesInTransitTableHeaderRowEl = document.getElementById("packagesInTransitTableHeaderRow");
+    const tableHeaderColumnNameList = Array.from(packagesInTransitTableHeaderRowEl.children);
 
-            // Return a filtered array of an item of grouped bags from GET request***
-            const bagsArr = groupAllBags(allBoxes);
+    const siteShipmentReceived = fieldToConceptIdMapping.siteShipmentReceived;
+    const yes = fieldToConceptIdMapping.yes;
 
-            // Returns an array of summed and grouped bag samples
-            const sumSamplesArr = countSamplesArr(bagsArr);
-            // Populate Cells with Data
-            allBoxes.forEach((box, index) => {
-                if (box[fieldToConceptIdMapping.siteShipmentReceived] != fieldToConceptIdMapping.yes) {
-                template += `
-                    <tr class="packageInTransitRow-${index}">
-                    <td style="text-align:center;">${
-                        box[fieldToConceptIdMapping.shippingShipDate]
-                            ? convertTime(box[fieldToConceptIdMapping.shippingShipDate]).split(",")[0] : ""
-                    }</td>
-                    <td style="text-align:center;">${
-                        box[fieldToConceptIdMapping.shippingTrackingNumber] ? box[fieldToConceptIdMapping.shippingTrackingNumber] : ""
-                    }</td>
-                    <td style="text-align:center;">${box.siteAcronym ? box.siteAcronym : ""}</td>
-                    <td style="text-align:center;">${sumSamplesArr[index]}</td>
-                    <td style="text-align:center;">${tempProbeFound(box[fieldToConceptIdMapping["tempProbe"]])}</td>
-                    <td>
-                    <button id="manifest-button-${index}" class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
-                        Manifest
-                    </button>
-                    </td>
-                    </tr>`;
-                }
-            });
+    for(let i = 0; i < boxesShippedNotReceived.length; i++) {
+        const currBoxShippedNotReceived = boxesShippedNotReceived[i];
 
+        if (currBoxShippedNotReceived[siteShipmentReceived] === yes) continue // current box is shipped and received break out of curr iteration
+        const rowEle = document.createElement('tr');
+
+        for(let j = 0; j < tableHeaderColumnNameList.length; j++) {
+            const cellEle = document.createElement('td')
+            const headerName = tableHeaderColumnNameList[j].textContent
+            
+            switch(headerName) {
+                case 'Ship Date':
+                    // console.log(i, j,'Ship Date');
+                    // const shippingShipDate = currBoxShippedNotReceived[fieldToConceptIdMapping.shippingShipDate]
+                    const currBoxShipDate = currBoxShippedNotReceived[fieldToConceptIdMapping.shippingShipDate]
+                    cellEle.innerText = currBoxShipDate ? convertTime(currBoxShipDate).split(",")[0] : ''
+                    break;
+                case 'Tracking Number':
+                    // console.log(i, j,'Tracking Number');
+                    const currBoxTrackingNumber = currBoxShippedNotReceived[fieldToConceptIdMapping.shippingTrackingNumber] 
+                    cellEle.innerText = currBoxTrackingNumber ? currBoxTrackingNumber : ''
+                    break;
+                case 'Shipped from Site':
+                    // console.log(i, j,'Shipped from Site');
+                    const siteShipped = currBoxShippedNotReceived['siteAcronym'] ? currBoxShippedNotReceived['siteAcronym'] : ''
+                    cellEle.innerText = siteShipped;
+                    break;
+                case 'Expected Number of Samples':
+                    // console.log(i, j,'Expected Number of Samples');
+                    const sumSamples = sumSamplesArr[i];
+                    cellEle.innerText = sumSamples;
+                    break;
+                case 'Temperature Monitor':
+                    // console.log(i, j,'Temperature Monitor');
+                    const tempProbe = fieldToConceptIdMapping.tempProbe
+                    const isTempProbeFound = tempProbeFound(currBoxShippedNotReceived[tempProbe]);
+                    cellEle.innerText = isTempProbeFound;
+                    break;
+                case 'Manifest':
+                    // console.log(i, j,'Manifest');
+                    const buttonEle = document.createElement('button');
+                    buttonEle.id = `manifest-button-${i}`
+                    buttonEle.className = 'manifest-button btn-primary';
+                    buttonEle.textContent = 'Manifest';
+                    buttonEle.setAttribute('data-toggle', 'modal')
+                    buttonEle.setAttribute('data-target', '#manifestModal')
+                    cellEle.appendChild(buttonEle)
+                    break;
+                default:
+                    cellEle.innerText = ''
+            }
+            rowEle.appendChild(cellEle)
+        }
+        tableBodyPackagesInTransit.appendChild(rowEle);
+    }
     return template;
 }
 
 const manifestButton = (allBoxes, dataObj, manifestModalBodyEl, searchSpecimenInstituteList) => {
-    console.log("🚀 ~ file: packagesInTransit.js:150 ~ manifestButton ~ dataObj:", dataObj)
+    // console.log("🚀 ~ file: packagesInTransit.js:150 ~ manifestButton ~ dataObj:", dataObj)
     const buttons = document.getElementsByClassName("manifest-button");
+    // console.log("🚀 ~ file: packagesInTransit.js:242 ~ manifestButton ~ buttons:", buttons)
     // DESTRUCTURING dataObj and fieldToConceptIdMapping
     const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr, trackingNumberArr, siteSpecificLocationArr } = dataObj;
     const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
@@ -212,52 +255,54 @@ const manifestButton = (allBoxes, dataObj, manifestModalBodyEl, searchSpecimenIn
 
             const modalBody = 
             `<div class="container-fluid">
-              <div class="row">
-                  <div class="col-md-4">
-                      <p style="font-size:1.5rem;"><strong>Shipping Manifest</strong></p>
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-md-4">
-                      <p><strong>Tracking Number:</strong> ${trackingNumber ? trackingNumber : ""} </p>
-                  </div>
-                  <div class="col-md-4 ml-auto">
-                    <p><strong>Site:</strong> ${site ? site : ""} </p>
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-md-4">
-                      <p><strong>Shipped Date and Time:</strong> ${date ? convertTime(date) : ""}</p>
-                  </div>
-                  <div class="col-md-4 ml-auto">
-                      <p><strong>Location:</strong> ${location ? (conceptIdToSiteSpecificLocation[location].length > 14 ? "<br>" + conceptIdToSiteSpecificLocation[location] : conceptIdToSiteSpecificLocation[location]) : ""}</p>
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-md-4">
-                      <p><strong>Sender:</strong><br/>${groupShippedBy[index] ? groupShippedBy[index] : ""}</p>
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="table-responsive">
-                      <table class="table table-striped">
-                          <thead>
-                          <tr>
-                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col-">Box Number</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Specimen Bag ID</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Full Specimen ID</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Deviation Type</th>
-                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Scanned By</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          ${addManifestTableRows(site, boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteList)}
-                      </tbody>
-                      </table>
-                  </div>
-              </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <p style="font-size:1.5rem;"><strong>Shipping Manifest</strong></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <p><strong>Tracking Number:</strong> ${trackingNumber ? trackingNumber : ""} </p>
+                    </div>
+                    <div class="col-md-4 ml-auto">
+                        <p><strong>Site:</strong> ${site ? site : ""} </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <p><strong>Shipped Date and Time:</strong> ${date ? convertTime(date) : ""}</p>
+                    </div>
+                    <div class="col-md-4 ml-auto">
+                        <p><strong>Location:</strong> ${location ? (conceptIdToSiteSpecificLocation[location].length > 14 ? "<br>" + conceptIdToSiteSpecificLocation[location] : conceptIdToSiteSpecificLocation[location]) : ""}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <p><strong>Sender:</strong><br/>${groupShippedBy[index] ? groupShippedBy[index] : ""}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table" id="packagesInTransitModalTable">
+                            <thead>
+                                <tr id="packagesInTransitModalTableHeaderRow">
+                                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col-">Box Number</th>
+                                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Specimen Bag ID</th>
+                                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Full Specimen ID</th>
+                                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Deviation Type</th>
+                                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Scanned By</th>
+                                </tr>
+                            </thead>
+                            <tbody id="manifestModalTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>`;
+        // console.log("modalBody", modalBody)
         manifestModalBodyEl.innerHTML = modalBody;
+        // <!-- ${addManifestTableRows(site, boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteList)} -->
+        addManifestTableRows(site, boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteList, allBoxes)
+        
         });
     });
 };
@@ -364,7 +409,7 @@ const groupShippedByArr = (allBoxes) => {
   allBoxes.forEach(box => {
     let shippedByFirstName = box[fieldToConceptIdMapping.shippedByFirstName].trim()
     let shippedByLastName = box[fieldToConceptIdMapping.shippedByLastName]?.trim() ?? ''
-    if(shippedByFirstName.length > 0 && shippedByLastName > 0) {
+    if (shippedByFirstName.length > 0 && shippedByLastName > 0) {
       arrShippedBy.push(shippedByFirstName + " " + shippedByLastName)
     }
     else if (shippedByFirstName.length > 0) {
@@ -404,87 +449,183 @@ const groupBySiteSpecificLocation = (allBoxes) => {
     return siteSpecificLocationArr
 }
 
-const addManifestTableRows = (site, boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteList) => {
-    console.log("🚀 ~ file: packagesInTransit.js:407 ~ addManifestTableRows ~ searchSpecimenInstituteList:", searchSpecimenInstituteList)
-    // console.log("🚀 ~ file: packagesInTransit.js:383 ~ addManifestTableRows ~ groupSamples:", groupSamples, site)
-    let manifestBody = ``;
-    let rows = ``;
+const addManifestTableRows = (site, boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteList, allBoxes) => {
+    // console.log("🚀 ~ file: packagesInTransit.js:454 ~ addManifestTableRows ~ index:", index)
+    // console.log("🚀 ~ file: packagesInTransit.js:456 ~ addManifestTableRows ~ bagIdArr:", bagIdArr)
+    // console.log("🚀 ~ file: packagesInTransit.js:407 ~ addManifestTableRows ~ searchSpecimenInstituteList:", searchSpecimenInstituteList)
+    // console.log("🚀 ~ file: packagesInTransit.js:383 ~ addManifestTableRows ~ groupSamples:", groupSamples, site, index)
+    const manifestBody = '';
+    const rows = '';
+    const manifestModalTableBodyEl = document.getElementById('manifestModalTableBody');
+    const packagesInTransitModalTableHeaderRowEl = document.getElementById('packagesInTransitModalTableHeaderRow')
+    const tableModalHeaderColumnNameList = Array.from(packagesInTransitModalTableHeaderRowEl.children)
+    console.log("🚀 ~ file: packagesInTransit.js:463 ~ addManifestTableRows ~ tableModalHeaderColumnNameList:", tableModalHeaderColumnNameList)
+    // console.log("🚀 ~ file: packagesInTransit.js:460 ~ addManifestTableRows ~ manifestModalTableBodyEl:", manifestModalTableBodyEl)
 
+    // const tableRowCount = allBoxes.length
+    // const groupSample = groupSamples[index]
+
+    
+    // const tableRowCount = getDeviationNumberCount(groupSamples, searchSpecimenInstituteList)
+    // const manifestTableRowCount = getCurrentTubeTableRowCount(groupSamples, searchSpecimenInstituteList)
+    // console.log("🚀 ~ file: packagesInTransit.js:468 ~ addManifestTableRows ~ manifestTableRowCount:", manifestTableRowCount)
+    
+    // console.log("🚀 ~ file: packagesInTransit.js:464 ~ addManifestTableRows ~ tableRowCount:", tableRowCount)
+    // console.log("🚀 ~ file: packagesInTransit.js:462 ~ addManifestTableRows ~ tableRowCount:", tableRowCount)
+    /*
+    Create a function to count the number of Specimen ID and Deviation Type  -- That will be the number of Row Counts
+    - If deviation # > Specimen Id # (Add Specimen Id - deviation type = #'s)
+    - If deviation # = Specimen Id #(Add Specimen Id = #)
+    - If deviation # < Specimen Id # (In this case no deviation, Add Specimen Id = #)
+    */ 
+
+    // bagIdArr --> already grouped for each manifest button
+    let greyIndex = 0
     // Needs siteSpecificLocation
+    const currBagIdList =  bagIdArr[index];
+    // const fullSpecimenIdList = groupSamples
+    // console.log("🚀 ~ file: packagesInTransit.js:487 ~ addManifestTableRows ~ fullSpecimenIdList:", fullSpecimenIdList)
     if (!bagIdArr[index].length) return manifestBody;
+    
+    // else {
+    //     bagIdArr[index].forEach((id, indexNum) => {
+    //        0 const currGroupSamples = groupSamples[indexNum]
+    //         console.log("🚀 ~ file: packagesInTransit.js:414 ~ bagIdArr[index].forEach ~ currGroupSamples:", currGroupSamples)
+    //         // If the current index of the bagIds is 0 insert # of samples
+    //         if (indexNum === 0) {
+    //             rows += `
+    //             <tr>
+    //                 <td style="text-align:center">
+    //                     <p>${boxNumber ? boxNumber.replace("Box", "") : ""}</p>
+    //                 </td>
+    //                 <td style="text-align:center">
+    //                     <p>${id ? id : "N//A"}</p>
+    //                 </td>
+    //                 <td style="text-align:center">
+    //                     ${currGroupSamples.toString().replaceAll(",", `<br>`)}
+    //                 </td>
+    //                 <td style="text-align:center">
+    //                     ${translateNumToDeviation(searchSpecimenInstituteList, currGroupSamples)}
+    //                 </td>
+    //                 <td style="text-align:center">
+    //                     ${groupScannedBy[indexNum].toString().replaceAll(",", `<br>`)}
+    //                 </td>
+    //             </tr>`
+    //         } 
+    //         else {
+    //             rows += `
+    //                 <tr>
+    //                     <td style="text-align:center">
+    //                     <p></p>
+    //                     </td>
+    //                     <td style="text-align:center">
+    //                     <p>${id ? id : ""}</p>
+    //                     </td>
+    //                     <td style="text-align:center">
+    //                     ${currGroupSamples.toString().replaceAll(",", `<br>`)}
+    //                     </td>
+    //                     <td style="text-align:center">
+    //                     ${translateNumToDeviation(searchSpecimenInstituteList, currGroupSamples)}
+    //                     </td>
+    //                     <td style="text-align:center">
+    //                             ${groupScannedBy[indexNum].toString().replaceAll(",", `<br>`)}
+    //                     </td>
+    //                 </tr>`
+    //         }
+    //     });
 
+    
+    //     manifestBody = rows;
+    //     return manifestBody;
+    // }
+
+    /*
+    SOLUTION --> NEED TO Dynamically create tr to style the contents
+    CREATE LOOP and loop by length of manifestTAbleRowCount
+    
+    Create tableRow
+    create table cell
+    insert text content
+    Create a switch case using the column headers
+
+
+    Insert at the end to manifestTableRowCountEl
+
+    Instead of getting the total amount of deviations, we can get the current deviation amount
+
+    tubeId# 1 (Tubes 1, 2) --> 4 Deviation --> 4 Rows
+    tubeId# 2 (Tubes 1, 2) --> 2 Deviation --> 2 Rows
+
+    */
     else {
-        bagIdArr[index].forEach((id, indexNum) => {
-            const currGroupSamples = groupSamples[indexNum]
-            console.log("🚀 ~ file: packagesInTransit.js:414 ~ bagIdArr[index].forEach ~ currGroupSamples:", currGroupSamples)
-            // If the current index of the bagIds is 0 insert # of samples
-            if (indexNum === 0) {
-                rows += `
-                <tr>
-                    <td style="text-align:center">
-                        <p>${boxNumber ? boxNumber.replace("Box", "") : ""}</p>
-                    </td>
-                
-                    <td style="text-align:center">
-                        <p>${id ? id : "N//A"}</p>
-                    </td>
-                
-                    <td style="text-align:center">
-                        ${currGroupSamples.toString().replaceAll(",", `<br>`)}
-                    </td>
-                
-                    <td style="text-align:center">
-                        ${translateNumToDeviation(searchSpecimenInstituteList, currGroupSamples)}
-                    </td>
-                
-                    <td style="text-align:center">
-                        ${groupScannedBy[indexNum].toString().replaceAll(",", `<br>`)}
-                    </td>
-                </tr>`
-            } 
-            else {
-                rows += `
-                    <tr>
-                        <td style="text-align:center">
-                        <p></p>
-                        </td>
-                    
-                    
-                        <td style="text-align:center">
-                        <p>${id ? id : ""}</p>
-                        </td>
-                    
-                        <td style="text-align:center">
-                        ${currGroupSamples.toString().replaceAll(",", `<br>`)}
-                        </td>
+            
+            console.log("currBagIdList",index, currBagIdList)
+            for (let i = 0; i < currBagIdList.length; i++) { // Table row level
+                // create element table row elements
+                // const tableRowEl = document.createElement('tr')
+                const currFullSpecimenIdList = groupSamples[i]
+                let totalDeviationTypeCounter = 0 // counter for number of rows
 
+                for(let j = 0; j < currFullSpecimenIdList.length; j++) {
+                    // console.log("🚀 ~ file: packagesInTransit.js:566 ~ addManifestTableRows ~ groupSamples:", currFullSpecimenIdList[j])
+                    const currTube = currFullSpecimenIdList[j]
+                    const [collectionId, tubeId] = currTube.split(' ')
+                    const currAcceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube); // returns individual deviation type in an array
+                    if (currAcceptedDeviationList.length) { // Adds to the DeviationTypeCounter
+                        totalDeviationTypeCounter += currAcceptedDeviationList.length
+                    }
+                    // console.log("currAcceptedDeviationList currTube", currAcceptedDeviationList, currTube, totalDeviationTypeCounter) 
                     
-                        <td style="text-align:center">
-                        ${translateNumToDeviation(searchSpecimenInstituteList, currGroupSamples)}
-                        </td>
+                    // Condition to get the last currFullSpecimenIdList iteration, then compare lengths
+                    if (j == currFullSpecimenIdList.length - 1) {
+                        // console.log("Done at iteration", j)
+                        // Write logic for comparing list lengths to determine the number of tr elements to create 
+                        const tableRowNumber = getCurrentTubeTableRowCount(currFullSpecimenIdList, totalDeviationTypeCounter)
+                        console.log("🚀 ~ file: packagesInTransit.js:584 ~ addManifestTableRows ~ tableRowNumber:", tableRowNumber)
 
-                    
-                        <td style="text-align:center">
-                                ${groupScannedBy[indexNum].toString().replaceAll(",", `<br>`)}
-                        </td>
-                    </tr>`
+                        // Create elements in another for loop
+                        for(let rowIndex = 0; rowIndex < tableRowNumber; rowIndex++) {
+                            const tableRowEl = document.createElement('tr')
+                            // tableRowEl.textContent = "Hello"
+                            for (let tableHeaderIndex = 0; tableHeaderIndex < tableModalHeaderColumnNameList.length; tableHeaderIndex++) {
+                                const tableCellEl = document.createElement('td')
+                                tableCellEl.textContent = 'TEST'
+                                tableRowEl.appendChild(tableCellEl)
+                            }
+                            
+                            manifestModalTableBodyEl.appendChild(tableRowEl)
+                        }
+
+                    }
+                    // console.log("🚀 ~ file: packagesInTransit.js:570 ~ addManifestTableRows ~ currTube:", currTube)
+                    // getCurrentTubeTableRowCount(currTube, currFullSpecimenIdList, searchSpecimenInstituteList)
+                }
+
+                
+                // if(greyIndex % 2 === 0) tableRowEl.style['background-color'] = "lightgrey";
+                // manifestModalTableBodyEl.appendChild(tableRowEl)
             }
-        });
-        manifestBody = rows;
-        return manifestBody;
-    }
+            // console.log("🚀 ~ file: packagesInTransit.js:567 ~ addManifestTableRows ~ greyIndex:", greyIndex)
+            // greyIndex += 1
+        }
 };
 
+// const tempProbeFound = (tempProbe) => {
+//   if(tempProbe == '104430631') {
+//     return "No"
+//   }
+//   else if(tempProbe == '353358909') {
+//     return "Yes"
+//   }
+//   else return ""
+// }
 const tempProbeFound = (tempProbe) => {
-  if(tempProbe == '104430631') {
-    return "No"
-  }
-  else if(tempProbe == '353358909') {
-    return "Yes"
-  }
-  else return ""
-}
-
+    const options = {
+      '104430631': 'No',
+      '353358909': 'Yes'
+    };
+    return options[tempProbe] || '';
+  };
 
 // make a function that takes in acceptedDeviationList
 
@@ -495,12 +636,63 @@ const translateNumToDeviation = (searchSpecimenInstituteList, currGroupSamples) 
     // using list of acceptedDeviationList display entire deviations
     let textContent = ''
     for(const currTube of currGroupSamples) {
-        console.log("currTube", currTube)
+        // console.log("currTube", currTube)
         const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube)
-        console.log("🚀 ~ file: packagesInTransit.js:488 ~ translateNumToDeviation ~ acceptedDeviationList:", acceptedDeviationList)
+        // console.log("🚀 ~ file: packagesInTransit.js:488 ~ translateNumToDeviation ~ acceptedDeviationList:", acceptedDeviationList)
         for(const deviation of acceptedDeviationList) {
             textContent += `${deviation}</br>`
         }
     }
     return textContent
+}
+
+const getCurrentTubeTableRowCount = (currFullSpecimenIdList, totalDeviationTypeCounter) => {    
+    // const samplesList = currTube.flat()
+    // const samplesListLength = samplesList.length
+    // console.log("🚀 ~ file: packagesInTransit.js:573 ~ getDeviationNumberCount ~ samplesList:", samplesList)
+    // let deviationCount = 0
+    let totalCountRows = 0
+    // for(const currTube of samplesList) {
+    //     const [collectionId, tubeId] = currTube.split(' ');
+    //     const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube)
+    //     const deviationListLength = acceptedDeviationList.length
+    //     deviationCount += deviationListLength
+    // }
+
+    // const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube);
+    // console.log("🚀 ~ file: packagesInTransit.js:640 ~ getCurrentTubeTableRowCount ~ acceptedDeviationList:", acceptedDeviationList)
+    /*
+    Compare currFullSpecimenIdList length with acceptedDeviationList length
+    */
+    
+    // LOGIC for sample list count (MODIFY FOR SINGLE CURRENT TUBE)
+
+    // if (samplesListLength > deviationCount) { // samples list length MORE --> deviation Count
+    //     totalCountRows = samplesListLength
+    // }
+    // else if (samplesListLength < deviationCount) {
+    //     totalCountRows = deviationCount - samplesListLength
+    //     // console.log("🚀 ~ file: packagesInTransit.js:589 ~ getDeviationNumberCount ~ totalCountRows:", totalCountRows)
+    // }
+    // else {
+    //     totalCountRows = samplesListLength 
+    // }
+
+    // currFullSpecimenIdList - separate # of tubes from one group list
+    // totalDeviationTypeCounter - # of type of deviations from currFullSpecimenIdList 
+    const currFullSpecimenIdListLength = currFullSpecimenIdList.length
+    if (currFullSpecimenIdListLength > totalDeviationTypeCounter) {
+        totalCountRows = currFullSpecimenIdListLength
+    }
+    else if (currFullSpecimenIdListLength < totalDeviationTypeCounter) {
+        totalCountRows = totalDeviationTypeCounter
+    } 
+    else {
+        totalCountRows = currFullSpecimenIdListLength
+    }
+
+    console.log("totalCountRows", totalCountRows)
+    return totalCountRows
+    // console.log("deviationCount", deviationCount,"samplesListLength", samplesListLength, "totalCountRows", totalCountRows, )
+
 }

@@ -3881,10 +3881,10 @@ if (tubeDeviation?.[conceptIds.brokenSpecimenDeviation] == conceptIds.yes ||
 */
 
 export const getSpecimenDeviation = (searchSpecimenInstituteList, currTube) => {
-    console.log("🚀 ~ file: events.js:3864 ~ getSpecimenDeviation ~ currTube:", currTube)
+    // console.log("🚀 ~ file: events.js:3864 ~ getSpecimenDeviation ~ currTube:", currTube)
     const specimenInstituteList = searchSpecimenInstituteList // add .length
     // const specimenInstituteList = fakeObj;
-    console.log("🚀 ~ file: events.js:3869 ~ getSpecimenDeviation ~ specimenInstituteList:", specimenInstituteList)
+    // console.log("🚀 ~ file: events.js:3869 ~ getSpecimenDeviation ~ specimenInstituteList:", specimenInstituteList)
     const [collectionId, tubeId] = currTube.split(" ");
 
     const filterTubeIdObject = tubes.filter(tubeIdObj => tubeIdObj['id'] === tubeId)
@@ -3895,7 +3895,7 @@ export const getSpecimenDeviation = (searchSpecimenInstituteList, currTube) => {
     
     
     const specimenObjList = specimenInstituteList.filter( specimen => (specimen["820476880"] === collectionId));
-    console.log("🧐🧐🧐🧐🧐 ~ file: events.js:3879 ~ getSpecimenDeviation ~ specimenObjList:",typeof specimenObjList ,specimenObjList)
+    // console.log("🧐🧐🧐🧐🧐 ~ file: events.js:3879 ~ getSpecimenDeviation ~ specimenObjList:",typeof specimenObjList ,specimenObjList)
     
     const { scannedId, isCollected, isDeviated, deviation } = conceptIds.collection.tube;
 
@@ -3905,7 +3905,7 @@ export const getSpecimenDeviation = (searchSpecimenInstituteList, currTube) => {
     // Flatten array of a single object to an Object of nested objects
     const specimenObj = (specimenObjList.length) ? Object.assign(...specimenObjList) : {}
     // console.log("🚀 ~ file: events.js:3817 ~ getSpecimenDeviation ~ Object.keys(specimenObj:", specimenObjKeys)
-    console.log("KEYS 🚀🚀🚀",Object.keys(specimenObj))
+    // console.log("KEYS 🚀🚀🚀",Object.keys(specimenObj))
     const acceptedDeviationArr = []
     for (const key in specimenObj) {
         const currSpecimenKey = specimenObj[key]
@@ -3915,7 +3915,7 @@ export const getSpecimenDeviation = (searchSpecimenInstituteList, currTube) => {
         // console.log(isCollected, deviation)
         if (!specimenObj[key].hasOwnProperty(scannedId)) continue
         if (currSpecimenKey[scannedId] === currTube && currSpecimenKey[isCollected] === conceptIds.yes && currSpecimenKey[isDeviated] === conceptIds.yes) {
-            console.log("HELLO", currSpecimenKey[scannedId])
+            // console.log("HELLO", currSpecimenKey[scannedId])
             const deviationObj = currSpecimenKey[deviation]
             if (currSpecimenKey[deviation]) {
                 for (const deviation in deviationObj) {
@@ -3926,7 +3926,7 @@ export const getSpecimenDeviation = (searchSpecimenInstituteList, currTube) => {
                         // console.log("deviation prop", deviation, typeof deviation, parseInt(deviation))
                         // console.log("tubeIdDeviationReasonArr loop", tubeIdDeviationReasonArr, typeof tubeIdDeviationReasonArr)
                         const [filteredDeviationObj] = tubeIdDeviationReasonArr.filter(deviationReason => {
-                            console.log("filteredDeviationObj",deviationReason['concept'], typeof deviationReason['concept'])
+                            // console.log("filteredDeviationObj",deviationReason['concept'], typeof deviationReason['concept'])
                             // debugger;
                             return (deviationReason['concept'] === parseInt(deviation))
                         })
@@ -3940,7 +3940,7 @@ export const getSpecimenDeviation = (searchSpecimenInstituteList, currTube) => {
         }
 
     }
-    console.log("acceptedDeviationArr", acceptedDeviationArr)
+    // console.log("acceptedDeviationArr", acceptedDeviationArr)
     return acceptedDeviationArr
 }
 
