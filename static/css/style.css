@@ -366,3 +366,13 @@ canvas.drawing, canvas.drawingBuffer {
 #saveTable tbody tr td:first-child {
     text-align: center;
 }
+
+#tableBodyPackagesInTransit tr td {
+    vertical-align: middle;
+}
+
+#manifestModalTableBody tr td {
+    border-top: unset;
+    text-align: center;
+    vertical-align: top;
+}
