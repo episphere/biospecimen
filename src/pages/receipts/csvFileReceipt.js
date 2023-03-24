@@ -118,21 +118,21 @@ const modifyBSIQueryResults = (results) => {
   return filteredResults
 }
 
-const updateInTransitMapping = (results) => {
+const updateInTransitMapping = (shippedBoxes) => {
   let holdProcessedResult = []
-  results.forEach(i => {    
+  shippedBoxes.forEach(i => {    
     const bagKeys = Object.keys(i.bags); // store specimenBagId in an array
     const specimenBags = Object.values(i.bags); // store bag content in an array
     
-    specimenBags.forEach((k, index) => {
-        k.arrElements.forEach((fullSpecimenIds, j, array) => { // grab fullSpecimenIds & loop thru content
+    specimenBags.forEach((specimenBag, index) => {
+      specimenBag.arrElements.forEach((fullSpecimenIds, j, specimenBagSize) => { // grab fullSpecimenIds & loop thru content
             let dataHolder = {}
             dataHolder['shipDate'] = i[fieldToConceptIdMapping.shippingShipDate] != undefined ? i[fieldToConceptIdMapping.shippingShipDate].split("T")[0] : ``
             dataHolder['trackingNumber'] = i[fieldToConceptIdMapping.shippingTrackingNumber] != undefined ? i[fieldToConceptIdMapping.shippingTrackingNumber] : ``
             dataHolder['shippedSite'] = i.siteAcronym != undefined ? i.siteAcronym : ``
             dataHolder['shippedLocation'] = i[fieldToConceptIdMapping.shippingLocation] != undefined ? conceptIdToSiteSpecificLocation[i[fieldToConceptIdMapping.shippingLocation]] : ``
             dataHolder['shipDateTime'] = i[fieldToConceptIdMapping.shippingShipDate] != undefined ? convertISODateTime(i[fieldToConceptIdMapping.shippingShipDate]) : ``
-            dataHolder['numSamples'] = array.length // to get number of samples
+            dataHolder['numSamples'] = specimenBagSize.length // to get number of samples
             dataHolder['tempMonitor'] = i[fieldToConceptIdMapping.tempProbe] == fieldToConceptIdMapping.yes ? `Yes` : `No`
             dataHolder['BoxId'] = i[fieldToConceptIdMapping.shippingBoxId] != undefined ? i[fieldToConceptIdMapping.shippingBoxId] : ``
             dataHolder['specimenBagId'] = bagKeys[index]
