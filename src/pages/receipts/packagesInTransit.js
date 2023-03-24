@@ -99,7 +99,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     manifestButton([...allBoxes], dataObj, manifestModalBodyEl);
 };
 
-const filterShipped = (boxes) => {
+export const filterShipped = (boxes) => {
   // boxes are from searchBoxes endpoint
   if(boxes.length === 0) return []
   let filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
