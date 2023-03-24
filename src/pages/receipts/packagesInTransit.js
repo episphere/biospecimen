@@ -145,11 +145,11 @@ const createPackagesInTransitRows = (boxes) => {
         if (currBoxShippedNotReceived[siteShipmentReceived] === yes) continue // current box is shipped and received break out of curr iteration
         const rowEle = document.createElement('tr');
 
-        for(let j = 0; j < tableHeaderColumnNameList.length; j++) {
+        for (let j = 0; j < tableHeaderColumnNameList.length; j++) {
             const cellEle = document.createElement('td')
             const headerName = tableHeaderColumnNameList[j].textContent
             
-            switch(headerName) {
+            switch (headerName) {
                 case 'Ship Date':
                     // console.log(i, j,'Ship Date');
                     // const shippingShipDate = currBoxShippedNotReceived[fieldToConceptIdMapping.shippingShipDate]
@@ -556,41 +556,117 @@ const addManifestTableRows = (site, boxNumber, bagIdArr, index, groupSamples, gr
     tubeId# 1 (Tubes 1, 2) --> 4 Deviation --> 4 Rows
     tubeId# 2 (Tubes 1, 2) --> 2 Deviation --> 2 Rows
 
+    Store tube id and array of deviations for checking***
     */
     else {
             
-            console.log("currBagIdList",index, currBagIdList)
+            console.log("currBagIdList",index, currBagIdList) // bagIdArr[index]
             for (let i = 0; i < currBagIdList.length; i++) { // Table row level
                 // create element table row elements
                 // const tableRowEl = document.createElement('tr')
                 const currFullSpecimenIdList = groupSamples[i]
+                const currSpecimenBagId = currBagIdList[i]
+                const currScannedByName =  groupScannedBy[i]
+                console.log("🚀 ~ file: packagesInTransit.js:569 ~ addManifestTableRows ~ currSpecimenBagId:", currSpecimenBagId)
+                const fullSpecimenIdDeviationObj = {}
                 let totalDeviationTypeCounter = 0 // counter for number of rows
+                // obj of fullspecimendeviation key and the number of deviation value
+                const fullSpecimenIdDeviationNumberObj = {}
 
                 for(let j = 0; j < currFullSpecimenIdList.length; j++) {
                     // console.log("🚀 ~ file: packagesInTransit.js:566 ~ addManifestTableRows ~ groupSamples:", currFullSpecimenIdList[j])
                     const currTube = currFullSpecimenIdList[j]
                     const [collectionId, tubeId] = currTube.split(' ')
-                    const currAcceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube); // returns individual deviation type in an array
+                    const currAcceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube); // returns individual samples deviation type(s) in an array
+                    let currFullSpecimenIdListCounter = 0
                     if (currAcceptedDeviationList.length) { // Adds to the DeviationTypeCounter
                         totalDeviationTypeCounter += currAcceptedDeviationList.length
                     }
-                    // console.log("currAcceptedDeviationList currTube", currAcceptedDeviationList, currTube, totalDeviationTypeCounter) 
-                    
+                    // console.log("currAcceptedDeviationList currTube", currAcceptedDeviationList, currTube, totalDeviationTypeCounter)
+                    fullSpecimenIdDeviationObj[currTube] = currAcceptedDeviationList
+                    fullSpecimenIdDeviationNumberObj[currTube] = currAcceptedDeviationList.length
                     // Condition to get the last currFullSpecimenIdList iteration, then compare lengths
-                    if (j == currFullSpecimenIdList.length - 1) {
+                    if (j == currFullSpecimenIdList.length - 1) { // LAST ITERATION
+                        console.log("🚀 ~ file: packagesInTransit.js:587 ~ addManifestTableRows ~ fullSpecimenIdDeviationObj:", fullSpecimenIdDeviationObj)
+                        console.log("🚀 ~ file: packagesInTransit.js:592 ~ addManifestTableRows ~ fullSpecimenIdDeviationNumberObj:", fullSpecimenIdDeviationNumberObj)
                         // console.log("Done at iteration", j)
                         // Write logic for comparing list lengths to determine the number of tr elements to create 
                         const tableRowNumber = getCurrentTubeTableRowCount(currFullSpecimenIdList, totalDeviationTypeCounter)
                         console.log("🚀 ~ file: packagesInTransit.js:584 ~ addManifestTableRows ~ tableRowNumber:", tableRowNumber)
+                        
 
                         // Create elements in another for loop
                         for(let rowIndex = 0; rowIndex < tableRowNumber; rowIndex++) {
-                            const tableRowEl = document.createElement('tr')
-                            // tableRowEl.textContent = "Hello"
-                            for (let tableHeaderIndex = 0; tableHeaderIndex < tableModalHeaderColumnNameList.length; tableHeaderIndex++) {
-                                const tableCellEl = document.createElement('td')
-                                tableCellEl.textContent = 'TEST'
-                                tableRowEl.appendChild(tableCellEl)
+                            const tableRowEl = document.createElement('tr');
+                            // add conditional to style table row bg color
+                            if(i % 2 === 0) tableRowEl.style.backgroundColor = 'lightgrey'
+                            for (let tableModalHeaderIndex = 0; tableModalHeaderIndex < tableModalHeaderColumnNameList.length; tableModalHeaderIndex++) { // loop over modal header list
+                                
+                                const cellEl = document.createElement('td');
+                                // const headerName = tableModalHeaderColumnNameList[tableModalHeaderIndex].textContent
+                                
+                                // console.log("header NAmes" ,tableModalHeaderColumnNameList[tableModalHeaderIndex].textContent)
+
+                                const headerName = tableModalHeaderColumnNameList[tableModalHeaderIndex].textContent
+                                const currFullSpecimenIdListLastIndex = currFullSpecimenIdList.length - 1 
+                                let currTubeDeviationListCounter = 0
+                                switch (headerName) {
+                                    case 'Box Number':
+                                        // console.log('Box #')
+                                        if(rowIndex === 0) cellEl.textContent = boxNumber;
+                                        else {
+                                            cellEl.textContent = '';
+                                        }
+                                        break
+                                    case 'Specimen Bag ID':
+                                        // console.log('specimen bag id')
+                                        if(rowIndex === 0) cellEl.textContent = currSpecimenBagId
+                                        else {
+                                            cellEl.textContent = '';
+                                        }
+                                        break
+                                    case 'Full Specimen ID':
+                                        // cellEl.textContent
+                                        // console.log('full specimen id')
+                                        /*
+                                        Array.from(fullSpecimenIdDeviationObj)
+                                        */ 
+                                        if( currFullSpecimenIdListCounter !== currFullSpecimenIdListLastIndex) {
+                                            cellEl.textContent = currFullSpecimenIdList[currFullSpecimenIdListCounter]
+                                            currFullSpecimenIdListCounter += 1
+                                        }
+                                        else {
+                                            cellEl.textContent = ''
+                                        }
+                                        break
+                                    case 'Deviation Type':
+                                        // console.log('deviation type')
+                                        // fullSpecimenIdListCounter logic
+                                        // fullSpecimenIdDeviationNumberObj logic
+                                        console.log("--", fullSpecimenIdDeviationObj[currFullSpecimenIdList[currFullSpecimenIdListCounter]], fullSpecimenIdDeviationObj[currFullSpecimenIdList[currFullSpecimenIdListCounter]])
+                                        if( currFullSpecimenIdListCounter !== currFullSpecimenIdListLastIndex && fullSpecimenIdDeviationObj[currFullSpecimenIdList[currFullSpecimenIdListCounter]].length && fullSpecimenIdDeviationNumberObj[currFullSpecimenIdList[currFullSpecimenIdListCounter]] !== currTubeDeviationListCounter) {
+                                            // console.log("*****", fullSpecimenIdDeviationObj[currTubeDeviationListCounter])
+                                            // const deviationTypeIndex = fullSpecimenIdDeviationNumberObj[currFullSpecimenIdList[currTubeDeviationListCounter]]
+                                            cellEl.textContent = fullSpecimenIdDeviationObj[currFullSpecimenIdList[currFullSpecimenIdListCounter]]
+                                            currTubeDeviationListCounter += 1
+                                        }
+                                        else {
+                                            cellEl.textContent = ''
+                                        }
+                                        break
+                                    case 'Scanned By':
+                                        // console.log("scanned by")
+                                        if(rowIndex === 0) cellEl.textContent = currScannedByName
+                                        else {
+                                            cellEl.textContent = '';
+                                        }
+                                        break
+                                    default:
+                                        cellEl.textContent = ''
+                                }
+                                
+
+                                tableRowEl.appendChild(cellEl)
                             }
                             
                             manifestModalTableBodyEl.appendChild(tableRowEl)
@@ -652,32 +728,6 @@ const getCurrentTubeTableRowCount = (currFullSpecimenIdList, totalDeviationTypeC
     // console.log("🚀 ~ file: packagesInTransit.js:573 ~ getDeviationNumberCount ~ samplesList:", samplesList)
     // let deviationCount = 0
     let totalCountRows = 0
-    // for(const currTube of samplesList) {
-    //     const [collectionId, tubeId] = currTube.split(' ');
-    //     const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube)
-    //     const deviationListLength = acceptedDeviationList.length
-    //     deviationCount += deviationListLength
-    // }
-
-    // const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube);
-    // console.log("🚀 ~ file: packagesInTransit.js:640 ~ getCurrentTubeTableRowCount ~ acceptedDeviationList:", acceptedDeviationList)
-    /*
-    Compare currFullSpecimenIdList length with acceptedDeviationList length
-    */
-    
-    // LOGIC for sample list count (MODIFY FOR SINGLE CURRENT TUBE)
-
-    // if (samplesListLength > deviationCount) { // samples list length MORE --> deviation Count
-    //     totalCountRows = samplesListLength
-    // }
-    // else if (samplesListLength < deviationCount) {
-    //     totalCountRows = deviationCount - samplesListLength
-    //     // console.log("🚀 ~ file: packagesInTransit.js:589 ~ getDeviationNumberCount ~ totalCountRows:", totalCountRows)
-    // }
-    // else {
-    //     totalCountRows = samplesListLength 
-    // }
-
     // currFullSpecimenIdList - separate # of tubes from one group list
     // totalDeviationTypeCounter - # of type of deviations from currFullSpecimenIdList 
     const currFullSpecimenIdListLength = currFullSpecimenIdList.length
@@ -696,3 +746,4 @@ const getCurrentTubeTableRowCount = (currFullSpecimenIdList, totalDeviationTypeC
     // console.log("deviationCount", deviationCount,"samplesListLength", samplesListLength, "totalCountRows", totalCountRows, )
 
 }
+
