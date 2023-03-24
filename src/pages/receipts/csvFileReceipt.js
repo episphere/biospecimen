@@ -120,35 +120,29 @@ const modifyBSIQueryResults = (results) => {
 
 const updateInTransitMapping = (results) => {
   let holdProcessedResult = []
-  results.forEach(i => {
-    holdProcessedResult.push(processInTransitMapping(i));
+  results.forEach(i => {    
+    const bagKeys = Object.keys(i.bags); // store specimenBagId in an array
+    const specimenBags = Object.values(i.bags); // store bag content in an array
+    
+    specimenBags.forEach((k, index) => {
+        k.arrElements.forEach((fullSpecimenIds, j, array) => { // grab fullSpecimenIds & loop thru content
+            let dataHolder = {}
+            dataHolder['shipDate'] = i[fieldToConceptIdMapping.shippingShipDate] != undefined ? i[fieldToConceptIdMapping.shippingShipDate].split("T")[0] : ``
+            dataHolder['trackingNumber'] = i[fieldToConceptIdMapping.shippingTrackingNumber] != undefined ? i[fieldToConceptIdMapping.shippingTrackingNumber] : ``
+            dataHolder['shippedSite'] = i.siteAcronym != undefined ? i.siteAcronym : ``
+            dataHolder['shippedLocation'] = i[fieldToConceptIdMapping.shippingLocation] != undefined ? conceptIdToSiteSpecificLocation[i[fieldToConceptIdMapping.shippingLocation]] : ``
+            dataHolder['shipDateTime'] = i[fieldToConceptIdMapping.shippingShipDate] != undefined ? convertISODateTime(i[fieldToConceptIdMapping.shippingShipDate]) : ``
+            dataHolder['numSamples'] = array.length // to get number of samples
+            dataHolder['tempMonitor'] = i[fieldToConceptIdMapping.tempProbe] == fieldToConceptIdMapping.yes ? `Yes` : `No`
+            dataHolder['BoxId'] = i[fieldToConceptIdMapping.shippingBoxId] != undefined ? i[fieldToConceptIdMapping.shippingBoxId] : ``
+            dataHolder['specimenBagId'] = bagKeys[index]
+            dataHolder['fullSpecimenIds'] = fullSpecimenIds
+            holdProcessedResult.push(dataHolder)
+        })
+    });
+
   })
   return holdProcessedResult
-}
-
-
-const processInTransitMapping = (i) => {
-  const bagKeys = Object.keys(i.bags); // store specimenBagId in an array
-  const specimenBags = Object.values(i.bags); // store bag content in an array
-  let dataHolder = {}
-  
-  specimenBags.forEach((k, index) => {
-      k.arrElements.forEach((fullSpecimenIds, j, array) => { // grab fullSpecimenIds & loop thru content 
-          dataHolder['shipDate'] = i[fieldToConceptIdMapping.shippingShipDate] != undefined ? i[fieldToConceptIdMapping.shippingShipDate].split("T")[0] : ``
-          dataHolder['trackingNumber'] = i[fieldToConceptIdMapping.shippingTrackingNumber] != undefined ? i[fieldToConceptIdMapping.shippingTrackingNumber] : ``
-          dataHolder['shippedSite'] = i.siteAcronym != undefined ? i.siteAcronym : ``
-          dataHolder['shippedLocation'] = i[fieldToConceptIdMapping.shippingLocation] != undefined ? conceptIdToSiteSpecificLocation[i[fieldToConceptIdMapping.shippingLocation]] : ``
-          dataHolder['shipDateTime'] = i[fieldToConceptIdMapping.shippingShipDate] != undefined ? convertISODateTime(i[fieldToConceptIdMapping.shippingShipDate]) : ``
-          dataHolder['numSamples'] = array.length // to get number of samples
-          dataHolder['tempMonitor'] = i[fieldToConceptIdMapping.tempProbe] == fieldToConceptIdMapping.yes ? `Yes` : `No`
-          dataHolder['BoxId'] = i[fieldToConceptIdMapping.shippingBoxId] != undefined ? i[fieldToConceptIdMapping.shippingBoxId] : ``
-          dataHolder['specimenBagId'] = bagKeys[index]
-          dataHolder['fullSpecimenIds'] = fullSpecimenIds
-      })
-  })
-  
-  return dataHolder
-  
 }
 
 const getVialTypesMappings = (i) => {
@@ -354,7 +348,7 @@ const downloadCSVfile = (items, csv, title) => {
     let keysAmount = Object.keys(items[row]).length
     let keysCounter = 0
     for(let key in items[row]) {
-        csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') 
+      csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') 
       keysCounter++
     }}
     let link = document.createElement("a");
