@@ -19,7 +19,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
     hideAnimation();
     
-    const allBoxesShippedBySiteAndNotReceived = filterShipped(response.data);
+    const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
     const searchSpecimenInstituteList = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : [];
     let template = '';
 
@@ -105,7 +105,12 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     manifestButton([...allBoxes], dataObj, manifestModalBodyEl, searchSpecimenInstituteList);
 };
 
-export const filterShipped = (boxes) => {
+/**
+ * Returns an array of shipped box items but not yet received and sorts the box items by most recent date
+ * @param {array} boxes - array of all boxes from getAllBoxes(`bptl`) function
+ * @returns 
+ */
+export const getRecentBoxesShippedBySiteNotReceived = (boxes) => {
   // boxes are from searchBoxes endpoint
   if(boxes.length === 0) return []
   const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
