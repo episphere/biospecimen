@@ -248,26 +248,24 @@ export const startShipping = async (userName) => {
 
 export const boxManifest = async (boxId, userName) => {    
     showAnimation();
-    let response = await  getBoxes();
-    let boxList = response.data;
-
-    let currBox = {}
-    let boxIdAndBagsObj = {};
+    const response = await getBoxes();
+    const boxList = response.data;
+    let currBox = {};
+    const boxIdAndBagsObj = {};
     for(let i = 0; i < boxList.length; i++){
-        let box = boxList[i]
-        if(box['132929440'] == boxId){
+        let box = boxList[i];
+        if (box['132929440'] == boxId) {
             currBox = box;
         }
-        boxIdAndBagsObj[box['132929440']] = box['bags']
+        boxIdAndBagsObj[box['132929440']] = box['bags'];
     }
-    let currInstitute = currBox.siteAcronym;
-    let currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
-    let currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute];
-    const searchSpecimenInstituteListResponse = await searchSpecimenInstitute()
-    const searchSpecimenInstituteList = searchSpecimenInstituteListResponse.data
-    console.log("🚀 ~ file: events.js:3087 ~ populateBoxManifestTable ~ searchSpecimenInstituteList:", searchSpecimenInstituteList)
+    const currInstitute = currBox.siteAcronym;
+    const currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
+    const currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute];
+    const searchSpecimenInstituteListResponse = await searchSpecimenInstitute();
+    const searchSpecimenInstituteList = searchSpecimenInstituteListResponse.data ? searchSpecimenInstituteListResponse.data : [];
 
-    let template = `
+    const template = `
         </br>
         <div id="shippingHiddenTable" style="display:none">
             <table>
@@ -314,7 +312,7 @@ export const boxManifest = async (boxId, userName) => {
             </div>
         </div>
         `;
-    removeActiveClass('navbar-btn', 'active')
+    removeActiveClass('navbar-btn', 'active');
     const navBarBtn = document.getElementById('navBarBoxManifest');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
@@ -340,8 +338,7 @@ export const boxManifest = async (boxId, userName) => {
 
 
 export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, currShippingLocationNumber) => {    
-    //let tempMonitorThere = document.getElementById('tempMonitorChecked').checked;
-    let response = await  getBoxes();
+    let response = await getBoxes();
     let boxList = response.data;
     let boxIdAndBagsObj = {};
     let locations = {};
