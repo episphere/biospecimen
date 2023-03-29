@@ -3119,16 +3119,10 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenI
             if (currTube) {
                 const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube);
                 let deviationString = '';
-                
-                if (acceptedDeviationList.length === 1) {
+
+                if (acceptedDeviationList.length >= 1) {
                     for (const deviationLabel of acceptedDeviationList) {
                         deviationString = `${deviationLabel} <br><br>`;
-                    }
-                    currRow.insertCell(3).innerHTML = deviationString;
-                }
-                else if (acceptedDeviationList.length > 1) {
-                    for (const deviationLabel of acceptedDeviationList) {
-                        deviationString += `${deviationLabel} <br><br>`;
                     }
                     currRow.insertCell(3).innerHTML = deviationString;
                 }
@@ -3688,15 +3682,10 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteLis
             if (currTube) {
                 const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube);
                 let deviationString = '';
-                if (acceptedDeviationList.length === 1) {
+
+                if (acceptedDeviationList.length >= 1) {
                     for (const deviationLabel of acceptedDeviationList) {
                         deviationString = `${deviationLabel} <br><br>`;
-                    }
-                    currRow.insertCell(3).innerHTML = deviationString;
-                }
-                else if (acceptedDeviationList.length > 1) {
-                    for (const deviationLabel of acceptedDeviationList) {
-                        deviationString += `${deviationLabel} <br><br>`;
                     }
                     currRow.insertCell(3).innerHTML = deviationString;
                 }
@@ -3870,8 +3859,7 @@ export const getSpecimenDeviation = (searchSpecimenInstituteList, currTube) => {
     for (const key in specimenObj) {
         const currSpecimenKey = specimenObj[key]
         // loop over all properties to find scannedId property - 825582494 
-        if (!currSpecimenKey.hasOwnProperty(scannedId)) continue;
-        if (currSpecimenKey[scannedId] === currTube && currSpecimenKey[isCollected] === conceptIds.yes && currSpecimenKey[isDeviated] === conceptIds.yes) { 
+        if (currSpecimenKey.hasOwnProperty(scannedId) && currSpecimenKey[scannedId] === currTube && currSpecimenKey[isCollected] === conceptIds.yes && currSpecimenKey[isDeviated] === conceptIds.yes) { 
             // deviationObj - current tube's deviation keys with yes or no values 
             const deviationObj = currSpecimenKey[deviation];
             if (deviationObj) {
