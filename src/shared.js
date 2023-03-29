@@ -837,7 +837,7 @@ export const removeBag = async(boxId, bags) => {
  * Fetches biospecimen collection data from the database
  * @returns {Promise}
  */
-export const searchSpecimenInstitute = async() => { // rename to searchSpecimenInstitute
+export const searchSpecimenInstitute = async() => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen`, {
         method: "GET",
