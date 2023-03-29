@@ -7,7 +7,7 @@ import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
-import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength, workflows, specimenCollection, tubes, deviationReasons, refusedShippingDeviationList} from './tubeValidation.js';
+import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength, workflows, specimenCollection, tubes, deviationReasons, refusedShippingDeviationConceptList} from './tubeValidation.js';
 import conceptIds from './fieldToConceptIdMapping.js';
 
 export const addEventSearchForm1 = () => {
@@ -3083,8 +3083,6 @@ export const populateSelectLocationList = async () => {
 }
 
 export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenInstituteList) => {
-    console.log("🚀 ~ file: events.js:3086 ~ populateBoxManifestTable ~ searchSpecimenInstituteList:", searchSpecimenInstituteList)
-    console.log("deviationReasons 🚀🚀", deviationReasons)
     let currTable = document.getElementById('boxManifestTable');
     let bagObjects = boxIdAndBagsObj[boxId];
     let bagList = Object.keys(bagObjects);
@@ -3092,12 +3090,10 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenI
     
     for (let i = 0; i < bagList.length; i++) {
         let tubes = bagObjects[bagList[i]]['arrElements'];
-        console.log("🚀 ~ file: events.js:3093 ~ populateBoxManifestTable ~ tubes:", tubes)
         for (let j = 0; j < tubes.length; j++) {
+            const currTube = tubes[j];
             let currRow = currTable.insertRow(rowCount);
-            // let cell = currRow.insertCell()
             if (j == 0) {
-                // currRow.insertCell(0).style = "1px solid black";
                 currRow.insertCell(0).innerHTML = bagList[i];
             }
             else {
@@ -3119,29 +3115,25 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenI
             if (bagObjects[bagList[i]].hasOwnProperty('618036638') && j == 0) {
                 fullScannerName += bagObjects[bagList[i]]['618036638'];
             }
-            // Cell 3 Content Logic
-            if(tubes[j]) {
-                const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList ,tubes[j])
-                // Iterate over array display numbers
-                // After numbers can be displayed transform numbers to deviation text
-                let deviationString = ''
+
+            if (currTube) {
+                const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube);
+                let deviationString = '';
                 
-                if(acceptedDeviationList.length === 1) {
-                    for(const deviationLabel of acceptedDeviationList) {
-                        console.log("deviation loop", deviationLabel)
-                        deviationString = deviationLabel
+                if (acceptedDeviationList.length === 1) {
+                    for (const deviationLabel of acceptedDeviationList) {
+                        deviationString = `${deviationLabel} <br><br>`;
                     }
-                        
-                    currRow.insertCell(3).innerHTML = deviationString
+                    currRow.insertCell(3).innerHTML = deviationString;
                 }
                 else if (acceptedDeviationList.length > 1) {
-                    for(const deviationLabel of acceptedDeviationList) {
-                        deviationString += `${deviationLabel}</br>`
+                    for (const deviationLabel of acceptedDeviationList) {
+                        deviationString += `${deviationLabel} <br><br>`;
                     }
-                    currRow.insertCell(3).innerHTML = deviationString
+                    currRow.insertCell(3).innerHTML = deviationString;
                 }
                 else {
-                    currRow.insertCell(3).innerHTML = deviationString 
+                    currRow.insertCell(3).innerHTML = `<br><br>`;
                 }
             }
             
@@ -3662,15 +3654,14 @@ export const populateReportManifestHeader = (currPage) => {
 }
 
 export const populateReportManifestTable = (currPage, searchSpecimenInstituteList) => {
-    // const specimenInstituteList = fakeObj;
-    // const specimenInstituteList = searchSpecimenInstituteList;
-    let currTable = document.getElementById('boxManifestTable');
-
+    const currTable = document.getElementById('boxManifestTable');
     let bags = Object.keys(currPage['bags']);
+
     let rowCount = 1;
     for (let i = 0; i < bags.length; i++) {
         let tubes = currPage['bags'][bags[i]]['arrElements'];
         for (let j = 0; j < tubes.length; j++) {
+            const currTube = tubes[j]
             let currRow = currTable.insertRow(rowCount);
             if (j == 0) {
                 currRow.insertCell(0).innerHTML = bags[i];
@@ -3678,8 +3669,8 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteLis
             else {
                 currRow.insertCell(0).innerHTML = '';
             }
-            currRow.insertCell(1).innerHTML = tubes[j]
-            let thisId = tubes[j].split(' ');
+            currRow.insertCell(1).innerHTML = currTube
+            let thisId = currTube.split(' ');
             let toAddType = 'N/A'
             if (translateNumToType.hasOwnProperty(thisId[1])) {
                 toAddType = translateNumToType[thisId[1]];
@@ -3694,40 +3685,26 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteLis
                 fullScannerName += currBox[bags[i]]['618036638'];
             }
 
-            // Cell 3 Content Logic
-            if(tubes[j]) {
-                console.log("tubes[j]", tubes[j])
-                const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList ,tubes[j])
-                console.log("🚀 ~ file: events.js:3681 ~ populateReportManifestTable ~ acceptedDeviationList:", acceptedDeviationList)
-                // Iterate over array display numbers
-                // After numbers can be displayed transform numbers to deviation text
-                let deviationString = ''
-                
-                if(acceptedDeviationList.length === 1) {
-                    for(const deviationLabel of acceptedDeviationList) {
-                        console.log("deviation loop", deviationLabel)
-                        deviationString = deviationLabel
+            if (currTube) {
+                const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube);
+                let deviationString = '';
+                if (acceptedDeviationList.length === 1) {
+                    for (const deviationLabel of acceptedDeviationList) {
+                        deviationString = `${deviationLabel} <br><br>`;
                     }
-                        
-                    currRow.insertCell(3).innerHTML = deviationString
+                    currRow.insertCell(3).innerHTML = deviationString;
                 }
                 else if (acceptedDeviationList.length > 1) {
-                    let deviationContent = ''
-                    for(const [index, deviationLabel] of acceptedDeviationList.entries()) {
-                        // const transformation
-                        console.log("deviation loop",index, acceptedDeviationList[deviationLabel])
-                        // deviationContent += `<td>${deviationLabel}</td>`
-                        if(acceptedDeviationList.length === index)
-                        console.log("🚀 ~ file: events.js:3143 ~ populateBoxManifestTable ~ deviationString:", deviationString)
-                        // deviationString += `<td>${deviationLabel}</td>`
-                        deviationString += `<p>${deviationLabel}</p>`
+                    for (const deviationLabel of acceptedDeviationList) {
+                        deviationString += `${deviationLabel} <br><br>`;
                     }
-                    currRow.insertCell(3).innerHTML = deviationString
+                    currRow.insertCell(3).innerHTML = deviationString;
                 }
                 else {
-                    currRow.insertCell(3).innerHTML = deviationString 
+                    currRow.insertCell(3).innerHTML = `<br><br>`;
                 }
             }
+
             currRow.insertCell(4).innerHTML = fullScannerName;
             if (i % 2 == 0) {
                 currRow.style['background-color'] = "lightgrey";
@@ -3870,356 +3847,45 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
   return dataObj
 }
 
-
-/*
-Add to logic when going through each tube0
-if (tubeDeviation?.[conceptIds.brokenSpecimenDeviation] == conceptIds.yes || 
-                tubeDeviation?.[conceptIds.discardSpecimenDeviation] == conceptIds.yes || 
-                tubeDeviation?.[conceptIds.insufficientVolumeSpecimenDeviation] == conceptIds.yes|| 
-                tubeDeviation?.[conceptIds.mislabelledDiscardSpecimenDeviation] == conceptIds.yes || 
-                tubeDeviation?.[conceptIds.notFoundSpecimenDeviation] == conceptIds.yes)
-*/
-
+/** 
+ *  Returns an array of deviation type name(s) for a single specimen tube id or an empty array if no deviation type found
+ *  @param {array} searchSpecimenInstituteList - firestore biospecimen collection data array of objects or empty array depending on response
+ *  @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteList - Ex. [CXA321789 0001]
+ *  @returns {array} Example array - ['Hemolysis present']
+ *   
+*/ 
 export const getSpecimenDeviation = (searchSpecimenInstituteList, currTube) => {
-    // console.log("🚀 ~ file: events.js:3864 ~ getSpecimenDeviation ~ currTube:", currTube)
-    const specimenInstituteList = searchSpecimenInstituteList // add .length
-    // const specimenInstituteList = fakeObj;
-    // console.log("🚀 ~ file: events.js:3869 ~ getSpecimenDeviation ~ specimenInstituteList:", specimenInstituteList)
+    const specimenInstituteList = searchSpecimenInstituteList;
     const [collectionId, tubeId] = currTube.split(" ");
-
-    const filterTubeIdObject = tubes.filter(tubeIdObj => tubeIdObj['id'] === tubeId)
-    // console.log("🚀 ~ file: events.js:3846 ~ getSpecimenDeviation ~ filterTubeIdObject:", filterTubeIdObject)
-
-    const tubeIdDeviationReasonArr = deviationReasons
-    // console.log("🚀 ~ file: events.js:3849 ~ getSpecimenDeviation ~ tubeIdDeviationReasonArr:", tubeIdDeviationReasonArr)
+    const tubeIdDeviationReasonList = deviationReasons;
     
-    
-    const specimenObjList = specimenInstituteList.filter( specimen => (specimen["820476880"] === collectionId));
-    // console.log("🧐🧐🧐🧐🧐 ~ file: events.js:3879 ~ getSpecimenDeviation ~ specimenObjList:",typeof specimenObjList ,specimenObjList)
-    
+    // specimenObjList - filter and return specimen object with matching tube collectedId
+    const specimenObjList = specimenInstituteList.filter(specimen => (specimen["820476880"] === collectionId));    
     const { scannedId, isCollected, isDeviated, deviation } = conceptIds.collection.tube;
-
-    // console.log("🚀 ~ file: test.js:14982 ~ refusedShippingDeviationList", refusedShippingDeviationList)
-    // console.log("🚀 ~ file: test.js:14975 ~ getSpecimenDeviation ~ scannedId, isCollected, deviation:", scannedId, isCollected, deviation)
     
-    // Flatten array of a single object to an Object of nested objects
-    const specimenObj = (specimenObjList.length) ? Object.assign(...specimenObjList) : {}
-    // console.log("🚀 ~ file: events.js:3817 ~ getSpecimenDeviation ~ Object.keys(specimenObj:", specimenObjKeys)
-    // console.log("KEYS 🚀🚀🚀",Object.keys(specimenObj))
-    const acceptedDeviationArr = []
+    // Flatten array to single object 
+    const specimenObj = (specimenObjList.length) ? Object.assign(...specimenObjList) : {};
+    const acceptedDeviationArr = [];
+
     for (const key in specimenObj) {
         const currSpecimenKey = specimenObj[key]
-        // if current key has the following: object ID, object collected and deviation
-        // console.log(key.hasOwnProperty(conceptIds.collectionId))
-        // check if SpecimenObjKeys has the Object ID keyword
-        // console.log(isCollected, deviation)
-        if (!specimenObj[key].hasOwnProperty(scannedId)) continue
-        if (currSpecimenKey[scannedId] === currTube && currSpecimenKey[isCollected] === conceptIds.yes && currSpecimenKey[isDeviated] === conceptIds.yes) {
-            // console.log("HELLO", currSpecimenKey[scannedId])
-            const deviationObj = currSpecimenKey[deviation]
-            if (currSpecimenKey[deviation]) {
+        // loop over all properties to find scannedId property - 825582494 
+        if (!currSpecimenKey.hasOwnProperty(scannedId)) continue;
+        if (currSpecimenKey[scannedId] === currTube && currSpecimenKey[isCollected] === conceptIds.yes && currSpecimenKey[isDeviated] === conceptIds.yes) { 
+            // deviationObj - current tube's deviation keys with yes or no values 
+            const deviationObj = currSpecimenKey[deviation];
+            if (deviationObj) {
                 for (const deviation in deviationObj) {
-                    // console.log("deviation", deviation)
-                    // console.log("deviation", deviation ,!refusedShippingDeviationList.includes(deviation) && deviationObj.deviation === conceptIds.yes)
-                    // console.log("TRUE?", deviation, deviationObj[deviation],deviationObj[deviation] === conceptIds.yes ,conceptIds.yes, refusedShippingDeviationList.includes(parseInt(deviation)))
-                    if (!refusedShippingDeviationList.includes(parseInt(deviation)) && deviationObj[deviation] === conceptIds.yes) {
-                        // console.log("deviation prop", deviation, typeof deviation, parseInt(deviation))
-                        // console.log("tubeIdDeviationReasonArr loop", tubeIdDeviationReasonArr, typeof tubeIdDeviationReasonArr)
-                        const [filteredDeviationObj] = tubeIdDeviationReasonArr.filter(deviationReason => {
-                            // console.log("filteredDeviationObj",deviationReason['concept'], typeof deviationReason['concept'])
-                            // debugger;
-                            return (deviationReason['concept'] === parseInt(deviation))
-                        })
-                        const deviationLabel = filteredDeviationObj['label']
-                        // console.log("🚀 ~ file: events.js:3886 ~ getSpecimenDeviation ~ deviationLabel:", deviationLabel)
-                        // console.log("🚀 ~ file: events.js:3885 ~ filteredDeviationObj ~ filteredDeviationObj:", filteredDeviationObj)
-                        acceptedDeviationArr.push(deviationLabel)
+                    // deviation not found in the the refused shipping deviation list and deviation exists
+                    if (!refusedShippingDeviationConceptList.includes(parseInt(deviation)) && deviationObj[deviation] === conceptIds.yes) {
+                        // destructure assignment to get single deviation object match 
+                        const [filteredDeviationObj] = tubeIdDeviationReasonList.filter(deviationReason => (deviationReason['concept'] === parseInt(deviation)))
+                        const deviationLabel = filteredDeviationObj['label'];
+                        acceptedDeviationArr.push(deviationLabel);
                     }
                 }
             }
         }
-
     }
-    // console.log("acceptedDeviationArr", acceptedDeviationArr)
-    return acceptedDeviationArr
+    return acceptedDeviationArr;
 }
-
-
-export const fakeObj = [
-    {
-        "299553921": {
-            "248868659": {
-                "102695484": 104430631,
-                "242307474": 353358909,
-                "283900611": 104430631,
-                "313097539": 104430631,
-                "453343022": 104430631,
-                "472864016": 104430631,
-                "550088682": 104430631,
-                "561005927": 104430631,
-                "635875253": 104430631,
-                "654002184": 104430631,
-                "684617815": 104430631,
-                "690540566": 104430631,
-                "728366619": 104430631,
-                "757246707": 104430631,
-                "777486216": 104430631,
-                "810960823": 104430631,
-                "861162895": 104430631,
-                "912088602": 104430631,
-                "937362785": 104430631,
-                "982885431": 104430631
-            },
-            "536710547": "(TEST) for CXA321789 0001",
-            "593843561": 353358909,
-            "678857215": 353358909,
-            "762124027": 104430631,
-            "825582494": "CXA321789 0001"
-        },
-        "331584571": 266600170,
-        "338570265": "",
-        "410912345": 353358909,
-        "556788178": "2022-11-18T17:27:40.587Z",
-        "646899796": 789,
-        "650516960": 664882224,
-        "703954371": {
-            "248868659": {
-                "102695484": 104430631,
-                "242307474": 353358909,
-                "283900611": 353358909,
-                "313097539": 353358909,
-                "453343022": 104430631,
-                "472864016": 104430631,
-                "550088682": 104430631,
-                "561005927": 104430631,
-                "635875253": 104430631,
-                "654002184": 104430631,
-                "684617815": 104430631,
-                "690540566": 104430631,
-                "728366619": 104430631,
-                "757246707": 104430631,
-                "777486216": 104430631,
-                "810960823": 104430631,
-                "861162895": 104430631,
-                "912088602": 104430631,
-                "937362785": 104430631,
-                "982885431": 104430631
-            },
-            "536710547": "(TEST) for CXA321789 0002",
-            "593843561": 353358909,
-            "678857215": 353358909,
-            "762124027": 104430631,
-            "825582494": "CXA321789 0002"
-        },
-        "820476880": "CXA321789",
-        "827220437": 13,
-        "915838974": "2022-11-18T17:27:06.198Z",
-        "928693120": 321,
-        "973670172": {
-            "248868659": {
-                "283900611": 104430631,
-                "313097539": 104430631,
-                "453343022": 104430631,
-                "472864016": 104430631,
-                "550088682": 104430631,
-                "684617815": 104430631,
-                "690540566": 104430631,
-                "728366619": 104430631,
-                "757246707": 104430631,
-                "956345366": 104430631,
-                "982885431": 104430631
-            },
-            "593843561": 353358909,
-            "678857215": 104430631,
-            "762124027": 104430631,
-            "825582494": "CXA321789 0006"
-        },
-        "siteAcronym": "NIH",
-        "Connect_ID": 9136738966,
-        "token": "718d6666-e90a-410f-b1f0-11d67ee1adee",
-        "id": "76d822d6-c3c7-4834-8076-db0cead365fb"
-    },
-    {
-        "143615646": {
-            "248868659": {
-                "283900611": 104430631,
-                "313097539": 104430631,
-                "453343022": 104430631,
-                "472864016": 104430631,
-                "684617815": 104430631,
-                "728366619": 104430631,
-                "742806035": 104430631,
-                "757246707": 104430631,
-                "982885431": 104430631
-            },
-            "593843561": 353358909,
-            "678857215": 104430631,
-            "762124027": 104430631,
-            "825582494": "CXA426800 0007"
-        },
-        "223999569": {
-            "593843561": 353358909,
-            "825582494": "CXA426800 0009"
-        },
-        "299553921": {
-            "248868659": {
-                "102695484": 104430631,
-                "242307474": 353358909,
-                "283900611": 104430631,
-                "313097539": 104430631,
-                "453343022": 104430631,
-                "472864016": 104430631,
-                "550088682": 104430631,
-                "561005927": 104430631,
-                "635875253": 104430631,
-                "654002184": 104430631,
-                "684617815": 104430631,
-                "690540566": 104430631,
-                "728366619": 104430631,
-                "757246707": 104430631,
-                "777486216": 104430631,
-                "810960823": 104430631,
-                "861162895": 104430631,
-                "912088602": 104430631,
-                "937362785": 104430631,
-                "982885431": 104430631
-            },
-            "536710547": "(TEST) for CXA426800 0001",
-            "593843561": 353358909,
-            "678857215": 353358909,
-            "762124027": 104430631,
-            "825582494": "CXA426800 0001"
-        },
-        "331584571": 266600170,
-        "338570265": "",
-        "410912345": 353358909,
-        "454453939": {
-            "248868659": {
-                "242307474": 353358909,
-                "283900611": 104430631,
-                "313097539": 104430631,
-                "453343022": 104430631,
-                "472864016": 104430631,
-                "550088682": 104430631,
-                "684617815": 104430631,
-                "690540566": 104430631,
-                "728366619": 104430631,
-                "757246707": 104430631,
-                "777486216": 104430631,
-                "810960823": 104430631,
-                "982885431": 104430631
-            },
-            "536710547": "",
-            "593843561": 353358909,
-            "678857215": 353358909,
-            "762124027": 104430631,
-            "825582494": "CXA426800 0004"
-        },
-        "556788178": "2023-03-11T14:26:19.750Z",
-        "650516960": 534621077,
-        "652357376": {
-            "248868659": {
-                "242307474": 104430631,
-                "283900611": 104430631,
-                "313097539": 104430631,
-                "453343022": 104430631,
-                "472864016": 104430631,
-                "550088682": 104430631,
-                "684617815": 104430631,
-                "690540566": 104430631,
-                "728366619": 104430631,
-                "757246707": 104430631,
-                "777486216": 104430631,
-                "810960823": 104430631,
-                "982885431": 104430631
-            },
-            "338286049": "",
-            "593843561": 104430631,
-            "678857215": 104430631,
-            "762124027": 104430631,
-            "883732523": 234139565
-        },
-        "678166505": "2023-01-26T14:22:47.095Z",
-        "703954371": {
-            "248868659": {
-                "102695484": 104430631,
-                "242307474": 104430631,
-                "283900611": 104430631,
-                "313097539": 104430631,
-                "453343022": 104430631,
-                "472864016": 104430631,
-                "550088682": 104430631,
-                "561005927": 104430631,
-                "635875253": 104430631,
-                "654002184": 104430631,
-                "684617815": 104430631,
-                "690540566": 104430631,
-                "728366619": 104430631,
-                "757246707": 104430631,
-                "777486216": 104430631,
-                "810960823": 104430631,
-                "861162895": 104430631,
-                "912088602": 104430631,
-                "937362785": 104430631,
-                "982885431": 104430631
-            },
-            "593843561": 353358909,
-            "678857215": 104430631,
-            "762124027": 104430631,
-            "825582494": "CXA426800 0002"
-        },
-        "719427591": "dh",
-        "787237543": {
-            "593843561": 353358909,
-            "825582494": "CXA426800 0008"
-        },
-        "820476880": "CXA426800",
-        "827220437": 13,
-        "838567176": {
-            "248868659": {
-                "242307474": 353358909,
-                "283900611": 104430631,
-                "313097539": 104430631,
-                "453343022": 104430631,
-                "472864016": 104430631,
-                "550088682": 104430631,
-                "684617815": 104430631,
-                "690540566": 104430631,
-                "728366619": 104430631,
-                "757246707": 104430631,
-                "777486216": 104430631,
-                "810960823": 104430631,
-                "982885431": 104430631
-            },
-            "536710547": "",
-            "593843561": 353358909,
-            "678857215": 353358909,
-            "762124027": 104430631,
-            "825582494": "CXA426800 0003"
-        },
-        "951355211": 111111111,
-        "973670172": {
-            "248868659": {
-                "283900611": 104430631,
-                "313097539": 104430631,
-                "453343022": 104430631,
-                "472864016": 104430631,
-                "550088682": 104430631,
-                "684617815": 104430631,
-                "690540566": 104430631,
-                "728366619": 104430631,
-                "757246707": 104430631,
-                "956345366": 104430631,
-                "982885431": 104430631
-            },
-            "593843561": 353358909,
-            "678857215": 104430631,
-            "762124027": 104430631,
-            "825582494": "CXA426800 0006"
-        },
-        "Connect_ID": 2693102887,
-        "siteAcronym": "NIH",
-        "id": "a70fd7ad-65cf-4423-aca4-0c78821686c6",
-        "token": "80b02d3c-d246-4347-a71b-157d9dadc75b"
-    }
-]

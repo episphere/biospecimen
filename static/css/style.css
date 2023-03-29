@@ -346,7 +346,7 @@ canvas.drawing, canvas.drawingBuffer {
     transform: scale(0);
     transition: all 0.2s ease-in-out;
     z-index: 1000;
-  }
+}
   
 .modal-wrapper.visible {
 visibility: visible;
@@ -415,16 +415,24 @@ box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
     box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
   }
 
-  #boxManifestTable tbody
-  {
+.modal-content {
+border-radius: 5px;
+box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+}
+
+#boxManifestTable tbody
+{
     vertical-align: top;
-  }
+}
 
 #saveTable tbody tr td:first-child {
     text-align: center;
 }
 
-#tableBodyPackagesInTransit tr td {
+#tableBodyPackagesInTransit tr td,
+#specimenList tbody tr th,
+#saveTable tbody tr th
+{
     vertical-align: middle;
 }
 

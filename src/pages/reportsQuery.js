@@ -82,7 +82,6 @@ export const showReportsManifest = async (currPage) => {
     showAnimation()
     const searchSpecimenInstituteResponse = await searchSpecimenInstitute()
     const searchSpecimenInstituteList = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : []
-    console.log("🚀 ~ file: reportsQuery.js:85 ~ showReportsManifest ~ searchSpecimenInstituteList:", searchSpecimenInstituteList)
     let template = `
         <div class="row">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
@@ -118,10 +117,8 @@ export const showReportsManifest = async (currPage) => {
         `;
         document.getElementById('contentBody').innerHTML = template;
         removeActiveClass('navbar-btn', 'active')
-        populateReportManifestHeader(currPage)
-        
-        console.log("🚀 ~ file: reportsQuery.js:124 ~ showReportsManifest ~ searchSpecimenInstituteList:", searchSpecimenInstituteList)
-        populateReportManifestTable(currPage, searchSpecimenInstituteList)
+        populateReportManifestHeader(currPage);
+        populateReportManifestTable(currPage, searchSpecimenInstituteList);
         document.getElementById('printBox').addEventListener('click', e => {
             window.print();
         });
