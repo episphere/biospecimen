@@ -133,6 +133,8 @@ export default {
     nci_mainCampus: 111111111,
     nci_frederick: 222222222,
     siteCode:789843387,
+    "FedEx": 712278213,
+    "World Courier": 149772928,
 
     collectionLocation: 951355211,
 

@@ -2923,15 +2923,15 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
     });
 }
 
-export const addEventReturnToReviewShipmentContents = (element, boxIdAndBagsObj, userName, tempChecked) => {
+export const addEventReturnToReviewShipmentContents = (element, boxIdAndBagsObj, userName, boxWithTempMonitor='') => {
     const btn = document.getElementById(element);
     document.getElementById(element).addEventListener('click', async e => {
         let boxListToShip = Object.keys(boxIdAndBagsObj).sort(compareBoxIds)
-        //return box 1 info
-        if (tempChecked != false) {
-            tempChecked = true;
-        }
-        await shippingManifest(boxListToShip, userName, tempChecked);
+        // //return box 1 info
+        // if (boxWithTempMonitor != false) {
+        //     boxWithTempMonitor = true;
+        // }
+        await shippingManifest(boxListToShip, userName, boxWithTempMonitor);
     });
 }
 
@@ -3170,7 +3170,7 @@ export const populateTrackingQuery = async (boxIdAndBagsObj) => {
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
 }
 
-export const addEventCompleteButton = (boxIdAndBagsObj, userName, tempChecked) => {
+export const addEventCompleteButton = (boxIdAndBagsObj, userName, boxWithTempMonitor) => {
     document.getElementById('completeTracking').addEventListener('click', async () => {
         let boxIdList = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
         let emptyField = false;
@@ -3223,7 +3223,7 @@ export const addEventCompleteButton = (boxIdAndBagsObj, userName, tempChecked) =
             document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBagsObj);
             addEventSaveContinue(boxIdAndBagsObj)
             let shipmentCourier = document.getElementById('courierSelect').value;
-            finalShipmentTracking(boxIdAndBagsObj, userName, tempChecked, shipmentCourier);
+            finalShipmentTracking(boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier);
         }
     })
 
@@ -3325,50 +3325,68 @@ export const addEventSaveContinue = (boxIdAndBagsObj) => {
       localforage.setItem("shipData",shippingData)
 }
 
-export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, tempChecked, shipmentCourier) => {
+/**
+ * Handle 'Sign' button click
+ * @param {object} boxIdAndBagsObj 
+ * @param {string} userName 
+ * @param {string} boxWithTempMonitor boxId of box with temp monitor (eg: 'box1') 
+ * @param {string} shipmentCourier name of shipment courier (eg: 'FedEx')
+ */
+export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier) => {
     document.getElementById('finalizeModalSign').addEventListener('click', async () => {
-        let finalizeTextField = document.getElementById('finalizeSignInput');
-        let firstNameShipper = userName.split(" ")[0] ? userName.split(" ")[0] : ""
-        let lastNameShipper = userName.split(" ")[1] ? userName.split(" ")[1] : ""
-        let conversion = {
-            "FedEx": 712278213,
-            "World Courier": 149772928
+        const finalizeSignInputEle = document.getElementById('finalizeSignInput');
+        const firstNameShipper = userName.split(" ")[0] ? userName.split(" ")[0] : ""
+        const lastNameShipper = userName.split(" ")[1] ? userName.split(" ")[1] : ""
+
+        // let isTempMonitorIncluded = 104430631
+        // if (boxWithTempMonitor !== '') {
+        //   isTempMonitorIncluded = conceptIds.yes;
+        // }
+
+        const shippingData = {
+          666553960: conceptIds[shipmentCourier],
+          948887825: firstNameShipper,
+          885486943: lastNameShipper,
+          boxWithTempMonitor,
+        };
+
+        // shippingData["666553960"] = courierNameToConceptIdMap[shipmentCourier]
+        // shippingData.boxWithTempMonitor = boxWithTempMonitor;
+        // shippingData["948887825"] = firstNameShipper;
+        // shippingData["885486943"] = lastNameShipper;
+        let boxIdToTrackingNumberMap = {}
+        let boxIdArray = Object.keys(boxIdAndBagsObj);
+
+        for (let i = 0; i < boxIdArray.length; i++) {
+            boxIdToTrackingNumberMap[boxIdArray[i]] = boxIdAndBagsObj[boxIdArray[i]]['959708259'];
         }
-        let tempCheckedId = 104430631
-        if (tempChecked != false) {
-          tempCheckedId = tempChecked
-        }
-        let shippingData = {}
-        shippingData["666553960"] = conversion[shipmentCourier]
-        shippingData["105891443"] = tempCheckedId;
-        shippingData["948887825"] = firstNameShipper;
-        shippingData["885486943"] = lastNameShipper;
-        let trackingNumbers = {}
-        let boxIdList = Object.keys(boxIdAndBagsObj);
-        for (let i = 0; i < boxIdList.length; i++) {
-            trackingNumbers[boxIdList[i]] = boxIdAndBagsObj[boxIdList[i]]['959708259'];
-        }
-        if (finalizeTextField.value.toUpperCase() === userName.toUpperCase()) {
-            let boxes = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
-            let shipSent = await ship(boxes, shippingData, trackingNumbers);
-            console.log(shipSent)
+
+        if (finalizeSignInputEle.value.toUpperCase() === userName.toUpperCase()) {
+            // boxIdArray = boxIdArray.sort(compareBoxIds); // is this needed?
+
+            const shipment = await ship(boxIdArray, shippingData, boxIdToTrackingNumberMap);
+            console.log("shipSent", shipment)
             document.getElementById('finalizeModalCancel').click();
-            if (tempChecked) {
+
+            if (boxWithTempMonitor) {
                 updateNewTempDate();
             }
-            if(shipSent.code === 200) {
+
+            if(shipment.code === 200) {
               alert("This shipment is now finalized; no other changes can be made")
               localforage.removeItem("shipData")
               startShipping(userName) 
+            } else {
+              let errorMessage = document.getElementById('finalizeModalError');
+              errorMessage.style.display = "block";
+              errorMessage.innerHTML = "There was an error finalizing this shipment. Please sign again.";
             }
-            // Add error logic here
-            else return
-        }
-        else {
+
+        } else {
             let errorMessage = document.getElementById('finalizeModalError');
             errorMessage.style.display = "block";
         }
-    })
+    });
 }
 
 export const populateFinalCheck = (boxIdAndBagsObj) => {
