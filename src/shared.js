@@ -556,13 +556,12 @@ export const updateNewTempDate = async () =>{
 }
 
 /**
- * 
- * @param {string[]} boxIdArray 
+ * Ship boxes
+ * @param {object} boxIdToTrackingNumberMap {boxId:trackingNumber}
  * @param {object} shippingData 
- * @param {object} boxIdToTrackingNumberMap boxId:trackingNumber
  * @returns 
  */
-export const ship = async (boxIdArray, shippingData, boxIdToTrackingNumberMap) => {
+export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -570,7 +569,7 @@ export const ship = async (boxIdArray, shippingData, boxIdToTrackingNumberMap) =
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({"boxes": boxIdArray, "shippingData": shippingData, "trackingNumbers":boxIdToTrackingNumberMap})
+        body: JSON.stringify({boxIdToTrackingNumberMap, shippingData})
     }
     const response = await fetch(`${api}api=ship`, requestObj);
     return response.json();

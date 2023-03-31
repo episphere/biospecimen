@@ -10,6 +10,8 @@ import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength, workflows, specimenCollection } from './tubeValidation.js';
 import conceptIds from './fieldToConceptIdMapping.js';
 
+let isRequestInProgress = false;
+
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
     if (!form) return;
@@ -3333,6 +3335,9 @@ export const addEventSaveContinue = (boxIdAndBagsObj) => {
  * @param {string} shipmentCourier name of shipment courier (eg: 'FedEx')
  */
 export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier) => {
+    if (isRequestInProgress) return;
+    isRequestInProgress = true;
+
     document.getElementById('finalizeModalSign').addEventListener('click', async () => {
         const finalizeSignInputEle = document.getElementById('finalizeSignInput');
         const firstNameShipper = userName.split(" ")[0] ? userName.split(" ")[0] : ""
@@ -3357,14 +3362,18 @@ export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWit
         let boxIdToTrackingNumberMap = {}
         let boxIdArray = Object.keys(boxIdAndBagsObj);
 
+        for (const boxId in boxIdAndBagsObj) {
+            boxIdToTrackingNumberMap[boxId] = boxIdAndBagsObj[boxId]['959708259'];
+        }
+
         for (let i = 0; i < boxIdArray.length; i++) {
             boxIdToTrackingNumberMap[boxIdArray[i]] = boxIdAndBagsObj[boxIdArray[i]]['959708259'];
         }
 
         if (finalizeSignInputEle.value.toUpperCase() === userName.toUpperCase()) {
             // boxIdArray = boxIdArray.sort(compareBoxIds); // is this needed?
-
-            const shipment = await ship(boxIdArray, shippingData, boxIdToTrackingNumberMap);
+            // no need to pass in boxIdArray, since we are passing in boxIdToTrackingNumberMap
+            const shipment = await ship(boxIdToTrackingNumberMap, shippingData);
             console.log("shipSent", shipment)
             document.getElementById('finalizeModalCancel').click();
 
@@ -3387,6 +3396,8 @@ export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWit
             errorMessage.style.display = "block";
         }
     });
+
+    isRequestInProgress = false;
 }
 
 export const populateFinalCheck = (boxIdAndBagsObj) => {
