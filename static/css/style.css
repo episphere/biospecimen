@@ -302,8 +302,14 @@ canvas.drawing, canvas.drawingBuffer {
     padding-bottom: 4px;
 }
 
-.deviation-comments-width {
+.deviation-comments-width,
+.deviation-type-width {
     max-width: 120px;
+    word-wrap: break-word;
+}
+
+#finalizeTable tr td {
+    padding: 1rem 0;
 }
 
 .active {
