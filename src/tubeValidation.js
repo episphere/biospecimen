@@ -35,32 +35,7 @@ const tubeNotCollectedReason5 = {'concept': 889386523, 'label': 'Supply Unavaila
 const tubeNotCollectedOptions1 = [tubeNotCollectedReason1, tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason5, tubeNotCollectedReason4];
 const tubeNotCollectedOptions2 = [tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason5, tubeNotCollectedReason4];
 
-export const refusedShippingDeviationConceptList = [deviationReason1.concept, deviationReason12.concept,deviationReason15.concept, deviationReason17.concept, deviationReason20.concept]
-
-export const deviationReasons = [
-    deviationReason1,
-    deviationReason2,
-    deviationReason3,
-    deviationReason4,
-    deviationReason5,
-    deviationReason6,
-    deviationReason7,
-    deviationReason8,
-    deviationReason9,
-    deviationReason10,
-    deviationReason11,
-    deviationReason12,
-    deviationReason13,
-    deviationReason14,
-    deviationReason15,
-    deviationReason16,
-    deviationReason17,
-    deviationReason18,
-    deviationReason19,
-    deviationReason20,
-    deviationReason21,
-    deviationReason22,
-]
+export const refusedShippingDeviationConceptList = [deviationReason1.concept, deviationReason12.concept,deviationReason15.concept, deviationReason17.concept, deviationReason20.concept];
 
 export const specimenCollection = {
   numToCid: {
@@ -462,3 +437,17 @@ export const getTubeList = () => {
 export const getConceptList = () => {
   return tubes.map((tube) => tube.concept);
 };
+
+const getUniqueDeviationReasonsList = () => {
+    const sumDeviationCollections = [...deviationCollection1, ...deviationCollection2, ...deviationCollection3, ...deviationCollection4];
+    const seenConcepts = new Set();
+    
+    return sumDeviationCollections.filter( deviationCollection => {
+        if(seenConcepts.has(deviationCollection.concept)) return false;
+        else {
+            seenConcepts.add(deviationCollection.concept)
+            return true;
+        }
+    })
+}
+export const deviationReasons = getUniqueDeviationReasonsList();

@@ -20,7 +20,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     hideAnimation();
     
     const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
-    const searchSpecimenInstituteList = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : [];
+    const searchSpecimenInstituteList = searchSpecimenInstituteResponse.data ?? [];
     let template = '';
 
     template += `
