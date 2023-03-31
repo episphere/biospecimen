@@ -263,7 +263,7 @@ export const boxManifest = async (boxId, userName) => {
     const currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
     const currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute];
     const searchSpecimenInstituteListResponse = await searchSpecimenInstitute();
-    const searchSpecimenInstituteList = searchSpecimenInstituteListResponse.data ? searchSpecimenInstituteListResponse.data : [];
+    const searchSpecimenInstituteList = searchSpecimenInstituteListResponse.data ?? [];
 
     const template = `
         </br>

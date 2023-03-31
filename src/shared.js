@@ -841,17 +841,26 @@ export const removeBag = async(boxId, bags) => {
 
 /**
  * Fetches biospecimen collection data from the database
- * @returns {Promise}
+ * @returns {object|array} returns a response object if response is 200 or an empty array
+ * 
  */
 export const searchSpecimenInstitute = async() => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen`, {
-        method: "GET",
-        headers: {
-            Authorization:"Bearer "+idToken
+    method: "GET",
+    headers: {
+        Authorization:"Bearer "+idToken
         }
     });
-    return response.json();
+
+    if (response.status === 200) {
+        const responseObject = await response.json();
+        return responseObject;
+    }
+    else {
+        console.error("searchSpecimenInstitute's responseObject status code not 200!");
+        return [];
+    }
 }
 
 /**
@@ -859,7 +868,6 @@ export const searchSpecimenInstitute = async() => {
  * @returns {Array} List of biospecimen collections
  */
 export const filterSpecimenCollectionList = async () => {
-    //https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
     const searchSpecimenInstituteResponse = await searchSpecimenInstitute()
     const searchSpecimenInstituteList = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : []
     

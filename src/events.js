@@ -3122,7 +3122,7 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenI
 
                 if (acceptedDeviationList.length >= 1) {
                     for (const deviationLabel of acceptedDeviationList) {
-                        deviationString = `${deviationLabel} <br><br>`;
+                        deviationString += `${deviationLabel} <br><br>`;
                     }
                     currRow.insertCell(3).innerHTML = deviationString;
                 }
@@ -3663,14 +3663,14 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteLis
             else {
                 currRow.insertCell(0).innerHTML = '';
             }
-            currRow.insertCell(1).innerHTML = currTube
+            currRow.insertCell(1).innerHTML = currTube;
             let thisId = currTube.split(' ');
-            let toAddType = 'N/A'
+            let toAddType = 'N/A';
             if (translateNumToType.hasOwnProperty(thisId[1])) {
                 toAddType = translateNumToType[thisId[1]];
             }
-            currRow.insertCell(2).innerHTML = toAddType
-            let fullScannerName = ''
+            currRow.insertCell(2).innerHTML = toAddType;
+            let fullScannerName = '';
             let currBox = currPage['bags'];
             if (currBox[bags[i]].hasOwnProperty('469819603') && j == 0) {
                 fullScannerName += currBox[bags[i]]['469819603'] + ' ';
@@ -3685,7 +3685,7 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteLis
 
                 if (acceptedDeviationList.length >= 1) {
                     for (const deviationLabel of acceptedDeviationList) {
-                        deviationString = `${deviationLabel} <br><br>`;
+                        deviationString += `${deviationLabel} <br><br>`;
                     }
                     currRow.insertCell(3).innerHTML = deviationString;
                 }
@@ -3695,6 +3695,7 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteLis
             }
 
             currRow.insertCell(4).innerHTML = fullScannerName;
+
             if (i % 2 == 0) {
                 currRow.style['background-color'] = "lightgrey";
             }
@@ -3847,8 +3848,6 @@ export const getSpecimenDeviation = (searchSpecimenInstituteList, currTube) => {
     const specimenInstituteList = searchSpecimenInstituteList;
     const [collectionId, tubeId] = currTube.split(" ");
     const tubeIdDeviationReasonList = deviationReasons;
-    
-    // specimenObjList - filter and return specimen object with matching tube collectedId
     const specimenObjList = specimenInstituteList.filter(specimen => (specimen["820476880"] === collectionId));    
     const { scannedId, isCollected, isDeviated, deviation } = conceptIds.collection.tube;
     
@@ -3866,10 +3865,7 @@ export const getSpecimenDeviation = (searchSpecimenInstituteList, currTube) => {
                 for (const deviation in deviationObj) {
                     // deviation not found in the the refused shipping deviation list and deviation exists
                     if (!refusedShippingDeviationConceptList.includes(parseInt(deviation)) && deviationObj[deviation] === conceptIds.yes) {
-                        // destructure assignment to get single deviation object match 
-                        const [filteredDeviationObj] = tubeIdDeviationReasonList.filter(deviationReason => (deviationReason['concept'] === parseInt(deviation)))
-                        const deviationLabel = filteredDeviationObj['label'];
-                        acceptedDeviationArr.push(deviationLabel);
+                        acceptedDeviationArr.push(tubeIdDeviationReasonList.find(deviationReason => deviationReason['concept'] === parseInt(deviation))?.['label']);
                     }
                 }
             }
