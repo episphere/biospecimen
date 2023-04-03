@@ -218,7 +218,7 @@ export const finalizeTemplate = (data, specimenData) => {
 const getDeviationSelections = (deviationSelectionsList) => {
     let deviationsSelectionContent = "";
     deviationSelectionsList.forEach( (deviationSelection, index) => {
-        deviationsSelectionContent += (index !== deviationSelectionsList.length - 1) ? `${deviationSelection} <br><br>` : `${deviationSelection}`;
+        deviationsSelectionContent += (index !== deviationSelectionsList.length - 1) ? `${deviationSelection}, <br>` : `${deviationSelection}`;
     })
     return deviationsSelectionContent;
 }
