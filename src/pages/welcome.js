@@ -20,6 +20,10 @@ export const welcomeScreen = async (auth, route) => {
     welcomeScreenTemplate(name || response.data.email, response.data, auth, route);
 }
 
+/*
+IMPORTANT - DO NOT PUSH THIS DEV CHANGE TO STAGE/PROD, HFHS SHOULD ONLY HAVE RESEARCH DASHBOARD ACCESS IN STAGE/PROD
+Removed 'HFHS' from researchSiteArray to give HFHS access to both research/clinical in dev only
+*/ 
 const clinicalSiteArray = ['KPNW', 'KPCO', 'KPHI', 'KPGA'];
 const researchSiteArray = ['MFC', 'UCM', 'HP', 'HFHS', 'SFH'];
 
