@@ -27,11 +27,12 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
     let dashboardSelectionStr = '';
 
+    console.log("data", data)
     if (location.host !== urls.stage || location.host !== urls.prod) {
         clinicalSiteArray.push('HFHS');
     }
-
-    if (clinicalSiteArray.includes(data.siteAcronym) && researchSiteArray.includes(data.siteAcronym)) {
+    
+    if (clinicalSiteArray.includes(data.siteAcronym) && researchSiteArray.includes(data.siteAcronym) || !clinicalSiteArray.includes(data.siteAcronym) && !researchSiteArray.includes(data.siteAcronym)) {
         dashboardSelectionStr = `
             <select required class="col form-control" id="dashboardSelection">
                 <option value="">-- Select Dashboard --</option>
@@ -47,13 +48,6 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
         dashboardSelectionStr = `
             <select required disabled class="col form-control" id="dashboardSelection">
                 <option selected value="research">Research Dashboard</option>
-            </select>`;
-    } else {
-        dashboardSelectionStr = `
-            <select required class="col form-control" id="dashboardSelection">
-                <option value="">-- Select Dashboard --</option>
-                <option value="clinical">Clinical Dashboard</option>
-                <option value="research">Research Dashboard</option>
             </select>`;
     }
 
