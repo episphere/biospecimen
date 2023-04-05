@@ -25,7 +25,7 @@ IMPORTANT - DO NOT PUSH THIS DEV CHANGE TO STAGE/PROD, HFHS SHOULD ONLY HAVE RES
 Removed 'HFHS' from researchSiteArray to give HFHS access to both research/clinical in dev only
 */ 
 const clinicalSiteArray = ['KPNW', 'KPCO', 'KPHI', 'KPGA'];
-const researchSiteArray = ['MFC', 'UCM', 'HP', 'HFHS', 'SFH'];
+const researchSiteArray = ['MFC', 'UCM', 'HP', 'SFH'];
 
 const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
