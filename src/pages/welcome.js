@@ -27,7 +27,7 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
     let dashboardSelectionStr = '';
 
-    if(location.host !== urls.stage || location.host !== urls.prod) {
+    if (location.host !== urls.stage || location.host !== urls.prod) {
         clinicalSiteArray.push('HFHS');
     }
 
