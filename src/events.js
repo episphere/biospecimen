@@ -1,4 +1,4 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorkflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, retrieveDateFromIsoString, convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion,  bagConceptIdList, checkAccessionId, checkSurveyEmailTrigger, packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput } from './shared.js';
+import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, searchSpecimenInstitute, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorkflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, retrieveDateFromIsoString, convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion,  bagConceptIdList, checkAccessionId, checkSurveyEmailTrigger, packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, requstsBlocker } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, boxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -9,8 +9,6 @@ import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength, workflows, specimenCollection } from './tubeValidation.js';
 import conceptIds from './fieldToConceptIdMapping.js';
-
-let isRequestInProgress = false;
 
 export const addEventSearchForm1 = () => {
     const form = document.getElementById('search1');
@@ -3335,10 +3333,10 @@ export const addEventSaveContinue = (boxIdAndBagsObj) => {
  * @param {string} shipmentCourier name of shipment courier (eg: 'FedEx')
  */
 export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier) => {
-    if (isRequestInProgress) return;
-    isRequestInProgress = true;
-
     document.getElementById('finalizeModalSign').addEventListener('click', async () => {
+        if (requstsBlocker.isBlocking()) return;
+        requstsBlocker.block();
+
         const finalizeSignInputEle = document.getElementById('finalizeSignInput');
         const firstNameShipper = userName.split(" ")[0] ? userName.split(" ")[0] : ""
         const lastNameShipper = userName.split(" ")[1] ? userName.split(" ")[1] : ""
@@ -3360,15 +3358,15 @@ export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWit
         // shippingData["948887825"] = firstNameShipper;
         // shippingData["885486943"] = lastNameShipper;
         let boxIdToTrackingNumberMap = {}
-        let boxIdArray = Object.keys(boxIdAndBagsObj);
+        // let boxIdArray = Object.keys(boxIdAndBagsObj);
 
         for (const boxId in boxIdAndBagsObj) {
             boxIdToTrackingNumberMap[boxId] = boxIdAndBagsObj[boxId]['959708259'];
         }
 
-        for (let i = 0; i < boxIdArray.length; i++) {
-            boxIdToTrackingNumberMap[boxIdArray[i]] = boxIdAndBagsObj[boxIdArray[i]]['959708259'];
-        }
+        // for (let i = 0; i < boxIdArray.length; i++) {
+        //     boxIdToTrackingNumberMap[boxIdArray[i]] = boxIdAndBagsObj[boxIdArray[i]]['959708259'];
+        // }
 
         if (finalizeSignInputEle.value.toUpperCase() === userName.toUpperCase()) {
             // boxIdArray = boxIdArray.sort(compareBoxIds); // is this needed?
@@ -3388,16 +3386,16 @@ export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWit
             } else {
               let errorMessage = document.getElementById('finalizeModalError');
               errorMessage.style.display = "block";
-              errorMessage.innerHTML = "There was an error finalizing this shipment. Please sign again.";
+              errorMessage.textContent = "There was an error finalizing this shipment. Please sign again.";
             }
 
         } else {
             let errorMessage = document.getElementById('finalizeModalError');
             errorMessage.style.display = "block";
         }
-    });
 
-    isRequestInProgress = false;
+        requstsBlocker.unblock();
+    });
 }
 
 export const populateFinalCheck = (boxIdAndBagsObj) => {

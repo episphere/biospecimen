@@ -2385,3 +2385,22 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
         await sendClientEmail(emailData);
     }
 }
+
+/**
+ * Block subsequent requests before the first request is completed, with a 5-second timeout.
+ */
+export const requstsBlocker = {
+  isReqInProcess: false,
+  block() {
+    this.isReqInProcess = true;
+    setTimeout(() => {
+      this.unblock();
+    }, 5000);
+  },
+  unblock() {
+    this.isReqInProcess = false;
+  },
+  isBlocking() {
+    return this.isReqInProcess;
+  },
+};
