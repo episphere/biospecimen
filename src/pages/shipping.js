@@ -547,12 +547,7 @@ export const shipmentTracking = async (boxIdAndBagsObj, userName, boxWithTempMon
 
 export const finalShipmentTracking = (boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier) => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
-    // let conversion = {
-    //     '712278213': 'FedEx',
-    //     '149772928': 'World Courier'
-    // }
-    //store a secret json that has all of the packed ones in it
-    //{"Box1":{specimenId:[allTubes], specimenId:[allTubes]}}
+
     let template = `
         <div id="shippingHiddenTable" style="display:none">
         {}
@@ -620,11 +615,6 @@ export const finalShipmentTracking = (boxIdAndBagsObj, userName, boxWithTempMoni
 
 
     `;
-    /*var x = document.getElementById("specimenList");
-    var option = document.createElement("option");
-    option.text = "Kiwi";
-    x.add(option);*/
-    
     
     removeActiveClass('navbar-btn', 'active')
     document.getElementById('contentHeader').innerHTML = `<h2 >Connect for Cancer Prevention Study</h2></br>` + shippingNavBar();
@@ -643,7 +633,4 @@ export const finalShipmentTracking = (boxIdAndBagsObj, userName, boxWithTempMoni
     addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName)
     addEventCompleteShippingButton(boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier);
     addEventBackToSearch('navBarShippingDash');
-    //addEventBackToSearch('navBarShippingDash');
-    //addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
-    //addEventSubmitAddBag();
 }
