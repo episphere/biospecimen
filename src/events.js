@@ -3341,8 +3341,8 @@ export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWit
         const errorMessageEle = document.getElementById('finalizeModalError');
 
         if (finalizeSignInputEle.value.toUpperCase() !== userName.toUpperCase()) {
-            errorMessageEle.style.display = "block";
-            return;
+          errorMessageEle.style.display = "block";
+          return;
         }
 
         // Block subsequent requests before the first one is completed
@@ -3350,15 +3350,15 @@ export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWit
         requstsBlocker.block();
 
         const shippingData = {
-            666553960: conceptIds[shipmentCourier],
-            948887825: firstNameShipper,
-            885486943: lastNameShipper,
-            boxWithTempMonitor,
-          };
+          666553960: conceptIds[shipmentCourier],
+          948887825: firstNameShipper,
+          885486943: lastNameShipper,
+          boxWithTempMonitor,
+        };
         let boxIdToTrackingNumberMap = {};
 
         for (const boxId in boxIdAndBagsObj) {
-            boxIdToTrackingNumberMap[boxId] = boxIdAndBagsObj[boxId]['959708259'];
+          boxIdToTrackingNumberMap[boxId] = boxIdAndBagsObj[boxId]['959708259'];
         }
 
         const shipment = await ship(boxIdToTrackingNumberMap, shippingData);
