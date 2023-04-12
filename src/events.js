@@ -3338,19 +3338,8 @@ export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWit
         const finalizeSignInputEle = document.getElementById('finalizeSignInput');
         const firstNameShipper = userName.split(" ")[0] ? userName.split(" ")[0] : ""
         const lastNameShipper = userName.split(" ")[1] ? userName.split(" ")[1] : ""
-        const shippingData = {
-          666553960: conceptIds[shipmentCourier],
-          948887825: firstNameShipper,
-          885486943: lastNameShipper,
-          boxWithTempMonitor,
-        };
-        let boxIdToTrackingNumberMap = {};
-
-        for (const boxId in boxIdAndBagsObj) {
-            boxIdToTrackingNumberMap[boxId] = boxIdAndBagsObj[boxId]['959708259'];
-        }
-
         const errorMessageEle = document.getElementById('finalizeModalError');
+
         if (finalizeSignInputEle.value.toUpperCase() !== userName.toUpperCase()) {
             errorMessageEle.style.display = "block";
             return;
@@ -3359,6 +3348,18 @@ export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWit
         // Block subsequent requests before the first one is completed
         if (requstsBlocker.isBlocking()) return;
         requstsBlocker.block();
+
+        const shippingData = {
+            666553960: conceptIds[shipmentCourier],
+            948887825: firstNameShipper,
+            885486943: lastNameShipper,
+            boxWithTempMonitor,
+          };
+        let boxIdToTrackingNumberMap = {};
+
+        for (const boxId in boxIdAndBagsObj) {
+            boxIdToTrackingNumberMap[boxId] = boxIdAndBagsObj[boxId]['959708259'];
+        }
 
         const shipment = await ship(boxIdToTrackingNumberMap, shippingData);
 
