@@ -3330,7 +3330,7 @@ export const addEventSaveContinue = (boxIdAndBagsObj) => {
  * Handle 'Sign' button click
  * @param {object} boxIdAndBagsObj 
  * @param {string} userName 
- * @param {string} boxWithTempMonitor boxId of box with temp monitor (eg: 'box1') 
+ * @param {string} boxWithTempMonitor boxId of box with temp monitor (eg: 'Box10') 
  * @param {string} shipmentCourier name of shipment courier (eg: 'FedEx')
  */
 export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier) => {
@@ -3338,38 +3338,21 @@ export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWit
         const finalizeSignInputEle = document.getElementById('finalizeSignInput');
         const firstNameShipper = userName.split(" ")[0] ? userName.split(" ")[0] : ""
         const lastNameShipper = userName.split(" ")[1] ? userName.split(" ")[1] : ""
-
-        // let isTempMonitorIncluded = 104430631
-        // if (boxWithTempMonitor !== '') {
-        //   isTempMonitorIncluded = conceptIds.yes;
-        // }
-
         const shippingData = {
           666553960: conceptIds[shipmentCourier],
           948887825: firstNameShipper,
           885486943: lastNameShipper,
           boxWithTempMonitor,
         };
-
-        // shippingData["666553960"] = courierNameToConceptIdMap[shipmentCourier]
-        // shippingData.boxWithTempMonitor = boxWithTempMonitor;
-        // shippingData["948887825"] = firstNameShipper;
-        // shippingData["885486943"] = lastNameShipper;
-        let boxIdToTrackingNumberMap = {}
-        // let boxIdArray = Object.keys(boxIdAndBagsObj);
+        let boxIdToTrackingNumberMap = {};
 
         for (const boxId in boxIdAndBagsObj) {
             boxIdToTrackingNumberMap[boxId] = boxIdAndBagsObj[boxId]['959708259'];
         }
 
-        // for (let i = 0; i < boxIdArray.length; i++) {
-        //     boxIdToTrackingNumberMap[boxIdArray[i]] = boxIdAndBagsObj[boxIdArray[i]]['959708259'];
-        // }
         const errorMessageEle = document.getElementById('finalizeModalError');
-
         if (finalizeSignInputEle.value.toUpperCase() !== userName.toUpperCase()) {
             errorMessageEle.style.display = "block";
-            // errorMessageEle.textContent = `*Please type in ${userName}`;
             return;
         }
 
@@ -3377,12 +3360,7 @@ export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWit
         if (requstsBlocker.isBlocking()) return;
         requstsBlocker.block();
 
-
-        // print data
-        console.log("shippingData", shippingData, "boxIdToTrackingNumberMap", boxIdToTrackingNumberMap);
-
         const shipment = await ship(boxIdToTrackingNumberMap, shippingData);
-        // const shipment = {code: 500, message: "bad request"};
 
         if (shipment.code === 200) {
           boxWithTempMonitor && (await updateNewTempDate());
