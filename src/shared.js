@@ -2168,7 +2168,7 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
   let forageBoxIdArr = []
   try {
       let value = await localforage.getItem("shipData")
-      console.log(value)
+
       if (value === null) {
           await localforage.setItem("shipData", shipSetForage)
       }
@@ -2394,7 +2394,7 @@ export const requstsBlocker = {
   block() {
     this.isReqInProcess = true;
     setTimeout(() => {
-      this.unblock();
+      this.isReqInProcess = false;
     }, 5000);
   },
   unblock() {

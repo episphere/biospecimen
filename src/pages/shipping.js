@@ -336,19 +336,19 @@ export const boxManifest = async (boxId, userName) => {
 
 /**
  * 
- * @param {*} boxesToShip 
+ * @param {string[]} boxIdArray 
  * @param {string} userName 
- * @param {string} boxWithTempMonitor boxId of box with temp monitor (eg: 'Box10')
+ * @param {boolean} isTempMonitorIncluded 
  * @param {*} currShippingLocationNumber 
  */
-export const shippingManifest = async (boxesToShip, userName, boxWithTempMonitor, currShippingLocationNumber) => {
+export const shippingManifest = async (boxIdArray, userName, isTempMonitorIncluded, currShippingLocationNumber) => {
     let response = await  getBoxes();
-    let boxList = response.data;
+    let boxArray = response.data;
     let boxIdAndBagsObj = {};
     let locations = {};
     let site = '';
 
-    for (const box of boxList) {
+    for (const box of boxArray) {
         const boxId= box[conceptIds.shippingBoxId]
         boxIdAndBagsObj[boxId] = box['bags']
         locations[boxId] = box[conceptIds.shippingLocation];
@@ -358,7 +358,7 @@ export const shippingManifest = async (boxesToShip, userName, boxWithTempMonitor
     let boxIdAndBagsObjToDisplay = {};
     let location = ''
 
-    for (const boxId of boxesToShip) {
+    for (const boxId of boxIdArray) {
         boxIdAndBagsObjToDisplay[boxId] = boxIdAndBagsObj[boxId];
         location = locations[boxId];
     }
@@ -424,8 +424,8 @@ export const shippingManifest = async (boxesToShip, userName, boxWithTempMonitor
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
 
-    if(boxWithTempMonitor){
-        populateTempSelect(boxesToShip);
+    if(isTempMonitorIncluded){
+        populateTempSelect(boxIdArray);
     }
 
     document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(boxIdAndBagsObj);
@@ -449,13 +449,13 @@ export const shippingManifest = async (boxesToShip, userName, boxWithTempMonitor
 
         const tempBoxElement = document.getElementById('tempBox');
 
-        if (boxWithTempMonitor && tempBoxElement.value === '') {
+        if (isTempMonitorIncluded && tempBoxElement.value === '') {
             showNotifications({title: 'Missing field!', body: 'Please enter the box where the temperature monitor is being stored.'}, true)
             return;
         }
 
         let boxWithTempMonitor = '';
-        if(boxWithTempMonitor){
+        if( isTempMonitorIncluded){
             boxWithTempMonitor = tempBoxElement.value;
         }
 
