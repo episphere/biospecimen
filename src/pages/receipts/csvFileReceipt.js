@@ -1,9 +1,9 @@
-import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToLocationObj, baseAPI, keyToNameObj, convertISODateTime, formatISODateTime } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToLocationObj, baseAPI, keyToNameObj, convertISODateTime, formatISODateTime, getAllBoxes, getSiteAcronym, conceptIdToSiteSpecificLocation } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
-import { getFakeResults } from "./fake.js";
+import { getRecentBoxesShippedBySiteNotReceived } from "./packagesInTransit.js";
 
 export const csvFileReceiptScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -13,6 +13,7 @@ export const csvFileReceiptScreen = async (auth, route) => {
   csvFileReceiptTemplate(username, auth, route);
   activeReceiptsNavbar();
   csvFileButtonSubmit();
+  csvInTransitButtonSubmit();
 }
 
 const csvFileReceiptTemplate = async (username, auth, route) => {
@@ -20,9 +21,22 @@ const csvFileReceiptTemplate = async (username, auth, route) => {
 
   template += receiptsNavbar();
   template += `<div id="root root-margin" style="margin-top:3rem;">
-                  <span> <h3 style="text-align: center; margin: 1rem 0;">Create CSV File</h3> </span>
+                <div id="alert_placeholder"></div>
+                <span> <h4 style="text-align: center; margin: 1rem 0;">In Transit CSV File</h4> </span>
+                <div class="container-fluid">
+                  <div class="card bg-light mb-3 mt-3 mx-auto" style="max-width:50rem;">
+                    <div class="card-body" style="padding: 4rem 2.5rem;">
+                      <form class="form">
+                      <div class="form-group d-flex flex-wrap align-items-center justify-content-center m-0">
+                          <p></p>
+                          <button id="createTransitCsv" class="btn btn-primary">Create File</button>
+                      </div>
+                      </form>
+                    </div>
+                  </div>
+              </div>`
+  template += `<span> <h4 style="text-align: center; margin: 1rem 0;">Receipted CSV File</h4> </span>
                   <div class="container-fluid">
-                  <div id="alert_placeholder"></div>
                     <div class="card bg-light mb-3 mt-3 mx-auto" style="max-width:50rem;">
                       <div class="card-body" style="padding: 4rem 2.5rem;">
                         <form class="form">
@@ -34,10 +48,21 @@ const csvFileReceiptTemplate = async (username, auth, route) => {
                         </form>
                       </div>
                     </div>
-                  </div>
-              </div>`
+                  </div>`
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
+}
+
+const csvInTransitButtonSubmit = () => {
+  document.getElementById("createTransitCsv").addEventListener("click", async (e)=> {
+    e.preventDefault();
+    showAnimation();
+    const response = await getAllBoxes(`bptl`);
+    hideAnimation();
+    const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
+    let modifiedTransitResults = updateInTransitMapping(allBoxesShippedBySiteAndNotReceived);
+    generateInTransitCSVData(modifiedTransitResults);
+  })
 }
 
 const csvFileButtonSubmit = () => {
@@ -88,9 +113,36 @@ const modifyBSIQueryResults = (results) => {
   filteredResults = filteredResults.flat()
   filteredResults.forEach( i => {
       let vialMappings = getVialTypesMappings(i)
-       updateResultMappings(i, vialMappings)
+      updateResultMappings(i, vialMappings)
   })
   return filteredResults
+}
+
+const updateInTransitMapping = (shippedBoxes) => {
+  let holdProcessedResult = []
+  shippedBoxes.forEach(i => {    
+    const bagKeys = Object.keys(i.bags); // store specimenBagId in an array
+    const specimenBags = Object.values(i.bags); // store bag content in an array
+    
+    specimenBags.forEach((specimenBag, index) => {
+      specimenBag.arrElements.forEach((fullSpecimenIds, j, specimenBagSize) => { // grab fullSpecimenIds & loop thru content
+            let dataHolder = {}
+            dataHolder['shipDate'] = i[fieldToConceptIdMapping.shippingShipDate] != undefined ? i[fieldToConceptIdMapping.shippingShipDate].split("T")[0] : ``
+            dataHolder['trackingNumber'] = i[fieldToConceptIdMapping.shippingTrackingNumber] != undefined ? i[fieldToConceptIdMapping.shippingTrackingNumber] : ``
+            dataHolder['shippedSite'] = i.siteAcronym != undefined ? i.siteAcronym : ``
+            dataHolder['shippedLocation'] = i[fieldToConceptIdMapping.shippingLocation] != undefined ? conceptIdToSiteSpecificLocation[i[fieldToConceptIdMapping.shippingLocation]] : ``
+            dataHolder['shipDateTime'] = i[fieldToConceptIdMapping.shippingShipDate] != undefined ? convertISODateTime(i[fieldToConceptIdMapping.shippingShipDate]) : ``
+            dataHolder['numSamples'] = specimenBagSize.length // to get number of samples
+            dataHolder['tempMonitor'] = i[fieldToConceptIdMapping.tempProbe] == fieldToConceptIdMapping.yes ? `Yes` : `No`
+            dataHolder['BoxId'] = i[fieldToConceptIdMapping.shippingBoxId] != undefined ? i[fieldToConceptIdMapping.shippingBoxId] : ``
+            dataHolder['specimenBagId'] = bagKeys[index]
+            dataHolder['fullSpecimenIds'] = fullSpecimenIds
+            holdProcessedResult.push(dataHolder)
+        })
+    });
+
+  })
+  return holdProcessedResult
 }
 
 const getVialTypesMappings = (i) => {
@@ -221,27 +273,32 @@ const getVialTypesMappings = (i) => {
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0006')) {
       vialMappingsHolder.push('15 ml Nalgene jar', 'No Additive', 'Urine', '10')
     }
+
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
-    (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' 
-    || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0011' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0012' )) {
-      vialMappingsHolder.push('5 ml Serum separator tube', 'SST', 'Serum', '5')
+    (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002')) {
+      vialMappingsHolder.push('10 ml Serum separator tube', 'SST', 'Serum', '10')
     }
+
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003')) {
-      vialMappingsHolder.push('10 mL Vacutainer', 'Lithium Heparin', 'Whole BI', '10')
+      vialMappingsHolder.push('10 ml Vacutainer', 'Lithium Heparin', 'Whole Blood', '10')
     }
+
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004')) {
-      vialMappingsHolder.push('10 mL Vacutainer', 'EDTA = K2', 'Whole BI', '10')
+      vialMappingsHolder.push('10 ml Vacutainer', 'EDTA', 'Whole Blood', '10')
     }
+
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005')) {
-      vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole BI', '6')
+      vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole Blood', '6')
     }
+
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0006')) {
-      vialMappingsHolder.push('15 ml Nalgene jar', 'No Additive', 'Urine', '10')
+      vialMappingsHolder.push('10 ml Vacutainer', 'No Additive', 'Urine', '6')
     }
+
     else{}
 
   return vialMappingsHolder
@@ -281,17 +338,28 @@ const updateResultMappings = (i, vialMappings) => {
 const generateBSIqueryCSVData = (items) => {
   let csv = ``;
   csv += `Study ID, Sample Collection Center, Sample ID, Sequence #, BSI ID, Subject ID, Date Received, Date Drawn, Vial Type, Additive/Preservative, Material Type, Volume, Volume Estimate, Volume Unit, Vial Warnings, Hemolyzed, Label Status, Visit\r\n`
+  downloadCSVfile(items, csv, 'BSI-data-export')
+}
+
+const generateInTransitCSVData = (items) => {
+  let csv = ``;
+  csv += `Ship Date, Tracking Number, Shipped from Site, Shipped from Location, Shipped Date & Time, Expected Number of Samples, Temperature Monitor, Box Number, Specimen Bag ID Type, Full Specimen IDs\r\n`
+  downloadCSVfile(items, csv, 'in-transit-data-export')
+  
+}
+
+const downloadCSVfile = (items, csv, title) => {
   for (let row = 0; row < (items.length); row++) {
     let keysAmount = Object.keys(items[row]).length
     let keysCounter = 0
     for(let key in items[row]) {
-        csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') 
+      csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') 
       keysCounter++
     }}
     let link = document.createElement("a");
     link.id = "download-csv";
     link.setAttribute("href","data:text/plain;charset=utf-8," + encodeURIComponent(csv));
-    link.setAttribute("download",`${new Date().toLocaleDateString()}-BSI-data-export.csv`);
+    link.setAttribute("download",`${new Date().toLocaleDateString()}-${title}.csv`);
     document.body.appendChild(link);
     document.querySelector("#download-csv").click();
     document.body.removeChild(link);
@@ -305,5 +373,4 @@ const generateBSIqueryCSVData = (items) => {
                     </button>
             </div>`;
     alertList.innerHTML = template;
-  
 }

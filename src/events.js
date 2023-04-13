@@ -7,7 +7,7 @@ import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
-import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength, workflows, specimenCollection } from './tubeValidation.js';
+import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength, workflows, specimenCollection, tubes, deviationReasons, refusedShippingDeviationConceptList} from './tubeValidation.js';
 import conceptIds from './fieldToConceptIdMapping.js';
 
 export const addEventSearchForm1 = () => {
@@ -624,7 +624,7 @@ export const getInstituteSpecimensList = async (boxList) => {
     boxList = boxList.sort((a,b) => compareBoxIds(a[conceptIds.shippingBoxId], b[conceptIds.shippingBoxId]));
 
     const collectionId = conceptIds.collection.id;
-    let collectionList = await searchSpecimenInstitute();
+    let collectionList = await filterSpecimenCollectionList();
     let resultBags = {};
 
     // note: currently collections have no mouthwash specimens (0007)
@@ -973,7 +973,7 @@ export const populateSaveTable = (boxIdAndBagsObj, boxList, userName) => {
                 currRow.style['background-color'] = 'lightgrey'
             }
             count += 1;
-            currRow.insertCell(0).innerHTML = `<input type="checkbox" class="markForShipping" style="transform: scale(1.5);">`
+            currRow.insertCell(0).innerHTML = `<input type="checkbox" class="markForShipping" style="transform: scale(1.5); text-align= center;">`
             let dateStarted = '';
             let lastModified = '';
             let thisLocation = '';
@@ -3082,15 +3082,16 @@ export const populateSelectLocationList = async () => {
     selectEle.innerHTML = options;
 }
 
-export const populateBoxManifestTable = (boxId, boxIdAndBagsObj) => {
+export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenInstituteList) => {
     let currTable = document.getElementById('boxManifestTable');
     let bagObjects = boxIdAndBagsObj[boxId];
-
     let bagList = Object.keys(bagObjects);
     let rowCount = 1;
+    
     for (let i = 0; i < bagList.length; i++) {
         let tubes = bagObjects[bagList[i]]['arrElements'];
         for (let j = 0; j < tubes.length; j++) {
+            const currTube = tubes[j];
             let currRow = currTable.insertRow(rowCount);
             if (j == 0) {
                 currRow.insertCell(0).innerHTML = bagList[i];
@@ -3104,6 +3105,7 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj) => {
             if (translateNumToType.hasOwnProperty(thisId[1])) {
                 toAddType = translateNumToType[thisId[1]];
             }
+
             currRow.insertCell(2).innerHTML = toAddType
             let fullScannerName = ''
 
@@ -3113,7 +3115,23 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj) => {
             if (bagObjects[bagList[i]].hasOwnProperty('618036638') && j == 0) {
                 fullScannerName += bagObjects[bagList[i]]['618036638'];
             }
-            currRow.insertCell(3).innerHTML = fullScannerName;
+
+            if (currTube) {
+                const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube);
+                let deviationString = '';
+
+                if (acceptedDeviationList.length >= 1) {
+                    for (const deviationLabel of acceptedDeviationList) {
+                        deviationString += `${deviationLabel} <br><br>`;
+                    }
+                    currRow.insertCell(3).innerHTML = deviationString;
+                }
+                else {
+                    currRow.insertCell(3).innerHTML = `<br><br>`;
+                }
+            }
+            
+            currRow.insertCell(4).innerHTML = fullScannerName;
 
             if (i % 2 == 0) {
                 currRow.style['background-color'] = "lightgrey";
@@ -3121,7 +3139,6 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj) => {
             rowCount += 1;
         }
     }
-
 }
 
 export const populateTrackingQuery = async (boxIdAndBagsObj) => {
@@ -3175,7 +3192,6 @@ export const addEventCompleteButton = async (boxIdAndBagsObj, userName, boxWithT
         let boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
         let emptyField = false;
         let trackingNumConfirmEls = Array.from(document.getElementsByClassName("invalid"))
-
         if(trackingNumConfirmEls.length > 0) {
           showNotifications({ title: 'Invalid Fields', body: 'Please add valid inputs to fields.' }, true)
           return
@@ -3631,14 +3647,15 @@ export const populateReportManifestHeader = (currPage) => {
     document.getElementById('boxManifestCol1').appendChild(newDiv)
 }
 
-export const populateReportManifestTable = (currPage) => {
-    let currTable = document.getElementById('boxManifestTable');
-
+export const populateReportManifestTable = (currPage, searchSpecimenInstituteList) => {
+    const currTable = document.getElementById('boxManifestTable');
     let bags = Object.keys(currPage['bags']);
+
     let rowCount = 1;
     for (let i = 0; i < bags.length; i++) {
         let tubes = currPage['bags'][bags[i]]['arrElements'];
         for (let j = 0; j < tubes.length; j++) {
+            const currTube = tubes[j]
             let currRow = currTable.insertRow(rowCount);
             if (j == 0) {
                 currRow.insertCell(0).innerHTML = bags[i];
@@ -3646,14 +3663,14 @@ export const populateReportManifestTable = (currPage) => {
             else {
                 currRow.insertCell(0).innerHTML = '';
             }
-            currRow.insertCell(1).innerHTML = tubes[j]
-            let thisId = tubes[j].split(' ');
-            let toAddType = 'N/A'
+            currRow.insertCell(1).innerHTML = currTube;
+            let thisId = currTube.split(' ');
+            let toAddType = 'N/A';
             if (translateNumToType.hasOwnProperty(thisId[1])) {
                 toAddType = translateNumToType[thisId[1]];
             }
-            currRow.insertCell(2).innerHTML = toAddType
-            let fullScannerName = ''
+            currRow.insertCell(2).innerHTML = toAddType;
+            let fullScannerName = '';
             let currBox = currPage['bags'];
             if (currBox[bags[i]].hasOwnProperty('469819603') && j == 0) {
                 fullScannerName += currBox[bags[i]]['469819603'] + ' ';
@@ -3661,7 +3678,24 @@ export const populateReportManifestTable = (currPage) => {
             if (currBox[bags[i]].hasOwnProperty('618036638') && j == 0) {
                 fullScannerName += currBox[bags[i]]['618036638'];
             }
-            currRow.insertCell(3).innerHTML = fullScannerName;
+
+            if (currTube) {
+                const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube);
+                let deviationString = '';
+
+                if (acceptedDeviationList.length >= 1) {
+                    for (const deviationLabel of acceptedDeviationList) {
+                        deviationString += `${deviationLabel} <br><br>`;
+                    }
+                    currRow.insertCell(3).innerHTML = deviationString;
+                }
+                else {
+                    currRow.insertCell(3).innerHTML = `<br><br>`;
+                }
+            }
+
+            currRow.insertCell(4).innerHTML = fullScannerName;
+
             if (i % 2 == 0) {
                 currRow.style['background-color'] = "lightgrey";
             }
@@ -3801,4 +3835,41 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
     }
   }
   return dataObj
+}
+
+/** 
+ *  Returns an array of deviation type name(s) for a single specimen tube id or an empty array if no deviation type found
+ *  @param {array} searchSpecimenInstituteList - firestore biospecimen collection data array of objects or empty array depending on response
+ *  @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteList - Ex. [CXA321789 0001]
+ *  @returns {array} Example array - ['Hemolysis present']
+ *   
+*/ 
+export const getSpecimenDeviation = (searchSpecimenInstituteList, currTube) => {
+    const specimenInstituteList = searchSpecimenInstituteList;
+    const [collectionId, tubeId] = currTube.split(" ");
+    const tubeIdDeviationReasonList = deviationReasons;
+    const specimenObjList = specimenInstituteList.filter(specimen => (specimen["820476880"] === collectionId));    
+    const { scannedId, isCollected, isDeviated, deviation } = conceptIds.collection.tube;
+    
+    // Flatten array to single object 
+    const specimenObj = (specimenObjList.length) ? Object.assign(...specimenObjList) : {};
+    const acceptedDeviationArr = [];
+
+    for (const key in specimenObj) {
+        const currSpecimenKey = specimenObj[key]
+        // loop over all properties to find scannedId property - 825582494 
+        if (currSpecimenKey.hasOwnProperty(scannedId) && currSpecimenKey[scannedId] === currTube && currSpecimenKey[isCollected] === conceptIds.yes && currSpecimenKey[isDeviated] === conceptIds.yes) { 
+            // deviationObj - current tube's deviation keys with yes or no values 
+            const deviationObj = currSpecimenKey[deviation];
+            if (deviationObj) {
+                for (const deviation in deviationObj) {
+                    // deviation not found in the the refused shipping deviation list and deviation exists
+                    if (!refusedShippingDeviationConceptList.includes(parseInt(deviation)) && deviationObj[deviation] === conceptIds.yes) {
+                        acceptedDeviationArr.push(tubeIdDeviationReasonList.find(deviationReason => deviationReason['concept'] === parseInt(deviation))?.['label']);
+                    }
+                }
+            }
+        }
+    }
+    return acceptedDeviationArr;
 }

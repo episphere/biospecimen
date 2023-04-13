@@ -21,12 +21,16 @@ export const welcomeScreen = async (auth, route) => {
 }
 
 const clinicalSiteArray = ['KPNW', 'KPCO', 'KPHI', 'KPGA'];
-const researchSiteArray = ['MFC', 'UCM', 'HP', 'HFHS', 'SFH'];
+const researchSiteArray = ['MFC', 'UCM', 'HP', 'SFH'];
 
 const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
     let dashboardSelectionStr = '';
 
+    if (location.host === urls.stage || location.host === urls.prod) {
+        researchSiteArray.push('HFHS');
+    }
+    
     if (clinicalSiteArray.includes(data.siteAcronym)) {
         dashboardSelectionStr = `                    
             <select required disabled class="col form-control" id="dashboardSelection">
