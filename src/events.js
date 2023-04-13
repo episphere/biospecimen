@@ -2924,7 +2924,6 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
 }
 
 export const addEventReturnToReviewShipmentContents = (element, boxIdAndBagsObj, userName, boxWithTempMonitor='') => {
-    // const btn = document.getElementById(element);
     document.getElementById(element).addEventListener('click', async e => {
         const boxIdArray = Object.keys(boxIdAndBagsObj);
         let isTempMonitorIncluded = false
