@@ -1,4 +1,4 @@
-import { getWorkflow } from "./shared.js";
+import { getWorkflow, appState } from "./shared.js";
 
 export const homeNavBar = () => {
     return `
@@ -11,6 +11,7 @@ export const homeNavBar = () => {
 }
 
 export const userNavBar = (name) => {
+    const dashboardSelectionStr = getDashboardSelectionStr();
     return `
         <div class="navbar-nav">
             <li class="nav-item">
@@ -32,7 +33,8 @@ export const userNavBar = (name) => {
                 <a class="nav-link" href="#reports" id="reports" title="Reports"><i class="fa fa-table"></i> Reports</a>
             </li>
         </div>
-        <div class="navbar-nav ml-auto">
+        ${dashboardSelectionStr}
+        <div class="navbar-nav ml-auto" id="userAccountWrapper">
             <div class="grid-elements dropdown">
                 <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn"  title="Welcome, ${name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-user"></i> ${name}
@@ -46,6 +48,7 @@ export const userNavBar = (name) => {
 }
 
 export const nonUserNavBar = (name, isBPTLUser) => {
+    const dashboardSelectionStr = getDashboardSelectionStr();
     return `
         <div class="navbar-nav current-page">
             <li class="nav-item">
@@ -57,7 +60,8 @@ export const nonUserNavBar = (name, isBPTLUser) => {
                 <a class="nav-link" href="#bptl" id="bptl" title="Home"><i class="fa fa-id-badge"></i> BPTL</a>
             </li>
         </div>` : ``}
-        <div class="navbar-nav ml-auto">
+        ${dashboardSelectionStr}
+        <div class="navbar-nav ml-auto" id="userAccountWrapper">
             <div class="grid-elements dropdown">
                 <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn"  title="Welcome, ${name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-user"></i> ${name}
@@ -193,3 +197,31 @@ export const shippingNavBar = () => {
             </li>
         </ul>`
 }
+
+/**
+ * Generate string for the dashboard selection in navbar
+ * @returns {string} HTML string
+ */
+function getDashboardSelectionStr() {  
+    const dashboardSelection = appState.getState().dashboardSelection;
+    
+    return generateDashboardSelectionStrForNavbar(dashboardSelection);
+  }
+
+  /**
+ * Generate string to display dashboard selection in navbar
+ * @returns {string} HTML string
+ */
+export function generateDashboardSelectionStrForNavbar(dashboardSelection) {
+    if (dashboardSelection === 'research') {
+        return `<div class="ml-auto hide-on-not-large-screen" id="dashboardSelectionInNavbar">
+        <span class="text-research">Research Dashboard</span>
+        </div>`;
+    } else if (dashboardSelection === 'clinical') {
+        return `<div class="ml-auto hide-on-not-large-screen" id="dashboardSelectionInNavbar">
+        <span class="text-clinical" >Clinical Dashboard</span>
+        </div>`;
+    } else {
+        return '';
+    }
+  }

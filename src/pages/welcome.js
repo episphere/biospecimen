@@ -1,6 +1,6 @@
-import { validateUser, siteFullNames, showAnimation, hideAnimation, errorMessage, removeAllErrors, urls, searchSpecimen } from "./../shared.js";
+import { validateUser, siteFullNames, showAnimation, hideAnimation, errorMessage, removeAllErrors, urls, searchSpecimen, appState } from "./../shared.js";
 import { userDashboard } from "./dashboard.js";
-import { nonUserNavBar, unAuthorizedUser } from './../navbar.js'
+import { nonUserNavBar, unAuthorizedUser, generateDashboardSelectionStrForNavbar } from './../navbar.js'
 
 export const welcomeScreen = async (auth, route) => {
 
@@ -42,12 +42,26 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
                 <option selected value="research">Research Dashboard</option>
             </select>`;
     } else {
+        const savedDashboardSelection = appState.getState().dashboardSelection ?? '';
         dashboardSelectionStr = `
             <select required class="col form-control" id="dashboardSelection">
-                <option value="">-- Select Dashboard --</option>
+                <option value="">-- Select Dashboard --</option>`;
+
+        if (savedDashboardSelection === 'research') {
+            dashboardSelectionStr += `
+                    <option selected value="research">Research Dashboard</option>
+                    <option value="clinical">Clinical Dashboard</option>`;
+        } else if (savedDashboardSelection === 'clinical') {
+            dashboardSelectionStr += `
+                    <option value="research">Research Dashboard</option>
+                    <option selected value="clinical">Clinical Dashboard</option>`;
+        } else {
+            dashboardSelectionStr += `
                 <option value="clinical">Clinical Dashboard</option>
-                <option value="research">Research Dashboard</option>
-            </select>`;
+                <option value="research">Research Dashboard</option>`;
+        }
+
+        dashboardSelectionStr += `</select>`;
     }
 
     template += `
@@ -97,6 +111,8 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     localStorage.setItem('siteAcronym',data.siteAcronym);
     localStorage.setItem('siteCode',data.siteCode);
     document.getElementById('contentHeader').innerHTML = '';
+
+    updateNavbarAfterDashboardSelection();
 
     document.getElementById('btnParticipantSearch') && document.getElementById('btnParticipantSearch').addEventListener('click', () => {
         removeAllErrors();
@@ -150,3 +166,69 @@ const headsupBanner = () => {
     
     alertList.innerHTML = template;
 }
+
+/**
+ * Change navbar based on selected  dashboard type
+ */
+function updateNavbarAfterDashboardSelection() {
+  const dashboardSelection = document.getElementById('dashboardSelection');
+
+  dashboardSelection.addEventListener('change', (event) => {
+    const selectedDashboard = event.target.value;
+    appState.setState({ dashboardSelection: selectedDashboard });
+
+    const dashboardEleInNavbar = document.getElementById('dashboardSelectionInNavbar');
+    dashboardEleInNavbar && dashboardEleInNavbar.remove();
+
+    if (selectedDashboard === 'research') {
+      showResearchThemeNavbar();
+    } else if (selectedDashboard === 'clinical') {
+      showClinicalThemeNavbar();
+    } else {
+      showDefaultNavbar();
+    }
+
+    renderDashboardSelectionInNavbar(selectedDashboard);
+  });
+}
+
+function showResearchThemeNavbar() {
+  const navbar = document.getElementById('topNavbar');
+  navbar.classList.remove('bg-light', 'bg-clinical');
+  navbar.classList.add('bg-research');
+
+  const logoImage = document.getElementById('connectLogo');
+  logoImage.src = './static/images/NCI-LOGO-FA-White-Yellow.png';
+}
+
+function showClinicalThemeNavbar() {
+  const navbar = document.getElementById('topNavbar');
+  navbar.classList.remove('bg-light', 'bg-research');
+  navbar.classList.add('bg-clinical');
+
+  const logoImage = document.getElementById('connectLogo');
+  logoImage.src = './static/images/NCI-LOGO-FA-Color-Blue.png';
+}
+
+function showDefaultNavbar() {
+  const navbar = document.getElementById('topNavbar');
+  navbar.classList.remove('bg-clinical', 'bg-research');
+  navbar.classList.add('bg-light');
+
+  const logoImage = document.getElementById('connectLogo');
+  logoImage.src = './static/images/NCI-LOGO-FA-Color-Blue.png';
+}
+
+/**
+ * Render dashboard selection element in navbar
+ * @returns {HTMLElement}
+ */
+function renderDashboardSelectionInNavbar(dashboardSelection) {  
+    let wrapperDiv = document.createElement('div');
+    wrapperDiv.innerHTML = generateDashboardSelectionStrForNavbar(dashboardSelection);
+
+    const userAccountWrapperDiv = document.getElementById('userAccountWrapper');
+    if (userAccountWrapperDiv) {
+     userAccountWrapperDiv.before(wrapperDiv.firstElementChild ?? '') ;
+    }
+  }
