@@ -49,16 +49,16 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
 
         if (savedDashboardSelection === 'research') {
             dashboardSelectionStr += `
-                    <option selected value="research">Research Dashboard</option>
-                    <option value="clinical">Clinical Dashboard</option>`;
+                <option selected value="research">Research Dashboard</option>
+                <option value="clinical">Clinical Dashboard</option>`;
         } else if (savedDashboardSelection === 'clinical') {
             dashboardSelectionStr += `
-                    <option value="research">Research Dashboard</option>
-                    <option selected value="clinical">Clinical Dashboard</option>`;
+                <option value="research">Research Dashboard</option>
+                <option selected value="clinical">Clinical Dashboard</option>`;
         } else {
             dashboardSelectionStr += `
-                <option value="clinical">Clinical Dashboard</option>
-                <option value="research">Research Dashboard</option>`;
+                <option value="research">Research Dashboard</option>
+                <option value="clinical">Clinical Dashboard</option>`;
         }
 
         dashboardSelectionStr += `</select>`;
@@ -167,56 +167,49 @@ const headsupBanner = () => {
     alertList.innerHTML = template;
 }
 
+const navbarThemesSettings = {
+  research: {
+    cssClassesToAdd: ['bg-research'],
+    cssClassesToRemove: ['bg-clinical', 'bg-light'],
+    logoImageSrc: './static/images/NCI-LOGO-FA-White-Yellow.png',
+  },
+  clinical: {
+    cssClassesToAdd: ['bg-clinical'],
+    cssClassesToRemove: ['bg-research', 'bg-light'],
+    logoImageSrc: './static/images/NCI-LOGO-FA-Color-Blue.png',
+  },
+  default: {
+    cssClassesToAdd: ['bg-light'],
+    cssClassesToRemove: ['bg-research', 'bg-clinical'],
+    logoImageSrc: './static/images/NCI-LOGO-FA-Color-Blue.png',
+  },
+};
+
 /**
- * Change navbar based on selected  dashboard type
+ * Update navbar after dashboard type change
  */
 function updateNavbarAfterDashboardSelection() {
-  const dashboardSelection = document.getElementById('dashboardSelection');
+  const dashboardSelectElement = document.getElementById('dashboardSelection');
 
-  dashboardSelection.addEventListener('change', (event) => {
+  dashboardSelectElement.addEventListener('change', (event) => {
     const selectedDashboard = event.target.value;
     appState.setState({ dashboardSelection: selectedDashboard });
 
     const dashboardEleInNavbar = document.getElementById('dashboardSelectionInNavbar');
     dashboardEleInNavbar && dashboardEleInNavbar.remove();
 
-    if (selectedDashboard === 'research') {
-      showResearchThemeNavbar();
-    } else if (selectedDashboard === 'clinical') {
-      showClinicalThemeNavbar();
-    } else {
-      showDefaultNavbar();
-    }
+    const { cssClassesToAdd, cssClassesToRemove, logoImageSrc } =
+      navbarThemesSettings[selectedDashboard] || navbarThemesSettings.default;
+
+    const navbar = document.getElementById('topNavbar');
+    navbar.classList.remove(...cssClassesToRemove);
+    navbar.classList.add(...cssClassesToAdd);
+
+    const logoImgElement = document.getElementById('connectLogo');
+    logoImgElement.src = logoImageSrc;
 
     renderDashboardSelectionInNavbar(selectedDashboard);
   });
-}
-
-function showResearchThemeNavbar() {
-  const navbar = document.getElementById('topNavbar');
-  navbar.classList.remove('bg-light', 'bg-clinical');
-  navbar.classList.add('bg-research');
-
-  const logoImage = document.getElementById('connectLogo');
-  logoImage.src = './static/images/NCI-LOGO-FA-White-Yellow.png';
-}
-
-function showClinicalThemeNavbar() {
-  const navbar = document.getElementById('topNavbar');
-  navbar.classList.remove('bg-light', 'bg-research');
-  navbar.classList.add('bg-clinical');
-
-  const logoImage = document.getElementById('connectLogo');
-  logoImage.src = './static/images/NCI-LOGO-FA-Color-Blue.png';
-}
-
-function showDefaultNavbar() {
-  const navbar = document.getElementById('topNavbar');
-  navbar.classList.remove('bg-clinical', 'bg-research');
-  navbar.classList.add('bg-light');
-
-  const logoImage = document.getElementById('connectLogo');
-  logoImage.src = './static/images/NCI-LOGO-FA-Color-Blue.png';
 }
 
 /**
