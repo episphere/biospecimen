@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, shippingPrintManifestReminder, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, conceptIdToSiteSpecificLocation, getNumPages, addSelectionEventListener} from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, shippingPrintManifestReminder, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, conceptIdToSiteSpecificLocation, getNumPages, addSelectionEventListener, searchSpecimenInstitute} from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, 
     populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, 
     addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventSaveContinue, addEventShipPrintManifest, addEventTrackingNumberScanAutoFocus } from "./../events.js";
@@ -248,23 +248,24 @@ export const startShipping = async (userName) => {
 
 export const boxManifest = async (boxId, userName) => {    
     showAnimation();
-    let response = await  getBoxes();
-    let boxList = response.data;
-
-    let currBox = {}
-    let boxIdAndBagsObj = {};
+    const response = await getBoxes();
+    const boxList = response.data;
+    let currBox = {};
+    const boxIdAndBagsObj = {};
     for(let i = 0; i < boxList.length; i++){
-        let box = boxList[i]
-        if(box['132929440'] == boxId){
+        let box = boxList[i];
+        if (box['132929440'] == boxId) {
             currBox = box;
         }
-        boxIdAndBagsObj[box['132929440']] = box['bags']
+        boxIdAndBagsObj[box['132929440']] = box['bags'];
     }
-    let currInstitute = currBox.siteAcronym;
-    let currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
-    let currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute];
+    const currInstitute = currBox.siteAcronym;
+    const currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
+    const currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute];
+    const searchSpecimenInstituteListResponse = await searchSpecimenInstitute();
+    const searchSpecimenInstituteList = searchSpecimenInstituteListResponse.data ?? [];
 
-    let template = `
+    const template = `
         </br>
         <div id="shippingHiddenTable" style="display:none">
             <table>
@@ -286,6 +287,7 @@ export const boxManifest = async (boxId, userName) => {
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Specimen Bag ID</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Full Specimen ID</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Type/Color</th>
+                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Deviation Type</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Scanned By</th>
                 </tr>
             </table>
@@ -310,7 +312,7 @@ export const boxManifest = async (boxId, userName) => {
             </div>
         </div>
         `;
-    removeActiveClass('navbar-btn', 'active')
+    removeActiveClass('navbar-btn', 'active');
     const navBarBtn = document.getElementById('navBarBoxManifest');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
@@ -321,7 +323,7 @@ export const boxManifest = async (boxId, userName) => {
     //addEventNavBarShipment("returnToPackaging");
     //document.getElementById('boxManifestTable').appendChild(result);
     populateBoxManifestHeader(boxId,boxList,currContactInfo);
-    populateBoxManifestTable(boxId,boxIdAndBagsObj);
+    populateBoxManifestTable(boxId, boxIdAndBagsObj, searchSpecimenInstituteList);
     addEventNavBarShipment("returnToPackaging", userName);
     document.getElementById('printBox').addEventListener('click', e => {
         window.print();
@@ -333,17 +335,21 @@ export const boxManifest = async (boxId, userName) => {
     //addEventBackToSearch('backToSearch');
 }
 
-
-
-export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, currShippingLocationNumber) => {    
-    //let tempMonitorThere = document.getElementById('tempMonitorChecked').checked;
+/**
+ * 
+ * @param {string[]} boxIdArray 
+ * @param {string} userName 
+ * @param {boolean} isTempMonitorIncluded 
+ * @param {*} currShippingLocationNumber 
+ */
+export const shippingManifest = async (boxIdArray, userName, isTempMonitorIncluded, currShippingLocationNumber) => {
     let response = await  getBoxes();
-    let boxList = response.data;
+    let boxArray = response.data;
     let boxIdAndBagsObj = {};
     let locations = {};
     let site = '';
 
-    for (const box of boxList) {
+    for (const box of boxArray) {
         const boxId= box[conceptIds.shippingBoxId]
         boxIdAndBagsObj[boxId] = box['bags']
         locations[boxId] = box[conceptIds.shippingLocation];
@@ -353,7 +359,7 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, 
     let boxIdAndBagsObjToDisplay = {};
     let location = ''
 
-    for (const boxId of boxesToShip) {
+    for (const boxId of boxIdArray) {
         boxIdAndBagsObjToDisplay[boxId] = boxIdAndBagsObj[boxId];
         location = locations[boxId];
     }
@@ -418,8 +424,9 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, 
     const navBarBtn = document.getElementById('navBarReviewShipmentContents');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
-    if(tempMonitorThere){
-        populateTempSelect(boxesToShip);
+
+    if(isTempMonitorIncluded){
+        populateTempSelect(boxIdArray);
     }
 
     document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(boxIdAndBagsObj);
@@ -440,24 +447,27 @@ export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, 
     document.getElementById('assignTrackingNumberPage').addEventListener('click', e => {
         e.stopPropagation();
         if(btn.classList.contains('active')) return;
-        if(tempMonitorThere && document.getElementById('tempBox').value == '') {
+
+        const tempBoxElement = document.getElementById('tempBox');
+
+        if (isTempMonitorIncluded && tempBoxElement.value === '') {
             showNotifications({title: 'Missing field!', body: 'Please enter the box where the temperature monitor is being stored.'}, true)
             return;
         }
-        //let currChecked = document.getElementById('tempMonitorChecked').checked;
-        let currChecked = false;
-        if(tempMonitorThere){
-            currChecked = document.getElementById('tempBox').value;
+
+        let boxWithTempMonitor = '';
+        if( isTempMonitorIncluded){
+            boxWithTempMonitor = tempBoxElement.value;
         }
-        //return box 1 info
-        shipmentTracking(boxIdAndBagsObjToDisplay, userName, currChecked);
+
+        shipmentTracking(boxIdAndBagsObjToDisplay, userName, boxWithTempMonitor);
     });
     //addEventNavBarShipment("navBarShippingDash");
     //addEventBackToSearch('backToSearch');
 }
 
 
-export const shipmentTracking = async (boxIdAndBagsObj, userName, tempCheckChecked) => {
+export const shipmentTracking = async (boxIdAndBagsObj, userName, boxWithTempMonitor) => {
     showAnimation();
 
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
@@ -521,14 +531,14 @@ export const shipmentTracking = async (boxIdAndBagsObj, userName, tempCheckCheck
     }
     //addEventReturnToShippingManifest('returnToShipping', hiddenJSON, userName, tempCheckChecked)
     addEventNavBarShipment("navBarShippingDash", userName);
-    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName, tempCheckChecked)
+    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName, boxWithTempMonitor)
     await populateTrackingQuery(boxIdAndBagsObj);
     addEventTrimTrackingNums()
     addEventTrackingNumberScanAutoFocus()
     addEventPreventTrackingConfirmPaste()
     addEventCheckValidTrackInputs(boxIdAndBagsObj)
     addEventSaveButton(boxIdAndBagsObj);
-    addEventCompleteButton(boxIdAndBagsObj, userName, tempCheckChecked);
+    addEventCompleteButton(boxIdAndBagsObj, userName, boxWithTempMonitor);
     //addEventCompleteShippingButton(hiddenJSON);
     //addEventBackToSearch('navBarShippingDash');
     // addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
@@ -536,14 +546,9 @@ export const shipmentTracking = async (boxIdAndBagsObj, userName, tempCheckCheck
     //addEventSubmitAddBag();
 }
 
-export const finalShipmentTracking = (boxIdAndBagsObj, userName, tempChecked, shipmentCourier) => {
+export const finalShipmentTracking = (boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier) => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
-    let conversion = {
-        '712278213': 'FedEx',
-        '149772928': 'World Courier'
-    }
-    //store a secret json that has all of the packed ones in it
-    //{"Box1":{specimenId:[allTubes], specimenId:[allTubes]}}
+
     let template = `
         <div id="shippingHiddenTable" style="display:none">
         {}
@@ -611,11 +616,6 @@ export const finalShipmentTracking = (boxIdAndBagsObj, userName, tempChecked, sh
 
 
     `;
-    /*var x = document.getElementById("specimenList");
-    var option = document.createElement("option");
-    option.text = "Kiwi";
-    x.add(option);*/
-    
     
     removeActiveClass('navbar-btn', 'active')
     document.getElementById('contentHeader').innerHTML = `<h2 >Connect for Cancer Prevention Study</h2></br>` + shippingNavBar();
@@ -625,16 +625,13 @@ export const finalShipmentTracking = (boxIdAndBagsObj, userName, tempChecked, sh
     
  
     addEventNavBarShipment("navBarShippingDash", userName);
-    addEventNavBarTracking("returnToTracking", userName, boxIdAndBagsObj, tempChecked)
-    addEventNavBarTracking("navBarFinalizeShipment", userName, boxIdAndBagsObj, tempChecked)
+    addEventNavBarTracking("returnToTracking", userName, boxIdAndBagsObj, boxWithTempMonitor)
+    addEventNavBarTracking("navBarFinalizeShipment", userName, boxIdAndBagsObj, boxWithTempMonitor)
     if(Object.keys(boxIdAndBagsObj).length > 0){
         document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBagsObj)
     }
     populateFinalCheck(boxIdAndBagsObj);
     addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName)
-    addEventCompleteShippingButton(boxIdAndBagsObj, userName, tempChecked, shipmentCourier);
+    addEventCompleteShippingButton(boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier);
     addEventBackToSearch('navBarShippingDash');
-    //addEventBackToSearch('navBarShippingDash');
-    //addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 9, 0);
-    //addEventSubmitAddBag();
 }

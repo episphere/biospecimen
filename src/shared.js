@@ -555,7 +555,13 @@ export const updateNewTempDate = async () =>{
     return response.json();
 }
 
-export const ship = async (boxes, shippingData, trackingNumbers) => {
+/**
+ * Ship boxes
+ * @param {object} boxIdToTrackingNumberMap {boxId:trackingNumber}
+ * @param {object} shippingData 
+ * @returns 
+ */
+export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -563,7 +569,7 @@ export const ship = async (boxes, shippingData, trackingNumbers) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({"boxes": boxes, "shippingData": shippingData, "trackingNumbers":trackingNumbers})
+        body: JSON.stringify({boxIdToTrackingNumberMap, shippingData})
     }
     const response = await fetch(`${api}api=ship`, requestObj);
     return response.json();
@@ -834,21 +840,39 @@ export const removeBag = async(boxId, bags) => {
 }
 
 /**
+ * Fetches biospecimen collection data from the database
+ * @returns {object|array} returns a response object if response is 200 or an empty array
+ * 
+ */
+export const searchSpecimenInstitute = async() => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=searchSpecimen`, {
+    method: "GET",
+    headers: {
+        Authorization:"Bearer "+idToken
+        }
+    });
+
+    if (response.status === 200) {
+        const responseObject = await response.json();
+        return responseObject;
+    }
+    else {
+        console.error("searchSpecimenInstitute's responseObject status code not 200!");
+        return [];
+    }
+}
+
+/**
  * Fetches biospecimen collection data from the database, and removes '0008', '0009' and deviation tubes from each collection
  * @returns {Array} List of biospecimen collections
  */
-export const searchSpecimenInstitute = async () => {
-    //https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=searchSpecimen`, {
-        method: "GET",
-        headers: {
-            Authorization:"Bearer "+idToken
-        }
-    });
-    let a = await response.json();
+export const filterSpecimenCollectionList = async () => {
+    const searchSpecimenInstituteResponse = await searchSpecimenInstitute()
+    const searchSpecimenInstituteList = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : []
+    
     /* Filter collections with ShipFlag value yes */
-    let collectionList = a.data.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
+    let collectionList = searchSpecimenInstituteList.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
     
     // loop over filtered data with shipFlag
     for (let i = 0; i < collectionList.length; i++){
@@ -882,7 +906,6 @@ export const searchSpecimenInstitute = async () => {
             }
         }
     }
-
     return collectionList;
 }
 
@@ -2162,7 +2185,7 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
   let forageBoxIdArr = []
   try {
       let value = await localforage.getItem("shipData")
-      console.log(value)
+
       if (value === null) {
           await localforage.setItem("shipData", shipSetForage)
       }
@@ -2379,3 +2402,22 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
         await sendClientEmail(emailData);
     }
 }
+
+/**
+ * Block subsequent requests before the first request is completed, with a 5-second timeout.
+ */
+export const requestsBlocker = {
+  isReqInProcess: false,
+  block() {
+    this.isReqInProcess = true;
+    setTimeout(() => {
+      this.isReqInProcess = false;
+    }, 5000);
+  },
+  unblock() {
+    this.isReqInProcess = false;
+  },
+  isBlocking() {
+    return this.isReqInProcess;
+  },
+};
