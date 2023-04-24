@@ -48,7 +48,7 @@ registerRoute(
 );
 
 registerRoute(
-  new RegExp('index.html'),
+  new RegExp('index.html$'),
   new NetworkFirst({
     cacheName: 'index-html-cache',
     plugins: [
