@@ -2590,7 +2590,7 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
     tubesCollected.forEach((tube) => {
         if (biospecimenData[tube.id] === undefined) biospecimenData[`${tube.id}`] = {};
         if (biospecimenData[tube.id] && biospecimenData[tube.id]['593843561'] === 353358909 && tube.checked === false) {
-            biospecimenData[tube.id] = {};
+            biospecimenData[tube.id][conceptIds.collection.tube.scannedId] && delete biospecimenData[tube.id][conceptIds.collection.tube.scannedId];
         }
 
         biospecimenData[tube.id]['593843561'] = tube.checked ? 353358909 : 104430631;
