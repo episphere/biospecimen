@@ -47,5 +47,5 @@ registerRoute(
     'POST'
 );
 
-
-workbox.precaching.precacheAndRoute([{url: 'index.html', revision: `1`}]);
+const indexFileRevision = '20230421';
+workbox.precaching.precacheAndRoute([{url: 'index.html', revision: indexFileRevision}]);
