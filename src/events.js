@@ -3701,7 +3701,7 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
                     deviationTypeCell.innerHTML = deviationString;
                 }
                 else {
-                    deviationTypeCell.innerHTML = `<br><br>;`
+                    deviationTypeCell.innerHTML = `<br><br>`;
                 }
                 
                 commentCell.innerHTML = currTubeComments;
@@ -3895,6 +3895,6 @@ export const getSpecimenComments = (searchSpecimenInstituteArray, currTube) => {
     const specimenObjArray = searchSpecimenInstituteArray.filter(specimen => (specimen["820476880"] === collectionId));
     const specimenObj = (specimenObjArray.length) ? Object.assign(...specimenObjArray) : {};
     const tubeIdToCid = specimenCollection["numToCid"]?.[tubeId];
-    return specimenObj[tubeIdToCid]?.["536710547"] ?? ""
+    return specimenObj[tubeIdToCid]?.["536710547"] ?? "";
 }
 
