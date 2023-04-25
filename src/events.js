@@ -3857,7 +3857,7 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
 */ 
 export const getSpecimenDeviation = (searchSpecimenInstituteArray, currTube) => {
     const specimenInstituteArray = searchSpecimenInstituteArray;
-    const [collectionId, tubeId] = currTube.split("\s+");
+    const [collectionId, tubeId] = currTube.split(/\s+/);
     const tubeIdDeviationReasonArray = deviationReasons;
     const specimenObjArray = specimenInstituteArray.filter(specimen => (specimen["820476880"] === collectionId));    
     const { scannedId, isCollected, isDeviated, deviation } = conceptIds.collection.tube;
@@ -3891,7 +3891,7 @@ export const getSpecimenDeviation = (searchSpecimenInstituteArray, currTube) => 
  * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. [CXA321789 0001]
  */
 export const getSpecimenComments = (searchSpecimenInstituteArray, currTube) => {
-    const [collectionId, tubeId] = currTube.split("\s+");
+    const [collectionId, tubeId] = currTube.split(/\s+/);
     const specimenObjArray = searchSpecimenInstituteArray.filter(specimen => (specimen["820476880"] === collectionId));
     const specimenObj = (specimenObjArray.length) ? Object.assign(...specimenObjArray) : {};
     const tubeIdToCid = specimenCollection["numToCid"]?.[tubeId];
