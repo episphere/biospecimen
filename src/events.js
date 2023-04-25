@@ -3133,7 +3133,7 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenI
                     deviationTypeCell.innerHTML = deviationString;
                 }
                 else {
-                    deviationTypeCell.innerHTML = `<br></br>`
+                    deviationTypeCell.innerHTML = `<br><br>`;
                 }
 
                 commentCell.innerHTML = currTubeComments;
@@ -3701,7 +3701,7 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
                     deviationTypeCell.innerHTML = deviationString;
                 }
                 else {
-                    deviationTypeCell.innerHTML = `<br></br>`
+                    deviationTypeCell.innerHTML = `<br><br>;`
                 }
                 
                 commentCell.innerHTML = currTubeComments;
@@ -3857,7 +3857,7 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
 */ 
 export const getSpecimenDeviation = (searchSpecimenInstituteArray, currTube) => {
     const specimenInstituteArray = searchSpecimenInstituteArray;
-    const [collectionId, tubeId] = currTube.split(" ");
+    const [collectionId, tubeId] = currTube.split("\s+");
     const tubeIdDeviationReasonArray = deviationReasons;
     const specimenObjArray = specimenInstituteArray.filter(specimen => (specimen["820476880"] === collectionId));    
     const { scannedId, isCollected, isDeviated, deviation } = conceptIds.collection.tube;
@@ -3882,7 +3882,6 @@ export const getSpecimenDeviation = (searchSpecimenInstituteArray, currTube) => 
             }
         }
     }
-    console.log("acceptedDeviationArr", acceptedDeviationArr)
     return acceptedDeviationArr;
 }
 
@@ -3892,9 +3891,8 @@ export const getSpecimenDeviation = (searchSpecimenInstituteArray, currTube) => 
  * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. [CXA321789 0001]
  */
 export const getSpecimenComments = (searchSpecimenInstituteArray, currTube) => {
-    const specimenInstituteArray = searchSpecimenInstituteArray;
-    const [collectionId, tubeId] = currTube.split(" ");
-    const specimenObjArray = specimenInstituteArray.filter(specimen => (specimen["820476880"] === collectionId));
+    const [collectionId, tubeId] = currTube.split("\s+");
+    const specimenObjArray = searchSpecimenInstituteArray.filter(specimen => (specimen["820476880"] === collectionId));
     const specimenObj = (specimenObjArray.length) ? Object.assign(...specimenObjArray) : {};
     const tubeIdToCid = specimenCollection["numToCid"]?.[tubeId];
     return specimenObj[tubeIdToCid]?.["536710547"] ?? ""
