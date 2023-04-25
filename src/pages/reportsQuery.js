@@ -80,8 +80,9 @@ export const startReport = async () => {
 
 export const showReportsManifest = async (currPage) => {
     showAnimation()
-    const searchSpecimenInstituteResponse = await searchSpecimenInstitute()
-    const searchSpecimenInstituteList = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : []
+    const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
+    const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : [];
+
     let template = `
         <div class="row">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
@@ -100,7 +101,7 @@ export const showReportsManifest = async (currPage) => {
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Full Specimen ID</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Type/Color</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Deviation Type</th>
-                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Scanned By</th>
+                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Comments</th>
                 </tr>
             </table>
         </div>
@@ -118,7 +119,7 @@ export const showReportsManifest = async (currPage) => {
         document.getElementById('contentBody').innerHTML = template;
         removeActiveClass('navbar-btn', 'active')
         populateReportManifestHeader(currPage);
-        populateReportManifestTable(currPage, searchSpecimenInstituteList);
+        populateReportManifestTable(currPage, searchSpecimenInstituteArray);
         document.getElementById('printBox').addEventListener('click', e => {
             window.print();
         });

@@ -262,8 +262,8 @@ export const boxManifest = async (boxId, userName) => {
     const currInstitute = currBox.siteAcronym;
     const currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
     const currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute];
-    const searchSpecimenInstituteListResponse = await searchSpecimenInstitute();
-    const searchSpecimenInstituteList = searchSpecimenInstituteListResponse.data ?? [];
+    const searchSpecimenInstituteArrayResponse = await searchSpecimenInstitute();
+    const searchSpecimenInstituteArray = searchSpecimenInstituteArrayResponse.data ?? [];
 
     const template = `
         </br>
@@ -288,7 +288,7 @@ export const boxManifest = async (boxId, userName) => {
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Full Specimen ID</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Type/Color</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Deviation Type</th>
-                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Scanned By</th>
+                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Comments</th>
                 </tr>
             </table>
         </div>
@@ -323,7 +323,7 @@ export const boxManifest = async (boxId, userName) => {
     //addEventNavBarShipment("returnToPackaging");
     //document.getElementById('boxManifestTable').appendChild(result);
     populateBoxManifestHeader(boxId,boxList,currContactInfo);
-    populateBoxManifestTable(boxId, boxIdAndBagsObj, searchSpecimenInstituteList);
+    populateBoxManifestTable(boxId, boxIdAndBagsObj, searchSpecimenInstituteArray);
     addEventNavBarShipment("returnToPackaging", userName);
     document.getElementById('printBox').addEventListener('click', e => {
         window.print();
