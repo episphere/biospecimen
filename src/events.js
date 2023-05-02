@@ -3170,7 +3170,7 @@ export const populateTrackingQuery = async (boxIdAndBagsObj) => {
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
 }
 
-export const addEventCompleteButton = (boxIdAndBagsObj, userName, tempChecked) => {
+export const addEventCompleteButton = async (boxIdAndBagsObj, userName, boxWithTempMonitor) => {
     document.getElementById('completeTracking').addEventListener('click', async () => {
         let boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
         let emptyField = false;
