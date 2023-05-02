@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, shippingPrintManifestReminder, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, conceptIdToSiteSpecificLocation, getNumPages, addSelectionEventListener, searchSpecimenInstitute} from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, shippingPrintManifestReminder, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, conceptIdToSiteSpecificLocation, getNumPages, addSelectionEventListener} from "./../shared.js"
 import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, 
     populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, 
     addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventSaveContinue, addEventShipPrintManifest, addEventTrackingNumberScanAutoFocus } from "./../events.js";
@@ -248,24 +248,23 @@ export const startShipping = async (userName) => {
 
 export const boxManifest = async (boxId, userName) => {    
     showAnimation();
-    const response = await getBoxes();
-    const boxList = response.data;
-    let currBox = {};
-    const boxIdAndBagsObj = {};
+    let response = await  getBoxes();
+    let boxList = response.data;
+
+    let currBox = {}
+    let boxIdAndBagsObj = {};
     for(let i = 0; i < boxList.length; i++){
-        let box = boxList[i];
-        if (box['132929440'] == boxId) {
+        let box = boxList[i]
+        if(box['132929440'] == boxId){
             currBox = box;
         }
-        boxIdAndBagsObj[box['132929440']] = box['bags'];
+        boxIdAndBagsObj[box['132929440']] = box['bags']
     }
-    const currInstitute = currBox.siteAcronym;
-    const currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
-    const currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute];
-    const searchSpecimenInstituteListResponse = await searchSpecimenInstitute();
-    const searchSpecimenInstituteList = searchSpecimenInstituteListResponse.data ?? [];
+    let currInstitute = currBox.siteAcronym;
+    let currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
+    let currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute];
 
-    const template = `
+    let template = `
         </br>
         <div id="shippingHiddenTable" style="display:none">
             <table>
@@ -287,7 +286,6 @@ export const boxManifest = async (boxId, userName) => {
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Specimen Bag ID</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Full Specimen ID</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Type/Color</th>
-                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Deviation Type</th>
                     <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Scanned By</th>
                 </tr>
             </table>
@@ -312,7 +310,7 @@ export const boxManifest = async (boxId, userName) => {
             </div>
         </div>
         `;
-    removeActiveClass('navbar-btn', 'active');
+    removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarBoxManifest');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
@@ -323,7 +321,7 @@ export const boxManifest = async (boxId, userName) => {
     //addEventNavBarShipment("returnToPackaging");
     //document.getElementById('boxManifestTable').appendChild(result);
     populateBoxManifestHeader(boxId,boxList,currContactInfo);
-    populateBoxManifestTable(boxId, boxIdAndBagsObj, searchSpecimenInstituteList);
+    populateBoxManifestTable(boxId,boxIdAndBagsObj);
     addEventNavBarShipment("returnToPackaging", userName);
     document.getElementById('printBox').addEventListener('click', e => {
         window.print();
