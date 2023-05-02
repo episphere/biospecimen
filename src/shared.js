@@ -840,21 +840,39 @@ export const removeBag = async(boxId, bags) => {
 }
 
 /**
+ * Fetches biospecimen collection data from the database
+ * @returns {object|array} returns a response object if response is 200 or an empty array
+ * 
+ */
+export const searchSpecimenInstitute = async() => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=searchSpecimen`, {
+    method: "GET",
+    headers: {
+        Authorization:"Bearer "+idToken
+        }
+    });
+
+    if (response.status === 200) {
+        const responseObject = await response.json();
+        return responseObject;
+    }
+    else {
+        console.error("searchSpecimenInstitute's responseObject status code not 200!");
+        return [];
+    }
+}
+
+/**
  * Fetches biospecimen collection data from the database, and removes '0008', '0009' and deviation tubes from each collection
  * @returns {Array} List of biospecimen collections
  */
-export const searchSpecimenInstitute = async () => {
-    //https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=searchSpecimen`, {
-        method: "GET",
-        headers: {
-            Authorization:"Bearer "+idToken
-        }
-    });
-    let a = await response.json();
+export const filterSpecimenCollectionList = async () => {
+    const searchSpecimenInstituteResponse = await searchSpecimenInstitute()
+    const searchSpecimenInstituteList = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : []
+    
     /* Filter collections with ShipFlag value yes */
-    let collectionList = a.data.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
+    let collectionList = searchSpecimenInstituteList.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
     
     // loop over filtered data with shipFlag
     for (let i = 0; i < collectionList.length; i++){
@@ -888,7 +906,6 @@ export const searchSpecimenInstitute = async () => {
             }
         }
     }
-
     return collectionList;
 }
 
