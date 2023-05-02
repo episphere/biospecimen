@@ -342,7 +342,7 @@ export const boxManifest = async (boxId, userName) => {
  */
 export const shippingManifest = async (boxIdArray, userName, isTempMonitorIncluded, currShippingLocationNumber) => {
     let response = await  getBoxes();
-    let boxList = response.data;
+    let boxArray = response.data;
     let boxIdAndBagsObj = {};
     let locations = {};
     let site = '';
