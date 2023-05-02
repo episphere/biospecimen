@@ -38,7 +38,7 @@ export const finalizeTemplate = (data, specimenData) => {
         </br>
         <div class="row">
             <table id="finalizeTable" class="table-borderless collection-table">
-                <thead style="margin-bottom: 1rem;">
+                <thead>
                     <tr>
                         <th>Specimen Type</th>
                         ${getWorkflow() === 'clinical' ? `<th>Received</th>`:`<th>Collected</th>`}
@@ -61,14 +61,15 @@ export const finalizeTemplate = (data, specimenData) => {
                             if(specimenData[obj.concept]['248868659'][option.concept] === 353358909) deviationSelections.push(option.label);
                         });
                     }
+
                     template += `
-                        <tr style="vertical-align: top;">
+                        <tr>
                             <td>${obj.specimenType}</td>
                             <td>${obj.collectionChkBox === true ? `${specimenData[`${obj.concept}`]['593843561'] === 353358909 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>'}` : ``}</td>
                             ${getWorkflow() === 'research' ? `<td>${specimenData[`${obj.concept}`]['883732523'] ? notCollectedOptions.filter(option => option.concept == specimenData[`${obj.concept}`]['883732523'])[0].label : ''}</td>` : ''}
                             <td>${specimenData[`${obj.concept}`]['593843561'] === 353358909 && specimenData[`${obj.concept}`]['825582494'] ? `${specimenData[`${obj.concept}`]['825582494']}` : '' }</td>
                             <td>${obj.deviationChkBox === true ? `${specimenData[`${obj.concept}`]['678857215'] === 353358909 ? 'Yes' : 'No'}`: ``}</td>
-                            <td class="deviation-type-width">${deviationSelections ? getDeviationSelections(deviationSelections) : ''}</td>
+                            <td class="deviation-comments-width">${deviationSelections ? deviationSelections : ''}</td>
                             <td class="deviation-comments-width">${specimenData[`${obj.concept}`]['536710547'] ? specimenData[`${obj.concept}`]['536710547'] : specimenData[`${obj.concept}`]['338286049'] ? specimenData[`${obj.concept}`]['338286049'] : ''}</td>
                         </tr>
                     `
@@ -213,12 +214,4 @@ export const finalizeTemplate = (data, specimenData) => {
             openedModalId = null;
         }
     }  
-}
-
-const getDeviationSelections = (deviationSelectionsList) => {
-    let deviationsSelectionContent = "";
-    deviationSelectionsList.forEach( (deviationSelection, index) => {
-        deviationsSelectionContent += (index !== deviationSelectionsList.length - 1) ? `${deviationSelection}, <br>` : `${deviationSelection}`;
-    })
-    return deviationsSelectionContent;
 }
