@@ -3082,7 +3082,7 @@ export const populateSelectLocationList = async () => {
     selectEle.innerHTML = options;
 }
 
-export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenInstituteArray) => {
+export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenInstituteList) => {
     let currTable = document.getElementById('boxManifestTable');
     let bagObjects = boxIdAndBagsObj[boxId];
     let bagList = Object.keys(bagObjects);
@@ -3117,27 +3117,22 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenI
             }
 
             if (currTube) {
-                const acceptedDeviationArray = getSpecimenDeviation(searchSpecimenInstituteArray, currTube);
-                const currTubeComments = getSpecimenComments(searchSpecimenInstituteArray, currTube)
+                const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube);
                 let deviationString = '';
 
-                const deviationTypeCell = currRow.insertCell(3);
-                deviationTypeCell.classList.add("deviation-type-cell");
-                const commentCell = currRow.insertCell(4);
-                commentCell.classList.add("comments-cell");
-
-                if (acceptedDeviationArray.length >= 1) {
-                    for (const deviationLabel of acceptedDeviationArray) {
+                if (acceptedDeviationList.length >= 1) {
+                    for (const deviationLabel of acceptedDeviationList) {
                         deviationString += `${deviationLabel} <br><br>`;
                     }
-                    deviationTypeCell.innerHTML = deviationString;
+                    currRow.insertCell(3).innerHTML = deviationString;
                 }
                 else {
-                    deviationTypeCell.innerHTML = `<br><br>`;
+                    currRow.insertCell(3).innerHTML = `<br><br>`;
                 }
-
-                commentCell.innerHTML = currTubeComments;
             }
+            
+            currRow.insertCell(4).innerHTML = fullScannerName;
+
             if (i % 2 == 0) {
                 currRow.style['background-color'] = "lightgrey";
             }
@@ -3652,7 +3647,7 @@ export const populateReportManifestHeader = (currPage) => {
     document.getElementById('boxManifestCol1').appendChild(newDiv)
 }
 
-export const populateReportManifestTable = (currPage, searchSpecimenInstituteArray) => {
+export const populateReportManifestTable = (currPage, searchSpecimenInstituteList) => {
     const currTable = document.getElementById('boxManifestTable');
     let bags = Object.keys(currPage['bags']);
 
@@ -3685,27 +3680,21 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
             }
 
             if (currTube) {
-                const acceptedDeviationArray = getSpecimenDeviation(searchSpecimenInstituteArray, currTube);
-                const currTubeComments = getSpecimenComments(searchSpecimenInstituteArray, currTube)
+                const acceptedDeviationList = getSpecimenDeviation(searchSpecimenInstituteList, currTube);
                 let deviationString = '';
-                
-                const deviationTypeCell = currRow.insertCell(3);
-                deviationTypeCell.classList.add("deviation-type-cell");
-                const commentCell = currRow.insertCell(4);
-                commentCell.classList.add("comments-cell");
 
-                if (acceptedDeviationArray.length >= 1) {
-                    for (const deviationLabel of acceptedDeviationArray) {
+                if (acceptedDeviationList.length >= 1) {
+                    for (const deviationLabel of acceptedDeviationList) {
                         deviationString += `${deviationLabel} <br><br>`;
                     }
-                    deviationTypeCell.innerHTML = deviationString;
+                    currRow.insertCell(3).innerHTML = deviationString;
                 }
                 else {
-                    deviationTypeCell.innerHTML = `<br><br>`;
+                    currRow.insertCell(3).innerHTML = `<br><br>`;
                 }
-                
-                commentCell.innerHTML = currTubeComments;
             }
+
+            currRow.insertCell(4).innerHTML = fullScannerName;
 
             if (i % 2 == 0) {
                 currRow.style['background-color'] = "lightgrey";
@@ -3850,20 +3839,20 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
 
 /** 
  *  Returns an array of deviation type name(s) for a single specimen tube id or an empty array if no deviation type found
- *  @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
- *  @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. [CXA321789 0001]
+ *  @param {array} searchSpecimenInstituteList - firestore biospecimen collection data array of objects or empty array depending on response
+ *  @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteList - Ex. [CXA321789 0001]
  *  @returns {array} Example array - ['Hemolysis present']
  *   
 */ 
-export const getSpecimenDeviation = (searchSpecimenInstituteArray, currTube) => {
-    const specimenInstituteArray = searchSpecimenInstituteArray;
-    const [collectionId, tubeId] = currTube.split(/\s+/);
-    const tubeIdDeviationReasonArray = deviationReasons;
-    const specimenObjArray = specimenInstituteArray.filter(specimen => (specimen["820476880"] === collectionId));    
+export const getSpecimenDeviation = (searchSpecimenInstituteList, currTube) => {
+    const specimenInstituteList = searchSpecimenInstituteList;
+    const [collectionId, tubeId] = currTube.split(" ");
+    const tubeIdDeviationReasonList = deviationReasons;
+    const specimenObjList = specimenInstituteList.filter(specimen => (specimen["820476880"] === collectionId));    
     const { scannedId, isCollected, isDeviated, deviation } = conceptIds.collection.tube;
     
     // Flatten array to single object 
-    const specimenObj = (specimenObjArray.length) ? Object.assign(...specimenObjArray) : {};
+    const specimenObj = (specimenObjList.length) ? Object.assign(...specimenObjList) : {};
     const acceptedDeviationArr = [];
 
     for (const key in specimenObj) {
@@ -3876,7 +3865,7 @@ export const getSpecimenDeviation = (searchSpecimenInstituteArray, currTube) => 
                 for (const deviation in deviationObj) {
                     // deviation not found in the the refused shipping deviation list and deviation exists
                     if (!refusedShippingDeviationConceptList.includes(parseInt(deviation)) && deviationObj[deviation] === conceptIds.yes) {
-                        acceptedDeviationArr.push(tubeIdDeviationReasonArray.find(deviationReason => deviationReason['concept'] === parseInt(deviation))?.['label']);
+                        acceptedDeviationArr.push(tubeIdDeviationReasonList.find(deviationReason => deviationReason['concept'] === parseInt(deviation))?.['label']);
                     }
                 }
             }
@@ -3884,17 +3873,3 @@ export const getSpecimenDeviation = (searchSpecimenInstituteArray, currTube) => 
     }
     return acceptedDeviationArr;
 }
-
-/**
- * Returns a string of the Full Specimen ID's comments
- * @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
- * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. [CXA321789 0001]
- */
-export const getSpecimenComments = (searchSpecimenInstituteArray, currTube) => {
-    const [collectionId, tubeId] = currTube.split(/\s+/);
-    const specimenObjArray = searchSpecimenInstituteArray.filter(specimen => (specimen["820476880"] === collectionId));
-    const specimenObj = (specimenObjArray.length) ? Object.assign(...specimenObjArray) : {};
-    const tubeIdToCid = specimenCollection["numToCid"]?.[tubeId];
-    return specimenObj[tubeIdToCid]?.["536710547"] ?? "";
-}
-

@@ -869,10 +869,10 @@ export const searchSpecimenInstitute = async() => {
  */
 export const filterSpecimenCollectionList = async () => {
     const searchSpecimenInstituteResponse = await searchSpecimenInstitute()
-    const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : []
+    const searchSpecimenInstituteList = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : []
     
     /* Filter collections with ShipFlag value yes */
-    let collectionList = searchSpecimenInstituteArray.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
+    let collectionList = searchSpecimenInstituteList.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
     
     // loop over filtered data with shipFlag
     for (let i = 0; i < collectionList.length; i++){
