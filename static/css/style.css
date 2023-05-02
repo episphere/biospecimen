@@ -302,11 +302,6 @@ canvas.drawing, canvas.drawingBuffer {
     padding-bottom: 4px;
 }
 
-#finalizeTable .deviation-type-width,
-.deviation-type-cell {
-    padding-right: 1.5rem;
-}
-
 .deviation-comments-width,
 .deviation-type-width {
     max-width: 120px;
