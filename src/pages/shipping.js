@@ -333,10 +333,14 @@ export const boxManifest = async (boxId, userName) => {
     //addEventBackToSearch('backToSearch');
 }
 
-
-
-export const shippingManifest = async (boxesToShip, userName, tempMonitorThere, currShippingLocationNumber) => {    
-    //let tempMonitorThere = document.getElementById('tempMonitorChecked').checked;
+/**
+ * 
+ * @param {string[]} boxIdArray 
+ * @param {string} userName 
+ * @param {boolean} isTempMonitorIncluded 
+ * @param {*} currShippingLocationNumber 
+ */
+export const shippingManifest = async (boxIdArray, userName, isTempMonitorIncluded, currShippingLocationNumber) => {
     let response = await  getBoxes();
     let boxList = response.data;
     let boxIdAndBagsObj = {};
