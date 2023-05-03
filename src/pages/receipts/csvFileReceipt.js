@@ -3,7 +3,7 @@ import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
-import { getRecentBoxesShippedBySiteNotReceived } from "./packagesInTransit.js";
+import { filterShipped } from "./packagesInTransit.js";
 
 export const csvFileReceiptScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -59,7 +59,7 @@ const csvInTransitButtonSubmit = () => {
     showAnimation();
     const response = await getAllBoxes(`bptl`);
     hideAnimation();
-    const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
+    const allBoxesShippedBySiteAndNotReceived = filterShipped(response.data);
     let modifiedTransitResults = updateInTransitMapping(allBoxesShippedBySiteAndNotReceived);
     generateInTransitCSVData(modifiedTransitResults);
   })

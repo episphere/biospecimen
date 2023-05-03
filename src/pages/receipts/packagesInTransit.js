@@ -1,10 +1,9 @@
-import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, ship, searchSpecimenInstitute } from "../../shared.js";
+import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 import { convertTime } from "../../shared.js";
-import { getSpecimenDeviation, getSpecimenComments} from "../../events.js";
 
 export const packagesInTransitScreen = async (auth, route) => {
     const user = auth.currentUser;
@@ -16,60 +15,58 @@ export const packagesInTransitScreen = async (auth, route) => {
 const packagesInTransitTemplate = async (username, auth, route) => {
     showAnimation();
     const response = await getAllBoxes(`bptl`);
-    const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
     hideAnimation();
-    
-    const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
-    const searchSpecimenInstituteArray = searchSpecimenInstituteResponse.data ?? [];
-    let template = '';
+    const allBoxesShippedBySiteAndNotReceived = filterShipped(response.data)
 
-    template += `
-    ${receiptsNavbar()}
-    <div class="container-fluid">
-        <div id="root root-margin">
-            <div class="table-responsive">
-                <span> <h3 style="text-align: center; margin: 1rem 0;">Packages In Transit</h3> </span>
-                <div class="sticky-header" style="overflow:auto;">
-                    <table class="table table-bordered" id="packagesInTransitTable"
-                        style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
-                        <thead> 
-                            <tr style="top: 0; position: sticky;" id="packagesInTransitTableHeaderRow">
-                                <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Ship Date</th>
-                                <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Tracking Number</th>
-                                <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipped from Site</th>
-                                <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Expected Number of Samples</th>
-                                <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Temperature Monitor</th>
-                                <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Manifest</th>
-                            </tr>
-                        </thead>   
-                        <tbody id="tableBodyPackagesInTransit" style="text-align: center; vertical-align: middle;"></tbody>
-                    </table>
-                </div>
-            </div>
+    let template = "";
+    template += receiptsNavbar();
+
+    template += `<div class="container-fluid">
+                <div id="root root-margin">
+                    <div class="table-responsive">
+                    <span> <h3 style="text-align: center; margin: 1rem 0;">Packages In Transit</h3> </span>
+                    <div class="sticky-header" style="overflow:auto;">
+                            <table class="table table-bordered" id="packagesInTransitData" 
+                                style="margin-bottom:0; position: relative;border-collapse:collapse; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);">
+                                <thead> 
+                                    <tr style="top: 0; position: sticky;">
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Ship Date</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Tracking Number</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Shipped from Site</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Expected Number of Samples</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Temperature Monitor</th>
+                                        <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Manifest</th>
+                                    </tr>
+                                </thead>   
+                                <tbody id="contentBodyPackagesInTransit">
+                                    ${createPackagesInTransitRows(allBoxesShippedBySiteAndNotReceived)}
+                                </tbody>
+                        </table>
+                    </div>
+                </div>`;
+
+    template += `<div class="modal fade" id="manifestModal" tabindex="-1" aria-labelledby="manifestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div>
+          <button style="font-size:2.5rem;padding:1rem;" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
+        <div id="manifest-modal-body" class="modal-body"></div>  
+      </div>
     </div>
+  </div>`;
 
-    <div class="modal fade" id="manifestModal" tabindex="-1" aria-labelledby="manifestModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div>
-                    <button style="font-size:2.5rem;padding:1rem;" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div id="manifest-modal-body" class="modal-body"></div>  
-            </div>
-        </div>
-    </div>`;
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
     activeReceiptsNavbar();
-    createPackagesInTransitRows(allBoxesShippedBySiteAndNotReceived);
-
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");
 
+    const allBoxes = allBoxesShippedBySiteAndNotReceived;
+
     // // Return an array of an item of grouped bags from GET request***
-    const bagsArr = groupAllBags(allBoxesShippedBySiteAndNotReceived);
+    const bagsArr = groupAllBags(allBoxes);
 
     // // Returns an array of summed and grouped bag samples
     const sumSamplesArr = countSamplesArr(bagsArr);
@@ -81,113 +78,73 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     const scannedByArr = groupScannedByArr(bagsArr, fieldToConceptIdMapping);
     
     // // Returns an array -->  nested array of grouped shipped by
-    const shippedByArr = groupShippedByArr(allBoxesShippedBySiteAndNotReceived);
+    const shippedByArr = groupShippedByArr(allBoxes)
 
     // // Returns an array -->  nested array of bag Ids names by index
     const bagIdArr = groupBagIdArr(bagsArr);
 
     // // Returns an array -->  array of tracking numbers 
-    const trackingNumberArr = groupByTrackingNumber(allBoxesShippedBySiteAndNotReceived);
+    const trackingNumberArr = groupByTrackingNumber(allBoxes)
 
-    // // Returns an array -->  array of siteSpecificLocation
-    const siteSpecificLocationArr = groupBySiteSpecificLocation(allBoxesShippedBySiteAndNotReceived);
-
+    // Object Property Value Shorthand
+    // Example: bagsArr and bagsArr:bagsArr are equivalent
     const dataObj = {
         sumSamplesArr,
         bagSamplesArr,
         scannedByArr,
         shippedByArr,
         bagIdArr,
-        trackingNumberArr,
-        siteSpecificLocationArr
+        trackingNumberArr
     };
-    manifestButton([...allBoxesShippedBySiteAndNotReceived], dataObj, manifestModalBodyEl, searchSpecimenInstituteArray);
+    manifestButton([...allBoxes], dataObj, manifestModalBodyEl);
 };
 
-/**
- * Returns an array of shipped box items but not yet received and sorts the box items by most recent date
- * @param {array} boxes - array of all boxes from getAllBoxes(`bptl`) function
- * @returns 
- */
-export const getRecentBoxesShippedBySiteNotReceived = (boxes) => {
+export const filterShipped = (boxes) => {
   // boxes are from searchBoxes endpoint
   if(boxes.length === 0) return []
-  const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
-  const sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
-  return sortBoxesBySubmitShipmentTime;
+  let filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
+  let sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
+  return sortBoxesBySubmitShipmentTime
 }
 
 const createPackagesInTransitRows = (boxes) => {
     let template = "";
-    const boxesShippedNotReceived = boxes;
-    const bagsArr = groupAllBags(boxesShippedNotReceived);
-    const sumSamplesArr = countSamplesArr(bagsArr);
-    const tableBodyPackagesInTransit = document.getElementById("tableBodyPackagesInTransit");
-    const packagesInTransitTableHeaderRowEl = document.getElementById("packagesInTransitTableHeaderRow");
-    const tableHeaderColumnNameArray = Array.from(packagesInTransitTableHeaderRowEl.children);
-    const siteShipmentReceived = fieldToConceptIdMapping.siteShipmentReceived;
-    const yes = fieldToConceptIdMapping.yes;
+            const allBoxes = boxes;
 
-    for(let i = 0; i < boxesShippedNotReceived.length; i++) {
-        const currBoxShippedNotReceived = boxesShippedNotReceived[i];
+            // Return a filtered array of an item of grouped bags from GET request***
+            const bagsArr = groupAllBags(allBoxes);
 
-        if (currBoxShippedNotReceived[siteShipmentReceived] === yes) continue; 
-        const rowEle = document.createElement('tr');
-
-        for (let j = 0; j < tableHeaderColumnNameArray.length; j++) {
-            const cellEle = document.createElement('td')
-            const headerName = tableHeaderColumnNameArray[j].textContent
-            
-            switch (headerName) {
-                case 'Ship Date':
-                    const currBoxShipDate = currBoxShippedNotReceived[fieldToConceptIdMapping.shippingShipDate];
-                    cellEle.innerText = currBoxShipDate ? convertTime(currBoxShipDate).split(",")[0] : '';
-                    break;
-
-                case 'Tracking Number':
-                    const currBoxTrackingNumber = currBoxShippedNotReceived[fieldToConceptIdMapping.shippingTrackingNumber];
-                    cellEle.innerText = currBoxTrackingNumber ? currBoxTrackingNumber : '';
-                    break;
-
-                case 'Shipped from Site':
-                    const siteShipped = currBoxShippedNotReceived['siteAcronym'] ? currBoxShippedNotReceived['siteAcronym'] : '';
-                    cellEle.innerText = siteShipped;
-                    break;
-
-                case 'Expected Number of Samples':
-                    const sumSamples = sumSamplesArr[i];
-                    cellEle.innerText = sumSamples;
-                    break;
-
-                case 'Temperature Monitor':
-                    const tempProbe = fieldToConceptIdMapping.tempProbe;
-                    const isTempProbeFound = tempProbeFound(currBoxShippedNotReceived[tempProbe]);
-                    cellEle.innerText = isTempProbeFound;
-                    break;
-
-                case 'Manifest':
-                    const buttonEle = document.createElement('button');
-                    buttonEle.id = `manifest-button-${i}`
-                    buttonEle.className = 'manifest-button btn-primary';
-                    buttonEle.textContent = 'Manifest';
-                    buttonEle.setAttribute('data-toggle', 'modal');
-                    buttonEle.setAttribute('data-target', '#manifestModal');
-                    cellEle.appendChild(buttonEle);
-                    break;
-
-                default:
-                    cellEle.innerText = ''
-            }
-            rowEle.appendChild(cellEle)
-        }
-        tableBodyPackagesInTransit.appendChild(rowEle);
-    }
-    return template;
+            // Returns an array of summed and grouped bag samples
+            const sumSamplesArr = countSamplesArr(bagsArr);
+            // Populate Cells with Data
+            allBoxes.forEach((box, index) => {
+                if (box[fieldToConceptIdMapping.siteShipmentReceived] != fieldToConceptIdMapping.yes) {
+                template += `
+                      <tr class="packageInTransitRow-${index}">
+                      <td style="text-align:center;">${
+                          box[fieldToConceptIdMapping.shippingShipDate]
+                              ? convertTime(box[fieldToConceptIdMapping.shippingShipDate]).split(",")[0] : ""
+                      }</td>
+                      <td style="text-align:center;">${
+                          box[fieldToConceptIdMapping.shippingTrackingNumber] ? box[fieldToConceptIdMapping.shippingTrackingNumber] : ""
+                      }</td>
+                      <td style="text-align:center;">${box.siteAcronym ? box.siteAcronym : ""}</td>
+                      <td style="text-align:center;">${sumSamplesArr[index]}</td>
+                      <td style="text-align:center;">${tempProbeFound(box[fieldToConceptIdMapping["tempProbe"]])}</td>
+                      <td>
+                        <button id="manifest-button-${index}" class="manifest-button btn-primary" data-toggle="modal" data-target="#manifestModal" style="margin: 0 auto;display:block;">
+                          Manifest
+                        </button>
+                      </td>
+                      </tr>`;
+            }});
+            return template;
 }
 
-const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestModalBodyEl, searchSpecimenInstituteArray) => {
+const manifestButton = (allBoxes, dataObj, manifestModalBodyEl) => {
     const buttons = document.getElementsByClassName("manifest-button");
-    const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr, trackingNumberArr, siteSpecificLocationArr } = dataObj;
+    // DESTRUCTURING dataObj and fieldToConceptIdMapping
+    const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr, trackingNumberArr  } = dataObj;
     const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
 
     Array.from(buttons).forEach((button, index) => {
@@ -204,25 +161,23 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
             groupScannedBy: "",
             groupShippedBy: "",
             trackingNumber: "",
-            siteSpecificLocation: "",
         };
 
-        modalData.site = allBoxesShippedBySiteAndNotReceived[index].siteAcronym;
-        modalData.date = allBoxesShippedBySiteAndNotReceived[index][shippingShipDate];
-        modalData.location = allBoxesShippedBySiteAndNotReceived[index][shippingLocation];
-        modalData.boxNumber = allBoxesShippedBySiteAndNotReceived[index][shippingBoxId];
+        modalData.site = allBoxes[index].siteAcronym;
+        modalData.date = allBoxes[index][shippingShipDate];
+        modalData.location = allBoxes[index][shippingLocation];
+        modalData.boxNumber = allBoxes[index][shippingBoxId];
         modalData.groupSamples = bagSamplesArr[index];
         modalData.groupScannedBy = scannedByArr[index];
         modalData.groupShippedBy = shippedByArr;
-        modalData.trackingNumber = trackingNumberArr[index];
-        modalData.siteSpecificLocation = siteSpecificLocationArr[index]
+        modalData.trackingNumberArr = trackingNumberArr[index];
 
         // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
         button.dataset.buttonIndex = `manifest-button-${index}`;
         button.addEventListener("click", (e) => {
-            const parsedModalData = JSON.parse(e.target.getAttribute("data-modal"));
-            const {
+            let parsedModalData = JSON.parse(e.target.getAttribute("data-modal"));
+            let {
                 site,
                 date,
                 location,
@@ -231,66 +186,66 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
                 groupSamples,
                 groupScannedBy,
                 groupShippedBy,
-                trackingNumber,
+                trackingNumberArr
             } = parsedModalData;
 
-            const modalBody = 
+            let modalBody = 
             `<div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-4">
-                        <p style="font-size:1.5rem;"><strong>Shipping Manifest</strong></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <p><strong>Tracking Number:</strong> ${trackingNumber ? trackingNumber : ""} </p>
-                    </div>
-                    <div class="col-md-4 ml-auto">
-                        <p><strong>Site:</strong> ${site ? site : ""} </p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <p><strong>Shipped Date and Time:</strong> ${date ? convertTime(date) : ""}</p>
-                    </div>
-                    <div class="col-md-4 ml-auto">
-                        <p><strong>Location:</strong> ${location ? (conceptIdToSiteSpecificLocation[location].length > 14 ? "<br>" + conceptIdToSiteSpecificLocation[location] : conceptIdToSiteSpecificLocation[location]) : ""}</p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <p><strong>Sender:</strong><br/>${groupShippedBy[index] ? groupShippedBy[index] : ""}</p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="table-responsive">
-                        <table class="table" id="packagesInTransitModalTable">
-                            <thead>
-                                <tr id="packagesInTransitModalTableHeaderRow">
-                                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col-">Box Number</th>
-                                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Specimen Bag ID</th>
-                                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Full Specimen ID</th>
-                                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Deviation Type</th>
-                                    <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Comments</th>
-                                </tr>
-                            </thead>
-                            <tbody id="manifestModalTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+              <div class="row">
+                  <div class="col-md-4">
+                      <p style="font-size:1.5rem;"><strong>Shipping Manifest</strong></p>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-4">
+                      <p><strong>Tracking Number:</strong> ${trackingNumberArr ? trackingNumberArr : ""} </p>
+                  </div>
+                  <div class="col-md-4 ml-auto">
+                    <p><strong>Site:</strong> ${site ? site : ""} </p>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-4">
+                      <p><strong>Shipped Date and Time:</strong> ${date ? convertTime(date) : ""}</p>
+                  </div>
+                  <div class="col-md-4 ml-auto">
+                      <p><strong>Location:</strong> ${location ? (conceptIdToSiteSpecificLocation[location].length > 14 ? "<br>" + conceptIdToSiteSpecificLocation[location] : conceptIdToSiteSpecificLocation[location]) : ""}</p>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-4">
+                      <p><strong>Sender:</strong><br/>${groupShippedBy[index] ? groupShippedBy[index] : ""}</p>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="table-responsive">
+                      <table class="table table-striped">
+                          <thead>
+                          <tr>
+                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col-">Box Number</th>
+                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Specimen Bag ID</th>
+                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Full Specimen ID</th>
+                          <th class="sticky-row" style="background-color: #f7f7f7; text-align:center;" scope="col">Scanned By</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          ${addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, groupScannedBy)}
+                      </tbody>
+                      </table>
+                  </div>
+              </div>
             </div>`;
         manifestModalBodyEl.innerHTML = modalBody;
-        addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteArray);
         });
     });
 };
 
 // Return an array of an item of grouped bags from GET request***
-const groupAllBags = (allBoxesShippedBySiteAndNotReceived) => {
+const groupAllBags = (allBoxes) => {
     const arrBoxes = [];
     // Object.keys --> Copies Keys and stores into array
     // If Key(bags) has a length push bag of objects, else an empty {}
-    allBoxesShippedBySiteAndNotReceived.forEach((box) => {
+    allBoxes.forEach((box) => {
         Object.keys(box.bags).length ? arrBoxes.push(box.bags) : arrBoxes.push(box.bags)
     });
     return arrBoxes;
@@ -380,12 +335,14 @@ const groupScannedByArr = (bagsArr, fieldToConceptIdMapping) => {
     return arrNames;
 };
 
-const groupShippedByArr = (allBoxesShippedBySiteAndNotReceived) => {
+const groupShippedByArr = (allBoxes) => {
   const arrShippedBy = []
-  allBoxesShippedBySiteAndNotReceived.forEach(box => {
+  // check if each box has first name and last name concept with length
+  // check length of last name and sanitize using trim 
+  allBoxes.forEach(box => {
     let shippedByFirstName = box[fieldToConceptIdMapping.shippedByFirstName].trim()
     let shippedByLastName = box[fieldToConceptIdMapping.shippedByLastName]?.trim() ?? ''
-    if (shippedByFirstName.length > 0 && shippedByLastName > 0) {
+    if(shippedByFirstName.length > 0 && shippedByLastName > 0) {
       arrShippedBy.push(shippedByFirstName + " " + shippedByLastName)
     }
     else if (shippedByFirstName.length > 0) {
@@ -405,9 +362,9 @@ const groupBagIdArr = (bagsArr) => {
     return arrBagId;
 };
 
-const groupByTrackingNumber = (allBoxesShippedBySiteAndNotReceived) => {
+const groupByTrackingNumber = (allBoxes) => {
     const arrTrackingNums = []
-    allBoxesShippedBySiteAndNotReceived.forEach((box,index) => {
+    allBoxes.forEach((box,index) => {
       if(box[fieldToConceptIdMapping["shippingTrackingNumber"]]) {
         let trackingNumber = box[fieldToConceptIdMapping["shippingTrackingNumber"]]
         arrTrackingNums.push(trackingNumber)
@@ -416,128 +373,58 @@ const groupByTrackingNumber = (allBoxesShippedBySiteAndNotReceived) => {
     return arrTrackingNums;
 }
 
-const groupBySiteSpecificLocation = (allBoxesShippedBySiteAndNotReceived) => {
-    const siteSpecificLocationArr = [];
-    allBoxesShippedBySiteAndNotReceived.forEach(box => {
-        const siteSpecificLocation = box[fieldToConceptIdMapping["shippingLocation"]];
-        if (siteSpecificLocation) siteSpecificLocationArr.push(siteSpecificLocation);
-    })
-    return siteSpecificLocationArr;
-}
-
-const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteArray) => {
-    const manifestBody = '';
-    const manifestModalTableBodyEl = document.getElementById('manifestModalTableBody');
-    const packagesInTransitModalTableHeaderRowEl = document.getElementById('packagesInTransitModalTableHeaderRow');
-    const tableModalHeaderColumnNameArray = Array.from(packagesInTransitModalTableHeaderRowEl.children);
-    // currBagIdArray - Ex. [CXA426800 0008, CXA426800 0009]
-    const currBagIdArray =  bagIdArr[index];
-
-    if (!bagIdArr[index].length) return manifestBody;
-    else {
-            for (let i = 0; i < currBagIdArray.length; i++) {
-                // currFullSpecimenIdArray - Ex. [CXA426800 0001, CXA426800 0002, ...]
-                const currFullSpecimenIdArray = groupSamples[i];
-                const currSpecimenBagId = currBagIdArray[i];
-                const currScannedByName =  groupScannedBy[i];
-                const fullSpecimenIdDeviationObj = {};
-
-                for (let j = 0; j < currFullSpecimenIdArray.length; j++) {
-                    const currTube = currFullSpecimenIdArray[j];
-                    const currAcceptedDeviationArray = getSpecimenDeviation(searchSpecimenInstituteArray, currTube);
-                    const currFullSpecimenIdArrayLength = currFullSpecimenIdArray.length;
-                    let currFullSpecimenIdArrayCounter = 0;
-
-                    fullSpecimenIdDeviationObj[currTube] = currAcceptedDeviationArray;
-
-                    if (j === currFullSpecimenIdArray.length - 1) {
-                        const tableRowNumber = currFullSpecimenIdArrayLength;
-
-                        for (let rowIndex = 0; rowIndex < tableRowNumber; rowIndex++) {
-                            const tableRowEl = document.createElement('tr');
-                            if(i % 2 === 0) tableRowEl.style.backgroundColor = 'lightgrey'
-                            
-                            for (let tableModalHeaderIndex = 0; tableModalHeaderIndex < tableModalHeaderColumnNameArray.length; tableModalHeaderIndex++) { 
-                                const cellEl = document.createElement('td');
-                                const headerName = tableModalHeaderColumnNameArray[tableModalHeaderIndex].textContent;
-                                const currFullSpecimenIdArrayLength = currFullSpecimenIdArray.length;
-                                let currTubeDeviationArrayCounter = 0;
-
-                                const currFullSpecimenId = currFullSpecimenIdArray[rowIndex];
-                                const currSpecimenComments = getSpecimenComments(searchSpecimenInstituteArray, currFullSpecimenId)
-
-                                switch (headerName) {
-
-                                    case 'Box Number':
-                                        if (rowIndex === 0) cellEl.textContent = boxNumber;
-                                        else {
-                                            cellEl.textContent = '';
-                                        }
-                                        break;
-
-                                    case 'Specimen Bag ID':
-                                        if (rowIndex === 0) cellEl.textContent = currSpecimenBagId;
-                                        else {
-                                            cellEl.textContent = '';
-                                        }
-                                        break;
-
-                                    case 'Full Specimen ID':
-                                        if (currFullSpecimenIdArrayCounter !== currFullSpecimenIdArrayLength) {
-                                            const currFullSpecimenId = currFullSpecimenIdArray[currFullSpecimenIdArrayCounter];
-                                            cellEl.textContent = currFullSpecimenId;
-                                            currFullSpecimenIdArrayCounter += 1;
-                                        }
-                                        else {
-                                            cellEl.textContent = ''
-                                        }
-                                        break;
-
-                                    case 'Deviation Type':
-                                        const currFullSpecimenId = currFullSpecimenIdArray[rowIndex];
-                                        // fullSpecimenIdDeviationObj Ex. { CXA854612 0001:['Hemolsysis Present'],... }
-                                        const currDeviationTypeArray = fullSpecimenIdDeviationObj[currFullSpecimenId] ? fullSpecimenIdDeviationObj[currFullSpecimenId] : [];
-                                        if (currDeviationTypeArray.length) {
-                                            let deviationTextContent = '';
-                                            for(let currDeviationType of currDeviationTypeArray) {
-                                                deviationTextContent += `${currDeviationType} <br><br>`
-                                            }
-                                            cellEl.classList.add("deviation-type-cell");
-                                            cellEl.innerHTML = deviationTextContent;
-                                            currTubeDeviationArrayCounter += 1;
-                                        }
-                                        else {
-                                            cellEl.textContent = '';
-                                        }
-                                        break;
-
-                                    case 'Comments': 
-                                        if (currFullSpecimenIdArrayCounter !== currFullSpecimenIdArrayLength + 1 && currSpecimenComments.length) {
-                                            cellEl.classList.add("comments-cell");
-                                            cellEl.textContent = currSpecimenComments;
-                                        }
-                                        else {
-                                            cellEl.textContent = ''
-                                        }
-                                        break;
-
-                                    default:
-                                        cellEl.textContent = '';
-                                }
-                                tableRowEl.appendChild(cellEl)
-                            }
-                            manifestModalTableBodyEl.appendChild(tableRowEl)
-                        }
-                    }
-                }
+const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupScannedBy) => {
+    let manifestBody = ``;
+    let rows = ``;
+    if (!bagIdArr[index].length) {
+        return manifestBody;
+    } else {
+        bagIdArr[index].forEach((id, indexNum) => {
+            // If the current index of the bagIds is 0 insert # of samples
+            if (indexNum === 0) {
+                rows += `<tr>
+                <td style="text-align:center">
+                <p>${boxNumber ? boxNumber.replace("Box", "") : ""}</p>
+                </td>
+                <td style="text-align:center">
+                    <p>${id ? id : "N//A"}</p>
+                </td>
+                <td style="text-align:center">
+                    ${groupSamples[indexNum].toString().replaceAll(",", `<br>`)}
+                </td>
+                <td style="text-align:center">
+                    ${groupScannedBy[indexNum].toString().replaceAll(",", `<br>`)}
+                </td>
+                </tr>`;
+            } else {
+                rows += `<tr>
+                <td style="text-align:center">
+                <p></p>
+                </td>
+                <td style="text-align:center">
+                    <p>${id ? id : ""}</p>
+                </td>
+                <td style="text-align:center">
+                    ${groupSamples[indexNum].toString().replaceAll(",", `<br>`)}
+                </td>
+                <td style="text-align:center">
+                    ${groupScannedBy[indexNum].toString().replaceAll(",", `<br>`)}
+                </td>
+                </tr>`;
             }
-        }
+        });
+        manifestBody = rows;
+        return manifestBody;
+    }
 };
 
 const tempProbeFound = (tempProbe) => {
-    const options = {
-      '104430631': 'No',
-      '353358909': 'Yes'
-    };
-    return options[tempProbe] || '';
-  };
+  if(tempProbe == '104430631') {
+    return "No"
+  }
+  else if(tempProbe == '353358909') {
+    return "Yes"
+  }
+  else return ""
+}
+

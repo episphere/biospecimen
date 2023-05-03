@@ -302,25 +302,8 @@ canvas.drawing, canvas.drawingBuffer {
     padding-bottom: 4px;
 }
 
-#finalizeTable .deviation-type-width,
-.deviation-type-cell {
-    padding-right: 1.5rem;
-}
-
-.deviation-comments-width,
-.deviation-type-width {
+.deviation-comments-width {
     max-width: 120px;
-}
-
-.deviation-comments-width,
-.deviation-type-width, 
-.deviation-type-cell,
-.comments-cell {
-    word-wrap: break-word;
-}
-
-#finalizeTable tr td {
-    padding: 1rem 0;
 }
 
 .active {
@@ -363,7 +346,7 @@ canvas.drawing, canvas.drawingBuffer {
     transform: scale(0);
     transition: all 0.2s ease-in-out;
     z-index: 1000;
-}
+  }
   
 .modal-wrapper.visible {
 visibility: visible;
@@ -422,3 +405,12 @@ box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
         display: none;
     }
 }
+  .modal-wrapper.visible {
+    visibility: visible;
+    transform: scale(1);
+  }
+  
+  .modal-content {
+    border-radius: 5px;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+  }
