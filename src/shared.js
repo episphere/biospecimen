@@ -555,7 +555,13 @@ export const updateNewTempDate = async () =>{
     return response.json();
 }
 
-export const ship = async (boxes, shippingData, trackingNumbers) => {
+/**
+ * Ship boxes
+ * @param {object} boxIdToTrackingNumberMap {boxId:trackingNumber}
+ * @param {object} shippingData 
+ * @returns 
+ */
+export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -563,7 +569,7 @@ export const ship = async (boxes, shippingData, trackingNumbers) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({"boxes": boxes, "shippingData": shippingData, "trackingNumbers":trackingNumbers})
+        body: JSON.stringify({boxIdToTrackingNumberMap, shippingData})
     }
     const response = await fetch(`${api}api=ship`, requestObj);
     return response.json();
@@ -2162,7 +2168,7 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
   let forageBoxIdArr = []
   try {
       let value = await localforage.getItem("shipData")
-      console.log(value)
+
       if (value === null) {
           await localforage.setItem("shipData", shipSetForage)
       }
@@ -2379,3 +2385,22 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
         await sendClientEmail(emailData);
     }
 }
+
+/**
+ * Block subsequent requests before the first request is completed, with a 5-second timeout.
+ */
+export const requestsBlocker = {
+  isReqInProcess: false,
+  block() {
+    this.isReqInProcess = true;
+    setTimeout(() => {
+      this.isReqInProcess = false;
+    }, 5000);
+  },
+  unblock() {
+    this.isReqInProcess = false;
+  },
+  isBlocking() {
+    return this.isReqInProcess;
+  },
+};

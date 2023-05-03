@@ -24,6 +24,8 @@ export default {
     scannedByLastName: 618036638,
     shippedByFirstName: 948887825,
     shippedByLastName: 885486943,
+    "FedEx": 712278213,
+    "World Courier": 149772928,
 
     shippingShipDate: 656548982,
     packageCondition: 238268405,

@@ -5,3 +5,4 @@ static/images/.DS_Store
 scratch.js
 /tmp
 .hintrc
+.eslintrc.json

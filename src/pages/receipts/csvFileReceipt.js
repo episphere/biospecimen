@@ -273,27 +273,32 @@ const getVialTypesMappings = (i) => {
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0006')) {
       vialMappingsHolder.push('15 ml Nalgene jar', 'No Additive', 'Urine', '10')
     }
+
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
-    (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002' 
-    || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0011' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0012' )) {
-      vialMappingsHolder.push('5 ml Serum separator tube', 'SST', 'Serum', '5')
+    (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0001' || i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0002')) {
+      vialMappingsHolder.push('10 ml Serum separator tube', 'SST', 'Serum', '10')
     }
+
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0003')) {
-      vialMappingsHolder.push('10 mL Vacutainer', 'Lithium Heparin', 'Whole BI', '10')
+      vialMappingsHolder.push('10 ml Vacutainer', 'Lithium Heparin', 'Whole Blood', '10')
     }
+
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0004')) {
-      vialMappingsHolder.push('10 mL Vacutainer', 'EDTA = K2', 'Whole BI', '10')
+      vialMappingsHolder.push('10 ml Vacutainer', 'EDTA', 'Whole Blood', '10')
     }
+
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0005')) {
-      vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole BI', '6')
+      vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole Blood', '6')
     }
+
     else if (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical && i[fieldToConceptIdMapping.healthcareProvider] === nameToKeyObj["hfHealth"] && 
     (i[fieldToConceptIdMapping.collectionId].split(' ')[1] === '0006')) {
-      vialMappingsHolder.push('15 ml Nalgene jar', 'No Additive', 'Urine', '10')
+      vialMappingsHolder.push('10 ml Vacutainer', 'No Additive', 'Urine', '6')
     }
+
     else{}
 
   return vialMappingsHolder
