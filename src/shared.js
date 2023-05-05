@@ -868,8 +868,8 @@ export const searchSpecimenInstitute = async() => {
  * @returns {Array} List of biospecimen collections
  */
 export const filterSpecimenCollectionList = async () => {
-    const searchSpecimenInstituteResponse = await searchSpecimenInstitute()
-    const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : []
+    const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
+    const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ?? [];
     
     /* Filter collections with ShipFlag value yes */
     let collectionList = searchSpecimenInstituteArray.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);

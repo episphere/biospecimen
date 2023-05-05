@@ -434,104 +434,102 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupSca
     const currBagIdArray =  bagIdArr[index];
 
     if (!bagIdArr[index].length) return manifestBody;
-    else {
-            for (let i = 0; i < currBagIdArray.length; i++) {
-                // currFullSpecimenIdArray - Ex. [CXA426800 0001, CXA426800 0002, ...]
-                const currFullSpecimenIdArray = groupSamples[i];
-                const currSpecimenBagId = currBagIdArray[i];
-                const currScannedByName =  groupScannedBy[i];
-                const fullSpecimenIdDeviationObj = {};
+    
+    for (let i = 0; i < currBagIdArray.length; i++) {
+        // currFullSpecimenIdArray - Ex. [CXA426800 0001, CXA426800 0002, ...]
+        const currFullSpecimenIdArray = groupSamples[i];
+        const currSpecimenBagId = currBagIdArray[i];
+        const fullSpecimenIdDeviationObj = {};
 
-                for (let j = 0; j < currFullSpecimenIdArray.length; j++) {
-                    const currTube = currFullSpecimenIdArray[j];
-                    const currAcceptedDeviationArray = getSpecimenDeviation(searchSpecimenInstituteArray, currTube);
-                    const currFullSpecimenIdArrayLength = currFullSpecimenIdArray.length;
-                    let currFullSpecimenIdArrayCounter = 0;
+        for (let j = 0; j < currFullSpecimenIdArray.length; j++) {
+            const currTube = currFullSpecimenIdArray[j];
+            const currAcceptedDeviationArray = getSpecimenDeviation(searchSpecimenInstituteArray, currTube);
+            const currFullSpecimenIdArrayLength = currFullSpecimenIdArray.length;
+            let currFullSpecimenIdArrayCounter = 0;
 
-                    fullSpecimenIdDeviationObj[currTube] = currAcceptedDeviationArray;
+            fullSpecimenIdDeviationObj[currTube] = currAcceptedDeviationArray;
 
-                    if (j === currFullSpecimenIdArray.length - 1) {
-                        const tableRowNumber = currFullSpecimenIdArrayLength;
+            if (j === currFullSpecimenIdArray.length - 1) {
+                const tableRowNumber = currFullSpecimenIdArrayLength;
 
-                        for (let rowIndex = 0; rowIndex < tableRowNumber; rowIndex++) {
-                            const tableRowEl = document.createElement('tr');
-                            if(i % 2 === 0) tableRowEl.style.backgroundColor = 'lightgrey'
-                            
-                            for (let tableModalHeaderIndex = 0; tableModalHeaderIndex < tableModalHeaderColumnNameArray.length; tableModalHeaderIndex++) { 
-                                const cellEl = document.createElement('td');
-                                const headerName = tableModalHeaderColumnNameArray[tableModalHeaderIndex].textContent;
-                                const currFullSpecimenIdArrayLength = currFullSpecimenIdArray.length;
-                                let currTubeDeviationArrayCounter = 0;
+                for (let rowIndex = 0; rowIndex < tableRowNumber; rowIndex++) {
+                    const tableRowEl = document.createElement('tr');
+                    if(i % 2 === 0) tableRowEl.style.backgroundColor = 'lightgrey'
+                    
+                    for (let tableModalHeaderIndex = 0; tableModalHeaderIndex < tableModalHeaderColumnNameArray.length; tableModalHeaderIndex++) { 
+                        const cellEl = document.createElement('td');
+                        const headerName = tableModalHeaderColumnNameArray[tableModalHeaderIndex].textContent;
+                        const currFullSpecimenIdArrayLength = currFullSpecimenIdArray.length;
+                        let currTubeDeviationArrayCounter = 0;
 
-                                const currFullSpecimenId = currFullSpecimenIdArray[rowIndex];
-                                const currSpecimenComments = getSpecimenComments(searchSpecimenInstituteArray, currFullSpecimenId)
+                        const currFullSpecimenId = currFullSpecimenIdArray[rowIndex];
+                        const currSpecimenComments = getSpecimenComments(searchSpecimenInstituteArray, currFullSpecimenId)
 
-                                switch (headerName) {
+                        switch (headerName) {
 
-                                    case 'Box Number':
-                                        if (rowIndex === 0) cellEl.textContent = boxNumber;
-                                        else {
-                                            cellEl.textContent = '';
-                                        }
-                                        break;
-
-                                    case 'Specimen Bag ID':
-                                        if (rowIndex === 0) cellEl.textContent = currSpecimenBagId;
-                                        else {
-                                            cellEl.textContent = '';
-                                        }
-                                        break;
-
-                                    case 'Full Specimen ID':
-                                        if (currFullSpecimenIdArrayCounter !== currFullSpecimenIdArrayLength) {
-                                            const currFullSpecimenId = currFullSpecimenIdArray[currFullSpecimenIdArrayCounter];
-                                            cellEl.textContent = currFullSpecimenId;
-                                            currFullSpecimenIdArrayCounter += 1;
-                                        }
-                                        else {
-                                            cellEl.textContent = ''
-                                        }
-                                        break;
-
-                                    case 'Deviation Type':
-                                        const currFullSpecimenId = currFullSpecimenIdArray[rowIndex];
-                                        // fullSpecimenIdDeviationObj Ex. { CXA854612 0001:['Hemolsysis Present'],... }
-                                        const currDeviationTypeArray = fullSpecimenIdDeviationObj[currFullSpecimenId] ? fullSpecimenIdDeviationObj[currFullSpecimenId] : [];
-                                        if (currDeviationTypeArray.length) {
-                                            let deviationTextContent = '';
-                                            for(let currDeviationType of currDeviationTypeArray) {
-                                                deviationTextContent += `${currDeviationType} <br><br>`
-                                            }
-                                            cellEl.classList.add("deviation-type-cell");
-                                            cellEl.innerHTML = deviationTextContent;
-                                            currTubeDeviationArrayCounter += 1;
-                                        }
-                                        else {
-                                            cellEl.textContent = '';
-                                        }
-                                        break;
-
-                                    case 'Comments': 
-                                        if (currFullSpecimenIdArrayCounter !== currFullSpecimenIdArrayLength + 1 && currSpecimenComments.length) {
-                                            cellEl.classList.add("comments-cell");
-                                            cellEl.textContent = currSpecimenComments;
-                                        }
-                                        else {
-                                            cellEl.textContent = ''
-                                        }
-                                        break;
-
-                                    default:
-                                        cellEl.textContent = '';
+                            case 'Box Number':
+                                if (rowIndex === 0) cellEl.textContent = boxNumber;
+                                else {
+                                    cellEl.textContent = '';
                                 }
-                                tableRowEl.appendChild(cellEl)
-                            }
-                            manifestModalTableBodyEl.appendChild(tableRowEl)
+                                break;
+
+                            case 'Specimen Bag ID':
+                                if (rowIndex === 0) cellEl.textContent = currSpecimenBagId;
+                                else {
+                                    cellEl.textContent = '';
+                                }
+                                break;
+
+                            case 'Full Specimen ID':
+                                if (currFullSpecimenIdArrayCounter !== currFullSpecimenIdArrayLength) {
+                                    const currFullSpecimenId = currFullSpecimenIdArray[currFullSpecimenIdArrayCounter];
+                                    cellEl.textContent = currFullSpecimenId;
+                                    currFullSpecimenIdArrayCounter += 1;
+                                }
+                                else {
+                                    cellEl.textContent = ''
+                                }
+                                break;
+
+                            case 'Deviation Type':
+                                const currFullSpecimenId = currFullSpecimenIdArray[rowIndex];
+                                // fullSpecimenIdDeviationObj Ex. { CXA854612 0001:['Hemolsysis Present'],... }
+                                const currDeviationTypeArray = fullSpecimenIdDeviationObj[currFullSpecimenId] ? fullSpecimenIdDeviationObj[currFullSpecimenId] : [];
+                                if (currDeviationTypeArray.length) {
+                                    let deviationTextContent = '';
+                                    for(let currDeviationType of currDeviationTypeArray) {
+                                        deviationTextContent += `${currDeviationType} <br><br>`
+                                    }
+                                    cellEl.classList.add("deviation-type-cell");
+                                    cellEl.innerHTML = deviationTextContent;
+                                    currTubeDeviationArrayCounter += 1;
+                                }
+                                else {
+                                    cellEl.textContent = '';
+                                }
+                                break;
+
+                            case 'Comments': 
+                                if (currFullSpecimenIdArrayCounter !== currFullSpecimenIdArrayLength + 1 && currSpecimenComments.length) {
+                                    cellEl.classList.add("comments-cell");
+                                    cellEl.textContent = currSpecimenComments;
+                                }
+                                else {
+                                    cellEl.textContent = ''
+                                }
+                                break;
+
+                            default:
+                                cellEl.textContent = '';
                         }
+                        tableRowEl.appendChild(cellEl)
                     }
+                    manifestModalTableBodyEl.appendChild(tableRowEl)
                 }
             }
         }
+    }
 };
 
 const tempProbeFound = (tempProbe) => {

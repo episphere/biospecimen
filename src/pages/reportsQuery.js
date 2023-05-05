@@ -81,7 +81,7 @@ export const startReport = async () => {
 export const showReportsManifest = async (currPage) => {
     showAnimation()
     const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
-    const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ? searchSpecimenInstituteResponse.data : [];
+    const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ?? [];
 
     let template = `
         <div class="row">
