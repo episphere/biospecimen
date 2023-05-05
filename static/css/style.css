@@ -437,8 +437,7 @@ border-radius: 5px;
 box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
 }
 
-#boxManifestTable tbody
-{
+#boxManifestTable tbody {
     vertical-align: top;
 }
 
@@ -448,8 +447,7 @@ box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
 
 #tableBodyPackagesInTransit tr td,
 #specimenList tbody tr th,
-#saveTable tbody tr th
-{
+#saveTable tbody tr th {
     vertical-align: middle;
 }
 
