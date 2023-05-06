@@ -1,10 +1,10 @@
-import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, ship, searchSpecimenInstitute, searchSpecimenInstitute, getSpecimensByRequestedSite } from "../../shared.js";
+import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, ship, searchSpecimenInstitute, searchSpecimenByRequestedSite } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 import { convertTime } from "../../shared.js";
-import { getSpecimenDeviation, getSpecimenComments} from "../../events.js";
+import { getSpecimenDeviation, getSpecimenComments } from "../../events.js";
 
 export const packagesInTransitScreen = async (auth, route) => {
     const user = auth.currentUser;
@@ -88,8 +88,9 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     // // Returns an array -->  array of tracking numbers 
     const trackingNumberArr = groupByTrackingNumber(allBoxesShippedBySiteAndNotReceived);
 
-    // // Returns an array -->  array of siteSpecificLocation
-    const siteSpecificLocationArr = groupBySiteSpecificLocation(allBoxesShippedBySiteAndNotReceived);
+    // // Returns an array -->  array of siteLocation
+    const groupByLoginSiteCidArr = groupByBoxLoginSiteCid(allBoxesShippedBySiteAndNotReceived);
+
 
     const dataObj = {
         sumSamplesArr,
@@ -98,7 +99,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
         shippedByArr,
         bagIdArr,
         trackingNumberArr,
-        siteSpecificLocationArr
+        groupByLoginSiteCidArr
     };
     manifestButton([...allBoxesShippedBySiteAndNotReceived], dataObj, manifestModalBodyEl);
 };
@@ -186,7 +187,7 @@ const createPackagesInTransitRows = (boxes) => {
 
 const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestModalBodyEl) => {
     const buttons = document.getElementsByClassName("manifest-button");
-    const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr, trackingNumberArr, siteSpecificLocationArr } = dataObj;
+    const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr, trackingNumberArr, groupByLoginSiteCidArr } = dataObj;
     const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
 
 
@@ -204,7 +205,7 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
             groupScannedBy: "",
             groupShippedBy: "",
             trackingNumber: "",
-            siteSpecificLocation: "",
+            loginSite: "",
         };
 
         modalData.site = allBoxesShippedBySiteAndNotReceived[index].siteAcronym;
@@ -215,7 +216,7 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
         modalData.groupScannedBy = scannedByArr[index];
         modalData.groupShippedBy = shippedByArr;
         modalData.trackingNumber = trackingNumberArr[index];
-        modalData.siteSpecificLocation = siteSpecificLocationArr[index];
+        modalData.loginSite = groupByLoginSiteCidArr[index];
 
         // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
@@ -234,13 +235,15 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
                 groupScannedBy,
                 groupShippedBy,
                 trackingNumber,
+                loginSite
             } = parsedModalData;
             
-            showAnimation()
-            const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
-            console.log("🚀 ~ file: packagesInTransit.js:20 ~ packagesInTransitTemplate ~ searchSpecimenInstituteResponse:", searchSpecimenInstituteResponse, "---" ,site)
             
-            const searchSpecimenInstituteArray = searchSpecimenInstituteResponse.data ?? [];
+            showAnimation()
+            const searchSpecimenByRequestedSiteResponse = await searchSpecimenByRequestedSite(loginSite);
+            const searchSpecimenInstituteArray = searchSpecimenByRequestedSiteResponse?.data ?? [];
+
+
             modalBody = 
             `<div class="container-fluid">
                 <div class="row">
@@ -287,7 +290,6 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
                 </div>
             </div>`;
         manifestModalBodyEl.innerHTML = modalBody;
-        console.log("searchSpecimenInstituteArray", searchSpecimenInstituteArray)
         addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteArray);
         hideAnimation()
         });
@@ -425,13 +427,13 @@ const groupByTrackingNumber = (allBoxesShippedBySiteAndNotReceived) => {
     return arrTrackingNums;
 }
 
-const groupBySiteSpecificLocation = (allBoxesShippedBySiteAndNotReceived) => {
-    const siteSpecificLocationArr = [];
+const groupByBoxLoginSiteCid = (allBoxesShippedBySiteAndNotReceived) => {
+    const boxLoginSiteArr = [];
     allBoxesShippedBySiteAndNotReceived.forEach(box => {
-        const siteSpecificLocation = box[fieldToConceptIdMapping["shippingLocation"]];
-        if (siteSpecificLocation) siteSpecificLocationArr.push(siteSpecificLocation);
+        const boxLoginSite = box[fieldToConceptIdMapping["loginSite"]];
+        if (boxLoginSite) boxLoginSiteArr.push(boxLoginSite);
     })
-    return siteSpecificLocationArr;
+    return boxLoginSiteArr;
 }
 
 const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteArray) => {

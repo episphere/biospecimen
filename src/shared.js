@@ -864,20 +864,19 @@ export const searchSpecimenInstitute = async () => {
 }
 
 /**
- * Fetches biospecimen collection data from the database by site
- * @param {number}
+ * Fetches biospecimen collection data from the database via login site number 
+ * @param {number} login site number
  * @returns {object|array} returns a response object if response is 200 or an empty array
  * 
  */
-export const getSpecimensByRequestedSite = async (requestedSite) => {
+export const searchSpecimenByRequestedSite = async (requestedSite) => {
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=searchSpecimen&requestedSite=${siteCode}`, {
+    const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}`, {
     method: "GET",
     headers: {
         Authorization:"Bearer "+idToken
         }
     });
-
     if (response.status === 200) {
         const responseObject = await response.json();
         return responseObject;
