@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, ship, searchSpecimenInstitute } from "../../shared.js";
+import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, ship, searchSpecimenInstitute, searchSpecimenInstitute, getSpecimensByRequestedSite } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -16,11 +16,10 @@ export const packagesInTransitScreen = async (auth, route) => {
 const packagesInTransitTemplate = async (username, auth, route) => {
     showAnimation();
     const response = await getAllBoxes(`bptl`);
-    const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
     hideAnimation();
     
     const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
-    const searchSpecimenInstituteArray = searchSpecimenInstituteResponse.data ?? [];
+    
     let template = '';
 
     template += `
@@ -101,7 +100,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
         trackingNumberArr,
         siteSpecificLocationArr
     };
-    manifestButton([...allBoxesShippedBySiteAndNotReceived], dataObj, manifestModalBodyEl, searchSpecimenInstituteArray);
+    manifestButton([...allBoxesShippedBySiteAndNotReceived], dataObj, manifestModalBodyEl);
 };
 
 /**
@@ -185,10 +184,11 @@ const createPackagesInTransitRows = (boxes) => {
     return template;
 }
 
-const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestModalBodyEl, searchSpecimenInstituteArray) => {
+const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestModalBodyEl) => {
     const buttons = document.getElementsByClassName("manifest-button");
     const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr, trackingNumberArr, siteSpecificLocationArr } = dataObj;
     const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
+
 
     Array.from(buttons).forEach((button, index) => {
         let modalData = {
@@ -215,12 +215,14 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
         modalData.groupScannedBy = scannedByArr[index];
         modalData.groupShippedBy = shippedByArr;
         modalData.trackingNumber = trackingNumberArr[index];
-        modalData.siteSpecificLocation = siteSpecificLocationArr[index]
+        modalData.siteSpecificLocation = siteSpecificLocationArr[index];
 
         // Stringify modalData to be parsed later
         button.dataset.modal = JSON.stringify(modalData);
         button.dataset.buttonIndex = `manifest-button-${index}`;
-        button.addEventListener("click", (e) => {
+        button.addEventListener("click", async (e) => {
+            let modalBody = '';
+            manifestModalBodyEl.innerHTML = modalBody;
             const parsedModalData = JSON.parse(e.target.getAttribute("data-modal"));
             const {
                 site,
@@ -233,8 +235,13 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
                 groupShippedBy,
                 trackingNumber,
             } = parsedModalData;
-
-            const modalBody = 
+            
+            showAnimation()
+            const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
+            console.log("🚀 ~ file: packagesInTransit.js:20 ~ packagesInTransitTemplate ~ searchSpecimenInstituteResponse:", searchSpecimenInstituteResponse, "---" ,site)
+            
+            const searchSpecimenInstituteArray = searchSpecimenInstituteResponse.data ?? [];
+            modalBody = 
             `<div class="container-fluid">
                 <div class="row">
                     <div class="col-md-4">
@@ -280,7 +287,9 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
                 </div>
             </div>`;
         manifestModalBodyEl.innerHTML = modalBody;
+        console.log("searchSpecimenInstituteArray", searchSpecimenInstituteArray)
         addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteArray);
+        hideAnimation()
         });
     });
 };
