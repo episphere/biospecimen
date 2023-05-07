@@ -91,7 +91,6 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     // // Returns an array -->  array of siteLocation
     const groupByLoginSiteCidArr = groupByBoxLoginSiteCid(allBoxesShippedBySiteAndNotReceived);
 
-
     const dataObj = {
         sumSamplesArr,
         bagSamplesArr,
@@ -238,11 +237,9 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
                 loginSite
             } = parsedModalData;
             
-            
             showAnimation()
             const searchSpecimenByRequestedSiteResponse = await searchSpecimenByRequestedSite(loginSite);
             const searchSpecimenInstituteArray = searchSpecimenByRequestedSiteResponse?.data ?? [];
-
 
             modalBody = 
             `<div class="container-fluid">
