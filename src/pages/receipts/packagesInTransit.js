@@ -236,7 +236,7 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
                 trackingNumber,
                 loginSite
             } = parsedModalData;
-            
+
             showAnimation()
             const searchSpecimenByRequestedSiteResponse = await searchSpecimenByRequestedSite(loginSite);
             const searchSpecimenInstituteArray = searchSpecimenByRequestedSiteResponse?.data ?? [];
@@ -286,9 +286,9 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
                     </div>
                 </div>
             </div>`;
-        manifestModalBodyEl.innerHTML = modalBody;
-        addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteArray);
-        hideAnimation()
+            manifestModalBodyEl.innerHTML = modalBody;
+            addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteArray);
+            hideAnimation()
         });
     });
 };
