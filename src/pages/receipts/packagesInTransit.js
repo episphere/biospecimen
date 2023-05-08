@@ -89,7 +89,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     const trackingNumberArr = groupByTrackingNumber(allBoxesShippedBySiteAndNotReceived);
 
     // // Returns an array -->  array of siteLocation
-    const groupByLoginSiteCidArr = groupByBoxLoginSiteCid(allBoxesShippedBySiteAndNotReceived);
+    const groupByLoginSiteCidArr = groupByLoginSiteCid(allBoxesShippedBySiteAndNotReceived);
 
     const dataObj = {
         sumSamplesArr,
@@ -424,7 +424,7 @@ const groupByTrackingNumber = (allBoxesShippedBySiteAndNotReceived) => {
     return arrTrackingNums;
 }
 
-const groupByBoxLoginSiteCid = (allBoxesShippedBySiteAndNotReceived) => {
+const groupByLoginSiteCid = (allBoxesShippedBySiteAndNotReceived) => {
     const boxLoginSiteArr = [];
     allBoxesShippedBySiteAndNotReceived.forEach(box => {
         const boxLoginSite = box[fieldToConceptIdMapping["loginSite"]];
