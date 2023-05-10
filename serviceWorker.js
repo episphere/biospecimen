@@ -51,10 +51,10 @@ registerRoute(
   /index\.html$/,
   new NetworkFirst({
     cacheName: 'index-html-cache',
+    networkTimeoutSeconds: 3,
     plugins: [
-      new ExpirationPlugin({
-        maxEntries: 1,
-        maxAgeSeconds: 7 * 24 * 60 * 60,
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
       }),
     ],
   })
