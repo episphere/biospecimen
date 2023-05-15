@@ -20,23 +20,19 @@ export const welcomeScreen = async (auth, route) => {
     welcomeScreenTemplate(name || response.data.email, response.data, auth, route);
 }
 
-const clinicalSiteArray = ['KPNW', 'KPCO', 'KPHI', 'KPGA'];
-const researchSiteArray = ['MFC', 'UCM', 'HP', 'SFH'];
+const clinicalOnlySiteArray = ['KPNW', 'KPCO', 'KPHI', 'KPGA'];
+const researchOnlySiteArray = ['MFC', 'UCM', 'HP', 'SFH'];
 
 const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
     let dashboardSelectionStr = '';
 
-    if (location.host === urls.stage || location.host === urls.prod) {
-        researchSiteArray.push('HFHS');
-    }
-    
-    if (clinicalSiteArray.includes(data.siteAcronym)) {
+    if (clinicalOnlySiteArray.includes(data.siteAcronym)) {
         dashboardSelectionStr = `                    
             <select required disabled class="col form-control" id="dashboardSelection">
                 <option selected value="clinical">Clinical Dashboard</option>
             </select>`;
-    } else if (researchSiteArray.includes(data.siteAcronym)) {
+    } else if (researchOnlySiteArray.includes(data.siteAcronym)) {
         dashboardSelectionStr = `
             <select required disabled class="col form-control" id="dashboardSelection">
                 <option selected value="research">Research Dashboard</option>
