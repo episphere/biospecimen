@@ -535,7 +535,6 @@ const savePackagesInTransitModalData = (packagesInTransitDataObject, index, allB
         date: "",
         location: "",
         boxNumber: "",
-        bagSamplesArr,
         groupSamples: "",
         groupShippedBy: "",
         trackingNumber: "",
