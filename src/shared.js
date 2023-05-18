@@ -883,7 +883,7 @@ export const searchSpecimenByRequestedSite = async (requestedSite) => {
     }
     else {
         console.error("getSpecimensByRequestedSite's responseObject status code not 200!");
-        return { data:[] };
+        return {data:[]};
     }
 }
 
