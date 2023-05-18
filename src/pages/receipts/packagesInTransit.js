@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, ship, searchSpecimenInstitute, searchSpecimenByRequestedSite } from "../../shared.js";
+import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, ship, searchSpecimenInstitute, searchSpecimenByRequestedSite, appState } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -77,7 +77,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     const bagSamplesArr = groupSamplesArr(bagsArr);
 
     // // Returns an array -->  nested array of grouped scanned by names by index
-    const scannedByArr = groupScannedByArr(bagsArr, fieldToConceptIdMapping);
+    const scannedByArr = groupScannedByArr(bagsArr);
     
     // // Returns an array -->  nested array of grouped shipped by
     const shippedByArr = groupShippedByArr(allBoxesShippedBySiteAndNotReceived);
@@ -91,16 +91,18 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     // // Returns an array -->  array of siteLocation
     const groupByLoginSiteCidArr = groupByLoginSiteCid(allBoxesShippedBySiteAndNotReceived);
 
-    const dataObj = {
+    const packagesInTransitDataObject = {
         sumSamplesArr,
         bagSamplesArr,
         scannedByArr,
         shippedByArr,
         bagIdArr,
         trackingNumberArr,
-        groupByLoginSiteCidArr
+        groupByLoginSiteCidArr,
     };
-    manifestButton([...allBoxesShippedBySiteAndNotReceived], dataObj, manifestModalBodyEl);
+
+    appState.setState({packagesInTransitDataObject: packagesInTransitDataObject});
+    manifestButton([...allBoxesShippedBySiteAndNotReceived], bagIdArr, manifestModalBodyEl);
 };
 
 /**
@@ -110,10 +112,10 @@ const packagesInTransitTemplate = async (username, auth, route) => {
  */
 export const getRecentBoxesShippedBySiteNotReceived = (boxes) => {
   // boxes are from searchBoxes endpoint
-  if(boxes.length === 0) return []
-  const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
-  const sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
-  return sortBoxesBySubmitShipmentTime;
+    if(boxes.length === 0) return []
+    const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
+    const sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
+    return sortBoxesBySubmitShipmentTime;
 }
 
 const createPackagesInTransitRows = (boxes) => {
@@ -166,7 +168,6 @@ const createPackagesInTransitRows = (boxes) => {
 
                 case 'Manifest':
                     const buttonEle = document.createElement('button');
-                    buttonEle.id = `manifest-button-${i}`
                     buttonEle.className = 'manifest-button btn-primary';
                     buttonEle.textContent = 'Manifest';
                     buttonEle.setAttribute('data-toggle', 'modal');
@@ -184,59 +185,29 @@ const createPackagesInTransitRows = (boxes) => {
     return template;
 }
 
-const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestModalBodyEl) => {
-    const buttons = document.getElementsByClassName("manifest-button");
-    const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr, trackingNumberArr, groupByLoginSiteCidArr } = dataObj;
-    const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
+const manifestButton = (allBoxesShippedBySiteAndNotReceived, bagIdArr, manifestModalBodyEl) => {
 
+    const buttons = document.getElementsByClassName("manifest-button");
+    const packagesInTransitDataObject = appState.getState().packagesInTransitDataObject;
 
     Array.from(buttons).forEach((button, index) => {
-        let modalData = {
-            site: "",
-            date: "",
-            location: "",
-            scannedByArr,
-            boxNumber: "",
-            sumSamplesArr,
-            bagSamplesArr,
-            bagIdArr,
-            groupSamples: "",
-            groupScannedBy: "",
-            groupShippedBy: "",
-            trackingNumber: "",
-            loginSite: "",
-        };
-
-        modalData.site = allBoxesShippedBySiteAndNotReceived[index].siteAcronym;
-        modalData.date = allBoxesShippedBySiteAndNotReceived[index][shippingShipDate];
-        modalData.location = allBoxesShippedBySiteAndNotReceived[index][shippingLocation];
-        modalData.boxNumber = allBoxesShippedBySiteAndNotReceived[index][shippingBoxId];
-        modalData.groupSamples = bagSamplesArr[index];
-        modalData.groupScannedBy = scannedByArr[index];
-        modalData.groupShippedBy = shippedByArr;
-        modalData.trackingNumber = trackingNumberArr[index];
-        modalData.loginSite = groupByLoginSiteCidArr[index];
-
-        // Stringify modalData to be parsed later
-        button.dataset.modal = JSON.stringify(modalData);
-        button.dataset.buttonIndex = `manifest-button-${index}`;
         button.addEventListener("click", async (e) => {
             let modalBody = '';
-            manifestModalBodyEl.innerHTML = modalBody;
-            const parsedModalData = JSON.parse(e.target.getAttribute("data-modal"));
+            savePackagesInTransitModalData(packagesInTransitDataObject, index, allBoxesShippedBySiteAndNotReceived);
+            
+            const packagesInTransitModalData = appState.getState().packagesInTransitModalData;
             const {
                 site,
                 date,
                 location,
                 boxNumber,
-                bagIdArr,
                 groupSamples,
-                groupScannedBy,
                 groupShippedBy,
                 trackingNumber,
                 loginSite
-            } = parsedModalData;
+            } = packagesInTransitModalData
 
+            manifestModalBodyEl.innerHTML = modalBody;
             showAnimation()
             const searchSpecimenByRequestedSiteResponse = await searchSpecimenByRequestedSite(loginSite);
             const searchSpecimenInstituteArray = searchSpecimenByRequestedSiteResponse?.data ?? [];
@@ -287,7 +258,7 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
                 </div>
             </div>`;
             manifestModalBodyEl.innerHTML = modalBody;
-            addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteArray);
+            addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, searchSpecimenInstituteArray);
             hideAnimation()
         });
     });
@@ -344,7 +315,7 @@ const groupSamplesArr = (bagsArr) => {
 };
 
 // NESTED GROUP SCANNED BY INDEX***
-const groupScannedByArr = (bagsArr, fieldToConceptIdMapping) => {
+const groupScannedByArr = (bagsArr) => {
     const arrNames = [];
     const { scannedByFirstName, scannedByLastName } = fieldToConceptIdMapping;
     bagsArr.forEach((bag) => {
@@ -353,33 +324,33 @@ const groupScannedByArr = (bagsArr, fieldToConceptIdMapping) => {
             let groupNames = [];
             for (let j = 0; j < Object.keys(bag).length; j++) {
               // First name and last name exist
-              if(bag[Object.keys(bag)[j]][scannedByFirstName] && bag[Object.keys(bag)[j]][scannedByLastName]){
+                if(bag[Object.keys(bag)[j]][scannedByFirstName] && bag[Object.keys(bag)[j]][scannedByLastName]){
                 groupNames.push([
-                  bag[Object.keys(bag)[j]][scannedByFirstName] +
-                  " " +
-                  bag[Object.keys(bag)[j]][scannedByLastName],]);
+                    bag[Object.keys(bag)[j]][scannedByFirstName] +
+                    " " +
+                    bag[Object.keys(bag)[j]][scannedByLastName],]);
                 if (j === Object.keys(bag).length - 1) {
                   // COMBINE TWO SEPARATE ARRAYS OF FULL NAME INTO ONE ARRAY
-                  groupNames.concat([
-                      bag[Object.keys(bag)[j]][scannedByFirstName] +
-                      " " +
-                      bag[Object.keys(bag)[j]][scannedByLastName],]);
-                  arrNames.push(groupNames);
+                    groupNames.concat([
+                        bag[Object.keys(bag)[j]][scannedByFirstName] +
+                        " " +
+                        bag[Object.keys(bag)[j]][scannedByLastName],]);
+                    arrNames.push(groupNames);
+                    }
                 }
-              }
               // only First name exists
-              else if(bag[Object.keys(bag)[j]][scannedByFirstName]) {
+                else if(bag[Object.keys(bag)[j]][scannedByFirstName]) {
                 groupNames.push([
-                  bag[Object.keys(bag)[j]][scannedByFirstName],
+                    bag[Object.keys(bag)[j]][scannedByFirstName],
                 ]);
                 if (j === Object.keys(bag).length - 1) {
                   // COMBINE TWO SEPARATE ARRAYS OF FULL NAME INTO ONE ARRAY
-                  groupNames.concat([
-                      bag[Object.keys(bag)[j]][scannedByFirstName],
-                  ]);
-                  arrNames.push(groupNames);
+                    groupNames.concat([
+                        bag[Object.keys(bag)[j]][scannedByFirstName],
+                    ]);
+                    arrNames.push(groupNames);
                 }
-              } 
+                } 
             }
         } else {
             arrNames.push([]);
@@ -389,19 +360,19 @@ const groupScannedByArr = (bagsArr, fieldToConceptIdMapping) => {
 };
 
 const groupShippedByArr = (allBoxesShippedBySiteAndNotReceived) => {
-  const arrShippedBy = []
-  allBoxesShippedBySiteAndNotReceived.forEach(box => {
+    const arrShippedBy = [];
+    allBoxesShippedBySiteAndNotReceived.forEach(box => {
     let shippedByFirstName = box[fieldToConceptIdMapping.shippedByFirstName].trim()
     let shippedByLastName = box[fieldToConceptIdMapping.shippedByLastName]?.trim() ?? ''
     if (shippedByFirstName.length > 0 && shippedByLastName > 0) {
-      arrShippedBy.push(shippedByFirstName + " " + shippedByLastName)
+        arrShippedBy.push(shippedByFirstName + " " + shippedByLastName)
     }
     else if (shippedByFirstName.length > 0) {
-      arrShippedBy.push(shippedByFirstName)
+        arrShippedBy.push(shippedByFirstName)
     }
-    else arrShippedBy.push("")
-  })
-  return arrShippedBy
+    else arrShippedBy.push("");
+    });
+    return arrShippedBy
 }
 
 // NESTED GROUP BAGS BY INDEX***
@@ -416,10 +387,10 @@ const groupBagIdArr = (bagsArr) => {
 const groupByTrackingNumber = (allBoxesShippedBySiteAndNotReceived) => {
     const arrTrackingNums = []
     allBoxesShippedBySiteAndNotReceived.forEach((box,index) => {
-      if(box[fieldToConceptIdMapping["shippingTrackingNumber"]]) {
-        let trackingNumber = box[fieldToConceptIdMapping["shippingTrackingNumber"]]
-        arrTrackingNums.push(trackingNumber)
-      }
+        if(box[fieldToConceptIdMapping["shippingTrackingNumber"]]) {
+            let trackingNumber = box[fieldToConceptIdMapping["shippingTrackingNumber"]]
+            arrTrackingNums.push(trackingNumber)
+        }
     })
     return arrTrackingNums;
 }
@@ -433,7 +404,7 @@ const groupByLoginSiteCid = (allBoxesShippedBySiteAndNotReceived) => {
     return boxLoginSiteArr;
 }
 
-const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteArray) => {
+const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, searchSpecimenInstituteArray) => {
     const manifestBody = '';
     const manifestModalTableBodyEl = document.getElementById('manifestModalTableBody');
     const packagesInTransitModalTableHeaderRowEl = document.getElementById('packagesInTransitModalTableHeaderRow');
@@ -531,9 +502,9 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupSca
                             default:
                                 cellEl.textContent = '';
                         }
-                        tableRowEl.appendChild(cellEl)
+                        tableRowEl.appendChild(cellEl);
                     }
-                    manifestModalTableBodyEl.appendChild(tableRowEl)
+                    manifestModalTableBodyEl.appendChild(tableRowEl);
                 }
             }
         }
@@ -542,8 +513,43 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupSca
 
 const tempProbeFound = (tempProbe) => {
     const options = {
-      '104430631': 'No',
-      '353358909': 'Yes'
+        '104430631': 'No',
+        '353358909': 'Yes'
     };
     return options[tempProbe] || '';
-  };
+};
+
+/**
+ * Creates the object packagesInTransitModalData and stores it in state
+ * @param {object} packagesInTransitDataObject - stored object in state with array values for each key, ex. { sumSamplesArr: [], bagSamplesArr: [], ... } 
+ * @param {number} index - index of modal button 
+ * @param {array} allBoxesShippedBySiteAndNotReceived - array of objects with all boxes shipped by site and not received sorted by most recent data
+*/
+
+const savePackagesInTransitModalData = (packagesInTransitDataObject, index, allBoxesShippedBySiteAndNotReceived ) => {
+    const { bagSamplesArr, shippedByArr, trackingNumberArr, groupByLoginSiteCidArr } = packagesInTransitDataObject
+    const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
+    
+    let packagesInTransitModalData = {
+        site: "",
+        date: "",
+        location: "",
+        boxNumber: "",
+        bagSamplesArr,
+        groupSamples: "",
+        groupShippedBy: "",
+        trackingNumber: "",
+        loginSite: "",
+    }
+
+    packagesInTransitModalData.site = allBoxesShippedBySiteAndNotReceived[index].siteAcronym;
+    packagesInTransitModalData.date = allBoxesShippedBySiteAndNotReceived[index][shippingShipDate];
+    packagesInTransitModalData.location = allBoxesShippedBySiteAndNotReceived[index][shippingLocation];
+    packagesInTransitModalData.boxNumber = allBoxesShippedBySiteAndNotReceived[index][shippingBoxId];
+    packagesInTransitModalData.groupSamples = bagSamplesArr[index];
+    packagesInTransitModalData.groupShippedBy = shippedByArr;
+    packagesInTransitModalData.trackingNumber = trackingNumberArr[index];
+    packagesInTransitModalData.loginSite = groupByLoginSiteCidArr[index];
+
+    appState.setState({ packagesInTransitModalData: packagesInTransitModalData });
+}

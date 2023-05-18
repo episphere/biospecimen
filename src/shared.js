@@ -866,7 +866,7 @@ export const searchSpecimenInstitute = async () => {
 /**
  * Fetches biospecimen collection data from the database via login site number 
  * @param {number} login site number
- * @returns {object|array} returns a response object if response is 200 or an empty array
+ * @returns {object} returns a response object
  * 
  */
 export const searchSpecimenByRequestedSite = async (requestedSite) => {
@@ -883,7 +883,7 @@ export const searchSpecimenByRequestedSite = async (requestedSite) => {
     }
     else {
         console.error("getSpecimensByRequestedSite's responseObject status code not 200!");
-        return [];
+        return { data:[] };
     }
 }
 
