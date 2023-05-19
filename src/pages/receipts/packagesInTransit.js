@@ -39,11 +39,8 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 
     appState.setState({packagesInTransitDataObject: packagesInTransitDataObject});
 
-
-
-    
     let template = '';
-
+    
     template += `
     ${receiptsNavbar()}
     <div class="container-fluid">
@@ -308,9 +305,6 @@ const groupSamplesArr = (bagsArr) => {
     return arrSamples;
 };
 
-// NESTED GROUP SCANNED BY INDEX***
-// // Returns an array -->  nested array of grouped scanned by names by index
-
 /**
  * Loops through each grouped bag and pushes the scanned by names in each bag to an array
  * @param {array} bagsArr - Array of grouped bags. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
@@ -442,7 +436,7 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, searchSp
                         let currTubeDeviationArrayCounter = 0;
 
                         const currFullSpecimenId = currFullSpecimenIdArray[rowIndex];
-                        const currSpecimenComments = getSpecimenComments(searchSpecimenInstituteArray, currFullSpecimenId)
+                        const currSpecimenComments = getSpecimenComments(searchSpecimenInstituteArray, currFullSpecimenId);
 
                         switch (headerName) {
 
