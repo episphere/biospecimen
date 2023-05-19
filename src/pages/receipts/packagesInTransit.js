@@ -1,10 +1,10 @@
-import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, ship, searchSpecimenInstitute } from "../../shared.js";
+import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, ship, searchSpecimenInstitute, searchSpecimenByRequestedSite, appState } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 import { convertTime } from "../../shared.js";
-import { getSpecimenDeviation, getSpecimenComments} from "../../events.js";
+import { getSpecimenDeviation, getSpecimenComments } from "../../events.js";
 
 export const packagesInTransitScreen = async (auth, route) => {
     const user = auth.currentUser;
@@ -16,13 +16,31 @@ export const packagesInTransitScreen = async (auth, route) => {
 const packagesInTransitTemplate = async (username, auth, route) => {
     showAnimation();
     const response = await getAllBoxes(`bptl`);
-    const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
     hideAnimation();
     
     const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
-    const searchSpecimenInstituteArray = searchSpecimenInstituteResponse.data ?? [];
-    let template = '';
+    const bagsArr = groupAllBags(allBoxesShippedBySiteAndNotReceived);
+    const sumSamplesArr = countSamplesArr(bagsArr);
+    const bagSamplesArr = groupSamplesArr(bagsArr);
+    const scannedByArr = groupScannedByArr(bagsArr);
+    const shippedByArr = groupShippedByArr(allBoxesShippedBySiteAndNotReceived);
+    const bagIdArr = groupBagIdArr(bagsArr);
+    const trackingNumberArr = groupByTrackingNumber(allBoxesShippedBySiteAndNotReceived);
+    const groupByLoginSiteCidArr = groupByLoginSiteCid(allBoxesShippedBySiteAndNotReceived);
+    const packagesInTransitDataObject = {
+        sumSamplesArr,
+        bagSamplesArr,
+        scannedByArr,
+        shippedByArr,
+        bagIdArr,
+        trackingNumberArr,
+        groupByLoginSiteCidArr,
+    };
 
+    appState.setState({packagesInTransitDataObject: packagesInTransitDataObject});
+
+    let template = '';
+    
     template += `
     ${receiptsNavbar()}
     <div class="container-fluid">
@@ -64,44 +82,10 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
     activeReceiptsNavbar();
-    createPackagesInTransitRows(allBoxesShippedBySiteAndNotReceived);
+    createPackagesInTransitRows(allBoxesShippedBySiteAndNotReceived, sumSamplesArr);
 
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");
-
-    // // Return an array of an item of grouped bags from GET request***
-    const bagsArr = groupAllBags(allBoxesShippedBySiteAndNotReceived);
-
-    // // Returns an array of summed and grouped bag samples
-    const sumSamplesArr = countSamplesArr(bagsArr);
-
-    // // Returns an array --> nested array of grouped samples by index
-    const bagSamplesArr = groupSamplesArr(bagsArr);
-
-    // // Returns an array -->  nested array of grouped scanned by names by index
-    const scannedByArr = groupScannedByArr(bagsArr, fieldToConceptIdMapping);
-    
-    // // Returns an array -->  nested array of grouped shipped by
-    const shippedByArr = groupShippedByArr(allBoxesShippedBySiteAndNotReceived);
-
-    // // Returns an array -->  nested array of bag Ids names by index
-    const bagIdArr = groupBagIdArr(bagsArr);
-
-    // // Returns an array -->  array of tracking numbers 
-    const trackingNumberArr = groupByTrackingNumber(allBoxesShippedBySiteAndNotReceived);
-
-    // // Returns an array -->  array of siteSpecificLocation
-    const siteSpecificLocationArr = groupBySiteSpecificLocation(allBoxesShippedBySiteAndNotReceived);
-
-    const dataObj = {
-        sumSamplesArr,
-        bagSamplesArr,
-        scannedByArr,
-        shippedByArr,
-        bagIdArr,
-        trackingNumberArr,
-        siteSpecificLocationArr
-    };
-    manifestButton([...allBoxesShippedBySiteAndNotReceived], dataObj, manifestModalBodyEl, searchSpecimenInstituteArray);
+    manifestButton([...allBoxesShippedBySiteAndNotReceived], bagIdArr, manifestModalBodyEl);
 };
 
 /**
@@ -111,17 +95,15 @@ const packagesInTransitTemplate = async (username, auth, route) => {
  */
 export const getRecentBoxesShippedBySiteNotReceived = (boxes) => {
   // boxes are from searchBoxes endpoint
-  if(boxes.length === 0) return []
-  const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
-  const sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
-  return sortBoxesBySubmitShipmentTime;
+    if(boxes.length === 0) return [];
+    const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
+    const sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
+    return sortBoxesBySubmitShipmentTime;
 }
 
-const createPackagesInTransitRows = (boxes) => {
+const createPackagesInTransitRows = (boxes, sumSamplesArr) => {
     let template = "";
     const boxesShippedNotReceived = boxes;
-    const bagsArr = groupAllBags(boxesShippedNotReceived);
-    const sumSamplesArr = countSamplesArr(bagsArr);
     const tableBodyPackagesInTransit = document.getElementById("tableBodyPackagesInTransit");
     const packagesInTransitTableHeaderRowEl = document.getElementById("packagesInTransitTableHeaderRow");
     const tableHeaderColumnNameArray = Array.from(packagesInTransitTableHeaderRowEl.children);
@@ -167,7 +149,6 @@ const createPackagesInTransitRows = (boxes) => {
 
                 case 'Manifest':
                     const buttonEle = document.createElement('button');
-                    buttonEle.id = `manifest-button-${i}`
                     buttonEle.className = 'manifest-button btn-primary';
                     buttonEle.textContent = 'Manifest';
                     buttonEle.setAttribute('data-toggle', 'modal');
@@ -185,56 +166,34 @@ const createPackagesInTransitRows = (boxes) => {
     return template;
 }
 
-const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestModalBodyEl, searchSpecimenInstituteArray) => {
+const manifestButton = (allBoxesShippedBySiteAndNotReceived, bagIdArr, manifestModalBodyEl) => {
+
     const buttons = document.getElementsByClassName("manifest-button");
-    const { sumSamplesArr, bagSamplesArr, scannedByArr, shippedByArr, bagIdArr, trackingNumberArr, siteSpecificLocationArr } = dataObj;
-    const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
+    const packagesInTransitDataObject = appState.getState().packagesInTransitDataObject;
 
     Array.from(buttons).forEach((button, index) => {
-        let modalData = {
-            site: "",
-            date: "",
-            location: "",
-            scannedByArr,
-            boxNumber: "",
-            sumSamplesArr,
-            bagSamplesArr,
-            bagIdArr,
-            groupSamples: "",
-            groupScannedBy: "",
-            groupShippedBy: "",
-            trackingNumber: "",
-            siteSpecificLocation: "",
-        };
-
-        modalData.site = allBoxesShippedBySiteAndNotReceived[index].siteAcronym;
-        modalData.date = allBoxesShippedBySiteAndNotReceived[index][shippingShipDate];
-        modalData.location = allBoxesShippedBySiteAndNotReceived[index][shippingLocation];
-        modalData.boxNumber = allBoxesShippedBySiteAndNotReceived[index][shippingBoxId];
-        modalData.groupSamples = bagSamplesArr[index];
-        modalData.groupScannedBy = scannedByArr[index];
-        modalData.groupShippedBy = shippedByArr;
-        modalData.trackingNumber = trackingNumberArr[index];
-        modalData.siteSpecificLocation = siteSpecificLocationArr[index]
-
-        // Stringify modalData to be parsed later
-        button.dataset.modal = JSON.stringify(modalData);
-        button.dataset.buttonIndex = `manifest-button-${index}`;
-        button.addEventListener("click", (e) => {
-            const parsedModalData = JSON.parse(e.target.getAttribute("data-modal"));
+        button.addEventListener("click", async (e) => {
+            let modalBody = '';
+            savePackagesInTransitModalData(packagesInTransitDataObject, index, allBoxesShippedBySiteAndNotReceived);
+            
+            const packagesInTransitModalData = appState.getState().packagesInTransitModalData;
             const {
                 site,
                 date,
                 location,
                 boxNumber,
-                bagIdArr,
                 groupSamples,
-                groupScannedBy,
                 groupShippedBy,
                 trackingNumber,
-            } = parsedModalData;
+                loginSite
+            } = packagesInTransitModalData
 
-            const modalBody = 
+            manifestModalBodyEl.innerHTML = modalBody;
+            showAnimation()
+            const searchSpecimenByRequestedSiteResponse = await searchSpecimenByRequestedSite(loginSite);
+            const searchSpecimenInstituteArray = searchSpecimenByRequestedSiteResponse?.data ?? [];
+
+            modalBody = 
             `<div class="container-fluid">
                 <div class="row">
                     <div class="col-md-4">
@@ -279,153 +238,167 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, dataObj, manifestMo
                     </div>
                 </div>
             </div>`;
-        manifestModalBodyEl.innerHTML = modalBody;
-        addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteArray);
+            manifestModalBodyEl.innerHTML = modalBody;
+            addManifestTableRows(boxNumber, bagIdArr, index, groupSamples, searchSpecimenInstituteArray);
+            hideAnimation()
         });
     });
 };
 
-// Return an array of an item of grouped bags from GET request***
+/**
+ * Loops through each box from allBoxesShippedBySiteAndNotReceived array with an existing bag key and pushes bags object to an array
+ * @param {array} allBoxesShippedBySiteAndNotReceived
+ * @returns {array} Returns an array of all grouped bags. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+*/
 const groupAllBags = (allBoxesShippedBySiteAndNotReceived) => {
     const arrBoxes = [];
-    // Object.keys --> Copies Keys and stores into array
-    // If Key(bags) has a length push bag of objects, else an empty {}
     allBoxesShippedBySiteAndNotReceived.forEach((box) => {
-        Object.keys(box.bags).length ? arrBoxes.push(box.bags) : arrBoxes.push(box.bags)
+        const specimenBags = Object.keys(box.bags);
+        if(specimenBags.length) {
+            arrBoxes.push(box.bags);
+        }
     });
     return arrBoxes;
 };
 
+/**
+ * Loops through each grouped bag and sums the number of samples/specimens in each bag
+ * @param {array} bagsArr - Array of grouped bags. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of summed grouped bag samples. Ex. [1, 6, 5, ...]
+*/
 const countSamplesArr = (bagsArr) => {
-    const arrNumSamples = [];
-    bagsArr.forEach((bag) => {
-        //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
-        if (Object.keys(bag).length) {
-            let sampleNumber = 0;
-            for (let j = 0; j < Object.keys(bag).length; j++) {
-                sampleNumber += bag[Object.keys(bag)[j]].arrElements.length;
-                if (j === Object.keys(bag).length - 1) {
-                    arrNumSamples.push(sampleNumber);
-                }
+    const arrNumSamples = bagsArr.map((groupBag) => {
+        let sampleNumber = 0;
+        const groupBagKeys = Object.keys(groupBag);
+
+        if (groupBagKeys.length) {
+            for (let bag of groupBagKeys) {
+                let bagSamples = groupBag[bag].arrElements
+                sampleNumber += bagSamples.length;
             }
-        } else {
-            arrNumSamples.push(0);
+            return sampleNumber;
         }
     });
     return arrNumSamples;
 };
 
+// // Returns an array --> nested array of grouped samples by index
+/**
+ * Loops through each grouped bag and pushes the samples/specimens in each bag to an array
+ * @param {array} bagsArr - Array of grouped bags. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of grouped bag samples. Ex. [[{…}], [{…}, {…}], ...]
+*/
+
 const groupSamplesArr = (bagsArr) => {
     const arrSamples = [];
-    bagsArr.forEach((bag) => {
-        //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
-        if (Object.keys(bag).length) {
-            let groupSamples = [];
-            for (let j = 0; j < Object.keys(bag).length; j++) {
-                groupSamples.push(bag[Object.keys(bag)[j]].arrElements);
-                if (j === Object.keys(bag).length - 1) {
-                    groupSamples.concat(bag[Object.keys(bag)[j]].arrElements);
-                    arrSamples.push(groupSamples);
-                }
+    bagsArr.forEach((groupBag) => {
+        let groupSamples = [];
+        const bagKeys = Object.keys(groupBag);
+
+        if (bagKeys.length) {
+            for (let bag of bagKeys) {
+                groupSamples.push(groupBag[bag].arrElements)
             }
-        } else {
-            arrSamples.push([]);
+            arrSamples.push(groupSamples);
         }
     });
     return arrSamples;
 };
 
-// NESTED GROUP SCANNED BY INDEX***
-const groupScannedByArr = (bagsArr, fieldToConceptIdMapping) => {
-    const arrNames = [];
+/**
+ * Loops through each grouped bag and pushes the scanned by names in each bag to an array
+ * @param {array} bagsArr - Array of grouped bags. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of grouped bag scanned by names. Ex. [[""], ["", ""], ...]
+*/
+const groupScannedByArr = (bagsArr) => {
     const { scannedByFirstName, scannedByLastName } = fieldToConceptIdMapping;
+    const arrNames = [];
     bagsArr.forEach((bag) => {
-        //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
-        if (Object.keys(bag).length) {
-            let groupNames = [];
-            for (let j = 0; j < Object.keys(bag).length; j++) {
-              // First name and last name exist
-              if(bag[Object.keys(bag)[j]][scannedByFirstName] && bag[Object.keys(bag)[j]][scannedByLastName]){
-                groupNames.push([
-                  bag[Object.keys(bag)[j]][scannedByFirstName] +
-                  " " +
-                  bag[Object.keys(bag)[j]][scannedByLastName],]);
-                if (j === Object.keys(bag).length - 1) {
-                  // COMBINE TWO SEPARATE ARRAYS OF FULL NAME INTO ONE ARRAY
-                  groupNames.concat([
-                      bag[Object.keys(bag)[j]][scannedByFirstName] +
-                      " " +
-                      bag[Object.keys(bag)[j]][scannedByLastName],]);
-                  arrNames.push(groupNames);
-                }
-              }
-              // only First name exists
-              else if(bag[Object.keys(bag)[j]][scannedByFirstName]) {
-                groupNames.push([
-                  bag[Object.keys(bag)[j]][scannedByFirstName],
-                ]);
-                if (j === Object.keys(bag).length - 1) {
-                  // COMBINE TWO SEPARATE ARRAYS OF FULL NAME INTO ONE ARRAY
-                  groupNames.concat([
-                      bag[Object.keys(bag)[j]][scannedByFirstName],
-                  ]);
-                  arrNames.push(groupNames);
-                }
-              } 
+        let groupNames = [];
+        const bagKeys = Object.keys(bag);
+
+        bagKeys.forEach((bagKey) => {
+            const currentBag = bag[bagKey];
+            if(currentBag[scannedByFirstName] && currentBag[scannedByLastName]) {
+                groupNames.push(currentBag[scannedByFirstName] + " " + currentBag[scannedByLastName]);
             }
-        } else {
-            arrNames.push([]);
-        }
+            else if(currentBag[scannedByFirstName]) {
+                groupNames.push(currentBag[scannedByFirstName]);
+            }
+        });
+        arrNames.push(groupNames.length ? groupNames : []);
     });
     return arrNames;
 };
 
+/**
+ * Loops through each box from allBoxesShippedBySiteAndNotReceived and pushes shipper's identity to an array 
+ * @param {array} allBoxesShippedBySiteAndNotReceived - Array of grouped boxes. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of shipper identities. Ex.["shipper1", "shipper2", ...]
+ * 
+*/
 const groupShippedByArr = (allBoxesShippedBySiteAndNotReceived) => {
-  const arrShippedBy = []
-  allBoxesShippedBySiteAndNotReceived.forEach(box => {
+    const arrShippedBy = [];
+    allBoxesShippedBySiteAndNotReceived.forEach(box => {
     let shippedByFirstName = box[fieldToConceptIdMapping.shippedByFirstName].trim()
     let shippedByLastName = box[fieldToConceptIdMapping.shippedByLastName]?.trim() ?? ''
     if (shippedByFirstName.length > 0 && shippedByLastName > 0) {
-      arrShippedBy.push(shippedByFirstName + " " + shippedByLastName)
+        arrShippedBy.push(shippedByFirstName + " " + shippedByLastName)
     }
     else if (shippedByFirstName.length > 0) {
-      arrShippedBy.push(shippedByFirstName)
+        arrShippedBy.push(shippedByFirstName)
     }
-    else arrShippedBy.push("")
-  })
-  return arrShippedBy
+    else arrShippedBy.push("");
+    });
+    return arrShippedBy
 }
 
-// NESTED GROUP BAGS BY INDEX***
+/**
+ * Loops through each box and adds bag ids to an array
+ * @param {array} allBoxesShippedBySiteAndNotReceived - Array of grouped boxes. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of grouped bag ids. Ex.[["CXA456873 0009"], ["CXA458003 0008", "CXA458003 0009"], ...]
+*/
 const groupBagIdArr = (bagsArr) => {
     const arrBagId = [];
-    bagsArr.forEach((bag, index) => {
-        arrBagId.push(Object.keys(bag));
+    bagsArr.forEach((bag) => {
+        const bagKeys = Object.keys(bag);
+        arrBagId.push(bagKeys);
     });
     return arrBagId;
 };
 
+/**
+ * Loops through each box and adds tracking number of box to an array
+ * @param {array} allBoxesShippedBySiteAndNotReceived - Array of grouped boxes. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of tracking number strings. Ex.["123456789999", "123321456654", ...] 
+ */
 const groupByTrackingNumber = (allBoxesShippedBySiteAndNotReceived) => {
     const arrTrackingNums = []
-    allBoxesShippedBySiteAndNotReceived.forEach((box,index) => {
-      if(box[fieldToConceptIdMapping["shippingTrackingNumber"]]) {
-        let trackingNumber = box[fieldToConceptIdMapping["shippingTrackingNumber"]]
-        arrTrackingNums.push(trackingNumber)
-      }
+    allBoxesShippedBySiteAndNotReceived.forEach((box) => {
+        if(box[fieldToConceptIdMapping["shippingTrackingNumber"]]) {
+            let trackingNumber = box[fieldToConceptIdMapping["shippingTrackingNumber"]]
+            arrTrackingNums.push(trackingNumber)
+        }
     })
     return arrTrackingNums;
 }
 
-const groupBySiteSpecificLocation = (allBoxesShippedBySiteAndNotReceived) => {
-    const siteSpecificLocationArr = [];
+/**
+ * Loops through each box and adds login site to an array
+ * @param {array} allBoxesShippedBySiteAndNotReceived - Array of grouped boxes. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of login site numbers as a number data type. Ex.[ 13, 303349821, ...]
+*/ 
+const groupByLoginSiteCid = (allBoxesShippedBySiteAndNotReceived) => {
+    const { loginSite } = fieldToConceptIdMapping;
+    const boxLoginSiteArr = [];
     allBoxesShippedBySiteAndNotReceived.forEach(box => {
-        const siteSpecificLocation = box[fieldToConceptIdMapping["shippingLocation"]];
-        if (siteSpecificLocation) siteSpecificLocationArr.push(siteSpecificLocation);
+        const boxLoginSite = box[loginSite];
+        if (boxLoginSite) boxLoginSiteArr.push(boxLoginSite);
     })
-    return siteSpecificLocationArr;
+    return boxLoginSiteArr;
 }
 
-const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupScannedBy, searchSpecimenInstituteArray) => {
+const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, searchSpecimenInstituteArray) => {
     const manifestBody = '';
     const manifestModalTableBodyEl = document.getElementById('manifestModalTableBody');
     const packagesInTransitModalTableHeaderRowEl = document.getElementById('packagesInTransitModalTableHeaderRow');
@@ -463,7 +436,7 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupSca
                         let currTubeDeviationArrayCounter = 0;
 
                         const currFullSpecimenId = currFullSpecimenIdArray[rowIndex];
-                        const currSpecimenComments = getSpecimenComments(searchSpecimenInstituteArray, currFullSpecimenId)
+                        const currSpecimenComments = getSpecimenComments(searchSpecimenInstituteArray, currFullSpecimenId);
 
                         switch (headerName) {
 
@@ -523,9 +496,9 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupSca
                             default:
                                 cellEl.textContent = '';
                         }
-                        tableRowEl.appendChild(cellEl)
+                        tableRowEl.appendChild(cellEl);
                     }
-                    manifestModalTableBodyEl.appendChild(tableRowEl)
+                    manifestModalTableBodyEl.appendChild(tableRowEl);
                 }
             }
         }
@@ -534,8 +507,42 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, groupSca
 
 const tempProbeFound = (tempProbe) => {
     const options = {
-      '104430631': 'No',
-      '353358909': 'Yes'
+        '104430631': 'No',
+        '353358909': 'Yes'
     };
     return options[tempProbe] || '';
-  };
+};
+
+/**
+ * Creates the object packagesInTransitModalData and stores it in state
+ * @param {object} packagesInTransitDataObject - stored object in state with array values for each key, ex. { sumSamplesArr: [], bagSamplesArr: [], ... } 
+ * @param {number} index - index of modal button 
+ * @param {array} allBoxesShippedBySiteAndNotReceived - array of objects with all boxes shipped by site and not received sorted by most recent data
+*/
+
+const savePackagesInTransitModalData = (packagesInTransitDataObject, index, allBoxesShippedBySiteAndNotReceived ) => {
+    const { bagSamplesArr, shippedByArr, trackingNumberArr, groupByLoginSiteCidArr } = packagesInTransitDataObject
+    const { shippingShipDate, shippingLocation, shippingBoxId } = fieldToConceptIdMapping;
+    
+    let packagesInTransitModalData = {
+        site: "",
+        date: "",
+        location: "",
+        boxNumber: "",
+        groupSamples: "",
+        groupShippedBy: "",
+        trackingNumber: "",
+        loginSite: "",
+    }
+
+    packagesInTransitModalData.site = allBoxesShippedBySiteAndNotReceived[index].siteAcronym;
+    packagesInTransitModalData.date = allBoxesShippedBySiteAndNotReceived[index][shippingShipDate];
+    packagesInTransitModalData.location = allBoxesShippedBySiteAndNotReceived[index][shippingLocation];
+    packagesInTransitModalData.boxNumber = allBoxesShippedBySiteAndNotReceived[index][shippingBoxId];
+    packagesInTransitModalData.groupSamples = bagSamplesArr[index];
+    packagesInTransitModalData.groupShippedBy = shippedByArr;
+    packagesInTransitModalData.trackingNumber = trackingNumberArr[index];
+    packagesInTransitModalData.loginSite = groupByLoginSiteCidArr[index];
+
+    appState.setState({ packagesInTransitModalData: packagesInTransitModalData });
+}

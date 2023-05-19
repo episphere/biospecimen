@@ -844,7 +844,7 @@ export const removeBag = async(boxId, bags) => {
  * @returns {object|array} returns a response object if response is 200 or an empty array
  * 
  */
-export const searchSpecimenInstitute = async() => {
+export const searchSpecimenInstitute = async () => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen`, {
     method: "GET",
@@ -860,6 +860,30 @@ export const searchSpecimenInstitute = async() => {
     else {
         console.error("searchSpecimenInstitute's responseObject status code not 200!");
         return [];
+    }
+}
+
+/**
+ * Fetches biospecimen collection data from the database via login site number 
+ * @param {number} login site number
+ * @returns {object} returns a response object
+ * 
+ */
+export const searchSpecimenByRequestedSite = async (requestedSite) => {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}`, {
+    method: "GET",
+    headers: {
+        Authorization:"Bearer "+idToken
+        }
+    });
+    if (response.status === 200) {
+        const responseObject = await response.json();
+        return responseObject;
+    }
+    else {
+        console.error("getSpecimensByRequestedSite's responseObject status code not 200!");
+        return {data:[]};
     }
 }
 
