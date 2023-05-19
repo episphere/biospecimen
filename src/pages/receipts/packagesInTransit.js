@@ -19,6 +19,28 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     hideAnimation();
     
     const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
+    const bagsArr = groupAllBags(allBoxesShippedBySiteAndNotReceived);
+    const sumSamplesArr = countSamplesArr(bagsArr);
+    const bagSamplesArr = groupSamplesArr(bagsArr);
+    const scannedByArr = groupScannedByArr(bagsArr);
+    const shippedByArr = groupShippedByArr(allBoxesShippedBySiteAndNotReceived);
+    const bagIdArr = groupBagIdArr(bagsArr);
+    const trackingNumberArr = groupByTrackingNumber(allBoxesShippedBySiteAndNotReceived);
+    const groupByLoginSiteCidArr = groupByLoginSiteCid(allBoxesShippedBySiteAndNotReceived);
+    const packagesInTransitDataObject = {
+        sumSamplesArr,
+        bagSamplesArr,
+        scannedByArr,
+        shippedByArr,
+        bagIdArr,
+        trackingNumberArr,
+        groupByLoginSiteCidArr,
+    };
+
+    appState.setState({packagesInTransitDataObject: packagesInTransitDataObject});
+
+
+
     
     let template = '';
 
@@ -63,45 +85,9 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
     activeReceiptsNavbar();
-    createPackagesInTransitRows(allBoxesShippedBySiteAndNotReceived);
+    createPackagesInTransitRows(allBoxesShippedBySiteAndNotReceived, sumSamplesArr);
 
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");
-
-    // // Return an array of an item of grouped bags from GET request***
-    const bagsArr = groupAllBags(allBoxesShippedBySiteAndNotReceived);
-
-    // // Returns an array of summed and grouped bag samples
-    const sumSamplesArr = countSamplesArr(bagsArr);
-
-    // // Returns an array --> nested array of grouped samples by index
-    const bagSamplesArr = groupSamplesArr(bagsArr);
-
-    // // Returns an array -->  nested array of grouped scanned by names by index
-    const scannedByArr = groupScannedByArr(bagsArr);
-    
-    // // Returns an array -->  nested array of grouped shipped by
-    const shippedByArr = groupShippedByArr(allBoxesShippedBySiteAndNotReceived);
-
-    // // Returns an array -->  nested array of bag Ids names by index
-    const bagIdArr = groupBagIdArr(bagsArr);
-
-    // // Returns an array -->  array of tracking numbers 
-    const trackingNumberArr = groupByTrackingNumber(allBoxesShippedBySiteAndNotReceived);
-
-    // // Returns an array -->  array of siteLocation
-    const groupByLoginSiteCidArr = groupByLoginSiteCid(allBoxesShippedBySiteAndNotReceived);
-
-    const packagesInTransitDataObject = {
-        sumSamplesArr,
-        bagSamplesArr,
-        scannedByArr,
-        shippedByArr,
-        bagIdArr,
-        trackingNumberArr,
-        groupByLoginSiteCidArr,
-    };
-
-    appState.setState({packagesInTransitDataObject: packagesInTransitDataObject});
     manifestButton([...allBoxesShippedBySiteAndNotReceived], bagIdArr, manifestModalBodyEl);
 };
 
@@ -112,17 +98,15 @@ const packagesInTransitTemplate = async (username, auth, route) => {
  */
 export const getRecentBoxesShippedBySiteNotReceived = (boxes) => {
   // boxes are from searchBoxes endpoint
-    if(boxes.length === 0) return []
+    if(boxes.length === 0) return [];
     const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
     const sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
     return sortBoxesBySubmitShipmentTime;
 }
 
-const createPackagesInTransitRows = (boxes) => {
+const createPackagesInTransitRows = (boxes, sumSamplesArr) => {
     let template = "";
     const boxesShippedNotReceived = boxes;
-    const bagsArr = groupAllBags(boxesShippedNotReceived);
-    const sumSamplesArr = countSamplesArr(bagsArr);
     const tableBodyPackagesInTransit = document.getElementById("tableBodyPackagesInTransit");
     const packagesInTransitTableHeaderRowEl = document.getElementById("packagesInTransitTableHeaderRow");
     const tableHeaderColumnNameArray = Array.from(packagesInTransitTableHeaderRowEl.children);
@@ -264,101 +248,101 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, bagIdArr, manifestM
     });
 };
 
-// Return an array of an item of grouped bags from GET request***
+/**
+ * Loops through each box from allBoxesShippedBySiteAndNotReceived array with an existing bag key and pushes bags object to an array
+ * @param {array} allBoxesShippedBySiteAndNotReceived
+ * @returns {array} Returns an array of all grouped bags. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+*/
 const groupAllBags = (allBoxesShippedBySiteAndNotReceived) => {
     const arrBoxes = [];
-    // Object.keys --> Copies Keys and stores into array
-    // If Key(bags) has a length push bag of objects, else an empty {}
     allBoxesShippedBySiteAndNotReceived.forEach((box) => {
-        Object.keys(box.bags).length ? arrBoxes.push(box.bags) : arrBoxes.push(box.bags)
+        const specimenBags = Object.keys(box.bags);
+        if(specimenBags.length) {
+            arrBoxes.push(box.bags);
+        }
     });
     return arrBoxes;
 };
 
+/**
+ * Loops through each grouped bag and sums the number of samples/specimens in each bag
+ * @param {array} bagsArr - Array of grouped bags. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of summed grouped bag samples. Ex. [1, 6, 5, ...]
+*/
 const countSamplesArr = (bagsArr) => {
-    const arrNumSamples = [];
-    bagsArr.forEach((bag) => {
-        //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
-        if (Object.keys(bag).length) {
-            let sampleNumber = 0;
-            for (let j = 0; j < Object.keys(bag).length; j++) {
-                sampleNumber += bag[Object.keys(bag)[j]].arrElements.length;
-                if (j === Object.keys(bag).length - 1) {
-                    arrNumSamples.push(sampleNumber);
-                }
+    const arrNumSamples = bagsArr.map((groupBag) => {
+        let sampleNumber = 0;
+        const groupBagKeys = Object.keys(groupBag);
+
+        if (groupBagKeys.length) {
+            for (let bag of groupBagKeys) {
+                let bagSamples = groupBag[bag].arrElements
+                sampleNumber += bagSamples.length;
             }
-        } else {
-            arrNumSamples.push(0);
+            return sampleNumber;
         }
     });
     return arrNumSamples;
 };
 
+// // Returns an array --> nested array of grouped samples by index
+/**
+ * Loops through each grouped bag and pushes the samples/specimens in each bag to an array
+ * @param {array} bagsArr - Array of grouped bags. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of grouped bag samples. Ex. [[{…}], [{…}, {…}], ...]
+*/
+
 const groupSamplesArr = (bagsArr) => {
     const arrSamples = [];
-    bagsArr.forEach((bag) => {
-        //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
-        if (Object.keys(bag).length) {
-            let groupSamples = [];
-            for (let j = 0; j < Object.keys(bag).length; j++) {
-                groupSamples.push(bag[Object.keys(bag)[j]].arrElements);
-                if (j === Object.keys(bag).length - 1) {
-                    groupSamples.concat(bag[Object.keys(bag)[j]].arrElements);
-                    arrSamples.push(groupSamples);
-                }
+    bagsArr.forEach((groupBag) => {
+        let groupSamples = [];
+        const bagKeys = Object.keys(groupBag);
+
+        if (bagKeys.length) {
+            for (let bag of bagKeys) {
+                groupSamples.push(groupBag[bag].arrElements)
             }
-        } else {
-            arrSamples.push([]);
+            arrSamples.push(groupSamples);
         }
     });
     return arrSamples;
 };
 
 // NESTED GROUP SCANNED BY INDEX***
+// // Returns an array -->  nested array of grouped scanned by names by index
+
+/**
+ * Loops through each grouped bag and pushes the scanned by names in each bag to an array
+ * @param {array} bagsArr - Array of grouped bags. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of grouped bag scanned by names. Ex. [[""], ["", ""], ...]
+*/
 const groupScannedByArr = (bagsArr) => {
-    const arrNames = [];
     const { scannedByFirstName, scannedByLastName } = fieldToConceptIdMapping;
+    const arrNames = [];
     bagsArr.forEach((bag) => {
-        //DETERMINE IF ARRAY IS EMPTY, IF NOT KEEP LOOPING INSIDE, ELSE PUSH 0 VALUE***
-        if (Object.keys(bag).length) {
-            let groupNames = [];
-            for (let j = 0; j < Object.keys(bag).length; j++) {
-              // First name and last name exist
-                if(bag[Object.keys(bag)[j]][scannedByFirstName] && bag[Object.keys(bag)[j]][scannedByLastName]){
-                groupNames.push([
-                    bag[Object.keys(bag)[j]][scannedByFirstName] +
-                    " " +
-                    bag[Object.keys(bag)[j]][scannedByLastName],]);
-                if (j === Object.keys(bag).length - 1) {
-                  // COMBINE TWO SEPARATE ARRAYS OF FULL NAME INTO ONE ARRAY
-                    groupNames.concat([
-                        bag[Object.keys(bag)[j]][scannedByFirstName] +
-                        " " +
-                        bag[Object.keys(bag)[j]][scannedByLastName],]);
-                    arrNames.push(groupNames);
-                    }
-                }
-              // only First name exists
-                else if(bag[Object.keys(bag)[j]][scannedByFirstName]) {
-                groupNames.push([
-                    bag[Object.keys(bag)[j]][scannedByFirstName],
-                ]);
-                if (j === Object.keys(bag).length - 1) {
-                  // COMBINE TWO SEPARATE ARRAYS OF FULL NAME INTO ONE ARRAY
-                    groupNames.concat([
-                        bag[Object.keys(bag)[j]][scannedByFirstName],
-                    ]);
-                    arrNames.push(groupNames);
-                }
-                } 
+        let groupNames = [];
+        const bagKeys = Object.keys(bag);
+
+        bagKeys.forEach((bagKey) => {
+            const currentBag = bag[bagKey];
+            if(currentBag[scannedByFirstName] && currentBag[scannedByLastName]) {
+                groupNames.push(currentBag[scannedByFirstName] + " " + currentBag[scannedByLastName]);
             }
-        } else {
-            arrNames.push([]);
-        }
+            else if(currentBag[scannedByFirstName]) {
+                groupNames.push(currentBag[scannedByFirstName]);
+            }
+        });
+        arrNames.push(groupNames.length ? groupNames : []);
     });
     return arrNames;
 };
 
+/**
+ * Loops through each box from allBoxesShippedBySiteAndNotReceived and pushes shipper's identity to an array 
+ * @param {array} allBoxesShippedBySiteAndNotReceived - Array of grouped boxes. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of shipper identities. Ex.["shipper1", "shipper2", ...]
+ * 
+*/
 const groupShippedByArr = (allBoxesShippedBySiteAndNotReceived) => {
     const arrShippedBy = [];
     allBoxesShippedBySiteAndNotReceived.forEach(box => {
@@ -375,18 +359,28 @@ const groupShippedByArr = (allBoxesShippedBySiteAndNotReceived) => {
     return arrShippedBy
 }
 
-// NESTED GROUP BAGS BY INDEX***
+/**
+ * Loops through each box and adds bag ids to an array
+ * @param {array} allBoxesShippedBySiteAndNotReceived - Array of grouped boxes. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of grouped bag ids. Ex.[["CXA456873 0009"], ["CXA458003 0008", "CXA458003 0009"], ...]
+*/
 const groupBagIdArr = (bagsArr) => {
     const arrBagId = [];
-    bagsArr.forEach((bag, index) => {
-        arrBagId.push(Object.keys(bag));
+    bagsArr.forEach((bag) => {
+        const bagKeys = Object.keys(bag);
+        arrBagId.push(bagKeys);
     });
     return arrBagId;
 };
 
+/**
+ * Loops through each box and adds tracking number of box to an array
+ * @param {array} allBoxesShippedBySiteAndNotReceived - Array of grouped boxes. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of tracking number strings. Ex.["123456789999", "123321456654", ...] 
+ */
 const groupByTrackingNumber = (allBoxesShippedBySiteAndNotReceived) => {
     const arrTrackingNums = []
-    allBoxesShippedBySiteAndNotReceived.forEach((box,index) => {
+    allBoxesShippedBySiteAndNotReceived.forEach((box) => {
         if(box[fieldToConceptIdMapping["shippingTrackingNumber"]]) {
             let trackingNumber = box[fieldToConceptIdMapping["shippingTrackingNumber"]]
             arrTrackingNums.push(trackingNumber)
@@ -395,10 +389,16 @@ const groupByTrackingNumber = (allBoxesShippedBySiteAndNotReceived) => {
     return arrTrackingNums;
 }
 
+/**
+ * Loops through each box and adds login site to an array
+ * @param {array} allBoxesShippedBySiteAndNotReceived - Array of grouped boxes. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
+ * @returns {array} Returns an array of login site numbers as a number data type. Ex.[ 13, 303349821, ...]
+*/ 
 const groupByLoginSiteCid = (allBoxesShippedBySiteAndNotReceived) => {
+    const { loginSite } = fieldToConceptIdMapping;
     const boxLoginSiteArr = [];
     allBoxesShippedBySiteAndNotReceived.forEach(box => {
-        const boxLoginSite = box[fieldToConceptIdMapping["loginSite"]];
+        const boxLoginSite = box[loginSite];
         if (boxLoginSite) boxLoginSiteArr.push(boxLoginSite);
     })
     return boxLoginSiteArr;
