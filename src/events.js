@@ -3087,9 +3087,10 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenI
     let bagObjects = boxIdAndBagsObj[boxId];
     let bagList = Object.keys(bagObjects);
     let rowCount = 1;
-    
+
     for (let i = 0; i < bagList.length; i++) {
         let tubes = bagObjects[bagList[i]]['arrElements'];
+
         for (let j = 0; j < tubes.length; j++) {
             const currTube = tubes[j];
             let currRow = currTable.insertRow(rowCount);
@@ -3115,32 +3116,7 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenI
             if (bagObjects[bagList[i]].hasOwnProperty('618036638') && j == 0) {
                 fullScannerName += bagObjects[bagList[i]]['618036638'];
             }
-
-            if (currTube) {
-                const acceptedDeviationArray = getSpecimenDeviation(searchSpecimenInstituteArray, currTube);
-                const currTubeComments = getSpecimenComments(searchSpecimenInstituteArray, currTube)
-                let deviationString = '';
-
-                const deviationTypeCell = currRow.insertCell(3);
-                deviationTypeCell.classList.add("deviation-type-cell");
-                const commentCell = currRow.insertCell(4);
-                commentCell.classList.add("comments-cell");
-
-                if (acceptedDeviationArray.length >= 1) {
-                    for (const deviationLabel of acceptedDeviationArray) {
-                        deviationString += `${deviationLabel} <br><br>`;
-                    }
-                    deviationTypeCell.innerHTML = deviationString;
-                }
-                else {
-                    deviationTypeCell.innerHTML = `<br><br>`;
-                }
-
-                commentCell.innerHTML = currTubeComments;
-            }
-            if (i % 2 == 0) {
-                currRow.style['background-color'] = "lightgrey";
-            }
+            addDeviationTypeCommentsContent(searchSpecimenInstituteArray, currTube, currRow, i)
             rowCount += 1;
         }
     }
@@ -3684,36 +3660,10 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
                 fullScannerName += currBox[bags[i]]['618036638'];
             }
 
-            if (currTube) {
-                const acceptedDeviationArray = getSpecimenDeviation(searchSpecimenInstituteArray, currTube);
-                const currTubeComments = getSpecimenComments(searchSpecimenInstituteArray, currTube)
-                let deviationString = '';
-                
-                const deviationTypeCell = currRow.insertCell(3);
-                deviationTypeCell.classList.add("deviation-type-cell");
-                const commentCell = currRow.insertCell(4);
-                commentCell.classList.add("comments-cell");
-
-                if (acceptedDeviationArray.length >= 1) {
-                    for (const deviationLabel of acceptedDeviationArray) {
-                        deviationString += `${deviationLabel} <br><br>`;
-                    }
-                    deviationTypeCell.innerHTML = deviationString;
-                }
-                else {
-                    deviationTypeCell.innerHTML = `<br><br>`;
-                }
-                
-                commentCell.innerHTML = currTubeComments;
-            }
-
-            if (i % 2 == 0) {
-                currRow.style['background-color'] = "lightgrey";
-            }
+            addDeviationTypeCommentsContent(searchSpecimenInstituteArray, currTube, currRow, i);
             rowCount += 1;
         }
     }
-
 }
 
 export const addPaginationFunctionality = (lastPage, filter) => {
@@ -3851,19 +3801,19 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
 /** 
  *  Returns an array of deviation type name(s) for a single specimen tube id or an empty array if no deviation type found
  *  @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
- *  @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. [CXA321789 0001]
+ *  @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. CXA321789 0001
  *  @returns {array} Example array - ['Hemolysis present']
  *   
 */ 
 export const getSpecimenDeviation = (searchSpecimenInstituteArray, currTube) => {
+    const { collection } = conceptIds
+    const { scannedId, isCollected, isDeviated, deviation } = conceptIds.collection.tube;
     const specimenInstituteArray = searchSpecimenInstituteArray;
     const [collectionId, tubeId] = currTube.split(/\s+/);
     const tubeIdDeviationReasonArray = deviationReasons;
-    const specimenObjArray = specimenInstituteArray.filter(specimen => (specimen["820476880"] === collectionId));    
-    const { scannedId, isCollected, isDeviated, deviation } = conceptIds.collection.tube;
+    const specimenObjArray = specimenInstituteArray.filter(specimen => (specimen[collection.id] === collectionId));    
     
-    // Flatten array to single object 
-    const specimenObj = (specimenObjArray.length) ? Object.assign(...specimenObjArray) : {};
+    const specimenObj = (specimenObjArray.length > 0) ? Object.assign({}, specimenObjArray[0]) : {};
     const acceptedDeviationArr = [];
 
     for (const key in specimenObj) {
@@ -3888,13 +3838,48 @@ export const getSpecimenDeviation = (searchSpecimenInstituteArray, currTube) => 
 /**
  * Returns a string of the Full Specimen ID's comments
  * @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
- * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. [CXA321789 0001]
+ * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. CXA321789 0001
  */
 export const getSpecimenComments = (searchSpecimenInstituteArray, currTube) => {
+    const { collection } = conceptIds;
+    const deviationComments = collection.tube.deviationComments;
     const [collectionId, tubeId] = currTube.split(/\s+/);
-    const specimenObjArray = searchSpecimenInstituteArray.filter(specimen => (specimen["820476880"] === collectionId));
-    const specimenObj = (specimenObjArray.length) ? Object.assign(...specimenObjArray) : {};
+    const specimenObjArray = searchSpecimenInstituteArray.filter(specimen => (specimen[collection.id] === collectionId));
+    const specimenObj = (specimenObjArray.length) ? Object.assign({}, specimenObjArray[0]) : {};
     const tubeIdToCid = specimenCollection["numToCid"]?.[tubeId];
-    return specimenObj[tubeIdToCid]?.["536710547"] ?? "";
+    return specimenObj[tubeIdToCid]?.[deviationComments] ?? "";
 }
 
+/**
+ * Function to add content to deviation type and comments cells in the manifest table
+ * @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
+ * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. CXA321789 0001
+ * @param {object} currRow - current row of the manifest table
+ * @param {number} bagsArrayIndex - current index of the bags array
+*/
+
+const addDeviationTypeCommentsContent = (searchSpecimenInstituteArray, currTube, currRow, bagsArrayIndex) => {
+    if (currTube) {
+        const acceptedDeviationArray = getSpecimenDeviation(searchSpecimenInstituteArray, currTube);
+        const currTubeComments = getSpecimenComments(searchSpecimenInstituteArray, currTube);
+        let deviationString = '';
+        const deviationTypeCell = currRow.insertCell(3);
+        deviationTypeCell.classList.add("deviation-type-cell");
+        const commentCell = currRow.insertCell(4);
+        commentCell.classList.add("comments-cell");
+
+        if (acceptedDeviationArray.length >= 1) {
+            for (const deviationLabel of acceptedDeviationArray) {
+                deviationString += `${deviationLabel} <br><br>`;
+            }
+            deviationTypeCell.innerHTML = deviationString;
+        }
+        else {
+            deviationTypeCell.innerHTML = `<br><br>`;
+        }
+        commentCell.innerHTML = currTubeComments;
+    }
+    if (bagsArrayIndex % 2 == 0) {
+        currRow.style['background-color'] = "lightgrey";
+    }
+}
