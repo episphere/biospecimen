@@ -47,5 +47,15 @@ registerRoute(
     'POST'
 );
 
-const indexFileRevision = '20230421';
-workbox.precaching.precacheAndRoute([{url: 'index.html', revision: indexFileRevision}]);
+registerRoute(
+  /index\.html$/,
+  new NetworkFirst({
+    cacheName: 'index-html-cache',
+    networkTimeoutSeconds: 3,
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+    ],
+  })
+);

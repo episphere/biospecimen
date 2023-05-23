@@ -35,6 +35,8 @@ const tubeNotCollectedReason5 = {'concept': 889386523, 'label': 'Supply Unavaila
 const tubeNotCollectedOptions1 = [tubeNotCollectedReason1, tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason5, tubeNotCollectedReason4];
 const tubeNotCollectedOptions2 = [tubeNotCollectedReason2, tubeNotCollectedReason3, tubeNotCollectedReason5, tubeNotCollectedReason4];
 
+export const refusedShippingDeviationConceptList = [deviationReason1.concept, deviationReason12.concept,deviationReason15.concept, deviationReason17.concept, deviationReason20.concept];
+
 export const specimenCollection = {
   numToCid: {
     '0001': '299553921',
@@ -405,7 +407,7 @@ export const additionalTubeIDRequirement = {
     length: 4
 }
 
-const tubes = [
+export const tubes = [
   tube0001,
   tube0002,
   tube0003,
@@ -423,6 +425,7 @@ const tubes = [
   tube0024,
 ];
 
+
 export const getTubesToConceptsMap = () => ({ ...specimenCollection.numToCid });
 
 export const getConceptsToTubesMap = () => ({ ...specimenCollection.cidToNum });
@@ -434,3 +437,17 @@ export const getTubeList = () => {
 export const getConceptList = () => {
   return tubes.map((tube) => tube.concept);
 };
+
+const getUniqueDeviationReasonsList = () => {
+    const sumDeviationCollections = [...deviationCollection1, ...deviationCollection2, ...deviationCollection3, ...deviationCollection4];
+    const seenConcepts = new Set();
+    
+    return sumDeviationCollections.filter( deviationCollection => {
+        if(seenConcepts.has(deviationCollection.concept)) return false;
+        else {
+            seenConcepts.add(deviationCollection.concept)
+            return true;
+        }
+    })
+}
+export const deviationReasons = getUniqueDeviationReasonsList();
