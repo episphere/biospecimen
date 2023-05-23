@@ -3845,7 +3845,7 @@ export const getSpecimenComments = (searchSpecimenInstituteArray, currTube) => {
     const deviationComments = collection.tube.deviationComments;
     const [collectionId, tubeId] = currTube.split(/\s+/);
     const specimenObjArray = searchSpecimenInstituteArray.filter(specimen => (specimen[collection.id] === collectionId));
-    const specimenObj = (specimenObjArray.length) ? Object.assign({}, specimenObjArray[0]) : {};
+    const specimenObj = (specimenObjArray.length > 0) ? Object.assign({}, specimenObjArray[0]) : {};
     const tubeIdToCid = specimenCollection["numToCid"]?.[tubeId];
     return specimenObj[tubeIdToCid]?.[deviationComments] ?? "";
 }
