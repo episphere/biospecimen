@@ -3801,7 +3801,7 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
 /** 
  *  Returns an array of deviation type name(s) for a single specimen tube id or an empty array if no deviation type found
  *  @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
- *  @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. CXA321789 0001
+ *  @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. 'CXA321789 0001'
  *  @returns {array} Example array - ['Hemolysis present']
  *   
 */ 
@@ -3835,7 +3835,7 @@ export const getSpecimenDeviation = (searchSpecimenInstituteArray, currTube) => 
 /**
  * Returns a string of the Full Specimen ID's comments
  * @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
- * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. CXA321789 0001
+ * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. 'CXA321789 0001'
  */
 export const getSpecimenComments = (searchSpecimenInstituteArray, currTube) => {
     const { collection } = conceptIds;
@@ -3849,7 +3849,7 @@ export const getSpecimenComments = (searchSpecimenInstituteArray, currTube) => {
 /**
  * Function to add content to deviation type and comments cells in the manifest table
  * @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
- * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. CXA321789 0001
+ * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. 'CXA321789 0001'
  * @param {object} currRow - current row of the manifest table
  * @param {number} bagsArrayIndex - current index of the bags array
 */
@@ -3869,8 +3869,7 @@ const addDeviationTypeCommentsContent = (searchSpecimenInstituteArray, currTube,
                 deviationString += `${deviationLabel} <br><br>`;
             }
             deviationTypeCell.innerHTML = deviationString;
-        }
-        else {
+        } else {
             deviationTypeCell.innerHTML = `<br><br>`;
         }
         commentCell.innerHTML = currTubeComments;
