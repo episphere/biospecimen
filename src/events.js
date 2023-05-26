@@ -3808,12 +3808,9 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
 export const getSpecimenDeviation = (searchSpecimenInstituteArray, currTube) => {
     const { collection } = conceptIds
     const { scannedId, isCollected, isDeviated, deviation } = conceptIds.collection.tube;
-    const specimenInstituteArray = searchSpecimenInstituteArray;
     const [collectionId, tubeId] = currTube.split(/\s+/);
     const tubeIdDeviationReasonArray = deviationReasons;
-    const specimenObjArray = specimenInstituteArray.filter(specimen => (specimen[collection.id] === collectionId));    
-    
-    const specimenObj = (specimenObjArray.length > 0) ? Object.assign({}, specimenObjArray[0]) : {};
+    const specimenObj = searchSpecimenInstituteArray.find(specimen => (specimen[collection.id] === collectionId)) ?? {};
     const acceptedDeviationArr = [];
 
     for (const key in specimenObj) {
@@ -3844,10 +3841,9 @@ export const getSpecimenComments = (searchSpecimenInstituteArray, currTube) => {
     const { collection } = conceptIds;
     const deviationComments = collection.tube.deviationComments;
     const [collectionId, tubeId] = currTube.split(/\s+/);
-    const specimenObjArray = searchSpecimenInstituteArray.filter(specimen => (specimen[collection.id] === collectionId));
-    const specimenObj = (specimenObjArray.length > 0) ? Object.assign({}, specimenObjArray[0]) : {};
-    const tubeIdToCid = specimenCollection["numToCid"]?.[tubeId];
-    return specimenObj[tubeIdToCid]?.[deviationComments] ?? "";
+    const specimenObj = searchSpecimenInstituteArray.find(specimen => (specimen[collection.id] === collectionId)) ?? {};
+    const tubeIdToCid = specimenCollection['numToCid']?.[tubeId];
+    return specimenObj[tubeIdToCid]?.[deviationComments] ?? '';
 }
 
 /**
@@ -3864,9 +3860,9 @@ const addDeviationTypeCommentsContent = (searchSpecimenInstituteArray, currTube,
         const currTubeComments = getSpecimenComments(searchSpecimenInstituteArray, currTube);
         let deviationString = '';
         const deviationTypeCell = currRow.insertCell(3);
-        deviationTypeCell.classList.add("deviation-type-cell");
+        deviationTypeCell.classList.add('deviation-type-cell');
         const commentCell = currRow.insertCell(4);
-        commentCell.classList.add("comments-cell");
+        commentCell.classList.add('comments-cell');
 
         if (acceptedDeviationArray.length >= 1) {
             for (const deviationLabel of acceptedDeviationArray) {
@@ -3880,6 +3876,6 @@ const addDeviationTypeCommentsContent = (searchSpecimenInstituteArray, currTube,
         commentCell.innerHTML = currTubeComments;
     }
     if (bagsArrayIndex % 2 == 0) {
-        currRow.style['background-color'] = "lightgrey";
+        currRow.style['background-color'] = 'lightgrey';
     }
 }
