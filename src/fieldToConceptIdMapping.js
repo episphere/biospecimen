@@ -88,7 +88,8 @@ export default {
             isDeviated: 678857215,
             isDiscarded: 762124027,
             scannedId: 825582494,
-            dateReceived: 926457119
+            dateReceived: 926457119,
+            deviationComments: 536710547,
         },
     },
 
