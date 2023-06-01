@@ -236,7 +236,7 @@ export const tubeCollectedTemplate = (data, formData) => {
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventSelectAllCollection();
     addEventBackToSearch('backToSearch');
-    addEventBiospecimenCollectionForm(data, formData); // over hereeeee
+    addEventBiospecimenCollectionForm(data, formData);
     addEventBiospecimenCollectionFormToggles();
     addEventBiospecimenCollectionFormEdit();
     addEventBiospecimenCollectionFormEditAll();
