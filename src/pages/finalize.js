@@ -1,8 +1,9 @@
-import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorkflow, getCheckedInVisit, updateSpecimen } from "./../shared.js";
+import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorkflow, getCheckedInVisit, updateSpecimen, appState } from "./../shared.js";
 import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollectProcess } from "./../events.js";
 import {searchTemplate} from "./dashboard.js";
+import { collecionIdSearchScreenTemplate } from "./reports/collectionIdSearch.js"
 
-export const finalizeTemplate = (data, specimenData) => {
+export const finalizeTemplate = (data, specimenData, flag) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarReview');
     navBarBtn?.classList.remove('disabled');
@@ -11,7 +12,8 @@ export const finalizeTemplate = (data, specimenData) => {
 
     template += `
         <div class="row">
-            <h5>Review Collection Data Entry</h5>
+        ${flag === true ? 
+            `` : `<h5>Review Collection Data Entry</h5>`}
         </div>
         </br>
         <div class="row">
@@ -86,17 +88,23 @@ export const finalizeTemplate = (data, specimenData) => {
                     </div>
                 </div>
                 </br>
-                <div class="form-group row">
-                    <div class="col-auto">
-                        <button class="btn btn-outline-danger" type="button" data-connect-id="${data.Connect_ID}" id="returnToCollectProcess" data-master-specimen-id="${specimenData['820476880']}">${getWorkflow() === 'research' ? 'Return to Collection Data Entry' : 'Return to Collection Data Entry'}</button>
+                ${flag === true ? 
+                    `<div class="form-group row">
+                        <div class="col-auto">
+                            <button class="btn btn-outline-danger" type="button" id="returnToSpecimenSearch">Return to Search</button>
+                        </div>
                     </div>
-                    <div class="ml-auto">
-                        <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['820476880']}" type="button" id="finalizedSaveExit">Exit</button>
-                    </div>
-                    <div class="col-auto">
-                        <button class="btn btn-outline-primary modal-open" data-modal-id="modal1" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['820476880']}" type="submit" id="finalizedContinue">Review Complete</button>
-                    </div>
+                    ` :`<div class="form-group row">
+                <div class="col-auto">
+                    <button class="btn btn-outline-danger" type="button" data-connect-id="${data.Connect_ID}" id="returnToCollectProcess" data-master-specimen-id="${specimenData['820476880']}">${getWorkflow() === 'research' ? 'Return to Collection Data Entry' : 'Return to Collection Data Entry'}</button>
                 </div>
+                <div class="ml-auto">
+                    <button class="btn btn-outline-warning" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['820476880']}" type="button" id="finalizedSaveExit">Exit</button>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-outline-primary modal-open" data-modal-id="modal1" data-connect-id="${data.Connect_ID}" data-master-specimen-id="${specimenData['820476880']}" type="submit" id="finalizedContinue">Review Complete</button>
+                </div>
+            </div>`}
             </form>
             <div class="modal-wrapper" id="modal1">
                 <div class="modal-dialog model-dialog-centered">
@@ -143,17 +151,21 @@ export const finalizeTemplate = (data, specimenData) => {
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
 
-    document.getElementById('finalizedSaveExit').addEventListener('click', () => {
+    document.getElementById('finalizedSaveExit') && document.getElementById('finalizedSaveExit').addEventListener('click', () => {
         searchTemplate();
     });
 
-    document.getElementById('finalizeForm').addEventListener('submit', (e) => { 
+    document.getElementById('returnToSpecimenSearch') && document.getElementById('returnToSpecimenSearch').addEventListener('click', () => {
+        collecionIdSearchScreenTemplate(appState.getState().username);
+    });
+
+    document.getElementById('finalizeForm') && document.getElementById('finalizeForm').addEventListener('submit', (e) => { 
         e.preventDefault();
         const modalId = e.target.getAttribute('data-modal-id');
         openModal(modalId);
     });
 
-    document.getElementById('finalizedConfirmButton').addEventListener('click', async (e) => { 
+    document.getElementById('finalizedConfirmButton') && document.getElementById('finalizedConfirmButton').addEventListener('click', async (e) => { 
         specimenData['410912345'] = 353358909;
         specimenData['556788178'] = new Date().toISOString();
         await updateSpecimen([specimenData]);
@@ -212,7 +224,7 @@ export const finalizeTemplate = (data, specimenData) => {
             openedModal = null;
             openedModalId = null;
         }
-    }  
+    } 
 }
 
 const getDeviationSelections = (deviationSelectionsList) => {

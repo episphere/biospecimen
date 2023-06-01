@@ -2689,7 +2689,6 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
     if (cntd) {
 
         formData = await getUpdatedParticipantData(formData);
-
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
         finalizeTemplate(formData, specimenData);
@@ -2783,7 +2782,7 @@ const finalizeHandler = async (biospecimenData, cntd) => {
 
 export const addEventReturnToCollectProcess = () => {
     const btn = document.getElementById('returnToCollectProcess');
-    btn.addEventListener('click', async () => {
+    btn && btn.addEventListener('click', async () => {
         const masterSpecimenId = btn.dataset.masterSpecimenId;
         const connectId = btn.dataset.connectId;
         showAnimation();
