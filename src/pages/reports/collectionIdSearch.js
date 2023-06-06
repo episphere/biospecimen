@@ -59,14 +59,14 @@ const searchSpecimenEvent = () => {
             return;
         }
         showAnimation();
-        const biospecimen = await searchSpecimen(masterSpecimenId);
+        const biospecimen = await searchSpecimen(masterSpecimenId, true);
         if (biospecimen.code !== 200) {
             hideAnimation();
             showNotifications({ title: 'Not found', body: 'Specimen not found!' }, true)
             return
         }
         const biospecimenData = biospecimen.data;
-        let query = `connectId=${parseInt(biospecimenData.Connect_ID)}`;
+        let query = `connectId=${parseInt(biospecimenData.Connect_ID)}&allSiteSearch=${true}`;
         const response = await findParticipant(query);
         hideAnimation();
         const data = response.data[0];

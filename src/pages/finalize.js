@@ -4,6 +4,7 @@ import {searchTemplate} from "./dashboard.js";
 import { collecionIdSearchScreenTemplate } from "./reports/collectionIdSearch.js"
 
 export const finalizeTemplate = (data, specimenData, flag) => {
+    console.log('data', data)
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarReview');
     navBarBtn?.classList.remove('disabled');
@@ -18,7 +19,7 @@ export const finalizeTemplate = (data, specimenData, flag) => {
         </br>
         <div class="row">
             <div class="col">
-                <div class="row"><h5>${data['996038075']}, ${data['399159511']}</h5></div>
+                <div class="row"><h5>${data['996038075'] && data['996038075']}, ${data['399159511'] && data['399159511']}</h5></div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${specimenData['820476880']}</div>
                 <div class="row">Collection ID Link Date/Time: ${getWorkflow() === 'research' ? new Date(specimenData['678166505']).toLocaleString(): new Date(specimenData['915838974']).toLocaleString()}</div>
