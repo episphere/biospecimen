@@ -4,7 +4,6 @@ import {searchTemplate} from "./dashboard.js";
 import { collecionIdSearchScreenTemplate } from "./reports/collectionIdSearch.js"
 
 export const finalizeTemplate = (data, specimenData, flag) => {
-    console.log('data', data)
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarReview');
     navBarBtn?.classList.remove('disabled');
