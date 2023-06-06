@@ -1,9 +1,9 @@
-import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorkflow, getCheckedInVisit, updateSpecimen, appState } from "./../shared.js";
+import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorkflow, getCheckedInVisit, updateSpecimen, appState, keyToNameObj } from "./../shared.js";
 import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollectProcess } from "./../events.js";
 import {searchTemplate} from "./dashboard.js";
 import { collecionIdSearchScreenTemplate } from "./reports/collectionIdSearch.js"
 
-export const finalizeTemplate = (data, specimenData, flag) => {
+export const finalizeTemplate = (data, specimenData, bptlCollectionFlag) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarReview');
     navBarBtn?.classList.remove('disabled');
@@ -12,7 +12,7 @@ export const finalizeTemplate = (data, specimenData, flag) => {
 
     template += `
         <div class="row">
-        ${flag === true ? 
+        ${bptlCollectionFlag === true ? 
             `` : `<h5>Review Collection Data Entry</h5>`}
         </div>
         </br>
@@ -23,12 +23,20 @@ export const finalizeTemplate = (data, specimenData, flag) => {
                 <div class="row">Collection ID: ${specimenData['820476880']}</div>
                 <div class="row">Collection ID Link Date/Time: ${getWorkflow() === 'research' ? new Date(specimenData['678166505']).toLocaleString(): new Date(specimenData['915838974']).toLocaleString()}</div>
                 ${getWorkflow() === 'research' ? `
+                ${bptlCollectionFlag === true ? 
+                    `<div class="row">
+                        <div>Collection Setting: Research</div>
+                </div>` : ``}
                     <div class="row">
                         <div>Collection Phlebotomist Initials: ${specimenData['719427591'] || ''}</div>
                     </div>` 
                     
-                    : ''
+                    : `<div class="row">
+                    ${bptlCollectionFlag === true ? `
+                        <div>Collection Setting: Clinical</div>` : ``}
+                    </div>`
                 }
+                ${bptlCollectionFlag === true ? `<div class="row"> Site: ${keyToNameObj[data['827220437']]} </div>` : ``}
             </div>
             ${specimenData['331584571'] ? `
                 <div class="ml-auto form-group">
@@ -88,7 +96,7 @@ export const finalizeTemplate = (data, specimenData, flag) => {
                     </div>
                 </div>
                 </br>
-                ${flag === true ? 
+                ${bptlCollectionFlag === true ? 
                     `<div class="form-group row">
                         <div class="col-auto">
                             <button class="btn btn-outline-danger" type="button" id="returnToSpecimenSearch">Return to Search</button>
