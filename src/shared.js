@@ -132,13 +132,12 @@ export const updateParticipant = async (array) => {
 
 export const getUserProfile = async (uid) => {
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=getUserProfile`, {
-        method: "POST",
+    const response = await fetch(`${api}api=getUserProfile&uid=${uid}`, {
+        method: "GET",
         headers: {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
-        },
-        body:  JSON.stringify(uid)
+        }
     });
     
     return await response.json();
