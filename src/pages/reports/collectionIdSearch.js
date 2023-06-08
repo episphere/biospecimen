@@ -6,15 +6,15 @@ import { masterSpecimenIDRequirement } from '../../tubeValidation.js';
 import { finalizeTemplate } from '../finalize.js';
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 
-export const collecionIdSearchScreen = async (auth, route) => {
+export const collectionIdSearchScreen = async (auth, route) => {
     const user = auth.currentUser;
     if (!user) return;
     const username = user.displayName ? user.displayName : user.email;
     appState.setState({ 'username': username });
-    collecionIdSearchScreenTemplate(username);
+    collectionIdSearchScreenTemplate(username);
 };
 
-export const collecionIdSearchScreenTemplate = async (username, auth, route) => {
+export const collectionIdSearchScreenTemplate = async (username) => {
     let template = "";
     template += reportsNavbar();
     template += ` 
@@ -69,8 +69,13 @@ const searchSpecimenEvent = () => {
         let query = `connectId=${parseInt(biospecimenData.Connect_ID)}&allSiteSearch=${true}`;
         const response = await findParticipant(query);
         hideAnimation();
-        const data = response.data[0];
-        localStorage.setItem('workflow', biospecimenData[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical ? `clinical` : `research`);
-        finalizeTemplate(data, biospecimenData, true);
+        try {
+            const data = response.data[0];
+            localStorage.setItem('workflow', biospecimenData[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical ? `clinical` : `research`);
+            finalizeTemplate(data, biospecimenData, true);
+        }
+        catch {
+            showNotifications({ title: 'Not found', body: 'Participant not found!' }, true)
+        }
     })
 }

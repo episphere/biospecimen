@@ -1,7 +1,7 @@
 import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorkflow, getCheckedInVisit, updateSpecimen, appState, keyToNameObj } from "./../shared.js";
 import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollectProcess } from "./../events.js";
 import {searchTemplate} from "./dashboard.js";
-import { collecionIdSearchScreenTemplate } from "./reports/collectionIdSearch.js"
+import { collectionIdSearchScreenTemplate } from "./reports/collectionIdSearch.js"
 
 export const finalizeTemplate = (data, specimenData, bptlCollectionFlag) => {
     removeActiveClass('navbar-btn', 'active')
@@ -164,7 +164,7 @@ export const finalizeTemplate = (data, specimenData, bptlCollectionFlag) => {
     });
 
     document.getElementById('returnToSpecimenSearch') && document.getElementById('returnToSpecimenSearch').addEventListener('click', () => {
-        collecionIdSearchScreenTemplate(appState.getState().username);
+        collectionIdSearchScreenTemplate(appState.getState().username);
     });
 
     document.getElementById('finalizeForm') && document.getElementById('finalizeForm').addEventListener('submit', (e) => { 

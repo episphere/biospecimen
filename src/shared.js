@@ -803,7 +803,7 @@ export const getBoxesByLocation = async (location) => {
 
 export const searchSpecimen = async (masterSpecimenId, allSitesFlag) => {
     const idToken = await getIdToken();
-    const specimenQuery = allSitesFlag === true ? `&masterSpecimenId=${masterSpecimenId}&allSitesFlag=${allSitesFlag}`: `&masterSpecimenId=${masterSpecimenId}`
+    const specimenQuery =  `&masterSpecimenId=${masterSpecimenId}` + (allSitesFlag ? `&allSitesFlag=${allSitesFlag}`: ``)
     const response = await fetch(`${api}api=searchSpecimen${specimenQuery}`, {
         method: "GET",
         headers: {
