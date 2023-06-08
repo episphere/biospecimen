@@ -422,19 +422,19 @@ box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
         display: none;
     }
 }
-  .modal-wrapper.visible {
+.modal-wrapper.visible {
     visibility: visible;
     transform: scale(1);
-  }
-  
-  .modal-content {
-    border-radius: 5px;
-    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-  }
+}
 
 .modal-content {
-border-radius: 5px;
-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content {
+    border-radius: 5px;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
 }
 
 #boxManifestTable tbody {
@@ -455,4 +455,5 @@ box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
     border-top: unset;
     text-align: center;
     vertical-align: top;
+    padding: 0 0.75rem;
 }
