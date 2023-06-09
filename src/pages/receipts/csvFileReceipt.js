@@ -146,14 +146,14 @@ const updateInTransitMapping = (shippedBoxes) => {
   return holdProcessedResult
 }
 
-const materialTypeMapping = (i) => {
-  if (i.split(' ')[1] === '0001' || i.split(' ')[1] === '0002' || i.split(' ')[1] === '0011' || i.split(' ')[1] === '0012' || i.split(' ')[1] === '0021')
+const materialTypeMapping = (specimenId) => {
+  if (specimenId.split(' ')[1] === '0001' || specimenId.split(' ')[1] === '0002' || specimenId.split(' ')[1] === '0011' || specimenId.split(' ')[1] === '0012' || specimenId.split(' ')[1] === '0021')
     return 'Serum'
-  else if (i.split(' ')[1] === '0003' || i.split(' ')[1] === '0004' || i.split(' ')[1] === '0005' || i.split(' ')[1] === '0013' || i.split(' ')[1] === '0014' || i.split(' ')[1] === '0024')
+  else if (specimenId.split(' ')[1] === '0003' || specimenId.split(' ')[1] === '0004' || specimenId.split(' ')[1] === '0005' || specimenId.split(' ')[1] === '0013' || specimenId.split(' ')[1] === '0014' || specimenId.split(' ')[1] === '0024')
     return 'Whole Bl'
-  else if (i.split(' ')[1] === '0006')
+  else if (specimenId.split(' ')[1] === '0006')
     return 'Urine'
-  else if (i.split(' ')[1] === '0007')
+  else if (specimenId.split(' ')[1] === '0007')
     return 'Saliva'
   else
     return ``
