@@ -147,16 +147,15 @@ const updateInTransitMapping = (shippedBoxes) => {
 }
 
 const materialTypeMapping = (specimenId) => {
-  if (specimenId.split(' ')[1] === '0001' || specimenId.split(' ')[1] === '0002' || specimenId.split(' ')[1] === '0011' || specimenId.split(' ')[1] === '0012' || specimenId.split(' ')[1] === '0021')
-    return 'Serum'
-  else if (specimenId.split(' ')[1] === '0003' || specimenId.split(' ')[1] === '0004' || specimenId.split(' ')[1] === '0005' || specimenId.split(' ')[1] === '0013' || specimenId.split(' ')[1] === '0014' || specimenId.split(' ')[1] === '0024')
-    return 'Whole Bl'
-  else if (specimenId.split(' ')[1] === '0006')
-    return 'Urine'
-  else if (specimenId.split(' ')[1] === '0007')
-    return 'Saliva'
-  else
-    return ``
+  return (specimenId.split(' ')[1] === '0001' || specimenId.split(' ')[1] === '0002' || specimenId.split(' ')[1] === '0011' || specimenId.split(' ')[1] === '0012' || specimenId.split(' ')[1] === '0021') ?
+     'Serum'
+  : (specimenId.split(' ')[1] === '0003' || specimenId.split(' ')[1] === '0004' || specimenId.split(' ')[1] === '0005' || specimenId.split(' ')[1] === '0013' || specimenId.split(' ')[1] === '0014' || specimenId.split(' ')[1] === '0024') ?
+     'Whole Bl'
+  : (specimenId.split(' ')[1] === '0006') ?
+      'Urine'
+  : (specimenId.split(' ')[1] === '0007') ?
+      'Saliva'
+  : ``
 }
 
 const getVialTypesMappings = (i) => {
