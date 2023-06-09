@@ -3089,12 +3089,9 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenI
     let rowCount = 1;
     for (let i = 0; i < bagList.length; i++) {
         let tubes = bagObjects[bagList[i]]['arrElements'];
-        let lastTube = tubes[tubes.length - 1];
-        // console.log("🚀 ~ file: events.js:3094 ~ populateBoxManifestTable ~ isLastTubesIndex:", isLastTubesIndex)
         
         for (let j = 0; j < tubes.length; j++) {
             const currTube = tubes[j];
-            const isLastTubeIndex = (currTube === lastTube);
             let currRow = currTable.insertRow(rowCount);
             if (j == 0) {
                 currRow.insertCell(0).innerHTML = bagList[i];
@@ -3117,7 +3114,7 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenI
             if (bagObjects[bagList[i]].hasOwnProperty('618036638') && j == 0) {
                 fullScannerName += bagObjects[bagList[i]]['618036638'];
             }
-            addDeviationTypeCommentsContent(searchSpecimenInstituteArray, currTube, currRow, i, isLastTubeIndex)
+            addDeviationTypeCommentsContent(searchSpecimenInstituteArray, currTube, currRow, i)
             rowCount += 1;
         }
     }
@@ -3634,15 +3631,9 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
     let bags = Object.keys(currPage['bags']);    
     let rowCount = 1;
     for (let i = 0; i < bags.length; i++) {
-        // console.log("bags -----", i ,bags)
-        // let isLastSpecimenBagIndex = (i === bags.length - 1);
-        // console.log("🚀 ~ file: events.js:3641 ~ populateReportManifestTable ~ isLastTubesIndex:", i, isLastSpecimenBagIndex)
         let tubes = currPage['bags'][bags[i]]['arrElements'];
-        let lastTube = tubes[tubes.length - 1];
         for (let j = 0; j < tubes.length; j++) {
             const currTube = tubes[j]
-            const isLastTubeIndex = (currTube === lastTube);
-            // console.log("🚀 ~ file: events.js:3649 ~ populateReportManifestTable ~ isLastTubeIndex:",i, j, isLastTubeIndex, "---", currTube, "---", lastTube)
             let currRow = currTable.insertRow(rowCount);
             if (j == 0) {
                 currRow.insertCell(0).innerHTML = bags[i];
@@ -3665,7 +3656,7 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
                 fullScannerName += currBox[bags[i]]['618036638'];
             }
             console.log("Current tubes length ---", tubes.length)
-            addDeviationTypeCommentsContent(searchSpecimenInstituteArray, currTube, currRow, i, isLastTubeIndex);
+            addDeviationTypeCommentsContent(searchSpecimenInstituteArray, currTube, currRow, i);
             rowCount += 1;
         }
     }
@@ -3857,15 +3848,11 @@ export const getSpecimenComments = (searchSpecimenInstituteArray, currTube) => {
  * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. 'CXA321789 0001'
  * @param {object} currRow - current row of the manifest table
  * @param {number} bagsArrayIndex - current index of the bags array
- * @param {boolean} isLastTubeIndex - boolean to check if the current tube is the last tube in the bags array
 */
 
-const addDeviationTypeCommentsContent = (searchSpecimenInstituteArray, currTube, currRow, bagsArrayIndex, isLastTubeIndex) => {
+const addDeviationTypeCommentsContent = (searchSpecimenInstituteArray, currTube, currRow, bagsArrayIndex) => {
     if (currTube) {
         const acceptedDeviationArray = getSpecimenDeviation(searchSpecimenInstituteArray, currTube);
-        console.log("🚀 ~ file: events.js:3860 ~ addDeviationTypeCommentsContent ~ acceptedDeviationArray:", acceptedDeviationArray)
-        const lastAcceptedDeviation = acceptedDeviationArray[acceptedDeviationArray.length - 1];
-        console.log("🚀 ~ file: events.js:3868 ~ addDeviationTypeCommentsContent ~ lastAcceptedDeviation:", lastAcceptedDeviation)
         const currTubeComments = getSpecimenComments(searchSpecimenInstituteArray, currTube);
         let deviationString = '';
         const deviationTypeCell = currRow.insertCell(3);
@@ -3875,29 +3862,6 @@ const addDeviationTypeCommentsContent = (searchSpecimenInstituteArray, currTube,
         
         if (acceptedDeviationArray.length >= 1) {
             for (const deviationLabel of acceptedDeviationArray) {
-                const isLastDeviation = (deviationLabel === lastAcceptedDeviation);
-                // if (isLastTubeIndex || (acceptedDeviationArray.length === 1)) { 
-                //     console.log("TESTING -----", (acceptedDeviationArray.length === 1, isLastTubeIndex))
-                //     deviationString += `${deviationLabel} <br>`;
-                // } else {
-                //     deviationString += `${deviationLabel} <br><br>`;
-                // }
-                
-                /*
-                only create a new line if the current tube is the last tube in the bags array and the current deviation is the last deviation in the accepted deviation array
-
-                isLastTubeIndex - boolean to check if the current tube is the last tube in the bags array
-                isLastDeviation - boolean to check if the current deviation is the last deviation in the accepted deviation array
-                */
-
-                // more than one deviation type, the last deviation type will have an extra line break, and the last tube will have no line break
-                // Full specimen Id has more than one deviation type, last deviation type row will have an extra line break (more spacing). Also cannot be the last tube in the Specimen Bag ID.
-                // if (!isLastTubeIndex && isLastDeviation && acceptedDeviationArray.length > 1) {
-                //     deviationString += `${deviationLabel} <br><br>`;
-                // } else {
-                //     deviationString += `${deviationLabel} <br>`;
-                // }
-
                 deviationString += `${deviationLabel} <br>`;
             }
             deviationTypeCell.innerHTML = deviationString;

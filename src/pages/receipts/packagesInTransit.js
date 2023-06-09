@@ -465,11 +465,7 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, searchSp
                                 if (currDeviationTypeArray.length > 0) {
                                     let deviationTextContent = '';
                                     for (const currDeviationType of currDeviationTypeArray) {
-                                        if (currDeviationTypeArray.length === 1 || isLastTubeIndex) {
-                                            deviationTextContent += `${currDeviationType} <br>`;
-                                        } else {
-                                            deviationTextContent += `${currDeviationType} <br><br>`;
-                                        }
+                                        deviationTextContent += `${currDeviationType} <br>`;
                                     }
                                     cellEl.classList.add("deviation-type-cell");
                                     cellEl.innerHTML = deviationTextContent;
