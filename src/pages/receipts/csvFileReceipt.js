@@ -118,6 +118,12 @@ const modifyBSIQueryResults = (results) => {
   return filteredResults
 }
 
+/**
+ * Loops through each shipped box & specimen bag. Then grabs essential information and stores the result in an object & pushes the object to an array
+ * @param {object} shippedBoxes - Shipped box object contains all the related specimen bags & more
+ * @returns {array} Returns an array of objects with essential information for in transit csv
+*/ 
+
 const updateInTransitMapping = (shippedBoxes) => {
   let holdProcessedResult = []
   shippedBoxes.forEach(i => {    
@@ -145,6 +151,13 @@ const updateInTransitMapping = (shippedBoxes) => {
   })
   return holdProcessedResult
 }
+
+
+/**
+ * Maps specimen id to material type based on last 4 digits
+ * @param {string} specimenId - Specimen id from each specimen bag
+ * @returns {string} Returns material type
+*/ 
 
 const materialTypeMapping = (specimenId) => {
   return (specimenId.split(' ')[1] === '0001' || specimenId.split(' ')[1] === '0002' || specimenId.split(' ')[1] === '0011' || specimenId.split(' ')[1] === '0012' || specimenId.split(' ')[1] === '0021') ?
