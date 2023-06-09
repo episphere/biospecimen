@@ -159,15 +159,11 @@ const updateInTransitMapping = (shippedBoxes) => {
 */ 
 
 const materialTypeMapping = (specimenId) => {
-  return (specimenId.split(' ')[1] === '0001' || specimenId.split(' ')[1] === '0002' || specimenId.split(' ')[1] === '0011' || specimenId.split(' ')[1] === '0012' || specimenId.split(' ')[1] === '0021') ?
-     'Serum'
-  : (specimenId.split(' ')[1] === '0003' || specimenId.split(' ')[1] === '0004' || specimenId.split(' ')[1] === '0005' || specimenId.split(' ')[1] === '0013' || specimenId.split(' ')[1] === '0014' || specimenId.split(' ')[1] === '0024') ?
-     'Whole Bl'
-  : (specimenId.split(' ')[1] === '0006') ?
-      'Urine'
-  : (specimenId.split(' ')[1] === '0007') ?
-      'Saliva'
-  : ``
+  const tubeId = specimenId.split(' ')[1]
+  const materialTypeObject = {'0001':'Serum', '0002':'Serum', '0011':'Serum', '0012':'Serum', '0021':'Serum', 
+                              '0003':  'Whole Bl', '0004': 'Whole Bl', '0005': 'Whole Bl', '0013': 'Whole Bl', '0014' : 'Whole Bl', '0024' : 'Whole Bl',
+                              '0006':'Urine', '0007': 'Saliva'}
+  return materialTypeObject[tubeId]
 }
 
 const getVialTypesMappings = (i) => {
