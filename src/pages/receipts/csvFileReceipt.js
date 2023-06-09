@@ -71,7 +71,7 @@ const csvFileButtonSubmit = () => {
     let dateFilter = document.getElementById("csvDateInput").value
     dateFilter = dateFilter+'T00:00:00.000Z'
     showAnimation();
-    const results = await getBSIQueryData(dateFilter);// getFakeResults() 
+    const results = await getBSIQueryData(dateFilter);
     hideAnimation();
     document.getElementById("csvDateInput").value = ``;
     let modifiedResults = modifyBSIQueryResults(results.data);
@@ -83,7 +83,6 @@ const getCurrentDate = () => {
   const currentDate = new Date().toLocaleDateString('en-CA');
   return currentDate;
 }
-// http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=queryBsiData&type=${filter}
 
 const getBSIQueryData = async (filter) => {
   const idToken = await getIdToken();
