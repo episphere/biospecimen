@@ -3089,7 +3089,7 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenI
     let rowCount = 1;
     for (let i = 0; i < bagList.length; i++) {
         let tubes = bagObjects[bagList[i]]['arrElements'];
-        
+
         for (let j = 0; j < tubes.length; j++) {
             const currTube = tubes[j];
             let currRow = currTable.insertRow(rowCount);
@@ -3655,7 +3655,6 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
             if (currBox[bags[i]].hasOwnProperty('618036638') && j == 0) {
                 fullScannerName += currBox[bags[i]]['618036638'];
             }
-            console.log("Current tubes length ---", tubes.length)
             addDeviationTypeCommentsContent(searchSpecimenInstituteArray, currTube, currRow, i);
             rowCount += 1;
         }
@@ -3859,7 +3858,7 @@ const addDeviationTypeCommentsContent = (searchSpecimenInstituteArray, currTube,
         deviationTypeCell.classList.add('deviation-type-cell');
         const commentCell = currRow.insertCell(4);
         commentCell.classList.add('comments-cell');
-        
+
         if (acceptedDeviationArray.length >= 1) {
             for (const deviationLabel of acceptedDeviationArray) {
                 deviationString += `${deviationLabel} <br>`;

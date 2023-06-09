@@ -405,7 +405,6 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, searchSp
         // currFullSpecimenIdArray - Ex. [CXA426800 0001, CXA426800 0002, ...]
         const currSpecimenBagId = currBagIdArray[i];
         const currFullSpecimenIdArray = groupSamples[i];
-        const lastCurrFullSpecimenId = currFullSpecimenIdArray[currFullSpecimenIdArray.length - 1];
         const fullSpecimenIdDeviationObj = {};
         
 
@@ -423,7 +422,6 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, searchSp
                     const tableRowEl = document.createElement('tr');
                     if (i % 2 === 0) tableRowEl.style.backgroundColor = 'lightgrey';
                     const currFullSpecimenId = currFullSpecimenIdArray[rowIndex];
-                    const isLastTubeIndex = (currFullSpecimenId === lastCurrFullSpecimenId);
                     const currSpecimenComments = getSpecimenComments(searchSpecimenInstituteArray, currFullSpecimenId);
 
                     for (let tableModalHeaderIndex = 0; tableModalHeaderIndex < tableModalHeaderColumnNameArray.length; tableModalHeaderIndex++) { 
