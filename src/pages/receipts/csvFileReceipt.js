@@ -163,7 +163,7 @@ const materialTypeMapping = (specimenId) => {
   const materialTypeObject = {'0001':'Serum', '0002':'Serum', '0011':'Serum', '0012':'Serum', '0021':'Serum', 
                               '0003':  'Whole Bl', '0004': 'Whole Bl', '0005': 'Whole Bl', '0013': 'Whole Bl', '0014' : 'Whole Bl', '0024' : 'Whole Bl',
                               '0006':'Urine', '0007': 'Saliva'}
-  return materialTypeObject[tubeId]
+  return materialTypeObject[tubeId] ?? '';
 }
 
 const getVialTypesMappings = (i) => {
