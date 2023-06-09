@@ -137,12 +137,26 @@ const updateInTransitMapping = (shippedBoxes) => {
             dataHolder['BoxId'] = i[fieldToConceptIdMapping.shippingBoxId] != undefined ? i[fieldToConceptIdMapping.shippingBoxId] : ``
             dataHolder['specimenBagId'] = bagKeys[index]
             dataHolder['fullSpecimenIds'] = fullSpecimenIds
+            dataHolder['materialType'] = materialTypeMapping(fullSpecimenIds)
             holdProcessedResult.push(dataHolder)
         })
     });
 
   })
   return holdProcessedResult
+}
+
+const materialTypeMapping = (i) => {
+  if (i.split(' ')[1] === '0001' || i.split(' ')[1] === '0002' || i.split(' ')[1] === '0011' || i.split(' ')[1] === '0012' || i.split(' ')[1] === '0021')
+    return 'Serum'
+  else if (i.split(' ')[1] === '0003' || i.split(' ')[1] === '0004' || i.split(' ')[1] === '0005' || i.split(' ')[1] === '0013' || i.split(' ')[1] === '0014' || i.split(' ')[1] === '0024')
+    return 'Whole Bl'
+  else if (i.split(' ')[1] === '0006')
+    return 'Urine'
+  else if (i.split(' ')[1] === '0007')
+    return 'Saliva'
+  else
+    return ``
 }
 
 const getVialTypesMappings = (i) => {
@@ -343,7 +357,7 @@ const generateBSIqueryCSVData = (items) => {
 
 const generateInTransitCSVData = (items) => {
   let csv = ``;
-  csv += `Ship Date, Tracking Number, Shipped from Site, Shipped from Location, Shipped Date & Time, Expected Number of Samples, Temperature Monitor, Box Number, Specimen Bag ID Type, Full Specimen IDs\r\n`
+  csv += `Ship Date, Tracking Number, Shipped from Site, Shipped from Location, Shipped Date & Time, Expected Number of Samples, Temperature Monitor, Box Number, Specimen Bag ID Type, Full Specimen IDs, Material Type\r\n`
   downloadCSVfile(items, csv, 'in-transit-data-export')
   
 }
