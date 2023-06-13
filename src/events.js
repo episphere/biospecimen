@@ -3869,6 +3869,7 @@ const addDeviationTypeCommentsContent = (searchSpecimenInstituteArray, currTube,
         }
         commentCell.innerHTML = currTubeComments;
     }
+    
     if (bagsArrayIndex % 2 === 0) {
         currRow.style['background-color'] = 'lightgrey';
     }
