@@ -3086,7 +3086,6 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenI
     let bagObjects = boxIdAndBagsObj[boxId];
     let bagList = Object.keys(bagObjects);
     let rowCount = 1;
-
     for (let i = 0; i < bagList.length; i++) {
         let tubes = bagObjects[bagList[i]]['arrElements'];
 
@@ -3095,8 +3094,7 @@ export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenI
             let currRow = currTable.insertRow(rowCount);
             if (j == 0) {
                 currRow.insertCell(0).innerHTML = bagList[i];
-            }
-            else {
+            } else {
                 currRow.insertCell(0).innerHTML = '';
             }
             currRow.insertCell(1).innerHTML = tubes[j]
@@ -3629,8 +3627,7 @@ export const populateReportManifestHeader = (currPage) => {
 
 export const populateReportManifestTable = (currPage, searchSpecimenInstituteArray) => {
     const currTable = document.getElementById('boxManifestTable');
-    let bags = Object.keys(currPage['bags']);
-
+    let bags = Object.keys(currPage['bags']);    
     let rowCount = 1;
     for (let i = 0; i < bags.length; i++) {
         let tubes = currPage['bags'][bags[i]]['arrElements'];
@@ -3639,8 +3636,7 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
             let currRow = currTable.insertRow(rowCount);
             if (j == 0) {
                 currRow.insertCell(0).innerHTML = bags[i];
-            }
-            else {
+            } else {
                 currRow.insertCell(0).innerHTML = '';
             }
             currRow.insertCell(1).innerHTML = currTube;
@@ -3658,7 +3654,6 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
             if (currBox[bags[i]].hasOwnProperty('618036638') && j == 0) {
                 fullScannerName += currBox[bags[i]]['618036638'];
             }
-
             addDeviationTypeCommentsContent(searchSpecimenInstituteArray, currTube, currRow, i);
             rowCount += 1;
         }
@@ -3865,15 +3860,16 @@ const addDeviationTypeCommentsContent = (searchSpecimenInstituteArray, currTube,
 
         if (acceptedDeviationArray.length >= 1) {
             for (const deviationLabel of acceptedDeviationArray) {
-                deviationString += `${deviationLabel} <br><br>`;
+                deviationString += `${deviationLabel} <br>`;
             }
             deviationTypeCell.innerHTML = deviationString;
         } else {
-            deviationTypeCell.innerHTML = `<br><br>`;
+            deviationTypeCell.innerHTML = `<br>`;
         }
         commentCell.innerHTML = currTubeComments;
     }
-    if (bagsArrayIndex % 2 == 0) {
+    
+    if (bagsArrayIndex % 2 === 0) {
         currRow.style['background-color'] = 'lightgrey';
     }
 }
