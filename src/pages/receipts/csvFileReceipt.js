@@ -194,7 +194,7 @@ const getVialTypesMappings = (filteredResult) => {
     vialMappingsHolder.push('5 mL Serum separator tube', 'SST', 'Serum', '5')
   } else if (collectionType === fieldToConceptIdMapping.clinical && (tubeId === '0003' || tubeId === '0013')) {
     vialMappingsHolder.push('4 ml Vacutainer', 'Lithium Heparin', 'Whole BI', '4')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && (tubeId === '0004' || tubeId === '0014') || tubeId === '0024') {
+  } else if (collectionType === fieldToConceptIdMapping.clinical && (tubeId === '0004' || tubeId === '0014' || tubeId === '0024')) {
     vialMappingsHolder.push('4 ml Vacutainer', 'EDTA = K2', 'Whole BI', '4')
   } else if (collectionType === fieldToConceptIdMapping.clinical && tubeId === '0005') {
     vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole BI', '6')
@@ -227,9 +227,6 @@ const getVialTypesMappings = (filteredResult) => {
     vialMappingsHolder.push('5 ml Serum separator tube', 'SST', 'Serum', '5')
   } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpHI"] && (tubeId === '0003' || tubeId === '0013')) {
     vialMappingsHolder.push('4 mL Vacutainer', 'Lithium Heparin', 'Whole BI', '4')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpHI"] && (tubeId === '0004' || tubeId === '0014' 
-  || tubeId === '0024')) {
-    vialMappingsHolder.push('3 mL Vacutainer', 'EDTA = K2', 'Whole BI', '3')
   } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpHI"] && (tubeId === '0004' || tubeId === '0014' 
   || tubeId === '0024')) {
     vialMappingsHolder.push('3 mL Vacutainer', 'EDTA = K2', 'Whole BI', '3')
