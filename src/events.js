@@ -1820,6 +1820,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
 
                         const response = await getParticipantCollections(data.token);
                         let collection = response.data.filter(res => res['331584571'] == visit.concept);
+                        if (collection.length === 0) continue;
 
                         const confirmRepeat = await swal({
                             title: "Warning - Participant Previously Checked In",
@@ -1846,7 +1847,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
                         if (confirmRepeat === "cancel") return;
                     }
                 }
-            };
+            }
 
             await checkInParticipant(data, visitConcept);
 
