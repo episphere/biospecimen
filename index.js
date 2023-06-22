@@ -21,6 +21,7 @@ import { packagesInTransitScreen } from "./src/pages/receipts/packagesInTransit.
 import { packageReceiptScreen } from "./src/pages/receipts/packageReceipt.js";
 import { csvFileReceiptScreen } from "./src/pages/receipts/csvFileReceipt.js";
 import { kitReportsScreen } from "./src/pages/reports/kitReports.js";
+import { collectionIdSearchScreen } from "./src/pages/reports/collectionIdSearch.js";
 
 
 let auth = '';
@@ -51,7 +52,7 @@ window.onload = () => {
 
     if(location.host === urls.prod) {
         !firebase.apps.length ? firebase.initializeApp(prodFirebaseConfig()) : firebase.app();
-        //window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'prod' });
+        window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'prod' });
     }
     else if(location.host === urls.stage) {
         !firebase.apps.length ? firebase.initializeApp(stageFirebaseConfig()) : firebase.app();
@@ -62,7 +63,7 @@ window.onload = () => {
         !isLocalDev && window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'dev' });
     }
 
-    !isLocalDev && location.host !== urls.prod && window.DD_RUM && window.DD_RUM.startSessionReplayRecording();
+    !isLocalDev && window.DD_RUM && window.DD_RUM.startSessionReplayRecording();
 
     auth = firebase.auth();
     auth.onAuthStateChanged(async user => {
@@ -97,6 +98,7 @@ const manageRoutes = async () => {
         else if (route === "#packagereceipt") packageReceiptScreen(auth, route);
         else if (route === "#csvfilereceipt") csvFileReceiptScreen(auth, route);
         else if (route === "#kitreports") kitReportsScreen(auth, route);
+        else if (route === "#collectionidsearch") collectionIdSearchScreen(auth, route);
         else if (route === "#reports") reportsQuery(auth, route);
         else if (route === "#manage_users") manageUsers(auth, route);
         else if (route === "#sign_out") signOut();

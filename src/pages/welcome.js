@@ -187,7 +187,7 @@ const navbarThemesSettings = {
 function updateNavbarAfterDashboardSelection() {
   const dashboardSelectElement = document.getElementById('dashboardSelection');
 
-  dashboardSelectElement.addEventListener('change', (event) => {
+  dashboardSelectElement && dashboardSelectElement.addEventListener('change', (event) => {
     const selectedDashboard = event.target.value;
     appState.setState({ dashboardSelection: selectedDashboard });
 

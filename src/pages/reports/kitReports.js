@@ -1,7 +1,7 @@
 import { showAnimation, hideAnimation } from "../../shared.js";
-import { kitReportsNavbar } from "./kitReportsNavbar.js";
+import { reportsNavbar } from "./reportsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
-import { activeKitReportsNavbar } from "./activeKitReportsNavbar.js";
+import { activeReportsNavbar } from "./activeReportsNavbar.js";
 import { getIdToken,convertTime } from "../../shared.js";
 
 // API
@@ -24,7 +24,7 @@ const kitReportsTemplate = async (username, auth, route) => {
     const sortParticipantsArr = sortAllParticipants(allParticipants);
     const allParticipantsActiveArr = allParticipantsActive(allParticipants);
     let template = "";
-    template += kitReportsNavbar();
+    template += reportsNavbar();
     template += ` 
               <div id="root root-margin" style="padding-top: 25px;">
                 <h3 style="text-align: center; margin: 1rem 0;">Reports Screen</h3>
@@ -59,7 +59,7 @@ const kitReportsTemplate = async (username, auth, route) => {
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML =
         nonUserNavBar(username);
-        activeKitReportsNavbar();
+        activeReportsNavbar();
         plotly(bptlMetricsData, allParticipantsActiveArr);
 };
 
