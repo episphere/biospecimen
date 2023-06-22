@@ -165,18 +165,6 @@ export const reportSideNavBar = () => {
             <li class="nav-item">
                 <a class="nav-link" href="#checkoutreport" id="navBarCheckoutReport">Check-Out Report</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" disabled>ABC Report</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" disabled>XYZ Report</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" disabled>123 Report</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" disabled>789 Report</a>
-            </li>
         </ul>`;
     return template;
 }

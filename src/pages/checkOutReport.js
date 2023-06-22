@@ -50,42 +50,48 @@ export const renderCheckOutReport = async () => {
 }
 
 export const populateCheckOutTable = async () => {
-    let currTable = document.getElementById('populateCheckOutTable')
-    currTable.innerHTML = ''
-    let rowCount = currTable.rows.length;
-    let currRow = currTable.insertRow(rowCount);
-    currRow.insertCell(0).innerHTML = "<b>Connect ID</b>";
-    currRow.insertCell(1).innerHTML = "<b>Last Name</b>";
-    currRow.insertCell(2).innerHTML = "<b>First Name</b>";
-    currRow.insertCell(3).innerHTML = "<b>Check-In Date/Time</b>";
-    currRow.insertCell(4).innerHTML = "<b>Go to Check-Out</b>";
-
+    const currTable = document.getElementById('populateCheckOutTable');
+    currTable.innerHTML = '';
+    
+    const headerRow = currTable.insertRow();
+    headerRow.innerHTML = `
+      <th><b>Connect ID</b></th>
+      <th><b>Last Name</b></th>
+      <th><b>First Name</b></th>
+      <th><b>Check-In Date/Time</b></th>
+      <th><b>Go to Check-Out</b></th>
+    `;
+    
     showAnimation();
     const data = await findParticipant(`checkedIn=${true}`).then(res => res.data);
-    for (let i = 0; i < data.length; i++) {
-        if(!data[i]['331584571']['266600170']['343048998']){
-            rowCount = currTable.rows.length;
-            currRow = currTable.insertRow(rowCount);
-            currRow.insertCell(0).innerHTML = data[i]['Connect_ID'];
-            currRow.insertCell(1).innerHTML = data[i][fieldToConceptIdMapping.lName];
-            currRow.insertCell(2).innerHTML = data[i][fieldToConceptIdMapping.fName];
-            currRow.insertCell(3).innerHTML = convertISODateTime(data[i]['331584571']['266600170']['840048338']);
-            currRow.insertCell(4).innerHTML = `<button class="btn btn-outline-primary text-nowrap participantCheckOutBtn" data-checkout='${JSON.stringify(data[i])}'>Go to Check-Out</button>`;
-        }
+    
+    for (const item of data) {
+      if (!item['331584571']['266600170']['343048998']) {
+        const newRow = currTable.insertRow();
+        newRow.innerHTML = `
+          <td>${item['Connect_ID']}</td>
+          <td>${item[fieldToConceptIdMapping.lName]}</td>
+          <td>${item[fieldToConceptIdMapping.fName]}</td>
+          <td>${convertISODateTime(item['331584571']['266600170']['840048338'])}</td>
+          <td><button class="btn btn-outline-primary text-nowrap participantCheckOutBtn" data-checkout='${JSON.stringify(item)}'>Go to Check-Out</button></td>
+        `;
+      }
     }
     hideAnimation();
-    redirectParticipantToCheckOut();
+    redirectParticipantToCheckOut();    
 }
 
 const redirectParticipantToCheckOut = () => {
     const participantCheckOutBtns = document.getElementsByClassName('participantCheckOutBtn');
-    for (let i = 0; i < participantCheckOutBtns.length; i++) {
-      participantCheckOutBtns[i].addEventListener('click', async (e) => {
-        e.preventDefault();
-        const checkoutParticipantObject = participantCheckOutBtns[i].getAttribute('data-checkout');
-        console.log('checkoutId:', JSON.parse(checkoutParticipantObject));
-        checkInTemplate(JSON.parse(checkoutParticipantObject), 'checkOutReport');
-        document.body.scrollIntoView();
-      });
+    
+    const handleClick = async (e) => {
+      e.preventDefault();
+      const checkoutParticipantObject = e.target.getAttribute('data-checkout');
+      checkInTemplate(JSON.parse(checkoutParticipantObject), 'checkOutReport');
+      document.body.scrollIntoView();
+    };
+  
+    for (const btn of participantCheckOutBtns) {
+      btn.addEventListener('click', handleClick);
     }
-  }
+  }  

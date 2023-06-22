@@ -107,7 +107,7 @@ export const validateUser = async () => {
 
 export const findParticipant = async (query) => {
     const idToken = await getIdToken();
-    const response = await fetch(`http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=getParticipants&type=filter&${query}`, {
+    const response = await fetch(`${api}biospecimen?api=getParticipants&type=filter&${query}`, {
         method: "GET",
         headers: {
             Authorization:"Bearer "+idToken
@@ -1932,21 +1932,19 @@ export const visitType = [
 ];
 
 export const checkedIn = (data) => {
-
-  console.log('data', data['331584571'])
-    let isCheckedIn = false;
+  let isCheckedIn = false;
 
 
-        Array.from(visitType).forEach(visit => {
-            if(data['331584571'][visit.concept]) {
-                if(data['331584571'][visit.concept]['135591601'] && data['331584571'][visit.concept]['135591601'] === 353358909) {
-                    isCheckedIn = true;
-                }
-            }
-        });
-    
+      Array.from(visitType).forEach(visit => {
+          if(data['331584571'][visit.concept]) {
+              if(data['331584571'][visit.concept]['135591601'] && data['331584571'][visit.concept]['135591601'] === 353358909) {
+                  isCheckedIn = true;
+              }
+          }
+      });
+  
 
-    return isCheckedIn;
+  return isCheckedIn;
 };
 
 export const getCheckedInVisit = (data) => {
