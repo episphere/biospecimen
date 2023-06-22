@@ -107,7 +107,7 @@ export const validateUser = async () => {
 
 export const findParticipant = async (query) => {
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=getParticipants&type=filter&${query}`, {
+    const response = await fetch(`http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=getParticipants&type=filter&${query}`, {
         method: "GET",
         headers: {
             Authorization:"Bearer "+idToken
@@ -1933,9 +1933,10 @@ export const visitType = [
 
 export const checkedIn = (data) => {
 
+  console.log('data', data['331584571'])
     let isCheckedIn = false;
 
-    if(data['331584571']) {
+
         Array.from(visitType).forEach(visit => {
             if(data['331584571'][visit.concept]) {
                 if(data['331584571'][visit.concept]['135591601'] && data['331584571'][visit.concept]['135591601'] === 353358909) {
@@ -1943,7 +1944,7 @@ export const checkedIn = (data) => {
                 }
             }
         });
-    }
+    
 
     return isCheckedIn;
 };
@@ -2352,8 +2353,8 @@ export const packageConditonConversion = {
     "853876696": "No Manifest provided",
 }
 
-export const convertISODateTime = (dateWithdrawn) => {
-    let date = new Date(dateWithdrawn);
+export const convertISODateTime = (isoDateTime) => {
+    const date = new Date(isoDateTime);
     return setZeroDateTime(date.getMonth() + 1)+ '/' + setZeroDateTime(date.getDate()) + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + setZeroDateTime(date.getMinutes())
 }
 

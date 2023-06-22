@@ -457,3 +457,18 @@ box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
     vertical-align: top;
     padding: 0 0.75rem;
 }
+
+#reportTabs .nav-link {
+    border-radius: 0;
+    border-top: 3px solid transparent;
+    padding: 10px 15px;
+}
+
+#reportTabs .nav-link.active {
+    background-color: #a6bace;
+    border-color: #dee2e6 ;
+}
+
+#reportTabs .nav-link:hover {
+    background-color: #f8f9fa;
+}
