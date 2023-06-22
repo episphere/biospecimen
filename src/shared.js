@@ -1934,7 +1934,7 @@ export const visitType = [
 export const checkedIn = (data) => {
   let isCheckedIn = false;
 
-
+  if(data['331584571']) {
       Array.from(visitType).forEach(visit => {
           if(data['331584571'][visit.concept]) {
               if(data['331584571'][visit.concept]['135591601'] && data['331584571'][visit.concept]['135591601'] === 353358909) {
@@ -1942,7 +1942,7 @@ export const checkedIn = (data) => {
               }
           }
       });
-  
+    }
 
   return isCheckedIn;
 };
