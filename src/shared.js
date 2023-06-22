@@ -132,13 +132,12 @@ export const updateParticipant = async (array) => {
 
 export const getUserProfile = async (uid) => {
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=getUserProfile`, {
-        method: "POST",
+    const response = await fetch(`${api}api=getUserProfile&uid=${uid}`, {
+        method: "GET",
         headers: {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
-        },
-        body:  JSON.stringify(uid)
+        }
     });
     
     return await response.json();
@@ -1170,10 +1169,10 @@ export const updateBaselineData = async (siteTubesList, data) => {
         }
     });
 
-    if(baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research) {
+    if (baselineCollections.length > 0 && baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research) {
         allBaselineCollected = bloodCollected && urineCollected && mouthwashCollected;
     }
-    else if(baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.clinical) {
+    else if (baselineCollections.length > 0 && baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.clinical) {
         allBaselineCollected = bloodCollected && urineCollected;
     }
 
@@ -1762,7 +1761,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                     Quagga.stop();
                     document.querySelector('[data-dismiss="modal"]').click();
                     return
-                };
+                }
                 if(elementID === 'accessionID3') {
                     disableInput('accessionID4', true);
                     // addEventClearScannedBarcode('clearScanAccessionID');
@@ -1770,7 +1769,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                     Quagga.stop();
                     document.querySelector('[data-dismiss="modal"]').click();
                     return
-                };
+                }
                 if(elementID === 'masterSpecimenId') {
                     disableInput('masterSpecimenId', true);
                     document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end) : result.codeResult.code;
@@ -1819,7 +1818,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                     }
                     document.querySelector('[data-dismiss="modal"]').click();
                     return;
-                };
+                }
                 if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,masterSpecimenIDRequirement.length))) return;
                 if(!elementID) return;
                 if(elementID === 'scanSpecimenID') {
@@ -2047,7 +2046,7 @@ export const getCollectionsByVisit = async (data) => {
 
     const response = await getParticipantCollections(data.token);
 
-    if(response.code != 404) {
+    if (response.data.length > 0) {
         response.data.forEach(col => {
             if(col['331584571'] == visit) collections.push(col);
         });
@@ -2056,16 +2055,6 @@ export const getCollectionsByVisit = async (data) => {
     return collections;
 };
 
-export const getCollectionById = async (data, collectionId) => {
-
-    const response = await getParticipantCollections(data.token);
-    let collectionExists = false;
-    if(response.code != 404) {
-        collectionExists = response.data.some(col => col.id === collectionId)
-        };
-    
-    return collections;
-};
 export const getWorkflow = () => document.getElementById('contentBody').dataset.workflow ?? localStorage.getItem('workflow');
 export const getSiteAcronym = () => document.getElementById('contentBody').dataset.siteAcronym ?? localStorage.getItem('siteAcronym');
 export const getSiteCode = () => document.getElementById('contentBody').dataset.siteCode ?? localStorage.getItem('siteCode');
@@ -2403,7 +2392,7 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
     const response = await getParticipantCollections(data.token);
     let sendBaselineEmail = false;
 
-    if(response.code != 404) {
+    if (response.data.length > 0) {
         // filter based on visit type (331584571) and collection type as 'clinical' (664882224)
         const collections = response.data.filter(res => res['331584571'] == visitType && res['650516960'] == 664882224);
         if(collections.length == 1) sendBaselineEmail = true;

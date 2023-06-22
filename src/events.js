@@ -1748,7 +1748,7 @@ export const addGoToCheckInEvent = () => {
         try {
             showAnimation();
 
-            let data = await getUserProfile({uid}).then(
+            let data = await getUserProfile(uid).then(
                 (res) => res.data
             );
 
@@ -1819,6 +1819,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn, flag) => {
 
                         const response = await getParticipantCollections(data.token);
                         let collection = response.data.filter(res => res['331584571'] == visit.concept);
+                        if (collection.length === 0) continue;
 
                         const confirmRepeat = await swal({
                             title: "Warning - Participant Previously Checked In",
@@ -1845,7 +1846,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn, flag) => {
                         if (confirmRepeat === "cancel") return;
                     }
                 }
-            };
+            }
 
             await checkInParticipant(data, visitConcept);
 

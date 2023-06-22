@@ -18,7 +18,7 @@ export const checkInTemplate = async (data, flag) => {
     let collections = [];
     let visitCollections = [];
 
-    if(response.code != 404) {
+    if (response.data.length > 0) {
         collections = response.data;
 
         if(isCheckedIn) {
