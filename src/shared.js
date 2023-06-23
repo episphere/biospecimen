@@ -1931,6 +1931,7 @@ export const visitType = [
 ];
 
 export const checkedIn = (data) => {
+
   let isCheckedIn = false;
 
   if(data['331584571']) {
@@ -1943,7 +1944,7 @@ export const checkedIn = (data) => {
       });
     }
 
-  return isCheckedIn;
+    return isCheckedIn;
 };
 
 export const getCheckedInVisit = (data) => {
