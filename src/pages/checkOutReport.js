@@ -66,13 +66,15 @@ export const populateCheckOutTable = async () => {
     const data = await findParticipant(`checkedIn=${true}`).then(res => res.data);
     
     for (const item of data) {
-      if (!item['331584571']['266600170']['343048998']) {
+      if (!item[fieldToConceptIdMapping.collection.selectedVisit][fieldToConceptIdMapping.baseline.visitId][
+          fieldToConceptIdMapping.checkOutDateTime]) {
         const newRow = currTable.insertRow();
         newRow.innerHTML = `
           <td>${item['Connect_ID']}</td>
           <td>${item[fieldToConceptIdMapping.lName]}</td>
           <td>${item[fieldToConceptIdMapping.fName]}</td>
-          <td>${convertISODateTime(item['331584571']['266600170']['840048338'])}</td>
+          <td>${convertISODateTime(item[fieldToConceptIdMapping.collection.selectedVisit][fieldToConceptIdMapping.baseline.visitId]
+                [fieldToConceptIdMapping.checkInDateTime])}</td>
           <td><button class="btn btn-outline-primary text-nowrap participantCheckOutBtn" data-checkout='${JSON.stringify(item)}'>Go to Check-Out</button></td>
         `;
       }

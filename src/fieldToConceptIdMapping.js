@@ -92,6 +92,8 @@ export default {
             deviationComments: 536710547,
         },
     },
+    checkOutDateTime: 343048998,
+    checkInDateTime: 840048338,
 
     // not shipped specimen deviation id
     brokenSpecimenDeviation: 472864016,
