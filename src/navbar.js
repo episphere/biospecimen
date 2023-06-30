@@ -157,7 +157,7 @@ export const bodyNavBar = () => {
 }
 
 export const reportSideNavBar = () => {
-    let template = `
+    return `
         <ul class="nav nav-tabs flex-column" id="reportTabs">
             <li class="nav-item">
                 <a class="nav-link active" href="#reports" id="navBarShippingReport">Shipping Report</a>
@@ -166,7 +166,6 @@ export const reportSideNavBar = () => {
                 <a class="nav-link" href="#checkoutreport" id="navBarCheckoutReport">Check-Out Report</a>
             </li>
         </ul>`;
-    return template;
 }
 
 /**

@@ -1,6 +1,6 @@
-import { userAuthorization, removeActiveClass, hideAnimation, showAnimation, findParticipant, convertISODateTime, checkOutParticipant } from "./../shared.js"
+import { userAuthorization, removeActiveClass, hideAnimation, showAnimation, findParticipant, convertISODateTime, restrictNonBiospecimenUser } from "./../shared.js"
 import { checkInTemplate } from './checkIn.js';
-import { homeNavBar, reportSideNavBar, unAuthorizedUser} from '../navbar.js';
+import { homeNavBar, reportSideNavBar } from '../navbar.js';
 import fieldToConceptIdMapping from "../fieldToConceptIdMapping.js";
 
 
@@ -9,8 +9,7 @@ export const checkOutReportTemplate = (auth, route) => {
         if(user){
             const response = await userAuthorization(route, user.displayName ? user.displayName : user.email);
             if ( response.isBiospecimenUser === false ) {
-                document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
-                document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
+                restrictNonBiospecimenUser();
                 return;
             }
             if(!response.role) return;
@@ -66,15 +65,13 @@ export const populateCheckOutTable = async () => {
     const data = await findParticipant(`checkedIn=${true}`).then(res => res.data);
     
     for (const item of data) {
-      if (!item[fieldToConceptIdMapping.collection.selectedVisit][fieldToConceptIdMapping.baseline.visitId][
-          fieldToConceptIdMapping.checkOutDateTime]) {
+      if (!item[fieldToConceptIdMapping.collection.selectedVisit]?.[fieldToConceptIdMapping.baseline.visitId]?.[fieldToConceptIdMapping.checkOutDateTime]) {
         const newRow = currTable.insertRow();
         newRow.innerHTML = `
           <td>${item['Connect_ID']}</td>
           <td>${item[fieldToConceptIdMapping.lName]}</td>
           <td>${item[fieldToConceptIdMapping.fName]}</td>
-          <td>${convertISODateTime(item[fieldToConceptIdMapping.collection.selectedVisit][fieldToConceptIdMapping.baseline.visitId]
-                [fieldToConceptIdMapping.checkInDateTime])}</td>
+          <td>${convertISODateTime(item[fieldToConceptIdMapping.collection.selectedVisit]?.[fieldToConceptIdMapping.baseline.visitId]?.[fieldToConceptIdMapping.checkInDateTime])}</td>
           <td><button class="btn btn-outline-primary text-nowrap participantCheckOutBtn" data-checkout='${JSON.stringify(item)}'>Go to Check-Out</button></td>
         `;
       }
@@ -89,7 +86,7 @@ const redirectParticipantToCheckOut = () => {
     const handleClick = async (e) => {
       e.preventDefault();
       const checkoutParticipantObject = e.target.getAttribute('data-checkout');
-      checkInTemplate(JSON.parse(checkoutParticipantObject), 'checkOutReport');
+      checkInTemplate(JSON.parse(checkoutParticipantObject), true);
       document.body.scrollIntoView();
     };
   

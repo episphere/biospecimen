@@ -2,7 +2,7 @@ import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInV
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 import conceptIds from '../fieldToConceptIdMapping.js';
 
-export const checkInTemplate = async (data, flag) => {
+export const checkInTemplate = async (data, checkOutFlag) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarParticipantCheckIn');
     if (navBarBtn) {
@@ -31,7 +31,7 @@ export const checkInTemplate = async (data, flag) => {
     let template = `
         </br>
 
-        ${flag === 'checkOutReport' ? `<button class="btn btn-outline-primary text-nowrap" id="backToCheckOutReport">Back to Check-Out Report</button>` : ``}
+        ${checkOutFlag === true ? `<button class="btn btn-outline-primary text-nowrap" id="backToCheckOutReport">Back to Check-Out Report</button>` : ``}
 
         </br>
         </br>
@@ -88,8 +88,8 @@ export const checkInTemplate = async (data, flag) => {
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventContactInformationModal(data);
-    flag === 'checkOutReport' ? reloadCheckOutReports('backToCheckOutReport') : addEventBackToSearch('navBarSearch')
-    addEventCheckInCompleteForm(isCheckedIn, flag);
+    checkOutFlag === true ? reloadCheckOutReports('backToCheckOutReport') : addEventBackToSearch('navBarSearch')
+    addEventCheckInCompleteForm(isCheckedIn, checkOutFlag);
     addEventVisitSelection();
 }
 

@@ -1,4 +1,4 @@
-import { userNavBar, adminNavBar, nonUserNavBar } from "./navbar.js";
+import { userNavBar, adminNavBar, nonUserNavBar, unAuthorizedUser } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
 import { shipmentTracking, shippingManifest } from "./pages/shipping.js"
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
@@ -2343,6 +2343,7 @@ export const packageConditonConversion = {
 
 export const convertISODateTime = (isoDateTime) => {
     const date = new Date(isoDateTime);
+    console.log('sa', isoDateTime)
     return setZeroDateTime(date.getMonth() + 1)+ '/' + setZeroDateTime(date.getDate()) + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + setZeroDateTime(date.getMinutes())
 }
 
@@ -2435,3 +2436,8 @@ export const requestsBlocker = {
     return this.isReqInProcess;
   },
 };
+
+export const restrictNonBiospecimenUser = () => {
+  document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
+  document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
+}
