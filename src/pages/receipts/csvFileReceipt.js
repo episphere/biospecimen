@@ -21,7 +21,7 @@ const csvFileReceiptTemplate = async (username) => {
   template += receiptsNavbar();
   template += `<div id="root root-margin" style="margin-top:3rem;">
                 <div id="alert_placeholder"></div>
-                <span> <h4 style="text-align: center; margin: 1rem 0;">In-Transit</h4> </span>
+                <span> <h4 style="text-align: center; margin: 1rem 0;">In Transit</h4> </span>
                 <div class="container-fluid">
                   <div class="card bg-light mb-3 mt-3 mx-auto" style="max-width:50rem;">
                     <div class="card-body" style="padding: 4rem 2.5rem;">
@@ -69,7 +69,7 @@ const getInTransitFileType = () => {
     const modalHeaderEl = document.getElementById("modalHeader");
     const modalBodyEl = document.getElementById("modalBody");
     modalHeaderEl.innerHTML = `
-                              <h4>Select a format to download In-Transit file</h4>
+                              <h4>Select a format to download In Transit file</h4>
                               <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeModal">
                               <span aria-hidden="true">&times;</span></button>`
 
