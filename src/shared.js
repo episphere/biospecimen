@@ -2343,7 +2343,6 @@ export const packageConditonConversion = {
 
 export const convertISODateTime = (isoDateTime) => {
     const date = new Date(isoDateTime);
-    console.log('sa', isoDateTime)
     return setZeroDateTime(date.getMonth() + 1)+ '/' + setZeroDateTime(date.getDate()) + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + setZeroDateTime(date.getMinutes())
 }
 
