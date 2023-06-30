@@ -1,40 +1,49 @@
 import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToLocationObj, baseAPI, keyToNameObj, convertISODateTime, formatISODateTime, getAllBoxes, getSiteAcronym, conceptIdToSiteSpecificLocation } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
-import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
+import { nonUserNavBar } from "../../navbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 import { getRecentBoxesShippedBySiteNotReceived } from "./packagesInTransit.js";
 
-export const csvFileReceiptScreen = async (auth, route) => {
+export const csvFileReceiptScreen = async (auth) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
 
-  csvFileReceiptTemplate(username, auth, route);
+  csvFileReceiptTemplate(username);
   activeReceiptsNavbar();
   csvFileButtonSubmit();
-  csvInTransitButtonSubmit();
+  getInTransitFileType();
 }
 
-const csvFileReceiptTemplate = async (username, auth, route) => {
+const csvFileReceiptTemplate = async (username) => {
   let template = "";
-
   template += receiptsNavbar();
   template += `<div id="root root-margin" style="margin-top:3rem;">
                 <div id="alert_placeholder"></div>
-                <span> <h4 style="text-align: center; margin: 1rem 0;">In Transit CSV File</h4> </span>
+                <span> <h4 style="text-align: center; margin: 1rem 0;">In-Transit</h4> </span>
                 <div class="container-fluid">
                   <div class="card bg-light mb-3 mt-3 mx-auto" style="max-width:50rem;">
                     <div class="card-body" style="padding: 4rem 2.5rem;">
                       <form class="form">
                       <div class="form-group d-flex flex-wrap align-items-center justify-content-center m-0">
                           <p></p>
-                          <button id="createTransitCsv" class="btn btn-primary">Create File</button>
+                          <button id="createTransitFile" data-toggle="modal" data-target="#modalShowMoreData" class="btn btn-primary">Create File</button>
                       </div>
                       </form>
                     </div>
                   </div>
               </div>`
+
+template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+              <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+                  <div class="modal-content sub-div-shadow">
+                      <div class="modal-header" id="modalHeader"></div>
+                      <div class="modal-body" id="modalBody"></div>
+                  </div>
+              </div>
+          </div>`
+
   template += `<span> <h4 style="text-align: center; margin: 1rem 0;">Receipted CSV File</h4> </span>
                   <div class="container-fluid">
                     <div class="card bg-light mb-3 mt-3 mx-auto" style="max-width:50rem;">
@@ -49,20 +58,57 @@ const csvFileReceiptTemplate = async (username, auth, route) => {
                       </div>
                     </div>
                   </div>`
+  
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
 }
 
-const csvInTransitButtonSubmit = () => {
-  document.getElementById("createTransitCsv").addEventListener("click", async (e)=> {
+const getInTransitFileType = () => {
+  document.getElementById("createTransitFile").addEventListener("click", async (e) => {
     e.preventDefault();
-    showAnimation();
-    const response = await getAllBoxes(`bptl`);
-    hideAnimation();
-    const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
-    let modifiedTransitResults = updateInTransitMapping(allBoxesShippedBySiteAndNotReceived);
-    generateInTransitCSVData(modifiedTransitResults);
+    const modalHeaderEl = document.getElementById("modalHeader");
+    const modalBodyEl = document.getElementById("modalBody");
+    modalHeaderEl.innerHTML = `
+                              <h4>Select a format to download In-Transit file</h4>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeModal">
+                              <span aria-hidden="true">&times;</span></button>`
+
+    modalBodyEl.innerHTML =  `<div class="row">
+                                <div class="col">
+                                      <form>
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="radio" name="fileFormat" value="xlsx" id="xlsxCheck">
+                                          <label class="form-check-label" for="xlsxCheck">
+                                            .XLSX (better readability)
+                                          </label>
+                                        </div>
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="radio" name="fileFormat" value="csv" id="csvCheck">
+                                          <label class="form-check-label" for="csvCheck">
+                                            .CSV (for BSI upload)
+                                          </label>
+                                        </div>
+                                      </form>
+                                </div>
+                            </div>`
+    confirmFileSelection();
   })
+}
+
+const confirmFileSelection = () => {
+  const radios = document.querySelectorAll('input[name="fileFormat"]');
+  radios.forEach(radio => {
+    radio.addEventListener('click', async (e) => {
+      const radioVal = radio.value;
+      document.getElementById('modalShowMoreData').querySelector('#closeModal').click(); // closes modal
+      showAnimation();
+      const response = await getAllBoxes(`bptl`);
+      hideAnimation();
+      const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
+      let modifiedTransitResults = updateInTransitMapping(allBoxesShippedBySiteAndNotReceived);
+      (radioVal === 'xlsx') ? processInTransitXLSXData(modifiedTransitResults) : generateInTransitCSVData(modifiedTransitResults)
+    });
+});
 }
 
 const csvFileButtonSubmit = () => {
@@ -131,19 +177,20 @@ const updateInTransitMapping = (shippedBoxes) => {
     
     specimenBags.forEach((specimenBag, index) => {
       specimenBag.arrElements.forEach((fullSpecimenIds, j, specimenBagSize) => { // grab fullSpecimenIds & loop thru content
-            let dataHolder = {}
-            dataHolder['shipDate'] = i[fieldToConceptIdMapping.shippingShipDate] != undefined ? i[fieldToConceptIdMapping.shippingShipDate].split("T")[0] : ``
-            dataHolder['trackingNumber'] = i[fieldToConceptIdMapping.shippingTrackingNumber] != undefined ? i[fieldToConceptIdMapping.shippingTrackingNumber] : ``
-            dataHolder['shippedSite'] = i.siteAcronym != undefined ? i.siteAcronym : ``
-            dataHolder['shippedLocation'] = i[fieldToConceptIdMapping.shippingLocation] != undefined ? conceptIdToSiteSpecificLocation[i[fieldToConceptIdMapping.shippingLocation]] : ``
-            dataHolder['shipDateTime'] = i[fieldToConceptIdMapping.shippingShipDate] != undefined ? convertISODateTime(i[fieldToConceptIdMapping.shippingShipDate]) : ``
-            dataHolder['numSamples'] = specimenBagSize.length // to get number of samples
-            dataHolder['tempMonitor'] = i[fieldToConceptIdMapping.tempProbe] == fieldToConceptIdMapping.yes ? `Yes` : `No`
-            dataHolder['BoxId'] = i[fieldToConceptIdMapping.shippingBoxId] != undefined ? i[fieldToConceptIdMapping.shippingBoxId] : ``
-            dataHolder['specimenBagId'] = bagKeys[index]
-            dataHolder['fullSpecimenIds'] = fullSpecimenIds
-            dataHolder['materialType'] = materialTypeMapping(fullSpecimenIds)
-            holdProcessedResult.push(dataHolder)
+        let dataHolder = {
+          shipDate: i[fieldToConceptIdMapping.shippingShipDate]?.split("T")[0] || '',
+          trackingNumber: i[fieldToConceptIdMapping.shippingTrackingNumber] || '',
+          shippedSite: i.siteAcronym || '',
+          shippedLocation: conceptIdToSiteSpecificLocation[i[fieldToConceptIdMapping.shippingLocation]] || '',
+          shipDateTime: convertISODateTime(i[fieldToConceptIdMapping.shippingShipDate]) || '',
+          numSamples: specimenBagSize.length,
+          tempMonitor: i[fieldToConceptIdMapping.tempProbe] === fieldToConceptIdMapping.yes ? 'Yes' : 'No',
+          BoxId: i[fieldToConceptIdMapping.shippingBoxId] || '',
+          specimenBagId: bagKeys[index],
+          fullSpecimenIds: fullSpecimenIds,
+          materialType: materialTypeMapping(fullSpecimenIds)
+        };
+        holdProcessedResult.push(dataHolder);        
         })
     });
 
@@ -263,34 +310,36 @@ const getVialTypesMappings = (filteredResult) => {
 }
 
 const updateResultMappings = (i, vialMappings) => {
-  i['Study ID'] = 'Connect Study'
-  i['Sample Collection Center'] = (i[fieldToConceptIdMapping.collectionType]) === fieldToConceptIdMapping.clinical ? keyToNameObj[i[fieldToConceptIdMapping.healthcareProvider]] : keyToLocationObj[i[fieldToConceptIdMapping.collectionLocation]]
-  i['Sample ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[0] : ``
-  i['Sequence #'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId].split(' ')[1] : ``
-  i['BSI ID'] = i[fieldToConceptIdMapping.collectionId] != undefined ? i[fieldToConceptIdMapping.collectionId] : ``
-  i['Subject ID'] = i['Connect_ID']
-  i['Date Received'] = i[fieldToConceptIdMapping.dateReceived] != undefined ? formatISODateTime(i[fieldToConceptIdMapping.dateReceived]) : ``
-  i['Date Drawn'] =  (i[fieldToConceptIdMapping.collectionType]) === fieldToConceptIdMapping.clinical ? (i[fieldToConceptIdMapping.clinicalDateTimeDrawn] != undefined ? convertISODateTime(i[fieldToConceptIdMapping.clinicalDateTimeDrawn]) : ``) : (i[fieldToConceptIdMapping.dateWithdrawn] != undefined ? convertISODateTime(i[fieldToConceptIdMapping.dateWithdrawn]) : ``) 
-  i['Vial Type'] = vialMappings[0]
-  i['Additive/Preservative'] = vialMappings[1]
-  i['Material Type'] = vialMappings[2]
-  i['Volume'] = vialMappings[3]
-  i['Volume Estimate'] = 'Assumed'
-  i['Voume Unit'] = 'ml (cc)'
-  i['Vial Warnings'] = ''
-  i['Hermolyzed'] = ''
-  i['Label Status'] = 'Barcoded'
-  i['Visit'] = 'BL'
-  delete i[fieldToConceptIdMapping.healthcareProvider]
-  delete i[fieldToConceptIdMapping.collectionLocation]
-  delete i['Connect_ID']
-  delete i[fieldToConceptIdMapping.collectionId]
-  delete i[fieldToConceptIdMapping.dateWithdrawn]
-  delete i[fieldToConceptIdMapping.clinicalDateTimeDrawn]
-  delete i[fieldToConceptIdMapping.dateReceived]
-  delete i[fieldToConceptIdMapping.collectionType]
-  delete i[fieldToConceptIdMapping.discardFlag]
-  delete i[fieldToConceptIdMapping.deviationNotFound]
+  i['Study ID'] = 'Connect Study';
+  i['Sample Collection Center'] = (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical) ? keyToNameObj[i[fieldToConceptIdMapping.healthcareProvider]] : keyToLocationObj[i[fieldToConceptIdMapping.collectionLocation]];
+  i['Sample ID'] = i[fieldToConceptIdMapping.collectionId]?.split(' ')[0] || '';
+  i['Sequence #'] = i[fieldToConceptIdMapping.collectionId]?.split(' ')[1] || '';
+  i['BSI ID'] = i[fieldToConceptIdMapping.collectionId] || '';
+  i['Subject ID'] = i['Connect_ID'];
+  i['Date Received'] = formatISODateTime(i[fieldToConceptIdMapping.dateReceived]) || '';
+  i['Date Drawn'] = (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical) ? convertISODateTime(i[fieldToConceptIdMapping.clinicalDateTimeDrawn]) || '' : convertISODateTime(i[fieldToConceptIdMapping.dateWithdrawn]) || '';
+  i['Vial Type'] = vialMappings[0];
+  i['Additive/Preservative'] = vialMappings[1];
+  i['Material Type'] = vialMappings[2];
+  i['Volume'] = vialMappings[3];
+  i['Volume Estimate'] = 'Assumed';
+  i['Voume Unit'] = 'ml (cc)';
+  i['Vial Warnings'] = '';
+  i['Hermolyzed'] = '';
+  i['Label Status'] = 'Barcoded';
+  i['Visit'] = 'BL';
+  
+  // Delete unwanted properties
+  delete i[fieldToConceptIdMapping.healthcareProvider];
+  delete i[fieldToConceptIdMapping.collectionLocation];
+  delete i['Connect_ID'];
+  delete i[fieldToConceptIdMapping.collectionId];
+  delete i[fieldToConceptIdMapping.dateWithdrawn];
+  delete i[fieldToConceptIdMapping.clinicalDateTimeDrawn];
+  delete i[fieldToConceptIdMapping.dateReceived];
+  delete i[fieldToConceptIdMapping.collectionType];
+  delete i[fieldToConceptIdMapping.discardFlag];
+  delete i[fieldToConceptIdMapping.deviationNotFound];  
 }
 
 const generateBSIqueryCSVData = (items) => {
@@ -303,7 +352,6 @@ const generateInTransitCSVData = (items) => {
   let csv = ``;
   csv += `Ship Date, Tracking Number, Shipped from Site, Shipped from Location, Shipped Date & Time, Expected Number of Samples, Temperature Monitor, Box Number, Specimen Bag ID Type, Full Specimen IDs, Material Type\r\n`
   downloadCSVfile(items, csv, 'in-transit-data-export')
-  
 }
 
 const downloadCSVfile = (items, csv, title) => {
@@ -314,21 +362,83 @@ const downloadCSVfile = (items, csv, title) => {
       csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') 
       keysCounter++
     }}
-    let link = document.createElement("a");
-    link.id = "download-csv";
-    link.setAttribute("href","data:text/plain;charset=utf-8," + encodeURIComponent(csv));
-    link.setAttribute("download",`${new Date().toLocaleDateString()}-${title}.csv`);
-    document.body.appendChild(link);
-    document.querySelector("#download-csv").click();
-    document.body.removeChild(link);
-    let alertList = document.getElementById("alert_placeholder");
-    let template = ``;
-    template += `
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-              Success!
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-            </div>`;
-    alertList.innerHTML = template;
+    generateFileToDownload(csv, title, 'csv')
+}
+
+/**
+ * Process data to the format required by xlsx library. Map function converts each row of inTransitItems into an array of values using Object.values
+ * @param {object} inTransitItems - array of objects
+ * @returns {array} Returns an array of arrays
+*/ 
+
+const processInTransitXLSXData = (inTransitItems) => {
+  const header = ['Ship Date', 'Tracking Number', 'Shipped from Site', 'Shipped from Location', 'Shipped Date & Time', 'Expected Number of Samples', 'Temperature Monitor', 'Box Number', 'Specimen Bag ID Type', 'Full Specimen IDs', 'Material Type'];
+  const inTransitData = [header, ...inTransitItems.map(row => Object.values(row))];
+  loadSheetJScdn(inTransitData);
+};
+
+/**
+ * Loads SheetJS CDN upon .XLSX selection & then triggers SheetJS to process upon script on load
+ * @param {array} modifiedTransitResults - array of arrays
+ * @returns
+*/ 
+
+const loadSheetJScdn = (modifiedTransitResults) => {
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.mini.min.js';
+  script.onload = function() {
+    handleXLSXLibrary(modifiedTransitResults); // runs after the script is successfully loaded
+  };
+  document.head.appendChild(script);
+}
+
+/**
+ * Using SheetJS, data gets processed & gets added to XLSX workbook and worksheet. Then triggers xlsx file download
+ * @param {array} data - array of arrays
+ * @returns
+*/ 
+
+const handleXLSXLibrary = (data) => {
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.aoa_to_sheet(data); // Create a new workbook and worksheet
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, `InTransitExport`); // Add the worksheet to the workbook
+
+  const xlsxFile = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });  // Convert the workbook to a binary XLSX file
+
+  const blob = new Blob([xlsxFile], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });  // Create a Blob from the binary data
+  generateFileToDownload(blob, 'In-Transit-XLSX', 'xlsx')
+}
+
+/**
+ * Generates xlsx or csv file for download
+ * @param {array, string, string}
+ * @returns
+*/ 
+
+const generateFileToDownload = (blob, title, fileType) => {
+  const link = document.createElement('a');  // Create a download link
+  if (fileType === 'xlsx') {
+    link.setAttribute('href', URL.createObjectURL(blob));
+    link.setAttribute("download",`${getCurrentDate()}-${title}.xlsx`);
+  }
+  else {
+    link.setAttribute("href", `data:text/plain;charset=utf-8,${encodeURIComponent(blob)}`);
+    link.setAttribute("download", `${getCurrentDate()}-${title}.csv`);
+  }
+
+  document.body.appendChild(link);
+  link.click(); // Trigger download
+  document.body.removeChild(link);
+
+  // Display success message
+  const alertList = document.getElementById('alert_placeholder');
+  const template = `
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      Success!
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`;
+  alertList.innerHTML = template;
 }
