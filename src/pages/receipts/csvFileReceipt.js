@@ -351,7 +351,7 @@ const generateBSIqueryCSVData = (items) => {
 const generateInTransitCSVData = (items) => {
   let csv = ``;
   csv += `Ship Date, Tracking Number, Shipped from Site, Shipped from Location, Shipped Date & Time, Expected Number of Samples, Temperature Monitor, Box Number, Specimen Bag ID Type, Full Specimen IDs, Material Type\r\n`
-  downloadCSVfile(items, csv, 'In-Transit-data-export-CSV')
+  downloadCSVfile(items, csv, 'In-Transit-CSV-data-export')
 }
 
 const downloadCSVfile = (items, csv, title) => {
@@ -407,7 +407,7 @@ const handleXLSXLibrary = (data) => {
   const xlsxFile = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });  // Convert the workbook to a binary XLSX file
 
   const blob = new Blob([xlsxFile], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });  // Create a Blob from the binary data
-  generateFileToDownload(blob, 'In-Transit-data-export-XLSX', 'xlsx')
+  generateFileToDownload(blob, 'In-Transit-XLSX-data-export', 'xlsx')
 }
 
 /**
