@@ -38,7 +38,6 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     };
 
     appState.setState({packagesInTransitDataObject: packagesInTransitDataObject});
-
     let template = '';
     
     template += `
@@ -68,7 +67,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     </div>
 
     <div class="modal fade" id="manifestModal" tabindex="-1" aria-labelledby="manifestModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
                 <div>
                     <button style="font-size:2.5rem;padding:1rem;" type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -91,11 +90,11 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 /**
  * Returns an array of shipped box items but not yet received and sorts the box items by most recent date
  * @param {array} boxes - array of all boxes from getAllBoxes(`bptl`) function
- * @returns 
+ * @returns sorted array of boxes by most recent date
  */
 export const getRecentBoxesShippedBySiteNotReceived = (boxes) => {
   // boxes are from searchBoxes endpoint
-    if(boxes.length === 0) return [];
+    if (boxes.length === 0) return [];
     const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
     const sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
     return sortBoxesBySubmitShipmentTime;
@@ -167,7 +166,6 @@ const createPackagesInTransitRows = (boxes, sumSamplesArr) => {
 }
 
 const manifestButton = (allBoxesShippedBySiteAndNotReceived, bagIdArr, manifestModalBodyEl) => {
-
     const buttons = document.getElementsByClassName("manifest-button");
     const packagesInTransitDataObject = appState.getState().packagesInTransitDataObject;
 
@@ -254,7 +252,7 @@ const groupAllBags = (allBoxesShippedBySiteAndNotReceived) => {
     const arrBoxes = [];
     allBoxesShippedBySiteAndNotReceived.forEach((box) => {
         const specimenBags = Object.keys(box.bags);
-        if(specimenBags.length) {
+        if (specimenBags.length) {
             arrBoxes.push(box.bags);
         }
     });
@@ -282,7 +280,6 @@ const countSamplesArr = (bagsArr) => {
     return arrNumSamples;
 };
 
-// // Returns an array --> nested array of grouped samples by index
 /**
  * Loops through each grouped bag and pushes the samples/specimens in each bag to an array
  * @param {array} bagsArr - Array of grouped bags. Ex.[({CXA456873 0009: {…}}), {CXA458003 0008: {…}, CXA458003 0009: {…}}]
@@ -319,10 +316,9 @@ const groupScannedByArr = (bagsArr) => {
 
         bagKeys.forEach((bagKey) => {
             const currentBag = bag[bagKey];
-            if(currentBag[scannedByFirstName] && currentBag[scannedByLastName]) {
+            if (currentBag[scannedByFirstName] && currentBag[scannedByLastName]) {
                 groupNames.push(currentBag[scannedByFirstName] + " " + currentBag[scannedByLastName]);
-            }
-            else if(currentBag[scannedByFirstName]) {
+            } else if (currentBag[scannedByFirstName]) {
                 groupNames.push(currentBag[scannedByFirstName]);
             }
         });
@@ -344,13 +340,11 @@ const groupShippedByArr = (allBoxesShippedBySiteAndNotReceived) => {
     let shippedByLastName = box[fieldToConceptIdMapping.shippedByLastName]?.trim() ?? ''
     if (shippedByFirstName.length > 0 && shippedByLastName > 0) {
         arrShippedBy.push(shippedByFirstName + " " + shippedByLastName)
-    }
-    else if (shippedByFirstName.length > 0) {
+    } else if (shippedByFirstName.length > 0) {
         arrShippedBy.push(shippedByFirstName)
-    }
-    else arrShippedBy.push("");
+    } else arrShippedBy.push("");
     });
-    return arrShippedBy
+    return arrShippedBy;
 }
 
 /**
@@ -375,7 +369,7 @@ const groupBagIdArr = (bagsArr) => {
 const groupByTrackingNumber = (allBoxesShippedBySiteAndNotReceived) => {
     const arrTrackingNums = []
     allBoxesShippedBySiteAndNotReceived.forEach((box) => {
-        if(box[fieldToConceptIdMapping["shippingTrackingNumber"]]) {
+        if (box[fieldToConceptIdMapping["shippingTrackingNumber"]]) {
             let trackingNumber = box[fieldToConceptIdMapping["shippingTrackingNumber"]]
             arrTrackingNums.push(trackingNumber)
         }
@@ -406,13 +400,13 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, searchSp
     // currBagIdArray - Ex. [CXA426800 0008, CXA426800 0009]
     const currBagIdArray =  bagIdArr[index];
 
-    if (!bagIdArr[index].length) return manifestBody;
-    
+    if (currBagIdArray.length === 0) return manifestBody;
     for (let i = 0; i < currBagIdArray.length; i++) {
         // currFullSpecimenIdArray - Ex. [CXA426800 0001, CXA426800 0002, ...]
-        const currFullSpecimenIdArray = groupSamples[i];
         const currSpecimenBagId = currBagIdArray[i];
+        const currFullSpecimenIdArray = groupSamples[i];
         const fullSpecimenIdDeviationObj = {};
+        
 
         for (let j = 0; j < currFullSpecimenIdArray.length; j++) {
             const currTube = currFullSpecimenIdArray[j];
@@ -421,22 +415,20 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, searchSp
             let currFullSpecimenIdArrayCounter = 0;
 
             fullSpecimenIdDeviationObj[currTube] = currAcceptedDeviationArray;
-
             if (j === currFullSpecimenIdArray.length - 1) {
                 const tableRowNumber = currFullSpecimenIdArrayLength;
 
                 for (let rowIndex = 0; rowIndex < tableRowNumber; rowIndex++) {
                     const tableRowEl = document.createElement('tr');
-                    if(i % 2 === 0) tableRowEl.style.backgroundColor = 'lightgrey'
-                    
+                    if (i % 2 === 0) tableRowEl.style.backgroundColor = 'lightgrey';
+                    const currFullSpecimenId = currFullSpecimenIdArray[rowIndex];
+                    const currSpecimenComments = getSpecimenComments(searchSpecimenInstituteArray, currFullSpecimenId);
+
                     for (let tableModalHeaderIndex = 0; tableModalHeaderIndex < tableModalHeaderColumnNameArray.length; tableModalHeaderIndex++) { 
                         const cellEl = document.createElement('td');
                         const headerName = tableModalHeaderColumnNameArray[tableModalHeaderIndex].textContent;
                         const currFullSpecimenIdArrayLength = currFullSpecimenIdArray.length;
                         let currTubeDeviationArrayCounter = 0;
-
-                        const currFullSpecimenId = currFullSpecimenIdArray[rowIndex];
-                        const currSpecimenComments = getSpecimenComments(searchSpecimenInstituteArray, currFullSpecimenId);
 
                         switch (headerName) {
 
@@ -459,8 +451,7 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, searchSp
                                     const currFullSpecimenId = currFullSpecimenIdArray[currFullSpecimenIdArrayCounter];
                                     cellEl.textContent = currFullSpecimenId;
                                     currFullSpecimenIdArrayCounter += 1;
-                                }
-                                else {
+                                } else {
                                     cellEl.textContent = ''
                                 }
                                 break;
@@ -468,17 +459,16 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, searchSp
                             case 'Deviation Type':
                                 const currFullSpecimenId = currFullSpecimenIdArray[rowIndex];
                                 // fullSpecimenIdDeviationObj Ex. { CXA854612 0001:['Hemolsysis Present'],... }
-                                const currDeviationTypeArray = fullSpecimenIdDeviationObj[currFullSpecimenId] ? fullSpecimenIdDeviationObj[currFullSpecimenId] : [];
-                                if (currDeviationTypeArray.length) {
+                                const currDeviationTypeArray = fullSpecimenIdDeviationObj[currFullSpecimenId] ?? [];
+                                if (currDeviationTypeArray.length > 0) {
                                     let deviationTextContent = '';
-                                    for(let currDeviationType of currDeviationTypeArray) {
-                                        deviationTextContent += `${currDeviationType} <br><br>`
+                                    for (const currDeviationType of currDeviationTypeArray) {
+                                        deviationTextContent += `${currDeviationType} <br>`;
                                     }
                                     cellEl.classList.add("deviation-type-cell");
                                     cellEl.innerHTML = deviationTextContent;
                                     currTubeDeviationArrayCounter += 1;
-                                }
-                                else {
+                                } else {
                                     cellEl.textContent = '';
                                 }
                                 break;
@@ -487,8 +477,7 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, searchSp
                                 if (currFullSpecimenIdArrayCounter !== currFullSpecimenIdArrayLength + 1 && currSpecimenComments.length) {
                                     cellEl.classList.add("comments-cell");
                                     cellEl.textContent = currSpecimenComments;
-                                }
-                                else {
+                                } else {
                                     cellEl.textContent = ''
                                 }
                                 break;
