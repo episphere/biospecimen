@@ -128,7 +128,11 @@ export const addEventsearchSpecimen = () => {
             return;
         }
         showAnimation();
+        console.log('masterSpecimenId', masterSpecimenId);
+        console.time('searchSpecimen');
         const biospecimen = await searchSpecimen(masterSpecimenId);
+        console.timeEnd('searchSpecimen');
+        console.log('biospecimen', biospecimen);
         if (biospecimen.code !== 200 || Object.keys(biospecimen.data).length === 0) {
             hideAnimation();
             showNotifications({ title: 'Not found', body: 'Specimen not found!' }, true)
@@ -151,8 +155,11 @@ export const addEventsearchSpecimen = () => {
             }
         }
 
+        console.time('findParticipant');
         let query = `connectId=${parseInt(biospecimenData.Connect_ID)}`;
         const response = await findParticipant(query);
+        
+        console.timeEnd('findParticipant');
         hideAnimation();
         const data = response.data[0];
 

@@ -23,10 +23,14 @@ const conversion = {
     "683613884":"0024",
 }
 
-export const shippingDashboard = (auth, route, goToSpecimenSearch) => {  
+export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
+    console.log("calling shippingDashboard");  
     auth.onAuthStateChanged(async user => {
         if (user) {
+            console.log("user is signed in at shipping.js");
+            console.time('userAuthorization');
             const responseData = await userAuthorization(route, user.displayName ? user.displayName : user.email);
+            console.timeEnd('userAuthorization');
             if ( responseData.isBiospecimenUser === false ) {
                 document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
                 document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
@@ -44,13 +48,17 @@ export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
 
 
 export const startShipping = async (userName) => {
+    console.log("calling startShipping");
     showAnimation();
 
     if (document.getElementById('navBarParticipantCheckIn')) {
       document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     }
 
-    let response = await  getBoxes();  // get un-shipped boxes
+    console.time('getBoxes');
+    let response = await  getBoxes();
+    console.log('response - boxes', response);  // get un-shipped boxes
+    console.timeEnd('getBoxes');
     let boxList = response.data;
     //boxIdAndBagsObj-->{"Box1":{"CXA123423 0008:{...}, "unlabelled":{...}}, "Box2":{...}}
     let boxIdAndBagsObj = {}; // for transformed box data structure

@@ -460,6 +460,8 @@ export const removeSingleError = (id) => {
 }
 
 export const storeSpecimen = async (array) => {
+  console.log('calling storeSpecimen');
+  console.time('storeSpecimen');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -470,10 +472,13 @@ export const storeSpecimen = async (array) => {
         body: JSON.stringify(array)
     }
     const response = await fetch(`${api}api=addSpecimen`, requestObj);
+    console.timeEnd('storeSpecimen');
     return response.json();
 }
 
 export const checkAccessionId = async (data) => {
+  console.log('calling checkAccessionId');
+  console.time('checkAccessionId');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -484,10 +489,13 @@ export const checkAccessionId = async (data) => {
         body: JSON.stringify(data)
     }
     const response = await fetch(`${api}api=accessionIdExists`, requestObj);
+    console.timeEnd('checkAccessionId');
     return response.json();
 }
 
 export const updateSpecimen = async (array) => {
+  console.log('calling updateSpecimen');
+  console.time('updateSpecimen');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -498,10 +506,13 @@ export const updateSpecimen = async (array) => {
         body: JSON.stringify(array)
     }
     const response = await fetch(`${api}api=updateSpecimen`, requestObj);
+    console.timeEnd('updateSpecimen');
     return response.json();
 }
 
 export const checkDerivedVariables = async (array) => {
+  console.log('calling checkDerivedVariables');
+  console.time('checkDerivedVariables');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -512,10 +523,13 @@ export const checkDerivedVariables = async (array) => {
         body: JSON.stringify(array)
     }
     const response = await fetch(`${api}api=checkDerivedVariables`, requestObj);
+    console.timeEnd('checkDerivedVariables');
     return response.json();
 }
 
 export const addBox = async (box) =>{
+  console.log('calling addBox');
+  console.time('addBox');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -526,10 +540,13 @@ export const addBox = async (box) =>{
         body: JSON.stringify(convertToFirestoreBox(box))
     }
     const response = await fetch(`${api}api=addBox`, requestObj);
+    console.timeEnd('addBox');
     return response.json();
 }
 
 export const updateBox = async (box) => {
+  console.log('calling updateBox');
+  console.time('updateBox');
   const idToken = await getIdToken();
   let requestObj = {
       method: "POST",
@@ -540,6 +557,7 @@ export const updateBox = async (box) => {
       body: JSON.stringify(convertToFirestoreBox(box))
   }
   const response = await fetch(`${api}api=updateBox`, requestObj);
+  console.timeEnd('updateBox');
   return response.json();
 }
 
@@ -561,6 +579,8 @@ export const updateNewTempDate = async () =>{
  * @returns 
  */
 export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
+  console.log('calling ship');
+  console.time('ship');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -571,10 +591,13 @@ export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
         body: JSON.stringify({boxIdToTrackingNumberMap, shippingData})
     }
     const response = await fetch(`${api}api=ship`, requestObj);
+    console.timeEnd('ship');
     return response.json();
 }
 
 export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) => {
+  console.log('calling getPage');
+  console.time('getPage');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -585,6 +608,7 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) =
         body: JSON.stringify({"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy, "filters":filters})
     }
     const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
+    console.timeEnd('getPage');
     return response.json();
 }
 
@@ -730,6 +754,8 @@ export const convertToFirestoreBox = (inputBox) => {
 
 // todo: fetch only the required un-shipped boxes
 export const getBoxes = async (box) => {
+  console.log('calling getBoxes');
+  console.time('getBoxes');
   const idToken = await getIdToken();
   const response = await fetch(`${api}api=searchBoxes`, {
     method: 'GET',
@@ -750,10 +776,13 @@ export const getBoxes = async (box) => {
       toReturn['data'].push(currJSON);
     }
   }
+  console.timeEnd('getBoxes');
   return toReturn;
 };
 
 export const getAllBoxesWithoutConversion =  async (flag) => { // make new function to return filtered boxes
+  console.log('calling getAllBoxesWithoutConversion');
+  console.time('getAllBoxesWithoutConversion');
   const idToken = await getIdToken();
   if (flag !== `bptl`) flag = ``
   const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
@@ -763,10 +792,13 @@ export const getAllBoxesWithoutConversion =  async (flag) => { // make new funct
     }
   });
   let res = await response.json();
+  console.timeEnd('getAllBoxesWithoutConversion');
   return res;
 };
 
 export const getAllBoxes = async (flag) => {
+  console.log('calling getAllBoxes');
+  console.time('getAllBoxes');
   const idToken = await getIdToken();
   if (flag !== `bptl`) flag = ``
   const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
@@ -779,10 +811,13 @@ export const getAllBoxes = async (flag) => {
   for (let i = 0; i < res.data.length; i++) {
     res.data[i] = convertToOldBox(res.data[i]);
   }
+  console.timeEnd('getAllBoxes');
   return res;
 };
 
 export const getBoxesByLocation = async (location) => {
+    console.log('calling getBoxesByLocation');
+    console.time('getBoxesByLocation');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchBoxesByLocation`, {
         method: "POST",
@@ -797,10 +832,14 @@ export const getBoxesByLocation = async (location) => {
     for (let i = 0; i < res.data.length; i++) {
         res.data[i] = convertToOldBox(res.data[i]);
     }
+    console.timeEnd('getBoxesByLocation');
     return res;
 }
 
 export const searchSpecimen = async (masterSpecimenId, allSitesFlag) => {
+  console.log('calling searchSpecimen:');
+  console.log('masterSpecimenId: ', masterSpecimenId);
+  console.log('allSitesFlag: ', allSitesFlag);
     const idToken = await getIdToken();
     const specimenQuery =  `&masterSpecimenId=${masterSpecimenId}` + (allSitesFlag ? `&allSitesFlag=${allSitesFlag}`: ``)
     const response = await fetch(`${api}api=searchSpecimen${specimenQuery}`, {
@@ -813,6 +852,8 @@ export const searchSpecimen = async (masterSpecimenId, allSitesFlag) => {
 }
 
 export const getParticipantCollections = async (token) => {
+    console.log('calling getParticipantCollections');
+    console.time('getParticipantCollections');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getParticipantCollections&token=${token}`, {
         method: "GET",
@@ -820,10 +861,15 @@ export const getParticipantCollections = async (token) => {
             Authorization:"Bearer "+idToken
         }
     });
+    console.timeEnd('getParticipantCollections');
     return response.json();
 }
 
 export const removeBag = async(boxId, bags) => {
+  console.log('calling removeBag');
+  console.log('boxId: ', boxId);
+  console.log('bags: ', bags);
+  console.time('removeBag');
     let currDate = new Date().toISOString();
     let toPass = {boxId:boxId, bags:bags, date:currDate}
     const idToken = await getIdToken();
@@ -835,6 +881,7 @@ export const removeBag = async(boxId, bags) => {
         },
         body: JSON.stringify(toPass)
     });
+    console.timeEnd('removeBag');
     return await response.json();
     
 }
@@ -845,6 +892,8 @@ export const removeBag = async(boxId, bags) => {
  * 
  */
 export const searchSpecimenInstitute = async () => {
+  console.log('calling searchSpecimenInstitute: (no params)');
+  console.time('searchSpecimenInstitute');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen`, {
     method: "GET",
@@ -855,6 +904,8 @@ export const searchSpecimenInstitute = async () => {
 
     if (response.status === 200) {
         const responseObject = await response.json();
+        console.log('responseObject: ', responseObject);
+        console.timeEnd('searchSpecimenInstitute');
         return responseObject;
     }
     else {
@@ -870,6 +921,8 @@ export const searchSpecimenInstitute = async () => {
  * 
  */
 export const searchSpecimenByRequestedSite = async (requestedSite) => {
+  console.log('calling searchSpecimenByRequestedSite:');
+  console.log('requestedSite: ', requestedSite);
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}`, {
     method: "GET",
@@ -891,7 +944,9 @@ export const searchSpecimenByRequestedSite = async (requestedSite) => {
  * Fetches biospecimen collection data from the database, and removes '0008', '0009' and deviation tubes from each collection
  * @returns {Array} List of biospecimen collections
  */
+// * * this doesn't take long, but the searchSpecimenInstitute() call takes a while
 export const filterSpecimenCollectionList = async () => {
+  console.log('calling filterSpecimenCollectionList');
     const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
     const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ?? [];
     
@@ -934,6 +989,8 @@ export const filterSpecimenCollectionList = async () => {
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
+    console.log('calling removeMissingSpecimen');
+    console.time('removeMissingSpecimen');
     //https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
     let toPass = {tubeId: tubeId};
     const idToken = await getIdToken();
@@ -945,10 +1002,13 @@ export const removeMissingSpecimen = async (tubeId) => {
         },
         body: JSON.stringify(toPass)
     });
+    console.timeEnd('removeMissingSpecimen');
     return await response.json();
 }
 
 export const getLocationsInstitute = async () => {
+    console.log('calling getLocationsInstitute');
+    console.time('getLocationsInstitute');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getLocations`, {
         method: "GET",
@@ -963,10 +1023,14 @@ export const getLocationsInstitute = async () => {
         let currJSON = arr[i];
         locations = locations.concat(currJSON['560975149']);
     }
+    console.log('locations: ', locations);
+    console.timeEnd('getLocationsInstitute');
     return locations;
 }
 
 export const getNumPages = async (numPerPage, filter) => {
+    console.log('calling getNumPages');
+    console.time('getNumPages');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getNumBoxesShipped`, {
         method: "POST",
@@ -978,10 +1042,13 @@ export const getNumPages = async (numPerPage, filter) => {
     });
     let res = await response.json();
     let numBoxes = res.data;
+    console.timeEnd('getNumPages');
     return Math.ceil(numBoxes/numPerPage);
 }
 
 export const getSiteCouriers = async () => {
+    console.log('calling getSiteCouriers');
+    console.time('getSiteCouriers');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getLocations`, {
         method: "GET",
@@ -998,10 +1065,13 @@ export const getSiteCouriers = async () => {
         '149772928': 'World Courier'
     }
     siteCouriers = siteCouriers.map(id => conversion[id]);
+    console.timeEnd('getSiteCouriers');
     return siteCouriers;
 }
 
 export const getNextTempCheck = async () => {
+    console.log('calling getNextTempCheck');
+    console.time('getNextTempCheck');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getLocations`, {
         method: "GET",
@@ -1016,6 +1086,7 @@ export const getNextTempCheck = async () => {
     let nextDate = currJSON['nextTempMonitor']
     let todaysDate = new Date();
     let tempDate = new Date(Date.parse(nextDate))
+    console.timeEnd('getNextTempCheck');
     if(todaysDate >= tempDate){
         return true;
     }
@@ -1024,7 +1095,10 @@ export const getNextTempCheck = async () => {
 }
 
 export const generateBarCode = (id, connectId) => {
+    console.log('calling generateBarCode');
+    console.time('generateBarCode');
     JsBarcode(`#${id}`, connectId, {height: 30});
+    console.timeEnd('generateBarCode');
 }
 
 export const getUpdatedParticipantData = async (data) => {
@@ -1034,6 +1108,8 @@ export const getUpdatedParticipantData = async (data) => {
 }
 
 export const updateCollectionSettingData = async (biospecimenData, tubes, data) => {
+   console.log('calling updateCollectionSettingData');
+    console.time('updateCollectionSettingData');
     
     data = await getUpdatedParticipantData(data);
 
@@ -1124,10 +1200,13 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
     };
         
     await updateParticipant(settingData);
+    console.timeEnd('updateCollectionSettingData');
 
 }
 
 export const updateBaselineData = async (siteTubesList, data) => {
+    console.log('calling updateBaselineData');
+    console.time('updateBaselineData');
 
     data = await getUpdatedParticipantData(data);
 
@@ -1185,6 +1264,7 @@ export const updateBaselineData = async (siteTubesList, data) => {
     };
         
     await updateParticipant(baselineData);
+    console.timeEnd('updateBaselineData');
 }
 
 export const siteFullNames = {
@@ -2018,6 +2098,8 @@ export const checkInParticipant = async (data, visitConcept) => {
 };
 
 export const checkOutParticipant = async (data) => {
+  console.log('calling checkOutParticipant');
+  console.time('checkOutParticipant');
 
     let visits = data['331584571'];
     const checkedInVisit = getCheckedInVisit(data);
@@ -2038,6 +2120,7 @@ export const checkOutParticipant = async (data) => {
          
          await updateParticipant(checkOutData);
     }
+    console.timeEnd('checkOutParticipant');
 };
 
 export const getCollectionsByVisit = async (data) => {
@@ -2096,6 +2179,8 @@ export const SSOConfig = (email) => {
 }
 
 export const getParticipantSelection = async (filter) => {
+  console.log('calling getParticipantSelection');
+  console.time('getParticipantSelection');
     const idToken = await getIdToken();
     const response = await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=getParticipantSelection&type=${filter}`, 
     {
@@ -2104,6 +2189,7 @@ export const getParticipantSelection = async (filter) => {
         Authorization: "Bearer " + idToken,
       },
     });
+    console.timeEnd('getParticipantSelection');
     return response.json();
   }
      
