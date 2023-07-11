@@ -1755,7 +1755,7 @@ export const addGoToCheckInEvent = () => {
         try {
             showAnimation();
 
-            let data = await getUserProfile({uid}).then(
+            let data = await getUserProfile(uid).then(
                 (res) => res.data
             );
 
