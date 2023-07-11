@@ -106,6 +106,7 @@ export const validateUser = async () => {
 }
 
 export const findParticipant = async (query) => {
+    console.log("🚀 ~ file: shared.js:109 ~ findParticipant ~ findParticipant: ----> ", query)
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getParticipants&type=filter&${query}`, {
         method: "GET",
@@ -116,7 +117,7 @@ export const findParticipant = async (query) => {
     return await response.json();
 }
 
-export const updateParticipant = async (array) => {
+export const updateParticipant = async (dataObj) => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=updateParticipantDataNotSite`, {
         method: "POST",
@@ -124,7 +125,7 @@ export const updateParticipant = async (array) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body:  JSON.stringify(array),
+        body:  JSON.stringify(dataObj),
     });
     
     return await response.json();
@@ -1034,9 +1035,10 @@ export const getUpdatedParticipantData = async (data) => {
     return responseParticipant.data[0];
 }
 
-export const updateCollectionSettingData = async (biospecimenData, tubes, data) => {
+export const updateCollectionSettingData = async (biospecimenData, tubes, data) => { // data is formData
     
-    data = await getUpdatedParticipantData(data);
+    data = await getUpdatedParticipantData(data); // participant data
+    console.log("🚀 ~ file: shared.js:1041 ~ updateCollectionSettingData ~ data: --->", data)
 
     let settings;
     let visit = biospecimenData[conceptIds.collection.selectedVisit];
@@ -1045,8 +1047,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
     const urineTubes = tubes.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = tubes.filter(tube => tube.tubeType === "Mouthwash");
 
-
-    if(data[conceptIds.collectionDetails]) {
+    if(data[conceptIds.collectionDetails]) { // if collection details exist
         settings = data[conceptIds.collectionDetails];
 
         if(!settings[visit]) {
@@ -1059,7 +1060,10 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
         }
     }
 
-    if(!settings[visit]['592099155']) {
+    // below if statements are using siteTubeList filtered by tubeType to iterate through biospecimenData
+    // and update settings with the correct collection setting and time
+
+    if(!settings[visit]['592099155']) { // blood collection setting
         bloodTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
@@ -1082,7 +1086,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
         });
     }
         
-    if(!settings[visit]['718172863']) {
+    if(!settings[visit]['718172863']) { // urine collection setting 
         urineTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
@@ -1105,7 +1109,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
         });
     }
 
-    if(!settings[visit]['915179629']) {
+    if(!settings[visit]['915179629']) { // mouthwash collection setting
         mouthwashTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
@@ -1123,8 +1127,9 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
         '173836415': settings,
         uid: data?.state?.uid
     };
+    console.log("🚀 ~ file: shared.js:1127 ~ updateCollectionSettingData ~ settingData:", settingData)
         
-    await updateParticipant(settingData);
+    await updateParticipant(settingData); // POST REQUEST
 
 }
 
@@ -2071,12 +2076,22 @@ export const getWorkflow = () => document.getElementById('contentBody').dataset.
 export const getSiteAcronym = () => document.getElementById('contentBody').dataset.siteAcronym ?? localStorage.getItem('siteAcronym');
 export const getSiteCode = () => document.getElementById('contentBody').dataset.siteCode ?? localStorage.getItem('siteCode');
 
-export const getSiteTubesLists = (specimenData) => {
+export const getSiteTubesLists = (biospecimenData) => {
+    console.log("🚀 ~ file: shared.js:2075 ~ getSiteTubesLists ~ biospecimenData:", biospecimenData)
     const dashboardType = getWorkflow();
+    console.log("🚀 ~ file: shared.js:2076 ~ getSiteTubesLists ~ dashboardType:", dashboardType);
     const siteAcronym = getSiteAcronym();
-    const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === specimenData['951355211'])[0]?.location : undefined;
-    const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
-    return siteTubesList;
+    console.log("🚀 ~ file: shared.js:2078 ~ getSiteTubesLists ~ siteAcronym:", siteAcronym);
+    // const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === biospecimenData['951355211'])[0]?.location : undefined; // can find be used here?
+    const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.find(dt => dt.concept === biospecimenData['951355211'])?.location : undefined;
+    console.log("🚀 ~ file: shared.js:2081 ~ getSiteTubesLists ~ subSiteLocation:", "----",subSiteLocation) // NIH-1
+    
+    // const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
+    const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType] ?? [];
+    // console.log("🚀 ~ file: shared.js:2086 ~ getSiteTubesLists ~ siteTubesList:", siteTubesList)
+    // console.log("TEST ---", siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation])
+    console.log("🚀 ~ file: shared.js:2090 ~ getSiteTubesLists ~ siteTubesList:", siteTubesList)
+    return siteTubesList; 
 }
 
 export const collectionSettings = {

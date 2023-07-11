@@ -155,7 +155,7 @@ export const addEventsearchSpecimen = () => {
         const response = await findParticipant(query);
         hideAnimation();
         const data = response.data[0];
-
+        console.log("🚀 ~ file: events.js:158 ~ addEventsearchSpecimen ~ data:", data)
         tubeCollectedTemplate(data, biospecimenData);
     })
 }
@@ -2059,6 +2059,7 @@ const btnsClicked = async (connectId, formData) => {
     showAnimation();
     let response = await findParticipant(query);
     let data = response.data[0];
+    console.log("🚀 ~ file: events.js:2062 ~ btnsClicked ~ data:", data)
     let specimenData;
     
     if (!formData?.collectionId) {
@@ -2336,22 +2337,24 @@ export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
 
 export const addEventBiospecimenCollectionFormToggles = () => {
     const collectedBoxes = Array.from(document.getElementsByClassName('tube-collected'));
+    // console.log("🚀 ~ file: events.js:2340 ~ addEventBiospecimenCollectionFormToggles ~ collectedBoxes:", collectedBoxes)
     const deviationBoxes = Array.from(document.getElementsByClassName('tube-deviated'));
-
+    // console.log("🚀 ~ file: events.js:2342 ~ addEventBiospecimenCollectionFormToggles ~ deviationBoxes:", deviationBoxes)
+    const reasonNotCollectedDropdown = Array.from(document.getElementsByClassName('reason-not-collected'));
     collectedBoxes.forEach(collected => {
 
-        const reason = document.getElementById(collected.id + "Reason");
-        const deviated = document.getElementById(collected.id + "Deviated");
-        const specimenId = document.getElementById(collected.id + "Id");
+        const reason = document.getElementById(collected.id + "Reason"); // reason select dropdown element 
+        const deviated = document.getElementById(collected.id + "Deviated"); // deviated checkbox element
+        const specimenId = document.getElementById(collected.id + "Id"); // full specimen id input element
 
         collected.addEventListener('change', () => {
             
-            if(getWorkflow() === 'research' && reason) reason.disabled = collected.checked;
+            if(getWorkflow() === 'research' && reason) reason.disabled = collected.checked; // disable reason if collected
             if(deviated) deviated.disabled = !collected.checked;
-            specimenId.disabled = !collected.checked;
+            specimenId.disabled = !collected.checked; // disable full specimen id if collected checkbox is not checked
             
             if(collected.checked) {
-                if(getWorkflow() === 'research' && reason) reason.value = '';
+                if(getWorkflow() === 'research' && reason) reason.value = ''; // must be research workflow and reason element must exist
             }
             else {
                 const event = new CustomEvent('change');
@@ -2362,62 +2365,109 @@ export const addEventBiospecimenCollectionFormToggles = () => {
                 if(deviated) {
                     deviated.checked = false;
                     deviated.dispatchEvent(event);
-                }
-            }
-            
-            if (getWorkflow() === 'research' && collected.id === '223999569') {
-                const mouthwashContainer = document.getElementById(`143615646Id`);
-                if (!mouthwashContainer.value && collected.checked) {
-                    specimenId.disabled = true;
-                }
-            }
 
+                }
+            }
+            // conditional logic for mouthwash (0009) and research workflow
+            // safeguards against user checking 0009 checkbox without 0007 checkbox being checked and mouthwash container full specimen id input being empty
+            if (getWorkflow() === 'research' && collected.id === '223999569') {
+                const mouthwashContainer = document.getElementById(`143615646Id`); // 0007 full specimen id input element
+                if (!mouthwashContainer.value && collected.checked) { // if mouthwash container full specimen id input is empty and collected checkbox is checked
+                    specimenId.disabled = true; // disable full specimen id input
+                }
+            }
+            // conditional logic for mouthwash tube 1 (0007) and research workflow
+            // click on 0007 checkbox, will check 0009 checkbox and enable 0009 full specimen id input
             if (getWorkflow() === 'research' && collected.id === '143615646') {
                 const mouthwashBagChkb = document.getElementById(`223999569`);
                 const mouthwashBagText = document.getElementById(`223999569Id`);
-                if (collected.checked) {
-                    mouthwashBagChkb.checked = true;
-                    mouthwashBagText.disabled = false;
+                if (collected.checked) { // if 0007 checkbox checked
+                    mouthwashBagChkb.checked = true; // 0009 checkbox checked
+                    mouthwashBagText.disabled = false; // 0009 full specimen id input enabled
                 }
             }
             
-            const selectionData = workflows[getWorkflow()].filter(tube => tube.concept === collected.id)[0];
+            const selectionData = workflows[getWorkflow()].filter(tube => tube.concept === collected.id)[0]; // match current checkbox id to workflow data
+            console.log("🚀 ~ file: events.js:2390 ~ collected.addEventListener ~ selectionData:", selectionData)
 
+
+            // NOTE - Explore conditional here, the trigger behavior is weird
             if (selectionData.tubeType === 'Blood tube' || selectionData.tubeType === 'Urine') {
-                const biohazardBagChkb = document.getElementById(`787237543`);
-                const biohazardBagText = document.getElementById(`787237543Id`);
-                const allTubesCollected = Array.from(document.querySelectorAll('.tube-collected'))
+                const biohazardBagChkb = document.getElementById(`787237543`); // biohazard bag (0008) checkbox element
+                const biohazardBagText = document.getElementById(`787237543Id`); // biohazard bag (0008) full specimen id input element
+                const allTubesCollected = Array.from(document.querySelectorAll('.tube-collected')) // everything regardless if checked or not
                 const allBloodUrineCheckedArray = allTubesCollected.filter(
                     item => (item.getAttribute("data-tube-type") === "Blood tube" && item.checked) || (item.getAttribute("data-tube-type") === "Urine" && item.checked)
                 );
+                console.log("🚀 ~ file: events.js:2399 ~ collected.addEventListener ~ allBloodUrineCheckedArray:", allBloodUrineCheckedArray)
                
-                if (collected.checked) {
-                    biohazardBagChkb.checked = true;
-                    biohazardBagText.disabled = false;
+                if (collected.checked) { // if current checkbox is checked 
+                    biohazardBagChkb.checked = true; // checks biohazard bag (0008) checkbox
+                    biohazardBagText.disabled = false; // enables biohazard bag (0008) full specimen id input
                 } 
-                else if(collected.checked === false && biohazardBagChkb.checked === true && allBloodUrineCheckedArray.length) {
-                    biohazardBagChkb.checked = true
-                    biohazardBagText.disabled = false;
+                else if(collected.checked === false && biohazardBagChkb.checked === true && allBloodUrineCheckedArray.length) { // if current checkbox is unchecked and biohazard bag (0008) checkbox is checked and there are other blood or urine tubes checked
+                    biohazardBagChkb.checked = true; // checks biohazard bag (0008) checkbox
+                    biohazardBagText.disabled = false; // enables biohazard bag (0008) full specimen id input
                 }
-                else {
-                    biohazardBagChkb.checked = false;
-                    biohazardBagText.disabled = true;
+                else { // all other cases
+                    biohazardBagChkb.checked = false; // unchecks biohazard bag (0008) checkbox
+                    biohazardBagText.disabled = true; // disables biohazard bag (0008) full specimen id input
                 }
             }
         });
     });
 
     deviationBoxes.forEach(deviation => {
-
-        const type = document.getElementById(deviation.id.replace('Deviated', 'Deviation'));
+        const collectedId = document.getElementById(deviation.id).id.replace('Deviated', '');
+        console.log("!!!", collectedId)
+        const type = document.getElementById(`${collectedId}Deviation`);
+        const comment = document.getElementById(`${collectedId}DeviatedExplanation`);
+        console.log("🚀 ~ file: events.js:2425 ~ addEventBiospecimenCollectionFormToggles ~ type:", type, comment)
+        // const type = document.getElementById(deviation.id.replace('Deviated', 'Deviation'));
 
         deviation.addEventListener('change', () => {
-
+            // console.log("value of deviated comments", deviation)
             type.disabled = !deviation.checked;
 
             if(!deviation.checked) type.value = '';
+            if(deviation.checked && comment.disabled) comment.disabled = false;
         });
     });
+
+    reasonNotCollectedDropdown.forEach( reasonDropdown => {
+        const collectedId = document.getElementById(reasonDropdown.id).id.replace('Reason', '');
+        const collected = document.getElementById(collectedId);
+        const specimenId = document.getElementById(`${collectedId}Id`);
+        const deviation = document.getElementById(`${collectedId}Deviated`);
+        const type = document.getElementById(`${collectedId}Deviation`);
+        // const comment = document.getElementById(`${collectedId}DeviatedExplanation`);
+
+        // clear input value of scan full specimen ID and disabled input
+        // clear select for deviation checkbox and disabled input
+        // clear deviation type input and disabled input
+
+        reasonDropdown.addEventListener('change', () => {
+            if(reasonDropdown.value) {
+                if (collected) {
+                    collected.checked = false;
+                    // collected.disabled = true;
+                }
+                if (specimenId) { 
+                    specimenId.value = '';
+                    specimenId.disabled = true;
+                }
+                if (deviation) {
+                    deviation.checked = false;
+                    deviation.disabled = true;
+                }
+                if (type) {
+                    type.value = '';
+                    type.disabled = true;
+                }
+            }
+        });
+    });
+
 };
 
 export const addEventBiospecimenCollectionFormEdit = () => {
@@ -2426,19 +2476,27 @@ export const addEventBiospecimenCollectionFormEdit = () => {
         button.addEventListener('click', () => {
             const conceptID = button.id.replace('collectEditBtn', '');
             document.getElementById(conceptID + 'Id').disabled = false;
+            const tubeCollectedCheckbox = document.getElementById(conceptID);
+            if (tubeCollectedCheckbox) tubeCollectedCheckbox.disabled = false;
+            const reasonNotCollectedDropdown = document.getElementById(conceptID + 'Reason');
+            if (reasonNotCollectedDropdown) reasonNotCollectedDropdown.disabled = false;
+
 
             const deviation = document.getElementById(conceptID + 'Deviated');
             if(deviation) {
                 deviation.disabled = false;
 
-                if(deviation.checked) {
+                if(deviation.checked) { // keep this functionality for now
                     const type = document.getElementById(deviation.id.replace('Deviated', 'Deviation'));
                     const comment = document.getElementById(deviation.id + 'Explanation'); 
 
                     type.disabled = false;
                     comment.disabled = false;
                 }
+
+
             }
+            
         });
 
     });
@@ -2530,7 +2588,7 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
 const collectionSubmission = async (formData, biospecimenData, cntd) => {
     removeAllErrors();
 
-    if (getWorkflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+    if (getWorkflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString(); // if collectionTime is not found, set it to current time
 
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
     const siteTubesList = getSiteTubesLists(biospecimenData);
@@ -2540,56 +2598,55 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
     let hasCntdError = false;
 
     inputFields.forEach(input => {
-        
-        const tubes = siteTubesList.filter(tube => tube.concept === input.id.replace('Id', ''));
+        // could make below filter a find instead
+        const tubes = siteTubesList.filter(tube => tube.concept === input.id.replace('Id', '')); // loop through input field elements with id, remove id and match them with tubes list
 
         let value = getValue(`${input.id}`).toUpperCase();
-        const masterID = value.substr(0, masterSpecimenIDRequirement.length);
-        const tubeID = value.substr(masterSpecimenIDRequirement.length + 1, totalCollectionIDLength);
+        const masterID = value.substr(0, masterSpecimenIDRequirement.length); // limit characters to 9
+        const tubeID = value.substr(masterSpecimenIDRequirement.length + 1, totalCollectionIDLength); // substr(10, 14) = 4, last 4 characters of tube
 
 
         const tubeCheckBox = document.getElementById(input.id.replace('Id',''));
 
-        if(tubeCheckBox) input.required = tubeCheckBox.checked;
+        if(tubeCheckBox) input.required = tubeCheckBox.checked; // input field is required if checkbox is checked
 
-        if(!cntd && value.length === 0) return;
-        
-        if(input.required && value.length !== totalCollectionIDLength) {
+        if(!cntd && value.length === 0) return; // if not continue and value is empty, proceed to next input field
+        console.log("input.required", input.required)
+        if(input.required && value.length !== totalCollectionIDLength) { // if input field is required and value is not 14 characters long
 
             hasError = true;
             hasCntdError = true;
             errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`, focus);
             focus = false;
-        }
-        else if (input.required && masterID !== biospecimenData['820476880']) {
+        } else if (input.required && masterID !== biospecimenData['820476880']) { // if input field is required and masterID is not equal to collection.tube.isCollected
             hasError = true;
             hasCntdError = true;
             errorMessage(input.id, 'Invalid Collection ID.', focus);
             focus = false;
-        }
-        else if (input.required && tubes.length === 0) {
+        } else if (input.required && tubes.length === 0) { // if input field is required and tubes is not found in siteTubesList
             hasError = true;
             hasCntdError = true;
             errorMessage(input.id, 'Invalid Full Specimen ID.', focus);
             focus = false;
-        }
-        else if (input.required && (tubes[0].id !== tubeID && !additionalTubeIDRequirement.regExp.test(tubeID))) {
+        } else if (input.required && (tubes[0].id !== tubeID && !additionalTubeIDRequirement.regExp.test(tubeID))) { // input field is required and tubeID is not equal to tubes[0].id and tubeID is not in additionalTubeIDRequirement 
             hasError = true;
             hasCntdError = true;
             errorMessage(input.id, 'Invalid Full Specimen ID.', focus);
             focus = false;
         }
 
-        if (input.required) biospecimenData[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim();
+        if (input.required) biospecimenData[`${input.id.replace('Id', '')}`]['825582494'] = `${masterID} ${tubeID}`.trim(); // objectId becomes full specimen id
     });
 
     if ((hasError && cntd == true) || hasCntdError) return;
 
-    const tubesCollected = Array.from(document.getElementsByClassName('tube-collected'));
+    console.log("NO ERRORS HERE! CONTINUE TO NEXT STEP")
+
+    const tubesCollected = Array.from(document.getElementsByClassName('tube-collected')); // get all tubes that are checked
 
     tubesCollected.forEach((tube) => {
-        if (biospecimenData[tube.id] === undefined) biospecimenData[`${tube.id}`] = {};
-        if (biospecimenData[tube.id] && biospecimenData[tube.id]['593843561'] === 353358909 && tube.checked === false) {
+        if (biospecimenData[tube.id] === undefined) biospecimenData[`${tube.id}`] = {}; // give tube an empty object if it doesn't exist
+        if (biospecimenData[tube.id] && biospecimenData[tube.id]['593843561'] === 353358909 && tube.checked === false) { // object collected yes, tube is unchecked
             delete biospecimenData[tube.id][conceptIds.collection.tube.scannedId];
         }
 
@@ -2599,45 +2656,67 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
         const deviated = document.getElementById(tube.id + 'Deviated');
         const deviation = document.getElementById(tube.id + 'Deviation');
         const comment = document.getElementById(tube.id + 'DeviatedExplanation');
+        // Reason selected dropdown
+        if (reason) {
+            if (reason.value) { // reason is selected, reason not collected and deviation example
+                biospecimenData[tube.id]['883732523'] = parseInt(reason.value); // 883732523 - selectReasonNotCollected
+                biospecimenData[tube.id]['338286049'] = comment.value.trim(); // 338286049 - notCollectedDetails
 
-        if(reason) {
-            if(reason.value) {
-                biospecimenData[tube.id]['883732523'] = parseInt(reason.value); 
-                biospecimenData[tube.id]['338286049'] = comment.value.trim();
-
-                if(biospecimenData[tube.id]['883732523'] === 181769837 && !comment.value.trim()) { 
+                // other must have comment
+                if (biospecimenData[tube.id]['883732523'] === 181769837 && !comment.value.trim()) { // 883732523 - selectReasonNotCollected, 181769837 - other, no comment value
                     hasError = true;
                     errorMessage(comment.id, 'Please provide more details', focus);
                     focus = false;
                     return
                 }
-            }
-            else {
-                delete biospecimenData[tube.id]['883732523'];
+            } else { // no reason selected
+                delete biospecimenData[tube.id]['883732523']; // 883732523 - selectReasonNotCollected
                 delete biospecimenData[tube.id]['338286049'];
             }
         }
         
-        if(deviated) {
-            if(deviated.checked) {
-                biospecimenData[tube.id]['678857215'] = 353358909;
-                biospecimenData[tube.id]['536710547'] = comment.value.trim();
-            }
-            else {
-                biospecimenData[tube.id]['678857215'] = 104430631;
-                delete biospecimenData[tube.id]['536710547'];
+        // 787237543 -- 0007
+        // 223999569 -- 0009
+        // Deviation Checkbox
+        if (deviated) { // check if deviated exists
+            if(deviated.checked) { // if deviated is checked
+                biospecimenData[tube.id]['678857215'] = 353358909; // collection time deviated yes
+                biospecimenData[tube.id]['536710547'] = comment.value.trim(); // provide comments (deviation details)
+            } else { // if deviated is not checked
+                biospecimenData[tube.id]['678857215'] = 104430631; // collection time deviated no
+                delete biospecimenData[tube.id]['536710547']; // remove deviation details
             }
     
             const tubeData = siteTubesList.filter(td => td.concept === tube.id)[0];
+            console.log("🚀 ~ file: events.js:2632 ~ tubesCollected.forEach ~ tubeData:", tubeData)
             const deviationSelections = Array.from(deviation).filter(dev => dev.selected).map(dev => parseInt(dev.value));
-    
+            console.log("🚀 ~ file: events.js:2649 ~ tubesCollected.forEach ~ deviationSelections:", deviationSelections)
+
+            /*
+            ~~~~ Ignore for Now ~~~~
+            Break occurs because option.concept does not exist
+            Solution: Add back deviations by using the deviations file
+            1. Check if current biospecimen[tube.id] has this key "248868659" (Proceed with steps below if not found)
+            2. Reference tubeData place all the deviation selections with a default no
+            3. Use existing code to check for existing (Yes/No) values in the deviationSelections array for current specimen
+            4. Should there be a check for other 
+
+            */
+            // Add deviation options to biospecimenData, add yes or no
             if(tubeData.deviationOptions) {
                 tubeData.deviationOptions.forEach(option => {
                     biospecimenData[tube.id]['248868659'][option.concept] = (deviationSelections.indexOf(option.concept) != -1 ? 353358909 : 104430631);
                 });
             }
-    
-            biospecimenData[tube.id]['762124027'] = (biospecimenData[tube.id]['248868659']['472864016'] === 353358909 || biospecimenData[tube.id]['248868659']['956345366'] === 353358909 || biospecimenData[tube.id]['248868659']['810960823'] === 353358909 || biospecimenData[tube.id]['248868659']['684617815'] === 353358909) ? 353358909 : 104430631;
+            // If any of the deviations types are found make deviation flag yes
+            // 762124027 discard flag
+            // TODO: Refactor this below
+            // Change discard flag value to yes if any of the deviation types are found
+            biospecimenData[tube.id]['762124027'] = 
+                (biospecimenData[tube.id]['248868659']['472864016'] === 353358909 || 
+                biospecimenData[tube.id]['248868659']['956345366'] === 353358909 || 
+                biospecimenData[tube.id]['248868659']['810960823'] === 353358909 || 
+                biospecimenData[tube.id]['248868659']['684617815'] === 353358909) ? 353358909 : 104430631;
     
             if (biospecimenData[tube.id]['248868659']['453343022'] === 353358909 && !comment.value.trim()) { 
                 hasError = true;
@@ -2648,7 +2727,7 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
         }
     });
 
-    if (hasError) return;
+    if (hasError) return; // PREVENTS SAVE
 
     biospecimenData['338570265'] = document.getElementById('collectionAdditionalNotes').value;
 
@@ -2669,16 +2748,23 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
             }
         }
     }
+    // ---- add return here ----
 
-    showAnimation();
-
-    await updateSpecimen([biospecimenData]);
+    // What's the value of biospecimenData now?
+    console.log(`biospecimen Data --->`, biospecimenData)
+    
+    showAnimation();  // ADD LOADING ANIMATION LATER
+    await updateSpecimen([biospecimenData]); // POST --> Updates biospecimenData obj and passes to firestore to update changes (Done)
     
 
-    const baselineVisit = (biospecimenData['331584571'] === 266600170);
-    const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224);
+    const baselineVisit = (biospecimenData['331584571'] === 266600170); // select visit - baseleine visit
+    const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224); // collection setting - 534621077 (clinical) or 664882224 (research)
 
+    
+    
     await updateCollectionSettingData(biospecimenData, siteTubesList, formData);
+
+
 
     if(baselineVisit && clinicalResearchSetting) {
         await updateBaselineData(siteTubesList, formData);
@@ -2723,7 +2809,8 @@ export const addEventSelectAllCollection = () => {
     checkbox.addEventListener('click', () => {
         
         Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => {
-            if(!chk.disabled && chk.id !== '223999569') {
+            // bagscan_mouthWash, NOTE remove extra condition if mouthwash (0009) should be cleared with select all
+            if(!chk.disabled && chk.id !== '223999569') { 
                 chk.checked = checkbox.checked;
 
                 const event = new CustomEvent('change');
@@ -2789,9 +2876,9 @@ export const addEventReturnToCollectProcess = () => {
         let query = `connectId=${parseInt(connectId)}`;
         const response = await findParticipant(query);
         const data = response.data[0];
-        const specimenData = (await searchSpecimen(masterSpecimenId)).data;
+        const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
         hideAnimation();
-        tubeCollectedTemplate(data, specimenData);
+        tubeCollectedTemplate(data, biospecimenData);
     })
 };
 
@@ -2799,9 +2886,9 @@ export const addEventBackToTubeCollection = (data, masterSpecimenId) => {
     const btn = document.getElementById('backToTubeCollection');
     btn.addEventListener('click', async () => {
         showAnimation();
-        const specimenData = (await searchSpecimen(masterSpecimenId)).data;
+        const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
         hideAnimation();
-        tubeCollectedTemplate(data, specimenData);
+        tubeCollectedTemplate(data, biospecimenData);
     })
 }
 
