@@ -123,19 +123,19 @@ const participantStatus = (data, collections) => {
     collections = collections.filter(collection => collection[conceptIds.collection.selectedVisit] == conceptIds.baseline.visitId);
 
     collections.forEach(collection => {
-        bloodTubes.forEach(tube => {
+        bloodTubes?.forEach(tube => {
             if(collection[tube.concept][conceptIds.collection.tube.isCollected] == conceptIds.yes) {
                 bloodCollected.push(collection);
             }
         });
 
-        urineTubes.forEach(tube => {
+        urineTubes?.forEach(tube => {
             if(collection[tube.concept][conceptIds.collection.tube.isCollected] == conceptIds.yes) {
                 urineCollected.push(collection);
             }
         });
 
-        mouthwashTubes.forEach(tube => {
+        mouthwashTubes?.forEach(tube => {
             if(collection[tube.concept][conceptIds.collection.tube.isCollected] == conceptIds.yes) {
                 mouthwashCollected.push(collection);
             }
