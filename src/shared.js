@@ -1,4 +1,4 @@
-import { userNavBar, adminNavBar, nonUserNavBar } from "./navbar.js";
+import { userNavBar, adminNavBar, nonUserNavBar, unAuthorizedUser } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
 import { shipmentTracking, shippingManifest } from "./pages/shipping.js"
 import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
@@ -1932,16 +1932,16 @@ export const visitType = [
 
 export const checkedIn = (data) => {
 
-    let isCheckedIn = false;
+  let isCheckedIn = false;
 
-    if(data['331584571']) {
-        Array.from(visitType).forEach(visit => {
-            if(data['331584571'][visit.concept]) {
-                if(data['331584571'][visit.concept]['135591601'] && data['331584571'][visit.concept]['135591601'] === 353358909) {
-                    isCheckedIn = true;
-                }
-            }
-        });
+  if(data['331584571']) {
+      Array.from(visitType).forEach(visit => {
+          if(data['331584571'][visit.concept]) {
+              if(data['331584571'][visit.concept]['135591601'] && data['331584571'][visit.concept]['135591601'] === 353358909) {
+                  isCheckedIn = true;
+              }
+          }
+      });
     }
 
     return isCheckedIn;
@@ -2341,8 +2341,8 @@ export const packageConditonConversion = {
     "853876696": "No Manifest provided",
 }
 
-export const convertISODateTime = (dateWithdrawn) => {
-    let date = new Date(dateWithdrawn);
+export const convertISODateTime = (isoDateTime) => {
+    const date = new Date(isoDateTime);
     return setZeroDateTime(date.getMonth() + 1)+ '/' + setZeroDateTime(date.getDate()) + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + setZeroDateTime(date.getMinutes())
 }
 
@@ -2435,3 +2435,8 @@ export const requestsBlocker = {
     return this.isReqInProcess;
   },
 };
+
+export const restrictNonBiospecimenUser = () => {
+  document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
+  document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
+}

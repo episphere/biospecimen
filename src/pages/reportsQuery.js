@@ -1,6 +1,7 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getNumPages, conceptIdToSiteSpecificLocation, searchSpecimenInstitute} from "./../shared.js"
+import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, restrictNonBiospecimenUser,
+    hideAnimation, showAnimation, showNotifications, getNumPages, conceptIdToSiteSpecificLocation, searchSpecimenInstitute} from "./../shared.js"
 import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality, addEventNavBarShipment, addEventFilter} from "./../events.js";
-import { homeNavBar, bodyNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
+import { homeNavBar, reportSideNavBar, unAuthorizedUser} from '../navbar.js';
 
 
 export const reportsQuery = (auth, route) => {
@@ -8,8 +9,7 @@ export const reportsQuery = (auth, route) => {
         if(user){
             const response = await userAuthorization(route, user.displayName ? user.displayName : user.email);
             if ( response.isBiospecimenUser === false ) {
-                document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
-                document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
+                restrictNonBiospecimenUser();
                 return;
             }
             if(!response.role) return;
@@ -28,40 +28,43 @@ export const startReport = async () => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     
     let template = `
-        <div class="row">
-            <div class="col-lg" style="margin-bottom:20px">
-                <h2>Shipping Reports</h2>
-            </div>
+    <div class="container">
+    <div class="row">
+        <div class="col-lg-2" style="margin-bottom:20px">
+            <h2>Reports</h2>
+            ${reportSideNavBar()}
         </div>
-        <div class="row">
-            
-            <div class="col-lg" style="margin-bottom:20px">
-                <h4>Filters</h4>
-                <label for="trackingIdInput" style="margin-right:0.5rem;">Tracking ID: </label>
-                <input type="text" id="trackingIdInput" style="margin-right:30px; height:38px; padding:5px;" placeholder="Tracking ID"></input>
-                <span style="display:inline-block; margin-right:.5rem;">Date Shipped:</span>
-                <input type="date" id="startDate"  style="height:38px; padding:5px;"></input>
-                <span style="display:inline-block; margin:0 .75rem">to</span>
-                <input type="date" id="endDate" style="margin-right:30px; height:38px; padding:5px";></input>
-                <button id="submitFilter" class="btn btn-primary">Apply filter</button>
+        <div class="col-lg-10">
+            <div class="row">
+                <div class="col-lg" style="margin-bottom:20px">
+                    <h4>Filters</h4>
+                    <label for="trackingIdInput" style="margin-right:0.5rem;">Tracking ID: </label>
+                    <input type="text" id="trackingIdInput" style="margin-right:30px; height:38px; padding:5px;" placeholder="Tracking ID">
+                    <span style="display:inline-block; margin-right:.5rem;">Date Shipped:</span>
+                    <input type="date" id="startDate" style="height:38px; padding:5px;">
+                    <span style="display:inline-block; margin:0 .75rem">to</span>
+                    <input type="date" id="endDate" style="margin-right:30px; height:38px; padding:5px;">
+                    <button id="submitFilter" class="btn btn-primary">Apply filter</button>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-lg">
-                <table id="boxTable" class="table table-bordered">
-                </table>
+            <div class="row">
+                <div class="col-lg">
+                    <table id="boxTable" class="table table-bordered">
+                    </table>
+                </div>
             </div>
+            <nav aria-label="Page navigation" id="paginationButtons">
+                <ul class="pagination">
+                    <li class="page-item" id="firstPage"><button class="page-link">First</button></li>
+                    <li class="page-item" id="previousPage"><button class="page-link">Previous</button></li>
+                    <li class="page-item" id="thisPage"><a class="page-link" id="middlePage">1</a></li>
+                    <li class="page-item" id="nextPage"><button class="page-link">Next</button></li>
+                    <li class="page-item" id="lastPage"><button class="page-link">Last</button></li>
+                </ul>
+            </nav>
         </div>
-        <nav aria-label="Page navigation" id="paginationButtons">
-            <ul class="pagination">
-                <li class="page-item" id="firstPage"><button class="page-link" >First</button></li>
-                <li class="page-item" id="previousPage"><button class="page-link" >Previous</button></li>
-                <li class="page-item" id="thisPage"><a class="page-link"  id = "middlePage">1</a></li>
-                <li class="page-item" id="nextPage"><button class="page-link">Next</button></li>
-                <li class="page-item" id="lastPage"><button class="page-link">Last</button></li>
-            </ul>
-        </nav>
-    `;
+    </div>
+</div>`;
     /*var x = document.getElementById("specimenList");
     var option = document.createElement("option");
     option.text = "Kiwi";
@@ -117,7 +120,6 @@ export const showReportsManifest = async (currPage) => {
         </div>
         `;
         document.getElementById('contentBody').innerHTML = template;
-        removeActiveClass('navbar-btn', 'active')
         populateReportManifestHeader(currPage);
         populateReportManifestTable(currPage, searchSpecimenInstituteArray);
         document.getElementById('printBox').addEventListener('click', e => {
