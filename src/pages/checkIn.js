@@ -116,9 +116,9 @@ const participantStatus = (data, collections) => {
 
     let siteTubesList = getSiteTubesLists({'951355211': conceptIds.research});
 
-    const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
-    const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
-    const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
+    const bloodTubes = siteTubesList?.filter(tube => tube.tubeType === "Blood tube");
+    const urineTubes = siteTubesList?.filter(tube => tube.tubeType === "Urine");
+    const mouthwashTubes = siteTubesList?.filter(tube => tube.tubeType === "Mouthwash");
 
     collections = collections.filter(collection => collection[conceptIds.collection.selectedVisit] == conceptIds.baseline.visitId);
 
