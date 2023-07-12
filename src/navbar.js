@@ -156,6 +156,18 @@ export const bodyNavBar = () => {
         document.getElementById('contentHeader').innerHTML = template;
 }
 
+export const reportSideNavBar = () => {
+    return `
+        <ul class="nav nav-tabs flex-column" id="reportTabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="#reports" id="navBarShippingReport">Shipping Report</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#checkoutreport" id="navBarCheckoutReport">Check-Out Report</a>
+            </li>
+        </ul>`;
+}
+
 /**
  ${workflow && workflow === 'clinical' ? ``:`
                 <li class="nav-item">
