@@ -1790,7 +1790,7 @@ export const addGoToSpecimenLinkEvent = () => {
     }
 };
 
-export const addEventCheckInCompleteForm = (isCheckedIn) => {
+export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
@@ -1811,8 +1811,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn) => {
                 icon: "success",
                 text: `Participant is checked out.`,
             });
-
-            goToParticipantSearch();
+            checkOutFlag === true ? location.reload() : goToParticipantSearch();
         }
         else {
 

@@ -22,6 +22,7 @@ import { packageReceiptScreen } from "./src/pages/receipts/packageReceipt.js";
 import { csvFileReceiptScreen } from "./src/pages/receipts/csvFileReceipt.js";
 import { kitReportsScreen } from "./src/pages/reports/kitReports.js";
 import { collectionIdSearchScreen } from "./src/pages/reports/collectionIdSearch.js";
+import { checkOutReportTemplate } from "./src/pages/checkOutReport.js";
 
 
 let auth = '';
@@ -100,6 +101,7 @@ const manageRoutes = async () => {
         else if (route === "#kitreports") kitReportsScreen(auth, route);
         else if (route === "#collectionidsearch") collectionIdSearchScreen(auth, route);
         else if (route === "#reports") reportsQuery(auth, route);
+        else if (route === "#checkoutreport") checkOutReportTemplate(auth, route);
         else if (route === "#manage_users") manageUsers(auth, route);
         else if (route === "#sign_out") signOut();
         else window.location.hash = "#welcome";

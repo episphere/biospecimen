@@ -2,12 +2,14 @@ import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInV
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 import conceptIds from '../fieldToConceptIdMapping.js';
 
-export const checkInTemplate = async (data) => {
+export const checkInTemplate = async (data, checkOutFlag) => {
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarParticipantCheckIn');
-    navBarBtn.style.display = 'block';
-    navBarBtn?.classList.remove('disabled');
-    navBarBtn?.classList.add('active');
+    if (navBarBtn) {
+        navBarBtn.style.display = 'block';
+        navBarBtn?.classList.remove('disabled');
+        navBarBtn?.classList.add('active');
+    }
 
     const isCheckedIn = checkedIn(data);
     const visit = getCheckedInVisit(data);
@@ -29,12 +31,14 @@ export const checkInTemplate = async (data) => {
     let template = `
         </br>
 
+        ${checkOutFlag === true ? `<button class="btn btn-outline-primary text-nowrap" id="backToCheckOutReport">Back to Check-Out Report</button>` : ``}
+
+        </br>
+        </br>
         <div class="row">
             ${isCheckedIn ? `<h5>Participant Check-Out</h5>` : `<h5>Participant Check-In</h5>`}
         </div>
-
         </br>
-
         <form method="POST" id="checkInCompleteForm" data-connect-id=${data.Connect_ID}>
 
             <div class="row">
@@ -84,9 +88,16 @@ export const checkInTemplate = async (data) => {
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventContactInformationModal(data);
-    addEventBackToSearch('navBarSearch');
-    addEventCheckInCompleteForm(isCheckedIn);
+    checkOutFlag === true ? reloadCheckOutReports('backToCheckOutReport') : addEventBackToSearch('navBarSearch')
+    addEventCheckInCompleteForm(isCheckedIn, checkOutFlag);
     addEventVisitSelection();
+}
+
+const reloadCheckOutReports = (id) => {
+    document.getElementById(id).addEventListener('click', e => {
+        e.stopPropagation();
+        location.reload(); // reloads url to CheckOut Report Page
+    });
 }
 
 const participantStatus = (data, collections) => {
@@ -105,26 +116,26 @@ const participantStatus = (data, collections) => {
 
     let siteTubesList = getSiteTubesLists({'951355211': conceptIds.research});
 
-    const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
-    const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
-    const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
+    const bloodTubes = siteTubesList?.filter(tube => tube.tubeType === "Blood tube");
+    const urineTubes = siteTubesList?.filter(tube => tube.tubeType === "Urine");
+    const mouthwashTubes = siteTubesList?.filter(tube => tube.tubeType === "Mouthwash");
 
     collections = collections.filter(collection => collection[conceptIds.collection.selectedVisit] == conceptIds.baseline.visitId);
 
     collections.forEach(collection => {
-        bloodTubes.forEach(tube => {
+        bloodTubes?.forEach(tube => {
             if(collection[tube.concept][conceptIds.collection.tube.isCollected] == conceptIds.yes) {
                 bloodCollected.push(collection);
             }
         });
 
-        urineTubes.forEach(tube => {
+        urineTubes?.forEach(tube => {
             if(collection[tube.concept][conceptIds.collection.tube.isCollected] == conceptIds.yes) {
                 urineCollected.push(collection);
             }
         });
 
-        mouthwashTubes.forEach(tube => {
+        mouthwashTubes?.forEach(tube => {
             if(collection[tube.concept][conceptIds.collection.tube.isCollected] == conceptIds.yes) {
                 mouthwashCollected.push(collection);
             }
