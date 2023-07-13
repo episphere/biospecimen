@@ -83,6 +83,10 @@ export default {
         urineAccessNumber: 928693120,
         reasonNotCollectedOther: 181769837,
         phlebotomistInitials: 719427591,
+        mouthwashBagScan: 223999569,
+        mouthwashTube1: 143615646,
+        bloodUrineBagScan: 787237543,
+
         tube:{
             isCollected: 593843561,
             isMissing: 258745303,

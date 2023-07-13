@@ -2339,6 +2339,7 @@ export const addEventBiospecimenCollectionFormToggles = () => {
     const collectedBoxes = Array.from(document.getElementsByClassName('tube-collected'));
     const deviationBoxes = Array.from(document.getElementsByClassName('tube-deviated'));
     const reasonNotCollectedDropdown = Array.from(document.getElementsByClassName('reason-not-collected'));
+    const { mouthwashBagScan, mouthwashTube1, bloodUrineBagScan, reasonNotCollectedOther } = conceptIds.collection
     collectedBoxes.forEach(collected => {
 
         const reason = document.getElementById(collected.id + "Reason"); // reason select dropdown element 
@@ -2346,66 +2347,61 @@ export const addEventBiospecimenCollectionFormToggles = () => {
         const specimenId = document.getElementById(collected.id + "Id"); // full specimen id input element
 
         collected.addEventListener('change', () => {
+            if (getWorkflow() === 'research' && reason) reason.disabled = collected.checked;
+            if (deviated) deviated.disabled = !collected.checked;
+            specimenId.disabled = !collected.checked;
             
-            if(getWorkflow() === 'research' && reason) reason.disabled = collected.checked; // disable reason if collected
-            if(deviated) deviated.disabled = !collected.checked;
-            specimenId.disabled = !collected.checked; // disable full specimen id if collected checkbox is not checked
-            
-            if(collected.checked) {
-                if(getWorkflow() === 'research' && reason) reason.value = ''; // must be research workflow and reason element must exist
-            }
-            else {
+            if (collected.checked) {
+                if (getWorkflow() === 'research' && reason) reason.value = '';
+            } else {
                 const event = new CustomEvent('change');
 
                 specimenId.value = '';
                 specimenId.dispatchEvent(event);
 
-                if(deviated) {
+                if (deviated) {
                     deviated.checked = false;
                     deviated.dispatchEvent(event);
 
                 }
             }
-            // conditional logic for mouthwash (0009) and research workflow
-            // safeguards against user checking 0009 checkbox without 0007 checkbox being checked and mouthwash container full specimen id input being empty
-            if (getWorkflow() === 'research' && collected.id === '223999569') {
-                const mouthwashContainer = document.getElementById(`143615646Id`); // 0007 full specimen id input element
-                if (!mouthwashContainer.value && collected.checked) { // if mouthwash container full specimen id input is empty and collected checkbox is checked
-                    specimenId.disabled = true; // disable full specimen id input
-                }
-            }
-            // conditional logic for mouthwash tube 1 (0007) and research workflow
-            // click on 0007 checkbox, will check 0009 checkbox and enable 0009 full specimen id input
-            if (getWorkflow() === 'research' && collected.id === '143615646') {
-                const mouthwashBagChkb = document.getElementById(`223999569`);
-                const mouthwashBagText = document.getElementById(`223999569Id`);
-                if (collected.checked) { // if 0007 checkbox checked
-                    mouthwashBagChkb.checked = true; // 0009 checkbox checked
-                    mouthwashBagText.disabled = false; // 0009 full specimen id input enabled
+
+            if (getWorkflow() === 'research' && collected.id === `${mouthwashBagScan}`) {
+                const mouthwashContainer = document.getElementById(`${mouthwashTube1}Id`);
+                if (!mouthwashContainer.value && collected.checked) {
+                    specimenId.disabled = true;
                 }
             }
             
-            const selectionData = workflows[getWorkflow()].filter(tube => tube.concept === collected.id)[0]; // match current checkbox id to workflow data
-
+            if (getWorkflow() === 'research' && collected.id === `${mouthwashTube1}`) {
+                const mouthwashBagChkb = document.getElementById(`${mouthwashBagScan}`);
+                const mouthwashBagText = document.getElementById(`${mouthwashBagScan}Id`);
+                if (collected.checked) {
+                    mouthwashBagChkb.checked = true;
+                    mouthwashBagText.disabled = false;
+                }
+            }
+            
+            const selectionData = workflows[getWorkflow()].filter(tube => tube.concept === collected.id)[0];
             if (selectionData.tubeType === 'Blood tube' || selectionData.tubeType === 'Urine') {
-                const biohazardBagChkb = document.getElementById(`787237543`); // biohazard bag (0008) checkbox element
-                const biohazardBagText = document.getElementById(`787237543Id`); // biohazard bag (0008) full specimen id input element
-                const allTubesCollected = Array.from(document.querySelectorAll('.tube-collected')) // everything regardless if checked or not
+                const biohazardBagChkb = document.getElementById(`${bloodUrineBagScan}`);
+                const biohazardBagText = document.getElementById(`${bloodUrineBagScan}Id`);
+                const allTubesCollected = Array.from(document.querySelectorAll('.tube-collected'))
                 const allBloodUrineCheckedArray = allTubesCollected.filter(
                     item => (item.getAttribute("data-tube-type") === "Blood tube" && item.checked) || (item.getAttribute("data-tube-type") === "Urine" && item.checked)
                 );
                
-                if (collected.checked) { // if current checkbox is checked 
-                    biohazardBagChkb.checked = true; // checks biohazard bag (0008) checkbox
-                    biohazardBagText.disabled = false; // enables biohazard bag (0008) full specimen id input
+                if (collected.checked) {
+                    biohazardBagChkb.checked = true;
+                    biohazardBagText.disabled = false;
                 } 
-                else if(collected.checked === false && biohazardBagChkb.checked === true && allBloodUrineCheckedArray.length) { // if current checkbox is unchecked and biohazard bag (0008) checkbox is checked and there are other blood or urine tubes checked
-                    biohazardBagChkb.checked = true; // checks biohazard bag (0008) checkbox
-                    biohazardBagText.disabled = false; // enables biohazard bag (0008) full specimen id input
+                else if(collected.checked === false && biohazardBagChkb.checked === true && allBloodUrineCheckedArray.length) {
+                    biohazardBagChkb.checked = true;
+                    biohazardBagText.disabled = false;
                 }
-                else { // all other cases
-                    biohazardBagChkb.checked = false; // unchecks biohazard bag (0008) checkbox
-                    biohazardBagText.disabled = true; // disables biohazard bag (0008) full specimen id input
+                else {
+                    biohazardBagChkb.checked = false;
+                    biohazardBagText.disabled = true;
                 }
             }
         });
@@ -2449,7 +2445,7 @@ export const addEventBiospecimenCollectionFormToggles = () => {
                     type.value = '';
                     type.disabled = true;
                 }
-                if (reasonDropdown.value === conceptIds['collection'].reasonNotCollectedOther.toString()) { // other record in comments
+                if (reasonDropdown.value === `${reasonNotCollectedOther}`) {
                     comment.value = '';
                     comment.disabled = false;
                 }
@@ -2553,21 +2549,21 @@ export const addEventBiospecimenCollectionFormText = (participantData, biospecim
 
 
 export const createTubesForCollection = async (formData, biospecimenData) => {
-    
-    if (getWorkflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
-    if (getWorkflow() === 'clinical' && biospecimenData['915838974'] === undefined) biospecimenData['915838974'] = new Date().toISOString();
+    const { collectionTime, scannedTime, tube } = conceptIds.collection;
+    if (getWorkflow() === 'research' && biospecimenData[collectionTime] === undefined) biospecimenData[collectionTime] = new Date().toISOString();
+    if (getWorkflow() === 'clinical' && biospecimenData[scannedTime] === undefined) biospecimenData[scannedTime] = new Date().toISOString();
     let siteTubesList = getSiteTubesLists(formData);
 
     siteTubesList.forEach((dt) => {
-        if (biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = {'593843561': 104430631};
+        if (biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = {[tube.isCollected]: conceptIds.no};
 
-        if (biospecimenData[dt.concept]['248868659'] === undefined && dt.deviationOptions) {
-            biospecimenData[dt.concept]['248868659'] = {};
+        if (biospecimenData[dt.concept][tube.deviation] === undefined && dt.deviationOptions) {
+            biospecimenData[dt.concept][tube.deviation] = {};
             dt.deviationOptions.forEach(dev => {
-                biospecimenData[dt.concept]['248868659'][dev.concept] = 104430631;
+                biospecimenData[dt.concept][tube.deviation][dev.concept] = conceptIds.no;
             });
-            biospecimenData[dt.concept]['678857215'] = 104430631;
-            biospecimenData[dt.concept]['762124027'] = 104430631;
+            biospecimenData[dt.concept][tube.isDeviated] = conceptIds.no;
+            biospecimenData[dt.concept][tube.isDiscarded] = conceptIds.no;
         }
     });
 

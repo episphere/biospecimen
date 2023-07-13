@@ -6,8 +6,6 @@ import conceptIds from '../fieldToConceptIdMapping.js';
 export const tubeCollectedTemplate = (participantData, biospecimenData) => {
     const isCheckedIn = checkedIn(participantData);
     const { collection, firstName, lastName, REASON_NOT_COLLECTED, yes, no } = conceptIds;
-
-    console.log("biospecimenData[collection.phlebotomistInitials]", biospecimenData[collection.phlebotomistInitials])
     
     let template = `
         </br>
@@ -98,7 +96,7 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
                                     >`
                                     :``}
                                 </td>`
-                                
+
                                 if(getWorkflow() === 'research') {
 
                                     template += 
