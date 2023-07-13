@@ -155,7 +155,6 @@ export const addEventsearchSpecimen = () => {
         const response = await findParticipant(query);
         hideAnimation();
         const participantData = response.data[0];
-        console.log("🚀 ~ file: events.js:158 ~ addEventsearchSpecimen ~ data:", participantData)
         tubeCollectedTemplate(participantData, biospecimenData);
     })
 }
@@ -2336,9 +2335,7 @@ export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
 
 export const addEventBiospecimenCollectionFormToggles = () => {
     const collectedBoxes = Array.from(document.getElementsByClassName('tube-collected'));
-    // console.log("🚀 ~ file: events.js:2340 ~ addEventBiospecimenCollectionFormToggles ~ collectedBoxes:", collectedBoxes)
     const deviationBoxes = Array.from(document.getElementsByClassName('tube-deviated'));
-    // console.log("🚀 ~ file: events.js:2342 ~ addEventBiospecimenCollectionFormToggles ~ deviationBoxes:", deviationBoxes)
     const reasonNotCollectedDropdown = Array.from(document.getElementsByClassName('reason-not-collected'));
     collectedBoxes.forEach(collected => {
 
@@ -2480,10 +2477,10 @@ export const addEventBiospecimenCollectionFormEdit = () => {
 
 
             const deviation = document.getElementById(conceptID + 'Deviated');
-            if(deviation) {
+            if (deviation) {
                 deviation.disabled = false;
 
-                if(deviation.checked) {
+                if (deviation.checked) {
                     const type = document.getElementById(deviation.id.replace('Deviated', 'Deviation'));
                     const comment = document.getElementById(deviation.id + 'Explanation'); 
 
@@ -2526,7 +2523,7 @@ export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
 
                 const tubeCheckBox = document.getElementById(input.id.replace('Id',''));
 
-                if(tubeCheckBox) input.required = tubeCheckBox.checked;
+                if (tubeCheckBox) input.required = tubeCheckBox.checked;
 
                 const masterID = value.substr(0, masterSpecimenIDRequirement.length);
                 const tubeID = value.substr(masterSpecimenIDRequirement.length + 1, totalCollectionIDLength);
@@ -2562,14 +2559,14 @@ export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
 
 export const createTubesForCollection = async (formData, biospecimenData) => {
     
-    if(getWorkflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
-    if(getWorkflow() === 'clinical' && biospecimenData['915838974'] === undefined) biospecimenData['915838974'] = new Date().toISOString();
+    if (getWorkflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString();
+    if (getWorkflow() === 'clinical' && biospecimenData['915838974'] === undefined) biospecimenData['915838974'] = new Date().toISOString();
     let siteTubesList = getSiteTubesLists(formData);
 
     siteTubesList.forEach((dt) => {
-        if(biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = {'593843561': 104430631};
+        if (biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = {'593843561': 104430631};
 
-        if(biospecimenData[dt.concept]['248868659'] === undefined && dt.deviationOptions) {
+        if (biospecimenData[dt.concept]['248868659'] === undefined && dt.deviationOptions) {
             biospecimenData[dt.concept]['248868659'] = {};
             dt.deviationOptions.forEach(dev => {
                 biospecimenData[dt.concept]['248868659'][dev.concept] = 104430631;
@@ -2595,7 +2592,6 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
     let hasCntdError = false;
 
     inputFields.forEach(input => {
-        // could make below filter a find instead
         const tubes = siteTubesList.filter(tube => tube.concept === input.id.replace('Id', '')); // loop through input field elements with id, remove id and match them with tubes list
 
         let value = getValue(`${input.id}`).toUpperCase();
@@ -2605,11 +2601,11 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
 
         const tubeCheckBox = document.getElementById(input.id.replace('Id',''));
 
-        if(tubeCheckBox) input.required = tubeCheckBox.checked; // input field is required if checkbox is checked
+        if (tubeCheckBox) input.required = tubeCheckBox.checked; // input field is required if checkbox is checked
 
-        if(!cntd && value.length === 0) return; // if not continue and value is empty, proceed to next input field
-        console.log("input.required", input.required)
-        if(input.required && value.length !== totalCollectionIDLength) { // if input field is required and value is not 14 characters long
+        if (!cntd && value.length === 0) return; // if not continue and value is empty, proceed to next input field
+
+        if (input.required && value.length !== totalCollectionIDLength) { // if input field is required and value is not 14 characters long
 
             hasError = true;
             hasCntdError = true;
@@ -2636,8 +2632,6 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
     });
 
     if ((hasError && cntd == true) || hasCntdError) return;
-
-    console.log("NO ERRORS HERE! CONTINUE TO NEXT STEP")
 
     const tubesCollected = Array.from(document.getElementsByClassName('tube-collected')); // get all tubes that are checked
 
@@ -2689,17 +2683,6 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
             const deviationSelections = Array.from(deviation).filter(dev => dev.selected).map(dev => parseInt(dev.value));
             console.log("🚀 ~ file: events.js:2649 ~ tubesCollected.forEach ~ deviationSelections:", deviationSelections)
 
-            /*
-            ~~~~ Ignore for Now ~~~~
-            Break occurs because option.concept does not exist
-            Solution: Add back deviations by using the deviations file
-            1. Check if current biospecimen[tube.id] has this key "248868659" (Proceed with steps below if not found)
-            2. Reference tubeData place all the deviation selections with a default no
-            3. Use existing code to check for existing (Yes/No) values in the deviationSelections array for current specimen
-            4. Should there be a check for other 
-
-            */
-            // Add deviation options to biospecimenData, add yes or no
             if(tubeData.deviationOptions) {
                 tubeData.deviationOptions.forEach(option => {
                     biospecimenData[tube.id]['248868659'][option.concept] = (deviationSelections.indexOf(option.concept) != -1 ? 353358909 : 104430631);
@@ -2724,7 +2707,7 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
         }
     });
 
-    if (hasError) return; // PREVENTS SAVE
+    if (hasError) return;
 
     biospecimenData['338570265'] = document.getElementById('collectionAdditionalNotes').value;
 
@@ -2745,23 +2728,14 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
             }
         }
     }
-    // ---- add return here ----
-
-    // What's the value of biospecimenData now?
-    console.log(`biospecimen Data --->`, biospecimenData)
     
-    showAnimation();  // ADD LOADING ANIMATION LATER
-    await updateSpecimen([biospecimenData]); // POST --> Updates biospecimenData obj and passes to firestore to update changes (Done)
+    showAnimation();
+    await updateSpecimen([biospecimenData]);
     
-
     const baselineVisit = (biospecimenData['331584571'] === 266600170); // select visit - baseleine visit
     const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224); // collection setting - 534621077 (clinical) or 664882224 (research)
 
-    
-    
     await updateCollectionSettingData(biospecimenData, siteTubesList, formData);
-
-
 
     if(baselineVisit && clinicalResearchSetting) {
         await updateBaselineData(siteTubesList, formData);
@@ -2806,7 +2780,6 @@ export const addEventSelectAllCollection = () => {
     checkbox.addEventListener('click', () => {
         
         Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => {
-            // bagscan_mouthWash, NOTE remove extra condition if mouthwash (0009) should be cleared with select all
             if(!chk.disabled && chk.id !== '223999569') { 
                 chk.checked = checkbox.checked;
 
