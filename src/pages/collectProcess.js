@@ -4,10 +4,8 @@ import { checkInTemplate } from './checkIn.js';
 import fieldMapping from '../fieldToConceptIdMapping.js';
 
 export const tubeCollectedTemplate = (participantData, biospecimenData) => {
-    console.log("🚀 ~ file: collectProcess.js:7 ~ tubeCollectedTemplate ~ biospecimenData:", biospecimenData)
     const isCheckedIn = checkedIn(participantData);
     const { collection } = fieldMapping;
-    // console.log("collection --> ", collection.id, "---", biospecimenData[collection.id])
     
     // TODO: change cids to connect ids
     let template = `
@@ -67,21 +65,16 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
                     <tbody>`
                     
                     let siteTubesList = getSiteTubesLists(biospecimenData);
-                    console.log("🚀 ~ file: collectProcess.js:68 ~ tubeCollectedTemplate ~ siteTubesList:", siteTubesList)
-                    const collectionFinalized = (biospecimenData['410912345'] === 353358909); // isFinalized /*bug that adds finalized?*/
+                    const collectionFinalized = (biospecimenData['410912345'] === 353358909); // isFinalized
                     
                     if(!siteTubesList || siteTubesList?.length === 0) siteTubesList = [];
 
                     siteTubesList?.forEach((obj, index) => {
-                        const notCollectedOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].tubeNotCollectedOptions; // Refactor? - obj.tubeNotCollectedOptions;
-                        // console.log("🚀 ~ file: collectProcess.js:75 ~ siteTubesList?.forEach ~ notCollectedOptions:", notCollectedOptions)
-                        const deviationOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].deviationOptions; // // Refactor? - obj.deviationOptions;
-                        // console.log("🚀 ~ file: collectProcess.js:77 ~ siteTubesList?.forEach ~ deviationOptions:", deviationOptions)
+                        const notCollectedOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].tubeNotCollectedOptions;
+                        const deviationOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].deviationOptions;
 
                         const tubeCollected = (biospecimenData[obj.concept]['593843561'] === 353358909); // collection.tube.isCollected
-                        console.log("🚀 ~ file: collectProcess.js:80 ~ siteTubesList?.forEach ~ tubeCollected:", obj.concept, "--", biospecimenData, "---", tubeCollected)
                         const tubeDeviated = (biospecimenData[obj.concept]['678857215'] === 353358909); // collectionTimestamp
-                        console.log("🚀 ~ file: collectProcess.js:82 ~ siteTubesList?.forEach ~ tubeDeviated:", biospecimenData[obj.concept], "---", tubeDeviated)
 
                         let required = false;
                         // checks if current tube is collected

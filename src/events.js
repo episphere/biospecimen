@@ -137,7 +137,7 @@ export const addEventsearchSpecimen = () => {
         const biospecimenData = biospecimen.data;
 
         if(getWorkflow() === 'research') {
-            if(biospecimenData['650516960'] != 534621077) {
+            if(biospecimenData['650516960'] !== 534621077) {
                 hideAnimation();
                 showNotifications({ title: 'Incorrect Dashboard', body: 'Clinical Collections cannot be viewed on Research Dashboard' }, true);
                 return;
@@ -2321,15 +2321,15 @@ const redirectSpecimenPage = async (accessionID1, accessionID3, selectedVisit, f
     specimenTemplate(data, formData);
 }
 
-export const addEventBiospecimenCollectionForm = (dt, biospecimenData) => {
+export const addEventBiospecimenCollectionForm = (participantData, biospecimenData) => {
     const collectionSaveExit = document.getElementById('collectionSave');
     collectionSaveExit.addEventListener('click', () => {
-        collectionSubmission(dt, biospecimenData);
+        collectionSubmission(participantData, biospecimenData);
     });
 
     const collectionSaveContinue = document.getElementById('collectionNext');
     collectionSaveContinue.addEventListener('click', () => {
-        collectionSubmission(dt, biospecimenData, true);
+        collectionSubmission(participantData, biospecimenData, true);
     });
 };
 
@@ -2384,7 +2384,6 @@ export const addEventBiospecimenCollectionFormToggles = () => {
             }
             
             const selectionData = workflows[getWorkflow()].filter(tube => tube.concept === collected.id)[0]; // match current checkbox id to workflow data
-            console.log("🚀 ~ file: events.js:2390 ~ collected.addEventListener ~ selectionData:", selectionData)
 
             if (selectionData.tubeType === 'Blood tube' || selectionData.tubeType === 'Urine') {
                 const biohazardBagChkb = document.getElementById(`787237543`); // biohazard bag (0008) checkbox element
@@ -2393,7 +2392,6 @@ export const addEventBiospecimenCollectionFormToggles = () => {
                 const allBloodUrineCheckedArray = allTubesCollected.filter(
                     item => (item.getAttribute("data-tube-type") === "Blood tube" && item.checked) || (item.getAttribute("data-tube-type") === "Urine" && item.checked)
                 );
-                console.log("🚀 ~ file: events.js:2399 ~ collected.addEventListener ~ allBloodUrineCheckedArray:", allBloodUrineCheckedArray)
                
                 if (collected.checked) { // if current checkbox is checked 
                     biohazardBagChkb.checked = true; // checks biohazard bag (0008) checkbox
@@ -2413,18 +2411,14 @@ export const addEventBiospecimenCollectionFormToggles = () => {
 
     deviationBoxes.forEach(deviation => {
         const collectedId = document.getElementById(deviation.id).id.replace('Deviated', '');
-        console.log("!!!", collectedId)
         const type = document.getElementById(`${collectedId}Deviation`);
         const comment = document.getElementById(`${collectedId}DeviatedExplanation`);
-        console.log("🚀 ~ file: events.js:2425 ~ addEventBiospecimenCollectionFormToggles ~ type:", type, comment)
-        // const type = document.getElementById(deviation.id.replace('Deviated', 'Deviation'));
 
         deviation.addEventListener('change', () => {
-            // console.log("value of deviated comments", deviation)
             type.disabled = !deviation.checked;
 
-            if(!deviation.checked) type.value = '';
-            if(deviation.checked && comment.disabled) comment.disabled = false;
+            if (!deviation.checked) type.value = '';
+            if (deviation.checked && comment.disabled) comment.disabled = false;
         });
     });
 
@@ -2437,7 +2431,6 @@ export const addEventBiospecimenCollectionFormToggles = () => {
         const comment = document.getElementById(`${collectedId}DeviatedExplanation`);
 
         reasonDropdown.addEventListener('change', () => {
-            console.log("reasonDropdown.value", reasonDropdown.value)
             if (reasonDropdown.value) {
                 if (collected) {
                     collected.checked = false;
@@ -2508,13 +2501,13 @@ export const addEventBiospecimenCollectionFormEditAll = () => {
     });
 };
 
-export const addEventBiospecimenCollectionFormText = (dt, biospecimenData) => {
+export const addEventBiospecimenCollectionFormText = (participantData, biospecimenData) => {
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
 
     inputFields.forEach(input => {
         input.addEventListener('change', () => {
             const siteTubesList = getSiteTubesLists(biospecimenData)
-            const tubes = siteTubesList.filter(dt => dt.concept === input.id.replace('Id', ''));
+            const tubes = siteTubesList.filter(participantData => participantData.concept === input.id.replace('Id', ''));
 
             removeSingleError(input.id);
 
@@ -2579,7 +2572,7 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
     await updateSpecimen([biospecimenData]);
 }
 
-const collectionSubmission = async (formData, biospecimenData, cntd) => {
+const collectionSubmission = async (participantData, biospecimenData, cntd) => {
     removeAllErrors();
 
     if (getWorkflow() === 'research' && biospecimenData['678166505'] === undefined) biospecimenData['678166505'] = new Date().toISOString(); // if collectionTime is not found, set it to current time
@@ -2679,9 +2672,7 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
             }
     
             const tubeData = siteTubesList.filter(td => td.concept === tube.id)[0];
-            console.log("🚀 ~ file: events.js:2632 ~ tubesCollected.forEach ~ tubeData:", tubeData)
             const deviationSelections = Array.from(deviation).filter(dev => dev.selected).map(dev => parseInt(dev.value));
-            console.log("🚀 ~ file: events.js:2649 ~ tubesCollected.forEach ~ deviationSelections:", deviationSelections)
 
             if(tubeData.deviationOptions) {
                 tubeData.deviationOptions.forEach(option => {
@@ -2728,27 +2719,27 @@ const collectionSubmission = async (formData, biospecimenData, cntd) => {
             }
         }
     }
-    
+
     showAnimation();
     await updateSpecimen([biospecimenData]);
     
     const baselineVisit = (biospecimenData['331584571'] === 266600170); // select visit - baseleine visit
     const clinicalResearchSetting = (biospecimenData['650516960'] === 534621077 || biospecimenData['650516960'] === 664882224); // collection setting - 534621077 (clinical) or 664882224 (research)
 
-    await updateCollectionSettingData(biospecimenData, siteTubesList, formData);
+    await updateCollectionSettingData(biospecimenData, siteTubesList, participantData);
 
     if(baselineVisit && clinicalResearchSetting) {
-        await updateBaselineData(siteTubesList, formData);
+        await updateBaselineData(siteTubesList, participantData);
     }
 
-    await checkDerivedVariables({"token": formData["token"]});
+    await checkDerivedVariables({"token": participantData["token"]});
 
     if (cntd) {
 
-        formData = await getUpdatedParticipantData(formData);
+        participantData = await getUpdatedParticipantData(participantData);
         const specimenData = (await searchSpecimen(biospecimenData['820476880'])).data;
         hideAnimation();
-        finalizeTemplate(formData, specimenData);
+        finalizeTemplate(participantData, specimenData);
     }
     else {
 

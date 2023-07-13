@@ -1029,16 +1029,14 @@ export const generateBarCode = (id, connectId) => {
     JsBarcode(`#${id}`, connectId, {height: 30});
 }
 
-export const getUpdatedParticipantData = async (data) => {
-    const query = `connectId=${parseInt(data['Connect_ID'])}`;
+export const getUpdatedParticipantData = async (participantData) => {
+    const query = `connectId=${parseInt(participantData['Connect_ID'])}`;
     let responseParticipant = await findParticipant(query);
     return responseParticipant.data[0];
 }
 
-export const updateCollectionSettingData = async (biospecimenData, tubes, data) => { // data is formData
-    
-    data = await getUpdatedParticipantData(data); // participant data
-    console.log("🚀 ~ file: shared.js:1041 ~ updateCollectionSettingData ~ data: --->", data)
+export const updateCollectionSettingData = async (biospecimenData, tubes, participantData) => {
+    participantData = await getUpdatedParticipantData(participantData);
 
     let settings;
     let visit = biospecimenData[conceptIds.collection.selectedVisit];
@@ -1047,8 +1045,8 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
     const urineTubes = tubes.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = tubes.filter(tube => tube.tubeType === "Mouthwash");
 
-    if(data[conceptIds.collectionDetails]) { // if collection details exist
-        settings = data[conceptIds.collectionDetails];
+    if(participantData[conceptIds.collectionDetails]) {
+        settings = participantData[conceptIds.collectionDetails];
 
         if(!settings[visit]) {
             settings[visit] = {};
@@ -1125,11 +1123,11 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
 
     const settingData = {
         '173836415': settings,
-        uid: data?.state?.uid
+        uid: participantData?.state?.uid
     };
     console.log("🚀 ~ file: shared.js:1127 ~ updateCollectionSettingData ~ settingData:", settingData)
         
-    await updateParticipant(settingData); // POST REQUEST
+    await updateParticipant(settingData);
 
 }
 
@@ -2077,20 +2075,10 @@ export const getSiteAcronym = () => document.getElementById('contentBody').datas
 export const getSiteCode = () => document.getElementById('contentBody').dataset.siteCode ?? localStorage.getItem('siteCode');
 
 export const getSiteTubesLists = (biospecimenData) => {
-    console.log("🚀 ~ file: shared.js:2075 ~ getSiteTubesLists ~ biospecimenData:", biospecimenData)
     const dashboardType = getWorkflow();
-    console.log("🚀 ~ file: shared.js:2076 ~ getSiteTubesLists ~ dashboardType:", dashboardType);
     const siteAcronym = getSiteAcronym();
-    console.log("🚀 ~ file: shared.js:2078 ~ getSiteTubesLists ~ siteAcronym:", siteAcronym);
-    // const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === biospecimenData['951355211'])[0]?.location : undefined; // can find be used here?
-    const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.find(dt => dt.concept === biospecimenData['951355211'])?.location : undefined;
-    console.log("🚀 ~ file: shared.js:2081 ~ getSiteTubesLists ~ subSiteLocation:", "----",subSiteLocation) // NIH-1
-    
-    // const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
-    const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType] ?? [];
-    // console.log("🚀 ~ file: shared.js:2086 ~ getSiteTubesLists ~ siteTubesList:", siteTubesList)
-    // console.log("TEST ---", siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation])
-    console.log("🚀 ~ file: shared.js:2090 ~ getSiteTubesLists ~ siteTubesList:", siteTubesList)
+    const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === biospecimenData[conceptIds.collectionLocation])[0]?.location : undefined;
+    const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
     return siteTubesList; 
 }
 
