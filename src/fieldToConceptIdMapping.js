@@ -1,8 +1,8 @@
 export default {
-    fName: 399159511,
+    firstName: 399159511,
     prefName: 153211406,
-    mName: 231676651,
-    lName: 996038075,
+    middleName: 231676651,
+    lastName: 996038075,
     birthMonth: 564964481,
     birthDay: 795827569,
     birthYear: 544150384,
@@ -175,7 +175,6 @@ export default {
     },
 
     collectionDetails: 173836415,
-
 
     clinicalDashboard: {
         bloodCollected: 534041351,

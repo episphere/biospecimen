@@ -106,7 +106,6 @@ export const validateUser = async () => {
 }
 
 export const findParticipant = async (query) => {
-    console.log("🚀 ~ file: shared.js:109 ~ findParticipant ~ findParticipant: ----> ", query)
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getParticipants&type=filter&${query}`, {
         method: "GET",
@@ -1058,9 +1057,6 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
         }
     }
 
-    // below if statements are using siteTubeList filtered by tubeType to iterate through biospecimenData
-    // and update settings with the correct collection setting and time
-
     if(!settings[visit]['592099155']) { // blood collection setting
         bloodTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
@@ -1125,7 +1121,6 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
         '173836415': settings,
         uid: participantData?.state?.uid
     };
-    console.log("🚀 ~ file: shared.js:1127 ~ updateCollectionSettingData ~ settingData:", settingData)
         
     await updateParticipant(settingData);
 
@@ -2079,7 +2074,7 @@ export const getSiteTubesLists = (biospecimenData) => {
     const siteAcronym = getSiteAcronym();
     const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === biospecimenData[conceptIds.collectionLocation])[0]?.location : undefined;
     const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
-    return siteTubesList; 
+    return siteTubesList;
 }
 
 export const collectionSettings = {
