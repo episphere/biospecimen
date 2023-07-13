@@ -5,7 +5,7 @@ import conceptIds from '../fieldToConceptIdMapping.js';
 
 export const tubeCollectedTemplate = (participantData, biospecimenData) => {
     const isCheckedIn = checkedIn(participantData);
-    const { collection, firstName, lastName, REASON_NOT_COLLECTED, yes, no } = conceptIds;
+    const { collection, firstName, lastName, yes, no } = conceptIds;
     
     let template = `
         </br>
@@ -115,7 +115,7 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
                                                         <option value=""> -- Select Reason -- </option>`
 
                                                         notCollectedOptions.forEach(option => {
-                                                            template += `<option ${biospecimenData[`${obj.concept}`][REASON_NOT_COLLECTED] == option.concept ? 'selected' : ''} value=${option.concept}>${option.label}</option>`;
+                                                            template += `<option ${biospecimenData[`${obj.concept}`][collection.tube.selectReasonNotCollected] == option.concept ? 'selected' : ''} value=${option.concept}>${option.label}</option>`;
                                                         })
 
                                                 template += `</select>`    

@@ -69,7 +69,7 @@ export default {
     clinicalDateTimeDrawn: 915838974,
 
     // biospecimen collection
-    collection:{
+    collection: {
         id: 820476880,
         selectedVisit: 331584571,
         note: 338570265,
@@ -86,8 +86,8 @@ export default {
         mouthwashBagScan: 223999569,
         mouthwashTube1: 143615646,
         bloodUrineBagScan: 787237543,
-
-        tube:{
+        
+        tube: {
             isCollected: 593843561,
             isMissing: 258745303,
             deviation: 248868659,
@@ -97,6 +97,16 @@ export default {
             dateReceived: 926457119,
             deviationComments: 536710547,
             optionalNotCollectedDetails: 338286049,
+            selectReasonNotCollected: 883732523,
+        },
+
+        deviationType: {
+            broken: 472864016,
+            insufficientVolume: 956345366,
+            discard: 810960823,
+            mislabel: 684617815,
+            notFound: 982885431,
+            other: 453343022,
         },
     },
 
