@@ -3,9 +3,9 @@ import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, 
 import { checkInTemplate } from './checkIn.js';
 import fieldMapping from '../fieldToConceptIdMapping.js';
 
-export const tubeCollectedTemplate = (data, biospecimenData) => { // data - participant data, 
+export const tubeCollectedTemplate = (participantData, biospecimenData) => {
     console.log("🚀 ~ file: collectProcess.js:7 ~ tubeCollectedTemplate ~ biospecimenData:", biospecimenData)
-    const isCheckedIn = checkedIn(data);
+    const isCheckedIn = checkedIn(participantData);
     const { collection } = fieldMapping;
     // console.log("collection --> ", collection.id, "---", biospecimenData[collection.id])
     
@@ -18,7 +18,7 @@ export const tubeCollectedTemplate = (data, biospecimenData) => { // data - part
         </br>
         <div class="row">
             <div class="col">
-                <div class="row"><h5>${data['996038075']}, ${data['399159511']}</h5></div>
+                <div class="row"><h5>${participantData['996038075']}, ${participantData['399159511']}</h5></div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${biospecimenData[collection.id]}</div>
                 <div class="row">Collection ID Link Date/Time: ${getWorkflow() === 'research' ? new Date(biospecimenData['678166505']).toLocaleString(): new Date(biospecimenData['915838974']).toLocaleString()}</div>
@@ -114,7 +114,7 @@ export const tubeCollectedTemplate = (data, biospecimenData) => { // data - part
                                             if(notCollectedOptions) {
                                                 template += `
                                                     <select 
-                                                        data-connect-id="${data.Connect_ID}" 
+                                                        data-connect-id="${participantData.Connect_ID}" 
                                                         id="${obj.concept}Reason"
                                                         class="reason-not-collected"
                                                         style="width:200px"
@@ -165,7 +165,7 @@ export const tubeCollectedTemplate = (data, biospecimenData) => { // data - part
                                     if(obj.deviationChkBox) {
                                         template += `
                                             <select 
-                                                data-connect-id="${data.Connect_ID}" 
+                                                data-connect-id="${participantData.Connect_ID}" 
                                                 id="${obj.concept}Deviation"
                                                 style="width:300px"
                                                 multiple
@@ -224,13 +224,13 @@ export const tubeCollectedTemplate = (data, biospecimenData) => { // data - part
                 </div>
                 ${isCheckedIn ?
                 `<div class="ml-auto" style="display:none">
-                    <button class="btn btn-outline-primary text-nowrap" data-connect-id=${data.Connect_ID} type="button" id="collectionCheckout">Go to Check-Out</button>
+                    <button class="btn btn-outline-primary text-nowrap" data-connect-id=${participantData.Connect_ID} type="button" id="collectionCheckout">Go to Check-Out</button>
                 </div>` : ``}               
                 <div class="ml-auto">
-                    <button class="btn btn-info" data-connect-id="${data.Connect_ID}" type="button" id="collectionSave">Save</button>
+                    <button class="btn btn-info" data-connect-id="${participantData.Connect_ID}" type="button" id="collectionSave">Save</button>
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="button" id="collectionNext">Go to Review</button>
+                    <button class="btn btn-outline-primary" data-connect-id="${participantData.Connect_ID}" type="button" id="collectionNext">Go to Review</button>
                 </div>
             </div>
         </form>
@@ -244,22 +244,21 @@ export const tubeCollectedTemplate = (data, biospecimenData) => { // data - part
 
     addEventBackToSearch('navBarSearch');
     document.getElementById('contentBody').innerHTML = template;
-    generateBarCode('connectIdBarCode', data.Connect_ID);
-    // - Code Marker -
+    generateBarCode('connectIdBarCode', participantData.Connect_ID);
     addEventSelectAllCollection();
     addEventBackToSearch('backToSearch');
-    addEventBiospecimenCollectionForm(data, biospecimenData);
+    addEventBiospecimenCollectionForm(participantData, biospecimenData);
     addEventBiospecimenCollectionFormToggles();
     addEventBiospecimenCollectionFormEdit();
     addEventBiospecimenCollectionFormEditAll();
-    addEventBiospecimenCollectionFormText(data, biospecimenData);
+    addEventBiospecimenCollectionFormText(participantData, biospecimenData);
     
     document.getElementById('collectionCheckout')?.addEventListener('click', async (e) => {
         e.preventDefault();
         const connectId = e.target.getAttribute('data-connect-id');
         try {
-            let data = await findParticipant(`connectId=${connectId}`).then(res => res.data?.[0]);
-            checkInTemplate(data);
+            const participantData = await findParticipant(`connectId=${connectId}`).then(res => res.data?.[0]);
+            checkInTemplate(participantData);
             document.body.scrollIntoView();
         } catch (error) {
             console.log("Error occured while trying to check out.");

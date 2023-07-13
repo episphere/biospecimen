@@ -81,6 +81,7 @@ export default {
         scannedTime: 915838974,
         receivedDate: 926457119,
         urineAccessNumber: 928693120,
+        reasonNotCollectedOther: 181769837,
         tube:{
             isCollected: 593843561,
             isMissing: 258745303,
@@ -174,6 +175,7 @@ export default {
     },
 
     collectionDetails: 173836415,
+
 
     clinicalDashboard: {
         bloodCollected: 534041351,

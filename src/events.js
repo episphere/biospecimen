@@ -154,9 +154,9 @@ export const addEventsearchSpecimen = () => {
         let query = `connectId=${parseInt(biospecimenData.Connect_ID)}`;
         const response = await findParticipant(query);
         hideAnimation();
-        const data = response.data[0];
-        console.log("🚀 ~ file: events.js:158 ~ addEventsearchSpecimen ~ data:", data)
-        tubeCollectedTemplate(data, biospecimenData);
+        const participantData = response.data[0];
+        console.log("🚀 ~ file: events.js:158 ~ addEventsearchSpecimen ~ data:", participantData)
+        tubeCollectedTemplate(participantData, biospecimenData);
     })
 }
 
@@ -2057,9 +2057,8 @@ const btnsClicked = async (connectId, formData) => {
     let query = `connectId=${parseInt(connectId)}`;
 
     showAnimation();
-    let response = await findParticipant(query);
-    let data = response.data[0];
-    console.log("🚀 ~ file: events.js:2062 ~ btnsClicked ~ data:", data)
+    const response = await findParticipant(query);
+    const particpantData = response.data[0];
     let specimenData;
     
     if (!formData?.collectionId) {
@@ -2067,13 +2066,13 @@ const btnsClicked = async (connectId, formData) => {
     }
     hideAnimation();
 
-    if (specimenData?.Connect_ID && parseInt(specimenData.Connect_ID) !== data.Connect_ID) {
+    if (specimenData?.Connect_ID && parseInt(specimenData.Connect_ID) !== particpantData.Connect_ID) {
         showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different Connect ID.' }, true)
         return;
     }
 
     showAnimation();
-    formData['331584571'] = formData?.['331584571'] || parseInt(getCheckedInVisit(data))
+    formData['331584571'] = formData?.['331584571'] || parseInt(getCheckedInVisit(particpantData));
     
     if (!formData?.collectionId) {
         const storeResponse = await storeSpecimen([formData]);  
@@ -2089,12 +2088,12 @@ const btnsClicked = async (connectId, formData) => {
     
     // if 'clinical' and no existing collection ID, check email trigger
     if (formData['650516960'] === 664882224 && !formData?.collectionId) {
-        await checkSurveyEmailTrigger(data, formData['331584571']);
+        await checkSurveyEmailTrigger(particpantData, formData['331584571']);
     }
 
     hideAnimation();
     if (formData?.collectionId || confirmVal == "confirmed") {
-        tubeCollectedTemplate(data, biospecimenData);
+        tubeCollectedTemplate(particpantData, biospecimenData);
 
     } else {
         searchTemplate();
@@ -2390,8 +2389,6 @@ export const addEventBiospecimenCollectionFormToggles = () => {
             const selectionData = workflows[getWorkflow()].filter(tube => tube.concept === collected.id)[0]; // match current checkbox id to workflow data
             console.log("🚀 ~ file: events.js:2390 ~ collected.addEventListener ~ selectionData:", selectionData)
 
-
-            // NOTE - Explore conditional here, the trigger behavior is weird
             if (selectionData.tubeType === 'Blood tube' || selectionData.tubeType === 'Urine') {
                 const biohazardBagChkb = document.getElementById(`787237543`); // biohazard bag (0008) checkbox element
                 const biohazardBagText = document.getElementById(`787237543Id`); // biohazard bag (0008) full specimen id input element
@@ -2440,17 +2437,13 @@ export const addEventBiospecimenCollectionFormToggles = () => {
         const specimenId = document.getElementById(`${collectedId}Id`);
         const deviation = document.getElementById(`${collectedId}Deviated`);
         const type = document.getElementById(`${collectedId}Deviation`);
-        // const comment = document.getElementById(`${collectedId}DeviatedExplanation`);
-
-        // clear input value of scan full specimen ID and disabled input
-        // clear select for deviation checkbox and disabled input
-        // clear deviation type input and disabled input
+        const comment = document.getElementById(`${collectedId}DeviatedExplanation`);
 
         reasonDropdown.addEventListener('change', () => {
-            if(reasonDropdown.value) {
+            console.log("reasonDropdown.value", reasonDropdown.value)
+            if (reasonDropdown.value) {
                 if (collected) {
                     collected.checked = false;
-                    // collected.disabled = true;
                 }
                 if (specimenId) { 
                     specimenId.value = '';
@@ -2463,6 +2456,10 @@ export const addEventBiospecimenCollectionFormToggles = () => {
                 if (type) {
                     type.value = '';
                     type.disabled = true;
+                }
+                if (reasonDropdown.value === conceptIds['collection'].reasonNotCollectedOther.toString()) { // other record in comments
+                    comment.value = '';
+                    comment.disabled = false;
                 }
             }
         });
@@ -2486,7 +2483,7 @@ export const addEventBiospecimenCollectionFormEdit = () => {
             if(deviation) {
                 deviation.disabled = false;
 
-                if(deviation.checked) { // keep this functionality for now
+                if(deviation.checked) {
                     const type = document.getElementById(deviation.id.replace('Deviated', 'Deviation'));
                     const comment = document.getElementById(deviation.id + 'Explanation'); 
 
@@ -2875,22 +2872,13 @@ export const addEventReturnToCollectProcess = () => {
         showAnimation();
         let query = `connectId=${parseInt(connectId)}`;
         const response = await findParticipant(query);
-        const data = response.data[0];
+        const participantData = response.data[0];
         const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
         hideAnimation();
-        tubeCollectedTemplate(data, biospecimenData);
+        
+        tubeCollectedTemplate(participantData, biospecimenData);
     })
 };
-
-export const addEventBackToTubeCollection = (data, masterSpecimenId) => {
-    const btn = document.getElementById('backToTubeCollection');
-    btn.addEventListener('click', async () => {
-        showAnimation();
-        const biospecimenData = (await searchSpecimen(masterSpecimenId)).data;
-        hideAnimation();
-        tubeCollectedTemplate(data, biospecimenData);
-    })
-}
 
 export const addEventNavBarSpecimenSearch = () => {
     const btn = document.getElementById('navBarSpecimenSearch');
