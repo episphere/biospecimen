@@ -137,14 +137,14 @@ export const addEventsearchSpecimen = () => {
         const biospecimenData = biospecimen.data;
 
         if(getWorkflow() === 'research') {
-            if(biospecimenData['650516960'] !== 534621077) {
+            if(biospecimenData[conceptIds.collection.collectionSetting] !== conceptIds.research) {
                 hideAnimation();
                 showNotifications({ title: 'Incorrect Dashboard', body: 'Clinical Collections cannot be viewed on Research Dashboard' }, true);
                 return;
             }
         }
         else {
-            if(biospecimenData['650516960'] === 534621077) {
+            if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
                 hideAnimation();
                 showNotifications({ title: 'Incorrect Dashboard', body: 'Research Collections cannot be viewed on Clinical Dashboard' }, true);
                 return;
@@ -2009,17 +2009,18 @@ const btnsClicked = async (connectId, formData) => {
 
     if (hasError) return;
 
-    if (collectionLocation) formData['951355211'] = parseInt(collectionLocation.value);
+    if (collectionLocation) formData[conceptIds.collectionLocation] = parseInt(collectionLocation.value);
 
     const collectionID = formData?.collectionId || scanSpecimenID;
-    const n = document.getElementById('399159511').innerText || ""
+    const firstNameCidString = conceptIds.firstName.toString();
+    const firstName = document.getElementById(firstNameCidString).innerText || ""
     let confirmVal = '';
 
     if (!formData?.collectionId) {
         confirmVal = await swal({
             title: "Confirm Collection ID",
             icon: "info",
-            text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${n}`,
+            text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${firstName}`,
             buttons: {
                 cancel: {
                     text: "Cancel",
@@ -2048,8 +2049,8 @@ const btnsClicked = async (connectId, formData) => {
 
     if (confirmVal === "cancel") return;
 
-    formData['820476880'] = collectionID;
-    formData['650516960'] = getWorkflow() === 'research' ? 534621077 : 664882224;
+    formData[conceptIds.collection.id] = collectionID;
+    formData[conceptIds.collection.collectionSetting] = getWorkflow() === 'research' ? conceptIds.research : conceptIds.clinical;
     formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
     formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
     
@@ -2061,7 +2062,7 @@ const btnsClicked = async (connectId, formData) => {
     let specimenData;
     
     if (!formData?.collectionId) {
-        specimenData = (await searchSpecimen(formData['820476880'])).data; // search by collection ID (820476880)
+        specimenData = (await searchSpecimen(formData[conceptIds.collection.id])).data;
     }
     hideAnimation();
 
@@ -2071,7 +2072,7 @@ const btnsClicked = async (connectId, formData) => {
     }
 
     showAnimation();
-    formData['331584571'] = formData?.['331584571'] || parseInt(getCheckedInVisit(particpantData));
+    formData[conceptIds.collection.selectedVisit] = formData?.[conceptIds.collection.selectedVisit] || parseInt(getCheckedInVisit(particpantData));
     
     if (!formData?.collectionId) {
         const storeResponse = await storeSpecimen([formData]);  
@@ -2082,12 +2083,13 @@ const btnsClicked = async (connectId, formData) => {
         }
     }
 
-    const biospecimenData = (await searchSpecimen(formData?.collectionId || formData['820476880'])).data;
+    const biospecimenData = (await searchSpecimen(formData?.collectionId || formData[conceptIds.collection.id])).data;
     await createTubesForCollection(formData, biospecimenData);
     
     // if 'clinical' and no existing collection ID, check email trigger
-    if (formData['650516960'] === 664882224 && !formData?.collectionId) {
-        await checkSurveyEmailTrigger(particpantData, formData['331584571']);
+    
+    if (formData[conceptIds.collection.collectionSetting] === conceptIds.clinical && !formData?.collectionId) {
+        await checkSurveyEmailTrigger(particpantData, formData[conceptIds.collection.selectedVisit]);
     }
 
     hideAnimation();
