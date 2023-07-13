@@ -100,7 +100,7 @@ export default {
     insufficientVolumeSpecimenDeviation: 956345366, 
     mislabelledDiscardSpecimenDeviation: 684617815,
     notFoundSpecimenDeviation: 982885431,
-
+    
     // shipment id
     bag1: 650224161,
     bag2: 136341211,
@@ -139,6 +139,9 @@ export default {
     siteCode:789843387,
 
     collectionLocation: 951355211,
+    bloodCollectionSetting: 592099155,
+    urineCollectionSetting: 718172863,
+    mouthwashCollectionSetting: 915179629,
 
     modules: {
         module1: {

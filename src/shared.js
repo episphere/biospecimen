@@ -1034,7 +1034,7 @@ export const getUpdatedParticipantData = async (participantData) => {
     return responseParticipant.data[0];
 }
 
-export const updateCollectionSettingData = async (biospecimenData, tubes, participantData) => {
+export const updateCollectionSettingData = async (biospecimenData, tubes, participantData) => { 
     participantData = await getUpdatedParticipantData(participantData);
 
     let settings;
@@ -1044,24 +1044,21 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     const urineTubes = tubes.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = tubes.filter(tube => tube.tubeType === "Mouthwash");
 
-    if(participantData[conceptIds.collectionDetails]) {
+    if (participantData[conceptIds.collectionDetails]) {
         settings = participantData[conceptIds.collectionDetails];
-
-        if(!settings[visit]) {
-            settings[visit] = {};
-        }
-    }
-    else {
+        if (!settings[visit]) settings[visit] = {};
+        
+    } else {
         settings = {
             [visit]: {}
         }
     }
 
-    if(!settings[visit]['592099155']) { // blood collection setting
+    if(!settings[visit][conceptIds.bloodCollectionSetting]) {
         bloodTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
-                settings[visit]['592099155'] = biospecimenData[conceptIds.collection.collectionSetting];
+                settings[visit][conceptIds.bloodCollectionSetting] = biospecimenData[conceptIds.collection.collectionSetting];
 
                 if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
                     settings[visit][conceptIds.baseline.bloodCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
@@ -1080,11 +1077,11 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
         });
     }
         
-    if(!settings[visit]['718172863']) { // urine collection setting 
+    if(!settings[visit][conceptIds.urineCollectionSetting]) {
         urineTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
-                settings[visit]['718172863'] = biospecimenData[conceptIds.collection.collectionSetting];
+                settings[visit][conceptIds.urineCollectionSetting] = biospecimenData[conceptIds.collection.collectionSetting];
 
                 if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
                     settings[visit][conceptIds.baseline.urineCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
@@ -1103,11 +1100,11 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
         });
     }
 
-    if(!settings[visit]['915179629']) { // mouthwash collection setting
+    if(!settings[visit][conceptIds.mouthwashCollectionSetting]) {
         mouthwashTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
-                settings[visit]['915179629'] = biospecimenData[conceptIds.collection.collectionSetting];
+                settings[visit][conceptIds.mouthwashCollectionSetting] = biospecimenData[conceptIds.collection.collectionSetting];
 
                 if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
                     settings[visit][conceptIds.baseline.mouthwashCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
@@ -1118,10 +1115,10 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     }
 
     const settingData = {
-        '173836415': settings,
+        [conceptIds.collectionDetails.toString()]: settings,
         uid: participantData?.state?.uid
     };
-        
+    console.log("🚀 ~ file: shared.js:1118 ~ updateCollectionSettingData ~ settingData:", settingData)
     await updateParticipant(settingData);
 
 }
