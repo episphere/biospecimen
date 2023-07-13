@@ -1047,14 +1047,14 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     if (participantData[conceptIds.collectionDetails]) {
         settings = participantData[conceptIds.collectionDetails];
         if (!settings[visit]) settings[visit] = {};
-        
+
     } else {
         settings = {
             [visit]: {}
         }
     }
 
-    if(!settings[visit][conceptIds.bloodCollectionSetting]) {
+    if (!settings[visit][conceptIds.bloodCollectionSetting]) {
         bloodTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
@@ -1077,7 +1077,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
         });
     }
         
-    if(!settings[visit][conceptIds.urineCollectionSetting]) {
+    if (!settings[visit][conceptIds.urineCollectionSetting]) {
         urineTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
@@ -1100,7 +1100,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
         });
     }
 
-    if(!settings[visit][conceptIds.mouthwashCollectionSetting]) {
+    if (!settings[visit][conceptIds.mouthwashCollectionSetting]) {
         mouthwashTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
@@ -1118,7 +1118,6 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
         [conceptIds.collectionDetails.toString()]: settings,
         uid: participantData?.state?.uid
     };
-    console.log("🚀 ~ file: shared.js:1118 ~ updateCollectionSettingData ~ settingData:", settingData)
     await updateParticipant(settingData);
 
 }

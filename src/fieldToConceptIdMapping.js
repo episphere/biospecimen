@@ -70,7 +70,7 @@ export default {
 
     // biospecimen collection
     collection:{
-        id:820476880,
+        id: 820476880,
         selectedVisit: 331584571,
         note: 338570265,
         isFinalized:410912345,
@@ -82,6 +82,7 @@ export default {
         receivedDate: 926457119,
         urineAccessNumber: 928693120,
         reasonNotCollectedOther: 181769837,
+        phlebotomistInitials: 719427591,
         tube:{
             isCollected: 593843561,
             isMissing: 258745303,
@@ -91,6 +92,7 @@ export default {
             scannedId: 825582494,
             dateReceived: 926457119,
             deviationComments: 536710547,
+            optionalNotCollectedDetails: 338286049,
         },
     },
 
