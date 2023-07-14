@@ -2339,7 +2339,7 @@ export const addEventBiospecimenCollectionFormToggles = () => {
     const collectedBoxes = Array.from(document.getElementsByClassName('tube-collected'));
     const deviationBoxes = Array.from(document.getElementsByClassName('tube-deviated'));
     const reasonNotCollectedDropdown = Array.from(document.getElementsByClassName('reason-not-collected'));
-    const { mouthwashBagScan, mouthwashTube1, bloodUrineBagScan, reasonNotCollectedOther } = conceptIds.collection
+    
     collectedBoxes.forEach(collected => {
 
         const reason = document.getElementById(collected.id + "Reason"); // reason select dropdown element 
@@ -2366,16 +2366,16 @@ export const addEventBiospecimenCollectionFormToggles = () => {
                 }
             }
 
-            if (getWorkflow() === 'research' && collected.id === `${mouthwashBagScan}`) {
-                const mouthwashContainer = document.getElementById(`${mouthwashTube1}Id`);
+            if (getWorkflow() === 'research' && collected.id === `${conceptIds.collection.mouthwashBagScan}`) {
+                const mouthwashContainer = document.getElementById(`${conceptIds.collection.mouthwashTube1}Id`);
                 if (!mouthwashContainer.value && collected.checked) {
                     specimenId.disabled = true;
                 }
             }
             
-            if (getWorkflow() === 'research' && collected.id === `${mouthwashTube1}`) {
-                const mouthwashBagChkb = document.getElementById(`${mouthwashBagScan}`);
-                const mouthwashBagText = document.getElementById(`${mouthwashBagScan}Id`);
+            if (getWorkflow() === 'research' && collected.id === `${conceptIds.collection.mouthwashTube1}`) {
+                const mouthwashBagChkb = document.getElementById(`${conceptIds.collection.mouthwashBagScan}`);
+                const mouthwashBagText = document.getElementById(`${conceptIds.collection.mouthwashBagScan}Id`);
                 if (collected.checked) {
                     mouthwashBagChkb.checked = true;
                     mouthwashBagText.disabled = false;
@@ -2384,8 +2384,8 @@ export const addEventBiospecimenCollectionFormToggles = () => {
             
             const selectionData = workflows[getWorkflow()].filter(tube => tube.concept === collected.id)[0];
             if (selectionData.tubeType === 'Blood tube' || selectionData.tubeType === 'Urine') {
-                const biohazardBagChkb = document.getElementById(`${bloodUrineBagScan}`);
-                const biohazardBagText = document.getElementById(`${bloodUrineBagScan}Id`);
+                const biohazardBagChkb = document.getElementById(`${conceptIds.collection.bloodUrineBagScan}`);
+                const biohazardBagText = document.getElementById(`${conceptIds.collection.bloodUrineBagScan}Id`);
                 const allTubesCollected = Array.from(document.querySelectorAll('.tube-collected'))
                 const allBloodUrineCheckedArray = allTubesCollected.filter(
                     item => (item.getAttribute("data-tube-type") === "Blood tube" && item.checked) || (item.getAttribute("data-tube-type") === "Urine" && item.checked)
@@ -2445,14 +2445,13 @@ export const addEventBiospecimenCollectionFormToggles = () => {
                     type.value = '';
                     type.disabled = true;
                 }
-                if (reasonDropdown.value === `${reasonNotCollectedOther}`) {
+                if (reasonDropdown.value === `${conceptIds.collection.reasonNotCollectedOther}`) {
                     comment.value = '';
                     comment.disabled = false;
                 }
             }
         });
     });
-
 };
 
 export const addEventBiospecimenCollectionFormEdit = () => {
@@ -2678,7 +2677,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
                 });
             }
             
-            biospecimenData[tube.id][tube.isDiscarded] = 
+            biospecimenData[tube.id][conceptIds.collection.tube.isDiscarded] = 
                 (biospecimenData[tube.id][conceptIds.collection.tube.deviation][conceptIds.collection.deviationType.broken] === conceptIds.yes || 
                 biospecimenData[tube.id][conceptIds.collection.tube.deviation][conceptIds.collection.deviationType.insufficientVolume] === conceptIds.yes || 
                 biospecimenData[tube.id][conceptIds.collection.tube.deviation][conceptIds.collection.deviationType.discard] === conceptIds.yes || 
