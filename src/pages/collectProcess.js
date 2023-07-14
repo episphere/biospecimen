@@ -5,7 +5,7 @@ import conceptIds from '../fieldToConceptIdMapping.js';
 
 export const tubeCollectedTemplate = (participantData, biospecimenData) => {
     const isCheckedIn = checkedIn(participantData);
-    const { collection, firstName, lastName, yes, no } = conceptIds;
+    const { collection } = conceptIds;
     
     let template = `
         </br>
@@ -15,7 +15,7 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
         </br>
         <div class="row">
             <div class="col">
-                <div class="row"><h5>${participantData[firstName]}, ${participantData[lastName]}</h5></div>
+                <div class="row"><h5>${participantData[conceptIds.firstName]}, ${participantData[conceptIds.lastName]}</h5></div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">Collection ID: ${biospecimenData[collection.id]}</div>
                 <div class="row">Collection ID Link Date/Time: ${getWorkflow() === 'research' ? new Date(biospecimenData[collection.collectionTime]).toLocaleString(): new Date(biospecimenData[collection.scannedTime]).toLocaleString()}</div>
@@ -64,7 +64,7 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
                     <tbody>`
                     
                     let siteTubesList = getSiteTubesLists(biospecimenData);
-                    const collectionFinalized = (biospecimenData[collection.isFinalized] === yes);
+                    const collectionFinalized = (biospecimenData[collection.isFinalized] === conceptIds.yes);
                     
                     if(!siteTubesList || siteTubesList?.length === 0) siteTubesList = [];
 
@@ -72,12 +72,12 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
                         const notCollectedOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].tubeNotCollectedOptions;
                         const deviationOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].deviationOptions;
 
-                        const tubeCollected = (biospecimenData[obj.concept][collection.tube.isCollected] === yes);
-                        const tubeDeviated = (biospecimenData[obj.concept][collection.tube.isDeviated] === yes);
+                        const tubeCollected = (biospecimenData[obj.concept][collection.tube.isCollected] === conceptIds.yes);
+                        const tubeDeviated = (biospecimenData[obj.concept][collection.tube.isDeviated] === conceptIds.yes);
 
                         let required = false;
 
-                        if (biospecimenData[obj.concept] && biospecimenData[obj.concept][collection.tube.isCollected] !== no) { 
+                        if (biospecimenData[obj.concept] && biospecimenData[obj.concept][collection.tube.isCollected] !== conceptIds.no) { 
                             required = true;
                         }
 
@@ -166,7 +166,7 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
                                                 <option value=""> -- Select Deviation -- </option>`
 
                                                 deviationOptions.forEach(deviation => {
-                                                    template += `<option ${biospecimenData[obj.concept][collection.tube.deviation][deviation.concept] === yes ? 'selected' : ''} value=${deviation.concept}>${deviation.label}</option>`;
+                                                    template += `<option ${biospecimenData[obj.concept][collection.tube.deviation][deviation.concept] === conceptIds.yes ? 'selected' : ''} value=${deviation.concept}>${deviation.label}</option>`;
                                                 })
 
                                         template += `</select>`  

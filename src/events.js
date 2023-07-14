@@ -2574,8 +2574,7 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
 const collectionSubmission = async (participantData, biospecimenData, cntd) => {
     removeAllErrors();
 
-    const { collection } = conceptIds;
-    if (getWorkflow() === 'research' && biospecimenData[collection.collectionTime] === undefined) biospecimenData[collection.collectionTime] = new Date().toISOString();
+    if (getWorkflow() === 'research' && biospecimenData[conceptIds.collection.collectionTime] === undefined) biospecimenData[conceptIds.collection.collectionTime] = new Date().toISOString();
 
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
     const siteTubesList = getSiteTubesLists(biospecimenData);
@@ -2604,7 +2603,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
             hasCntdError = true;
             errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`, focus);
             focus = false;
-        } else if (input.required && masterID !== biospecimenData[collection.id]) {
+        } else if (input.required && masterID !== biospecimenData[conceptIds.collection.id]) {
             hasError = true;
             hasCntdError = true;
             errorMessage(input.id, 'Invalid Collection ID.', focus);
@@ -2621,7 +2620,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
             focus = false;
         }
 
-        if (input.required) biospecimenData[`${input.id.replace('Id', '')}`][collection.tube.scannedId] = `${masterID} ${tubeID}`.trim();
+        if (input.required) biospecimenData[`${input.id.replace('Id', '')}`][conceptIds.collection.tube.scannedId] = `${masterID} ${tubeID}`.trim();// here
     });
 
     if ((hasError && cntd == true) || hasCntdError) return;
@@ -2630,11 +2629,11 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
 
     tubesCollected.forEach((tube) => {
         if (biospecimenData[tube.id] === undefined) biospecimenData[`${tube.id}`] = {};
-        if (biospecimenData[tube.id] && biospecimenData[tube.id][collection.tube.isCollected] === conceptIds.yes && tube.checked === false) {
-            delete biospecimenData[tube.id][collection.tube.scannedId];
+        if (biospecimenData[tube.id] && biospecimenData[tube.id][conceptIds.collection.tube.isCollected] === conceptIds.yes && tube.checked === false) {
+            delete biospecimenData[tube.id][conceptIds.collection.tube.scannedId];
         }
 
-        biospecimenData[tube.id][tube.isCollected] = tube.checked ? conceptIds.yes : conceptIds.no;
+        biospecimenData[tube.id][conceptIds.collection.tube.isCollected] = tube.checked ? conceptIds.yes : conceptIds.no;
 
         const reason = document.getElementById(tube.id + 'Reason');
         const deviated = document.getElementById(tube.id + 'Deviated');
@@ -2644,30 +2643,30 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
         // Reason selected dropdown
         if (reason) {
             if (reason.value) {
-                biospecimenData[tube.id][collection.tube.selectReasonNotCollected] = parseInt(reason.value);
-                biospecimenData[tube.id][collection.tube.optionalNotCollectedDetails] = comment.value.trim();
+                biospecimenData[tube.id][conceptIds.collection.tube.selectReasonNotCollected] = parseInt(reason.value);
+                biospecimenData[tube.id][conceptIds.collection.tube.optionalNotCollectedDetails] = comment.value.trim();
 
 
-                if (biospecimenData[tube.id][collection.tube.selectReasonNotCollected] === collection.reasonNotCollectedOther && !comment.value.trim()) {
+                if (biospecimenData[tube.id][conceptIds.collection.tube.selectReasonNotCollected] === conceptIds.collection.reasonNotCollectedOther && !comment.value.trim()) {
                     hasError = true;
                     errorMessage(comment.id, 'Please provide more details', focus);
                     focus = false;
                     return
                 }
             } else {
-                delete biospecimenData[tube.id][collection.tube.selectReasonNotCollected];
-                delete biospecimenData[tube.id][collection.tube.optionalNotCollectedDetails];
+                delete biospecimenData[tube.id][conceptIds.collection.tube.selectReasonNotCollected];
+                delete biospecimenData[tube.id][conceptIds.collection.tube.optionalNotCollectedDetails];
             }
         }
 
         // Deviation Checkbox
         if (deviated) {
             if(deviated.checked) {
-                biospecimenData[tube.id][collection.tube.isDeviated] = conceptIds.yes;
-                biospecimenData[tube.id][collection.tube.deviationComments] = comment.value.trim();
+                biospecimenData[tube.id][conceptIds.collection.tube.isDeviated] = conceptIds.yes;
+                biospecimenData[tube.id][conceptIds.collection.tube.deviationComments] = comment.value.trim();
             } else {
-                biospecimenData[tube.id][collection.tube.isDeviated] = conceptIds.no;
-                delete biospecimenData[tube.id][collection.tube.deviationComments];
+                biospecimenData[tube.id][conceptIds.collection.tube.isDeviated] = conceptIds.no;
+                delete biospecimenData[tube.id][conceptIds.collection.tube.deviationComments];
             }
     
             const tubeData = siteTubesList.filter(td => td.concept === tube.id)[0];
@@ -2675,17 +2674,17 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
 
             if(tubeData.deviationOptions) {
                 tubeData.deviationOptions.forEach(option => { 
-                    biospecimenData[tube.id][collection.tube.deviation][option.concept] = (deviationSelections.indexOf(option.concept) != -1 ? conceptIds.yes : conceptIds.no);
+                    biospecimenData[tube.id][conceptIds.collection.tube.deviation][option.concept] = (deviationSelections.indexOf(option.concept) != -1 ? conceptIds.yes : conceptIds.no);
                 });
             }
             
             biospecimenData[tube.id][tube.isDiscarded] = 
-                (biospecimenData[tube.id][collection.tube.deviation][collection.deviationType.broken] === conceptIds.yes || 
-                biospecimenData[tube.id][collection.tube.deviation][collection.deviationType.insufficientVolume] === conceptIds.yes || 
-                biospecimenData[tube.id][collection.tube.deviation][collection.deviationType.discard] === conceptIds.yes || 
-                biospecimenData[tube.id][collection.tube.deviation][collection.deviationType.mislabel] === conceptIds.yes) ? conceptIds.yes : conceptIds.no;
+                (biospecimenData[tube.id][conceptIds.collection.tube.deviation][conceptIds.collection.deviationType.broken] === conceptIds.yes || 
+                biospecimenData[tube.id][conceptIds.collection.tube.deviation][conceptIds.collection.deviationType.insufficientVolume] === conceptIds.yes || 
+                biospecimenData[tube.id][conceptIds.collection.tube.deviation][conceptIds.collection.deviationType.discard] === conceptIds.yes || 
+                biospecimenData[tube.id][conceptIds.collection.tube.deviation][conceptIds.collection.deviationType.mislabel] === conceptIds.yes) ? conceptIds.yes : conceptIds.no;
     
-            if (biospecimenData[tube.id][collection.tube.deviation][collection.deviationType.other] === conceptIds.yes && !comment.value.trim()) { 
+            if (biospecimenData[tube.id][conceptIds.collection.tube.deviation][conceptIds.collection.deviationType.other] === conceptIds.yes && !comment.value.trim()) { 
                 hasError = true;
                 errorMessage(comment.id, 'Please provide more details', focus);
                 focus = false;
@@ -2696,11 +2695,11 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
 
     if (hasError) return;
 
-    biospecimenData[collection.note] = document.getElementById('collectionAdditionalNotes').value;
+    biospecimenData[conceptIds.collection.note] = document.getElementById('collectionAdditionalNotes').value;
 
     if (cntd) {
         if (getWorkflow() === 'clinical') {
-            if (biospecimenData[collection.scannedTime] === undefined) biospecimenData[collection.scannedTime] = new Date().toISOString();
+            if (biospecimenData[conceptIds.collection.scannedTime] === undefined) biospecimenData[conceptIds.collection.scannedTime] = new Date().toISOString();
         }
 
         if (getWorkflow() === 'research') {
@@ -2711,7 +2710,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
                 return;
             }
             else {
-                biospecimenData[collection.phlebotomistInitials] = initials.value.trim();
+                biospecimenData[conceptIds.collection.phlebotomistInitials] = initials.value.trim();
             }
         }
     }
@@ -2719,8 +2718,8 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
     showAnimation();
     await updateSpecimen([biospecimenData]);
     
-    const baselineVisit = (biospecimenData[collection.selectedVisit] === conceptIds.baseline.visitId);
-    const clinicalResearchSetting = (biospecimenData[collection.collectionSetting] === conceptIds.research || biospecimenData[collection.collectionSetting] === conceptIds.clinical);
+    const baselineVisit = (biospecimenData[conceptIds.collection.selectedVisit] === conceptIds.baseline.visitId);
+    const clinicalResearchSetting = (biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research || biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical);
 
     await updateCollectionSettingData(biospecimenData, siteTubesList, participantData);
 
@@ -2733,7 +2732,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
     if (cntd) {
 
         participantData = await getUpdatedParticipantData(participantData);
-        const specimenData = (await searchSpecimen(biospecimenData[collection.id])).data;
+        const specimenData = (await searchSpecimen(biospecimenData[conceptIds.collection.id])).data;
         hideAnimation();
         finalizeTemplate(participantData, specimenData);
     }
@@ -2764,11 +2763,10 @@ const isChecked = (id) => document.getElementById(id).checked;
 
 export const addEventSelectAllCollection = () => {
     const checkbox = document.getElementById('selectAllCollection');
-    const { mouthwashBagScan } = conceptIds.collection;
     checkbox.addEventListener('click', () => {
         
         Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => {
-            if(!chk.disabled && chk.id !== `${mouthwashBagScan}`) { 
+            if(!chk.disabled && chk.id !== `${conceptIds.collection.mouthwashBagScan}`) { 
                 chk.checked = checkbox.checked;
 
                 const event = new CustomEvent('change');
