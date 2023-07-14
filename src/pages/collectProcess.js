@@ -5,7 +5,7 @@ import conceptIds from '../fieldToConceptIdMapping.js';
 
 export const tubeCollectedTemplate = (participantData, biospecimenData) => {
     const isCheckedIn = checkedIn(participantData);
-    
+
     let template = `
         </br>
         <div class="row">

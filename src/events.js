@@ -2464,7 +2464,6 @@ export const addEventBiospecimenCollectionFormEdit = () => {
             const reasonNotCollectedDropdown = document.getElementById(conceptID + 'Reason');
             if (reasonNotCollectedDropdown) reasonNotCollectedDropdown.disabled = false;
 
-
             const deviation = document.getElementById(conceptID + 'Deviated');
             if (deviation) {
                 deviation.disabled = false;
@@ -2476,12 +2475,8 @@ export const addEventBiospecimenCollectionFormEdit = () => {
                     type.disabled = false;
                     comment.disabled = false;
                 }
-
-
             }
-            
         });
-
     });
 };
 
