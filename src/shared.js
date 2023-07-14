@@ -116,7 +116,7 @@ export const findParticipant = async (query) => {
     return await response.json();
 }
 
-export const updateParticipant = async (array) => {
+export const updateParticipant = async (dataObj) => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=updateParticipantDataNotSite`, {
         method: "POST",
@@ -124,7 +124,7 @@ export const updateParticipant = async (array) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body:  JSON.stringify(array),
+        body:  JSON.stringify(dataObj),
     });
     
     return await response.json();
@@ -1027,15 +1027,14 @@ export const generateBarCode = (id, connectId) => {
     JsBarcode(`#${id}`, connectId, {height: 30});
 }
 
-export const getUpdatedParticipantData = async (data) => {
-    const query = `connectId=${parseInt(data['Connect_ID'])}`;
+export const getUpdatedParticipantData = async (participantData) => {
+    const query = `connectId=${parseInt(participantData['Connect_ID'])}`;
     let responseParticipant = await findParticipant(query);
     return responseParticipant.data[0];
 }
 
-export const updateCollectionSettingData = async (biospecimenData, tubes, data) => {
-    
-    data = await getUpdatedParticipantData(data);
+export const updateCollectionSettingData = async (biospecimenData, tubes, participantData) => { 
+    participantData = await getUpdatedParticipantData(participantData);
 
     let settings;
     let visit = biospecimenData[conceptIds.collection.selectedVisit];
@@ -1044,25 +1043,21 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
     const urineTubes = tubes.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = tubes.filter(tube => tube.tubeType === "Mouthwash");
 
+    if (participantData[conceptIds.collectionDetails]) {
+        settings = participantData[conceptIds.collectionDetails];
+        if (!settings[visit]) settings[visit] = {};
 
-    if(data[conceptIds.collectionDetails]) {
-        settings = data[conceptIds.collectionDetails];
-
-        if(!settings[visit]) {
-            settings[visit] = {};
-        }
-    }
-    else {
+    } else {
         settings = {
             [visit]: {}
         }
     }
 
-    if(!settings[visit]['592099155']) {
+    if (!settings[visit][conceptIds.bloodCollectionSetting]) {
         bloodTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
-                settings[visit]['592099155'] = biospecimenData[conceptIds.collection.collectionSetting];
+                settings[visit][conceptIds.bloodCollectionSetting] = biospecimenData[conceptIds.collection.collectionSetting];
 
                 if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
                     settings[visit][conceptIds.baseline.bloodCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
@@ -1081,11 +1076,11 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
         });
     }
         
-    if(!settings[visit]['718172863']) {
+    if (!settings[visit][conceptIds.urineCollectionSetting]) {
         urineTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
-                settings[visit]['718172863'] = biospecimenData[conceptIds.collection.collectionSetting];
+                settings[visit][conceptIds.urineCollectionSetting] = biospecimenData[conceptIds.collection.collectionSetting];
 
                 if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
                     settings[visit][conceptIds.baseline.urineCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
@@ -1104,11 +1099,11 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
         });
     }
 
-    if(!settings[visit]['915179629']) {
+    if (!settings[visit][conceptIds.mouthwashCollectionSetting]) {
         mouthwashTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
-                settings[visit]['915179629'] = biospecimenData[conceptIds.collection.collectionSetting];
+                settings[visit][conceptIds.mouthwashCollectionSetting] = biospecimenData[conceptIds.collection.collectionSetting];
 
                 if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
                     settings[visit][conceptIds.baseline.mouthwashCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
@@ -1119,10 +1114,9 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
     }
 
     const settingData = {
-        '173836415': settings,
-        uid: data?.state?.uid
+        [conceptIds.collectionDetails]: settings,
+        uid: participantData?.state?.uid
     };
-        
     await updateParticipant(settingData);
 
 }
@@ -2060,10 +2054,10 @@ export const getWorkflow = () => document.getElementById('contentBody').dataset.
 export const getSiteAcronym = () => document.getElementById('contentBody').dataset.siteAcronym ?? localStorage.getItem('siteAcronym');
 export const getSiteCode = () => document.getElementById('contentBody').dataset.siteCode ?? localStorage.getItem('siteCode');
 
-export const getSiteTubesLists = (specimenData) => {
+export const getSiteTubesLists = (biospecimenData) => {
     const dashboardType = getWorkflow();
     const siteAcronym = getSiteAcronym();
-    const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === specimenData['951355211'])[0]?.location : undefined;
+    const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === biospecimenData[conceptIds.collectionLocation])[0]?.location : undefined;
     const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
     return siteTubesList;
 }

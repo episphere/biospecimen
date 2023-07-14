@@ -1,8 +1,8 @@
 export default {
-    fName: 399159511,
+    firstName: 399159511,
     prefName: 153211406,
-    mName: 231676651,
-    lName: 996038075,
+    middleName: 231676651,
+    lastName: 996038075,
     birthMonth: 564964481,
     birthDay: 795827569,
     birthYear: 544150384,
@@ -69,8 +69,8 @@ export default {
     clinicalDateTimeDrawn: 915838974,
 
     // biospecimen collection
-    collection:{
-        id:820476880,
+    collection: {
+        id: 820476880,
         selectedVisit: 331584571,
         note: 338570265,
         isFinalized:410912345,
@@ -81,7 +81,13 @@ export default {
         scannedTime: 915838974,
         receivedDate: 926457119,
         urineAccessNumber: 928693120,
-        tube:{
+        reasonNotCollectedOther: 181769837,
+        phlebotomistInitials: 719427591,
+        mouthwashBagScan: 223999569,
+        mouthwashTube1: 143615646,
+        bloodUrineBagScan: 787237543,
+        
+        tube: {
             isCollected: 593843561,
             isMissing: 258745303,
             deviation: 248868659,
@@ -90,6 +96,17 @@ export default {
             scannedId: 825582494,
             dateReceived: 926457119,
             deviationComments: 536710547,
+            optionalNotCollectedDetails: 338286049,
+            selectReasonNotCollected: 883732523,
+        },
+
+        deviationType: {
+            broken: 472864016,
+            insufficientVolume: 956345366,
+            discard: 810960823,
+            mislabel: 684617815,
+            notFound: 982885431,
+            other: 453343022,
         },
     },
     checkOutDateTime: 343048998,
@@ -140,6 +157,9 @@ export default {
     siteCode:789843387,
 
     collectionLocation: 951355211,
+    bloodCollectionSetting: 592099155,
+    urineCollectionSetting: 718172863,
+    mouthwashCollectionSetting: 915179629,
 
     modules: {
         module1: {
