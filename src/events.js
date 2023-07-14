@@ -2087,7 +2087,6 @@ const btnsClicked = async (connectId, formData) => {
     await createTubesForCollection(formData, biospecimenData);
     
     // if 'clinical' and no existing collection ID, check email trigger
-    
     if (formData[conceptIds.collection.collectionSetting] === conceptIds.clinical && !formData?.collectionId) {
         await checkSurveyEmailTrigger(particpantData, formData[conceptIds.collection.selectedVisit]);
     }
@@ -2339,7 +2338,7 @@ export const addEventBiospecimenCollectionFormToggles = () => {
     const collectedBoxes = Array.from(document.getElementsByClassName('tube-collected'));
     const deviationBoxes = Array.from(document.getElementsByClassName('tube-deviated'));
     const reasonNotCollectedDropdown = Array.from(document.getElementsByClassName('reason-not-collected'));
-    
+
     collectedBoxes.forEach(collected => {
 
         const reason = document.getElementById(collected.id + "Reason"); // reason select dropdown element 
@@ -2372,7 +2371,7 @@ export const addEventBiospecimenCollectionFormToggles = () => {
                     specimenId.disabled = true;
                 }
             }
-            
+
             if (getWorkflow() === 'research' && collected.id === `${conceptIds.collection.mouthwashTube1}`) {
                 const mouthwashBagChkb = document.getElementById(`${conceptIds.collection.mouthwashBagScan}`);
                 const mouthwashBagText = document.getElementById(`${conceptIds.collection.mouthwashBagScan}Id`);
