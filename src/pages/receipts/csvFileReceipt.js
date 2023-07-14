@@ -157,9 +157,9 @@ const modifyBSIQueryResults = (results) => {
                         result[0][fieldToConceptIdMapping.collectionId].split(' ')[1] !== '0008' && result[0][fieldToConceptIdMapping.collectionId].split(' ')[1] !== '0009')
                         && result[0][fieldToConceptIdMapping.discardFlag] !== fieldToConceptIdMapping.yes && result[0][fieldToConceptIdMapping.deviationNotFound] !== fieldToConceptIdMapping.yes)
   filteredResults = filteredResults.flat()
-  filteredResults.forEach( i => {
-      let vialMappings = getVialTypesMappings(i)
-      updateResultMappings(i, vialMappings)
+  filteredResults.forEach(filteredResult => {
+      let vialMappings = getVialTypesMappings(filteredResult)
+      updateResultMappings(filteredResult, vialMappings)
   })
   return filteredResults
 }
@@ -172,21 +172,21 @@ const modifyBSIQueryResults = (results) => {
 
 const updateInTransitMapping = (shippedBoxes) => {
   let holdProcessedResult = []
-  shippedBoxes.forEach(i => {    
-    const bagKeys = Object.keys(i.bags); // store specimenBagId in an array
-    const specimenBags = Object.values(i.bags); // store bag content in an array
+  shippedBoxes.forEach(shippedBox => {
+    const bagKeys = Object.keys(shippedBox.bags); // store specimenBagId in an array
+    const specimenBags = Object.values(shippedBox.bags); // store bag content in an array
     
     specimenBags.forEach((specimenBag, index) => {
       specimenBag.arrElements.forEach((fullSpecimenIds, j, specimenBagSize) => { // grab fullSpecimenIds & loop thru content
         let dataHolder = {
-          shipDate: i[fieldToConceptIdMapping.shippingShipDate]?.split("T")[0] || '',
-          trackingNumber: i[fieldToConceptIdMapping.shippingTrackingNumber] || '',
-          shippedSite: i.siteAcronym || '',
-          shippedLocation: conceptIdToSiteSpecificLocation[i[fieldToConceptIdMapping.shippingLocation]] || '',
-          shipDateTime: convertISODateTime(i[fieldToConceptIdMapping.shippingShipDate]) || '',
+          shipDate: shippedBox[fieldToConceptIdMapping.shippingShipDate]?.split("T")[0] || '',
+          trackingNumber: shippedBox[fieldToConceptIdMapping.shippingTrackingNumber] || '',
+          shippedSite: shippedBox.siteAcronym || '',
+          shippedLocation: conceptIdToSiteSpecificLocation[shippedBox[fieldToConceptIdMapping.shippingLocation]] || '',
+          shipDateTime: convertISODateTime(shippedBox[fieldToConceptIdMapping.shippingShipDate]) || '',
           numSamples: specimenBagSize.length,
-          tempMonitor: i[fieldToConceptIdMapping.tempProbe] === fieldToConceptIdMapping.yes ? 'Yes' : 'No',
-          BoxId: i[fieldToConceptIdMapping.shippingBoxId] || '',
+          tempMonitor: shippedBox[fieldToConceptIdMapping.tempProbe] === fieldToConceptIdMapping.yes ? 'Yes' : 'No',
+          BoxId: shippedBox[fieldToConceptIdMapping.shippingBoxId] || '',
           specimenBagId: bagKeys[index],
           fullSpecimenIds: fullSpecimenIds,
           materialType: materialTypeMapping(fullSpecimenIds)
@@ -209,7 +209,7 @@ const updateInTransitMapping = (shippedBoxes) => {
 const materialTypeMapping = (specimenId) => {
   const tubeId = specimenId.split(' ')[1]
   const materialTypeObject = {'0001':'Serum', '0002':'Serum', '0011':'Serum', '0012':'Serum', '0021':'Serum', 
-                              '0003':  'WHOLE BL', '0004': 'WHOLE BL', '0005': 'WHOLE BL', '0013': 'WHOLE BL', '0014' : 'WHOLE BL', '0024' : 'WHOLE BL',
+                              '0003': 'WHOLE BL', '0004': 'WHOLE BL', '0005': 'WHOLE BL', '0013': 'WHOLE BL', '0014' : 'WHOLE BL', '0024' : 'WHOLE BL',
                               '0006':'Urine', '0007': 'Saliva'}
   return materialTypeObject[tubeId] ?? '';
 }
@@ -310,37 +310,39 @@ const getVialTypesMappings = (filteredResult) => {
   return vialMappingsHolder
 }
 
-const updateResultMappings = (i, vialMappings) => {
-  i['Study ID'] = 'Connect Study';
-  i['Sample Collection Center'] = (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical) ? keyToNameObj[i[fieldToConceptIdMapping.healthcareProvider]] : keyToLocationObj[i[fieldToConceptIdMapping.collectionLocation]];
-  i['Sample ID'] = i[fieldToConceptIdMapping.collectionId]?.split(' ')[0] || '';
-  i['Sequence #'] = i[fieldToConceptIdMapping.collectionId]?.split(' ')[1] || '';
-  i['BSI ID'] = i[fieldToConceptIdMapping.collectionId] || '';
-  i['Subject ID'] = i['Connect_ID'];
-  i['Date Received'] = formatISODateTime(i[fieldToConceptIdMapping.dateReceived]) || '';
-  i['Date Drawn'] = (i[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical) ? convertISODateTime(i[fieldToConceptIdMapping.clinicalDateTimeDrawn]) || '' : convertISODateTime(i[fieldToConceptIdMapping.dateWithdrawn]) || '';
-  i['Vial Type'] = vialMappings[0];
-  i['Additive/Preservative'] = vialMappings[1];
-  i['Material Type'] = vialMappings[2];
-  i['Volume'] = vialMappings[3];
-  i['Volume Estimate'] = 'Assumed';
-  i['Voume Unit'] = 'ml (cc)';
-  i['Vial Warnings'] = '';
-  i['Hermolyzed'] = '';
-  i['Label Status'] = 'Barcoded';
-  i['Visit'] = 'BL';
+const updateResultMappings = (filteredResult, vialMappings) => {
+  filteredResult['Study ID'] = 'Connect Study';
+  filteredResult['Sample Collection Center'] = (filteredResult[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical) 
+              ? keyToNameObj[filteredResult[fieldToConceptIdMapping.healthcareProvider]] : keyToLocationObj[filteredResult[fieldToConceptIdMapping.collectionLocation]];
+  filteredResult['Sample ID'] = filteredResult[fieldToConceptIdMapping.collectionId]?.split(' ')[0] || '';
+  filteredResult['Sequence #'] = filteredResult[fieldToConceptIdMapping.collectionId]?.split(' ')[1] || '';
+  filteredResult['BSI ID'] = filteredResult[fieldToConceptIdMapping.collectionId] || '';
+  filteredResult['Subject ID'] = filteredResult['Connect_ID'];
+  filteredResult['Date Received'] = formatISODateTime(filteredResult[fieldToConceptIdMapping.dateReceived]) || '';
+  filteredResult['Date Drawn'] = (filteredResult[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical) 
+              ? convertISODateTime(filteredResult[fieldToConceptIdMapping.clinicalDateTimeDrawn]) || '' : convertISODateTime(filteredResult[fieldToConceptIdMapping.dateWithdrawn]) || '';
+  filteredResult['Vial Type'] = vialMappings[0];
+  filteredResult['Additive/Preservative'] = vialMappings[1];
+  filteredResult['Material Type'] = vialMappings[2];
+  filteredResult['Volume'] = vialMappings[3];
+  filteredResult['Volume Estimate'] = 'Assumed';
+  filteredResult['Voume Unit'] = 'ml (cc)';
+  filteredResult['Vial Warnings'] = '';
+  filteredResult['Hermolyzed'] = '';
+  filteredResult['Label Status'] = 'Barcoded';
+  filteredResult['Visit'] = 'BL';
   
   // Delete unwanted properties
-  delete i[fieldToConceptIdMapping.healthcareProvider];
-  delete i[fieldToConceptIdMapping.collectionLocation];
-  delete i['Connect_ID'];
-  delete i[fieldToConceptIdMapping.collectionId];
-  delete i[fieldToConceptIdMapping.dateWithdrawn];
-  delete i[fieldToConceptIdMapping.clinicalDateTimeDrawn];
-  delete i[fieldToConceptIdMapping.dateReceived];
-  delete i[fieldToConceptIdMapping.collectionType];
-  delete i[fieldToConceptIdMapping.discardFlag];
-  delete i[fieldToConceptIdMapping.deviationNotFound];  
+  delete filteredResult[fieldToConceptIdMapping.healthcareProvider];
+  delete filteredResult[fieldToConceptIdMapping.collectionLocation];
+  delete filteredResult['Connect_ID'];
+  delete filteredResult[fieldToConceptIdMapping.collectionId];
+  delete filteredResult[fieldToConceptIdMapping.dateWithdrawn];
+  delete filteredResult[fieldToConceptIdMapping.clinicalDateTimeDrawn];
+  delete filteredResult[fieldToConceptIdMapping.dateReceived];
+  delete filteredResult[fieldToConceptIdMapping.collectionType];
+  delete filteredResult[fieldToConceptIdMapping.discardFlag];
+  delete filteredResult[fieldToConceptIdMapping.deviationNotFound];  
 }
 
 const generateBSIqueryCSVData = (items) => {
