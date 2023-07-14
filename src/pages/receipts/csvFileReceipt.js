@@ -80,7 +80,7 @@ const getInTransitFileType = () => {
                                         <div class="form-check">
                                           <input class="form-check-input" type="radio" name="fileFormat" value="xlsx" id="xlsxCheck">
                                           <label class="form-check-label" for="xlsxCheck">
-                                            .XLSX (better readability)
+                                            .XLSX (for better readability)
                                           </label>
                                         </div>
                                         <div class="form-check">
