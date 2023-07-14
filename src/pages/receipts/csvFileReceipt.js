@@ -14,6 +14,7 @@ export const csvFileReceiptScreen = async (auth) => {
   activeReceiptsNavbar();
   csvFileButtonSubmit();
   getInTransitFileType();
+  loadSheetJScdn();
 }
 
 const csvFileReceiptTemplate = async (username) => {
@@ -28,7 +29,7 @@ const csvFileReceiptTemplate = async (username) => {
                       <form class="form">
                       <div class="form-group d-flex flex-wrap align-items-center justify-content-center m-0">
                           <p></p>
-                          <button id="createTransitFile" data-toggle="modal" data-target="#modalShowMoreData" class="btn btn-primary">Create File</button>
+                          <button id="createTransitFile" data-toggle="modal" data-target="#modalShowMoreData" class="btn btn-primary" disabled>Create File</button>
                       </div>
                       </form>
                     </div>
@@ -374,20 +375,20 @@ const downloadCSVfile = (items, csv, title) => {
 const processInTransitXLSXData = (inTransitItems) => {
   const header = ['Ship Date', 'Tracking Number', 'Shipped from Site', 'Shipped from Location', 'Shipped Date & Time', 'Expected Number of Samples', 'Temperature Monitor', 'Box Number', 'Specimen Bag ID Type', 'Full Specimen IDs', 'Material Type'];
   const inTransitData = [header, ...inTransitItems.map(row => Object.values(row))];
-  loadSheetJScdn(inTransitData);
+  handleXLSXLibrary(inTransitData);
 };
 
 /**
- * Loads SheetJS CDN upon .XLSX selection & then triggers SheetJS to process upon script on load
- * @param {array} modifiedTransitResults - array of arrays
+ * Loads SheetJS CDN upon Create .csv file selection & then enables create file button upon script onload
+ * @param {} 
  * @returns
 */ 
 
-const loadSheetJScdn = (modifiedTransitResults) => {
+const loadSheetJScdn = () => {
   const script = document.createElement('script');
   script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.mini.min.js';
   script.onload = function() {
-    handleXLSXLibrary(modifiedTransitResults); // runs after the script is successfully loaded
+    document.getElementById("createTransitFile").disabled = false; // enable create file button after the script is successfully loaded
   };
   document.head.appendChild(script);
 }
