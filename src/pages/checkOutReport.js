@@ -69,8 +69,8 @@ export const populateCheckOutTable = async () => {
         const newRow = currTable.insertRow();
         newRow.innerHTML = `
           <td>${item['Connect_ID']}</td>
-          <td>${item[fieldToConceptIdMapping.lName]}</td>
-          <td>${item[fieldToConceptIdMapping.fName]}</td>
+          <td>${item[fieldToConceptIdMapping.lastName]}</td>
+          <td>${item[fieldToConceptIdMapping.firstName]}</td>
           <td>${convertISODateTime(item[fieldToConceptIdMapping.collection.selectedVisit]?.[fieldToConceptIdMapping.baseline.visitId]?.[fieldToConceptIdMapping.checkInDateTime])}</td>
           <td><button class="btn btn-outline-primary text-nowrap participantCheckOutBtn" data-checkout='${JSON.stringify(item)}'>Go to Check-Out</button></td>
         `;
