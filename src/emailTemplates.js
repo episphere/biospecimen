@@ -42,6 +42,9 @@ export const baselineEmailTemplate = (data, isClinical) => {
         Thank you for donating your samples for the Connect for Cancer Prevention Study! Next, please visit the <a href=${appLocation}>MyConnect app</a> to answer the ${isClinical ? 'Baseline Blood and Urine Sample Survey' : 'Baseline Blood, Urine, and Mouthwash Sample Survey'}. This short survey asks questions about the day that you donated samples, so it is important to complete it as soon as you can.
         <br/>
         <br/>
+        A new survey about your experience with COVID-19 is also available on MyConnect. Please complete this survey as soon as you can.
+        <br/>
+        <br/>
         Please use ${loginDetails} to access the survey on the MyConnect app. If you forgot your login information or have questions, please contact the <a href=${supportLocation}>Connect Support Center.</a>
         <br/>
         <br/>
