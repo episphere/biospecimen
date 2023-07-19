@@ -51,25 +51,42 @@ export const startShipping = async (userName) => {
     console.log("calling startShipping");
     showAnimation();
 
-    if (document.getElementById('navBarParticipantCheckIn')) {
-      document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
+    const navBarParticipantCheckIn = document.getElementById('navBarParticipantCheckIn');
+    if (navBarParticipantCheckIn) {
+      navBarParticipantCheckIn.classList.add('disabled');
     }
 
+    let template = `
+        ${renderShippingHiddenTable()}
+        ${renderShippingLocationSelector()}
+        ${renderScanOrEnterSpecimenId()}
+        ${renderCollectionsContentsAndBoxes()}
+        ${renderTempMonitorCheckbox()}
+    `;
+
+    removeActiveClass('navbar-btn', 'active')
+    document.getElementById('contentHeader').innerHTML = `<h2>Connect for Cancer Prevention Study</h2></br>` + shippingNavBar();
+    const navBarBtn = document.getElementById('navBarShippingDash');
+    navBarBtn.classList.add('active');
+    document.getElementById('contentBody').innerHTML = template;
+    await populateSelectLocationList();
+    //addSelectionEventListener("selectLocationList", "shipping_location");
+
     console.time('getBoxes');
-    let response = await  getBoxes();
-    console.log('response - boxes', response);  // get un-shipped boxes
+    const responseGetBoxes = await getBoxes();
     console.timeEnd('getBoxes');
-    let boxList = response.data;
     //boxIdAndBagsObj-->{"Box1":{"CXA123423 0008:{...}, "unlabelled":{...}}, "Box2":{...}}
+    const boxList = responseGetBoxes.data;
     let boxIdAndBagsObj = {}; // for transformed box data structure
 
     for (const box of boxList) {
       const boxId = box[conceptIds.shippingBoxId];
       boxIdAndBagsObj[boxId] = box['bags'];
     }
+    console.log('boxIdAndBagsObj', boxIdAndBagsObj);
 
-    response = await  getAllBoxes();
-    let allBoxList = response.data;
+    const responseAllBoxes = await getAllBoxes();
+    let allBoxList = responseAllBoxes.data;
     let allBoxIdAndBagsObj = {};
 
     for (const box of allBoxList) {
@@ -77,11 +94,52 @@ export const startShipping = async (userName) => {
         allBoxIdAndBagsObj[boxId] = box['bags']
     }
 
-    let template = `
+    console.log('allBoxIdAndBagsObj', allBoxIdAndBagsObj);
+    console.log('allBoxList', allBoxList);
+
+    
+    await populateSaveTable(boxIdAndBagsObj, allBoxList, userName);
+    await populateSpecimensList(allBoxList);
+
+    let currLocation = document.getElementById('selectLocationList').value;
+    if (currLocation !== 'none') { 
+        let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
+        const responseBoxesByLocation = await getBoxesByLocation(currLocationConceptId);
+        const allBoxByLocationList = responseBoxesByLocation.data;
+        let boxIdAndBagsObj = {};
+        for (const box of allBoxByLocationList) {
+            const boxId = box[conceptIds.shippingBoxId];
+            boxIdAndBagsObj[boxId] = box['bags']
+        }
+        await populateBoxSelectList(boxIdAndBagsObj, userName);
+    };
+
+    const tempMonitorCheckedEl = document.getElementById('tempMonitorChecked')
+    
+    await populateTempNotification();
+    addSelectionEventListener("selectLocationList", "shipping_location");
+    addEventNavBarShipment("navBarShippingDash", userName);
+    addEventNavBarShippingManifest(userName, tempMonitorCheckedEl);
+    addEventBoxSelectListChanged();
+    addEventNavBarBoxManifest("navBarBoxManifest", userName)
+    addEventChangeLocationSelect(userName);
+    addEventAddSpecimenToBox(userName);
+    //// addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 14, 0);
+    addEventModalAddBox(userName);
+    hideAnimation();
+    ////addEventSubmitAddBag();
+}
+
+const renderShippingHiddenTable = () => {
+    return `
         <div id="shippingHiddenTable" style="display:none">
         {}
         </div>
-        
+    `;
+}
+
+const renderShippingLocationSelector = () => {
+    return `
         <div class="row">
             <div class="col-lg">
                 <h5>Choose your shipping location</h5>
@@ -91,168 +149,153 @@ export const startShipping = async (userName) => {
             <div class = "col-lg">
                 <select class="selectpicker" id="selectLocationList" style="padding:.25rem">
                 </select>
+                </br></br>
             </div>
         </div>
+    `;
+}
 
-        <div class="row" style="margin:0;">
-            <div class="col-lg" style="padding: 0;margin: 0;">
-                <div class="row form-row" style="padding-left:0px;margin:0;">
-                    <form id="addSpecimenForm" method="POST" style="width:100%;">
-                      <label for="masterSpecimenId">
-                      <h5>To start packing the shipping boxes, scan specimen bag ID or Full Specimen ID here:</h5>
-                      </label>
-                        <div class="form-group">
-                          <div class="input-group">
+const renderScanOrEnterSpecimenId = () => {
+    return `
+    <div class="row" style="margin:0;">
+        <div class="col-lg" style="padding: 0;margin: 0;">
+            <div class="row form-row" style="padding-left:0px;margin:0;">
+                <form id="addSpecimenForm" method="POST" style="width:100%;">
+                    <label for="masterSpecimenId">
+                        <h5>To start packing the shipping boxes, scan specimen bag ID or Full Specimen ID here:</h5>
+                    </label>
+                    <div class="form-group">
+                        <div class="input-group">
                             <input class="form-control" required type="text" id="masterSpecimenId" placeholder="Enter/Scan" autocomplete="off"/>
                             <div class="input-group-append">
-                              <button class="btn btn-primary" aria-label="Enter Specimen ID" type="submit">Enter</button>
+                                <button class="btn btn-primary" aria-label="Enter Specimen ID" type="submit">Enter</button>
                             </div>
-                          </div>
                         </div>
-                    </form>
-                    <button href="#" id="submitMasterSpecimenId" type="submit" class="btn btn-outline-primary" data-toggle="modal" data-target="#shippingModal" data-backdrop="static" style = "display:none">Add specimen to box</button>
-                    <button href="#" id="submitSpecimenIdProxyButton" type="submit" class="btn btn-outline-primary" data-toggle="modal" data-target="#shippingModal" data-backdrop="static" style = "display:none">Add specimen to box</button>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            
-        </div>
-        <div class="row">
-    <div class="col-5">
-
-    <h4 style="text-align:center; margin-bottom:1rem;">Available Collections</h4>
-    <div class="panel panel-default" style="border-style:solid;height:550px;border-width:1px;overflow:auto;" id="specimenPanel">
-            <table class = "table" style="width: 100%;margin-bottom:0px;" id="specimenList" >
-            </table>
-    </div>
-
-    <div class="panel panel-default" style="position:absolute; border-style:solid;height:0px;border-width:1px;overflow:auto; top:-100000px; " id="orphansPanel">
-            <table class = "table" style="width: 100%; margin-bottom:0px;" id="orphansList" >
-                
-            </table>
-    </div>
-    </div>
-    <div class="col-7">
-        <div style="display:flex; justify-content:space-evenly; align-items:center; margin-bottom:.625rem;">
-            <div>
-                <h4>View Shipping Box Contents</h4>
-            </div>
-            <div>
-                <select class="selectpicker" id="selectBoxList" name="box-ids" style="padding:0.25rem">
-                </select>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="panel panel-default" style="border-style:solid;height:550px;border-width:1px;overflow:auto">
-                    <table style="width: 100%;" id="currTubeTable">
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-    
-
-    <!-- The Modal -->
-    <div class="modal fade" id="shippingModal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content sub-div-shadow">
-                <div class="modal-header" id="shippingModalHeader"></div>
-                <div class="modal-body" id="shippingModalBody">
-                </div>
-                <div class="modal-body"> 
-                    <h4 style="margin-bottom:0.8rem">Select Box or Create New Box</h4>
-                    <div id="create-box-success" class="alert alert-success" role="alert" style="display:none;">
-                      New box has been created
                     </div>
-                    <div id="create-box-error" class="alert alert-danger" role="alert" style="display:none;">
-                      Please add a specimen or specimens to last box
-                    </div>
-                    <select class="selectpicker" id="shippingModalChooseBox" data-new-box="" style="font-size:1.4rem;"></select>
-                    <button type="button" class="btn btn-primary" id="modalAddBoxButton">Create New Box</button>
-                    
-                </div>
-                <div class="modal-footer">
-                   
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="addToBagButton">Add to Box</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="shippingModalCancel">Cancel</button>
-                </div>  
+                </form>
+                <button href="#" id="submitMasterSpecimenId" type="submit" class="btn btn-outline-primary" data-toggle="modal" data-target="#shippingModal" data-backdrop="static" style = "display:none">Add specimen to box</button>
+                <button href="#" id="submitSpecimenIdProxyButton" type="submit" class="btn btn-outline-primary" data-toggle="modal" data-target="#shippingModal" data-backdrop="static" style = "display:none">Add specimen to box</button>
+                <br><br>
             </div>
-        </div>
-    </div>
-</div>
-
-    </br>
-    <div id="tempTubeReminder" style="color:red;display:none;">
-        <p>
-            Please put a temperature monitor in the box for shipping
-        </p>
-    </div>
-    <div id="edit">
-        <div class="row" style="margin-bottom:.5rem">
-          <div class="col-9 no-gutters">
-            <h4 style="text-align:start;">Select one or more boxes to ship</h4>
-          </div>
-          <div class="col-3 no-gutters">
-          <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging" style="margin:auto;display:block;">Continue to Review Shipment Contents</button>
-          </div>
-        </div>
-        <div style="border: 1px solid black; overflow: auto; margin-bottom: 0.5rem; height: 400px;">
-            <table  class="table table-bordered" style="width:100%;border:1px solid;" id = "saveTable">
-            </table>
-        </div>
-    </div>
-    <div class="row" id="checkForTemp">
-        <div class="col-lg">
-            <input type="checkbox" id="tempMonitorChecked" style="transform: scale(1.5); margin-right:10px; margin-top:5px; margin-left:5px;" checked>
-            <label for="tempMonitorChecked">Temperature Monitor is included in this shipment</label><br>
         </div>
     </div>
     `;
-
-    removeActiveClass('navbar-btn', 'active')
-    document.getElementById('contentHeader').innerHTML = `<h2>Connect for Cancer Prevention Study</h2></br>` + shippingNavBar();
-    const navBarBtn = document.getElementById('navBarShippingDash');
-    navBarBtn.classList.add('active');
-    document.getElementById('contentBody').innerHTML = template;
-    await populateSelectLocationList();
-    addSelectionEventListener("selectLocationList", "shipping_location");
-
-    
-    await populateSaveTable(boxIdAndBagsObj, allBoxList, userName);
-    await populateSpecimensList(allBoxList);
-
-    let currLocation = document.getElementById('selectLocationList').value;
-    if (currLocation !== 'none') { 
-        let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
-        response = await getBoxesByLocation(currLocationConceptId);
-        allBoxList = response.data;
-        let boxIdAndBagsObj = {};
-        for (const box of allBoxList) {
-            const boxId = box[conceptIds.shippingBoxId];
-            boxIdAndBagsObj[boxId] = box['bags']
-        }
-        await populateBoxSelectList(boxIdAndBagsObj,userName);
-    };
-
-    let tempMonitorCheckedEl = document.getElementById('tempMonitorChecked')
-    
-    await populateTempNotification();
-    addEventNavBarShipment("navBarShippingDash", userName);
-    addEventNavBarShippingManifest(userName, tempMonitorCheckedEl);
-    addEventBoxSelectListChanged();
-    addEventNavBarBoxManifest("navBarBoxManifest", userName)
-    addEventChangeLocationSelect(userName);
-    addEventAddSpecimenToBox(userName);
-    // addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 14, 0);
-    addEventModalAddBox(userName);
-    hideAnimation();
-    //addEventSubmitAddBag();
 }
+
+const renderCollectionsContentsAndBoxes = () => {
+    return `
+    <div class="row">
+        ${renderAvailableCollections()}
+        ${renderViewShippingBoxContents()}
+        ${renderSpecimenVerificationModal()}
+        ${renderTempTubeReminder()} 
+    </div>
+    </br>
+    <div id="edit">
+        ${renderSelectBoxes()}
+    </div>
+    `;
+}
+
+const renderAvailableCollections = () => {
+    return `
+        <div class="col-5">
+            <h4 style="text-align:center; margin-bottom:1rem;">Available Collections</h4>
+            <div class="panel panel-default" style="border-style:solid;height:550px;border-width:1px;overflow:auto;" id="specimenPanel">
+                <table class = "table" style="width: 100%;margin-bottom:0px;" id="specimenList"></table>
+            </div>
+            <div class="panel panel-default" style="position:absolute; border-style:solid;height:0px;border-width:1px;overflow:auto; top:-100000px; " id="orphansPanel">
+                <table class = "table" style="width: 100%; margin-bottom:0px;" id="orphansList"></table>
+            </div>
+        </div>
+    `;
+}
+
+const renderViewShippingBoxContents = () => {
+    return `
+        <div class="col-7">
+            <div style="display:flex; justify-content:space-evenly; align-items:center; margin-bottom:.625rem;">
+                <div>
+                    <h4>View Shipping Box Contents</h4>
+                </div>
+                <div>
+                    <select class="selectpicker" id="selectBoxList" name="box-ids" style="padding:0.25rem"></select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="panel panel-default" style="border-style:solid;height:550px;border-width:1px;overflow:auto">
+                        <table style="width: 100%;" id="currTubeTable"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+const renderTempTubeReminder = () => {
+    return `
+        <div id="tempTubeReminder" style="color:red;display:none;">
+            <p>Please put a temperature monitor in the box for shipping
+            </p>
+        </div>
+    `;
+}
+
+const renderSelectBoxes = () => {
+    return `
+        <div class="row" style="margin-bottom:.5rem">
+            <div class="col-9 no-gutters">
+                <h4 style="text-align:start;">Select one or more boxes to ship</h4>
+            </div>
+            <div class="col-3 no-gutters">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging" style="margin:auto;display:block;">Continue to Review Shipment Contents</button>
+            </div>
+        </div>
+        <div style="border: 1px solid black; overflow: auto; margin-bottom: 0.5rem; height: 400px;">
+            <table class="table table-bordered" style="width:100%;border:1px solid;" id="saveTable">
+            </table>
+        </div>
+    `;
+}
+
+const renderTempMonitorCheckbox = () => {
+    return `
+        <div class="row" id="checkForTemp">
+            <div class="col-lg">
+                <input type="checkbox" id="tempMonitorChecked" style="transform: scale(1.5); margin-right:10px; margin-top:5px; margin-left:5px;" checked>
+                <label for="tempMonitorChecked">Temperature Monitor is included in this shipment</label><br>
+            </div>
+        </div>
+    `;
+}
+
+const renderSpecimenVerificationModal = () => {
+    return `
+        <div class="modal fade" id="shippingModal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content sub-div-shadow">
+                    <div class="modal-header" id="shippingModalHeader"></div>
+                    <div class="modal-body" id="shippingModalBody"></div>
+                    <div class="modal-body"> 
+                        <h4 style="margin-bottom:0.8rem">Select Box or Create New Box</h4>
+                        <div id="create-box-success" class="alert alert-success" role="alert" style="display:none;">New box has been created
+                        </div>
+                        <div id="create-box-error" class="alert alert-danger" role="alert" style="display:none;">Please add a specimen or specimens to last box
+                        </div>
+                        <select class="selectpicker" id="shippingModalChooseBox" data-new-box="" style="font-size:1.4rem;"></select>
+                        <button type="button" class="btn btn-primary" id="modalAddBoxButton">Create New Box</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" id="addToBagButton">Add to Box</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="shippingModalCancel">Cancel</button>
+                    </div>  
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 
 export const boxManifest = async (boxId, userName) => {    
     showAnimation();

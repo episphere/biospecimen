@@ -190,11 +190,11 @@ export const addEventAddSpecimenToBox = (userName) => {
         showAnimation();
         const getAllBoxesWithoutConversionResponse = await getAllBoxesWithoutConversion(); // get and search all boxes from a login site
         hideAnimation();
-        let masterIdSplit = masterSpecimenId.split(/\s+/);
+        //let masterIdSplit = masterSpecimenId.split(/\s+/);
         let foundInOrphan = false;
         //get all ids from the hidden
-        let shippingTable = document.getElementById('specimenList') // Available Collections table
-        let orphanTable = document.getElementById('orphansList') // Hidden Orphan Table 
+        const shippingTable = document.getElementById('specimenList') // Available Collections table
+        const orphanTable = document.getElementById('orphansList') // Hidden Orphan Table 
         let biospecimensList = []
         let tableIndex = -1;
         let foundinShippingTable = false;
@@ -243,6 +243,7 @@ export const addEventAddSpecimenToBox = (userName) => {
             document.getElementById('submitMasterSpecimenId').click();
         }
     });
+
     const submitButtonSpecimen = document.getElementById('submitMasterSpecimenId');
     submitButtonSpecimen.addEventListener('click', async e => {
         e.preventDefault();
@@ -627,6 +628,8 @@ export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrpha
 
 
 export const getInstituteSpecimensList = async (boxList) => {
+    console.log('calling getInstituteSpecimensList');
+    console.time('getInstituteSpecimensList');
     boxList = boxList.sort((a,b) => compareBoxIds(a[conceptIds.shippingBoxId], b[conceptIds.shippingBoxId]));
 
     const collectionId = conceptIds.collection.id;
@@ -752,13 +755,16 @@ export const getInstituteSpecimensList = async (boxList) => {
             resultBags[currCollection[collectionId] + ' 0009'] = tubesToAdd.mouthWash;
         }
     }
+    console.timeEnd('getInstituteSpecimensList');
     return resultBags;
 }
 
 export const populateSpecimensList = async (boxList) => {
-    let bagIdAndtubeIdListObj = await getInstituteSpecimensList(boxList);
+    const bagIdAndtubeIdListObj = await getInstituteSpecimensList(boxList);
     let bagIdList = Object.keys(bagIdAndtubeIdListObj);
     bagIdList.sort();
+    console.log('boxList', boxList);
+    console.log('bagIdList', bagIdList);
 
     let tableEle = document.getElementById("specimenList");
     let numRows = 1;
@@ -1058,7 +1064,6 @@ export const populateSaveTable = (boxIdAndBagsObj, boxList, userName) => {
 export const populateTempNotification = async () => {
 
     let checkDate = false;
-    //let checkDate = await getNextTempCheck();
     let toToggle = document.getElementById('tempTubeReminder');
     if (checkDate == true) {
         toToggle.style.display = 'block';
@@ -1070,7 +1075,6 @@ export const populateTempNotification = async () => {
 
 export const populateTempCheck = async () => {
     let checkDate = false;
-    //let checkDate = await getNextTempCheck();
     let toToggle = document.getElementById('checkForTemp');
     if (checkDate == true) {
         toToggle.style.display = 'block';
