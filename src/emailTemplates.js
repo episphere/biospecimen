@@ -36,7 +36,7 @@ export const baselineEmailTemplate = (data, isClinical) => {
     }
 
     return `
-        Dear ${data['153211406'] !== '' ? data['153211406'] : data['399159511']},
+        Dear ${data['153211406'] || data['399159511']},
         <br/>
         <br/>
         Thank you for donating your samples for the Connect for Cancer Prevention Study! Next, please visit the <a href=${appLocation}>MyConnect app</a> to answer the ${isClinical ? 'Baseline Blood and Urine Sample Survey' : 'Baseline Blood, Urine, and Mouthwash Sample Survey'}. This short survey asks questions about the day that you donated samples, so it is important to complete it as soon as you can.
