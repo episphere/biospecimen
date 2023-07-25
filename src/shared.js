@@ -630,32 +630,40 @@ export const bagConceptIdList = [
     conceptIds.bag15,
 ];
   
+const bagConversionKeys = [
+  conceptIds.scannedByFirstName,
+  conceptIds.scannedByLastName,
+  conceptIds.orphanBagFlag,
+];
+
 export const convertToOldBox = (inputBox) => {
+  // If the box already has a bags property, return early
   if (inputBox.bags) return inputBox;
 
+  // Otherwise, process the bags
   let bags = {};
   let outputBox = { ...inputBox };
   let hasOrphanBag = false;
   let orphanBag = { arrElements: [] };
 
   for (let bagConceptId of bagConceptIdList) {
+    // If there's no bag corresponding to the current bagConceptId, skip to the next one
     if (!inputBox[bagConceptId]) continue;
+
+    // Extract properties from inputBag
     let outputBag = {};
     const inputBag = inputBox[bagConceptId];
-    const keysNeeded = [
-      conceptIds.scannedByFirstName,
-      conceptIds.scannedByLastName,
-      conceptIds.orphanBagFlag,
-    ];
 
-    for (let k of keysNeeded) {
+    for (let k of bagConversionKeys) {
       if (inputBag[k]) outputBag[k] = inputBag[k];
     }
 
+    // Handle the orphanBag case
     if (inputBag[conceptIds.bagscan_orphanBag]) {
       hasOrphanBag = true;
       orphanBag = { ...orphanBag, ...outputBag };
       orphanBag.arrElements.push(...inputBag[conceptIds.tubesCollected]);
+    // Handle the regular bag case
     } else {
       outputBag.arrElements = inputBag[conceptIds.tubesCollected];
       let bagID;
@@ -671,18 +679,20 @@ export const convertToOldBox = (inputBox) => {
       bags[bagID] = outputBag;
     }
       
+    // Clean up the outputBox
     delete outputBox[bagConceptId];
   }
 
+  // Handle the orphanBag case
   if (hasOrphanBag) {
     bags['unlabelled'] = orphanBag;
   }
 
+  // Finalize the outputBox
   outputBox.bags = bags;
   const locationConceptID = inputBox[conceptIds.shippingLocation];
-  outputBox.siteAcronym =
-    locationConceptIDToLocationMap[locationConceptID]?.siteAcronym ||
-    'Not Found';
+  outputBox.siteAcronym = locationConceptIDToLocationMap[locationConceptID]?.siteAcronym || 'Not Found';
+
   return outputBox;
 };
 
@@ -752,32 +762,27 @@ export const convertToFirestoreBox = (inputBox) => {
   return outputBox;
 };
 
-// todo: fetch only the required un-shipped boxes
-export const getBoxes = async (box) => {
-  console.log('calling getBoxes');
+// TODO resolve this and old version
+// Fetches all boxes for site
+export const getBoxes = async () => {
+  console.log('calling getBoxesUPDATED');
   console.time('getBoxes');
+
   const idToken = await getIdToken();
   const response = await fetch(`${api}api=searchBoxes`, {
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + idToken,
-    },
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + idToken,
+      },
   });
-  let res = await response.json();
-  let toReturn = {};
-  toReturn['data'] = [];
-  let data = res.data;
-  for (let i = 0; i < data.length; i++) {
-    let currJSON = convertToOldBox(data[i]);
-    if (
-      !currJSON.hasOwnProperty(conceptIds.submitShipmentFlag) ||
-      currJSON[conceptIds.submitShipmentFlag] != conceptIds.booleanOne
-    ) {
-      toReturn['data'].push(currJSON);
-    }
-  }
+  const res = await response.json();
+
+  const boxesToReturn = res.data
+      .map(convertToOldBox)
+      .filter(box => !box.hasOwnProperty(conceptIds.submitShipmentFlag) || box[conceptIds.submitShipmentFlag] !== conceptIds.yes);
+
   console.timeEnd('getBoxes');
-  return toReturn;
+  return { data: boxesToReturn };
 };
 
 export const getAllBoxesWithoutConversion =  async (flag) => { // make new function to return filtered boxes
@@ -808,13 +813,14 @@ export const getAllBoxes = async (flag) => {
     }
   });
   let res = await response.json();
-  for (let i = 0; i < res.data.length; i++) {
-    res.data[i] = convertToOldBox(res.data[i]);
-  }
+  res.data = res.data.map(convertToOldBox);
   console.timeEnd('getAllBoxes');
   return res;
 };
 
+// searches boxes collection by login site (789843387) and Site-specific location id (560975149)
+// filters out any boxes where submitShipmentFlag is true
+// TODO recommend adding 145971562 (shipment submitted flag = no) to all boxes on creation. Then we can rewrite the searchBoxesByLocation function to only return boxes where this variable is no (not shipped)
 export const getBoxesByLocation = async (location) => {
     console.log('calling getBoxesByLocation');
     console.time('getBoxesByLocation');
@@ -829,9 +835,7 @@ export const getBoxesByLocation = async (location) => {
     });
 
     let res = await response.json();
-    for (let i = 0; i < res.data.length; i++) {
-        res.data[i] = convertToOldBox(res.data[i]);
-    }
+    res.data = res.data.map(convertToOldBox);
     console.timeEnd('getBoxesByLocation');
     return res;
 }
@@ -883,13 +887,11 @@ export const removeBag = async(boxId, bags) => {
     });
     console.timeEnd('removeBag');
     return await response.json();
-    
 }
 
 /**
  * Fetches biospecimen collection data from the database
  * @returns {object|array} returns a response object if response is 200 or an empty array
- * 
  */
 export const searchSpecimenInstitute = async () => {
   console.log('calling searchSpecimenInstitute: (no params)');
@@ -950,25 +952,29 @@ export const filterSpecimenCollectionList = async () => {
     const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
     const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ?? [];
     
+    console.log('searchSpecimenInstituteArray: ', searchSpecimenInstituteArray);
+    for (let specimenCollection of searchSpecimenInstituteArray) {
+      console.log('specimen shipped?: ', specimenCollection[conceptIds.submitShipmentFlag]);
+    }
     /* Filter collections with ShipFlag value yes */
-    let collectionList = searchSpecimenInstituteArray.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
+    const collectionList = searchSpecimenInstituteArray.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
     
     // loop over filtered data with shipFlag
     for (let i = 0; i < collectionList.length; i++){
-        let currCollection = collectionList[i];
+        const currCollection = collectionList[i];
 
-        if (currCollection['787237543']) {
-            delete currCollection['787237543']
+        if (currCollection[conceptIds.collection.bloodUrineBagScan]) {
+            delete currCollection[conceptIds.collection.bloodUrineBagScan]
         }
 
-        if (currCollection['223999569']) {
-            delete currCollection['223999569'] 
+        if (currCollection[conceptIds.collection.mouthwashBagScan]) {
+            delete currCollection[conceptIds.collection.mouthwashBagScan] 
         }
  
         for (let tubeCid of specimenCollection.tubeCidList) {
             if (!currCollection[tubeCid]) continue;
 
-            let currTube = currCollection[tubeCid];
+            const currTube = currCollection[tubeCid];
             // delete specimen key if tube collected key is no
             if (!currTube[conceptIds.collection.tube.isCollected] || currTube[conceptIds.collection.tube.isCollected] == conceptIds.no){
                 delete currCollection[tubeCid];
@@ -985,6 +991,7 @@ export const filterSpecimenCollectionList = async () => {
             }
         }
     }
+    console.log('COLLECTION LIST:', collectionList);
     return collectionList;
 }
 
@@ -2464,7 +2471,6 @@ export function addSelectionEventListener(elemId, pageAndElement) {
         const selection = event.target.value;
         const prevSelections = JSON.parse(localStorage.getItem('selections'));
         localStorage.setItem('selections', JSON.stringify({...prevSelections, [pageAndElement] : selection}));
-
     });
 
 }

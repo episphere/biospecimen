@@ -1,8 +1,7 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, getPage, shippingPrintManifestReminder, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, conceptIdToSiteSpecificLocation, getNumPages, addSelectionEventListener, searchSpecimenInstitute} from "./../shared.js"
-import { addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventAddSpecimenToBox, addEventNavBarSpecimenSearch, 
-    populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, populateModalSelect, addEventCompleteShippingButton, populateSelectLocationList, 
-    addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventSaveContinue, addEventShipPrintManifest, addEventTrackingNumberScanAutoFocus } from "./../events.js";
-import { homeNavBar, bodyNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
+import { userAuthorization, removeActiveClass, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, searchSpecimenInstitute} from "./../shared.js"
+import { addEventBackToSearch, addEventAddSpecimenToBox, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateBoxesToShipTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxContentsList, addEventBoxSelectListChanged, addEventCompleteShippingButton, populateSelectLocationList, 
+    addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventShipPrintManifest, addEventTrackingNumberScanAutoFocus } from "./../events.js";
+import { homeNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
 import conceptIds from '../fieldToConceptIdMapping.js';
 
 const conversion = {
@@ -23,7 +22,7 @@ const conversion = {
     "683613884":"0024",
 }
 
-export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
+export const shippingDashboard = (auth, route) => {
     console.log("calling shippingDashboard");  
     auth.onAuthStateChanged(async user => {
         if (user) {
@@ -47,87 +46,166 @@ export const shippingDashboard = (auth, route, goToSpecimenSearch) => {
 }
 
 
-export const startShipping = async (userName) => {
-    console.log("calling startShipping");
-    showAnimation();
+// Initialize the shipping page.
+// Check for a stored location, else wait for a location to be selected, then build the page
+export const startShipping = async (userName) => {    
+    buildNavAndHeaderDOM();
 
-    const navBarParticipantCheckIn = document.getElementById('navBarParticipantCheckIn');
-    if (navBarParticipantCheckIn) {
-      navBarParticipantCheckIn.classList.add('disabled');
+    const storedLocation = getStoredLocationOnInit();
+    if (storedLocation !== 'none') {
+        loadShippingWithLocation(storedLocation, userName);
+    } else {
+        loadShippingPreLocation(userName);
     }
+}
 
-    let template = `
-        ${renderShippingHiddenTable()}
-        ${renderShippingLocationSelector()}
-        ${renderScanOrEnterSpecimenId()}
-        ${renderCollectionsContentsAndBoxes()}
-        ${renderTempMonitorCheckbox()}
-    `;
+const buildNavAndHeaderDOM = () => {
+    const navBarParticipantCheckIn = document.getElementById('navBarParticipantCheckIn');
+    if (navBarParticipantCheckIn) navBarParticipantCheckIn.classList.add('disabled');
 
     removeActiveClass('navbar-btn', 'active')
     document.getElementById('contentHeader').innerHTML = `<h2>Connect for Cancer Prevention Study</h2></br>` + shippingNavBar();
     const navBarBtn = document.getElementById('navBarShippingDash');
     navBarBtn.classList.add('active');
-    document.getElementById('contentBody').innerHTML = template;
+}
+
+// Build the DOM for the shipping page. If the user has a stored location, build the full page. Else, build the page with just the location selector
+const buildShippingDOM = async (hasLocation) => {
+    if (hasLocation) {
+        document.getElementById('contentBody').innerHTML = `
+            ${renderShippingHiddenTable()}
+            ${renderShippingLocationSelector()}
+            ${renderScanOrEnterSpecimenId()}
+            ${renderCollectionsContentsAndBoxes()}
+            ${renderTempMonitorCheckbox()}
+        `;
+    } else {
+        document.getElementById('contentBody').innerHTML = `${renderShippingLocationSelector()}`;
+    }
+}
+
+// Populate the location selector with the list of locations. This is called when the page is first loaded and the user doesn't have a stored location
+const loadShippingPreLocation = async (userName) => {
+    buildShippingDOM(false, userName);
     await populateSelectLocationList();
+    addEventLocationSelect("selectLocationList", "shipping_location", userName);
+}
+
+// Populate the location selector with the list of locations. This is called when user has a stored or selected location
+const loadShippingWithLocation = async (selectedLocation, userName) => {
+    console.log('calling loadShippingWithLocation', selectedLocation);
+    buildShippingDOM(true);
+    await buildShippingInterface(selectedLocation, userName);
+}
+
+//TODO if select Shipping Location is none, remove data
+const buildShippingInterface = async (selectedLocation, userName) => {
+
+    showAnimation();
+    const selectedLocationConceptId = siteSpecificLocationToConceptId[selectedLocation];
+
+    // TO add back in the future
+    //let boxByLocationResponse;
+    /*boxByLocationResponse,*/ 
+    //getBoxesByLocation(selectedLocationConceptId),
+    //const byLocationBoxList = boxByLocationResponse.data;
+    //const boxIdAndBagsObjByLocation = createBoxIdAndBagsObj(byLocationBoxList); // Location-specific data in the 'select boxes to ship' section
+    let getBoxesResponse;
+    let getAllBoxesResponse;
+
+    [getBoxesResponse, getAllBoxesResponse] = await Promise.all([
+        getBoxes(),
+        getAllBoxes(),
+    ]);
+
+    const getBoxesBoxList = getBoxesResponse.data;
+    const getAllBoxesBoxList = getAllBoxesResponse.data;
+    
+    const boxIdAndBagsObjGetBoxes = createBoxIdAndBagsObj(getBoxesBoxList); // login-site-specific data in the 'select boxes to ship' section
+    const boxIdAndBagsObjGetAllBoxes = createBoxIdAndBagsObj(getAllBoxesBoxList); // this one has ALL boxes from the selected location if 'bptl' flag is included in the query
+
+    let specimensList;
+
+    ({2: specimensList} = await Promise.all([
+        populateBoxContentsList(boxIdAndBagsObjGetBoxes, userName), // 'View Shipping Box Contents' section
+        populateBoxesToShipTable(boxIdAndBagsObjGetBoxes, getBoxesBoxList, userName), // 'Select Boxes' section
+        //TODO this doesn't seem to be filtering correctly
+        //TODO why all boxes??
+        //NOTE: getAllBoxesList is used because the larger filter iterates ALL boxes and removes specimens that belong to the shipped boxes ¯\_(ツ)_/¯
+        populateSpecimensList(/*getBoxesBoxList*/getAllBoxesBoxList), // 'Available Collections' section
+        populateSelectLocationList(),
+    ]));
+
+    console.log('specimensList', specimensList);
+    
+    hideAnimation();
+    addEventLocationSelect("selectLocationList", "shipping_location", userName);
+    addShippingEventListeners(userName);
+    populateTempNotification();
+    //populateSelectLocationList(),
+
     //addSelectionEventListener("selectLocationList", "shipping_location");
+    //addEventChangeLocationSelect(userName);
+    //// addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 14, 0);
+    //// addEventSubmitAddBag();
+    
+    //console.log('boxIdAndBagsObjByLocation', boxIdAndBagsObjByLocation);
+    console.log('boxIdAndBagsObjGetBoxes - getBoxes', boxIdAndBagsObjGetBoxes);
+    console.log('allBoxIdAndBagsObjGetAllBoxes - getAllBoxes', boxIdAndBagsObjGetAllBoxes);
+    //console.log('allBoxList', getAllBoxesBoxList);
+}
 
-    console.time('getBoxes');
-    const responseGetBoxes = await getBoxes();
-    console.timeEnd('getBoxes');
-    //boxIdAndBagsObj-->{"Box1":{"CXA123423 0008:{...}, "unlabelled":{...}}, "Box2":{...}}
-    const boxList = responseGetBoxes.data;
-    let boxIdAndBagsObj = {}; // for transformed box data structure
-
+const createBoxIdAndBagsObj = (boxList) => {
+    const boxIdAndBagsObj = {};
+    
     for (const box of boxList) {
-      const boxId = box[conceptIds.shippingBoxId];
-      boxIdAndBagsObj[boxId] = box['bags'];
-    }
-    console.log('boxIdAndBagsObj', boxIdAndBagsObj);
-
-    const responseAllBoxes = await getAllBoxes();
-    let allBoxList = responseAllBoxes.data;
-    let allBoxIdAndBagsObj = {};
-
-    for (const box of allBoxList) {
         const boxId = box[conceptIds.shippingBoxId];
-        allBoxIdAndBagsObj[boxId] = box['bags']
+        boxIdAndBagsObj[boxId] = box['bags'];
     }
 
-    console.log('allBoxIdAndBagsObj', allBoxIdAndBagsObj);
-    console.log('allBoxList', allBoxList);
+    console.log('boxList', boxList);
+    console.log('boxIdAndBagsObj', boxIdAndBagsObj);
+    return boxIdAndBagsObj;
+}
 
-    
-    await populateSaveTable(boxIdAndBagsObj, allBoxList, userName);
-    await populateSpecimensList(allBoxList);
-
-    let currLocation = document.getElementById('selectLocationList').value;
-    if (currLocation !== 'none') { 
-        let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
-        const responseBoxesByLocation = await getBoxesByLocation(currLocationConceptId);
-        const allBoxByLocationList = responseBoxesByLocation.data;
-        let boxIdAndBagsObj = {};
-        for (const box of allBoxByLocationList) {
-            const boxId = box[conceptIds.shippingBoxId];
-            boxIdAndBagsObj[boxId] = box['bags']
-        }
-        await populateBoxSelectList(boxIdAndBagsObj, userName);
-    };
-
+const addShippingEventListeners = (userName) => {
     const tempMonitorCheckedEl = document.getElementById('tempMonitorChecked')
-    
-    await populateTempNotification();
-    addSelectionEventListener("selectLocationList", "shipping_location");
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarShippingManifest(userName, tempMonitorCheckedEl);
     addEventBoxSelectListChanged();
     addEventNavBarBoxManifest("navBarBoxManifest", userName)
-    addEventChangeLocationSelect(userName);
     addEventAddSpecimenToBox(userName);
-    //// addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 14, 0);
     addEventModalAddBox(userName);
-    hideAnimation();
-    ////addEventSubmitAddBag();
+}
+
+const getStoredLocationOnInit = () => {
+    return JSON.parse(localStorage.getItem('selections'))?.shipping_location ?? 'none';
+}
+
+/**
+ * Location selection event listener. Remove the event listener if it was previously added, then add the event listener back.
+ * This makes sure the listener is only added once.
+ * @param {string} elemId - the id of the element to add the event listener to 
+ * @param {*} pageAndElement - the page and element to store in local storage
+ * @param {*} userName - the user name to store in local storage
+ */
+const addEventLocationSelect = (elemId, pageAndElement, userName) => {
+    const selectionChangeHandler = (event) => {
+        const selection = event.target.value;
+        const prevSelections = JSON.parse(localStorage.getItem('selections'));
+        console.log('selection', selection);
+        console.log('prevSelections', prevSelections);
+        localStorage.setItem('selections', JSON.stringify({...prevSelections, [pageAndElement] : selection}));
+        if (selection && selection !== 'none') {
+            loadShippingWithLocation(selection, userName);
+        }
+    };
+
+    const element = document.getElementById(elemId);
+    if (element) {
+        element.removeEventListener("change", selectionChangeHandler);
+        element.addEventListener("change", selectionChangeHandler);
+    }
 }
 
 const renderShippingHiddenTable = () => {
@@ -197,6 +275,7 @@ const renderCollectionsContentsAndBoxes = () => {
     `;
 }
 
+//TODO orphan panel is always hidden
 const renderAvailableCollections = () => {
     return `
         <div class="col-5">
@@ -204,7 +283,7 @@ const renderAvailableCollections = () => {
             <div class="panel panel-default" style="border-style:solid;height:550px;border-width:1px;overflow:auto;" id="specimenPanel">
                 <table class = "table" style="width: 100%;margin-bottom:0px;" id="specimenList"></table>
             </div>
-            <div class="panel panel-default" style="position:absolute; border-style:solid;height:0px;border-width:1px;overflow:auto; top:-100000px; " id="orphansPanel">
+            <div class="panel panel-default" style="position:absolute; border-style:solid;height:0px;border-width:1px;overflow:auto; display:none;" id="orphansPanel">
                 <table class = "table" style="width: 100%; margin-bottom:0px;" id="orphansList"></table>
             </div>
         </div>
@@ -296,102 +375,94 @@ const renderSpecimenVerificationModal = () => {
     `;
 }
 
-
-export const boxManifest = async (boxId, userName) => {    
+//TODO add searchSpecimenInstituteArray to this function
+export const generateBoxManifest = async (boxId, userName, activeBox) => {    
     showAnimation();
     const response = await getBoxes();
     const boxList = response.data;
-    let currBox = {};
+
     const boxIdAndBagsObj = {};
-    for(let i = 0; i < boxList.length; i++){
-        let box = boxList[i];
-        if (box['132929440'] == boxId) {
-            currBox = box;
-        }
-        boxIdAndBagsObj[box['132929440']] = box['bags'];
-    }
+    const currBox = boxList.find(box => {
+        boxIdAndBagsObj[box[conceptIds.shippingBoxId]] = box['bags'];
+        return box[conceptIds.shippingBoxId] == boxId;
+    });
+
+    console.log('currBox', currBox);
     const currInstitute = currBox.siteAcronym;
-    const currLocation = locationConceptIDToLocationMap[currBox['560975149']]["siteSpecificLocation"];
-    const currContactInfo = locationConceptIDToLocationMap[currBox['560975149']]["contactInfo"][currInstitute];
+    const currLocation = locationConceptIDToLocationMap[currBox[conceptIds.shippingLocation]]["siteSpecificLocation"];
+    const currContactInfo = locationConceptIDToLocationMap[currBox[conceptIds.shippingLocation]]["contactInfo"][currInstitute];
+
     const searchSpecimenInstituteArrayResponse = await searchSpecimenInstitute();
     const searchSpecimenInstituteArray = searchSpecimenInstituteArrayResponse.data ?? [];
 
-    const template = `
+    removeActiveClass('navbar-btn', 'active');
+    const navBarBoxManifestBtn = document.getElementById('navBarBoxManifest');
+    navBarBoxManifestBtn.classList.add('active');
+    document.getElementById('contentBody').innerHTML = renderBoxManifestTemplate(currInstitute, currLocation);
+    hideAnimation();
+
+    populateBoxManifestHeader(boxId,boxList,currContactInfo);
+    populateBoxManifestTable(boxId, boxIdAndBagsObj, searchSpecimenInstituteArray);
+    document.getElementById('printBox').addEventListener('click', e => {
+        window.print();
+    });
+
+    addEventNavBarShipment("returnToPackaging", userName);
+}
+
+const renderBoxManifestTemplate = (currInstitute, currLocation) => {
+    return `
         </br>
         <div id="shippingHiddenTable" style="display:none">
             <table>
-
             </table>
         </div>
         <div class="row">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
             </div>
             <div style="float: left;width: 33%;"></div>
-            <div style="float:left;width: 33%;" id="boxManifestCol3">
-                <p>Site: ` + currInstitute + `</p>
-                <p>Location: ` + currLocation + `</p>
+                <div style="float:left;width: 33%;" id="boxManifestCol3">
+                    <p>Site: ` + currInstitute + `</p>
+                    <p>Location: ` + currLocation + `</p>
+                </div>
             </div>
+            <div class="row">
+                <table id="boxManifestTable" style="width: 100%;">
+                    <tr>
+                        <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Specimen Bag ID</th>
+                        <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Full Specimen ID</th>
+                        <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Type/Color</th>
+                        <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Deviation Type</th>
+                        <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Comments</th>
+                    </tr>
+                </table>
+            </div>
+            <div class="row" style="margin-top:3.125rem">
+                <div class="card" style="width:100%">
+                    <div class="card-body" style="text-align:center;">
+                        <p style="margin-bottom: 0;">
+                        <strong><span style="margin-right:0.5rem;"><i class="fas fa-exclamation-triangle fa-lg" style="color:#ffc107"></i></span>IMPORTANT: PRINT AND INCLUDE THIS MANIFEST IN SHIPPING BOX</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top:3.125rem; display: flex; justify-content: space-between;">
+                <div id="boxManifestCol1">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Return to Packaging</button>
+                </div>
+                <div id="boxManifestCol3">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="printBox">Print Box Manifest</button>
+                </div>
         </div>
-        <div class="row">
-            <table id="boxManifestTable" style="width: 100%;">
-                <tr>
-                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Specimen Bag ID</th>
-                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Full Specimen ID</th>
-                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Type/Color</th>
-                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Deviation Type</th>
-                    <th style="padding-top: 12px;padding-bottom: 12px;text-align: left;">Comments</th>
-                </tr>
-            </table>
-        </div>
-        <div class="row" style="margin-top:3.125rem">
-          <div class="card" style="width:100%">
-            <div class="card-body" style="text-align:center;">
-              <p style="margin-bottom: 0;">
-                <strong><span style="margin-right:0.5rem;"><i class="fas fa-exclamation-triangle fa-lg" style="color:#ffc107"></i></span>IMPORTANT: PRINT AND INCLUDE THIS MANIFEST IN SHIPPING BOX</strong>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="row" style="margin-top:3.125rem">
-            <div style="float: left;width: 33%;" id="boxManifestCol1">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Return to Packaging</button>
-            </div>
-            <div style="float: left;width: 33%;">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="printBox">Print Box Manifest</button>
-            </div>
-            <div style="float:left;width: 33%;" id="boxManifestCol3">
-            </div>
-        </div>
-        `;
-    removeActiveClass('navbar-btn', 'active');
-    const navBarBtn = document.getElementById('navBarBoxManifest');
-    navBarBtn.classList.add('active');
-    document.getElementById('contentBody').innerHTML = template;
-   
-// We may not need this anymore for data storage:
-    document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(boxIdAndBagsObj);
-    
-    //addEventNavBarShipment("returnToPackaging");
-    //document.getElementById('boxManifestTable').appendChild(result);
-    populateBoxManifestHeader(boxId,boxList,currContactInfo);
-    populateBoxManifestTable(boxId, boxIdAndBagsObj, searchSpecimenInstituteArray);
-    addEventNavBarShipment("returnToPackaging", userName);
-    document.getElementById('printBox').addEventListener('click', e => {
-        window.print();
-    });
-    addEventNavBarShipment("returnToPackaging", userName);
-    //addEventNavBarShippingManifest();
-    hideAnimation();
-    //addEventNavBarShipment("navBarShippingDash");
-    //addEventBackToSearch('backToSearch');
+    `;
 }
 
 /**
  * 
- * @param {string[]} boxIdArray 
- * @param {string} userName 
- * @param {boolean} isTempMonitorIncluded 
- * @param {*} currShippingLocationNumber 
+ * @param {string[]} boxIdArray
+ * @param {string} userName
+ * @param {boolean} isTempMonitorIncluded
+ * @param {*} currShippingLocationNumber
  */
 export const shippingManifest = async (boxIdArray, userName, isTempMonitorIncluded, currShippingLocationNumber) => {
     let response = await  getBoxes();
@@ -485,7 +556,7 @@ export const shippingManifest = async (boxIdArray, userName, isTempMonitorInclud
     
     //document.getElementById('boxManifestTable').appendChild(result);
     
-    populateShippingManifestHeader(boxIdAndBagsObjToDisplay, userName, location, site, currShippingLocationNumber); // populate shipping header via site specfiic location selected from shipping page
+    populateShippingManifestHeader(userName, site, currShippingLocationNumber); // populate shipping header via site specfiic location selected from shipping page
     populateShippingManifestBody(boxIdAndBagsObjToDisplay);
     addEventNavBarShipment("navBarShippingDash", userName);
     await populateTempCheck();
