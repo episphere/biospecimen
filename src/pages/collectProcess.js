@@ -1,9 +1,10 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormEditAll, addEventBiospecimenCollectionFormText } from './../events.js'
 import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorkflow, getCheckedInVisit, findParticipant, checkedIn } from '../shared.js';
 import { checkInTemplate } from './checkIn.js';
+import conceptIds from '../fieldToConceptIdMapping.js';
 
-export const tubeCollectedTemplate = (data, formData) => {
-    const isCheckedIn = checkedIn(data);
+export const tubeCollectedTemplate = (participantData, biospecimenData) => {
+    const isCheckedIn = checkedIn(participantData);
 
     let template = `
         </br>
@@ -13,16 +14,16 @@ export const tubeCollectedTemplate = (data, formData) => {
         </br>
         <div class="row">
             <div class="col">
-                <div class="row"><h5>${data['996038075']}, ${data['399159511']}</h5></div>
+                <div class="row"><h5>${participantData[conceptIds.firstName]}, ${participantData[conceptIds.lastName]}</h5></div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
-                <div class="row">Collection ID: ${formData['820476880']}</div>
-                <div class="row">Collection ID Link Date/Time: ${getWorkflow() === 'research' ? new Date(formData['678166505']).toLocaleString(): new Date(formData['915838974']).toLocaleString()}</div>
+                <div class="row">Collection ID: ${biospecimenData[conceptIds.collection.id]}</div>
+                <div class="row">Collection ID Link Date/Time: ${getWorkflow() === 'research' ? new Date(biospecimenData[conceptIds.collection.collectionTime]).toLocaleString(): new Date(biospecimenData[conceptIds.collection.scannedTime]).toLocaleString()}</div>
                 ${getWorkflow() === 'research' ? `
                     <div class="row">
                         <div>Collection Phlebotomist Initials:&nbsp</div>
                         <input 
                             type="text"
-                            ${formData['719427591'] ? `value=${formData['719427591']}` : ``}
+                            ${biospecimenData[conceptIds.collection.phlebotomistInitials] ? `value=${biospecimenData[conceptIds.collection.phlebotomistInitials]}` : ``}
                             id="collectionInitials"
                             style="text-transform:uppercase"
                             onpaste="return false;"
@@ -33,9 +34,9 @@ export const tubeCollectedTemplate = (data, formData) => {
                     : ''
                 }
             </div>
-            ${formData['331584571'] ? `
+            ${biospecimenData[conceptIds.collection.selectedVisit] ? `
                 <div class="ml-auto form-group">
-                    Visit: ${visitType.filter(visit => visit.concept == formData['331584571'])[0]?.visitType}
+                    Visit: ${visitType.filter(visit => visit.concept == biospecimenData[conceptIds.collection.selectedVisit])[0]?.visitType}
                 </div>
             ` : ``
             }
@@ -61,21 +62,21 @@ export const tubeCollectedTemplate = (data, formData) => {
                     </thead>
                     <tbody>`
                     
-                    let siteTubesList = getSiteTubesLists(formData);
-                    const collectionFinalized = (formData['410912345'] === 353358909);
+                    let siteTubesList = getSiteTubesLists(biospecimenData);
+                    const collectionFinalized = (biospecimenData[conceptIds.collection.isFinalized] === conceptIds.yes);
                     
                     if(!siteTubesList || siteTubesList?.length === 0) siteTubesList = [];
 
                     siteTubesList?.forEach((obj, index) => {
-
                         const notCollectedOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].tubeNotCollectedOptions;
                         const deviationOptions = siteTubesList.filter(tube => tube.concept === obj.concept)[0].deviationOptions;
 
-                        const tubeCollected = (formData[obj.concept]['593843561'] === 353358909);
-                        const tubeDeviated = (formData[obj.concept]['678857215'] === 353358909);
+                        const tubeCollected = (biospecimenData[obj.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes);
+                        const tubeDeviated = (biospecimenData[obj.concept][conceptIds.collection.tube.isDeviated] === conceptIds.yes);
 
                         let required = false;
-                        if(formData[obj.concept] && formData[obj.concept]['593843561'] !== 104430631) {
+
+                        if (biospecimenData[obj.concept] && biospecimenData[obj.concept][conceptIds.collection.tube.isCollected] !== conceptIds.no) { 
                             required = true;
                         }
 
@@ -104,15 +105,16 @@ export const tubeCollectedTemplate = (data, formData) => {
                                             if(notCollectedOptions) {
                                                 template += `
                                                     <select 
-                                                        data-connect-id="${data.Connect_ID}" 
+                                                        data-connect-id="${participantData.Connect_ID}" 
                                                         id="${obj.concept}Reason"
+                                                        class="reason-not-collected"
                                                         style="width:200px"
                                                         ${tubeCollected ? 'disabled' : ''}
                                                     >
                                                         <option value=""> -- Select Reason -- </option>`
 
                                                         notCollectedOptions.forEach(option => {
-                                                            template += `<option ${formData[`${obj.concept}`]['883732523'] == option.concept ? 'selected' : ''} value=${option.concept}>${option.label}</option>`;
+                                                            template += `<option ${biospecimenData[`${obj.concept}`][conceptIds.collection.tube.selectReasonNotCollected] == option.concept ? 'selected' : ''} value=${option.concept}>${option.label}</option>`;
                                                         })
 
                                                 template += `</select>`    
@@ -127,7 +129,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         type="text" 
                                         autocomplete="off" 
                                         id="${obj.concept}Id" 
-                                        ${formData[`${obj.concept}`] && formData[`${obj.concept}`]['825582494'] ? `value='${formData[`${obj.concept}`]['825582494']}'`: ``}
+                                        ${biospecimenData[`${obj.concept}`] && biospecimenData[`${obj.concept}`][conceptIds.collection.tube.scannedId] ? `value='${biospecimenData[`${obj.concept}`][conceptIds.collection.tube.scannedId]}'`: ``}
                                         class="form-control input-barcode-id" 
                                         ${required ? 'required' : ''} 
                                         disabled
@@ -154,7 +156,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                     if(obj.deviationChkBox) {
                                         template += `
                                             <select 
-                                                data-connect-id="${data.Connect_ID}" 
+                                                data-connect-id="${participantData.Connect_ID}" 
                                                 id="${obj.concept}Deviation"
                                                 style="width:300px"
                                                 multiple
@@ -163,7 +165,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                                 <option value=""> -- Select Deviation -- </option>`
 
                                                 deviationOptions.forEach(deviation => {
-                                                    template += `<option ${formData[obj.concept]['248868659'][deviation.concept] === 353358909 ? 'selected' : ''} value=${deviation.concept}>${deviation.label}</option>`;
+                                                    template += `<option ${biospecimenData[obj.concept][conceptIds.collection.tube.deviation][deviation.concept] === conceptIds.yes ? 'selected' : ''} value=${deviation.concept}>${deviation.label}</option>`;
                                                 })
 
                                         template += `</select>`  
@@ -177,7 +179,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                                         type="text" 
                                         placeholder="Details (Optional)" 
                                         id="${obj.concept}DeviatedExplanation" 
-                                        ${formData[obj.concept]['536710547'] ? `value='${formData[`${obj.concept}`]['536710547']}'`: formData[obj.concept]['338286049'] ? `value='${formData[`${obj.concept}`]['338286049']}'` : ``}
+                                        ${biospecimenData[obj.concept][conceptIds.collection.tube.deviationComments] ? `value='${biospecimenData[`${obj.concept}`][conceptIds.collection.tube.deviationComments]}'`: biospecimenData[obj.concept][conceptIds.collection.tube.optionalNotCollectedDetails] ? `value='${biospecimenData[`${obj.concept}`][conceptIds.collection.tube.optionalNotCollectedDetails]}'` : ``}
                                         ${tubeCollected ? 'disabled': ''}
                                     >
                                     `: ``}
@@ -203,7 +205,7 @@ export const tubeCollectedTemplate = (data, formData) => {
                 <div class="col">
                     <label for="collectionAdditionalNotes">Additional notes on collection</label>
                     </br>
-                    <textarea rows=3 class="form-control" id="collectionAdditionalNotes">${formData['338570265'] ? `${formData["338570265"]}`: ''}</textarea>
+                    <textarea rows=3 class="form-control" id="collectionAdditionalNotes">${biospecimenData[conceptIds.collection.note] ? `${biospecimenData[conceptIds.collection.note]}`: ''}</textarea>
                 </div>
             </div>
             </br>
@@ -213,13 +215,13 @@ export const tubeCollectedTemplate = (data, formData) => {
                 </div>
                 ${isCheckedIn ?
                 `<div class="ml-auto" style="display:none">
-                    <button class="btn btn-outline-primary text-nowrap" data-connect-id=${data.Connect_ID} type="button" id="collectionCheckout">Go to Check-Out</button>
+                    <button class="btn btn-outline-primary text-nowrap" data-connect-id=${participantData.Connect_ID} type="button" id="collectionCheckout">Go to Check-Out</button>
                 </div>` : ``}               
                 <div class="ml-auto">
-                    <button class="btn btn-info" data-connect-id="${data.Connect_ID}" type="button" id="collectionSave">Save</button>
+                    <button class="btn btn-info" data-connect-id="${participantData.Connect_ID}" type="button" id="collectionSave">Save</button>
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-outline-primary" data-connect-id="${data.Connect_ID}" type="button" id="collectionNext">Go to Review</button>
+                    <button class="btn btn-outline-primary" data-connect-id="${participantData.Connect_ID}" type="button" id="collectionNext">Go to Review</button>
                 </div>
             </div>
         </form>
@@ -233,21 +235,21 @@ export const tubeCollectedTemplate = (data, formData) => {
 
     addEventBackToSearch('navBarSearch');
     document.getElementById('contentBody').innerHTML = template;
-    generateBarCode('connectIdBarCode', data.Connect_ID);
+    generateBarCode('connectIdBarCode', participantData.Connect_ID);
     addEventSelectAllCollection();
     addEventBackToSearch('backToSearch');
-    addEventBiospecimenCollectionForm(data, formData);
+    addEventBiospecimenCollectionForm(participantData, biospecimenData);
     addEventBiospecimenCollectionFormToggles();
     addEventBiospecimenCollectionFormEdit();
     addEventBiospecimenCollectionFormEditAll();
-    addEventBiospecimenCollectionFormText(data, formData);
+    addEventBiospecimenCollectionFormText(participantData, biospecimenData);
     
     document.getElementById('collectionCheckout')?.addEventListener('click', async (e) => {
         e.preventDefault();
         const connectId = e.target.getAttribute('data-connect-id');
         try {
-            let data = await findParticipant(`connectId=${connectId}`).then(res => res.data?.[0]);
-            checkInTemplate(data);
+            const participantData = await findParticipant(`connectId=${connectId}`).then(res => res.data?.[0]);
+            checkInTemplate(participantData);
             document.body.scrollIntoView();
         } catch (error) {
             console.log("Error occured while trying to check out.");
