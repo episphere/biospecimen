@@ -52,10 +52,6 @@ export const startShipping = async (userName) => {
     }
 
     let template = `
-        <div id="shippingHiddenTable" style="display:none">
-        {}
-        </div>
-        
         <div class="row">
             <div class="col-lg">
                 <h5>Choose your shipping location</h5>
@@ -247,11 +243,6 @@ export const boxManifest = async (boxId, userName) => {
 
     const template = `
         </br>
-        <div id="shippingHiddenTable" style="display:none">
-            <table>
-
-            </table>
-        </div>
         <div class="row">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
             </div>
@@ -297,9 +288,6 @@ export const boxManifest = async (boxId, userName) => {
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
    
-    // We may not need this anymore for data storage:
-    document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(boxIdAndBagsObj);
-    
     populateBoxManifestHeader(boxId,boxList,currContactInfo);
     populateBoxManifestTable(boxId, boxIdAndBagsObj, searchSpecimenInstituteArray);
     addEventNavBarShipment("returnToPackaging", userName);
@@ -340,11 +328,6 @@ export const shippingManifest = async (boxIdArray, userName, isTempMonitorInclud
 
     let template = `
         </br>
-        <div id="shippingHiddenTable" style="display:none">
-            <table>
-
-            </table>
-        </div>
         <div class="row">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
             </div>
@@ -391,8 +374,6 @@ export const shippingManifest = async (boxIdArray, userName, isTempMonitorInclud
         populateTempSelect(boxIdArray);
     }
 
-    document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(boxIdAndBagsObj);
-    
     populateShippingManifestHeader(boxIdAndBagsObjToDisplay, userName, location, site, currShippingLocationNumber); // populate shipping header via site specfiic location selected from shipping page
     populateShippingManifestBody(boxIdAndBagsObjToDisplay);
     addEventNavBarShipment("navBarShippingDash", userName);
@@ -430,9 +411,6 @@ export const shipmentTracking = async (boxIdAndBagsObj, userName, boxWithTempMon
     //{"Box1":{specimenId:[allTubes], specimenId:[allTubes]}}
     
     let template = `
-        <div id="shippingHiddenTable" style="display:none">
-        {}
-        </div>
         <div class="row" style="margin-top:40px;">
             <div class="col-lg">
                 <label for="courierSelect" style="font-size:1.4rem; margin-bottom:1rem;">Choose Shipment Courier</label>
@@ -470,10 +448,6 @@ export const shipmentTracking = async (boxIdAndBagsObj, userName, boxWithTempMon
     document.getElementById('contentBody').innerHTML = template;
     await populateCourierBox();
     addEventNavBarShipment("returnToPackaging", userName);
-    if(Object.keys(boxIdAndBagsObj).length > 0){
-        document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBagsObj)
-    }
- 
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName, boxWithTempMonitor)
     await populateTrackingQuery(boxIdAndBagsObj);
@@ -490,9 +464,6 @@ export const finalShipmentTracking = (boxIdAndBagsObj, userName, boxWithTempMoni
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
 
     let template = `
-        <div id="shippingHiddenTable" style="display:none">
-        {}
-        </div>
         <div class="row" style="margin-top:40px">
             <div class="col-lg" id="numBoxes">
             </div>
@@ -567,9 +538,6 @@ export const finalShipmentTracking = (boxIdAndBagsObj, userName, boxWithTempMoni
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarTracking("returnToTracking", userName, boxIdAndBagsObj, boxWithTempMonitor)
     addEventNavBarTracking("navBarFinalizeShipment", userName, boxIdAndBagsObj, boxWithTempMonitor)
-    if(Object.keys(boxIdAndBagsObj).length > 0){
-        document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBagsObj)
-    }
     populateFinalCheck(boxIdAndBagsObj);
     addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName)
     addEventCompleteShippingButton(boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier);

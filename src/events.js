@@ -3241,7 +3241,6 @@ export const addEventCompleteButton = async (boxIdAndBagsObj, userName, boxWithT
         }
 
         if (emptyField == false) {
-            document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBagsObj);
             addEventSaveContinue(boxIdAndBagsObj)
             let shipmentCourier = document.getElementById('courierSelect').value;
             finalShipmentTracking(boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier);
