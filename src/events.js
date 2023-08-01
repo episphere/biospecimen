@@ -3245,7 +3245,7 @@ export const addEventSaveButton = async (boxIdAndBagsObj) => {
 
 /**
  * Handle 'Sign' button click
- * @param {object} boxIdAndTrackingObj eg: {Box1: {959708259: '123456789012'}}
+ * @param {object} boxIdAndTrackingObj eg: {Box1: {959708259: '123456789012', specimens:{'CXA001234 0008':{...}} }}
  * @param {string} userName 
  * @param {string} boxWithTempMonitor boxId of box with temp monitor (eg: 'Box10') 
  * @param {string} shipmentCourier name of shipment courier (eg: 'FedEx')

@@ -784,7 +784,7 @@ export const getAllBoxes = async (flag) => {
 
 export const getBoxesByLocation = async (location) => {
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=searchBoxesByLocation`, {
+    const response = await fetch(`${api}api=searchBoxesByLocation&location=${location}`, {
         method: "POST",
         headers:{
             Authorization:"Bearer "+idToken,
