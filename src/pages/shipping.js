@@ -1,32 +1,17 @@
-import { userAuthorization, removeActiveClass, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, searchSpecimenInstitute} from "./../shared.js"
-import { addEventBackToSearch, addEventAddSpecimenToBox, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateBoxesToShipTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxContentsList, addEventBoxSelectListChanged, addEventCompleteShippingButton, populateSelectLocationList, 
-    addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventShipPrintManifest, addEventTrackingNumberScanAutoFocus } from "./../events.js";
+import { appState, userAuthorization, removeActiveClass, displayContactInformation, getBoxes, getAllBoxes, hideAnimation, showAnimation, showNotifications, siteSpecificLocationToConceptId, locationConceptIDToLocationMap } from "./../shared.js"
+import { addEventBackToSearch, addEventAddSpecimenToBox, populateAvailableCollectionsList, addEventNavBarShipment, addEventNavBarBoxManifest, formatBoxTimestamp, populateBoxManifestTable, populateBoxesToShipTable,
+         populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxContentsList, addEventBoxSelectListChanged,
+         addEventCompleteShippingButton, populateSelectLocationList, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents,
+         populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventReturnToPackaging, addEventShipPrintManifest, addEventTrackingNumberScanAutoFocus } from "./../events.js";
 import { homeNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
+import { specimenCollection } from "../tubeValidation.js";
+import { setAllShippingState } from "../shippingState.js";
 import conceptIds from '../fieldToConceptIdMapping.js';
-
-const conversion = {
-    "299553921":"0001",
-    "703954371":"0002",
-    "838567176":"0003",
-    "454453939":"0004",
-    "652357376":"0005",
-    "973670172":"0006",
-    "143615646":"0007",
-    "787237543":"0008",
-    "223999569":"0009",
-    "376960806":"0011",
-    "232343615":"0012",
-    "589588440":"0021",
-    "958646668":"0013",
-    "677469051":"0014",
-    "683613884":"0024",
-}
 
 export const shippingDashboard = (auth, route) => {
     console.log("calling shippingDashboard");  
     auth.onAuthStateChanged(async user => {
         if (user) {
-            console.log("user is signed in at shipping.js");
             console.time('userAuthorization');
             const responseData = await userAuthorization(route, user.displayName ? user.displayName : user.email);
             console.timeEnd('userAuthorization');
@@ -48,15 +33,14 @@ export const shippingDashboard = (auth, route) => {
 
 // Initialize the shipping page.
 // Check for a stored location, else wait for a location to be selected, then build the page
-export const startShipping = async (userName) => {    
+export const startShipping = async (userName, loadFromState = false) => {    
+    console.log('START SHIPPING');
     buildNavAndHeaderDOM();
 
     const storedLocation = getStoredLocationOnInit();
-    if (storedLocation !== 'none') {
-        loadShippingWithLocation(storedLocation, userName);
-    } else {
-        loadShippingPreLocation(userName);
-    }
+
+    buildShippingDOM();
+    await buildShippingInterface(storedLocation, userName, loadFromState);
 }
 
 const buildNavAndHeaderDOM = () => {
@@ -69,111 +53,159 @@ const buildNavAndHeaderDOM = () => {
     navBarBtn.classList.add('active');
 }
 
-// Build the DOM for the shipping page. If the user has a stored location, build the full page. Else, build the page with just the location selector
-const buildShippingDOM = async (hasLocation) => {
-    if (hasLocation) {
-        document.getElementById('contentBody').innerHTML = `
-            ${renderShippingHiddenTable()}
-            ${renderShippingLocationSelector()}
-            ${renderScanOrEnterSpecimenId()}
-            ${renderCollectionsContentsAndBoxes()}
-            ${renderTempMonitorCheckbox()}
-        `;
-    } else {
-        document.getElementById('contentBody').innerHTML = `${renderShippingLocationSelector()}`;
-    }
+// Build the DOM for the shipping page.
+const buildShippingDOM = async () => {
+    document.getElementById('contentBody').innerHTML = `
+        ${renderShippingHiddenTable()}
+        ${renderShippingLocationSelector()}
+        ${renderScanOrEnterSpecimenId()}
+        ${renderCollectionsContentsAndBoxes()}
+        ${renderTempMonitorCheckbox()}
+    `;
 }
 
-// Populate the location selector with the list of locations. This is called when the page is first loaded and the user doesn't have a stored location
-const loadShippingPreLocation = async (userName) => {
-    buildShippingDOM(false, userName);
-    await populateSelectLocationList();
-    addEventLocationSelect("selectLocationList", "shipping_location", userName);
-}
-
-// Populate the location selector with the list of locations. This is called when user has a stored or selected location
-const loadShippingWithLocation = async (selectedLocation, userName) => {
-    console.log('calling loadShippingWithLocation', selectedLocation);
-    buildShippingDOM(true);
-    await buildShippingInterface(selectedLocation, userName);
-}
-
-//TODO if select Shipping Location is none, remove data
-const buildShippingInterface = async (selectedLocation, userName) => {
-
+/**
+ * NOTE: getAllBoxesList is used because the larger filter iterates ALL boxes and removes specimens that belong to the shipped boxes ¯\_(ツ)_/¯
+ * This will run asyncronously when pulling new data (loadFromState = false) and synchronously when loading from state (loadFromState = true).
+ * @param {string} selectedLocation - the user's selected location from local storage.
+ * @param {*} userName - the logged-in userName.
+ * @param {*} loadFromState - whether to load data from state or from the server.
+ */
+const buildShippingInterface = async (selectedLocation, userName, loadFromState) => {    
     showAnimation();
-    const selectedLocationConceptId = siteSpecificLocationToConceptId[selectedLocation];
 
-    // TO add back in the future
-    //let boxByLocationResponse;
-    /*boxByLocationResponse,*/ 
-    //getBoxesByLocation(selectedLocationConceptId),
-    //const byLocationBoxList = boxByLocationResponse.data;
-    //const boxIdAndBagsObjByLocation = createBoxIdAndBagsObj(byLocationBoxList); // Location-specific data in the 'select boxes to ship' section
-    let getBoxesResponse;
-    let getAllBoxesResponse;
+    let allBoxesList;
+    let availableLocations;
 
-    [getBoxesResponse, getAllBoxesResponse] = await Promise.all([
-        getBoxes(),
-        getAllBoxes(),
+    if (loadFromState) {
+        availableLocations = appState.getState().availableLocations;
+        allBoxesList = appState.getState().allBoxesList;
+    } else {
+        const getAllBoxesResponse = await getAllBoxes();
+        allBoxesList = getAllBoxesResponse.data;
+    }
+
+    const promiseResponse = await Promise.all([
+        populateAvailableCollectionsList(allBoxesList, loadFromState),
+        populateSelectLocationList(availableLocations, loadFromState),
     ]);
 
-    const getBoxesBoxList = getBoxesResponse.data;
-    const getAllBoxesBoxList = getAllBoxesResponse.data;
+    const { finalizedSpecimenList, availableCollectionsObj } = promiseResponse[0];
+    availableLocations = promiseResponse[1];
+
+    const boxesByProviderList = filterUnshippedBoxes(allBoxesList);
+    const providerBoxesObj = createBoxAndBagsObj(boxesByProviderList); // provider-specific data in the 'select boxes to ship' section
+    const providerBoxWithSpecimenData = addSpecimenDataToDetailBox(providerBoxesObj, finalizedSpecimenList);
+    const detailedProviderBoxes = addBoxDataToDetailBox(providerBoxWithSpecimenData, boxesByProviderList);
+    console.log('detailedProviderBoxes - startShipping', detailedProviderBoxes);
+
+    setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, detailedProviderBoxes, finalizedSpecimenList, userName);
+
+    populateBoxContentsList(), // 'View Shipping Box Contents' section
+    populateBoxesToShipTable(), // 'Select boxes to ship' section
     
-    const boxIdAndBagsObjGetBoxes = createBoxIdAndBagsObj(getBoxesBoxList); // login-site-specific data in the 'select boxes to ship' section
-    const boxIdAndBagsObjGetAllBoxes = createBoxIdAndBagsObj(getAllBoxesBoxList); // this one has ALL boxes from the selected location if 'bptl' flag is included in the query
-
-    let specimensList;
-
-    ({2: specimensList} = await Promise.all([
-        populateBoxContentsList(boxIdAndBagsObjGetBoxes, userName), // 'View Shipping Box Contents' section
-        populateBoxesToShipTable(boxIdAndBagsObjGetBoxes, getBoxesBoxList, userName), // 'Select Boxes' section
-        //TODO this doesn't seem to be filtering correctly
-        //TODO why all boxes??
-        //NOTE: getAllBoxesList is used because the larger filter iterates ALL boxes and removes specimens that belong to the shipped boxes ¯\_(ツ)_/¯
-        populateSpecimensList(/*getBoxesBoxList*/getAllBoxesBoxList), // 'Available Collections' section
-        populateSelectLocationList(),
-    ]));
-
-    console.log('specimensList', specimensList);
-    
-    hideAnimation();
-    addEventLocationSelect("selectLocationList", "shipping_location", userName);
     addShippingEventListeners(userName);
     populateTempNotification();
-    //populateSelectLocationList(),
 
-    //addSelectionEventListener("selectLocationList", "shipping_location");
-    //addEventChangeLocationSelect(userName);
-    //// addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, 14, 0);
-    //// addEventSubmitAddBag();
-    
-    //console.log('boxIdAndBagsObjByLocation', boxIdAndBagsObjByLocation);
-    console.log('boxIdAndBagsObjGetBoxes - getBoxes', boxIdAndBagsObjGetBoxes);
-    console.log('allBoxIdAndBagsObjGetAllBoxes - getAllBoxes', boxIdAndBagsObjGetAllBoxes);
-    //console.log('allBoxList', getAllBoxesBoxList);
+    hideAnimation();
 }
 
-const createBoxIdAndBagsObj = (boxList) => {
-    const boxIdAndBagsObj = {};
+const filterUnshippedBoxes = (boxList) => {
+    return boxList.filter(box => !box[conceptIds.submitShipmentFlag] || !box[conceptIds.submitShipmentFlag] === conceptIds.yes);
+}
+
+// retain for future use
+const filterBoxesByLocation = (boxList, selectedLocation) => {
+    if (selectedLocation === 'none') return [];
+    const selectedLocationConceptId = siteSpecificLocationToConceptId[selectedLocation];
+    return boxList.filter(box => box[conceptIds.shippingLocation] === selectedLocationConceptId);
+}
+
+const createBoxAndBagsObj = (boxList) => {
+    return boxList.reduce((createdObj, boxInList) => {
+        const boxId = boxInList[conceptIds.shippingBoxId];
+        createdObj[boxId] = boxInList['bags'];
+
+        return createdObj;
+    }, {});
+}
+
+/**
+ * Add specimen details to the box object. This is used in generateBoxManifest (and TODO future: shipping reports)
+ * @param {object} boxAndBagsObj - the basic box object with bag ids and tube ids (arrElements)
+ * @param {object} finalizedSpecimenList - the list of specimen data where finalized === true
+ * @returns {object} - the box object with specimen details added
+ * iterate through the box object, focusing on each bag in the box.
+ * for each bag, find the specimen bag id (first element in the arrElements array)
+ * find the specimen details for that specimen bag id in the finalizedSpecimenList
+ * add the specimen details to the box object (collectionId, healthcareProvider, collectionLocation, collection.note, and detailed specimen data for each specimenId in arrElements)
+ */
+const addSpecimenDataToDetailBox = (boxAndBagsObj, finalizedSpecimenList) => {
+    const specimenBagLookup = finalizedSpecimenList.reduce((acc, specimen) => {
+        acc[specimen[conceptIds.collection.id]] = specimen;
+        return acc;
+    }, {});
     
-    for (const box of boxList) {
-        const boxId = box[conceptIds.shippingBoxId];
-        boxIdAndBagsObj[boxId] = box['bags'];
+    for (let boxObj in boxAndBagsObj) {
+        const box = boxAndBagsObj[boxObj];
+        for (let bagId in box) {
+            const bag = box[bagId];
+            const specimenDetails = boxAndBagsObj[boxObj][bagId]['specimenDetails'] = {};
+            if (bag.arrElements && bag.arrElements.length > 0) {
+                const specimenBagId = bag.arrElements[0].split(' ')[0];
+                const foundSpecimenDetailsBag = specimenBagLookup[specimenBagId];
+                if (foundSpecimenDetailsBag) {
+                    specimenDetails['collectionData'] = {};
+                    specimenDetails['collectionData'][conceptIds.collection.id] = foundSpecimenDetailsBag[conceptIds.collection.id];
+                    specimenDetails['collectionData'][conceptIds.healthcareProvider] = foundSpecimenDetailsBag[conceptIds.healthcareProvider];
+                    specimenDetails['collectionData'][conceptIds.collectionLocation] = foundSpecimenDetailsBag[conceptIds.collectionLocation];
+                    specimenDetails['collectionData'][conceptIds.collection.note] = foundSpecimenDetailsBag[conceptIds.collection.note];
+                    for (let specimenId of bag.arrElements) {
+                        const specimenKey = specimenCollection.numToCid[specimenId.split(' ')[1]];    
+                        specimenDetails[specimenId] = foundSpecimenDetailsBag[specimenKey] ? foundSpecimenDetailsBag[specimenKey] : {};
+                    }
+                }
+            }
+            boxAndBagsObj[boxObj][bagId]['specimenDetails'] = specimenDetails;
+        }
     }
 
-    console.log('boxList', boxList);
-    console.log('boxIdAndBagsObj', boxIdAndBagsObj);
-    return boxIdAndBagsObj;
+    return boxAndBagsObj;
+}
+
+const addBoxDataToDetailBox = (boxAndBagsObj, boxList) => {
+    const boxListLookup = boxList.reduce((acc, box) => {
+        acc[box[conceptIds.shippingBoxId]] = box;
+        return acc;
+    }, {});
+
+    for (let boxObj in boxAndBagsObj) {
+        const boxInList = boxListLookup[boxObj];
+
+        const boxData = {};
+        boxData[conceptIds.firstBagAddedToBoxTimestamp] = boxInList[conceptIds.firstBagAddedToBoxTimestamp];
+        boxData[conceptIds.shippingShipDateModify] = boxInList[conceptIds.shippingShipDateModify];
+        boxData[conceptIds.shippingLocation] = boxInList[conceptIds.shippingLocation];
+        boxData[conceptIds.loginSite] = boxInList[conceptIds.loginSite];
+        boxData[conceptIds.containsOrphanFlag] = boxInList[conceptIds.containsOrphanFlag];
+        boxData[conceptIds.shippingBoxId] = boxInList[conceptIds.shippingBoxId];
+        boxData[conceptIds.submitShipmentFlag] = boxInList[conceptIds.submitShipmentFlag] ?? conceptIds.no;
+        boxData[conceptIds.shippedByFirstName] = boxInList[conceptIds.shippedByFirstName] ?? '';
+        boxData['siteAcronym'] = boxInList['siteAcronym'];
+
+        boxAndBagsObj[boxObj]['boxData'] = boxData;
+    }
+
+    return boxAndBagsObj;
 }
 
 const addShippingEventListeners = (userName) => {
-    const tempMonitorCheckedEl = document.getElementById('tempMonitorChecked')
+    const tempMonitorCheckedEl = document.getElementById('tempMonitorChecked');
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarShippingManifest(userName, tempMonitorCheckedEl);
     addEventBoxSelectListChanged();
-    addEventNavBarBoxManifest("navBarBoxManifest", userName)
+    addEventNavBarBoxManifest("navBarBoxManifest", userName); //TODO does this get used?
+    addEventLocationSelect("selectLocationList", "shipping_location", userName);
     addEventAddSpecimenToBox(userName);
     addEventModalAddBox(userName);
 }
@@ -193,11 +225,9 @@ const addEventLocationSelect = (elemId, pageAndElement, userName) => {
     const selectionChangeHandler = (event) => {
         const selection = event.target.value;
         const prevSelections = JSON.parse(localStorage.getItem('selections'));
-        console.log('selection', selection);
-        console.log('prevSelections', prevSelections);
         localStorage.setItem('selections', JSON.stringify({...prevSelections, [pageAndElement] : selection}));
         if (selection && selection !== 'none') {
-            loadShippingWithLocation(selection, userName);
+            startShipping(userName);
         }
     };
 
@@ -366,7 +396,7 @@ const renderSpecimenVerificationModal = () => {
                         <button type="button" class="btn btn-primary" id="modalAddBoxButton">Create New Box</button>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" id="addToBagButton">Add to Box</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" id="addToBoxButton">Add to Box</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" id="shippingModalCancel">Cancel</button>
                     </div>  
                 </div>
@@ -375,39 +405,87 @@ const renderSpecimenVerificationModal = () => {
     `;
 }
 
-//TODO add searchSpecimenInstituteArray to this function
-export const generateBoxManifest = async (boxId, userName, activeBox) => {    
-    showAnimation();
-    const response = await getBoxes();
-    const boxList = response.data;
-
-    const boxIdAndBagsObj = {};
-    const currBox = boxList.find(box => {
-        boxIdAndBagsObj[box[conceptIds.shippingBoxId]] = box['bags'];
-        return box[conceptIds.shippingBoxId] == boxId;
-    });
-
-    console.log('currBox', currBox);
-    const currInstitute = currBox.siteAcronym;
-    const currLocation = locationConceptIDToLocationMap[currBox[conceptIds.shippingLocation]]["siteSpecificLocation"];
-    const currContactInfo = locationConceptIDToLocationMap[currBox[conceptIds.shippingLocation]]["contactInfo"][currInstitute];
-
-    const searchSpecimenInstituteArrayResponse = await searchSpecimenInstitute();
-    const searchSpecimenInstituteArray = searchSpecimenInstituteArrayResponse.data ?? [];
+//TODO move boxManifest items to separate file
+export const generateBoxManifest = (currBox) => {
+    const currInstitute = currBox.boxData.siteAcronym;
+    const currLocation = locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]["siteSpecificLocation"];
+    const currContactInfo = locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]["contactInfo"];
 
     removeActiveClass('navbar-btn', 'active');
     const navBarBoxManifestBtn = document.getElementById('navBarBoxManifest');
     navBarBoxManifestBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = renderBoxManifestTemplate(currInstitute, currLocation);
-    hideAnimation();
 
-    populateBoxManifestHeader(boxId,boxList,currContactInfo);
-    populateBoxManifestTable(boxId, boxIdAndBagsObj, searchSpecimenInstituteArray);
+    populateBoxManifestHeader(currBox, currContactInfo);
+    populateBoxManifestTable(currBox);
     document.getElementById('printBox').addEventListener('click', e => {
         window.print();
     });
 
-    addEventNavBarShipment("returnToPackaging", userName);
+    addEventReturnToPackaging("returnToPackaging", appState.getState().userName);
+}
+
+export const populateBoxManifestHeader = (currBox, currContactInfo) => {
+    if(!currBox) return;
+
+    const currKeys = Object.keys(currBox).filter(key => key !== 'boxData');
+    const numBags = currKeys.length;
+    const numTubes = currKeys.reduce((acc, bagKey) => acc + currBox[bagKey]['arrElements'].length, 0);
+
+    const boxId = currBox.boxData[conceptIds.shippingBoxId];
+    const boxStartedTimestamp = formatBoxTimestamp(currBox.boxData[conceptIds.firstBagAddedToBoxTimestamp]);
+    const boxLastModifiedTimestamp = formatBoxTimestamp(currBox.boxData[conceptIds.shippingShipDateModify]);
+
+    renderBoxManifestHeader(boxId, boxStartedTimestamp, boxLastModifiedTimestamp, numBags, numTubes, currContactInfo);
+}
+
+const renderBoxManifestHeader = (boxId, boxStartedTimestamp, boxLastModifiedTimestamp, numBags, numTubes, currContactInfo) => {
+    const boxManifestCol1 = document.getElementById('boxManifestCol1');
+    const boxManifestCol3 = document.getElementById('boxManifestCol3');
+    
+    // Create parent div
+    const div1 = document.createElement("div");
+    const div3 = document.createElement("div");
+    
+    // List of data to be appended
+    const dataCol1 = [
+        { text: `${boxId} Manifest`, style: { fontWeight: '700', fontSize: '1.5rem' } },
+        { text: `Date Started: ${boxStartedTimestamp}` },
+        { text: `Last Modified: ${boxLastModifiedTimestamp}` },
+        { text: displayContactInformation(currContactInfo), isHTML: true }
+    ];
+    
+    const dataCol3 = [
+        { text: `Number of Sleeves/Bags: ${numBags}` },
+        { text: `Number of Specimens:  ${numTubes}` }
+    ];
+    
+    // Function to create elements from data
+    const createElements = (data, parent) => {
+        for (const item of data) {
+            const newP = document.createElement("p");
+            newP.innerHTML = item.text;
+    
+            if (item.style) {
+                Object.assign(newP.style, item.style);
+            }
+    
+            if (item.isHTML) {
+                const newDiv = document.createElement("div");
+                newDiv.innerHTML = newP.outerHTML;
+                parent.appendChild(newDiv);
+            } else {
+                parent.appendChild(newP);
+            }
+        }
+    }
+    
+    createElements(dataCol1, div1);
+    createElements(dataCol3, div3);
+    
+    // Append parent divs to the target elements
+    boxManifestCol1.appendChild(div1);
+    boxManifestCol3.appendChild(div3);
 }
 
 const renderBoxManifestTemplate = (currInstitute, currLocation) => {
@@ -584,8 +662,6 @@ export const shippingManifest = async (boxIdArray, userName, isTempMonitorInclud
 
         shipmentTracking(boxIdAndBagsObjToDisplay, userName, boxWithTempMonitor);
     });
-    //addEventNavBarShipment("navBarShippingDash");
-    //addEventBackToSearch('backToSearch');
 }
 
 

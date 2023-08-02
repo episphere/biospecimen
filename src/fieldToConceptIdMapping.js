@@ -57,7 +57,7 @@ export default {
     no: 104430631,
     
     // collection id
-    collectionId: 825582494,
+    collectionId: 825582494, //TODO this should be 'objectId' per the data dictionary
     dateReceived: 926457119,
     dateWithdrawn: 678166505,
     collectionType: 650516960,

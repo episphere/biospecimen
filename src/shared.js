@@ -1,7 +1,6 @@
 import { userNavBar, adminNavBar, nonUserNavBar, unAuthorizedUser } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
-import { shipmentTracking, shippingManifest } from "./pages/shipping.js"
-import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
+import { shippingManifest } from "./pages/shipping.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
 import { workflows, specimenCollection } from "./tubeValidation.js";
 import { signOut } from "./pages/signIn.js";
@@ -871,11 +870,9 @@ export const getParticipantCollections = async (token) => {
 
 export const removeBag = async(boxId, bags) => {
   console.log('calling removeBag');
-  console.log('boxId: ', boxId);
-  console.log('bags: ', bags);
   console.time('removeBag');
-    let currDate = new Date().toISOString();
-    let toPass = {boxId:boxId, bags:bags, date:currDate}
+    const currDate = new Date().toISOString();
+    const bagDataToRemove = {boxId:boxId, bags:bags, date:currDate}
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=removeBag`, {
         method: "POST",
@@ -883,7 +880,7 @@ export const removeBag = async(boxId, bags) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(toPass)
+        body: JSON.stringify(bagDataToRemove)
     });
     console.timeEnd('removeBag');
     return await response.json();
@@ -952,32 +949,28 @@ export const filterSpecimenCollectionList = async () => {
     const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
     const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ?? [];
     
-    console.log('searchSpecimenInstituteArray: ', searchSpecimenInstituteArray);
-    for (let specimenCollection of searchSpecimenInstituteArray) {
-      console.log('specimen shipped?: ', specimenCollection[conceptIds.submitShipmentFlag]);
-    }
     /* Filter collections with ShipFlag value yes */
-    const collectionList = searchSpecimenInstituteArray.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
+    const finalizedSpecimenList = searchSpecimenInstituteArray.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
     
     // loop over filtered data with shipFlag
-    for (let i = 0; i < collectionList.length; i++){
-        const currCollection = collectionList[i];
+    for (let i = 0; i < finalizedSpecimenList.length; i++){
+        const currSpecimen = finalizedSpecimenList[i];
 
-        if (currCollection[conceptIds.collection.bloodUrineBagScan]) {
-            delete currCollection[conceptIds.collection.bloodUrineBagScan]
+        if (currSpecimen[conceptIds.collection.bloodUrineBagScan]) {
+            delete currSpecimen[conceptIds.collection.bloodUrineBagScan]
         }
 
-        if (currCollection[conceptIds.collection.mouthwashBagScan]) {
-            delete currCollection[conceptIds.collection.mouthwashBagScan] 
+        if (currSpecimen[conceptIds.collection.mouthwashBagScan]) {
+            delete currSpecimen[conceptIds.collection.mouthwashBagScan] 
         }
  
         for (let tubeCid of specimenCollection.tubeCidList) {
-            if (!currCollection[tubeCid]) continue;
+            if (!currSpecimen[tubeCid]) continue;
 
-            const currTube = currCollection[tubeCid];
+            const currTube = currSpecimen[tubeCid];
             // delete specimen key if tube collected key is no
             if (!currTube[conceptIds.collection.tube.isCollected] || currTube[conceptIds.collection.tube.isCollected] == conceptIds.no){
-                delete currCollection[tubeCid];
+                delete currSpecimen[tubeCid];
             }
 
             // delete tube if it contains deviation concept ID that disallows shipping
@@ -987,12 +980,12 @@ export const filterSpecimenCollectionList = async () => {
                 tubeDeviation?.[conceptIds.insufficientVolumeSpecimenDeviation] == conceptIds.yes|| 
                 tubeDeviation?.[conceptIds.mislabelledDiscardSpecimenDeviation] == conceptIds.yes || 
                 tubeDeviation?.[conceptIds.notFoundSpecimenDeviation] == conceptIds.yes) {
-                    delete currCollection[tubeCid];
+                    delete currSpecimen[tubeCid];
             }
         }
     }
-    console.log('COLLECTION LIST:', collectionList);
-    return collectionList;
+
+    return finalizedSpecimenList;
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
@@ -1023,14 +1016,13 @@ export const getLocationsInstitute = async () => {
             Authorization:"Bearer "+idToken
         }
     });
-    let res = await response.json();
-    let arr = res.response;
+    const res = await response.json();
+    const arr = res.response;
     let locations = [];
     for(let i = 0; i < arr.length; i++){
         let currJSON = arr[i];
-        locations = locations.concat(currJSON['560975149']);
+        locations = locations.concat(currJSON[conceptIds.shippingLocation]);
     }
-    console.log('locations: ', locations);
     console.timeEnd('getLocationsInstitute');
     return locations;
 }
@@ -2307,7 +2299,33 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
   }
 }
 
-export const sortBiospecimensList = (biospecimensList, tubeOrder) => {
+// Modify to change tube order, tube ordered by color
+const tubeOrder = [      
+  "0001", //"SST/Gold or Red"
+  "0002", //"SST/Gold or Red"
+  "0011", //"SST/Gold or Red"
+  "0012", //"SST/Gold or Red"
+  "0021", //"SST/Gold or Red"
+  "0022", //"SST/Gold or Red"
+  "0031", //"SST/Gold or Red"
+  "0032", //"SST/Gold or Red"
+  "0003", //"Heparin/Green"
+  "0013", //"Heparin/Green"
+  "0004", //"EDTA/Lavender"
+  "0014", //"EDTA/Lavender"
+  "0024", //"EDTA/Lavender"
+  "0005", //"ACD/Yellow"
+  "0006", //"Urine/Yellow"
+  "0016", //"Urine Cup"
+  "0007", //"Mouthwash Container"
+  "0050", //"NA"
+  "0051", //"NA"
+  "0052", //"NA"
+  "0053", //"NA"
+  "0054", //"NA
+];
+
+export const sortBiospecimensList = (biospecimensList) => {
   const bioArr = []
   // push list of unordered ids
   biospecimensList.forEach(id => { bioArr.push({"tubeId": id}) })

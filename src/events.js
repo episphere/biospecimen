@@ -1,4 +1,12 @@
-import { performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant, errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, filterSpecimenCollectionList, addBox, updateBox, getBoxes, ship, getLocationsInstitute, getBoxesByLocation, disableInput, allStates, removeBag, removeMissingSpecimen, getAllBoxes, getNextTempCheck, updateNewTempDate, getSiteTubesLists, getWorkflow, collectionSettings, getSiteCouriers, getPage, getNumPages, allTubesCollected, removeSingleError, updateParticipant, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, retrieveDateFromIsoString, convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder, checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, siteSpecificLocation, siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, siteFullNames, updateCollectionSettingData, convertToOldBox, translateNumToType, getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion,  bagConceptIdList, checkAccessionId, checkSurveyEmailTrigger, packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, requestsBlocker} from './shared.js';
+import { appState, performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant,
+        errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, filterSpecimenCollectionList, addBox, updateBox, getBoxes,
+        ship, getLocationsInstitute, getBoxesByLocation, disableInput, removeBag, removeMissingSpecimen, getAllBoxes, updateNewTempDate, getSiteTubesLists, getWorkflow, 
+        getSiteCouriers, getPage, getNumPages, removeSingleError, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, retrieveDateFromIsoString,
+        convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
+        checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, siteSpecificLocation,
+        siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
+        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion,  bagConceptIdList, checkAccessionId, checkSurveyEmailTrigger,
+        packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, requestsBlocker} from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, generateBoxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -7,7 +15,8 @@ import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
-import { additionalTubeIDRequirement, masterSpecimenIDRequirement, siteSpecificTubeRequirements, totalCollectionIDLength, workflows, specimenCollection, tubes, deviationReasons, refusedShippingDeviationConceptList} from './tubeValidation.js';
+import { additionalTubeIDRequirement, masterSpecimenIDRequirement, totalCollectionIDLength, workflows, specimenCollection, deviationReasons, refusedShippingDeviationConceptList} from './tubeValidation.js';
+import { updateShippingStateAddBagToBox, updateShippingStateRemoveBagFromBox } from './shippingState.js';
 import conceptIds from './fieldToConceptIdMapping.js';
 
 export const addEventSearchForm1 = () => {
@@ -172,6 +181,7 @@ export const getCurrBoxNumber = (j) => {
     return keys.length;
 }
 
+//TODO update this - triggered from the input/scan box
 export const addEventAddSpecimenToBox = (userName) => {
     const form = document.getElementById('addSpecimenForm');
     form.addEventListener('submit', async e => {
@@ -179,28 +189,30 @@ export const addEventAddSpecimenToBox = (userName) => {
         const masterSpecimenId = document.getElementById('masterSpecimenId').value.trim();
         const shippingLocationValue = document.getElementById('selectLocationList').value;
         if(shippingLocationValue === 'none') { // No Shipping Location Selected from dropdown
-            showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' }, true)
-            return
+            showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' }, true);
+            return;
         }
         if (masterSpecimenId == '') { // Message when whitespace is removed and input is empty string
-            showNotifications({ title: 'Empty Entry or Scan', body: 'Please enter or scan a specimen bag ID or Full Specimen ID.' }, true)
-            return
+            showNotifications({ title: 'Empty Entry or Scan', body: 'Please enter or scan a specimen bag ID or Full Specimen ID.' }, true);
+            return;
         }
 
         showAnimation();
+        //TODO this is not needed, but the search for shipped specimens should be done here
         const getAllBoxesWithoutConversionResponse = await getAllBoxesWithoutConversion(); // get and search all boxes from a login site
+        console.log('getAllBoxesWithoutConversionResponse', getAllBoxesWithoutConversionResponse);
         hideAnimation();
-        //let masterIdSplit = masterSpecimenId.split(/\s+/);
-        let foundInOrphan = false;
-        //get all ids from the hidden
+
+        //get all ids from the hidden table
         const shippingTable = document.getElementById('specimenList') // Available Collections table
         const orphanTable = document.getElementById('orphansList') // Hidden Orphan Table 
+        const foundScannedIdShipped = isScannedIdShipped(getAllBoxesWithoutConversionResponse, masterSpecimenId)
+        const scannedIdInBoxesNotShippedObject = findScannedIdInBoxesNotShippedObject(getAllBoxesWithoutConversionResponse, masterSpecimenId)
+        const isScannedIdInBoxesNotShipped = scannedIdInBoxesNotShippedObject['foundMatch']
+        let foundInOrphan = false;
         let biospecimensList = []
         let tableIndex = -1;
         let foundinShippingTable = false;
-        let foundScannedIdShipped = isScannedIdShipped(getAllBoxesWithoutConversionResponse, masterSpecimenId)
-        let scannedIdInBoxesNotShippedObject = findScannedIdInBoxesNotShippedObject(getAllBoxesWithoutConversionResponse, masterSpecimenId)
-        let isScannedIdInBoxesNotShipped = scannedIdInBoxesNotShippedObject['foundMatch']
 
         for (let i = 1; i < shippingTable.rows.length; i++) {
             let currRow = shippingTable.rows[i];
@@ -222,22 +234,22 @@ export const addEventAddSpecimenToBox = (userName) => {
         }
         
         if (foundScannedIdShipped){ // Check if item scanned is already shipped
-            showNotifications({ title:'Item reported as already shipped', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.'}, true)
-            return
+            showNotifications({ title:'Item reported as already shipped', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.'}, true);
+            return;
         }
         
         if(isScannedIdInBoxesNotShipped) { // Check if item scanned appears in current boxes
-            let boxNum = scannedIdInBoxesNotShippedObject['132929440']
-            let siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInBoxesNotShippedObject['560975149']]
-            let siteSpecificLocationName = siteSpecificLocation ? siteSpecificLocation : ''
-            let scannedInput = scannedIdInBoxesNotShippedObject['inputScanned']
-            showNotifications({ title:`${scannedInput} has already been recorded`, body: `${scannedInput} is recorded as being in ${boxNum} in ${siteSpecificLocationName}`}, true)
-            return
+            const boxNum = scannedIdInBoxesNotShippedObject[conceptIds.shippingBoxId];
+            const siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInBoxesNotShippedObject[conceptIds.shippingLocation]];
+            const siteSpecificLocationName = siteSpecificLocation ? siteSpecificLocation : '';
+            const scannedInput = scannedIdInBoxesNotShippedObject['inputScanned'];
+            showNotifications({ title:`${scannedInput} has already been recorded`, body: `${scannedInput} is recorded as being in ${boxNum} in ${siteSpecificLocationName}`}, true);
+            return;
         }
 
         if (biospecimensList.length == 0) {
-            showNotifications({ title: 'Item not found', body: `Item not reported as collected. Go to the Collection Dashboard to add specimen.` }, true)
-            return
+            showNotifications({ title: 'Item not found', body: `Item not reported as collected. Go to the Collection Dashboard to add specimen.` }, true);
+            return;
         }
         else {
             document.getElementById('submitMasterSpecimenId').click();
@@ -251,8 +263,8 @@ export const addEventAddSpecimenToBox = (userName) => {
         //getCurrBoxNumber
 
         const masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase().trim();
-        let mouthwashList = document.getElementById("mouthwashList")
-        let currTubeTable = document.getElementById("currTubeTable")
+        const mouthwashList = document.getElementById("mouthwashList")
+        const currTubeTable = document.getElementById("currTubeTable")
 
         const header = document.getElementById('shippingModalHeader');
         const body = document.getElementById('shippingModalBody');
@@ -261,51 +273,15 @@ export const addEventAddSpecimenToBox = (userName) => {
                                 <span aria-hidden="true">&times;</span>
                             </button>`;
 
-        /*body.innerHTML = `
-        <table class="table" id="shippingModalTable">
-            <thead>
-                <tr>
-                    <th>Full Specimen ID</th>
-                    <th>Type/Color</th>
-                    <th style="text-align:center;">Sample Present</th>
-                </tr>
-            </thead>
-        </table>
-        `;*/
-        let masterIdSplit = masterSpecimenId.split(/\s+/);
-        let foundInOrphan = false;
         //get all ids from the hidden
-        let shippingTable = document.getElementById('specimenList')
-        let orphanTable = document.getElementById('orphansList')
+        const masterIdSplit = masterSpecimenId.split(/\s+/);
+        const shippingTable = document.getElementById('specimenList')
+        const orphanTable = document.getElementById('orphansList')
+        let foundInOrphan = false;
         let biospecimensList = []
         let tableIndex = -1;
         let foundinShippingTable = false;
 
-        // Modify to change tube order, tube ordered by color
-        let tubeOrder = [      
-        "0001", //"SST/Gold or Red"
-        "0002", //"SST/Gold or Red"
-        "0011", //"SST/Gold or Red"
-        "0012", //"SST/Gold or Red"
-        "0021", //"SST/Gold or Red"
-        "0022", //"SST/Gold or Red"
-        "0031", //"SST/Gold or Red"
-        "0032", //"SST/Gold or Red"
-        "0003", //"Heparin/Green"
-        "0013", //"Heparin/Green"
-        "0004", //"EDTA/Lavender"
-        "0014", //"EDTA/Lavender"
-        "0024", //"EDTA/Lavender"
-        "0005", //"ACD/Yellow"
-        "0006", //"Urine/Yellow"
-        "0016", //"Urine Cup"
-        "0007", //"Mouthwash Container"
-        "0050", //"NA"
-        "0051", //"NA"
-        "0052", //"NA"
-        "0053", //"NA"
-        "0054", //"NA
-      ] 
         for (let i = 1; i < shippingTable.rows.length; i++) {
             let currRow = shippingTable.rows[i];
             if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId) {
@@ -313,7 +289,6 @@ export const addEventAddSpecimenToBox = (userName) => {
                 biospecimensList = JSON.parse(currRow.cells[2].innerText)
                 foundinShippingTable = true;
             }
-
         }
 
         for (let i = 1; i < orphanTable.rows.length; i++) {
@@ -324,7 +299,6 @@ export const addEventAddSpecimenToBox = (userName) => {
                 biospecimensList = [currTubeNum];
                 foundInOrphan = true;
             }
-
         }
 
         if (biospecimensList.length == 0) {
@@ -333,27 +307,19 @@ export const addEventAddSpecimenToBox = (userName) => {
             const delay = ms => new Promise(res => setTimeout(res, ms));
             await delay(500);
             document.getElementById('shippingCloseButton').click();
-            return
+            return;
         }
 
-        const biospecimensListByType = sortBiospecimensList(biospecimensList, tubeOrder)
-        await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan)
+        const biospecimensListByType = sortBiospecimensList(biospecimensList);
+        await createShippingModalBody(biospecimensListByType, masterSpecimenId, foundInOrphan);
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan, userName);
         hideAnimation();
 
     })
 }
 
+//TODO update this handling - triggered from addEventAddSpecimenToBox
 export const createShippingModalBody = async (biospecimensList, masterBiospecimenId, isOrphan) => {
-    //let keys = Object.keys(biospecimenData)
-    /*let tubes = [];
-    for(let i = 0; i < biospecimensList.length; i++){
-        let currData = biospecimenData[keys[i]];
-        let re = /tube[0-9]*Id/
-        if(biospecimensList[i].match(re) != null){
-            tubes.push(biospecimenData[keys[i]]);
-        }
-    }*/
     let currLocation = document.getElementById('selectLocationList').value;
     let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
     let response = await getBoxesByLocation(currLocationConceptId);
@@ -364,7 +330,6 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
         boxIdAndBagsObj[box['132929440']] = box['bags']
     }
 
-    //let tubeTable = document.getElementById("shippingModalTable")
     let tubeTable = document.createElement('table');
     let currSplit = masterBiospecimenId.split(/\s+/); /* Ex. ['CXA000133', '0008']*/
     let currBag = [];
@@ -470,175 +435,177 @@ export const createShippingModalBody = async (biospecimensList, masterBiospecime
 
 }
 
-//TODO examine impact of calling populateBoxesToShipTable
-export const addEventAddSpecimensToListModalButton = (bagid, tableIndex, isOrphan, userName) => {
-    let submitButton = document.getElementById('addToBagButton')
-    let specimenSearch = document.getElementById('masterSpecimenId')
+//TODO implement state management
+export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrphan, userName) => {
+    const submitButton = document.getElementById('addToBoxButton')
     submitButton.addEventListener('click', async e => {
         e.preventDefault();
         showAnimation();
         let boxIdAndBagsObj = {};
-        // get un-shipped boxes
-        let response = await getBoxes();
-        let boxList = response.data;
-        let locations = {};
+
+        //TODO: handle when new box is added
+        const boxList = appState.getState().allBoxesList;
+        const locations = {};
         for (let i = 0; i < boxList.length; i++) {
-            let box = boxList[i]
-            // Box ID ("132929440"); Location ID, site specific ("560975149"); Login Site ("789843387")
-            boxIdAndBagsObj[box['132929440']] = box['bags']
-            // Location ID's value will be a number
-            locations[box['132929440']] = box['560975149'];
+            const box = boxList[i];
+            boxIdAndBagsObj[box[conceptIds.shippingBoxId]] = box['bags']
+            locations[box[conceptIds.shippingBoxId]] = box[conceptIds.shippingLocation];
         }
 
-        //push the things into the right box
-        //first get all elements still left
-        let tubeTable = document.getElementById("shippingModalTable");
-        let numRows = tubeTable.rows.length;
-        let bagSplit = bagid.split(/\s+/);
-        let boxId = document.getElementById('shippingModalChooseBox').value;
-        let nameSplit = userName.split(/\s+/);
-        let firstName = nameSplit[0] ? nameSplit[0] : '';
-        let lastName = nameSplit[1] ? nameSplit[1] : '';
-        let checkedEleList = [];
-        let uncheckedEleList = [];
-        const allCheckboxEle = document.querySelectorAll(".samplePresentCheckbox");
-
-        for (let ele of allCheckboxEle) {
-            if (ele.checked) {
-                checkedEleList.push(ele)
-            }
-            else {
-                uncheckedEleList.push(ele)
-            }
-        }
-
-        if (isOrphan) {
-            bagid = 'unlabelled'
-        }
-
-        let toDelete = [];
-
-        for (let i = 0; i < checkedEleList.length; i++) {
-            // data-full-specimen-id (Ex. "CXA444444 0007")
-            let idToAdd = checkedEleList[i].getAttribute("data-full-specimen-id")
-            const [collectionId, tubeId] = idToAdd.split(/\s+/);
-            toDelete.push(tubeId);
-
-            if (!isOrphan) {
-                if (tubeId === '0007') {
-                    bagid = collectionId + ' 0009';
-                } else {
-                    bagid = collectionId + ' 0008';
-                }
-            }
-
-            if (boxIdAndBagsObj.hasOwnProperty(boxId)) {
-                if (boxIdAndBagsObj[boxId].hasOwnProperty(bagid)) {
-                    let arr = boxIdAndBagsObj[boxId][bagid]['arrElements'];
-                    arr.push(idToAdd);
-                }
-                else {
-                    boxIdAndBagsObj[boxId][bagid] = { 'arrElements': [idToAdd], '469819603': firstName, '618036638': lastName };
-                }
-            }
-            else {
-                boxIdAndBagsObj[boxId] = {}
-                boxIdAndBagsObj[boxId][bagid] = { 'arrElements': [idToAdd], '469819603': firstName, '618036638': lastName };
-            }
-
-        }
-
+        //push the things into the right box, first get all elements still left
+        const boxId = document.getElementById('shippingModalChooseBox').value;
         document.getElementById('selectBoxList').value = boxId;
 
-        let shippingTable = document.getElementById('specimenList')
+        const allCheckboxEle = document.querySelectorAll(".samplePresentCheckbox");
+        const nameSplit = userName.split(/\s+/);
+        const firstName = nameSplit[0] ? nameSplit[0] : '';
+        const lastName = nameSplit[1] ? nameSplit[1] : '';
+        const checkedEleList = Array.from(allCheckboxEle).filter(ele => ele.checked);
 
-        // handle an orphan tube scanned if currArr is undefined 
-        let currArr = shippingTable?.rows[tableIndex]?.cells[2]?.innerText
-        if(currArr != undefined) {
-          let parseCurrArr = JSON.parse(shippingTable.rows[tableIndex].cells[2].innerText)
-          for (let i = 0; i < toDelete.length; i++) {
-            let currDel = toDelete[i];
-            parseCurrArr.splice(parseCurrArr.indexOf(toDelete[i]), 1);
-          }
-          if (parseCurrArr.length == 0) {
-            shippingTable.deleteRow(tableIndex);
-          }
-          else {
-            shippingTable.rows[tableIndex].cells[2].innerText = JSON.stringify(parseCurrArr);
-            shippingTable.rows[tableIndex].cells[1].innerText = parseCurrArr.length;
-          }
+        if (isOrphan) {
+            bagId = 'unlabelled'
         }
-        let boxIds = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
+
+        boxIdAndBagsObj = processCheckedModalElements(boxIdAndBagsObj, checkedEleList, bagId, boxId, firstName, lastName, isOrphan, tableIndex);
+
+        // for (let i = 0; i < checkedEleList.length; i++) {
+        //     const specimenIdToAdd = checkedEleList[i].getAttribute("data-full-specimen-id"); // data-full-specimen-id (Ex. "CXA444444 0007")
+        //     const [collectionId, tubeId] = specimenIdToAdd.split(/\s+/);
+        //     tubesToDelete.push(tubeId);
+
+        //     if (!isOrphan) {
+        //         bagId = assignBagId(tubeId, collectionId);
+        //     }
+
+        //     if (boxIdAndBagsObj.hasOwnProperty(boxId)) {
+        //         if (boxIdAndBagsObj[boxId].hasOwnProperty(bagId)) {
+        //             const arr = boxIdAndBagsObj[boxId][bagId]['arrElements'];
+        //             arr.push(specimenIdToAdd);
+        //         }
+        //         else {
+        //             boxIdAndBagsObj[boxId][bagId] = { 'arrElements': [specimenIdToAdd], '469819603': firstName, '618036638': lastName };
+        //         }
+        //     }
+        //     else {
+        //         boxIdAndBagsObj[boxId] = {}
+        //         boxIdAndBagsObj[boxId][bagId] = { 'arrElements': [specimenIdToAdd], '469819603': firstName, '618036638': lastName };
+        //     }
+        // }
+
+        // console.log('TO DELETE', tubesToDelete)
+        // handleModalTableRows(tableIndex, tubesToDelete);
+        console.log('boxIdAndBagsObj - update modal', boxIdAndBagsObj);
+        const boxIds = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
 
         for (let i = 0; i < boxIds.length; i++) {
-            let currTime = new Date().toISOString();
-            let toPass = {};
+            const currTime = new Date().toISOString();
+            const boxToUpdate = {};
             let found = false;
             if (boxIds[i] == boxId) {
                 for (let j = 0; j < boxList.length; j++) {
-                    if (boxList[j]['132929440'] == boxIds[i]) {
-                      // Autogenerated date/time when first bag added to box - 672863981
-                        if (boxList[j].hasOwnProperty('672863981')) {
-                            toPass['672863981'] = boxList[j]['672863981'];
+                    if (boxList[j][conceptIds.shippingBoxId] == boxIds[i]) {
+                        if (boxList[j].hasOwnProperty(conceptIds.firstBagAddedToBoxTimestamp)) {
+                            boxToUpdate[conceptIds.firstBagAddedToBoxTimestamp] = boxList[j][conceptIds.firstBagAddedToBoxTimestamp];
                             found = true;
                         }
-                        if (boxList[j].hasOwnProperty('555611076')) {
-                            toPass['555611076'] = boxList[j]['555611076'];
+                        if (boxList[j].hasOwnProperty(conceptIds.shippingShipDateModify)) {
+                            boxToUpdate[conceptIds.shippingShipDateModify] = boxList[j][conceptIds.shippingShipDateModify];
                         }
                     }
                 }
 
                 if (found == false) {
-                    toPass['672863981'] = currTime;
+                    boxToUpdate[conceptIds.firstBagAddedToBoxTimestamp] = currTime;
                 }
-                /* 
-                Box ID - 132929440
-                Location ID, site specific - 560975149
-                Autogenerated date/time when box last modified (bag added or removed)- 555611076
-                */
-                toPass['132929440'] = boxIds[i]; 
-                toPass['bags'] = boxIdAndBagsObj[boxIds[i]]
-                toPass['560975149'] = locations[boxIds[i]]
-                toPass['789843387'] = siteSpecificLocation[conceptIdToSiteSpecificLocation[locations[boxIds[i]]]].siteCode
-                toPass['555611076'] = currTime;
-                await updateBox(toPass);
+
+                boxToUpdate['bags'] = boxIdAndBagsObj[boxIds[i]];
+                boxToUpdate[conceptIds.shippingBoxId] = boxIds[i]; 
+                boxToUpdate[conceptIds.shippingLocation] = locations[boxIds[i]];
+                boxToUpdate[conceptIds.siteCode] = siteSpecificLocation[conceptIdToSiteSpecificLocation[locations[boxIds[i]]]].siteCode;
+                boxToUpdate[conceptIds.shippingShipDateModify] = currTime;
+
+                await updateBox(boxToUpdate);
             }
         }
 
-        response = await getAllBoxes();
-        boxList = response.data;
-        await populateTubeInBoxList(userName);
-        await populateSpecimensList(boxList);
-        boxIdAndBagsObj = {};
-
-        for (let i = 0; i < boxList.length; i++) {
-            if (!boxList[i].hasOwnProperty('145971562') || boxList[i]['145971562'] != '353358909') {
-                let box = boxList[i]
-                boxIdAndBagsObj[box['132929440']] = box['bags']
-            }
-
-        }
-
-        await populateBoxesToShipTable(boxIdAndBagsObj, boxList, userName)
-        // clear input field
-        specimenSearch.value = ""
         hideAnimation();
+        
+        //TODO: update to state managed solution and pass true as second arg)
+        startShipping(appState.getState().userName);
+
     }, { once: true })
-    //ppulateSpecimensList();
 }
 
-//updated to use 
+const processCheckedModalElements = (boxIdAndBagsObj, checkedEleList, bagId, boxId, firstName, lastName, isOrphan, tableIndex) => {
+    const tubesToDelete = [];
+
+    for (let i = 0; i < checkedEleList.length; i++) {
+        const specimenIdToAdd = checkedEleList[i].getAttribute("data-full-specimen-id"); // data-full-specimen-id (Ex. "CXA444444 0007")
+        const [collectionId, tubeId] = specimenIdToAdd.split(/\s+/);
+        tubesToDelete.push(tubeId);
+
+        if (!isOrphan) {
+            bagId = assignBagId(tubeId, collectionId);
+        }
+
+        if (boxIdAndBagsObj.hasOwnProperty(boxId)) {
+            if (boxIdAndBagsObj[boxId].hasOwnProperty(bagId)) {
+                const arr = boxIdAndBagsObj[boxId][bagId]['arrElements'];
+                arr.push(specimenIdToAdd);
+            }
+            else {
+                boxIdAndBagsObj[boxId][bagId] = { 'arrElements': [specimenIdToAdd], '469819603': firstName, '618036638': lastName };
+            }
+        }
+        else {
+            boxIdAndBagsObj[boxId] = {}
+            boxIdAndBagsObj[boxId][bagId] = { 'arrElements': [specimenIdToAdd], '469819603': firstName, '618036638': lastName };
+        }
+    }
+
+    console.log('TO DELETE', tubesToDelete)
+    handleModalTableRows(tableIndex, tubesToDelete);
+    
+    return boxIdAndBagsObj;
+}
+
+const handleModalTableRows = (tableIndex, tubesToDelete) => {
+    const shippingTable = document.getElementById('specimenList');
+    
+    // handle an orphan tube scanned if currArr is undefined  
+    const currArr = shippingTable?.rows[tableIndex]?.cells[2]?.innerText;
+    if(currArr != undefined) {
+        const parseCurrArr = JSON.parse(shippingTable.rows[tableIndex].cells[2].innerText);
+        for (let i = 0; i < tubesToDelete.length; i++) {
+            parseCurrArr.splice(parseCurrArr.indexOf(tubesToDelete[i]), 1);
+        }
+        if (parseCurrArr.length == 0) {
+            shippingTable.deleteRow(tableIndex);
+        }
+        else {
+            shippingTable.rows[tableIndex].cells[2].innerText = JSON.stringify(parseCurrArr);
+            shippingTable.rows[tableIndex].cells[1].innerText = parseCurrArr.length;
+        }
+    }
+}
+
+const assignBagId = (tubeId, collectionId) => {
+    if (tubeId === '0007') {
+        return collectionId + ' 0009';
+    } else {
+        return collectionId + ' 0008';
+    }
+}
+
 export const getInstituteSpecimensList = async (boxList) => {
-    console.log('calling getInstituteSpecimensList');
-    console.time('getInstituteSpecimensList');
     boxList = boxList.sort((a,b) => compareBoxIds(a[conceptIds.shippingBoxId], b[conceptIds.shippingBoxId]));
 
     const collectionId = conceptIds.collection.id;
-    const collectionList = await filterSpecimenCollectionList();
-    const resultBags = {};
+    const finalizedSpecimenList = await filterSpecimenCollectionList();
+    const availableCollectionsObj = {};
 
     // note: currently collections have no mouthwash specimens (0007)
-    for (const currCollection of collectionList) {
+    for (const currCollection of finalizedSpecimenList) {
         const tubesInBox = {
           shipped: {
             bloodUrine: [],
@@ -742,162 +709,42 @@ export const getInstituteSpecimensList = async (boxList) => {
         }
 
         for (const tubeNum of tubesToAdd.orphan) {
-            if (!resultBags['unlabelled']) {
-                resultBags['unlabelled'] = [];
+            if (!availableCollectionsObj['unlabelled']) {
+                availableCollectionsObj['unlabelled'] = [];
             }
-            resultBags['unlabelled'].push(currCollection[collectionId] + ' ' + tubeNum);
+            availableCollectionsObj['unlabelled'].push(currCollection[collectionId] + ' ' + tubeNum);
         }
 
         if (tubesInBox.shipped.bloodUrine.length === 0 && tubesInBox.notShipped.bloodUrine.length ===0 && tubesToAdd.bloodUrine.length> 0) {
-            resultBags[currCollection[collectionId] + ' 0008'] = tubesToAdd.bloodUrine;
+            availableCollectionsObj[currCollection[collectionId] + ' 0008'] = tubesToAdd.bloodUrine;
         }
 
         if (tubesInBox.shipped.mouthWash.length === 0 && tubesInBox.notShipped.mouthWash.length ===0 && tubesToAdd.mouthWash.length > 0) {
-            resultBags[currCollection[collectionId] + ' 0009'] = tubesToAdd.mouthWash;
+            availableCollectionsObj[currCollection[collectionId] + ' 0009'] = tubesToAdd.mouthWash;
         }
     }
-    console.timeEnd('getInstituteSpecimensList');
-    return resultBags;
+
+    return { finalizedSpecimenList, availableCollectionsObj };
 }
 
-
-// export const getInstituteSpecimensList = async (boxList) => {
-//     console.log('calling getInstituteSpecimensList');
-//     console.time('getInstituteSpecimensList');
-//     boxList = boxList.sort((a,b) => compareBoxIds(a[conceptIds.shippingBoxId], b[conceptIds.shippingBoxId]));
-
-//     const collectionId = conceptIds.collection.id;
-//     const collectionList = await filterSpecimenCollectionList();
-//     const resultBags = {};
-
-//     // note: currently collections have no mouthwash specimens (0007)
-//     for (const currCollection of collectionList) {
-//         const tubesInBox = {
-//           shipped: {
-//             bloodUrine: [],
-//             mouthWash: [],
-//             orphan: [],
-//           },
-//           notShipped: {
-//             bloodUrine: [],
-//             mouthWash: [],
-//             orphan: [],
-//           },
-//         };
-
-//         // For each collection, get its blood/urine, mouthwash, and orphan specimens that are in the box already
-//         if (currCollection[collectionId]) {
-//             // todo: save box id in collection and remove box iteration.
-//             for (const box of boxList) {
-//                 let boxIsShipped = false;
-//                 if (box[conceptIds.submitShipmentFlag] == conceptIds.yes) {
-//                     boxIsShipped = true;
-//                 }
-
-//                 const bagObjects = box.bags;
-//                 const bloodUrineBagId = currCollection[collectionId] + ' 0008';
-
-//                 if (bagObjects[bloodUrineBagId]) {
-//                     const tubeIdList = bagObjects[bloodUrineBagId]['arrElements']
-//                     if (tubeIdList.length > 0) {
-//                         for (const tubeId of tubeIdList) {          
-//                             const tubeNum = tubeId.split(/\s+/)[1] // tubeId (eg 'CXA002655 0001'); tubeNum (eg '0001')
-//                             if (boxIsShipped ) {
-//                                 tubesInBox.shipped.bloodUrine.push(tubeNum);
-//                             } else {
-//                                 tubesInBox.notShipped.bloodUrine.push(tubeNum);
-//                             }
-//                         }
-//                     }
-//                 }
-
-//                 const mouthWashBagId = currCollection[collectionId] + ' 0009';
-//                 if (bagObjects[mouthWashBagId]) {
-//                     const tubeIdList = bagObjects[mouthWashBagId]['arrElements']
-//                     for (const tubeId of tubeIdList) {
-//                         const tubeNum = tubeId.split(/\s+/)[1];
-//                         if (boxIsShipped ) {
-//                             tubesInBox.shipped.mouthWash.push(tubeNum);
-//                         } else {
-//                             tubesInBox.notShipped.mouthWash.push(tubeNum);
-//                         }
-//                     }
-//                 }
-
-//                 if (bagObjects['unlabelled']) {
-//                     let tubeIdList = bagObjects['unlabelled']['arrElements']
-
-//                     for (const tubeId of tubeIdList) {
-//                         const [collectionIdFromTube, tubeNumber] = tubeId.split(/\s+/);
-
-//                         if (collectionIdFromTube == currCollection[collectionId]) {
-//                             if (boxIsShipped ) {
-//                                 tubesInBox.shipped.orphan.push(tubeNumber);
-//                             } else {
-//                                 tubesInBox.notShipped.orphan.push(tubeNumber);
-//                             }
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-
-//         const tubesToAdd={
-//             bloodUrine: [],
-//             mouthWash: [],
-//             orphan: [],
-//           }
-
-//         for (let currCid of specimenCollection.tubeCidList) {
-//             const currTubeNum = specimenCollection.cidToNum[currCid];
-//             const currSpecimen = currCollection[currCid];
-
-//             if (!currSpecimen) continue;
-
-//             if (currTubeNum == '0007') {
-//                 if (tubesInBox.shipped.mouthWash.includes(currTubeNum) || tubesInBox.notShipped.mouthWash.includes(currTubeNum)) {
-//                     continue;
-//                 } else {
-//                     tubesToAdd.mouthWash.push(currTubeNum);
-//                 }
-//             } else {
-//                 if (tubesInBox.shipped.bloodUrine.includes(currTubeNum) || tubesInBox.shipped.orphan.includes(currTubeNum) || tubesInBox.notShipped.bloodUrine.includes(currTubeNum) || tubesInBox.notShipped.orphan.includes(currTubeNum)) {
-//                     continue;
-//                 } else {
-//                     tubesToAdd.bloodUrine.push(currTubeNum);
-//                 }
-//             }
-//         }
-
-//         if (tubesInBox.shipped.bloodUrine.length > 0 && tubesToAdd.bloodUrine.length > 0) {
-//             tubesToAdd.orphan=tubesToAdd.bloodUrine;
-//             tubesToAdd.bloodUrine=[];
-//         }
-
-//         for (const tubeNum of tubesToAdd.orphan) {
-//             if (!resultBags['unlabelled']) {
-//                 resultBags['unlabelled'] = [];
-//             }
-//             resultBags['unlabelled'].push(currCollection[collectionId] + ' ' + tubeNum);
-//         }
-
-//         if (tubesInBox.shipped.bloodUrine.length === 0 && tubesInBox.notShipped.bloodUrine.length ===0 && tubesToAdd.bloodUrine.length> 0) {
-//             resultBags[currCollection[collectionId] + ' 0008'] = tubesToAdd.bloodUrine;
-//         }
-
-//         if (tubesInBox.shipped.mouthWash.length === 0 && tubesInBox.notShipped.mouthWash.length ===0 && tubesToAdd.mouthWash.length > 0) {
-//             resultBags[currCollection[collectionId] + ' 0009'] = tubesToAdd.mouthWash;
-//         }
-//     }
-//     console.timeEnd('getInstituteSpecimensList');
-//     return resultBags;
-// }
-
-// Populate the 'Available Collections' table
+/**
+ * Populate the 'Available Collections' table
+ * @param {*} boxList 
+ * @returns 
+ */
+// 
+// if finalizedSpecimenList or availableCollectionsObj are empty, data will be fetched from the server. This is expected on initial load.
 // Note: the orphan panel is currently hidden by request of the product team. Retail for possible future use.
-export const populateSpecimensList = async (boxList) => {
-    const bagIdAndtubeIdListObj = await getInstituteSpecimensList(boxList);
-    const bagIdList = Object.keys(bagIdAndtubeIdListObj);
+export const populateAvailableCollectionsList = async (boxList, loadFromState = false) => {
+    let finalizedSpecimenList = appState.getState().finalizedSpecimenList ?? [];
+    let availableCollectionsObj = appState.getState().availableCollectionsObj ?? {};
+
+    if (!loadFromState) {
+        console.log('calling getInstituteSpecimensList');
+        ({ finalizedSpecimenList, availableCollectionsObj } = await getInstituteSpecimensList(boxList));
+    }
+
+    const bagIdList = Object.keys(availableCollectionsObj);
     bagIdList.sort();
 
     const tableEle = document.getElementById("specimenList");
@@ -910,10 +757,10 @@ export const populateSpecimensList = async (boxList) => {
         if (bagId != "unlabelled") {
             const rowEle = tableEle.insertRow();
             rowEle.insertCell(0).innerHTML = bagId;
-            rowEle.insertCell(1).innerHTML = bagIdAndtubeIdListObj[bagId].length;
+            rowEle.insertCell(1).innerHTML = availableCollectionsObj[bagId].length;
 
             const hiddenChannel = rowEle.insertCell(2)
-            hiddenChannel.innerHTML = JSON.stringify(bagIdAndtubeIdListObj[bagId]);
+            hiddenChannel.innerHTML = JSON.stringify(availableCollectionsObj[bagId]);
             hiddenChannel.style.display = "none";
             if (numRows % 2 == 0) {
                 rowEle.style['background-color'] = "lightgrey";
@@ -929,11 +776,11 @@ export const populateSpecimensList = async (boxList) => {
     const specimenPanel = document.getElementById('specimenPanel')
     orphanTableEle.innerHTML = '';
 
-    if (orphanBagId && bagIdAndtubeIdListObj['unlabelled'].length > 0) {
+    if (orphanBagId && availableCollectionsObj['unlabelled'].length > 0) {
         orphanPanel.style.display = 'block'
         specimenPanel.style.height = '550px'
 
-        const orphanTubeIdList = bagIdAndtubeIdListObj['unlabelled'];
+        const orphanTubeIdList = availableCollectionsObj['unlabelled'];
         const rowEle = orphanTableEle.insertRow();
         rowEle.insertCell(0).innerHTML = 'Stray tubes';
         rowEle.insertCell(1).innerHTML = orphanTubeIdList.length;
@@ -971,9 +818,10 @@ export const populateSpecimensList = async (boxList) => {
                     currRow = table.rows[index];
                 }
 
+                //TODO consider optimizing these calls (remove box without get() call?)
                 let response = await getAllBoxes();
                 let boxList = response.data;
-                await populateSpecimensList(boxList);
+                await populateAvailableCollectionsList(boxList);
                 hideAnimation();
             })
         }
@@ -982,7 +830,7 @@ export const populateSpecimensList = async (boxList) => {
         specimenPanel.style.height = '550px'
     }
 
-    return bagIdAndtubeIdListObj;
+    return { finalizedSpecimenList, availableCollectionsObj };
 }
 
 const buildPopulateSpecimensHeader = () => {
@@ -994,84 +842,20 @@ const buildPopulateSpecimensHeader = () => {
     `;
 }
 
-export const populateBoxManifestHeader = (boxId, boxList, currContactInfo) => {
-    const currBox = boxList.find(box => box[conceptIds.shippingBoxId] == boxId);
-    if(!currBox) return;
-
-    const currJSONKeys = Object.keys(currBox['bags'])
-    const numBags = currJSONKeys.length;
-    const numTubes = currJSONKeys.reduce((accumulator, currentKey) => {
-        return accumulator + currBox['bags'][currentKey]['arrElements'].length;
-    }, 0);
-
-    const boxStartedTimestamp = formatBoxTimestamp(currBox[conceptIds.firstBagAddedToBoxTimestamp]);
-    const boxLastModifiedTimestamp = formatBoxTimestamp(currBox[conceptIds.shippingShipDateModify]);
-
-    renderBoxManifestHeader(boxId, boxStartedTimestamp, boxLastModifiedTimestamp, numBags, numTubes, currContactInfo);
-}
-
-const renderBoxManifestHeader = (boxId, boxStartedTimestamp, boxLastModifiedTimestamp, numBags, numTubes, currContactInfo) => {
-    const boxManifestCol1 = document.getElementById('boxManifestCol1');
-    const boxManifestCol3 = document.getElementById('boxManifestCol3');
-    
-    // Create parent div
-    const div1 = document.createElement("div");
-    const div3 = document.createElement("div");
-    
-    // List of data to be appended
-    const dataCol1 = [
-        { text: `${boxId} Manifest`, style: { fontWeight: '700', fontSize: '1.5rem' } },
-        { text: `Date Started: ${boxStartedTimestamp}` },
-        { text: `Last Modified: ${boxLastModifiedTimestamp}` },
-        { text: displayContactInformation(currContactInfo), isHTML: true }
-    ];
-    
-    const dataCol3 = [
-        { text: `Number of Sleeves/Bags: ${numBags}` },
-        { text: `Number of Specimens:  ${numTubes}` }
-    ];
-    
-    // Function to create elements from data
-    const createElements = (data, parent) => {
-        for (const item of data) {
-            const newP = document.createElement("p");
-            newP.innerHTML = item.text;
-    
-            if (item.style) {
-                Object.assign(newP.style, item.style);
-            }
-    
-            if (item.isHTML) {
-                const newDiv = document.createElement("div");
-                newDiv.innerHTML = newP.outerHTML;
-                parent.appendChild(newDiv);
-            } else {
-                parent.appendChild(newP);
-            }
-        }
-    }
-    
-    createElements(dataCol1, div1);
-    createElements(dataCol3, div3);
-    
-    // Append parent divs to the target elements
-    boxManifestCol1.appendChild(div1);
-    boxManifestCol3.appendChild(div3);
-}
-
 export const populateModalSelect = (boxIdAndBagsObj) => {
-    let boxSelectEle = document.getElementById('shippingModalChooseBox');
-    let selectedBoxId = boxSelectEle.getAttribute('data-new-box') || document.getElementById('selectBoxList').value;
-    let addToBoxButton =  document.getElementById('addToBagButton');
+    const boxSelectEle = document.getElementById('shippingModalChooseBox');
+    const selectedBoxId = boxSelectEle.getAttribute('data-new-box') || document.getElementById('selectBoxList').value;
+    const addToBoxButton =  document.getElementById('addToBoxButton');
+    
     addToBoxButton.removeAttribute("disabled")
-    let options = '';
-    let boxIds = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
-    for (let i = 0; i < boxIds.length; i++) {
-        options += `<option>${boxIds[i]}</option>`;
-    }
+    
+    const boxIds = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
+    const options = boxIds.map(boxId => `<option>${boxId}</option>`).join(''); 
+
     if (options == '') {
         addToBoxButton.setAttribute('disabled', 'true');
     }
+
     boxSelectEle.innerHTML = options;
     boxSelectEle.value = selectedBoxId;
 }
@@ -1099,39 +883,68 @@ export const populateTempSelect = (boxes) => {
     }
 }
 
-const formatBoxTimestamp = (timestamp) => {
+//TODO merge this with populateBoxesToShipTable once dependencies are sorted (don't break the current code)
+export const populateBoxesToShipTable = () => {
+    const detailedBoxes = appState.getState().detailedProviderBoxes;
+    const table = document.getElementById("saveTable");
+    table.innerHTML = renderBoxesToShipTableHeader();
+
+    if (Object.keys(detailedBoxes).length > 0) {
+        const sortedBoxKeys = Object.keys(detailedBoxes).sort();
+        sortedBoxKeys.forEach((box, i) => {
+            const currBox = detailedBoxes[box];
+            const bagKeys = Object.keys(currBox).filter(key => key !== 'boxData').sort((a, b) => a.split(/\s+/)[1] - b.split(/\s+/)[1]);
+            const boxStartedTimestamp = currBox.boxData[conceptIds.firstBagAddedToBoxTimestamp] ? formatBoxTimestamp(Date.parse(currBox.boxData[conceptIds.firstBagAddedToBoxTimestamp])) : '';
+            const boxLastModifiedTimestamp = currBox.boxData[conceptIds.shippingShipDateModify] ? formatBoxTimestamp(Date.parse(currBox.boxData[conceptIds.shippingShipDateModify])) : '';
+            const boxLocation = currBox.boxData[conceptIds.shippingLocation] ? locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]["siteSpecificLocation"] : '';
+            const numTubesInBox = bagKeys.reduce((total, bagKey) => total + currBox[bagKey]['arrElements'].length, 0);
+
+            const currRow = table.insertRow(i + 1);
+            currRow.style['background-color'] = i % 2 === 1 ? 'lightgrey' : '';
+            currRow.innerHTML += renderBoxesToShipRow(boxStartedTimestamp, boxLastModifiedTimestamp, box, boxLocation, numTubesInBox);
+            
+            const currBoxButton = currRow.cells[6].querySelector(".boxManifestButton");
+            currBoxButton.addEventListener("click", async () => {
+                generateBoxManifest(currBox);
+            });
+        });
+    }
+}
+
+export const formatBoxTimestamp = (timestamp) => {
     const newDate = new Date(timestamp);
     const ampm = newDate.getHours() >= 12 ? 'PM' : 'AM';
     const minutesTag = newDate.getMinutes() < 10 ? `0${newDate.getMinutes()}` : newDate.getMinutes();
     return `${newDate.getMonth() + 1}/${newDate.getDate()}/${newDate.getFullYear()} ${(newDate.getHours() + 11) % 12 + 1}:${minutesTag} ${ampm}`;
 };
 
-export const populateBoxesToShipTable = (boxIdAndBagsObj, boxList, userName, searchSpecimenInstituteArray) => {
-    const boxIdMap = boxList.reduce((acc, box) => ({ ...acc, [box[conceptIds.shippingBoxId]]: box }), {});
+// //TODO merge this with populateBoxesToShipTableInit once dependencies are sorted (don't break the current code)
+// export const populateBoxesToShipTable = (boxIdAndBagsObj, boxList, userName) => {
+//     const boxIdMap = boxList.reduce((acc, box) => ({ ...acc, [box[conceptIds.shippingBoxId]]: box }), {});
 
-    const table = document.getElementById("saveTable");
-    table.innerHTML = renderBoxesToShipTableHeader();
+//     const table = document.getElementById("saveTable");
+//     table.innerHTML = renderBoxesToShipTableHeader();
 
-    const boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
-    boxIdArray.forEach((boxId, i) => {
-        if (Object.keys(boxIdAndBagsObj[boxId]).length > 0) {
-            const box = boxIdMap[boxId];
-            const boxStartedTimestamp = box[conceptIds.firstBagAddedToBoxTimestamp] ? formatBoxTimestamp(Date.parse(box[conceptIds.firstBagAddedToBoxTimestamp])) : '';
-            const boxLastModifiedTimestamp = box[conceptIds.shippingShipDateModify] ? formatBoxTimestamp(Date.parse(box[conceptIds.shippingShipDateModify])) : '';
-            const boxLocation = box[conceptIds.shippingLocation] ? locationConceptIDToLocationMap[box[conceptIds.shippingLocation]]["siteSpecificLocation"] : '';
-            const numTubesInBox = Object.values(boxIdAndBagsObj[boxId]).reduce((total, curr) => total + curr['arrElements'].length, 0);
+//     const boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
+//     boxIdArray.forEach((boxId, i) => {
+//         if (Object.keys(boxIdAndBagsObj[boxId]).length > 0) {
+//             const box = boxIdMap[boxId];
+//             const boxStartedTimestamp = box[conceptIds.firstBagAddedToBoxTimestamp] ? formatBoxTimestamp(Date.parse(box[conceptIds.firstBagAddedToBoxTimestamp])) : '';
+//             const boxLastModifiedTimestamp = box[conceptIds.shippingShipDateModify] ? formatBoxTimestamp(Date.parse(box[conceptIds.shippingShipDateModify])) : '';
+//             const boxLocation = box[conceptIds.shippingLocation] ? locationConceptIDToLocationMap[box[conceptIds.shippingLocation]]["siteSpecificLocation"] : '';
+//             const numTubesInBox = Object.values(boxIdAndBagsObj[boxId]).reduce((total, curr) => total + curr['arrElements'].length, 0);
 
-            const currRow = table.insertRow(i + 1);
-            currRow.style['background-color'] = i % 2 === 1 ? 'lightgrey' : '';            
-            currRow.innerHTML += renderBoxesToShipRow(boxStartedTimestamp, boxLastModifiedTimestamp, boxId, boxLocation, numTubesInBox);
+//             const currRow = table.insertRow(i + 1);
+//             currRow.style['background-color'] = i % 2 === 1 ? 'lightgrey' : '';
+//             currRow.innerHTML += renderBoxesToShipRow(boxStartedTimestamp, boxLastModifiedTimestamp, boxId, boxLocation, numTubesInBox);
             
-            const currBoxButton = currRow.cells[6].querySelector(".boxManifestButton");
-            currBoxButton.addEventListener("click", async () => {
-                await generateBoxManifest(boxId, userName, searchSpecimenInstituteArray);
-            });
-        }
-    });
-}
+//             const currBoxButton = currRow.cells[6].querySelector(".boxManifestButton");
+//             currBoxButton.addEventListener("click", async () => {
+//                 await generateBoxManifest(boxId, userName, box);
+//             });
+//         }
+//     });
+// }
 
 const renderBoxesToShipTableHeader = () => {
     return `
@@ -1289,16 +1102,7 @@ export const populateShippingManifestBody = (boxIdAndBagsObj) => {
 }
 
 const compareBoxIds = (a, b) => {
-    let a1 = parseInt(a.substring(3));
-    let b1 = parseInt(b.substring(3));
-    if (a1 < b1) {
-        return -1;
-    }
-    else if (a1 > b1) {
-        return 1;
-    }
-    return 0;
-
+    return parseInt(a.substring(3), 10) - parseInt(b.substring(3), 10);
 }
 
 const populateShippingBoxContentsRows = (bagNum, cellNum, row, currBagId, fullTubeId, tubeType) => {
@@ -1310,20 +1114,26 @@ const populateShippingBoxContentsRows = (bagNum, cellNum, row, currBagId, fullTu
     }
 }
 
-// This is the list on shipping screen -> view shipping box contents
-export const populateBoxContentsList = async (boxIdAndBagsObj, userName) => {
+const handleShippingBoxContentsSelector = (boxIdAndBagsObj) => {
     const boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
-    const options = boxIdArray.map(boxId => `<option>${boxId}</option>`).join('');
-    
+    const boxOptionsList = boxIdArray.map(boxId => `<option>${boxId}</option>`).join('');
     const boxSelectEle = document.getElementById('selectBoxList');
-    boxSelectEle.innerHTML = options;
+    boxSelectEle.innerHTML = boxOptionsList;
 
-    const currBoxId = boxSelectEle.value;
+    return boxSelectEle.value;
+}
+
+// This is the list on shipping screen -> view shipping box contents
+export const populateBoxContentsList = async () => {
+    const boxIdAndBagsObj = appState.getState().detailedProviderBoxes;
+    const currBoxId = handleShippingBoxContentsSelector(boxIdAndBagsObj);
+    
     if (currBoxId != '') {
         const currBox = boxIdAndBagsObj[currBoxId];
-        const toInsertTable = document.getElementById('currTubeTable')
-        const boxKeys = Object.keys(currBox)
-        toInsertTable.innerHTML = renderViewBoxContentsTableHeader();
+        const shippingBoxContentsTable = document.getElementById('currTubeTable');
+        const boxKeys = Object.keys(currBox).filter(key => key !== 'boxData');
+
+        shippingBoxContentsTable.innerHTML = renderViewBoxContentsTableHeader();
 
         //set the rest of the table up
         for (let bagNum = 0; bagNum < boxKeys.length; bagNum++) {
@@ -1332,15 +1142,15 @@ export const populateBoxContentsList = async (boxIdAndBagsObj, userName) => {
             for (let tubeNum = 0; tubeNum < currTubes.length; tubeNum++) {
                 //get the tubeId
                 const fullTubeId = currTubes[tubeNum];
-                const tubeTypeDataSplit = fullTubeId.split(' ');
-                const tubeType = translateNumToType[tubeTypeDataSplit[1]] ? translateNumToType[tubeTypeDataSplit[1]] : 'N/A';
-                const rowCount = toInsertTable.rows.length;
-                const row = toInsertTable.insertRow(rowCount);
+                const tubeTypeStringArr = fullTubeId.split(' ');
+                const tubeType = translateNumToType[tubeTypeStringArr[1]] ? translateNumToType[tubeTypeStringArr[1]] : 'N/A';
+                const rowCount = shippingBoxContentsTable.rows.length;
+                const row = shippingBoxContentsTable.insertRow(rowCount);
                 
                 populateShippingBoxContentsRows(bagNum, tubeNum, row, currBagId, fullTubeId, tubeType);
                 if (tubeNum == 0) {
                     const currDeleteButton = row.cells[3].querySelector(".delButton");
-                    handleRemoveBagButton(currDeleteButton, currTubes, boxSelectEle, userName);
+                    handleRemoveBagButton(currDeleteButton, currTubes, currBoxId);
                 }
             }
         }
@@ -1351,36 +1161,48 @@ export const populateBoxContentsList = async (boxIdAndBagsObj, userName) => {
     }
 }
 
-const handleRemoveBagButton = (currDeleteButton, currTubes, boxSelectEle, userName) => {
+const handleRemoveBagButton = (currDeleteButton, currTubes, currBoxId) => {
     //This should remove the entire bag
     currDeleteButton.addEventListener("click", async e => {
         showAnimation();
         let row = e.target.closest('tr');
         const currBagId = row.cells[0].innerText;
         const bagsToRemove = currBagId === "unlabelled" ? currTubes : [currBagId];
-        const table = document.getElementById("currTubeTable");
+        //const table = document.getElementById("currTubeTable");
         
         //TODO consider not blocking the UI while this is happening
-        await removeBag(boxSelectEle.value, bagsToRemove);
-        
-        while (row && row.cells[0].innerText === "") {
-            let nextRow = row.nextElementSibling;
-            table.deleteRow(row.rowIndex);
-            row = nextRow;
-        }
+        const removeBagResponse = await removeBag(currBoxId, bagsToRemove);
+        console.log('removeBagResponse', removeBagResponse);
 
-        //TODO handle this better
-        const response = await getAllBoxes();
-        const boxList = response.data;
-        const boxIdAndBagsObj = generateUnshippedBoxIdAndBagsObj(boxList);
         hideAnimation();
 
-        await Promise.all([
-            populateSpecimensList(boxList),
-            populateBoxesToShipTable(boxIdAndBagsObj, boxList, userName),
-        ]);
+        if (removeBagResponse.code === 200) {
+            updateShippingStateRemoveBagFromBox(currBoxId, bagsToRemove);
+
+            //TODO handle this better
+            startShipping(appState.getState().userName, true);
+        } else {
+            //TODO handle the removeBag error case
+        }
     });
 }
+
+        // while (row && row.cells[0].innerText === "") {
+        //     let nextRow = row.nextElementSibling;
+        //     table.deleteRow(row.rowIndex);
+        //     row = nextRow;
+        // }
+
+        
+        // const response = await getAllBoxes();
+        // const boxList = response.data;
+        // const boxIdAndBagsObj = generateUnshippedBoxIdAndBagsObj(boxList);
+        // hideAnimation();
+
+        // await Promise.all([
+        //     populateAvailableCollectionsList(boxList),
+        //     populateBoxesToShipTable(boxIdAndBagsObj, boxList, userName),
+        // ]);
 
 const generateUnshippedBoxIdAndBagsObj = (boxList) => {
     const boxIdAndBagsObj = {};
@@ -1508,6 +1330,7 @@ const addNewBox = async (userName) => {
 
 }
 
+//TODO FIX (old version of populate...())
 export const addEventModalAddBox = (userName) => {
     let boxButton = document.getElementById('modalAddBoxButton');
     let createBoxSuccessAlertEl = document.getElementById("create-box-success");
@@ -1658,7 +1481,7 @@ export const populateTubeInBoxList = async (userName) => {
                     let boxList = response.data;
                     let boxIdAndBagsObj = {};
 
-                    await populateSpecimensList(boxList);
+                    await populateAvailableCollectionsList(boxList);
 
                     for (let i = 0; i < boxList.length; i++) {
                         if (!boxList[i].hasOwnProperty('145971562') || boxList[i]['145971562'] != '353358909') {
@@ -2934,7 +2757,16 @@ export const addEventNavBarShipment = (id, userName) => {
         let navButton = document.getElementById('navBarShippingDash')
         if (navButton.classList.contains('active')) return;
         await startShipping(userName);
+    });
+}
 
+export const addEventReturnToPackaging = () => {
+    const btn = document.getElementById('returnToPackaging');
+    btn.addEventListener('click', async e => {
+        e.stopPropagation();
+        let navButton = document.getElementById('navBarShippingDash')
+        if (navButton.classList.contains('active')) return;
+        await startShipping(appState.getState().userName, true);
     });
 }
 
@@ -2948,6 +2780,7 @@ export const addEventShipPrintManifest = (id) => {
   })
 }
 
+//TODO does this get used??
 export const addEventNavBarBoxManifest = (id, userName) => {
     const btn = document.getElementById(id);
     document.getElementById(id).addEventListener('click', e => {
@@ -3182,40 +3015,108 @@ export const addEventCheckValidTrackInputs = (boxIdAndBagsObj) => {
   })
 }
 
-export const populateSelectLocationList = async () => {
+// get available locations from firestore on the first load
+// save those locations in state and load from state on subsequent loads - if (availableLocations)
+export const populateSelectLocationList = async (availableLocations, loadFromState) => {
     const locationSelection = JSON.parse(localStorage.getItem('selections'))?.shipping_location;
-    let selectEle = document.getElementById('selectLocationList')
-    let response = await getLocationsInstitute();
-    let options = '<option value="none">Select Shipping Location</option>'
+    const selectEle = document.getElementById('selectLocationList')
     
-    for (let i = 0; i < response.length; i++) {
-        options += `<option ${locationSelection === response[i] ? 'selected="selected"' : ""}>` + response[i] + '</option>';
+    if (!loadFromState) {
+        availableLocations = await getLocationsInstitute();
     }
+    
+    const locationOptions = availableLocations.map(location => 
+        `<option ${locationSelection === location ? 'selected="selected"' : ""}>${location}</option>`
+    ).join('');
 
-    selectEle.innerHTML = options;
+    selectEle.innerHTML = locationOptions;
+
+    return availableLocations;
 }
 
-export const populateBoxManifestTable = (boxId, boxIdAndBagsObj, searchSpecimenInstituteArray) => {
-    const currTable = document.getElementById('boxManifestTable');
-    const bagObjects = boxIdAndBagsObj[boxId];
-    const bagList = Object.keys(bagObjects);
-    console.log('bagObjects - populateBoxManifestTable', bagObjects);
-    for (let i = 0; i < bagList.length; i++) {
-        const tubes = bagObjects[bagList[i]]['arrElements'];
+export const populateBoxManifestTable = (currBox) => {
+    const boxManifestTable = document.getElementById('boxManifestTable');
+    const bagList = Object.keys(currBox).filter(key => key !== 'boxData');
 
-        for (let j = 0; j < tubes.length; j++) {
-            const currTube = tubes[j];
-            const currRow = currTable.insertRow(j+1);
-            const tubeId = tubes[j].split(' ');
+    bagList.forEach((bagKey, i) => {
+        const tubesList = currBox[bagKey].arrElements;
+
+        for (let j = 0; j < tubesList.length; j++) {
+            const tubeDetail = currBox[bagKey].specimenDetails[tubesList[j]];
+            const currRow = boxManifestTable.insertRow(j + 1);
+            const tubeId = tubesList[j].split(' ');
             const tubeTypeAndColor = translateNumToType[tubeId[1]] ? translateNumToType[tubeId[1]] : 'N/A';
 
-            currRow.insertCell(0).innerHTML = j === 0 ? bagList[i] : '';
-            currRow.insertCell(1).innerHTML = currTube;
+            currRow.insertCell(0).innerHTML = j === 0 ? bagKey : '';
+            currRow.insertCell(1).innerHTML = tubesList[j];
             currRow.insertCell(2).innerHTML = tubeTypeAndColor;
 
-            addDeviationTypeCommentsContent(searchSpecimenInstituteArray, currTube, currRow, i);
+            addDeviationTypeCommentsContent(tubeDetail, currRow, i);
+        };
+    });
+}
+
+/**
+ * Function to add content to deviation type and comments cells in the manifest table
+ * @param {string} tubeDetail - tube with deviation data
+ * @param {object} currRow - current row of the manifest table
+ * @param {number} bagsArrayIndex - current index of the bags array
+*/
+const addDeviationTypeCommentsContent = (tubeDetail, currRow, bagsArrayIndex) => {
+    if (!tubeDetail) return;
+    
+    const acceptedDeviationArray = getSpecimenDeviation(tubeDetail);
+    const currTubeComments = getSpecimenComments(tubeDetail);
+    const deviationTypeCell = currRow.insertCell(3);
+    const commentCell = currRow.insertCell(4);
+    deviationTypeCell.classList.add('deviation-type-cell');
+    commentCell.classList.add('comments-cell');
+    
+    if (acceptedDeviationArray.length >= 1) {
+        let deviationString = '';
+        for (const deviationLabel of acceptedDeviationArray) {
+            deviationString += `${deviationLabel} <br>`;
+        }
+        deviationTypeCell.innerHTML = deviationString;
+    } else {
+        deviationTypeCell.innerHTML = `<br>`;
+    }
+    commentCell.innerHTML = currTubeComments;
+    
+    if (bagsArrayIndex % 2 === 0) {
+        currRow.style['background-color'] = 'lightgrey';
+    }
+}
+
+/** 
+ *  Returns an array of deviation type name(s) for a single specimen tube id or an empty array if no deviation type found.
+ *  @param {object} tubeDetail - tube with deviation data.
+ *  @returns {array} Example array - ['Hemolysis present'].
+ *  DeviationObj - current tube's deviation keys with yes or no values.
+ *  Push to acceptedDeviationArr if deviation not found in the the refused shipping deviation list and deviation exists.
+*/
+export const getSpecimenDeviation = (tubeDetail) => {
+    const acceptedDeviationArr = [];
+    if (tubeDetail[conceptIds.collection.tube.isCollected] === conceptIds.yes &&
+        tubeDetail[conceptIds.collection.tube.isDeviated] === conceptIds.yes) { 
+        const deviationObj = tubeDetail[conceptIds.collection.tube.deviation];
+        if (deviationObj) {
+            for (const deviation in deviationObj) {
+                if (!refusedShippingDeviationConceptList.includes(parseInt(deviation)) && deviationObj[deviation] === conceptIds.yes) {
+                    acceptedDeviationArr.push(deviationReasons.find(deviationReason => deviationReason['concept'] === parseInt(deviation))?.['label']);
+                }
+            }
         }
     }
+    return acceptedDeviationArr;
+}
+
+/**
+ * Returns a string of the Full Specimen ID's comments
+ * @param {object} tubeDetail - tube with deviation data
+ */
+export const getSpecimenComments = (tubeDetail) => {
+    return tubeDetail[conceptIds.collection.tube.deviationComments] ?? '';
 }
 
 export const populateTrackingQuery = async (boxIdAndBagsObj) => {
@@ -3861,7 +3762,7 @@ export const isScannedIdShipped = (getAllBoxesWithoutConversionResponse, masterS
 
 const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionResponse, masterSpecimenId) => {
   const getAllBoxesWithoutConversionData = getAllBoxesWithoutConversionResponse.data
-  const allBoxesNotShippedFilter = getAllBoxesWithoutConversionData.filter(box => !box.hasOwnProperty('145971562'))
+  const allBoxesNotShippedFilter = getAllBoxesWithoutConversionData.filter(box => !box.hasOwnProperty(conceptIds.submitShipmentFlag))
   const inputScanned = masterSpecimenId;
   let foundMatch = false
   let boxNumber
@@ -3874,145 +3775,19 @@ const findScannedIdInBoxesNotShippedObject = (getAllBoxesWithoutConversionRespon
     for(let bagConceptId of bagConceptIdList) {
       const bag = box[bagConceptId];
       if(
-        bag?.["223999569"] == inputScanned || // Biohazard Bag (mouthwash) scan
-        bag?.["522094118"] == inputScanned || // Orphan Bag/Container Scan
-        bag?.["787237543"] == inputScanned || // Biohazard Bag (Blood or Blood/Urine) ID
-        bag?.["234868461"]?.includes(inputScanned)){ // Check if input is found in (Samples Within - "234868461") array
-          foundMatch = true
-          boxNumber = box['132929440']
-          siteSpecificLocationId = box['560975149']
-          dataObj['foundMatch'] = foundMatch
-          dataObj['560975149'] = siteSpecificLocationId
-          dataObj['132929440'] = boxNumber
+        bag?.[conceptIds.bagscan_mouthWash] == inputScanned || // Biohazard Bag (mouthwash) scan 223999569
+        bag?.[conceptIds.bagscan_orphanBag] == inputScanned || // Orphan Bag/Container Scan //conceptIds.bagscan_orphanBag 522094118
+        bag?.[conceptIds.bagscan_bloodUrine] == inputScanned || // Biohazard Bag (Blood or Blood/Urine) ID 787237543
+        bag?.[conceptIds.tubesCollected]?.includes(inputScanned)){ // Check if input is found in (Samples Within - "234868461") array
+          foundMatch = true;
+          boxNumber = box[conceptIds.shippingBoxId];
+          siteSpecificLocationId = box[conceptIds.shippingLocation];
+          dataObj['foundMatch'] = foundMatch;
+          dataObj[conceptIds.shippingLocation] = siteSpecificLocationId;
+          dataObj[conceptIds.shippingBoxId] = boxNumber;
           break;
         }
     }
   }
-  return dataObj
-}
-
-/** 
- *  Returns an array of deviation type name(s) for a single specimen tube id or an empty array if no deviation type found
- *  @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
- *  @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. 'CXA321789 0001'
- *  @returns {array} Example array - ['Hemolysis present']
- *   
-*/ 
-export const getSpecimenDeviation = (searchSpecimenInstituteArray, currTube) => {
-    const { collection } = conceptIds
-    const { scannedId, isCollected, isDeviated, deviation } = conceptIds.collection.tube;
-    const [collectionId, tubeId] = currTube.split(/\s+/);
-    const tubeIdDeviationReasonArray = deviationReasons;
-    const specimenObj = searchSpecimenInstituteArray.find(specimen => (specimen[collection.id] === collectionId)) ?? {};
-    const acceptedDeviationArr = [];
-
-    for (const key in specimenObj) {
-        const currSpecimenKey = specimenObj[key]
-        // loop over all properties to find scannedId property - 825582494 
-        if (currSpecimenKey[scannedId] === currTube && currSpecimenKey[isCollected] === conceptIds.yes && currSpecimenKey[isDeviated] === conceptIds.yes) { 
-            // deviationObj - current tube's deviation keys with yes or no values 
-            const deviationObj = currSpecimenKey[deviation];
-            if (deviationObj) {
-                for (const deviation in deviationObj) {
-                    // deviation not found in the the refused shipping deviation list and deviation exists
-                    if (!refusedShippingDeviationConceptList.includes(parseInt(deviation)) && deviationObj[deviation] === conceptIds.yes) {
-                        acceptedDeviationArr.push(tubeIdDeviationReasonArray.find(deviationReason => deviationReason['concept'] === parseInt(deviation))?.['label']);
-                    }
-                }
-            }
-        }
-    }
-    return acceptedDeviationArr;
-}
-
-/**
- * Returns a string of the Full Specimen ID's comments
- * @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
- * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. 'CXA321789 0001'
- */
-export const getSpecimenComments = (searchSpecimenInstituteArray, currTube) => {
-    const { collection } = conceptIds;
-    const deviationComments = collection.tube.deviationComments;
-    const [collectionId, tubeId] = currTube.split(/\s+/);
-    const specimenObj = searchSpecimenInstituteArray.find(specimen => (specimen[collection.id] === collectionId)) ?? {};
-    const tubeIdToCid = specimenCollection['numToCid']?.[tubeId];
-    return specimenObj[tubeIdToCid]?.[deviationComments] ?? '';
-}
-
-/**
- * Function to add content to deviation type and comments cells in the manifest table
- * @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
- * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. 'CXA321789 0001'
- * @param {object} currRow - current row of the manifest table
- * @param {number} bagsArrayIndex - current index of the bags array
-*/
-
-const addDeviationTypeCommentsContentUPDATED = (searchSpecimenInstituteArray, currTube, currRow, bagsArrayIndex) => {
-    if (!currTube) return;
-
-    console.log('searchSpecimenInstituteArray', searchSpecimenInstituteArray);
-    console.log('currTube', currTube);
-    console.log('bagsArrayIndex', bagsArrayIndex);
-    
-    const acceptedDeviationArray = getSpecimenDeviation(searchSpecimenInstituteArray, currTube);
-    const currTubeComments = getSpecimenComments(searchSpecimenInstituteArray, currTube);
-    const deviationTypeCell = currRow.insertCell(3);
-    const commentCell = currRow.insertCell(4);
-    deviationTypeCell.classList.add('deviation-type-cell');
-    commentCell.classList.add('comments-cell');
-    
-    let deviationString = '';
-    if (acceptedDeviationArray.length >= 1) {
-        for (const deviationLabel of acceptedDeviationArray) {
-            deviationString += `${deviationLabel} <br>`;
-        }
-        deviationTypeCell.innerHTML = deviationString;
-    } else {
-        deviationTypeCell.innerHTML = `<br>`;
-    }
-    commentCell.innerHTML = currTubeComments;
-    
-    
-    if (bagsArrayIndex % 2 === 0) {
-        currRow.style['background-color'] = 'lightgrey';
-    }
-}
-
-/**
- * Function to add content to deviation type and comments cells in the manifest table
- * @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
- * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. 'CXA321789 0001'
- * @param {object} currRow - current row of the manifest table
- * @param {number} bagsArrayIndex - current index of the bags array
-*/
-
-const addDeviationTypeCommentsContent = (searchSpecimenInstituteArray, currTube, currRow, bagsArrayIndex) => {
-    if (!currTube) return;
-
-    // console.log('searchSpecimenInstituteArray', searchSpecimenInstituteArray);
-    // console.log('currTube', currTube);
-    // console.log('bagsArrayIndex', bagsArrayIndex);
-    
-    const acceptedDeviationArray = getSpecimenDeviation(searchSpecimenInstituteArray, currTube);
-    const currTubeComments = getSpecimenComments(searchSpecimenInstituteArray, currTube);
-    const deviationTypeCell = currRow.insertCell(3);
-    const commentCell = currRow.insertCell(4);
-    deviationTypeCell.classList.add('deviation-type-cell');
-    commentCell.classList.add('comments-cell');
-    
-    let deviationString = '';
-    if (acceptedDeviationArray.length >= 1) {
-        for (const deviationLabel of acceptedDeviationArray) {
-            deviationString += `${deviationLabel} <br>`;
-        }
-        deviationTypeCell.innerHTML = deviationString;
-    } else {
-        deviationTypeCell.innerHTML = `<br>`;
-    }
-    commentCell.innerHTML = currTubeComments;
-    
-    
-    if (bagsArrayIndex % 2 === 0) {
-        currRow.style['background-color'] = 'lightgrey';
-    }
+  return dataObj;
 }
