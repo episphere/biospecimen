@@ -2907,7 +2907,7 @@ export const addEventNavBarShippingManifest = (userName, tempCheckedEl) => {
         tempCheckStatus = tempCheckedEl.checked 
         // Push empty item with boxId and empty tracking number string
         // shipSetForage used to handle empty localforage or no box id match
-        boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
+        boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, [conceptIds.shippingTrackingNumber]: "" }));
         checkShipForage(shipSetForage,boxesToShip)
         //return box 1 info
         shippingPrintManifestReminder(boxesToShip, userName, tempCheckStatus, currShippingLocationNumber);
@@ -3114,15 +3114,15 @@ export const populateTrackingQuery = async (boxIdAndBagsObj) => {
     for(let box of shipData) {
       // if boxes has box id of localforage shipData push
       if(boxIdArray.includes(box["boxId"])) {
-        shipping[box["boxId"]] = {"959708259":box["959708259"], "confirmTrackNum": box["confirmTrackNum"] }
+        shipping[box["boxId"]] = {[conceptIds.shippingTrackingNumber]: box[conceptIds.shippingTrackingNumber], "confirmTrackNum": box["confirmTrackNum"] };
       }
       else {
-        shipping[box["boxId"]] = {"959708259":"" , confirmTrackNum:"", }
+        shipping[box["boxId"]] = {[conceptIds.shippingTrackingNumber]: "" , confirmTrackNum: ""};
       }
     }
     
     for(let i = 0; i < boxIdArray.length; i++){
-        let trackNum = boxIdArray[i] && shipping?.[boxIdArray[i]]?.["959708259"];
+        let trackNum = boxIdArray[i] && shipping?.[boxIdArray[i]]?.[conceptIds.shippingTrackingNumber];
         let trackNumConfirm = boxIdArray[i] && shipping?.[boxIdArray[i]]?.["confirmTrackNum"];
         toBeInnerHTML +=`
         <div class = "row" style="justify-content:space-around">
@@ -3214,9 +3214,9 @@ export const addEventSaveButton = async (boxIdAndBagsObj) => {
               break;
             }
 
-            shippingData.push({ "959708259": trackingId, confirmTrackNum: trackingIdConfirm, boxId});
+            shippingData.push({[conceptIds.shippingTrackingNumber]: trackingId, confirmTrackNum: trackingIdConfirm, boxId});
             boxIdAndTrackingObj[boxId] = {
-                959708259: trackingId,
+                [conceptIds.shippingTrackingNumber]: trackingId,
                 specimens: boxIdAndBagsObj[boxId],
               };
         }
@@ -3280,7 +3280,7 @@ export const addEventCompleteShippingButton = (boxIdAndTrackingObj, userName, bo
         let boxIdToTrackingNumberObj = {};
 
         for (const boxId in boxIdAndTrackingObj) {
-          boxIdToTrackingNumberObj[boxId] = boxIdAndTrackingObj[boxId]['959708259'];
+          boxIdToTrackingNumberObj[boxId] = boxIdAndTrackingObj[boxId][conceptIds.shippingTrackingNumber];
         }
 
         const shipment = await ship(boxIdToTrackingNumberObj, commonShippingData);
@@ -3317,7 +3317,7 @@ export const populateFinalCheck = (boxIdAndTrackingObj) => {
     let table = document.getElementById('finalCheckTable');
     let boxIdArray = Object.keys(boxIdAndTrackingObj).sort(compareBoxIds);
     for (const boxId of boxIdArray) {
-        const trackingNumber = boxIdAndTrackingObj[boxId]['959708259']
+        const trackingNumber = boxIdAndTrackingObj[boxId][conceptIds.shippingTrackingNumber];
         const specimenObj = boxIdAndTrackingObj[boxId]['specimens'];
         const bagArray = Object.keys(specimenObj);
         const numBags = specimenObj['orphans'] ? bagArray.length - 1 : bagArray.length;
@@ -3478,7 +3478,7 @@ export const populateBoxTable = async (page, filter) => {
           packagedCondition = currPage['238268405']
         }
 
-        currRow.insertCell(0).innerHTML = currPage.hasOwnProperty('959708259') ? currPage['959708259'] : '';
+        currRow.insertCell(0).innerHTML = currPage[conceptIds.shippingTrackingNumber] ?? '';
         currRow.insertCell(1).innerHTML = shippedDate;
         currRow.insertCell(2).innerHTML = conceptIdToSiteSpecificLocation[currPage['560975149']];
         currRow.insertCell(3).innerHTML = currPage['132929440'];
