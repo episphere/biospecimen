@@ -5,7 +5,7 @@ import { appState, performSearch, showAnimation, addBiospecimenUsers, hideAnimat
         convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
         checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, siteSpecificLocation,
         siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
-        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, getAllBoxesWithoutConversion,  bagConceptIdList, checkAccessionId, checkSurveyEmailTrigger,
+        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger,
         packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, requestsBlocker} from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
@@ -16,7 +16,7 @@ import { specimenTemplate } from './pages/specimen.js';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, totalCollectionIDLength, workflows, specimenCollection, deviationReasons, refusedShippingDeviationConceptList} from './tubeValidation.js';
-import { updateShippingStateAddBagToBox, updateShippingStateRemoveBagFromBox } from './shippingState.js';
+import { updateShippingStateAddBagToBox, updateShippingStateCreateBox, updateShippingStateRemoveBagFromBox } from './shippingState.js';
 import conceptIds from './fieldToConceptIdMapping.js';
 
 export const addEventSearchForm1 = () => {
@@ -179,11 +179,8 @@ export const getCurrBoxNumber = (j) => {
     return keys.length;
 }
 
-//TODO: update this - triggered from the input/scan box
-/**
- * Add specimen to box using the allBoxesList from state.
- * Return early if (1) no shipping location selected, (2) if the input is empty, (3) if item is already shipped, (4) if item is already in a box.
- */
+// Add specimen to box using the allBoxesList from state.
+// Return early if (1) no shipping location selected, (2) if the input is empty, (3) if item is already shipped, (4) if item is already in a box.
 export const addEventAddSpecimenToBox = () => {
     const form = document.getElementById('addSpecimenForm');
     form.addEventListener('submit', async e => {
@@ -269,8 +266,8 @@ const renderShippingModalHeader = () => {
         </button>`;
 }
 
+//get all ids from the available collections table and hidden orphan table
 const buildSpecimenDataInModal = (masterSpecimenId) =>{
-    //get all ids from the available collections table and hidden orphan table 
     const shippingTable = document.getElementById('specimenList');
     const orphanTable = document.getElementById('orphansList');
     
@@ -764,15 +761,16 @@ const buildPopulateSpecimensHeader = () => {
     `;
 }
 
-export const populateModalSelect = (boxIdAndBagsObj) => {
-    console.log('boxIdAndBagsObj - populateModalSelect', boxIdAndBagsObj);
+//TODO: future have this load from state instead of passing boxes (cleaner)
+export const populateModalSelect = (detailedProvierBoxes) => {
+    console.log('boxIdAndBagsObj - populateModalSelect', detailedProvierBoxes);
     const boxSelectEle = document.getElementById('shippingModalChooseBox');
     const selectedBoxId = boxSelectEle.getAttribute('data-new-box') || document.getElementById('selectBoxList').value;
     const addToBoxButton =  document.getElementById('addToBoxButton');
     
     addToBoxButton.removeAttribute("disabled")
     
-    const boxIds = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
+    const boxIds = Object.keys(detailedProvierBoxes).sort(compareBoxIds);
     const options = boxIds.map(boxId => `<option>${boxId}</option>`).join(''); 
 
     if (options == '') {
@@ -1047,7 +1045,7 @@ const handleShippingBoxContentsSelector = (boxIdAndBagsObj) => {
 }
 
 // This is the list on shipping screen -> view shipping box contents
-export const populateBoxContentsList = async () => {
+export const populateBoxContentsList = () => {
     const boxIdAndBagsObj = appState.getState().detailedProviderBoxes;
     const currBoxId = handleShippingBoxContentsSelector(boxIdAndBagsObj);
     
@@ -1098,7 +1096,7 @@ const handleRemoveBagButton = (currDeleteButton, currTubes, currBoxId) => {
             updateShippingStateRemoveBagFromBox(currBoxId, bagsToRemove);
             startShipping(appState.getState().userName, true);
         } else {
-            //TODO handle the removeBag error case
+            showNotifications({ title: 'Error removing bag', body: 'We experienced an error removing this bag. Please try again.' });
         }
     });
 }
@@ -1126,139 +1124,139 @@ const renderViewBoxContentsTableHeader = () => {
 }
 
 // TODO: this function needs to be refactored for efficiency & state management (remove getAllBoxes() call)
-const addNewBox = async (userName) => {
-    let response = await getAllBoxes();
-    let boxList = response.data;
-    let locations = {};
-    let keys = [];
-    let largestOverall = 0; /*Largest Box num value if it exists*/
-    let largeIndex = -1;
+const addNewBox = async () => {    
+    const pageLocation = document.getElementById('selectLocationList').value;
+    const pageLocationConversion = siteSpecificLocationToConceptId[pageLocation];
+    const loginSite = siteSpecificLocation[pageLocation]["siteCode"];
+    
+    const boxList = appState.getState().allBoxesList;
+    
+    const { largestBoxIndex, largestLocationIndex } = findLargestBoxData(boxList, pageLocation);
+    const shouldUpdateBoxModal = largestLocationIndex != -1 && Object.keys(boxList[largestLocationIndex]['bags']).length != 0;
+    
+    let largestBoxId;
+    if (shouldUpdateBoxModal) largestBoxId = boxList[largestBoxIndex][conceptIds.shippingBoxId];
+    else largestBoxId = largestBoxIndex !== -1 ? boxList[largestBoxIndex][conceptIds.shippingBoxId] : 'Box0';
 
+    if (largestLocationIndex == -1 || shouldUpdateBoxModal) {
+        const boxToAdd = await createNewBox(boxList, pageLocationConversion, loginSite, largestBoxId, shouldUpdateBoxModal);
+        if (!boxToAdd) return false;
+        //TODO: figure out what needs to change in state object (boxList) and update it.
+
+        // add box to allBoxesList and boxesByLocationList, and detailedProviderBoxes
+        updateShippingStateCreateBox(boxToAdd);
+        populateBoxContentsList();
+        return true;
+    } else {
+        return false;
+    }
+}
+
+const createNewBox = async (boxList, pageLocationConversion, loginSite, largestBoxId, updateBoxModal) => {
+    const newBoxNum = parseInt(largestBoxId.substring(3)) + 1;
+    const newBoxId = 'Box' + newBoxNum.toString();
+    const boxToAdd = {
+        'bags': {},
+        [conceptIds.shippingBoxId]: newBoxId,
+        [conceptIds.shippingLocation]: pageLocationConversion,
+        [conceptIds.siteCode]: loginSite,
+        [conceptIds.submitShipmentFlag]: conceptIds.no
+    };
+
+    try {
+        await addBox(boxToAdd);
+    } catch (e) {
+        console.log('Error adding box', e);
+        return null;
+    }
+    
+    boxList.push(boxToAdd);
+    if (updateBoxModal) document.getElementById('shippingModalChooseBox').setAttribute('data-new-box', newBoxId);
+
+    return boxToAdd;
+    // // Filtering and transforming the boxes that meet specific conditions
+    // return boxList.reduce((result, box) => {
+    //     if (box[conceptIds.shippingLocation] === pageLocationConversion && 
+    //         (!box.hasOwnProperty(conceptIds.submitShipmentFlag) || box[conceptIds.submitShipmentFlag] !== conceptIds.yes)) {
+    //         result[box[conceptIds.shippingBoxId]] = box['bags'];
+    //     }
+    //     return result;
+    // }, {});
+
+    // Assigning the new object to boxList
+    //boxList = newBoxList;
+    // const boxJSONS = boxList;
+
+    // boxList = {};
+    // for (let i = 0; i < boxJSONS.length; i++) {
+    //     const box = boxJSONS[i]
+    //     if (box[conceptIds.shippingLocation] == pageLocationConversion) {
+    //         if (!box.hasOwnProperty(conceptIds.submitShipmentFlag) || box[conceptIds.submitShipmentFlag] !== conceptIds.yes) {
+    //             boxList[box[conceptIds.shippingBoxId]] = box['bags'];
+    //         }
+    //     }
+    // }
+
+    
+
+    //return boxList;
+}
+
+const findLargestBoxData = (boxList, pageLocation) => {
+    let largestBoxNum = 0; //Largest Box num value if it exists
+    let largestBoxIndex = -1;
     let largestLocation = 0;
-    let largestLocationIndex = -1; /* If getAllBoxes has box with box# value*/
-    let pageLocation = document.getElementById('selectLocationList').value;
+    let largestLocationIndex = -1; //If allBoxesList has box with box# value
 
-    let pageLocationConversion = siteSpecificLocationToConceptId[pageLocation];
-    let loginSite = siteSpecificLocation[pageLocation]["siteCode"]
-    // loop through entire hiddenJSON and determine the largest boxid number
-    // hiddenJSON includes in process and shipped boxes
     for (let i = 0; i < boxList.length; i++) {
-        let curr = parseInt(boxList[i]['132929440'].substring(3))
-        let currLocation = conceptIdToSiteSpecificLocation[boxList[i]['560975149']]
+        const curr = parseInt(boxList[i][conceptIds.shippingBoxId].substring(3));
+        const currLocation = conceptIdToSiteSpecificLocation[boxList[i][conceptIds.shippingLocation]];
 
-        if (curr > largestOverall) {
-            largestOverall = curr;
-            largeIndex = i;
+        if (curr > largestBoxNum) {
+            largestBoxNum = curr;
+            largestBoxIndex = i;
         }
         if (curr > largestLocation && currLocation == pageLocation) {
             largestLocation = curr;
             largestLocationIndex = i;
         }
-
     }
 
-    if (largestLocationIndex != -1) {
-      // find index of largest box and assign boxid
-        let lastBox = boxList[largeIndex]['132929440']
-        // check if largest boxid number has bags
-        if (Object.keys(boxList[largestLocationIndex]['bags']).length != 0) {
-            //add a new Box
-            //create new Box Id
-            let newBoxNum = parseInt(lastBox.substring(3)) + 1;
-            if (newBoxNum === undefined) {
-                newBoxNum = 1;
-            }
-            let newBoxId = 'Box' + newBoxNum.toString();
-            let toPass = {};
-            toPass['132929440'] = newBoxId;
-            toPass['bags'] = {};
-            toPass['560975149'] = pageLocationConversion;
-            toPass['789843387'] = loginSite
-            await addBox(toPass);
-            boxList.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocationConversion })
-            let boxJSONS = boxList;
-
-            boxList = {};
-
-            for (let i = 0; i < boxJSONS.length; i++) {
-                let box = boxJSONS[i]
-                if (box['560975149'] == pageLocationConversion) {
-                    if (!box.hasOwnProperty('145971562') || box['145971562'] !== '353358909') {
-                        boxList[box['132929440']] = box['bags']
-                    }
-                }
-            }
-            document.getElementById('shippingModalChooseBox').setAttribute('data-new-box', newBoxId);
-            await populateBoxContentsList(boxList, userName)
-            return true
-        }
-        else {
-            return false
-        }
-    }
-    else {
-        //add a new Box
-        //create new Box Id
-        let lastBox = 'Box0'
-        if (largeIndex != -1) {
-            lastBox = boxList[largeIndex]['132929440']
-        }
-        let newBoxNum = parseInt(lastBox.substring(3)) + 1;
-        let newBoxId = 'Box' + newBoxNum.toString();
-        let toPass = {};
-        toPass['132929440'] = newBoxId;
-        toPass['bags'] = {};
-        toPass['560975149'] = pageLocationConversion;
-        toPass['789843387'] = loginSite;
-        await addBox(toPass);
-        boxList.push({ '132929440': newBoxId, bags: {}, '560975149': pageLocationConversion })
-        let boxJSONS = boxList;
-
-        boxList = {};
-        for (let i = 0; i < boxJSONS.length; i++) {
-            let box = boxJSONS[i]
-            if (box['560975149'] == pageLocationConversion) {
-                if (!box.hasOwnProperty('145971562') || box['145971562'] !== '353358909') {
-                    boxList[box['132929440']] = box['bags']
-                }
-            }
-        }
-        await populateBoxContentsList(boxList, userName)
-        return true
-    }
-
+    return { largestBoxIndex, largestLocationIndex };
 }
 
-//TODO: FIX (old version of populate...())
-export const addEventModalAddBox = (userName) => {
-    let boxButton = document.getElementById('modalAddBoxButton');
-    let createBoxSuccessAlertEl = document.getElementById("create-box-success");
-    let createBoxErrorAlertEl = document.getElementById("create-box-error");
+
+//TODO: handle state changes and remove getBoxesByLocation() call or run routine to update state after fetch (temporary solution)
+export const addEventModalAddBox = () => {
+    const boxButton = document.getElementById('modalAddBoxButton');
+    const createBoxSuccessAlertEle = document.getElementById("create-box-success");
+    const createBoxErrorAlertEle = document.getElementById("create-box-error");
     boxButton.addEventListener('click', async () => {
         // Check whether a box is being added. If so, return.
         if (document.body.getAttribute('data-adding-box')) return;
-
-        let alertState = ''
         document.body.setAttribute('data-adding-box', 'true');
+        
         showAnimation();
-        // returns boolean value
-        let notifyCreateBox = await addNewBox(userName);
-        alertState = notifyCreateBox
-        let currLocation = document.getElementById('selectLocationList').value;
-        let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
-        let response = await getBoxesByLocation(currLocationConceptId);
-        let boxArray = response.data;
-        let currLocationBoxObjects = {};
-        for (let i = 0; i < boxArray.length; i++) {
-            let box = boxArray[i]
-            currLocationBoxObjects[box['132929440']] = box['bags']
-        }
-        populateModalSelect(currLocationBoxObjects)
-        await populateBoxContentsList(currLocationBoxObjects, userName);
-        hideAnimation()
-        checkAlertState(alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl)
+        const isCreateBoxSuccess = await addNewBox();
+        hideAnimation();
+        // const currLocation = document.getElementById('selectLocationList').value;
+        // const currLocationConceptId = siteSpecificLocationToConceptId[currLocation];
+
+        // //TODO: get this locally from state (make sure it's updated with the new box that was added)
+        // const response = await getBoxesByLocation(currLocationConceptId);
+        // const boxArray = response.data;
+        // const currLocationBoxObjects = {};
+        // for (let i = 0; i < boxArray.length; i++) {
+        //     let box = boxArray[i];
+        //     currLocationBoxObjects[box[conceptIds.shippingBoxId]] = box['bags'];
+        // }
+
+        //TODO: this loads detailedProviderBoxes from state (make sure it's updated with the new box that was added)
+        const detailedProviderBoxes = appState.getState().detailedProviderBoxes;
+        populateModalSelect(detailedProviderBoxes);
+        populateBoxContentsList();
+        checkAlertState(isCreateBoxSuccess, createBoxSuccessAlertEle, createBoxErrorAlertEle)
         // reset alertState
-        alertState = ''
         document.body.removeAttribute('data-adding-box');
     }
   )}
@@ -1408,32 +1406,31 @@ export const addEventBoxSelectListChanged = () => {
     })
 }
 
-export const addEventChangeLocationSelect = (userName) => {
-    let locationSelectEle = document.getElementById('selectLocationList');
-    locationSelectEle.addEventListener("change", async () => {
-        let currLocation = locationSelectEle.value;
-        if (currLocation !== 'none') {
-            showAnimation();
-            let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
-            let boxArray = (await getBoxesByLocation(currLocationConceptId)).data;
+// //TODO: FIX (old version of populate...())
+// export const addEventChangeLocationSelect = (userName) => {
+//     let locationSelectEle = document.getElementById('selectLocationList');
+//     locationSelectEle.addEventListener("change", async () => {
+//         let currLocation = locationSelectEle.value;
+//         if (currLocation !== 'none') {
+//             showAnimation();
+//             //TODO: remove this and use state
+//             let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
+//             let boxArray = (await getBoxesByLocation(currLocationConceptId)).data;
 
-            let boxIdAndBagsObj = {};
-            for (let i = 0; i < boxArray.length; i++) {
-                let box = boxArray[i]
-                boxIdAndBagsObj[box['132929440']] = box['bags']
-            }
+//             let boxIdAndBagsObj = {};
+//             for (let i = 0; i < boxArray.length; i++) {
+//                 let box = boxArray[i]
+//                 boxIdAndBagsObj[box['132929440']] = box['bags']
+//             }
 
-            await populateBoxContentsList(boxIdAndBagsObj, userName);
-            hideAnimation();
-        }
-        else {
-            showAnimation();
-            let boxObjects = {};
-            await populateBoxContentsList(boxObjects, userName);
-            hideAnimation();
-        }
-    })
-}
+//             populateBoxContentsList();
+//             hideAnimation();
+//         }
+//         else {            
+//             populateBoxContentsList();
+//         }
+//     })
+// }
 
 export const addEventBackToSearch = (id) => {
     document.getElementById(id).addEventListener('click', e => {

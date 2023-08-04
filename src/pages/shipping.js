@@ -1,10 +1,9 @@
-import { appState, userAuthorization, removeActiveClass, displayContactInformation, getBoxes, getAllBoxes, hideAnimation, showAnimation, showNotifications, siteSpecificLocationToConceptId, locationConceptIDToLocationMap } from "./../shared.js"
+import { appState, userAuthorization, removeActiveClass, displayContactInformation, getBoxes, getAllBoxes, hideAnimation, showAnimation, showNotifications, locationConceptIDToLocationMap } from "./../shared.js"
 import { addEventBackToSearch, addEventAddSpecimenToBox, populateAvailableCollectionsList, addEventNavBarShipment, addEventNavBarBoxManifest, formatBoxTimestamp, populateBoxManifestTable, populateBoxesToShipTable,
          populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxContentsList, addEventBoxSelectListChanged,
          addEventCompleteShippingButton, populateSelectLocationList, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents,
          populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventReturnToPackaging, addEventShipPrintManifest, addEventTrackingNumberScanAutoFocus } from "./../events.js";
 import { homeNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
-import { specimenCollection } from "../tubeValidation.js";
 import { setAllShippingState } from "../shippingState.js";
 import conceptIds from '../fieldToConceptIdMapping.js';
 
@@ -93,121 +92,27 @@ const buildShippingInterface = async (selectedLocation, userName, loadFromState)
     const { finalizedSpecimenList, availableCollectionsObj } = promiseResponse[0];
     availableLocations = promiseResponse[1];
 
-    const boxesByProviderList = filterUnshippedBoxes(allBoxesList);
-    const providerBoxesObj = createBoxAndBagsObj(boxesByProviderList); // provider-specific data in the 'select boxes to ship' section
-    const providerBoxWithSpecimenData = addSpecimenDataToDetailBox(providerBoxesObj, finalizedSpecimenList);
-    const detailedProviderBoxes = addBoxDataToDetailBox(providerBoxWithSpecimenData, boxesByProviderList);
-    console.log('detailedProviderBoxes - startShipping', detailedProviderBoxes);
-
-    setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, detailedProviderBoxes, finalizedSpecimenList, userName);
+    setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName, selectedLocation);
 
     populateBoxContentsList(), // 'View Shipping Box Contents' section
     populateBoxesToShipTable(), // 'Select boxes to ship' section
-    
-    addShippingEventListeners(userName);
+    addShippingEventListeners();
     populateTempNotification();
 
     hideAnimation();
 }
 
-const filterUnshippedBoxes = (boxList) => {
-    return boxList.filter(box => !box[conceptIds.submitShipmentFlag] || !box[conceptIds.submitShipmentFlag] === conceptIds.yes);
-}
-
-// retain for future use
-const filterBoxesByLocation = (boxList, selectedLocation) => {
-    if (selectedLocation === 'none') return [];
-    const selectedLocationConceptId = siteSpecificLocationToConceptId[selectedLocation];
-    return boxList.filter(box => box[conceptIds.shippingLocation] === selectedLocationConceptId);
-}
-
-const createBoxAndBagsObj = (boxList) => {
-    return boxList.reduce((createdObj, boxInList) => {
-        const boxId = boxInList[conceptIds.shippingBoxId];
-        createdObj[boxId] = boxInList['bags'];
-
-        return createdObj;
-    }, {});
-}
-
-/**
- * Add specimen details to the box object. This is used in generateBoxManifest (and TODO future: shipping reports)
- * @param {object} boxAndBagsObj - the basic box object with bag ids and tube ids (arrElements)
- * @param {object} finalizedSpecimenList - the list of specimen data where finalized === true
- * @returns {object} - the box object with specimen details added
- * iterate through the box object, focusing on each bag in the box.
- * for each bag, find the specimen bag id (first element in the arrElements array)
- * find the specimen details for that specimen bag id in the finalizedSpecimenList
- * add the specimen details to the box object (collectionId, healthcareProvider, collectionLocation, collection.note, and detailed specimen data for each specimenId in arrElements)
- */
-const addSpecimenDataToDetailBox = (boxAndBagsObj, finalizedSpecimenList) => {
-    const specimenBagLookup = finalizedSpecimenList.reduce((acc, specimen) => {
-        acc[specimen[conceptIds.collection.id]] = specimen;
-        return acc;
-    }, {});
-    
-    for (let boxObj in boxAndBagsObj) {
-        const box = boxAndBagsObj[boxObj];
-        for (let bagId in box) {
-            const bag = box[bagId];
-            const specimenDetails = boxAndBagsObj[boxObj][bagId]['specimenDetails'] = {};
-            if (bag.arrElements && bag.arrElements.length > 0) {
-                const specimenBagId = bag.arrElements[0].split(' ')[0];
-                const foundSpecimenDetailsBag = specimenBagLookup[specimenBagId];
-                if (foundSpecimenDetailsBag) {
-                    specimenDetails['collectionData'] = {};
-                    specimenDetails['collectionData'][conceptIds.collection.id] = foundSpecimenDetailsBag[conceptIds.collection.id];
-                    specimenDetails['collectionData'][conceptIds.healthcareProvider] = foundSpecimenDetailsBag[conceptIds.healthcareProvider];
-                    specimenDetails['collectionData'][conceptIds.collectionLocation] = foundSpecimenDetailsBag[conceptIds.collectionLocation];
-                    specimenDetails['collectionData'][conceptIds.collection.note] = foundSpecimenDetailsBag[conceptIds.collection.note];
-                    for (let specimenId of bag.arrElements) {
-                        const specimenKey = specimenCollection.numToCid[specimenId.split(' ')[1]];    
-                        specimenDetails[specimenId] = foundSpecimenDetailsBag[specimenKey] ? foundSpecimenDetailsBag[specimenKey] : {};
-                    }
-                }
-            }
-            boxAndBagsObj[boxObj][bagId]['specimenDetails'] = specimenDetails;
-        }
-    }
-
-    return boxAndBagsObj;
-}
-
-const addBoxDataToDetailBox = (boxAndBagsObj, boxList) => {
-    const boxListLookup = boxList.reduce((acc, box) => {
-        acc[box[conceptIds.shippingBoxId]] = box;
-        return acc;
-    }, {});
-
-    for (let boxObj in boxAndBagsObj) {
-        const boxInList = boxListLookup[boxObj];
-
-        const boxData = {};
-        boxData[conceptIds.firstBagAddedToBoxTimestamp] = boxInList[conceptIds.firstBagAddedToBoxTimestamp];
-        boxData[conceptIds.shippingShipDateModify] = boxInList[conceptIds.shippingShipDateModify];
-        boxData[conceptIds.shippingLocation] = boxInList[conceptIds.shippingLocation];
-        boxData[conceptIds.loginSite] = boxInList[conceptIds.loginSite];
-        boxData[conceptIds.containsOrphanFlag] = boxInList[conceptIds.containsOrphanFlag];
-        boxData[conceptIds.shippingBoxId] = boxInList[conceptIds.shippingBoxId];
-        boxData[conceptIds.submitShipmentFlag] = boxInList[conceptIds.submitShipmentFlag] ?? conceptIds.no;
-        boxData[conceptIds.shippedByFirstName] = boxInList[conceptIds.shippedByFirstName] ?? '';
-        boxData['siteAcronym'] = boxInList['siteAcronym'];
-
-        boxAndBagsObj[boxObj]['boxData'] = boxData;
-    }
-
-    return boxAndBagsObj;
-}
-
-const addShippingEventListeners = (userName) => {
+//TODO: use state for userName refs
+const addShippingEventListeners = () => {
+    const userName = appState.getState().userName;
     const tempMonitorCheckedEl = document.getElementById('tempMonitorChecked');
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarShippingManifest(userName, tempMonitorCheckedEl);
     addEventBoxSelectListChanged();
     addEventNavBarBoxManifest("navBarBoxManifest", userName); //TODO does this get used?
     addEventLocationSelect("selectLocationList", "shipping_location", userName);
-    addEventAddSpecimenToBox(userName);
-    addEventModalAddBox(userName);
+    addEventAddSpecimenToBox();
+    addEventModalAddBox();
 }
 
 const getStoredLocationOnInit = () => {

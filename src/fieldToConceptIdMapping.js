@@ -15,7 +15,6 @@ export default {
     //booleanOne: 353358909,
     verficationDate: 914594314,
     submitShipmentFlag: 145971562,
-    shipmentIsSubmitted: 145971562,
     firstBagAddedToBoxTimestamp: 672863981,
     shippingShipDateModify: 555611076,
     shippingTrackingNumber: 959708259,

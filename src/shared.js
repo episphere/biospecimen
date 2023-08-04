@@ -527,8 +527,6 @@ export const checkDerivedVariables = async (array) => {
 }
 
 export const addBox = async (box) =>{
-  console.log('calling addBox');
-  console.time('addBox');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -539,7 +537,6 @@ export const addBox = async (box) =>{
         body: JSON.stringify(convertToFirestoreBox(box))
     }
     const response = await fetch(`${api}api=addBox`, requestObj);
-    console.timeEnd('addBox');
     return response.json();
 }
 
@@ -784,22 +781,6 @@ export const getBoxes = async () => {
   return { data: boxesToReturn };
 };
 
-export const getAllBoxesWithoutConversion =  async (flag) => { // make new function to return filtered boxes
-  console.log('calling getAllBoxesWithoutConversion');
-  console.time('getAllBoxesWithoutConversion');
-  const idToken = await getIdToken();
-  if (flag !== `bptl`) flag = ``
-  const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + idToken,
-    }
-  });
-  let res = await response.json();
-  console.timeEnd('getAllBoxesWithoutConversion');
-  return res;
-};
-
 export const getAllBoxes = async (flag) => {
   console.log('calling getAllBoxes');
   console.time('getAllBoxes');
@@ -900,14 +881,10 @@ export const searchSpecimenInstitute = async () => {
         Authorization:"Bearer "+idToken
         }
     });
-
+    console.timeEnd('searchSpecimenInstitute');
     if (response.status === 200) {
-        const responseObject = await response.json();
-        console.log('responseObject: ', responseObject);
-        console.timeEnd('searchSpecimenInstitute');
-        return responseObject;
-    }
-    else {
+        return await response.json();
+    } else {
         console.error("searchSpecimenInstitute's responseObject status code not 200!");
         return [];
     }
@@ -2333,6 +2310,7 @@ export const sortBiospecimensList = (biospecimensList) => {
   bioArr.sort((a, b) => tubeOrder.indexOf(a.tubeId) - tubeOrder.indexOf(b.tubeId))
   return bioArr.map(item => item.tubeId)
 }
+
 export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl) => {
   if (typeof alertState === "boolean") {
     if (alertState) {
