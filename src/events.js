@@ -3169,11 +3169,15 @@ export const addEventSaveAndContinueButton = async (boxIdAndBagsObj, userName, b
                 return;
             }
         
-            shippingData.push({ 959708259: trackingId, confirmTrackNum: trackingIdConfirm, boxId});
+            shippingData.push({
+              [conceptIds.shippingTrackingNumber]: trackingId,
+              confirmTrackNum: trackingIdConfirm,
+              boxId
+            });
             boxIdAndTrackingObj[boxId] = {
-                959708259: trackingId,
-                specimens: boxIdAndBagsObj[boxId],
-              };
+              [conceptIds.shippingTrackingNumber]: trackingId,
+              specimens: boxIdAndBagsObj[boxId]
+            };
         }
 
         const isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxIdArray );
@@ -3187,7 +3191,7 @@ export const addEventSaveAndContinueButton = async (boxIdAndBagsObj, userName, b
           return;
         }
 
-        localforage.setItem("shipData",shippingData);
+        localforage.setItem("shipData", shippingData);
         const shipmentCourier = document.getElementById('courierSelect').value;
         finalShipmentTracking({boxIdAndBagsObj, boxIdAndTrackingObj, userName, boxWithTempMonitor, shipmentCourier});
     })

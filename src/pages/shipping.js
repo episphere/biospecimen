@@ -1,5 +1,5 @@
 import { userAuthorization, removeActiveClass, getBoxes, getAllBoxes, getBoxesByLocation, hideAnimation, showAnimation, showNotifications, siteSpecificLocationToConceptId, locationConceptIDToLocationMap, addSelectionEventListener, searchSpecimenInstitute } from "./../shared.js";
-import { addEventAddSpecimenToBox, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventSaveAndContinueButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, addEventNavBarAssignTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventShipPrintManifest, addEventTrackingNumberScanAutoFocus } from "./../events.js";
+import { addEventAddSpecimenToBox, populateSpecimensList, addEventNavBarShipment, addEventNavBarBoxManifest, populateBoxManifestTable, populateBoxManifestHeader, populateSaveTable, populateShippingManifestBody, populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventSaveAndContinueButton, populateFinalCheck, populateBoxSelectList, addEventBoxSelectListChanged, addEventCompleteShippingButton, populateSelectLocationList, addEventChangeLocationSelect, addEventModalAddBox, populateTempNotification, addEventNavBarAssignTracking, addEventReturnToReviewShipmentContents, populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventShipPrintManifest, addEventTrackingNumberScanAutoFocus } from "./../events.js";
 import { homeNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
 import conceptIds from '../fieldToConceptIdMapping.js';
 
@@ -382,31 +382,30 @@ export const shippingManifest = async (boxIdArray, userName, isTempMonitorInclud
     });
 
     hideAnimation();
-
-    function tempSelectStringRender({boxIdArray, isTempMonitorIncluded}) {
-        let tempSelectString = '';
-        if (isTempMonitorIncluded) {
-            tempSelectString = `
-                <div style="display:block">
-                    <p>Select the box that contains the temperature monitor</p>
-                    <select name="tempBox" id="tempBox">
-                    <option disabled value> -- select a box -- </option>
-                    ${boxIdArray
-                      .map((boxId, idx) =>
-                        idx === 0
-                          ? `<option selected value="${boxId}">${boxId}</option>`
-                          : `<option value="${boxId}">${boxId}</option>`
-                      )
-                      .join("")}
-                    </select>
-                </div>
-            `;
-        }
-
-        return tempSelectString;
-    }
-
 };
+
+function tempSelectStringRender({ boxIdArray, isTempMonitorIncluded }) {
+  let tempSelectString = "";
+  if (isTempMonitorIncluded) {
+    tempSelectString = `
+            <div style="display:block">
+                <p>Select the box that contains the temperature monitor</p>
+                <select name="tempBox" id="tempBox">
+                <option disabled value> -- select a box -- </option>
+                ${boxIdArray
+                  .map((boxId, idx) =>
+                    idx === 0
+                      ? `<option selected value="${boxId}">${boxId}</option>`
+                      : `<option value="${boxId}">${boxId}</option>`
+                  )
+                  .join("")}
+                </select>
+            </div>
+        `;
+  }
+
+  return tempSelectString;
+}
 
 export const shipmentTracking = async (boxIdAndBagsObj, userName, boxWithTempMonitor) => {
     showAnimation();
