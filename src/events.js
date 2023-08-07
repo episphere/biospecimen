@@ -1,12 +1,12 @@
 import { appState, performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant,
-        errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, filterSpecimenCollectionList, addBox, updateBox, getBoxes,
-        ship, getLocationsInstitute, getBoxesByLocation, disableInput, removeBag, removeMissingSpecimen, getAllBoxes, updateNewTempDate, getSiteTubesLists, getWorkflow, 
+        errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, filterSpecimenCollectionList, addBox, updateBox,
+        ship, getLocationsInstitute, disableInput, removeBag, removeMissingSpecimen, getAllBoxes, updateNewTempDate, getSiteTubesLists, getWorkflow, 
         getSiteCouriers, getPage, getNumPages, removeSingleError, displayContactInformation, checkShipForage, checkAlertState, sortBiospecimensList, retrieveDateFromIsoString,
         convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
         checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData, siteSpecificLocation,
         siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
         getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger,
-        packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, requestsBlocker} from './shared.js';
+        packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, requestsBlocker } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest, startReport } from './pages/reportsQuery.js';
 import { startShipping, generateBoxManifest, shippingManifest, finalShipmentTracking, shipmentTracking } from './pages/shipping.js';
@@ -370,51 +370,42 @@ const addRowToModalTable = (isBagEmpty, tubeTable, splitTubeIdArray, tubeId) => 
     return isBagEmpty;
 }
 
-//TODO implement state management
 export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrphan) => {
-    const submitButton = document.getElementById('addToBoxButton')
+    const submitButton = document.getElementById('addToBoxButton');
     submitButton.addEventListener('click', async e => {
         e.preventDefault();
-        showAnimation();
 
-        //TODO: handle when new box is added
         const boxList = appState.getState().allBoxesList;
         const locations = {};
         let boxIdAndBagsObj = {};
         for (let i = 0; i < boxList.length; i++) {
             const box = boxList[i];
-            boxIdAndBagsObj[box[conceptIds.shippingBoxId]] = box['bags']
+            boxIdAndBagsObj[box[conceptIds.shippingBoxId]] = box['bags'];
             locations[box[conceptIds.shippingBoxId]] = box[conceptIds.shippingLocation];
         }
 
-        const boxId = updateBoxListModalUIValue();
-        boxIdAndBagsObj = processCheckedModalElements(boxIdAndBagsObj, bagId, boxId, isOrphan, tableIndex);
-        console.log('boxIdAndBagsObj - update modal - 1', boxIdAndBagsObj);
+        const currBoxId = updateBoxListModalUIValue();
+        boxIdAndBagsObj = processCheckedModalElements(boxIdAndBagsObj, bagId, currBoxId, isOrphan, tableIndex);
 
-        if (boxIdAndBagsObj.hasOwnProperty(boxId)) {
-            const boxToUpdate = prepareBoxToUpdate(boxId, boxList, boxIdAndBagsObj, locations);
+        if (boxIdAndBagsObj.hasOwnProperty(currBoxId)) {
+            const boxToUpdate = prepareBoxToUpdate(currBoxId, boxList, boxIdAndBagsObj, locations);
+            showAnimation();
             const boxUpdateResponse = await updateBox(boxToUpdate);
+            hideAnimation();
             if (boxUpdateResponse.code === 200) {
                 //TODO: update state here
+                updateShippingStateAddBagToBox(currBoxId, bagId, boxToUpdate);
+                startShipping(appState.getState().userName, true, currBoxId);
             } else {
                 showNotifications({ title: 'Error', body: 'Error updating box' }, true);
-                hideAnimation();
-                return;
             }
         }
-
-        hideAnimation();
-        //TODO: pass true as second arg)
-        startShipping(appState.getState().userName);
-
     }, { once: true })
 }
 
 const updateBoxListModalUIValue = () => {
     const shippingModalChooseBox = document.getElementById('shippingModalChooseBox');
     const boxId = shippingModalChooseBox.value;
-    console.log('shippingModalChooseBox', shippingModalChooseBox);
-    console.log('boxId', boxId);
     document.getElementById('selectBoxList').value = boxId;
     
     return boxId;
@@ -422,16 +413,15 @@ const updateBoxListModalUIValue = () => {
 
 const processCheckedModalElements = (boxIdAndBagsObj, bagId, boxId, isOrphan, tableIndex) => {
     const allCheckboxEle = document.querySelectorAll(".samplePresentCheckbox");
-    const nameSplit = appState.getState().userName.split(/\s+/);
-    const firstName = nameSplit[0] ? nameSplit[0] : '';
-    const lastName = nameSplit[1] ? nameSplit[1] : '';
+    const [firstName = '', lastName = ''] = appState.getState().userName.split(/\s+/);
+    console.log('firstName', firstName, 'lastName', lastName);
     const checkedEleList = Array.from(allCheckboxEle).filter(ele => ele.checked);
     const tubesToDelete = [];
 
     if (isOrphan) bagId = 'unlabelled';
 
-    for (let i = 0; i < checkedEleList.length; i++) {
-        const specimenIdToAdd = checkedEleList[i].getAttribute("data-full-specimen-id"); // data-full-specimen-id (Ex. "CXA444444 0007")
+    for (const checkedEle of checkedEleList) {
+        const specimenIdToAdd = checkedEle.getAttribute("data-full-specimen-id"); // data-full-specimen-id (Ex. "CXA444444 0007")
         const [collectionId, tubeId] = specimenIdToAdd.split(/\s+/);
         tubesToDelete.push(tubeId);
 
@@ -441,14 +431,21 @@ const processCheckedModalElements = (boxIdAndBagsObj, bagId, boxId, isOrphan, ta
 
         if (boxIdAndBagsObj.hasOwnProperty(boxId)) {
             if (boxIdAndBagsObj[boxId].hasOwnProperty(bagId)) {
-                const arr = boxIdAndBagsObj[boxId][bagId]['arrElements'];
-                arr.push(specimenIdToAdd);
+                boxIdAndBagsObj[boxId][bagId]['arrElements'].push(specimenIdToAdd);
             } else {
-                boxIdAndBagsObj[boxId][bagId] = { 'arrElements': [specimenIdToAdd], '469819603': firstName, '618036638': lastName };
+                boxIdAndBagsObj[boxId][bagId] = {
+                    'arrElements': [specimenIdToAdd],
+                    [conceptIds.scannedByFirstName]: firstName,
+                    [conceptIds.scannedByLastName]: lastName
+                };
             }
         } else {
             boxIdAndBagsObj[boxId] = {}
-            boxIdAndBagsObj[boxId][bagId] = { 'arrElements': [specimenIdToAdd], '469819603': firstName, '618036638': lastName };
+            boxIdAndBagsObj[boxId][bagId] = {
+                'arrElements': [specimenIdToAdd],
+                [conceptIds.scannedByFirstName]: firstName,
+                [conceptIds.scannedByLastName]: lastName
+            };
         }
     }
     handleAvailableCollectionsTableRows(tableIndex, tubesToDelete);
@@ -457,36 +454,51 @@ const processCheckedModalElements = (boxIdAndBagsObj, bagId, boxId, isOrphan, ta
 }
 
 const prepareBoxToUpdate = (boxId, boxList, boxIdAndBagsObj, locations) => {
-    console.log('locations', locations);
-    let found = false;
     const currTime = new Date().toISOString();
-    const boxToUpdate = {};
-    for (const box of boxList) {
-        if (box[conceptIds.shippingBoxId] == boxId) {
-            if (box.hasOwnProperty(conceptIds.firstBagAddedToBoxTimestamp)) {
-                boxToUpdate[conceptIds.firstBagAddedToBoxTimestamp] = box[conceptIds.firstBagAddedToBoxTimestamp];
-                found = true;
-            }
-            if (box.hasOwnProperty(conceptIds.shippingShipDateModify)) {
-                boxToUpdate[conceptIds.shippingShipDateModify] = box[conceptIds.shippingShipDateModify];
-            }
-        }
-    }
+    const foundBox = boxList.find(box => box[conceptIds.shippingBoxId] == boxId) || {};
 
-    if (found == false) {
-        boxToUpdate[conceptIds.firstBagAddedToBoxTimestamp] = currTime;
-    }
-    console.log('locations siteCode', siteSpecificLocation[conceptIdToSiteSpecificLocation[locations[boxId]]].siteCode);
-    boxToUpdate['bags'] = boxIdAndBagsObj[boxId];
-    boxToUpdate[conceptIds.shippingBoxId] = boxId;
-    boxToUpdate[conceptIds.shippingLocation] = locations[boxId];
-    boxToUpdate[conceptIds.siteCode] = siteSpecificLocation[conceptIdToSiteSpecificLocation[locations[boxId]]].siteCode;
-    boxToUpdate[conceptIds.shippingShipDateModify] = currTime;
-    
-    console.log('boxToUpdate', boxToUpdate);
-    
-    return boxToUpdate;
+    return {
+        ...foundBox,
+        'bags': boxIdAndBagsObj[boxId],
+        [conceptIds.shippingShipDateModify]: currTime,
+        [conceptIds.shippingBoxId]: boxId,
+        [conceptIds.shippingLocation]: locations[boxId],
+        [conceptIds.siteCode]: siteSpecificLocation[conceptIdToSiteSpecificLocation[locations[boxId]]].siteCode,
+        [conceptIds.firstBagAddedToBoxTimestamp]: foundBox[conceptIds.firstBagAddedToBoxTimestamp]
+            ? foundBox[conceptIds.firstBagAddedToBoxTimestamp]
+            : currTime,
+    };
 }
+// const prepareBoxToUpdate = (boxId, boxList, boxIdAndBagsObj, locations) => {
+//     let found = false;
+//     const currTime = new Date().toISOString();
+//     const boxToUpdate = {};
+//     for (const box of boxList) {
+//         if (box[conceptIds.shippingBoxId] == boxId) {
+//             if (box.hasOwnProperty(conceptIds.firstBagAddedToBoxTimestamp)) {
+//                 boxToUpdate[conceptIds.firstBagAddedToBoxTimestamp] = box[conceptIds.firstBagAddedToBoxTimestamp];
+//                 found = true;
+//             }
+//             if (box.hasOwnProperty(conceptIds.shippingShipDateModify)) {
+//                 boxToUpdate[conceptIds.shippingShipDateModify] = box[conceptIds.shippingShipDateModify];
+//             }
+//         }
+//     }
+
+//     if (found == false) {
+//         boxToUpdate[conceptIds.firstBagAddedToBoxTimestamp] = currTime;
+//     }
+
+//     boxToUpdate['bags'] = boxIdAndBagsObj[boxId];
+//     boxToUpdate[conceptIds.shippingBoxId] = boxId;
+//     boxToUpdate[conceptIds.shippingLocation] = locations[boxId];
+//     boxToUpdate[conceptIds.siteCode] = siteSpecificLocation[conceptIdToSiteSpecificLocation[locations[boxId]]].siteCode;
+//     boxToUpdate[conceptIds.shippingShipDateModify] = currTime;
+    
+//     console.log('boxToUpdate', boxToUpdate);
+    
+//     return boxToUpdate;
+// }
 
 const handleAvailableCollectionsTableRows = (tableIndex, tubesToDelete) => {
     const availableCollectionsTable = document.getElementById('specimenList');
@@ -646,14 +658,15 @@ export const getInstituteSpecimensList = async (boxList) => {
 }
 
 /**
- * Populate the 'Available Collections' table
- * @param {*} boxList 
- * @returns 
+ * Populate the 'Available Collections' table.
+ * @param {array} boxList - list of available boxes 
+ * @param {boolean} loadFromState - if true, load data from state instead of fetching from server
+ * @returns {array} finalizedSpecimenList - the list of specimens with the finalized flag
+ * @returns {object} availableCollectionsObj - the object containing the available collections (to populate the 'Available Collections' table)
+ * If finalizedSpecimenList or availableCollectionsObj are empty, data will be fetched from the server. This is expected on initial load.
+ * Note: The orphan panel is currently hidden by request of the product team. Retain for possible future use.
+ *       Future orphan panel use would require completed state management implementation in the 'currDeleteButton' event listener.
  */
-// 
-// if finalizedSpecimenList or availableCollectionsObj are empty, data will be fetched from the server. This is expected on initial load.
-// Note: the orphan panel is currently hidden by request of the product team. Retail for possible future use.
-// TODO: this event listener still needs to be refactored
 export const populateAvailableCollectionsList = async (boxList, loadFromState = false) => {
     let finalizedSpecimenList = appState.getState().finalizedSpecimenList ?? [];
     let availableCollectionsObj = appState.getState().availableCollectionsObj ?? {};
@@ -663,8 +676,7 @@ export const populateAvailableCollectionsList = async (boxList, loadFromState = 
         ({ finalizedSpecimenList, availableCollectionsObj } = await getInstituteSpecimensList(boxList));
     }
 
-    const bagIdList = Object.keys(availableCollectionsObj);
-    bagIdList.sort();
+    const bagIdList = Object.keys(availableCollectionsObj).sort();
 
     const tableEle = document.getElementById("specimenList");
     tableEle.innerHTML = buildPopulateSpecimensHeader();
@@ -691,19 +703,19 @@ export const populateAvailableCollectionsList = async (boxList, loadFromState = 
     }
 
     const orphanPanel = document.getElementById('orphansPanel');
-    const orphanTableEle = document.getElementById('orphansList')
-    const specimenPanel = document.getElementById('specimenPanel')
+    const orphanTableEle = document.getElementById('orphansList');
+    const specimenPanel = document.getElementById('specimenPanel');
     orphanTableEle.innerHTML = '';
 
     if (orphanBagId && availableCollectionsObj['unlabelled'].length > 0) {
-        orphanPanel.style.display = 'block'
-        specimenPanel.style.height = '550px'
+        orphanPanel.style.display = 'block';
+        specimenPanel.style.height = '550px';
 
         const orphanTubeIdList = availableCollectionsObj['unlabelled'];
         const rowEle = orphanTableEle.insertRow();
         rowEle.insertCell(0).innerHTML = 'Stray tubes';
         rowEle.insertCell(1).innerHTML = orphanTubeIdList.length;
-        const hiddenChannel = rowEle.insertCell(2)
+        const hiddenChannel = rowEle.insertCell(2);
         hiddenChannel.innerHTML = JSON.stringify(orphanTubeIdList);
         hiddenChannel.style.display = "none";
 
@@ -712,7 +724,7 @@ export const populateAvailableCollectionsList = async (boxList, loadFromState = 
             const rowEle = orphanTableEle.insertRow();
 
             if (rowCount % 2 == 0) {
-                rowEle.style['background-color'] = 'lightgrey'
+                rowEle.style['background-color'] = 'lightgrey';
             }
 
             rowEle.insertCell(0).innerHTML = orphanTubeIdList[i];
@@ -725,24 +737,12 @@ export const populateAvailableCollectionsList = async (boxList, loadFromState = 
                 showAnimation();
                 const index = e.target.parentNode.parentNode.rowIndex;
                 const table = e.target.parentNode.parentNode.parentNode.parentNode;
-                let currRow = table.rows[index];
                 const currTubeId = table.rows[index].cells[0].innerText;
-
-                table.deleteRow(index);
                 await removeMissingSpecimen(currTubeId);
-                currRow = table.rows[index];
-
-                while (currRow != undefined && currRow.cells[0].innerText == "") {
-                    table.deleteRow(index);
-                    currRow = table.rows[index];
-                }
-
-                //TODO: consider optimizing these calls (remove box without get() call?)
-                let response = await getAllBoxes();
-                let boxList = response.data;
-                await populateAvailableCollectionsList(boxList);
                 hideAnimation();
-            })
+
+                startShipping(appState.getState().userName);
+            });
         }
     } else {
         orphanPanel.style.display = 'none'
@@ -814,7 +814,7 @@ export const populateBoxesToShipTable = () => {
         const sortedBoxKeys = Object.keys(detailedBoxes).sort();
         sortedBoxKeys.forEach((box, i) => {
             const currBox = detailedBoxes[box];
-            const bagKeys = Object.keys(currBox).filter(key => key !== 'boxData').sort((a, b) => a.split(/\s+/)[1] - b.split(/\s+/)[1]);
+            const bagKeys = Object.keys(currBox).filter(key => key !== 'boxData' && key !== 'undefined').sort((a, b) => a.split(/\s+/)[1] - b.split(/\s+/)[1]);
             const boxStartedTimestamp = currBox.boxData[conceptIds.firstBagAddedToBoxTimestamp] ? formatBoxTimestamp(Date.parse(currBox.boxData[conceptIds.firstBagAddedToBoxTimestamp])) : '';
             const boxLastModifiedTimestamp = currBox.boxData[conceptIds.shippingShipDateModify] ? formatBoxTimestamp(Date.parse(currBox.boxData[conceptIds.shippingShipDateModify])) : '';
             const boxLocation = currBox.boxData[conceptIds.shippingLocation] ? locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]["siteSpecificLocation"] : '';
@@ -1035,33 +1035,33 @@ const populateShippingBoxContentsRows = (bagNum, cellNum, row, currBagId, fullTu
     }
 }
 
-const handleShippingBoxContentsSelector = (boxIdAndBagsObj) => {
+const handleShippingBoxContentsSelector = (boxIdAndBagsObj, selectedBoxId) => {
     const boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
     const boxOptionsList = boxIdArray.map(boxId => `<option>${boxId}</option>`).join('');
     const boxSelectEle = document.getElementById('selectBoxList');
     boxSelectEle.innerHTML = boxOptionsList;
+    boxSelectEle.value = selectedBoxId ?? boxIdArray[0];
 
     return boxSelectEle.value;
 }
 
 // This is the list on shipping screen -> view shipping box contents
-export const populateBoxContentsList = () => {
+export const populateViewShippingBoxContentsList = (selectedBoxId) => {
     const boxIdAndBagsObj = appState.getState().detailedProviderBoxes;
-    const currBoxId = handleShippingBoxContentsSelector(boxIdAndBagsObj);
+    const currBoxId = handleShippingBoxContentsSelector(boxIdAndBagsObj, selectedBoxId);
     
     if (currBoxId != '') {
         const currBox = boxIdAndBagsObj[currBoxId];
         const shippingBoxContentsTable = document.getElementById('currTubeTable');
-        const boxKeys = Object.keys(currBox).filter(key => key !== 'boxData');
+        const boxKeys = Object.keys(currBox).filter(key => key !== 'boxData' && key !== 'undefined');
 
         shippingBoxContentsTable.innerHTML = renderViewBoxContentsTableHeader();
 
-        //set the rest of the table up
+        //set up the table
         for (let bagNum = 0; bagNum < boxKeys.length; bagNum++) {
             const currBagId = boxKeys[bagNum];
             const currTubes = currBox[boxKeys[bagNum]]['arrElements'];
             for (let tubeNum = 0; tubeNum < currTubes.length; tubeNum++) {
-                //get the tubeId
                 const fullTubeId = currTubes[tubeNum];
                 const tubeTypeStringArr = fullTubeId.split(' ');
                 const tubeType = translateNumToType[tubeTypeStringArr[1]] ? translateNumToType[tubeTypeStringArr[1]] : 'N/A';
@@ -1076,7 +1076,7 @@ export const populateBoxContentsList = () => {
             }
         }
     } else {
-      // Clear Table if no list is found
+      // Clear table if no list is found
       const toInsertTable = document.getElementById('currTubeTable')
       toInsertTable.innerHTML = renderViewBoxContentsTableHeader();
     }
@@ -1086,7 +1086,7 @@ export const populateBoxContentsList = () => {
 const handleRemoveBagButton = (currDeleteButton, currTubes, currBoxId) => {
     currDeleteButton.addEventListener("click", async e => {
         showAnimation();
-        let row = e.target.closest('tr');
+        const row = e.target.closest('tr');
         const currBagId = row.cells[0].innerText;
         const bagsToRemove = currBagId === "unlabelled" ? currTubes : [currBagId];        
         const removeBagResponse = await removeBag(currBoxId, bagsToRemove);
@@ -1094,23 +1094,12 @@ const handleRemoveBagButton = (currDeleteButton, currTubes, currBoxId) => {
 
         if (removeBagResponse.code === 200) {
             updateShippingStateRemoveBagFromBox(currBoxId, bagsToRemove);
-            startShipping(appState.getState().userName, true);
+            startShipping(appState.getState().userName, true, currBoxId);
         } else {
             showNotifications({ title: 'Error removing bag', body: 'We experienced an error removing this bag. Please try again.' });
         }
     });
 }
-
-// const generateUnshippedBoxIdAndBagsObj = (boxList) => {
-//     const boxIdAndBagsObj = {};
-//     for (let i = 0; i < boxList.length; i++) {
-//         if (!boxList[i].hasOwnProperty(conceptIds.submitShipmentFlag) || boxList[i][conceptIds.submitShipmentFlag] != conceptIds.yes) {
-//             const box = boxList[i]
-//             boxIdAndBagsObj[box[conceptIds.shippingBoxId]] = box['bags']
-//         }
-//     }
-//     return boxIdAndBagsObj;
-// }
 
 const renderViewBoxContentsTableHeader = () => {
     return `
@@ -1123,43 +1112,40 @@ const renderViewBoxContentsTableHeader = () => {
     `;
 }
 
-// TODO: this function needs to be refactored for efficiency & state management (remove getAllBoxes() call)
+// Calculate the highest existing box number and increment by 1
+// Create the box and add it to firestore. On success, add it to the relevant state objects (allBoxesList and boxesByLocationList, and detailedProviderBoxes).
 const addNewBox = async () => {    
-    const pageLocation = document.getElementById('selectLocationList').value;
-    const pageLocationConversion = siteSpecificLocationToConceptId[pageLocation];
-    const loginSite = siteSpecificLocation[pageLocation]["siteCode"];
+    const siteLocation = document.getElementById('selectLocationList').value;
+    const siteLocationConversion = siteSpecificLocationToConceptId[siteLocation];
+    const siteCode = siteSpecificLocation[siteLocation]["siteCode"];
     
     const boxList = appState.getState().allBoxesList;
     
-    const { largestBoxIndex, largestLocationIndex } = findLargestBoxData(boxList, pageLocation);
-    const shouldUpdateBoxModal = largestLocationIndex != -1 && Object.keys(boxList[largestLocationIndex]['bags']).length != 0;
+    const { largestBoxIndex, largestBoxIndexAtLocation } = findLargestBoxData(boxList, siteLocation);
+    const shouldUpdateBoxModal = largestBoxIndexAtLocation != -1 && Object.keys(boxList[largestBoxIndexAtLocation]['bags']).length != 0;
     
     let largestBoxId;
     if (shouldUpdateBoxModal) largestBoxId = boxList[largestBoxIndex][conceptIds.shippingBoxId];
     else largestBoxId = largestBoxIndex !== -1 ? boxList[largestBoxIndex][conceptIds.shippingBoxId] : 'Box0';
 
-    if (largestLocationIndex == -1 || shouldUpdateBoxModal) {
-        const boxToAdd = await createNewBox(boxList, pageLocationConversion, loginSite, largestBoxId, shouldUpdateBoxModal);
+    if (largestBoxIndexAtLocation == -1 || shouldUpdateBoxModal) {
+        const boxToAdd = await createNewBox(boxList, siteLocationConversion, siteCode, largestBoxId, shouldUpdateBoxModal);
         if (!boxToAdd) return false;
-        //TODO: figure out what needs to change in state object (boxList) and update it.
-
-        // add box to allBoxesList and boxesByLocationList, and detailedProviderBoxes
         updateShippingStateCreateBox(boxToAdd);
-        populateBoxContentsList();
         return true;
     } else {
         return false;
     }
 }
 
-const createNewBox = async (boxList, pageLocationConversion, loginSite, largestBoxId, updateBoxModal) => {
+const createNewBox = async (boxList, pageLocationConversion, siteCode, largestBoxId, updateBoxModal) => {
     const newBoxNum = parseInt(largestBoxId.substring(3)) + 1;
     const newBoxId = 'Box' + newBoxNum.toString();
     const boxToAdd = {
         'bags': {},
         [conceptIds.shippingBoxId]: newBoxId,
         [conceptIds.shippingLocation]: pageLocationConversion,
-        [conceptIds.siteCode]: loginSite,
+        [conceptIds.siteCode]: siteCode,
         [conceptIds.submitShipmentFlag]: conceptIds.no
     };
 
@@ -1174,59 +1160,36 @@ const createNewBox = async (boxList, pageLocationConversion, loginSite, largestB
     if (updateBoxModal) document.getElementById('shippingModalChooseBox').setAttribute('data-new-box', newBoxId);
 
     return boxToAdd;
-    // // Filtering and transforming the boxes that meet specific conditions
-    // return boxList.reduce((result, box) => {
-    //     if (box[conceptIds.shippingLocation] === pageLocationConversion && 
-    //         (!box.hasOwnProperty(conceptIds.submitShipmentFlag) || box[conceptIds.submitShipmentFlag] !== conceptIds.yes)) {
-    //         result[box[conceptIds.shippingBoxId]] = box['bags'];
-    //     }
-    //     return result;
-    // }, {});
-
-    // Assigning the new object to boxList
-    //boxList = newBoxList;
-    // const boxJSONS = boxList;
-
-    // boxList = {};
-    // for (let i = 0; i < boxJSONS.length; i++) {
-    //     const box = boxJSONS[i]
-    //     if (box[conceptIds.shippingLocation] == pageLocationConversion) {
-    //         if (!box.hasOwnProperty(conceptIds.submitShipmentFlag) || box[conceptIds.submitShipmentFlag] !== conceptIds.yes) {
-    //             boxList[box[conceptIds.shippingBoxId]] = box['bags'];
-    //         }
-    //     }
-    // }
-
-    
-
-    //return boxList;
 }
 
-const findLargestBoxData = (boxList, pageLocation) => {
-    let largestBoxNum = 0; //Largest Box num value if it exists
+//TODO: why are both even needed? Can't we just use the largestBoxNum?
+const findLargestBoxData = (boxList, siteLocation) => {
+    let largestBoxNum = 0; 
     let largestBoxIndex = -1;
-    let largestLocation = 0;
-    let largestLocationIndex = -1; //If allBoxesList has box with box# value
+    let largestLocationBoxNum = 0; 
+    let largestBoxIndexAtLocation = -1;
 
     for (let i = 0; i < boxList.length; i++) {
-        const curr = parseInt(boxList[i][conceptIds.shippingBoxId].substring(3));
+        const currBoxNum = parseInt(boxList[i][conceptIds.shippingBoxId].substring(3));
         const currLocation = conceptIdToSiteSpecificLocation[boxList[i][conceptIds.shippingLocation]];
 
-        if (curr > largestBoxNum) {
-            largestBoxNum = curr;
+        // Find the largest box among all boxes
+        if (currBoxNum > largestBoxNum) {
+            largestBoxNum = currBoxNum;
             largestBoxIndex = i;
         }
-        if (curr > largestLocation && currLocation == pageLocation) {
-            largestLocation = curr;
-            largestLocationIndex = i;
+
+        // Find the largest box for the specified location
+        if (currLocation == siteLocation && currBoxNum > largestLocationBoxNum) {
+            largestLocationBoxNum = currBoxNum;
+            largestBoxIndexAtLocation = i;
         }
     }
 
-    return { largestBoxIndex, largestLocationIndex };
+    return { largestBoxIndex, largestBoxIndexAtLocation };
 }
 
-
-//TODO: handle state changes and remove getBoxesByLocation() call or run routine to update state after fetch (temporary solution)
+// Handle new box creation in the shipping modal.
 export const addEventModalAddBox = () => {
     const boxButton = document.getElementById('modalAddBoxButton');
     const createBoxSuccessAlertEle = document.getElementById("create-box-success");
@@ -1251,186 +1214,165 @@ export const addEventModalAddBox = () => {
         //     currLocationBoxObjects[box[conceptIds.shippingBoxId]] = box['bags'];
         // }
 
-        //TODO: this loads detailedProviderBoxes from state (make sure it's updated with the new box that was added)
         const detailedProviderBoxes = appState.getState().detailedProviderBoxes;
+        const boxIdsArray = Object.keys(detailedProviderBoxes).sort(compareBoxIds);
         populateModalSelect(detailedProviderBoxes);
-        populateBoxContentsList();
+        populateViewShippingBoxContentsList(boxIdsArray[boxIdsArray.length - 1]);
         checkAlertState(isCreateBoxSuccess, createBoxSuccessAlertEle, createBoxErrorAlertEle)
         // reset alertState
         document.body.removeAttribute('data-adding-box');
     }
   )}
 
-export const populateTubeInBoxList = async (userName) => {
-    let selectEle = document.getElementById('selectBoxList');
-    let currBoxId = selectEle.value;
-    let response = await getBoxes();
-    let boxList = response.data;
-    let currBox = {};
-    for (let i = 0; i < boxList.length; i++) {
-        let box = boxList[i];
-        if (box['132929440'] == currBoxId) {
-            currBox = box.bags;
-        }
-    }
-    let currList = "";
+// export const populateTubeInBoxList = async (userName) => {
+//     const selectEle = document.getElementById('selectBoxList');
+//     const currBoxId = selectEle.value;
+//     //let response = await getBoxes();
+//     //let boxList = response.data;
+//     const boxList = appState.getState().allBoxesList;
+//     const currBox = boxList.find(box => box[conceptIds.shippingBoxId] === currBoxId);
+//     const currBags = currBox ? currBox.bags : {};
+//     // let currBags = {};
+//     // for (let i = 0; i < boxList.length; i++) {
+//     //     let box = boxList[i];
+//     //     if (box[conceptIds.shippingBoxId] == currBoxId) {
+//     //         currBags = box.bags;
+//     //     }
+//     // }
+//     //let currList = "";
 
-    //document.getElementById('BoxNumBlood').innerText = currBoxId;
-    let toInsertTable = document.getElementById('currTubeTable')
-    let boxKeys = Object.keys(currBox)
-    toInsertTable.innerHTML = ` <tr>
-                                    <th style = "border-bottom:1px solid;">Specimen Bag ID</th>
-                                    <th style = "border-bottom:1px solid;">Full Specimen ID</th>
-                                    <th style = "border-bottom:1px solid;">Type/Color</th>
-                                    <th style = "border-bottom:1px solid;"></th>
-                                </tr>`;
-    //set the rest of the table up
-    let translateNumToType = {
-        "0001": "SST/Gold or Red",
-        "0002": "SST/Gold or Red",
-        "0003": "Heparin/Green",
-        "0004": "EDTA/Lavender",
-        "0005": "ACD/Yellow",
-        "0006": "Urine/Yellow",
-        "0007": "Mouthwash Container",
-        "0011": "SST/Gold or Red",
-        "0012": "SST/Gold or Red",
-        "0013": "Heparin/Green",
-        "0014": "EDTA/Lavender",
-        "0016": "Urine Cup",
-        "0021": "SST/Gold or Red",
-        "0022": "SST/Gold or Red",
-        "0031": "SST/Gold or Red",
-        "0032": "SST/Gold or Red",
-        "0024": "EDTA/Lavender",
-        "0050": "NA",
-        "0051": "NA",
-        "0052": "NA",
-        "0053": "NA",
-        "0054": "NA"
-    };
-    for (let j = 0; j < boxKeys.length; j++) {
-        let currBagId = boxKeys[j];
-        let currTubes = currBox[boxKeys[j]]['arrElements'];
+//     //document.getElementById('BoxNumBlood').innerText = currBoxId;
+//     const toInsertTable = document.getElementById('currTubeTable');
+//     toInsertTable.innerHTML = renderViewBoxContentsTableHeader();
+//     const boxKeys = Object.keys(currBags);
+//     // toInsertTable.innerHTML = ` <tr>
+//     //                                 <th style = "border-bottom:1px solid;">Specimen Bag ID</th>
+//     //                                 <th style = "border-bottom:1px solid;">Full Specimen ID</th>
+//     //                                 <th style = "border-bottom:1px solid;">Type/Color</th>
+//     //                                 <th style = "border-bottom:1px solid;"></th>
+//     //                             </tr>`;
+//     //set the rest of the table up
+//     // let translateNumToType = {
+//     //     "0001": "SST/Gold or Red",
+//     //     "0002": "SST/Gold or Red",
+//     //     "0003": "Heparin/Green",
+//     //     "0004": "EDTA/Lavender",
+//     //     "0005": "ACD/Yellow",
+//     //     "0006": "Urine/Yellow",
+//     //     "0007": "Mouthwash Container",
+//     //     "0011": "SST/Gold or Red",
+//     //     "0012": "SST/Gold or Red",
+//     //     "0013": "Heparin/Green",
+//     //     "0014": "EDTA/Lavender",
+//     //     "0016": "Urine Cup",
+//     //     "0021": "SST/Gold or Red",
+//     //     "0022": "SST/Gold or Red",
+//     //     "0031": "SST/Gold or Red",
+//     //     "0032": "SST/Gold or Red",
+//     //     "0024": "EDTA/Lavender",
+//     //     "0050": "NA",
+//     //     "0051": "NA",
+//     //     "0052": "NA",
+//     //     "0053": "NA",
+//     //     "0054": "NA"
+//     // };
+//     for (let j = 0; j < boxKeys.length; j++) {
+//         let currBagId = boxKeys[j];
+//         let currTubes = currBags[boxKeys[j]]['arrElements'];
 
-        for (let k = 0; k < currTubes.length; k++) {
+//         for (let k = 0; k < currTubes.length; k++) {
 
-            //get the first element (tube id) from the thingx
-            let toAddId = currTubes[k];
-            let thisId = toAddId.split(' ');
-            let toAddType = 'N/A'
-            if (translateNumToType.hasOwnProperty(thisId[1])) {
-                toAddType = translateNumToType[thisId[1]];
-            }
-            var rowCount = toInsertTable.rows.length;
-            var row = toInsertTable.insertRow(rowCount);
-            if (j % 2 == 1) {
-                row.style['background-color'] = 'lightgrey'
-            }
-            if (k == 0) {
-                row.insertCell(0).innerHTML = currBagId
-            }
-            else {
-                row.insertCell(0).innerHTML = ""
-            }
-            row.insertCell(1).innerHTML = toAddId;
-            row.insertCell(2).innerHTML = toAddType;
-            if (k == 0) {
-                row.insertCell(3).innerHTML = '<input type="button" class="delButton" value = "remove bag" style="margin-top:2px;margin-bottom:2px;">';
-            }
-            else {
-                row.insertCell(3).innerHTML = "";
-            }
-            //row.insertCell(3).innerHTML= '<input type="button" class="delButton" value = "remove">';
+//             //get the first element (tube id) from the thingx
+//             let toAddId = currTubes[k];
+//             let thisId = toAddId.split(' ');
+//             let toAddType = 'N/A'
+//             if (translateNumToType.hasOwnProperty(thisId[1])) {
+//                 toAddType = translateNumToType[thisId[1]];
+//             }
+//             var rowCount = toInsertTable.rows.length;
+//             var row = toInsertTable.insertRow(rowCount);
+//             if (j % 2 == 1) {
+//                 row.style['background-color'] = 'lightgrey'
+//             }
+//             if (k == 0) {
+//                 row.insertCell(0).innerHTML = currBagId
+//             }
+//             else {
+//                 row.insertCell(0).innerHTML = ""
+//             }
+//             row.insertCell(1).innerHTML = toAddId;
+//             row.insertCell(2).innerHTML = toAddType;
+//             if (k == 0) {
+//                 row.insertCell(3).innerHTML = '<input type="button" class="delButton" value = "remove bag" style="margin-top:2px;margin-bottom:2px;">';
+//             }
+//             else {
+//                 row.insertCell(3).innerHTML = "";
+//             }
+//             //row.insertCell(3).innerHTML= '<input type="button" class="delButton" value = "remove">';
 
-            if (k == 0) {
-                let currDeleteButton = row.cells[3].getElementsByClassName("delButton")[0];
+//             if (k == 0) {
+//                 let currDeleteButton = row.cells[3].getElementsByClassName("delButton")[0];
 
-                //This should remove the entrire bag
-                currDeleteButton.addEventListener("click", async e => {
-                    showAnimation();
-                    var index = e.target.parentNode.parentNode.rowIndex;
-                    var table = e.target.parentNode.parentNode.parentNode.parentNode;
+//                 //This should remove the entrire bag
+//                 currDeleteButton.addEventListener("click", async e => {
+//                     showAnimation();
+//                     var index = e.target.parentNode.parentNode.rowIndex;
+//                     var table = e.target.parentNode.parentNode.parentNode.parentNode;
 
-                    let currRow = table.rows[index];
-                    let currBagId = table.rows[index].cells[0].innerText;
-                    /*if(currRow.cells[0].innerText != ""){
-                        if(index < table.rows.length-1){
-                            if(table.rows[index + 1].cells[0].innerText ==""){
-                                table.rows[index+1].cells[0].innerText = currRow.cells[0].innerText;
-                            }
-                        }
-                    }*/
-                    table.deleteRow(index);
-                    let bagsToRemove = [currBagId];
-                    if (currBagId === "unlabelled") { 
-                        bagsToRemove = currTubes;
-                    }
-                    let result = await removeBag(selectEle.value, bagsToRemove)
-                    currRow = table.rows[index];
+//                     let currRow = table.rows[index];
+//                     let currBagId = table.rows[index].cells[0].innerText;
+//                     /*if(currRow.cells[0].innerText != ""){
+//                         if(index < table.rows.length-1){
+//                             if(table.rows[index + 1].cells[0].innerText ==""){
+//                                 table.rows[index+1].cells[0].innerText = currRow.cells[0].innerText;
+//                             }
+//                         }
+//                     }*/
+//                     table.deleteRow(index);
+//                     let bagsToRemove = [currBagId];
+//                     if (currBagId === "unlabelled") { 
+//                         bagsToRemove = currTubes;
+//                     }
+//                     let result = await removeBag(selectEle.value, bagsToRemove)
+//                     currRow = table.rows[index];
 
-                    while (currRow != undefined && currRow.cells[0].innerText == "") {
-                        table.deleteRow(index);
-                        currRow = table.rows[index];
-                    }
+//                     while (currRow != undefined && currRow.cells[0].innerText == "") {
+//                         table.deleteRow(index);
+//                         currRow = table.rows[index];
+//                     }
 
-                    let response = await getAllBoxes();
-                    let boxList = response.data;
-                    let boxIdAndBagsObj = {};
+//                     let response = await getAllBoxes();
+//                     let boxList = response.data;
+//                     let boxIdAndBagsObj = {};
 
-                    await populateAvailableCollectionsList(boxList);
+//                     await populateAvailableCollectionsList(boxList);
 
-                    for (let i = 0; i < boxList.length; i++) {
-                        if (!boxList[i].hasOwnProperty('145971562') || boxList[i]['145971562'] != '353358909') {
-                            let box = boxList[i]
-                            boxIdAndBagsObj[box['132929440']] = box['bags']
-                        }
-                    }
+//                     for (let i = 0; i < boxList.length; i++) {
+//                         if (!boxList[i].hasOwnProperty(conceptIds.submitShipmentFlag) || boxList[i][conceptIds.submitShipmentFlag] != conceptIds.yes) {
+//                             let box = boxList[i]
+//                             boxIdAndBagsObj[box[conceptIds.shippingBoxId]] = box['bags']
+//                         }
+//                     }
 
-                    await populateBoxesToShipTable(boxIdAndBagsObj, boxList, userName)
-                    hideAnimation();
-                })
-            }
-
-        }
-    }
-
-}
-
-export const addEventBoxSelectListChanged = () => {
-    let selectBoxList = document.getElementById('selectBoxList');
-    selectBoxList.addEventListener("change", async () => {
-        showAnimation();
-        await populateTubeInBoxList();
-        hideAnimation();
-    })
-}
-
-// //TODO: FIX (old version of populate...())
-// export const addEventChangeLocationSelect = (userName) => {
-//     let locationSelectEle = document.getElementById('selectLocationList');
-//     locationSelectEle.addEventListener("change", async () => {
-//         let currLocation = locationSelectEle.value;
-//         if (currLocation !== 'none') {
-//             showAnimation();
-//             //TODO: remove this and use state
-//             let currLocationConceptId = siteSpecificLocationToConceptId[currLocation]
-//             let boxArray = (await getBoxesByLocation(currLocationConceptId)).data;
-
-//             let boxIdAndBagsObj = {};
-//             for (let i = 0; i < boxArray.length; i++) {
-//                 let box = boxArray[i]
-//                 boxIdAndBagsObj[box['132929440']] = box['bags']
+//                     await populateBoxesToShipTable(boxIdAndBagsObj, boxList, userName)
+//                     hideAnimation();
+//                 })
 //             }
 
-//             populateBoxContentsList();
-//             hideAnimation();
 //         }
-//         else {            
-//             populateBoxContentsList();
-//         }
-//     })
+//     }
+
 // }
+
+// Handle changes to the selected boxId in the 'View Shipping Box Contents' section
+export const addEventBoxSelectListChanged = () => {
+    console.log('calling addEventBoxSelectListChanged');
+    const selectBoxList = document.getElementById('selectBoxList');
+    selectBoxList.addEventListener("change", () => {
+        const selectedBoxId = document.getElementById('selectBoxList').value;
+        populateViewShippingBoxContentsList(selectedBoxId);
+    })
+}
 
 export const addEventBackToSearch = (id) => {
     document.getElementById(id).addEventListener('click', e => {
@@ -2933,7 +2875,8 @@ export const populateSelectLocationList = async (availableLocations, loadFromSta
 
 export const populateBoxManifestTable = (currBox) => {
     const boxManifestTable = document.getElementById('boxManifestTable');
-    const bagList = Object.keys(currBox).filter(key => key !== 'boxData');
+    const bagList = Object.keys(currBox).filter(key => key !== 'boxData' && key !== 'undefined').sort(sortSpecimenKeys);
+    console.log('bagList', bagList);
 
     bagList.forEach((bagKey, i) => {
         const tubesList = currBox[bagKey].arrElements;
@@ -2951,6 +2894,12 @@ export const populateBoxManifestTable = (currBox) => {
             addDeviationTypeCommentsContent(tubeDetail, currRow, i);
         };
     });
+}
+
+const sortSpecimenKeys = (a, b) => {
+    const numA = parseInt(a.split(' ')[0].substring(3));
+    const numB = parseInt(b.split(' ')[0].substring(3));
+    return numB - numA;
 }
 
 /**
@@ -3632,7 +3581,6 @@ export const addEventFilter = () => {
 
 }
 
-//TODO: future implementation will include shipped property on the specimen object
 /**
  * Search for the specimenId in the shipped boxes
  * @param {array<object>} allBoxesList - list of all boxes for the healthcare provider
@@ -3641,6 +3589,7 @@ export const addEventFilter = () => {
  * If the specimenId is a masterId, search for the key in the bags.
  * If the bag is unlabelled, search arrElements for the key.
  * If the specimen isn't a masterId, iterate the bags and search for the keys in the arrElements. 
+ * TODO: future implementation will include shipped property on the specimen object
  */
 export const isScannedIdShipped = (allBoxesList, masterSpecimenId) => {
     if (!allBoxesList.length) return false;
@@ -3649,19 +3598,15 @@ export const isScannedIdShipped = (allBoxesList, masterSpecimenId) => {
     const isMasterId = ['0007', '0008', '0009'].includes(specimenIdType);
 
     for (const box of allBoxesList) {
-        //console.log('box', box[conceptIds.shippingBoxId]);
         if (box[conceptIds.submitShipmentFlag] !== conceptIds.yes) continue;
         
         const { bags } = box;
-        //console.log('bags', bags);
         if (isMasterId) {
             if (bags[masterSpecimenId] || (bags.unlabelled && bags.unlabelled.arrElements.includes(masterSpecimenId))) {
-                //console.log('TEST', bags[masterSpecimenId], bags.unlabelled && bags.unlabelled.arrElements.includes(masterSpecimenId));
                 return true;
             }
         } else {
             for (const bagId in bags) {
-                console.log('bagId', bagId, bags[bagId].arrElements, masterSpecimenId);
                 if (bags[bagId].arrElements.includes(masterSpecimenId)) {
                     return true;
                 }
@@ -3673,7 +3618,6 @@ export const isScannedIdShipped = (allBoxesList, masterSpecimenId) => {
 };
 
 const findScannedIdInUnshippedBoxes = (allBoxesList, masterSpecimenId) => {
-
     const buildFoundDataObj = (box) => {
         const dataObj = {};
         dataObj['foundMatch'] = true;
@@ -3687,11 +3631,9 @@ const findScannedIdInUnshippedBoxes = (allBoxesList, masterSpecimenId) => {
     let dataObj = {"inputScanned": masterSpecimenId};
 
     for (const box of allBoxesList) {
-        //console.log('box', box[conceptIds.shippingBoxId]);
-        if (box[conceptIds.submitShipmentFlag] === conceptIds.yes) continue;
-        
+        if (box[conceptIds.submitShipmentFlag] === conceptIds.yes) continue;        
         const { bags } = box;
-        //console.log('bags', bags);
+
         if (isMasterId) {
             if (bags[masterSpecimenId] || (bags.unlabelled && bags.unlabelled.arrElements.includes(masterSpecimenId))) {
                 dataObj = buildFoundDataObj(box);
@@ -3699,7 +3641,6 @@ const findScannedIdInUnshippedBoxes = (allBoxesList, masterSpecimenId) => {
             }
         } else {
             for (const bagId in bags) {
-                console.log('bagId', bagId, bags[bagId].arrElements, masterSpecimenId);
                 if (bags[bagId]?.arrElements?.includes(masterSpecimenId)) {
                     dataObj = buildFoundDataObj(box);
                     return dataObj;

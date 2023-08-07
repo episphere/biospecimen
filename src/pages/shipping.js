@@ -1,6 +1,6 @@
 import { appState, userAuthorization, removeActiveClass, displayContactInformation, getBoxes, getAllBoxes, hideAnimation, showAnimation, showNotifications, locationConceptIDToLocationMap } from "./../shared.js"
 import { addEventBackToSearch, addEventAddSpecimenToBox, populateAvailableCollectionsList, addEventNavBarShipment, addEventNavBarBoxManifest, formatBoxTimestamp, populateBoxManifestTable, populateBoxesToShipTable,
-         populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateBoxContentsList, addEventBoxSelectListChanged,
+         populateShippingManifestBody,populateShippingManifestHeader, addEventNavBarShippingManifest, populateTrackingQuery, addEventCompleteButton, populateFinalCheck, populateViewShippingBoxContentsList, addEventBoxSelectListChanged,
          addEventCompleteShippingButton, populateSelectLocationList, addEventModalAddBox, populateTempNotification, populateTempCheck, populateTempSelect, addEventNavBarTracking, addEventReturnToReviewShipmentContents,
          populateCourierBox, addEventSaveButton, addEventTrimTrackingNums, addEventCheckValidTrackInputs, addEventPreventTrackingConfirmPaste, addEventReturnToPackaging, addEventShipPrintManifest, addEventTrackingNumberScanAutoFocus } from "./../events.js";
 import { homeNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
@@ -32,14 +32,14 @@ export const shippingDashboard = (auth, route) => {
 
 // Initialize the shipping page.
 // Check for a stored location, else wait for a location to be selected, then build the page
-export const startShipping = async (userName, loadFromState = false) => {    
-    console.log('START SHIPPING');
+export const startShipping = async (userName, loadFromState = false, currBoxId) => {    
+    console.log('START SHIPPING', currBoxId);
     buildNavAndHeaderDOM();
 
     const storedLocation = getStoredLocationOnInit();
 
     buildShippingDOM();
-    await buildShippingInterface(storedLocation, userName, loadFromState);
+    await buildShippingInterface(storedLocation, userName, loadFromState, currBoxId);
 }
 
 const buildNavAndHeaderDOM = () => {
@@ -70,7 +70,8 @@ const buildShippingDOM = async () => {
  * @param {*} userName - the logged-in userName.
  * @param {*} loadFromState - whether to load data from state or from the server.
  */
-const buildShippingInterface = async (selectedLocation, userName, loadFromState) => {    
+const buildShippingInterface = async (selectedLocation, userName, loadFromState, currBoxId) => {    
+    console.log('calling - BUILD SHIPPING INTERFACE');
     showAnimation();
 
     let allBoxesList;
@@ -94,7 +95,7 @@ const buildShippingInterface = async (selectedLocation, userName, loadFromState)
 
     setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName, selectedLocation);
 
-    populateBoxContentsList(), // 'View Shipping Box Contents' section
+    populateViewShippingBoxContentsList(currBoxId), // 'View Shipping Box Contents' section
     populateBoxesToShipTable(), // 'Select boxes to ship' section
     addShippingEventListeners();
     populateTempNotification();
@@ -110,7 +111,7 @@ const addShippingEventListeners = () => {
     addEventNavBarShippingManifest(userName, tempMonitorCheckedEl);
     addEventBoxSelectListChanged();
     addEventNavBarBoxManifest("navBarBoxManifest", userName); //TODO does this get used?
-    addEventLocationSelect("selectLocationList", "shipping_location", userName);
+    addEventLocationSelect("selectLocationList", "shipping_location");
     addEventAddSpecimenToBox();
     addEventModalAddBox();
 }
@@ -126,13 +127,14 @@ const getStoredLocationOnInit = () => {
  * @param {*} pageAndElement - the page and element to store in local storage
  * @param {*} userName - the user name to store in local storage
  */
-const addEventLocationSelect = (elemId, pageAndElement, userName) => {
+const addEventLocationSelect = (elemId, pageAndElement) => {
     const selectionChangeHandler = (event) => {
         const selection = event.target.value;
         const prevSelections = JSON.parse(localStorage.getItem('selections'));
         localStorage.setItem('selections', JSON.stringify({...prevSelections, [pageAndElement] : selection}));
         if (selection && selection !== 'none') {
-            startShipping(userName);
+            const currBoxId = document.getElementById('selectBoxList').value;
+            startShipping(appState.getState().userName, true, currBoxId);
         }
     };
 
@@ -310,7 +312,7 @@ const renderSpecimenVerificationModal = () => {
     `;
 }
 
-//TODO move boxManifest items to separate file
+//TODO: move boxManifest items to separate file
 export const generateBoxManifest = (currBox) => {
     const currInstitute = currBox.boxData.siteAcronym;
     const currLocation = locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]["siteSpecificLocation"];
@@ -333,7 +335,7 @@ export const generateBoxManifest = (currBox) => {
 export const populateBoxManifestHeader = (currBox, currContactInfo) => {
     if(!currBox) return;
 
-    const currKeys = Object.keys(currBox).filter(key => key !== 'boxData');
+    const currKeys = Object.keys(currBox).filter(key => key !== 'boxData' && key !== 'undefined');
     const numBags = currKeys.length;
     const numTubes = currKeys.reduce((acc, bagKey) => acc + currBox[bagKey]['arrElements'].length, 0);
 
@@ -348,7 +350,7 @@ const renderBoxManifestHeader = (boxId, boxStartedTimestamp, boxLastModifiedTime
     const boxManifestCol1 = document.getElementById('boxManifestCol1');
     const boxManifestCol3 = document.getElementById('boxManifestCol3');
     
-    // Create parent div
+    // PParent divs
     const div1 = document.createElement("div");
     const div3 = document.createElement("div");
     

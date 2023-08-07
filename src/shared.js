@@ -758,10 +758,9 @@ export const convertToFirestoreBox = (inputBox) => {
   return outputBox;
 };
 
-// TODO resolve this and old version
 // Fetches all boxes for site
 export const getBoxes = async () => {
-  console.log('calling getBoxesUPDATED');
+  console.log('calling getBoxes');
   console.time('getBoxes');
 
   const idToken = await getIdToken();
@@ -775,7 +774,7 @@ export const getBoxes = async () => {
 
   const boxesToReturn = res.data
       .map(convertToOldBox)
-      .filter(box => !box.hasOwnProperty(conceptIds.submitShipmentFlag) || box[conceptIds.submitShipmentFlag] !== conceptIds.yes);
+      .filter(box => box[conceptIds.submitShipmentFlag] !== conceptIds.yes);
 
   console.timeEnd('getBoxes');
   return { data: boxesToReturn };

@@ -1,7 +1,6 @@
 import { appState } from './shared.js';
 import { specimenCollection } from './tubeValidation.js';
 import { siteSpecificLocationToConceptId } from './shared.js';
-
 import conceptIds from './fieldToConceptIdMapping.js';
 
 /**
@@ -13,26 +12,23 @@ import conceptIds from './fieldToConceptIdMapping.js';
  * @param {array} finalizedSpecimenList - the list of finalized specimens for the healthcare provider
  * @param {string} userName - the name of the logged in user
  */
-export const setAllShippingState = (availableCollectionsObj, availableLocations, allBoxesList, /*boxesByLocationList, detailedProviderBoxes,*/ finalizedSpecimenList, userName, selectedLocation) => {
-
+export const setAllShippingState = (availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName, selectedLocation) => {
     const boxesByProviderList = filterUnshippedBoxes(allBoxesList);
     const boxesByLocationList = filterBoxesByLocation(boxesByProviderList, selectedLocation);
-    //console.log('boxesByLocationList', boxesByLocationList);
     //const allBoxesObj = createBoxAndBagsObj(allBoxesList); // all boxes for the healthcare provider
     const providerBoxesObj = createBoxAndBagsObj(boxesByProviderList); // provider-specific data in the 'select boxes to ship' section
     const providerBoxWithSpecimenData = addSpecimenDataToDetailBox(providerBoxesObj, finalizedSpecimenList);
     const detailedProviderBoxes = addBoxDataToDetailBox(providerBoxWithSpecimenData, boxesByProviderList);
-    //console.log('detailedProviderBoxes - startShipping', detailedProviderBoxes);
-    //console.log('finalizedSpecimenList - startShipping', finalizedSpecimenList);
+    console.log('detailedProviderBoxes', detailedProviderBoxes);
 
     appState.setState({
+        allBoxesList: allBoxesList,
         availableCollectionsObj: availableCollectionsObj,
         availableLocations: availableLocations,
-        allBoxesList: allBoxesList,
         boxesByLocationList: boxesByLocationList,
         detailedProviderBoxes: detailedProviderBoxes,
         finalizedSpecimenList: finalizedSpecimenList,
-        userName: userName, //TODO handle this in available places
+        userName: userName,
     });
 }
 
@@ -43,7 +39,6 @@ export const setAllShippingState = (availableCollectionsObj, availableLocations,
  * @param {array} bagsToMove - the bags to be removed from the box. 
  */
 export const updateShippingStateRemoveBagFromBox = (boxId, bagsToMove) => {
-    console.log('updateShippingStateRemoveBag', boxId, bagsToMove);
     addBagToAvailableCollections(boxId, bagsToMove);
     removeBagFromBox(boxId, bagsToMove);
 }
@@ -54,10 +49,9 @@ export const updateShippingStateRemoveBagFromBox = (boxId, bagsToMove) => {
  * @param {string} boxId - the box with the bag to be added
  * @param {array} bagToMove - the bag to be added to the box
  */
-export const updateShippingStateAddBagToBox = (boxId, bagToMove) => {
-    console.log('updateShippingStateAddBag', boxId, bagToMove);
-    addBagToBox(boxId, bagToMove);
-    removeBagFromAvailableCollections(boxId, bagToMove);
+export const updateShippingStateAddBagToBox = (boxId, bagId, boxToUpdate) => {
+    addBagToBox(boxId, boxToUpdate);
+    removeBagFromAvailableCollections(bagId);
 }
 
 /**
@@ -84,6 +78,7 @@ const addBagToAvailableCollections = (boxId, bagsToMove) => {
     });
 }
 
+// Remove the bag from the box when user has clicked 'remove bag' in the 'View Shipping Box Contents' table.
 const removeBagFromBox = (boxId, bagsToMove) => {
     const allBoxesList = appState.getState().allBoxesList;
     const boxIndex = allBoxesList.findIndex(box => box[conceptIds.shippingBoxId] === boxId);
@@ -99,12 +94,32 @@ const removeBagFromBox = (boxId, bagsToMove) => {
     }
 }
 
-const removeBagFromAvailableCollections = (boxId, bagsToMove) => {
+// Remove the bag from the availableCollectionsObj when it has been added to a box.
+const removeBagFromAvailableCollections = (bagId) => {
+    const availableCollectionsObj = { ...appState.getState().availableCollectionsObj };
+    delete availableCollectionsObj[bagId];
 
+    appState.setState({
+        availableCollectionsObj: availableCollectionsObj,
+    });
 }
 
-const addBagToBox = (boxId, bagsToMove) => {
+// Replace the previous box with the updated box when a bag is added.
+// If an existing box is not found, add it to the list.
+const addBagToBox = (boxId, boxToUpdate) => {
+    let allBoxesList = [...appState.getState().allBoxesList];
 
+    allBoxesList = allBoxesList.map(box => 
+        box[conceptIds.shippingBoxId] === boxId ? boxToUpdate : box
+    );
+
+    if (!allBoxesList.some(box => box[conceptIds.shippingBoxId] === boxId)) {
+        allBoxesList.push(boxToUpdate);
+    }
+
+    appState.setState({
+        allBoxesList: allBoxesList,
+    });
 }
 
 export const updateShippingStateCreateBox = (boxToAdd) => {
@@ -125,28 +140,11 @@ export const updateShippingStateCreateBox = (boxToAdd) => {
     });
 }
 
-// const addBagToB = (boxId, bagsToMove) => {
-//     const allBoxesList = appState.getState().allBoxesList;
-//     const boxIndex = allBoxesList.findIndex(box => box[conceptIds.shippingBoxId] === boxId);
-
-//     if (boxIndex !== -1) { 
-//         for (const bagId of bagsToMove) {
-//             delete allBoxesList[boxIndex].bags[bagId];
-//         }
-
-//         appState.setState({
-//             allBoxesList: [...allBoxesList],
-//         });
-//     }
-// }
-
 const filterUnshippedBoxes = (boxList) => {
-    return boxList.filter(box => !box[conceptIds.submitShipmentFlag] || box[conceptIds.submitShipmentFlag] !== conceptIds.yes);
+    return boxList.filter(box => box[conceptIds.submitShipmentFlag] !== conceptIds.yes);
 }
 
-// retain for future use
 const filterBoxesByLocation = (boxList, selectedLocation) => {
-    console.log('filterBoxesByLocation', boxList, selectedLocation);
     if (selectedLocation === 'none') return [];
     const selectedLocationConceptId = siteSpecificLocationToConceptId[selectedLocation];
     return boxList.filter(box => box[conceptIds.shippingLocation] === selectedLocationConceptId);
@@ -155,7 +153,14 @@ const filterBoxesByLocation = (boxList, selectedLocation) => {
 const createBoxAndBagsObj = (boxList) => {
     return boxList.reduce((createdObj, boxInList) => {
         const boxId = boxInList[conceptIds.shippingBoxId];
-        createdObj[boxId] = boxInList['bags'];
+        const bags = { ...boxInList['bags'] };
+        if (bags['undefined']) console.log('FOUND UNDEFINED KEY IN BAGS: bags[undefined]', boxId, bags['undefined']);
+        delete bags['undefined'];
+
+        if (boxId) {
+            console.log('boxInList[bags]', bags);
+            createdObj[boxId] = bags;
+        }
 
         return createdObj;
     }, {});
@@ -186,11 +191,13 @@ const addSpecimenDataToDetailBox = (boxAndBagsObj, finalizedSpecimenList) => {
                 const specimenBagId = bag.arrElements[0].split(' ')[0];
                 const foundSpecimenDetailsBag = specimenBagLookup[specimenBagId];
                 if (foundSpecimenDetailsBag) {
-                    specimenDetails['collectionData'] = {};
-                    specimenDetails['collectionData'][conceptIds.collection.id] = foundSpecimenDetailsBag[conceptIds.collection.id];
-                    specimenDetails['collectionData'][conceptIds.healthcareProvider] = foundSpecimenDetailsBag[conceptIds.healthcareProvider];
-                    specimenDetails['collectionData'][conceptIds.collectionLocation] = foundSpecimenDetailsBag[conceptIds.collectionLocation];
-                    specimenDetails['collectionData'][conceptIds.collection.note] = foundSpecimenDetailsBag[conceptIds.collection.note];
+                    specimenDetails['collectionData'] = {
+                        [conceptIds.collection.id]: foundSpecimenDetailsBag[conceptIds.collection.id],
+                        [conceptIds.healthcareProvider]: foundSpecimenDetailsBag[conceptIds.healthcareProvider],
+                        [conceptIds.collectionLocation]: foundSpecimenDetailsBag[conceptIds.collectionLocation],
+                        [conceptIds.collection.note]: foundSpecimenDetailsBag[conceptIds.collection.note]
+                    };
+                    
                     for (let specimenId of bag.arrElements) {
                         const specimenKey = specimenCollection.numToCid[specimenId.split(' ')[1]];    
                         specimenDetails[specimenId] = foundSpecimenDetailsBag[specimenKey] ? foundSpecimenDetailsBag[specimenKey] : {};
@@ -213,16 +220,17 @@ const addBoxDataToDetailBox = (boxAndBagsObj, boxList) => {
     for (let boxObj in boxAndBagsObj) {
         const boxInList = boxListLookup[boxObj];
 
-        const boxData = {};
-        boxData[conceptIds.firstBagAddedToBoxTimestamp] = boxInList[conceptIds.firstBagAddedToBoxTimestamp];
-        boxData[conceptIds.shippingShipDateModify] = boxInList[conceptIds.shippingShipDateModify];
-        boxData[conceptIds.shippingLocation] = boxInList[conceptIds.shippingLocation];
-        boxData[conceptIds.loginSite] = boxInList[conceptIds.loginSite];
-        boxData[conceptIds.containsOrphanFlag] = boxInList[conceptIds.containsOrphanFlag];
-        boxData[conceptIds.shippingBoxId] = boxInList[conceptIds.shippingBoxId];
-        boxData[conceptIds.submitShipmentFlag] = boxInList[conceptIds.submitShipmentFlag] ?? conceptIds.no;
-        boxData[conceptIds.shippedByFirstName] = boxInList[conceptIds.shippedByFirstName] ?? '';
-        boxData['siteAcronym'] = boxInList['siteAcronym'];
+        const boxData = {
+            [conceptIds.firstBagAddedToBoxTimestamp]: boxInList[conceptIds.firstBagAddedToBoxTimestamp],
+            [conceptIds.shippingShipDateModify]: boxInList[conceptIds.shippingShipDateModify],
+            [conceptIds.shippingLocation]: boxInList[conceptIds.shippingLocation],
+            [conceptIds.loginSite]: boxInList[conceptIds.loginSite],
+            [conceptIds.containsOrphanFlag]: boxInList[conceptIds.containsOrphanFlag],
+            [conceptIds.shippingBoxId]: boxInList[conceptIds.shippingBoxId],
+            [conceptIds.submitShipmentFlag]: boxInList[conceptIds.submitShipmentFlag] ?? conceptIds.no,
+            [conceptIds.shippedByFirstName]: boxInList[conceptIds.shippedByFirstName] ?? '',
+            'siteAcronym': boxInList['siteAcronym']
+        };
 
         boxAndBagsObj[boxObj]['boxData'] = boxData;
     }
