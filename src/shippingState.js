@@ -15,11 +15,9 @@ import conceptIds from './fieldToConceptIdMapping.js';
 export const setAllShippingState = (availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName, selectedLocation) => {
     const boxesByProviderList = filterUnshippedBoxes(allBoxesList);
     const boxesByLocationList = filterBoxesByLocation(boxesByProviderList, selectedLocation);
-    //const allBoxesObj = createBoxAndBagsObj(allBoxesList); // all boxes for the healthcare provider
     const providerBoxesObj = createBoxAndBagsObj(boxesByProviderList); // provider-specific data in the 'select boxes to ship' section
     const providerBoxWithSpecimenData = addSpecimenDataToDetailBox(providerBoxesObj, finalizedSpecimenList);
     const detailedProviderBoxes = addBoxDataToDetailBox(providerBoxWithSpecimenData, boxesByProviderList);
-    console.log('detailedProviderBoxes', detailedProviderBoxes);
 
     appState.setState({
         allBoxesList: allBoxesList,
@@ -154,7 +152,7 @@ const createBoxAndBagsObj = (boxList) => {
     return boxList.reduce((createdObj, boxInList) => {
         const boxId = boxInList[conceptIds.shippingBoxId];
         const bags = { ...boxInList['bags'] };
-        
+
         delete bags['undefined'];
 
         if (boxId) {

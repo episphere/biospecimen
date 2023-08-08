@@ -12,9 +12,7 @@ import conceptIds from '../fieldToConceptIdMapping.js';
 export const shippingDashboard = (auth, route) => {
     auth.onAuthStateChanged(async user => {
         if (user) {
-            console.time('userAuthorization');
             const responseData = await userAuthorization(route, user.displayName ? user.displayName : user.email);
-            console.timeEnd('userAuthorization');
             if ( responseData.isBiospecimenUser === false ) {
                 document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
                 document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();

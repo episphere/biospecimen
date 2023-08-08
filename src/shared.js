@@ -218,8 +218,10 @@ export const hideAnimation = () => {
 }
 
 export const userAuthorization = async (route, name) => {
+    logAPICallStartDev('userAuthorization');
     showAnimation();
     const response = await validateUser();
+    logAPICallEndDev('userAuthorization');
     if(response.code === 200) {
         const responseData = response.data;
         if(responseData.role === 'admin' || responseData.role === 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name || responseData.email);
