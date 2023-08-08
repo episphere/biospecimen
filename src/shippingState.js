@@ -154,11 +154,10 @@ const createBoxAndBagsObj = (boxList) => {
     return boxList.reduce((createdObj, boxInList) => {
         const boxId = boxInList[conceptIds.shippingBoxId];
         const bags = { ...boxInList['bags'] };
-        if (bags['undefined']) console.log('FOUND UNDEFINED KEY IN BAGS: bags[undefined]', boxId, bags['undefined']);
+        
         delete bags['undefined'];
 
         if (boxId) {
-            console.log('boxInList[bags]', bags);
             createdObj[boxId] = bags;
         }
 

@@ -76,9 +76,6 @@ export const startReport = async () => {
     populateBoxTable(0, {});
     addPaginationFunctionality(numPages, {});
     hideAnimation();
-    
-    //addEventSubmitAddBag();
-    
 }
 
 export const showReportsManifest = async (currPage) => {

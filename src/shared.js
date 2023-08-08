@@ -1,6 +1,6 @@
 import { userNavBar, adminNavBar, nonUserNavBar, unAuthorizedUser } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
-import { shippingManifest } from "./pages/shipping.js"
+import { generateShippingManifest } from "./pages/shipping.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
 import { workflows, specimenCollection } from "./tubeValidation.js";
 import { signOut } from "./pages/signIn.js";
@@ -365,7 +365,7 @@ export const shippingPrintManifestReminder = (boxesToShip, userName, tempCheckSt
 `;
   const shipManifestConfirmButton = document.getElementById("shipManifestConfirm")
   shipManifestConfirmButton.addEventListener("click", async () => {
-    await shippingManifest(boxesToShip, userName, tempCheckStatus, currShippingLocationNumber);
+    generateShippingManifest(boxesToShip, userName, tempCheckStatus, currShippingLocationNumber);
   })
 }
 
@@ -459,8 +459,7 @@ export const removeSingleError = (id) => {
 }
 
 export const storeSpecimen = async (array) => {
-  console.log('calling storeSpecimen');
-  console.time('storeSpecimen');
+    logAPICallStartDev('storeSpecimen');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -471,13 +470,11 @@ export const storeSpecimen = async (array) => {
         body: JSON.stringify(array)
     }
     const response = await fetch(`${api}api=addSpecimen`, requestObj);
-    console.timeEnd('storeSpecimen');
+    logAPICallEndDev('storeSpecimen');
     return response.json();
 }
 
 export const checkAccessionId = async (data) => {
-  console.log('calling checkAccessionId');
-  console.time('checkAccessionId');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -488,13 +485,11 @@ export const checkAccessionId = async (data) => {
         body: JSON.stringify(data)
     }
     const response = await fetch(`${api}api=accessionIdExists`, requestObj);
-    console.timeEnd('checkAccessionId');
     return response.json();
 }
 
 export const updateSpecimen = async (array) => {
-  console.log('calling updateSpecimen');
-  console.time('updateSpecimen');
+    logAPICallStartDev('updateSpecimen');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -505,13 +500,11 @@ export const updateSpecimen = async (array) => {
         body: JSON.stringify(array)
     }
     const response = await fetch(`${api}api=updateSpecimen`, requestObj);
-    console.timeEnd('updateSpecimen');
+    logAPICallEndDev('updateSpecimen');
     return response.json();
 }
 
 export const checkDerivedVariables = async (array) => {
-  console.log('calling checkDerivedVariables');
-  console.time('checkDerivedVariables');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -522,7 +515,6 @@ export const checkDerivedVariables = async (array) => {
         body: JSON.stringify(array)
     }
     const response = await fetch(`${api}api=checkDerivedVariables`, requestObj);
-    console.timeEnd('checkDerivedVariables');
     return response.json();
 }
 
@@ -541,8 +533,7 @@ export const addBox = async (box) =>{
 }
 
 export const updateBox = async (box) => {
-  console.log('calling updateBox');
-  console.time('updateBox');
+  logAPICallStartDev('updateBox');
   const idToken = await getIdToken();
   let requestObj = {
       method: "POST",
@@ -553,7 +544,7 @@ export const updateBox = async (box) => {
       body: JSON.stringify(convertToFirestoreBox(box))
   }
   const response = await fetch(`${api}api=updateBox`, requestObj);
-  console.timeEnd('updateBox');
+  logAPICallEndDev('updateBox');
   return response.json();
 }
 
@@ -575,8 +566,6 @@ export const updateNewTempDate = async () =>{
  * @returns 
  */
 export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
-  console.log('calling ship');
-  console.time('ship');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -587,13 +576,10 @@ export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
         body: JSON.stringify({boxIdToTrackingNumberMap, shippingData})
     }
     const response = await fetch(`${api}api=ship`, requestObj);
-    console.timeEnd('ship');
     return response.json();
 }
 
 export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) => {
-  console.log('calling getPage');
-  console.time('getPage');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -604,7 +590,6 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) =
         body: JSON.stringify({"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy, "filters":filters})
     }
     const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
-    console.timeEnd('getPage');
     return response.json();
 }
 
@@ -760,9 +745,7 @@ export const convertToFirestoreBox = (inputBox) => {
 
 // Fetches all boxes for site
 export const getBoxes = async () => {
-  console.log('calling getBoxes');
-  console.time('getBoxes');
-
+  logAPICallStartDev('getBoxes');
   const idToken = await getIdToken();
   const response = await fetch(`${api}api=searchBoxes`, {
       method: 'GET',
@@ -776,13 +759,12 @@ export const getBoxes = async () => {
       .map(convertToOldBox)
       .filter(box => box[conceptIds.submitShipmentFlag] !== conceptIds.yes);
 
-  console.timeEnd('getBoxes');
+  logAPICallEndDev('getBoxes');
   return { data: boxesToReturn };
 };
 
 export const getAllBoxes = async (flag) => {
-  console.log('calling getAllBoxes');
-  console.time('getAllBoxes');
+  logAPICallStartDev('getAllBoxes');
   const idToken = await getIdToken();
   if (flag !== `bptl`) flag = ``
   const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
@@ -793,16 +775,15 @@ export const getAllBoxes = async (flag) => {
   });
   let res = await response.json();
   res.data = res.data.map(convertToOldBox);
-  console.timeEnd('getAllBoxes');
+  logAPICallEndDev('getAllBoxes');
   return res;
 };
 
 // searches boxes collection by login site (789843387) and Site-specific location id (560975149)
 // filters out any boxes where submitShipmentFlag is true
-// TODO recommend adding 145971562 (shipment submitted flag = no) to all boxes on creation. Then we can rewrite the searchBoxesByLocation function to only return boxes where this variable is no (not shipped)
+// TODO: future: recommend adding 145971562 (shipment submitted flag = no) to all boxes on creation. Then we can rewrite the searchBoxesByLocation function to only return boxes where this variable is no (not shipped)
 export const getBoxesByLocation = async (location) => {
-    console.log('calling getBoxesByLocation');
-    console.time('getBoxesByLocation');
+    logAPICallStartDev('getBoxesByLocation');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchBoxesByLocation`, {
         method: "POST",
@@ -815,14 +796,12 @@ export const getBoxesByLocation = async (location) => {
 
     let res = await response.json();
     res.data = res.data.map(convertToOldBox);
-    console.timeEnd('getBoxesByLocation');
+    logAPICallEndDev('getBoxesByLocation');
     return res;
 }
 
 export const searchSpecimen = async (masterSpecimenId, allSitesFlag) => {
-  console.log('calling searchSpecimen:');
-  console.log('masterSpecimenId: ', masterSpecimenId);
-  console.log('allSitesFlag: ', allSitesFlag);
+    logAPICallStartDev('searchSpecimen');
     const idToken = await getIdToken();
     const specimenQuery =  `&masterSpecimenId=${masterSpecimenId}` + (allSitesFlag ? `&allSitesFlag=${allSitesFlag}`: ``)
     const response = await fetch(`${api}api=searchSpecimen${specimenQuery}`, {
@@ -831,12 +810,11 @@ export const searchSpecimen = async (masterSpecimenId, allSitesFlag) => {
             Authorization:"Bearer "+idToken
         }
     });
+    logAPICallEndDev('searchSpecimen');
     return response.json();
 }
 
 export const getParticipantCollections = async (token) => {
-    console.log('calling getParticipantCollections');
-    console.time('getParticipantCollections');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getParticipantCollections&token=${token}`, {
         method: "GET",
@@ -844,13 +822,10 @@ export const getParticipantCollections = async (token) => {
             Authorization:"Bearer "+idToken
         }
     });
-    console.timeEnd('getParticipantCollections');
     return response.json();
 }
 
 export const removeBag = async(boxId, bags) => {
-  console.log('calling removeBag');
-  console.time('removeBag');
     const currDate = new Date().toISOString();
     const bagDataToRemove = {boxId:boxId, bags:bags, date:currDate}
     const idToken = await getIdToken();
@@ -862,7 +837,6 @@ export const removeBag = async(boxId, bags) => {
         },
         body: JSON.stringify(bagDataToRemove)
     });
-    console.timeEnd('removeBag');
     return await response.json();
 }
 
@@ -871,8 +845,7 @@ export const removeBag = async(boxId, bags) => {
  * @returns {object|array} returns a response object if response is 200 or an empty array
  */
 export const searchSpecimenInstitute = async () => {
-  console.log('calling searchSpecimenInstitute: (no params)');
-  console.time('searchSpecimenInstitute');
+    logAPICallStartDev('searchSpecimenInstitute');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen`, {
     method: "GET",
@@ -880,7 +853,7 @@ export const searchSpecimenInstitute = async () => {
         Authorization:"Bearer "+idToken
         }
     });
-    console.timeEnd('searchSpecimenInstitute');
+    logAPICallEndDev('searchSpecimenInstitute');
     if (response.status === 200) {
         return await response.json();
     } else {
@@ -896,8 +869,7 @@ export const searchSpecimenInstitute = async () => {
  * 
  */
 export const searchSpecimenByRequestedSite = async (requestedSite) => {
-  console.log('calling searchSpecimenByRequestedSite:');
-  console.log('requestedSite: ', requestedSite);
+    logAPICallStartDev('searchSpecimenByRequestedSite');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}`, {
     method: "GET",
@@ -905,6 +877,7 @@ export const searchSpecimenByRequestedSite = async (requestedSite) => {
         Authorization:"Bearer "+idToken
         }
     });
+    logAPICallEndDev('searchSpecimenByRequestedSite');
     if (response.status === 200) {
         const responseObject = await response.json();
         return responseObject;
@@ -921,7 +894,6 @@ export const searchSpecimenByRequestedSite = async (requestedSite) => {
  */
 // * * this doesn't take long, but the searchSpecimenInstitute() call takes a while
 export const filterSpecimenCollectionList = async () => {
-  console.log('calling filterSpecimenCollectionList');
     const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
     const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ?? [];
     
@@ -965,8 +937,6 @@ export const filterSpecimenCollectionList = async () => {
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
-    console.log('calling removeMissingSpecimen');
-    console.time('removeMissingSpecimen');
     //https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
     let toPass = {tubeId: tubeId};
     const idToken = await getIdToken();
@@ -978,13 +948,11 @@ export const removeMissingSpecimen = async (tubeId) => {
         },
         body: JSON.stringify(toPass)
     });
-    console.timeEnd('removeMissingSpecimen');
     return await response.json();
 }
 
 export const getLocationsInstitute = async () => {
-    console.log('calling getLocationsInstitute');
-    console.time('getLocationsInstitute');
+    logAPICallStartDev('getLocationsInstitute');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getLocations`, {
         method: "GET",
@@ -999,13 +967,12 @@ export const getLocationsInstitute = async () => {
         let currJSON = arr[i];
         locations = locations.concat(currJSON[conceptIds.shippingLocation]);
     }
-    console.timeEnd('getLocationsInstitute');
+    logAPICallEndDev('getLocationsInstitute');
     return locations;
 }
 
 export const getNumPages = async (numPerPage, filter) => {
-    console.log('calling getNumPages');
-    console.time('getNumPages');
+    logAPICallStartDev('getNumPages');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getNumBoxesShipped`, {
         method: "POST",
@@ -1017,13 +984,11 @@ export const getNumPages = async (numPerPage, filter) => {
     });
     let res = await response.json();
     let numBoxes = res.data;
-    console.timeEnd('getNumPages');
+    logAPICallEndDev('getNumPages');
     return Math.ceil(numBoxes/numPerPage);
 }
 
 export const getSiteCouriers = async () => {
-    console.log('calling getSiteCouriers');
-    console.time('getSiteCouriers');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getLocations`, {
         method: "GET",
@@ -1040,13 +1005,10 @@ export const getSiteCouriers = async () => {
         '149772928': 'World Courier'
     }
     siteCouriers = siteCouriers.map(id => conversion[id]);
-    console.timeEnd('getSiteCouriers');
     return siteCouriers;
 }
 
 export const getNextTempCheck = async () => {
-    console.log('calling getNextTempCheck');
-    console.time('getNextTempCheck');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getLocations`, {
         method: "GET",
@@ -1061,7 +1023,6 @@ export const getNextTempCheck = async () => {
     let nextDate = currJSON['nextTempMonitor']
     let todaysDate = new Date();
     let tempDate = new Date(Date.parse(nextDate))
-    console.timeEnd('getNextTempCheck');
     if(todaysDate >= tempDate){
         return true;
     }
@@ -1070,10 +1031,9 @@ export const getNextTempCheck = async () => {
 }
 
 export const generateBarCode = (id, connectId) => {
-    console.log('calling generateBarCode');
-    console.time('generateBarCode');
+    logAPICallStartDev('generateBarCode');
     JsBarcode(`#${id}`, connectId, {height: 30});
-    console.timeEnd('generateBarCode');
+    logAPICallEndDev('generateBarCode');
 }
 
 export const getUpdatedParticipantData = async (participantData) => {
@@ -1083,8 +1043,6 @@ export const getUpdatedParticipantData = async (participantData) => {
 }
 
 export const updateCollectionSettingData = async (biospecimenData, tubes, data) => {
-  console.log('calling updateCollectionSettingData');
-  console.time('updateCollectionSettingData');
   participantData = await getUpdatedParticipantData(participantData);
 
     let settings;
@@ -1169,14 +1127,9 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, data) 
         uid: participantData?.state?.uid
     };
     await updateParticipant(settingData);
-    console.timeEnd('updateCollectionSettingData');
-
 }
 
 export const updateBaselineData = async (siteTubesList, data) => {
-    console.log('calling updateBaselineData');
-    console.time('updateBaselineData');
-
     data = await getUpdatedParticipantData(data);
 
     const response = await getParticipantCollections(data.token);
@@ -1233,7 +1186,6 @@ export const updateBaselineData = async (siteTubesList, data) => {
     };
         
     await updateParticipant(baselineData);
-    console.timeEnd('updateBaselineData');
 }
 
 export const siteFullNames = {
@@ -2067,9 +2019,6 @@ export const checkInParticipant = async (data, visitConcept) => {
 };
 
 export const checkOutParticipant = async (data) => {
-  console.log('calling checkOutParticipant');
-  console.time('checkOutParticipant');
-
     let visits = data['331584571'];
     const checkedInVisit = getCheckedInVisit(data);
     const user_uid = data.state.uid;
@@ -2089,7 +2038,6 @@ export const checkOutParticipant = async (data) => {
          
          await updateParticipant(checkOutData);
     }
-    console.timeEnd('checkOutParticipant');
 };
 
 export const getCollectionsByVisit = async (data) => {
@@ -2148,8 +2096,7 @@ export const SSOConfig = (email) => {
 }
 
 export const getParticipantSelection = async (filter) => {
-  console.log('calling getParticipantSelection');
-  console.time('getParticipantSelection');
+    logAPICallStartDev('getParticipantSelection');
     const idToken = await getIdToken();
     const response = await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=getParticipantSelection&type=${filter}`, 
     {
@@ -2158,7 +2105,7 @@ export const getParticipantSelection = async (filter) => {
         Authorization: "Bearer " + idToken,
       },
     });
-    console.timeEnd('getParticipantSelection');
+    logAPICallEndDev('getParticipantSelection');
     return response.json();
   }
      
@@ -2270,7 +2217,7 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
       }
   }    
    catch (e) {
-      console.log(e)
+      console.error(e)
       await localforage.setItem("shipData", shipSetForage)
   }
 }
@@ -2520,4 +2467,19 @@ export const requestsBlocker = {
 export const restrictNonBiospecimenUser = () => {
   document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
   document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
+}
+
+export const isDev = () => !(location.host === urls.prod || location.host === urls.stage);
+
+export const logAPICallStartDev = (funcName) => {
+  if (isDev) {
+    console.log(`calling ${funcName}`);
+    console.time(funcName);
+  }
+}
+
+export const logAPICallEndDev = (funcName) => {
+  if (isDev) {
+    console.timeEnd(funcName);
+  }
 }
