@@ -124,19 +124,19 @@ const participantStatus = (data, collections) => {
 
     collections.forEach(collection => {
         bloodTubes?.forEach(tube => {
-            if(collection[tube.concept][conceptIds.collection.tube.isCollected] == conceptIds.yes) {
+            if(collection?.[tube.concept]?.[conceptIds.collection.tube.isCollected] == conceptIds.yes) {
                 bloodCollected.push(collection);
             }
         });
 
         urineTubes?.forEach(tube => {
-            if(collection[tube.concept][conceptIds.collection.tube.isCollected] == conceptIds.yes) {
+            if(collection?.[tube.concept]?.[conceptIds.collection.tube.isCollected] == conceptIds.yes) {
                 urineCollected.push(collection);
             }
         });
 
         mouthwashTubes?.forEach(tube => {
-            if(collection[tube.concept][conceptIds.collection.tube.isCollected] == conceptIds.yes) {
+            if(collection?.[tube.concept]?.[conceptIds.collection.tube.isCollected] == conceptIds.yes) {
                 mouthwashCollected.push(collection);
             }
         });
