@@ -30,10 +30,9 @@ export const shippingDashboard = (auth, route) => {
     });
 }
 
-
 // Check for a stored location and initialize the shipping page.
 export const startShipping = async (userName, loadFromState = false, currBoxId) => {    
-    buildNavAndHeaderDOM();
+    buildShippingNavAndHeader();
 
     const storedLocation = getStoredLocationOnInit();
 
@@ -41,7 +40,7 @@ export const startShipping = async (userName, loadFromState = false, currBoxId) 
     await buildShippingInterface(storedLocation, userName, loadFromState, currBoxId);
 }
 
-const buildNavAndHeaderDOM = () => {
+const buildShippingNavAndHeader = () => {
     const navBarParticipantCheckIn = document.getElementById('navBarParticipantCheckIn');
     if (navBarParticipantCheckIn) navBarParticipantCheckIn.classList.add('disabled');
 
@@ -239,9 +238,8 @@ const populateBoxesToShipTable = () => {
 }
 
 export const populateTempNotification = () => {
-
     let checkDate = false;
-    let toToggle = document.getElementById('tempTubeReminder');
+    const toToggle = document.getElementById('tempTubeReminder');
     if (checkDate == true) {
         toToggle.style.display = 'block';
     }
@@ -252,7 +250,7 @@ export const populateTempNotification = () => {
 
 export const populateTempCheck = () => {
     let checkDate = false;
-    let toToggle = document.getElementById('checkForTemp');
+    const toToggle = document.getElementById('checkForTemp');
     if (checkDate == true) {
         toToggle.style.display = 'block';
     }
