@@ -3180,8 +3180,8 @@ export const addEventSaveAndContinueButton = async (boxIdAndBagsObj, userName, b
             };
         }
 
-        const isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxIdArray );
-        if (isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxIdArray) && boxIdArray.length > 1)){
+        const isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxIdArray);
+        if (isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxIdArray) && boxIdArray.length > 1)) {
             shippingDuplicateMessage();
             return;
           }
