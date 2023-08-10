@@ -904,23 +904,23 @@ export const filterSpecimenCollectionList = async () => {
     
     // loop over filtered data with shipFlag
     for (let i = 0; i < finalizedSpecimenList.length; i++){
-        const currSpecimen = finalizedSpecimenList[i];
+        const currCollection = finalizedSpecimenList[i];
 
-        if (currSpecimen[conceptIds.collection.bloodUrineBagScan]) {
-            delete currSpecimen[conceptIds.collection.bloodUrineBagScan]
+        if (currCollection[conceptIds.collection.bloodUrineBagScan]) {
+            delete currCollection[conceptIds.collection.bloodUrineBagScan]
         }
 
-        if (currSpecimen[conceptIds.collection.mouthwashBagScan]) {
-            delete currSpecimen[conceptIds.collection.mouthwashBagScan] 
+        if (currCollection[conceptIds.collection.mouthwashBagScan]) {
+            delete currCollection[conceptIds.collection.mouthwashBagScan] 
         }
  
         for (let tubeCid of specimenCollection.tubeCidList) {
-            if (!currSpecimen[tubeCid]) continue;
+            if (!currCollection[tubeCid]) continue;
 
-            const currTube = currSpecimen[tubeCid];
+            const currTube = currCollection[tubeCid];
             // delete specimen key if tube collected key is no
             if (!currTube[conceptIds.collection.tube.isCollected] || currTube[conceptIds.collection.tube.isCollected] == conceptIds.no){
-                delete currSpecimen[tubeCid];
+                delete currCollection[tubeCid];
             }
 
             // delete tube if it contains deviation concept ID that disallows shipping
@@ -930,7 +930,7 @@ export const filterSpecimenCollectionList = async () => {
                 tubeDeviation?.[conceptIds.insufficientVolumeSpecimenDeviation] == conceptIds.yes|| 
                 tubeDeviation?.[conceptIds.mislabelledDiscardSpecimenDeviation] == conceptIds.yes || 
                 tubeDeviation?.[conceptIds.notFoundSpecimenDeviation] == conceptIds.yes) {
-                    delete currSpecimen[tubeCid];
+                    delete currCollection[tubeCid];
             }
         }
     }
