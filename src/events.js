@@ -17,7 +17,7 @@ import { specimenTemplate } from './pages/specimen.js';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, totalCollectionIDLength, workflows, specimenCollection, deviationReasons, refusedShippingDeviationConceptList} from './tubeValidation.js';
-import { updateShippingStateAddBagToBox } from './shippingState.js';
+import { updateShippingStateAddBagToBox, updateShippingStateSelectedLocation } from './shippingState.js';
 import conceptIds from './fieldToConceptIdMapping.js';
 
 
@@ -422,8 +422,13 @@ export const addEventLocationSelect = (elemId, pageAndElement) => {
         const selection = event.target.value;
         const prevSelections = JSON.parse(localStorage.getItem('selections'));
         localStorage.setItem('selections', JSON.stringify({...prevSelections, [pageAndElement] : selection}));
-        if (selection && selection !== 'none') {
-            const currBoxId = document.getElementById('selectBoxList').value;
+        if (selection) {
+            updateShippingStateSelectedLocation(selection);
+            const detailedLocationBoxes = appState.getState().detailedLocationBoxes;
+            const locationBoxIds = Object.keys(detailedLocationBoxes).length > 0 ? Object.keys(detailedLocationBoxes).sort() : [''];
+            const selectedBoxId = document.getElementById('selectBoxList').value;
+            const currBoxId = (selectedBoxId && locationBoxIds.includes(selectedBoxId)) ? selectedBoxId : locationBoxIds[0];
+
             startShipping(appState.getState().userName, true, currBoxId);
         }
     };
@@ -453,9 +458,9 @@ export const addEventModalAddBox = () => {
         const isCreateBoxSuccess = await addNewBox();
         hideAnimation();
 
-        const detailedProviderBoxes = appState.getState().detailedProviderBoxes;
-        const boxIdsArray = Object.keys(detailedProviderBoxes).sort(compareBoxIds);
-        populateModalSelect(detailedProviderBoxes);
+        const detailedLocationBoxes = appState.getState().detailedLocationBoxes;
+        const boxIdsArray = Object.keys(detailedLocationBoxes).sort(compareBoxIds);
+        populateModalSelect(detailedLocationBoxes);
         populateViewShippingBoxContentsList(boxIdsArray[boxIdsArray.length - 1]);
         checkAlertState(isCreateBoxSuccess, createBoxSuccessAlertEle, createBoxErrorAlertEle)
         // reset alertState

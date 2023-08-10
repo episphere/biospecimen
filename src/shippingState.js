@@ -12,21 +12,36 @@ import conceptIds from './fieldToConceptIdMapping.js';
  * @param {array} finalizedSpecimenList - the list of finalized specimens for the healthcare provider
  * @param {string} userName - the name of the logged in user
  */
-export const setAllShippingState = (availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName, selectedLocation) => {
+export const setAllShippingState = (availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName) => {
     const boxesByProviderList = filterUnshippedBoxes(allBoxesList);
-    const boxesByLocationList = filterBoxesByLocation(boxesByProviderList, selectedLocation);
+    const boxesByLocationList = filterBoxListBoxesByLocation(boxesByProviderList);
     const providerBoxesObj = createBoxAndBagsObj(boxesByProviderList); // provider-specific data in the 'select boxes to ship' section
     const providerBoxWithSpecimenData = addSpecimenDataToDetailBox(providerBoxesObj, finalizedSpecimenList);
     const detailedProviderBoxes = addBoxDataToDetailBox(providerBoxWithSpecimenData, boxesByProviderList);
+    const detailedLocationBoxes = filterDetailBoxesByLocation(detailedProviderBoxes);
 
     appState.setState({
         allBoxesList: allBoxesList,
         availableCollectionsObj: availableCollectionsObj,
         availableLocations: availableLocations,
         boxesByLocationList: boxesByLocationList,
+        detailedLocationBoxes: detailedLocationBoxes,
         detailedProviderBoxes: detailedProviderBoxes,
         finalizedSpecimenList: finalizedSpecimenList,
         userName: userName,
+    });
+}
+
+export const updateShippingStateSelectedLocation = (selectedLocation) => {
+    appState.setState({
+        selectedLocation: selectedLocation,
+    });
+
+    const detailedProviderBoxes = appState.getState().detailedProviderBoxes;
+    const detailedLocationBoxes = filterDetailBoxesByLocation(detailedProviderBoxes);
+
+    appState.setState({
+        detailedLocationBoxes: detailedLocationBoxes,
     });
 }
 
@@ -130,10 +145,12 @@ export const updateShippingStateCreateBox = (boxToAdd) => {
     const locationBoxesObj = createBoxAndBagsObj(updatedBoxesByLocationList); // provider-specific data in the 'select boxes to ship' section
     const locationBoxWithSpecimenData = addSpecimenDataToDetailBox(locationBoxesObj, finalizedSpecimenList);
     const detailedProviderBoxes = addBoxDataToDetailBox(locationBoxWithSpecimenData, updatedBoxesByLocationList);
+    const detailedLocationBoxes = filterDetailBoxesByLocation(detailedProviderBoxes);
 
     appState.setState({ 
         allBoxesList: updatedAllBoxesList,
         boxesByLocationList: updatedBoxesByLocationList,
+        detailedLocationBoxes: detailedLocationBoxes,
         detailedProviderBoxes: detailedProviderBoxes,
     });
 }
@@ -142,7 +159,24 @@ const filterUnshippedBoxes = (boxList) => {
     return boxList.filter(box => box[conceptIds.submitShipmentFlag] !== conceptIds.yes);
 }
 
-const filterBoxesByLocation = (boxList, selectedLocation) => {
+const filterDetailBoxesByLocation = (detailedProviderBoxes) => {
+    const selectedLocation = appState.getState().selectedLocation;
+    const detailedLocationBoxes = { ...detailedProviderBoxes };
+
+    if (selectedLocation === 'none') return {};
+    const selectedLocationConceptId = siteSpecificLocationToConceptId[selectedLocation];
+
+    for (let boxKey in detailedLocationBoxes) {
+        if (!detailedLocationBoxes[boxKey].boxData || detailedLocationBoxes[boxKey].boxData[conceptIds.shippingLocation] !== selectedLocationConceptId) {
+            delete detailedLocationBoxes[boxKey];
+        }
+    }
+
+    return detailedLocationBoxes;
+}
+
+const filterBoxListBoxesByLocation = (boxList) => {
+    const selectedLocation = appState.getState().selectedLocation;
     if (selectedLocation === 'none') return [];
     const selectedLocationConceptId = siteSpecificLocationToConceptId[selectedLocation];
     return boxList.filter(box => box[conceptIds.shippingLocation] === selectedLocationConceptId);

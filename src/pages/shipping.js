@@ -6,7 +6,7 @@ import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBack
         addEventPreventTrackingConfirmPaste, addEventReturnToPackaging, addEventReturnToReviewShipmentContents, addEventSaveButton, addEventShipPrintManifest,
         addEventTrackingNumberScanAutoFocus, addEventTrimTrackingNums, compareBoxIds, getInstituteSpecimensList, populateCourierBox, populateFinalCheck, populateTrackingQuery } from "./../events.js";     
 import { homeNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
-import { setAllShippingState, updateShippingStateCreateBox, updateShippingStateRemoveBagFromBox } from '../shippingState.js';
+import { setAllShippingState, updateShippingStateCreateBox, updateShippingStateRemoveBagFromBox, updateShippingStateSelectedLocation } from '../shippingState.js';
 import conceptIds from '../fieldToConceptIdMapping.js';
 
 export const shippingDashboard = (auth, route) => {
@@ -31,11 +31,10 @@ export const shippingDashboard = (auth, route) => {
 // Check for a stored location and initialize the shipping page.
 export const startShipping = async (userName, loadFromState = false, currBoxId) => {    
     buildShippingNavAndHeader();
-
-    const storedLocation = getStoredLocationOnInit();
-
+    getStoredLocationOnInit();
     buildShippingDOM();
-    await buildShippingInterface(storedLocation, userName, loadFromState, currBoxId);
+
+    await buildShippingInterface(userName, loadFromState, currBoxId);
 }
 
 const buildShippingNavAndHeader = () => {
@@ -63,11 +62,10 @@ const buildShippingDOM = async () => {
  * NOTE: allBoxesList is used because the larger filter iterates ALL boxes and removes specimens that belong to the shipped boxes.
  * TODO: future change: add shipped property and only pull unshipped.
  * This will run asyncronously when pulling new data (loadFromState = false) and synchronously when loading from state (loadFromState = true).
- * @param {string} selectedLocation - the user's selected location from local storage.
  * @param {*} userName - the logged-in userName.
  * @param {*} loadFromState - whether to load data from state or from the server.
  */
-const buildShippingInterface = async (selectedLocation, userName, loadFromState, currBoxId) => {    
+const buildShippingInterface = async (userName, loadFromState, currBoxId) => {    
     showAnimation();
 
     let allBoxesList;
@@ -89,7 +87,7 @@ const buildShippingInterface = async (selectedLocation, userName, loadFromState,
     const { finalizedSpecimenList, availableCollectionsObj } = promiseResponse[0];
     availableLocations = promiseResponse[1];
 
-    setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName, selectedLocation);
+    setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName);
 
     populateViewShippingBoxContentsList(currBoxId), // 'View Shipping Box Contents' section
     populateBoxesToShipTable(), // 'Select boxes to ship' section
@@ -111,7 +109,9 @@ const addShippingEventListeners = () => {
 }
 
 const getStoredLocationOnInit = () => {
-    return JSON.parse(localStorage.getItem('selections'))?.shipping_location ?? 'none';
+    const selectedLocation = JSON.parse(localStorage.getItem('selections'))?.shipping_location ?? 'none';
+    updateShippingStateSelectedLocation(selectedLocation);
+    return selectedLocation;
 }
 
 /**
@@ -209,10 +209,11 @@ const populateAvailableCollectionsList = async (boxList, loadFromState = false) 
 }
 
 const populateBoxesToShipTable = () => {
-    const detailedBoxes = appState.getState().detailedProviderBoxes;
+    //TODO: filter out empty boxes
+    const detailedBoxes = appState.getState().detailedProviderBoxes//.filter(box => box['bags'].length !== 0);
     const table = document.getElementById("saveTable");
     table.innerHTML = renderBoxesToShipTableHeader();
-
+    
     if (Object.keys(detailedBoxes).length > 0) {
         const sortedBoxKeys = Object.keys(detailedBoxes).sort();
         sortedBoxKeys.forEach((box, i) => {
@@ -225,12 +226,14 @@ const populateBoxesToShipTable = () => {
 
             const currRow = table.insertRow(i + 1);
             currRow.style['background-color'] = i % 2 === 1 ? 'lightgrey' : '';
-            currRow.innerHTML += renderBoxesToShipRow(boxStartedTimestamp, boxLastModifiedTimestamp, box, boxLocation, numTubesInBox);
             
-            const currBoxButton = currRow.cells[6].querySelector(".boxManifestButton");
-            currBoxButton.addEventListener("click", async () => {
+            if (numTubesInBox > 0) {
+                currRow.innerHTML += renderBoxesToShipRow(boxStartedTimestamp, boxLastModifiedTimestamp, box, boxLocation, numTubesInBox);
+                const currBoxButton = currRow.cells[6].querySelector(".boxManifestButton");
+                currBoxButton.addEventListener("click", async () => {
                 generateBoxManifest(currBox);
             });
+            }
         });
     }
 }
@@ -271,45 +274,46 @@ const handleShippingBoxContentsSelector = (boxIdAndBagsObj, selectedBoxId) => {
     const boxOptionsList = boxIdArray.map(boxId => `<option>${boxId}</option>`).join('');
     const boxSelectEle = document.getElementById('selectBoxList');
     boxSelectEle.innerHTML = boxOptionsList;
-    boxSelectEle.value = selectedBoxId ?? boxIdArray[0];
+    boxSelectEle.value = selectedBoxId ?? boxIdArray[0] ?? '';
 
     return boxSelectEle.value;
 }
 
 // This is the list on shipping screen -> view shipping box contents
 export const populateViewShippingBoxContentsList = (selectedBoxId) => {
-    const boxIdAndBagsObj = appState.getState().detailedProviderBoxes;
-    const currBoxId = handleShippingBoxContentsSelector(boxIdAndBagsObj, selectedBoxId);
-    
+    const detailedLocationBoxes = appState.getState().detailedLocationBoxes;
+    const currBoxId = handleShippingBoxContentsSelector(detailedLocationBoxes, selectedBoxId);
+    const selectedLocation = appState.getState().selectedLocation;
+    const shippingBoxContentsTable = document.getElementById('currTubeTable');
+
     if (currBoxId != '') {
-        const currBox = boxIdAndBagsObj[currBoxId];
-        const shippingBoxContentsTable = document.getElementById('currTubeTable');
+        const currBox = detailedLocationBoxes[currBoxId];    
         const boxKeys = Object.keys(currBox).filter(key => key !== 'boxData' && key !== 'undefined');
+        shippingBoxContentsTable.innerHTML = renderViewBoxContentsTableHeader(selectedLocation);
 
-        shippingBoxContentsTable.innerHTML = renderViewBoxContentsTableHeader();
-
-        //set up the table
-        for (let bagNum = 0; bagNum < boxKeys.length; bagNum++) {
-            const currBagId = boxKeys[bagNum];
-            const currTubes = currBox[boxKeys[bagNum]]['arrElements'];
-            for (let tubeNum = 0; tubeNum < currTubes.length; tubeNum++) {
-                const fullTubeId = currTubes[tubeNum];
-                const tubeTypeStringArr = fullTubeId.split(' ');
-                const tubeType = translateNumToType[tubeTypeStringArr[1]] ? translateNumToType[tubeTypeStringArr[1]] : 'N/A';
-                const rowCount = shippingBoxContentsTable.rows.length;
-                const row = shippingBoxContentsTable.insertRow(rowCount);
-                
-                populateShippingBoxContentsRows(bagNum, tubeNum, row, currBagId, fullTubeId, tubeType);
-                if (tubeNum == 0) {
-                    const currDeleteButton = row.cells[3].querySelector(".delButton");
-                    handleRemoveBagButton(currDeleteButton, currTubes, currBoxId);
+        if (selectedLocation !== 'none') {
+            //set up the table
+            for (let bagNum = 0; bagNum < boxKeys.length; bagNum++) {
+                const currBagId = boxKeys[bagNum];
+                const currTubes = currBox[boxKeys[bagNum]]['arrElements'];
+                for (let tubeNum = 0; tubeNum < currTubes.length; tubeNum++) {
+                    const fullTubeId = currTubes[tubeNum];
+                    const tubeTypeStringArr = fullTubeId.split(' ');
+                    const tubeType = translateNumToType[tubeTypeStringArr[1]] ? translateNumToType[tubeTypeStringArr[1]] : 'N/A';
+                    const rowCount = shippingBoxContentsTable.rows.length;
+                    const row = shippingBoxContentsTable.insertRow(rowCount);
+                    
+                    populateShippingBoxContentsRows(bagNum, tubeNum, row, currBagId, fullTubeId, tubeType);
+                    if (tubeNum == 0) {
+                        const currDeleteButton = row.cells[3].querySelector(".delButton");
+                        handleRemoveBagButton(currDeleteButton, currTubes, currBoxId);
+                    }
                 }
             }
         }
     } else {
       // Clear table if no list is found
-      const toInsertTable = document.getElementById('currTubeTable')
-      toInsertTable.innerHTML = renderViewBoxContentsTableHeader();
+      shippingBoxContentsTable.innerHTML = renderViewBoxContentsTableHeader(selectedLocation);
     }
 }
 
@@ -407,9 +411,6 @@ const findLargestBoxData = (boxList, siteLocation) => {
 
     return { largestBoxIndex, largestBoxIndexAtLocation };
 }
-
-
-
 
 export const generateBoxManifest = (currBox) => {
     const currInstitute = currBox.boxData.siteAcronym;
@@ -673,14 +674,14 @@ const assignBagId = (tubeId, collectionId) => {
     }
 }
 
-export const populateModalSelect = (detailedProvierBoxes) => {
+export const populateModalSelect = (detailedLocationBoxes) => {
     const boxSelectEle = document.getElementById('shippingModalChooseBox');
     const selectedBoxId = boxSelectEle.getAttribute('data-new-box') || document.getElementById('selectBoxList').value;
     const addToBoxButton =  document.getElementById('addToBoxButton');
     
     addToBoxButton.removeAttribute("disabled")
     
-    const boxIds = Object.keys(detailedProvierBoxes).sort(compareBoxIds);
+    const boxIds = Object.keys(detailedLocationBoxes).sort(compareBoxIds);
     const options = boxIds.map(boxId => `<option>${boxId}</option>`).join(''); 
 
     if (options == '') {
@@ -704,7 +705,7 @@ export const populateTempSelect = (boxes) => {
 
     for (let i = 0; i < boxes.length; i++) {
         
-        var opt = document.createElement("option");
+        const opt = document.createElement("option");
         opt.value = boxes[i];
         opt.innerHTML = boxes[i];
         if(i === 0){
@@ -745,21 +746,19 @@ const populateSelectLocationList = async (availableLocations, loadFromState) => 
 const populateBoxManifestTable = (currBox) => {
     const boxManifestTable = document.getElementById('boxManifestTable');
     const bagList = Object.keys(currBox).filter(key => key !== 'boxData' && key !== 'undefined').sort(sortSpecimenKeys);
-
-    bagList.forEach((bagKey, i) => {
+    bagList.forEach((bagKey, bagIndex) => {
+        const bagIndexStart = bagIndex + 1;
         const tubesList = currBox[bagKey].arrElements;
-
         for (let i = 0; i < tubesList.length; i++) {
             const tubeDetail = currBox[bagKey].specimenDetails[tubesList[i]];
             const currRow = boxManifestTable.insertRow(i + 1);
             const tubeId = tubesList[i].split(' ');
             const tubeTypeAndColor = translateNumToType[tubeId[1]] ? translateNumToType[tubeId[1]] : 'N/A';
-
             currRow.insertCell(0).innerHTML = i === 0 ? bagKey : '';
             currRow.insertCell(1).innerHTML = tubesList[i];
             currRow.insertCell(2).innerHTML = tubeTypeAndColor;
 
-            addDeviationTypeCommentsContent(tubeDetail, currRow, i);
+            addDeviationTypeCommentsContent(tubeDetail, currRow, bagIndexStart);
         };
     });
 }
@@ -1275,14 +1274,15 @@ export const renderBoxesToShipRow = (boxStartedTimestamp, boxLastModifiedTimesta
     `;
 };
 
-export const renderViewBoxContentsTableHeader = () => {
+export const renderViewBoxContentsTableHeader = (selectedLocation) => {
     return `
         <tr>
             <th style = "border-bottom:1px solid;">Specimen Bag ID</th>
             <th style = "border-bottom:1px solid;">Full Specimen ID</th>
             <th style = "border-bottom:1px solid;">Type/Color</th>
-            <th style = "border-bottom:1px solid;"></th>
+            <th style = "border-bottom:1px solid; min-width:125px;"></th>
         </tr>
+        ${selectedLocation === 'none' ? '<tr><td colspan="1" style="text-align:center; vertical-align:middle;">Please select a shipping location</td></tr>' : ''}
     `;
 }
 

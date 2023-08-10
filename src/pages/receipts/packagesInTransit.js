@@ -4,7 +4,7 @@ import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 import { convertTime } from "../../shared.js";
-import { getSpecimenDeviation, getSpecimenComments } from "../../events.js";
+import { getSpecimenDeviationReports, getSpecimenCommentsReports } from "../../events.js";
 
 export const packagesInTransitScreen = async (auth, route) => {
     const user = auth.currentUser;
@@ -88,15 +88,26 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 };
 
 /**
- * Returns an array of shipped box items but not yet received and sorts the box items by most recent date
- * @param {array} boxes - array of all boxes from getAllBoxes(`bptl`) function
- * @returns sorted array of boxes by most recent date
+ * filteredBoxesBySubmitShipmentTimeAndNotReceived(): handle boxes with a received shipment flag with a default false value.
+ * sortBoxesBySubmitShipmentTime(): sort method use direct comparison operator over the localeCompare for more speed.
  */
 export const getRecentBoxesShippedBySiteNotReceived = (boxes) => {
-  // boxes are from searchBoxes endpoint
+    // boxes are from searchBoxes endpoint
     if (boxes.length === 0) return [];
-    const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => item[fieldToConceptIdMapping["shippingShipDate"]] && !item[fieldToConceptIdMapping["siteShipmentDateReceived"]])
-    const sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => b[fieldToConceptIdMapping["shippingShipDate"]].localeCompare(a[fieldToConceptIdMapping["shippingShipDate"]]))
+
+    const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => {
+        const hasShippingShipDate = item[fieldToConceptIdMapping.shippingShipDate];
+        const hasNoSiteShipmentDateReceivedKey = !item[fieldToConceptIdMapping.siteShipmentDateReceived];
+        const hasNotReceivedSiteShipment = item[fieldToConceptIdMapping.siteShipmentReceived] === fieldToConceptIdMapping.no;
+        return hasShippingShipDate && (hasNoSiteShipmentDateReceivedKey || hasNotReceivedSiteShipment);
+    });
+
+    const sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => {
+        const shipDateA = a[fieldToConceptIdMapping.shippingShipDate];
+        const shipDataB = b[fieldToConceptIdMapping.shippingShipDate];
+        return (shipDateA < shipDataB) ? 1 : -1;
+    });
+
     return sortBoxesBySubmitShipmentTime;
 }
 
@@ -410,7 +421,7 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, searchSp
 
         for (let j = 0; j < currFullSpecimenIdArray.length; j++) {
             const currTube = currFullSpecimenIdArray[j];
-            const currAcceptedDeviationArray = getSpecimenDeviation(searchSpecimenInstituteArray, currTube);
+            const currAcceptedDeviationArray = getSpecimenDeviationReports(searchSpecimenInstituteArray, currTube);
             const currFullSpecimenIdArrayLength = currFullSpecimenIdArray.length;
             let currFullSpecimenIdArrayCounter = 0;
 
@@ -422,7 +433,7 @@ const addManifestTableRows = (boxNumber, bagIdArr, index, groupSamples, searchSp
                     const tableRowEl = document.createElement('tr');
                     if (i % 2 === 0) tableRowEl.style.backgroundColor = 'lightgrey';
                     const currFullSpecimenId = currFullSpecimenIdArray[rowIndex];
-                    const currSpecimenComments = getSpecimenComments(searchSpecimenInstituteArray, currFullSpecimenId);
+                    const currSpecimenComments = getSpecimenCommentsReports(searchSpecimenInstituteArray, currFullSpecimenId);
 
                     for (let tableModalHeaderIndex = 0; tableModalHeaderIndex < tableModalHeaderColumnNameArray.length; tableModalHeaderIndex++) { 
                         const cellEl = document.createElement('td');
