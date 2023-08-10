@@ -2474,14 +2474,14 @@ export const restrictNonBiospecimenUser = () => {
 export const isDev = () => !(location.host === urls.prod || location.host === urls.stage);
 
 export const logAPICallStartDev = (funcName) => {
-  if (isDev) {
+  if (isDev()) {
     console.log(`calling ${funcName}`);
     console.time(funcName);
   }
 }
 
 export const logAPICallEndDev = (funcName) => {
-  if (isDev) {
+  if (isDev()) {
     console.timeEnd(funcName);
   }
 }
