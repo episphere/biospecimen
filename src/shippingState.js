@@ -259,6 +259,7 @@ const addBoxDataToDetailBox = (boxAndBagsObj, boxList) => {
             [conceptIds.containsOrphanFlag]: boxInList[conceptIds.containsOrphanFlag],
             [conceptIds.shippingBoxId]: boxInList[conceptIds.shippingBoxId],
             [conceptIds.submitShipmentFlag]: boxInList[conceptIds.submitShipmentFlag] ?? conceptIds.no,
+            [conceptIds.siteShipmentReceived]: boxInList[conceptIds.siteShipmentReceived] ?? conceptIds.no,
             [conceptIds.shippedByFirstName]: boxInList[conceptIds.shippedByFirstName] ?? '',
             'siteAcronym': boxInList['siteAcronym']
         };

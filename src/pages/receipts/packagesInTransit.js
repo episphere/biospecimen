@@ -104,8 +104,8 @@ export const getRecentBoxesShippedBySiteNotReceived = (boxes) => {
 
     const sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => {
         const shipDateA = a[fieldToConceptIdMapping.shippingShipDate];
-        const shipDataB = b[fieldToConceptIdMapping.shippingShipDate];
-        return (shipDateA < shipDataB) ? 1 : -1;
+        const shipDateB = b[fieldToConceptIdMapping.shippingShipDate];
+        return (shipDateA < shipDateB) ? 1 : -1;
     });
 
     return sortBoxesBySubmitShipmentTime;
