@@ -1,31 +1,28 @@
-import { userAuthorization, removeActiveClass, addEventBarCodeScanner, getBoxes, getAllBoxes, getBoxesByLocation, restrictNonBiospecimenUser,
-    hideAnimation, showAnimation, showNotifications, getNumPages, conceptIdToSiteSpecificLocation, searchSpecimenInstitute} from "./../shared.js"
-import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality, addEventNavBarShipment, addEventFilter} from "./../events.js";
-import { homeNavBar, reportSideNavBar, unAuthorizedUser} from '../navbar.js';
-
+import { userAuthorization, removeActiveClass, restrictNonBiospecimenUser, hideAnimation, showAnimation, getNumPages, conceptIdToSiteSpecificLocation, searchSpecimenInstitute } from "./../shared.js";
+import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality, addEventFilter } from "./../events.js";
+import { homeNavBar, reportSideNavBar } from '../navbar.js';
+import conceptIds from '../fieldToConceptIdMapping.js';
 
 export const reportsQuery = (auth, route) => {
     auth.onAuthStateChanged(async user => {
-        if(user){
+        if (user) {
             const response = await userAuthorization(route, user.displayName ? user.displayName : user.email);
-            if ( response.isBiospecimenUser === false ) {
+            if (response.isBiospecimenUser === false) {
                 restrictNonBiospecimenUser();
                 return;
             }
-            if(!response.role) return;
+            if (!response.role) return;
             startReport();
-        }
-        else {
+        } else {
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
             window.location.hash = '#';
         }
     });
-}
-
+};
 
 export const startReport = async () => {
     showAnimation();
-    if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
+    if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     
     let template = `
     <div class="container">
@@ -65,21 +62,17 @@ export const startReport = async () => {
         </div>
     </div>
 </div>`;
-    /*var x = document.getElementById("specimenList");
-    var option = document.createElement("option");
-    option.text = "Kiwi";
-    x.add(option);*/
     let numPages = await getNumPages(5, {});
     document.getElementById('contentBody').innerHTML = template;
-    removeActiveClass('navbar-btn', 'active')
+    removeActiveClass('navbar-btn', 'active');
     addEventFilter();
     populateBoxTable(0, {});
     addPaginationFunctionality(numPages, {});
     hideAnimation();
-}
+};
 
 export const showReportsManifest = async (currPage) => {
-    showAnimation()
+    showAnimation();
     const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
     const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ?? [];
 
@@ -91,7 +84,7 @@ export const showReportsManifest = async (currPage) => {
             <div style="float:left;width: 33%;" id="boxManifestCol3">
                 <p>Site: ` + currPage['siteAcronym'] + `</p>
                 <p>Location: ` + conceptIdToSiteSpecificLocation[currPage['560975149']] + `</p>
-                <p>Tracking Number: ${currPage['959708259'] ? currPage['959708259'] : ""} </p>
+                <p>Tracking Number: ${currPage[conceptIds.shippingTrackingNumber] ?? ""} </p>
             </div>
         </div>
         <div class="row">
@@ -124,7 +117,7 @@ export const showReportsManifest = async (currPage) => {
         });
         document.getElementById('returnToReports').addEventListener('click', e => {
             startReport();
-        })
+        });
         hideAnimation();
     
-}
+};

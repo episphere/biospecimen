@@ -1747,6 +1747,7 @@ export const addEventNavBarShippingManifest = (userName) => {
         let tempCheckStatus = ""
         const currSiteSpecificName = document.getElementById('selectLocationList').value
         const currShippingLocationNumber = siteSpecificLocationToConceptId[currSiteSpecificName]
+        appState.setState(state => ({shipping: {...state.shipping, locationNumber: currShippingLocationNumber}}));
         for (var r = 1; r < currTable.rows.length; r++) {
 
             let currCheck = currTable.rows[r].cells[0]
@@ -1798,7 +1799,7 @@ export const addEventNavBarShippingManifest = (userName) => {
         tempCheckStatus = tempCheckedEl.checked 
         // Push empty item with boxId and empty tracking number string
         // shipSetForage used to handle empty localforage or no box id match
-        boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, "959708259": "" }))
+        boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, [conceptIds.shippingTrackingNumber]: "" }));
         checkShipForage(shipSetForage,boxesToShip)
         //return box 1 info
         shippingPrintManifestReminder(boxesToShip, userName, tempCheckStatus, currShippingLocationNumber);
@@ -1813,25 +1814,18 @@ export const addEventReturnToReviewShipmentContents = (element, boxIdAndBagsObj,
         if (boxWithTempMonitor) {
             isTempMonitorIncluded = true;
         }
-        await generateShippingManifest(boxIdArray, userName, isTempMonitorIncluded);
+
+        const locationNumber = appState.getState().shipping.locationNumber;
+        await generateShippingManifest(boxIdArray, userName, isTempMonitorIncluded, locationNumber);
     });
 }
 
-export const addEventNavBarTracking = (element, userName, boxIdAndBagsObj, tempChecked) => {
+export const addEventNavBarAssignTracking = (element, userName, boxIdAndBagsObj, tempChecked) => {
     let btn = document.getElementById('navBarShipmentTracking');
-    document.getElementById(element).addEventListener('click', async e => {
+    document.getElementById(element).addEventListener('click', async (e) => {
         e.stopPropagation();
         if (btn.classList.contains('active')) return;
-        let boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds)
-        for (let i = 0; i < boxIdArray.length; i++) {
-            // hiddenJSON[keys[i]] = hiddenJSON[keys[i]]['specimens']
-            boxIdAndBagsObj[boxIdArray[i]] = {
-              "959708259" : boxIdAndBagsObj[boxIdArray[i]]["959708259"],
-              "specimens" : boxIdAndBagsObj[boxIdArray[i]]['specimens']
-          }
-        }
-        //return box 1 info
-        shipmentTracking(boxIdAndBagsObj, userName, tempChecked);
+        await shipmentTracking(boxIdAndBagsObj, userName, tempChecked);
     });
 }
 
@@ -1961,15 +1955,15 @@ export const populateTrackingQuery = async (boxIdAndBagsObj) => {
     for(let box of shipData) {
       // if boxes has box id of localforage shipData push
       if(boxIdArray.includes(box["boxId"])) {
-        shipping[box["boxId"]] = {"959708259":box["959708259"], "confirmTrackNum": box["confirmTrackNum"] }
+        shipping[box["boxId"]] = {[conceptIds.shippingTrackingNumber]: box[conceptIds.shippingTrackingNumber], "confirmTrackNum": box["confirmTrackNum"] };
       }
       else {
-        shipping[box["boxId"]] = {"959708259":"" , confirmTrackNum:"", }
+        shipping[box["boxId"]] = {[conceptIds.shippingTrackingNumber]: "" , confirmTrackNum: ""};
       }
     }
     
     for(let i = 0; i < boxIdArray.length; i++){
-        let trackNum = boxIdArray[i] && shipping?.[boxIdArray[i]]?.["959708259"];
+        let trackNum = boxIdArray[i] && shipping?.[boxIdArray[i]]?.[conceptIds.shippingTrackingNumber];
         let trackNumConfirm = boxIdArray[i] && shipping?.[boxIdArray[i]]?.["confirmTrackNum"];
         toBeInnerHTML +=`
         <div class = "row" style="justify-content:space-around">
@@ -1997,172 +1991,116 @@ export const populateTrackingQuery = async (boxIdAndBagsObj) => {
     document.getElementById("forTrackingNumbers").innerHTML = toBeInnerHTML;
 }
 
-export const addEventCompleteButton = async (boxIdAndBagsObj, userName, boxWithTempMonitor) => {
+export const addEventSaveAndContinueButton = async (boxIdAndBagsObj, userName, boxWithTempMonitor) => {
     document.getElementById('completeTracking').addEventListener('click', async () => {
-        let boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
-        let emptyField = false;
-        let trackingNumConfirmEls = Array.from(document.getElementsByClassName("invalid"))
-        if(trackingNumConfirmEls.length > 0) {
-          showNotifications({ title: 'Invalid Fields', body: 'Please add valid inputs to fields.' }, true)
-          return
+        let shippingData = [];
+        let boxIdAndTrackingObj = {};
+        const boxIdArray = Object.keys(boxIdAndBagsObj);
+        const trackingNumConfirmEls = Array.from(document.getElementsByClassName("invalid"));
+        if (trackingNumConfirmEls.length > 0) {
+          showNotifications({ title: 'Invalid Fields', body: 'Please add valid inputs to fields.' }, true);
+          return;
         }
 
-        for (let i = 0; i < boxIdArray.length; i++) {
-            let boxi = document.getElementById(boxIdArray[i] + "trackingId").value.toUpperCase();
-            let boxiConfirm = document.getElementById(boxIdArray[i] + "trackingIdConfirm").value.toUpperCase();
-            if (boxi == '' || boxiConfirm == '') {
-                emptyField = true
-                showNotifications({ title: 'Missing Fields', body: 'Please enter in shipment tracking numbers'}, true)
-                return
+        for (const boxId of boxIdArray) {
+            const trackingId = document.getElementById(boxId + "trackingId").value.toUpperCase();
+            const trackingIdConfirm = document.getElementById(boxId + "trackingIdConfirm").value.toUpperCase();
+            if (trackingId === '' || trackingIdConfirm === '') {
+                showNotifications({ title: 'Missing Fields', body: 'Please enter in shipment tracking numbers'}, true);
+                return;
             }
         
-            // if '959708259' exists update tracking number
-            if (boxIdAndBagsObj[boxIdArray[i]].hasOwnProperty('959708259')) {
-              boxIdAndBagsObj[boxIdArray[i]]['959708259'] = boxi
-            }
-            // if 'confirmTrackNum' exists update tracking number
-            if (boxIdAndBagsObj[boxIdArray[i]].hasOwnProperty('confirmTrackNum')) {
-              boxIdAndBagsObj[boxIdArray[i]]['confirmTrackNum'] = boxiConfirm 
-            }
-            // if specimens exists update, else add following key/values
-            if (boxIdAndBagsObj[boxIdArray[i]].hasOwnProperty('specimens')) {
-              boxIdAndBagsObj[boxIdArray[i]]['specimens'] = boxIdAndBagsObj[boxIdArray[i]]['specimens'] 
-            } 
-            else {
-              boxIdAndBagsObj[boxIdArray[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: boxIdAndBagsObj[boxIdArray[i]] }
-            }  
+            shippingData.push({
+              [conceptIds.shippingTrackingNumber]: trackingId,
+              confirmTrackNum: trackingIdConfirm,
+              boxId
+            });
+            boxIdAndTrackingObj[boxId] = {
+              [conceptIds.shippingTrackingNumber]: trackingId,
+              specimens: boxIdAndBagsObj[boxId]
+            };
         }
 
-        let isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxIdArray );
-        
-        if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxIdArray) && boxIdArray.length > 1)){
-            shippingDuplicateMessage()
-            return
+        const isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxIdArray);
+        if (isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxIdArray) && boxIdArray.length > 1)) {
+            shippingDuplicateMessage();
+            return;
           }
 
-        if(checkNonAlphanumericStr(boxIdArray)) {
-          shippingNonAlphaNumericStrMessage()
-          return 
+        if (checkNonAlphanumericStr(boxIdArray)) {
+          shippingNonAlphaNumericStrMessage();
+          return;
         }
 
-        if (emptyField == false) {
-            document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBagsObj);
-            addEventSaveContinue(boxIdAndBagsObj)
-            let shipmentCourier = document.getElementById('courierSelect').value;
-            finalShipmentTracking(boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier);
-        }
+        localforage.setItem("shipData", shippingData);
+        const shipmentCourier = document.getElementById('courierSelect').value;
+        finalShipmentTracking({boxIdAndBagsObj, boxIdAndTrackingObj, userName, boxWithTempMonitor, shipmentCourier});
     })
 
 }
 
 export const addEventSaveButton = async (boxIdAndBagsObj) => {
     document.getElementById('saveTracking').addEventListener('click', async () => {
-        let boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
-        let isMismatch = -1;
+        let isMismatch = false;
+        let shippingData = [];
+        let boxIdAndTrackingObj = {};
+        const boxIdArray = Object.keys(boxIdAndBagsObj);
 
-        for (let i = 0; i < boxIdArray.length; i++) {
-            let boxi = document.getElementById(boxIdArray[i] + "trackingId").value.toUpperCase();
-            let boxiConfirm = document.getElementById(boxIdArray[i] + "trackingIdConfirm").value.toUpperCase();
-            
-            if (boxi !== boxiConfirm) {
-                isMismatch = i;
-                break;
+        for (const boxId of boxIdArray) {
+            const trackingId = document.getElementById(boxId + "trackingId").value.toUpperCase();
+            const trackingIdConfirm = document.getElementById(boxId + "trackingIdConfirm").value.toUpperCase();
+    
+            if (trackingId !== trackingIdConfirm) {
+              isMismatch = true;
+              break;
             }
 
-            // if '959708259' exists update tracking number
-            if (boxIdAndBagsObj[boxIdArray[i]].hasOwnProperty('959708259')) {
-              boxIdAndBagsObj[boxIdArray[i]]['959708259'] = boxi
-            }
-            // if 'confirmTrackNum' exists update tracking number
-            if (boxIdAndBagsObj[boxIdArray[i]].hasOwnProperty('confirmTrackNum')) {
-              boxIdAndBagsObj[boxIdArray[i]]['confirmTrackNum'] = boxiConfirm 
-            }
-            // if specimens exists update, else add following key/values
-            if (boxIdAndBagsObj[boxIdArray[i]].hasOwnProperty('specimens')) {
-              boxIdAndBagsObj[boxIdArray[i]]['specimens'] = boxIdAndBagsObj[boxIdArray[i]]['specimens'] 
-            } 
-            else {
-              boxIdAndBagsObj[boxIdArray[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: boxIdAndBagsObj[boxIdArray[i]] }
-            }  
+            shippingData.push({[conceptIds.shippingTrackingNumber]: trackingId, confirmTrackNum: trackingIdConfirm, boxId});
+            boxIdAndTrackingObj[boxId] = {
+                [conceptIds.shippingTrackingNumber]: trackingId,
+                specimens: boxIdAndBagsObj[boxId],
+              };
         }
 
-        if (isMismatch > - 1) {
+        if (isMismatch) {
             await swal({
                 title: 'Error!',
                 icon: 'error',
                 text: 'Tracking Ids do not match in one of the boxes.',
                 timer: 1600,
-              })           
+              });
             return;
         }
+
         let isDuplicateTrackingIdInDb = await checkDuplicateTrackingIdFromDb(boxIdArray);
         if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxIdArray) && boxIdArray.length > 1)){
             shippingDuplicateMessage(isDuplicateTrackingIdInDb)
             return
           }
           
-        let shippingData = []
-
-        for(let i = 0; i < boxIdArray.length; i++){
-          let boxi = document.getElementById(boxIdArray[i] + "trackingId").value.toUpperCase();
-          let boxiConfirm = document.getElementById(boxIdArray[i] + "trackingIdConfirm").value.toUpperCase();
-            shippingData.push({ "959708259": boxi, confirmTrackNum: boxiConfirm, "boxId":boxIdArray[i]})
-        }
-        localforage.setItem("shipData",shippingData)
-
+        localforage.setItem("shipData", shippingData);
         await swal({
           title: 'Success!',
           icon: 'success',
           text: 'Tracking input saved',
           timer: 1600,
-        })
+        });
     })
-}
-
-export const addEventSaveContinue = (boxIdAndBagsObj) => {
-      let boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
-      for (let i = 0; i < boxIdArray.length; i++) {
-          let boxi = document.getElementById(boxIdArray[i] + "trackingId").value.toUpperCase();
-          let boxiConfirm = document.getElementById(boxIdArray[i] + "trackingIdConfirm").value.toUpperCase();
-          // if '959708259' exists update tracking number
-          if (boxIdAndBagsObj[boxIdArray[i]].hasOwnProperty('959708259')) {
-            boxIdAndBagsObj[boxIdArray[i]]['959708259'] = boxi
-          }
-          // if 'confirmTrackNum' exists update tracking number
-          if (boxIdAndBagsObj[boxIdArray[i]].hasOwnProperty('confirmTrackNum')) {
-            boxIdAndBagsObj[boxIdArray[i]]['confirmTrackNum'] = boxiConfirm 
-          }
-          // if specimens exists update, else add following key/values
-          if (boxIdAndBagsObj[boxIdArray[i]].hasOwnProperty('specimens')) {
-            boxIdAndBagsObj[boxIdArray[i]]['specimens'] = boxIdAndBagsObj[boxIdArray[i]]['specimens'] 
-          } 
-          else {
-            boxIdAndBagsObj[boxIdArray[i]] = { '959708259': boxi, confirmTrackNum: boxiConfirm, specimens: boxIdAndBagsObj[boxIdArray[i]] }
-          }  
-      }
-      
-      let shippingData = []
-
-      for(let i = 0; i < boxIdArray.length; i++){
-        let boxi = document.getElementById(boxIdArray[i] + "trackingId").value.toUpperCase();
-        let boxiConfirm = document.getElementById(boxIdArray[i] + "trackingIdConfirm").value.toUpperCase();
-          shippingData.push({ "959708259": boxi, confirmTrackNum: boxiConfirm, "boxId":boxIdArray[i]})
-      }
-      localforage.setItem("shipData",shippingData)
 }
 
 /**
  * Handle 'Sign' button click
- * @param {object} boxIdAndBagsObj 
+ * @param {object} boxIdAndTrackingObj eg: {Box1: {959708259: '123456789012', specimens:{'CXA001234 0008':{...}} }}
  * @param {string} userName 
  * @param {string} boxWithTempMonitor boxId of box with temp monitor (eg: 'Box10') 
  * @param {string} shipmentCourier name of shipment courier (eg: 'FedEx')
  */
-export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier) => {
+export const addEventCompleteShippingButton = (boxIdAndTrackingObj, userName, boxWithTempMonitor, shipmentCourier) => {
     document.getElementById('finalizeModalSign').addEventListener('click', async () => {
         const finalizeSignInputEle = document.getElementById('finalizeSignInput');
-        const firstNameShipper = userName.split(" ")[0] ? userName.split(" ")[0] : ""
-        const lastNameShipper = userName.split(" ")[1] ? userName.split(" ")[1] : ""
+        const [firstName, lastName] = userName.split(/\s+/);
+        const firstNameShipper = firstName ?? "";
+        const lastNameShipper = lastName ?? "";
         const errorMessageEle = document.getElementById('finalizeModalError');
 
         if (finalizeSignInputEle.value.toUpperCase() !== userName.toUpperCase()) {
@@ -2174,19 +2112,19 @@ export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWit
         if (requestsBlocker.isBlocking()) return;
         requestsBlocker.block();
 
-        const shippingData = {
+        const commonShippingData = {
           666553960: conceptIds[shipmentCourier],
           948887825: firstNameShipper,
           885486943: lastNameShipper,
           boxWithTempMonitor,
         };
-        let boxIdToTrackingNumberMap = {};
+        let boxIdToTrackingNumberObj = {};
 
-        for (const boxId in boxIdAndBagsObj) {
-          boxIdToTrackingNumberMap[boxId] = boxIdAndBagsObj[boxId]['959708259'];
+        for (const boxId in boxIdAndTrackingObj) {
+          boxIdToTrackingNumberObj[boxId] = boxIdAndTrackingObj[boxId][conceptIds.shippingTrackingNumber];
         }
 
-        const shipment = await ship(boxIdToTrackingNumberMap, shippingData);
+        const shipment = await ship(boxIdToTrackingNumberObj, commonShippingData);
 
         if (shipment.code === 200) {
           boxWithTempMonitor && (await updateNewTempDate());
@@ -2216,24 +2154,25 @@ export const addEventCompleteShippingButton = (boxIdAndBagsObj, userName, boxWit
     });
 }
 
-export const populateFinalCheck = (boxIdAndBagsObj) => {
+export const populateFinalCheck = (boxIdAndTrackingObj) => {
     let table = document.getElementById('finalCheckTable');
-    let boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
-    for (let i = 0; i < boxIdArray.length; i++) {
-        let currBox = boxIdArray[i]
-        let currShippingNumber = boxIdAndBagsObj[boxIdArray[i]]['959708259']
-        let specimenObj = boxIdAndBagsObj[boxIdArray[i]]['specimens'];
-        let keys = Object.keys(specimenObj);
+    let boxIdArray = Object.keys(boxIdAndTrackingObj).sort(compareBoxIds);
+    for (const boxId of boxIdArray) {
+        const trackingNumber = boxIdAndTrackingObj[boxId][conceptIds.shippingTrackingNumber];
+        const specimenObj = boxIdAndTrackingObj[boxId]['specimens'];
+        const bagArray = Object.keys(specimenObj);
+        const numBags = specimenObj['orphans'] ? bagArray.length - 1 : bagArray.length;
         let numTubes = 0;
-        let numBags = specimenObj.hasOwnProperty('orphans') ? keys.length - 1 : keys.length;
-        for (let j = 0; j < keys.length; j++) {
-            numTubes += specimenObj[keys[j]]?.['arrElements'].length;
+
+        for (const bag of bagArray) {
+            numTubes += specimenObj[bag]['arrElements']?.length ?? 0;
         }
-        let row = table.insertRow(i + 1);
-        row.insertCell(0).innerHTML = currBox;
-        row.insertCell(1).innerHTML = currShippingNumber;
-        row.insertCell(2).innerHTML = numTubes;
-        row.insertCell(3).innerHTML = numBags;
+
+        let row = table.insertRow();
+        row.insertCell().textContent = boxId;
+        row.insertCell().textContent = trackingNumber;
+        row.insertCell().textContent = numTubes;
+        row.insertCell().textContent = numBags;
     }
 }
 
@@ -2380,7 +2319,7 @@ export const populateBoxTable = async (page, filter) => {
           packagedCondition = currPage['238268405']
         }
 
-        currRow.insertCell(0).innerHTML = currPage.hasOwnProperty('959708259') ? currPage['959708259'] : '';
+        currRow.insertCell(0).innerHTML = currPage[conceptIds.shippingTrackingNumber] ?? '';
         currRow.insertCell(1).innerHTML = shippedDate;
         currRow.insertCell(2).innerHTML = conceptIdToSiteSpecificLocation[currPage['560975149']];
         currRow.insertCell(3).innerHTML = currPage['132929440'];

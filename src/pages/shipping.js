@@ -1,9 +1,9 @@
 import { addBox, appState, conceptIdToSiteSpecificLocation, displayContactInformation, getAllBoxes, getLocationsInstitute, hideAnimation, locationConceptIDToLocationMap,
         removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
         translateNumToType, userAuthorization } from "./../shared.js"
-import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs, addEventCompleteButton,
+import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs,
         addEventCompleteShippingButton, addEventModalAddBox, addEventNavBarBoxManifest, addEventNavBarShipment, addEventNavBarShippingManifest, addEventNavBarTracking, addEventLocationSelect,
-        addEventPreventTrackingConfirmPaste, addEventReturnToPackaging, addEventReturnToReviewShipmentContents, addEventSaveButton, addEventShipPrintManifest,
+        addEventPreventTrackingConfirmPaste, addEventReturnToPackaging, addEventReturnToReviewShipmentContents, addEventSaveButton, addEventSaveAndContinueButton, addEventShipPrintManifest,
         addEventTrackingNumberScanAutoFocus, addEventTrimTrackingNums, compareBoxIds, getInstituteSpecimensList, populateCourierBox, populateFinalCheck, populateTrackingQuery } from "./../events.js";     
 import { homeNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
 import { setAllShippingState, updateShippingStateCreateBox, updateShippingStateRemoveBagFromBox, updateShippingStateSelectedLocation } from '../shippingState.js';
@@ -50,7 +50,6 @@ const buildShippingNavAndHeader = () => {
 // Build the DOM for the shipping page.
 const buildShippingDOM = async () => {
     document.getElementById('contentBody').innerHTML = `
-        ${renderShippingHiddenTable()}
         ${renderShippingLocationSelector()}
         ${renderScanOrEnterSpecimenId()}
         ${renderCollectionsContentsAndBoxes()}
@@ -209,8 +208,7 @@ const populateAvailableCollectionsList = async (boxList, loadFromState = false) 
 }
 
 const populateBoxesToShipTable = () => {
-    //TODO: filter out empty boxes
-    const detailedBoxes = appState.getState().detailedProviderBoxes//.filter(box => box['bags'].length !== 0);
+    const detailedBoxes = appState.getState().detailedProviderBoxes;
     const table = document.getElementById("saveTable");
     table.innerHTML = renderBoxesToShipTableHeader();
     
@@ -774,66 +772,74 @@ const sortSpecimenKeys = (a, b) => {
  * @param {string[]} boxIdArray
  * @param {string} userName
  * @param {boolean} isTempMonitorIncluded
- * @param {*} currShippingLocationNumber
+ * @param {number} currShippingLocationNumber
  */
 export const generateShippingManifest = (boxIdArray, userName, isTempMonitorIncluded, currShippingLocationNumber) => {
+    showAnimation();
     const boxArray = appState.getState().allBoxesList;
-    const boxIdAndBagsObj = {};
-    const locations = {};
-    let site = '';
+    let siteAcronym = '';
+    let boxIdAndBagsObjToDisplay = {};
 
     for (const box of boxArray) {
-        const boxId= box[conceptIds.shippingBoxId]
-        boxIdAndBagsObj[boxId] = box['bags']
-        locations[boxId] = box[conceptIds.shippingLocation];
-        site = box['siteAcronym'];
-    }
-    
-    let boxIdAndBagsObjToDisplay = {};
-    let location = '';
+        const boxId = box[conceptIds.shippingBoxId];
+        if (!boxIdArray.includes(boxId)) continue;
 
-    for (const boxId of boxIdArray) {
-        boxIdAndBagsObjToDisplay[boxId] = boxIdAndBagsObj[boxId];
-        location = locations[boxId];
+        boxIdAndBagsObjToDisplay[boxId] = box['bags'];
+        !siteAcronym && (siteAcronym = box['siteAcronym']);
     }
 
     removeActiveClass('navbar-btn', 'active')
     const navBarBtn = document.getElementById('navBarReviewShipmentContents');
     navBarBtn.classList.add('active');
-    document.getElementById('contentBody').innerHTML = renderShippingManifestTemplate();//template;
-
-    if(isTempMonitorIncluded){
-        populateTempSelect(boxIdArray);
-    }
-
-    document.getElementById('shippingHiddenTable').innerHTML = JSON.stringify(boxIdAndBagsObj);
+    document.getElementById('contentBody').innerHTML = renderShippingManifestTemplate(boxIdArray, isTempMonitorIncluded);
     
-    populateShippingManifestHeader(userName, site, currShippingLocationNumber); // populate shipping header via site specfiic location selected from shipping page
+    populateShippingManifestHeader(userName, siteAcronym, currShippingLocationNumber); // populate shipping header via site specfiic location selected from shipping page
     populateShippingManifestTable(boxIdAndBagsObjToDisplay);
     addEventNavBarShipment("navBarShippingDash", userName);
-    populateTempCheck();
-    const btn = document.getElementById('assignTrackingNumberPage'); // assignTracking
-    addEventShipPrintManifest('printBox')
-    addEventReturnToPackaging();    
-
-    document.getElementById('assignTrackingNumberPage').addEventListener('click', e => {
+    addEventShipPrintManifest('printBox');
+    addEventNavBarShipment('returnToPackaging', userName);
+    
+    const btn = document.getElementById('assignTrackingNumberPage');
+    btn && btn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        if(btn.classList.contains('active')) return;
-
         const tempBoxElement = document.getElementById('tempBox');
-
         if (isTempMonitorIncluded && tempBoxElement.value === '') {
-            showNotifications({title: 'Missing field!', body: 'Please enter the box where the temperature monitor is being stored.'}, true)
+            showNotifications({title: 'Missing field!', body: 'Please enter the box where the temperature monitor is being stored.'}, true);
             return;
         }
 
         let boxWithTempMonitor = '';
-        if( isTempMonitorIncluded){
+        if (isTempMonitorIncluded) {
             boxWithTempMonitor = tempBoxElement.value;
         }
 
-        shipmentTracking(boxIdAndBagsObjToDisplay, userName, boxWithTempMonitor);
+        await shipmentTracking(boxIdAndBagsObjToDisplay, userName, boxWithTempMonitor);
     });
+
+    hideAnimation();
+}
+
+const tempSelectStringRender = ({boxIdArray, isTempMonitorIncluded}) => {
+    let tempSelectString = "";
+    if (isTempMonitorIncluded) {
+        tempSelectString = `
+            <div style="display:block">
+                <p>Select the box that contains the temperature monitor</p>
+                <select name="tempBox" id="tempBox">
+                <option disabled value> -- select a box -- </option>
+                ${boxIdArray
+                  .map((boxId, idx) =>
+                    idx === 0
+                      ? `<option selected value="${boxId}">${boxId}</option>`
+                      : `<option value="${boxId}">${boxId}</option>`
+                  )
+                  .join("")}
+                </select>
+            </div>
+        `;
+    }
+
+    return tempSelectString;
 }
 
 export const populateShippingManifestHeader = (userName, siteAcronym, currShippingLocationNumber) => {
@@ -927,9 +933,6 @@ export const shipmentTracking = async (boxIdAndBagsObj, userName, boxWithTempMon
 
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     let template = `
-        <div id="shippingHiddenTable" style="display:none">
-        {}
-        </div>
         <div class="row" style="margin-top:40px;">
             <div class="col-lg">
                 <label for="courierSelect" style="font-size:1.4rem; margin-bottom:1rem;">Choose Shipment Courier</label>
@@ -941,7 +944,6 @@ export const shipmentTracking = async (boxIdAndBagsObj, userName, boxWithTempMon
             <div class="col-lg">
                 <p style="margin:0; font-size:1.4rem;">Enter Shipment Tracking Numbers:</p>
                 <div class="col-lg" id="forTrackingNumbers">
-                    
                 </div>
             </div>
         </div>
@@ -949,15 +951,13 @@ export const shipmentTracking = async (boxIdAndBagsObj, userName, boxWithTempMon
             <div style="float: left;width: 33%;" id="boxManifestCol1">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="returnToPackaging">Return to Packaging</button>
             </div>
-            <div style="float: left;width: 33%;" id="boxManifestCol2">
-                
+            <div style="float: left;width: 33%;" id="boxManifestCol2">  
             </div>
             <div style="float:left;width: 33%;" id="boxManifestCol3">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveTracking" style="margin-right:.5rem;">Save</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="completeTracking">Save and Continue</button>
             </div>
         </div>
-
     `;
 
     removeActiveClass('navbar-btn', 'active')
@@ -967,9 +967,6 @@ export const shipmentTracking = async (boxIdAndBagsObj, userName, boxWithTempMon
     document.getElementById('contentBody').innerHTML = template;
     await populateCourierBox();
     addEventNavBarShipment("returnToPackaging", userName);
-    if(Object.keys(boxIdAndBagsObj).length > 0){
-        document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBagsObj)
-    }
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName, boxWithTempMonitor)
     await populateTrackingQuery(boxIdAndBagsObj);
@@ -978,7 +975,7 @@ export const shipmentTracking = async (boxIdAndBagsObj, userName, boxWithTempMon
     addEventPreventTrackingConfirmPaste()
     addEventCheckValidTrackInputs(boxIdAndBagsObj)
     addEventSaveButton(boxIdAndBagsObj);
-    addEventCompleteButton(boxIdAndBagsObj, userName, boxWithTempMonitor);
+    addEventSaveAndContinueButton(boxIdAndBagsObj, userName, boxWithTempMonitor);
     hideAnimation();
 }
 
@@ -1172,10 +1169,6 @@ const renderSpecimenVerificationModal = () => {
 const renderBoxManifestTemplate = (currInstitute, currLocation) => {
     return `
         </br>
-        <div id="shippingHiddenTable" style="display:none">
-            <table>
-            </table>
-        </div>
         <div class="row">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
             </div>
@@ -1286,14 +1279,9 @@ export const renderViewBoxContentsTableHeader = (selectedLocation) => {
     `;
 }
 
-export const renderShippingManifestTemplate = () => {
+export const renderShippingManifestTemplate = (boxIdArray, isTempMonitorIncluded) => {
     return `
         </br>
-        <div id="shippingHiddenTable" style="display:none">
-            <table>
-
-            </table>
-        </div>
         <div class="row">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
             </div>
@@ -1311,11 +1299,8 @@ export const renderShippingManifestTemplate = () => {
                 </tr>
             </table>
         </div>
-        <div class="row" id="checkForTemp" style="display:none">
-            <input type="checkbox" id="tempMonitorChecked">
-            <label for="tempMonitorChecked">Temp Monitor is included in this shipment</label><br>
-        </div>
         <div class="row" id="tempCheckList">
+            ${tempSelectStringRender({boxIdArray, isTempMonitorIncluded})}
         </div>
         <div class="row" style="margin-top:100px">
             <div style="float: left;width: 33%;" id="boxManifestCol1">
@@ -1333,9 +1318,6 @@ export const renderShippingManifestTemplate = () => {
 
 const renderFinalShipmentTrackingTemplate = (shipmentCourier, userName) => {
     return `
-        <div id="shippingHiddenTable" style="display:none">
-        {}
-        </div>
         <div class="row" style="margin-top:40px">
             <div class="col-lg" id="numBoxes">
             </div>
