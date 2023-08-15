@@ -63,7 +63,6 @@ export const populateCheckOutTable = async () => {
     
     showAnimation();
     const data = await findParticipant(`checkedIn=${true}`).then(res => res.data);
-    console.log('participant data', data);
     for (const item of data) {
       if (!item[fieldToConceptIdMapping.collection.selectedVisit]?.[fieldToConceptIdMapping.baseline.visitId]?.[fieldToConceptIdMapping.checkOutDateTime]) {
         const newRow = currTable.insertRow();

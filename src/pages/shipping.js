@@ -2,7 +2,7 @@ import { addBox, appState, conceptIdToSiteSpecificLocation, displayContactInform
         removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
         translateNumToType, userAuthorization } from "./../shared.js"
 import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs,
-        addEventCompleteShippingButton, addEventModalAddBox, addEventNavBarBoxManifest, addEventNavBarShipment, addEventNavBarShippingManifest, addEventNavBarTracking, addEventLocationSelect,
+        addEventCompleteShippingButton, addEventModalAddBox, addEventNavBarBoxManifest, addEventNavBarShipment, addEventNavBarShippingManifest, addEventNavBarAssignTracking, addEventLocationSelect,
         addEventPreventTrackingConfirmPaste, addEventReturnToPackaging, addEventReturnToReviewShipmentContents, addEventSaveButton, addEventSaveAndContinueButton, addEventShipPrintManifest,
         addEventTrackingNumberScanAutoFocus, addEventTrimTrackingNums, compareBoxIds, getInstituteSpecimensList, populateCourierBox, populateFinalCheck, populateTrackingQuery } from "./../events.js";     
 import { homeNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
@@ -989,23 +989,12 @@ export const finalShipmentTracking = (boxIdAndBagsObj, userName, boxWithTempMoni
     document.getElementById('contentBody').innerHTML = renderFinalShipmentTrackingTemplate(shipmentCourier, userName);
     
     addEventNavBarShipment("navBarShippingDash", userName);
-    addEventNavBarTracking("returnToTracking", userName, boxIdAndBagsObj, boxWithTempMonitor)
-    addEventNavBarTracking("navBarFinalizeShipment", userName, boxIdAndBagsObj, boxWithTempMonitor)
-    if(Object.keys(boxIdAndBagsObj).length > 0){
-        document.getElementById('shippingHiddenTable').innerText = JSON.stringify(boxIdAndBagsObj)
-    }
+    addEventNavBarAssignTracking("returnToTracking", userName, boxIdAndBagsObj, boxWithTempMonitor)
+    addEventNavBarAssignTracking("navBarFinalizeShipment", userName, boxIdAndBagsObj, boxWithTempMonitor)
     populateFinalCheck(boxIdAndBagsObj);
     addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName)
     addEventCompleteShippingButton(boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier);
     addEventBackToSearch('navBarShippingDash');
-}
-
-const renderShippingHiddenTable = () => {
-    return `
-        <div id="shippingHiddenTable" style="display:none">
-        {}
-        </div>
-    `;
 }
 
 const renderShippingLocationSelector = () => {
