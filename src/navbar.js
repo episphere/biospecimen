@@ -165,6 +165,9 @@ export const reportSideNavBar = () => {
             <li class="nav-item">
                 <a class="nav-link" href="#checkoutreport" id="navBarCheckoutReport">Check-Out Report</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#dailyreport" id="navBarDailyReport">Daily Review Report</a>
+            </li>
         </ul>`;
 }
 

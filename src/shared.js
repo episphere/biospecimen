@@ -116,6 +116,19 @@ export const findParticipant = async (query) => {
     return await response.json();
 }
 
+export const getDailyParticipant = async (query) => {
+  const idToken = await getIdToken();
+  const response = await fetch(`http://127.0.0.1:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=getDailyReportParticipants`, {
+      method: "GET",
+      headers: {
+          Authorization:"Bearer "+idToken
+      }
+  });
+  return await response.json();
+}
+
+
+
 export const updateParticipant = async (dataObj) => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=updateParticipantDataNotSite`, {
@@ -2434,3 +2447,5 @@ export const restrictNonBiospecimenUser = () => {
   document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
   document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
 }
+
+export const getDataAttributes = (el) => { return el.getAttribute('data-sitekey'); }
