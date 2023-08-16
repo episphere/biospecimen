@@ -231,7 +231,7 @@ const addSpecimenDataToDetailBox = (boxAndBagsObj, finalizedSpecimenList) => {
                     
                     for (let specimenId of bag.arrElements) {
                         const specimenKey = specimenCollection.numToCid[specimenId.split(' ')[1]];    
-                        specimenDetails[specimenId] = foundSpecimenDetailsBag[specimenKey] ? foundSpecimenDetailsBag[specimenKey] : {};
+                        specimenDetails[specimenId] = foundSpecimenDetailsBag[specimenKey] ?? {};
                     }
                 }
             }
