@@ -84,7 +84,7 @@ const renderCollectionLocationList = () => {
 
 const initializeDailyReportTable = async () => {
     showAnimation();
-    const dailyReportsData = await getDailyParticipant(`checkedIn=${true}`).then(res => res.data);
+    const dailyReportsData = await getDailyParticipant().then(res => res.data);
     appState.setState({dailyReportsData: dailyReportsData}); // store inital daily reports data
     populateDailyReportTable(`Filter by Collection Location`, dailyReportsData);
 }

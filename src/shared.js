@@ -116,7 +116,7 @@ export const findParticipant = async (query) => {
     return await response.json();
 }
 
-export const getDailyParticipant = async (query) => {
+export const getDailyParticipant = async () => {
   const idToken = await getIdToken();
   const response = await fetch(`${api}api=getDailyReportParticipants`, {
       method: "GET",
