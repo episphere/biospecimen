@@ -1,10 +1,10 @@
 import { addBox, appState, conceptIdToSiteSpecificLocation, displayContactInformation, getAllBoxes, getLocationsInstitute, hideAnimation, locationConceptIDToLocationMap,
         removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
-        translateNumToType, userAuthorization } from "./../shared.js"
+        translateNumToType, userAuthorization } from "../shared.js"
 import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs,
         addEventCompleteShippingButton, addEventModalAddBox, addEventNavBarBoxManifest, addEventNavBarShipment, addEventNavBarShippingManifest, addEventNavBarAssignTracking, addEventLocationSelect,
         addEventPreventTrackingConfirmPaste, addEventReturnToPackaging, addEventReturnToReviewShipmentContents, addEventSaveButton, addEventSaveAndContinueButton, addEventShipPrintManifest,
-        addEventTrackingNumberScanAutoFocus, addEventTrimTrackingNums, compareBoxIds, getInstituteSpecimensList, populateCourierBox, populateFinalCheck, populateTrackingQuery } from "./../events.js";     
+        addEventTrackingNumberScanAutoFocus, addEventTrimTrackingNums, compareBoxIds, getInstituteSpecimensList, populateCourierBox, populateFinalCheck, populateTrackingQuery } from "../events.js";     
 import { homeNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
 import { setAllShippingState, updateShippingStateCreateBox, updateShippingStateRemoveBagFromBox, updateShippingStateSelectedLocation } from '../shippingState.js';
 import conceptIds from '../fieldToConceptIdMapping.js';
@@ -48,7 +48,7 @@ const buildShippingNavAndHeader = () => {
 }
 
 // Build the DOM for the shipping page.
-const buildShippingDOM = async () => {
+const buildShippingDOM = () => {
     document.getElementById('contentBody').innerHTML = `
         ${renderShippingLocationSelector()}
         ${renderScanOrEnterSpecimenId()}
@@ -63,6 +63,7 @@ const buildShippingDOM = async () => {
  * This will run asyncronously when pulling new data (loadFromState = false) and synchronously when loading from state (loadFromState = true).
  * @param {*} userName - the logged-in userName.
  * @param {*} loadFromState - whether to load data from state or from the server.
+ * @param {*} currBoxId - the currently selected boxId.
  */
 const buildShippingInterface = async (userName, loadFromState, currBoxId) => {    
     showAnimation();
@@ -91,7 +92,6 @@ const buildShippingInterface = async (userName, loadFromState, currBoxId) => {
     populateViewShippingBoxContentsList(currBoxId), // 'View Shipping Box Contents' section
     populateBoxesToShipTable(), // 'Select boxes to ship' section
     addShippingEventListeners();
-    populateTempNotification();
 
     hideAnimation();
 }
@@ -140,7 +140,7 @@ const populateAvailableCollectionsList = async (boxList, loadFromState = false) 
     let orphanBagId;
 
     for (const bagId of bagIdList) {
-        if (bagId != "unlabelled") {
+        if (bagId !== "unlabelled") {
             const rowEle = tableEle.insertRow();
             rowEle.insertCell(0).innerHTML = bagId;
             rowEle.insertCell(1).innerHTML = availableCollectionsObj[bagId].length;
@@ -148,7 +148,7 @@ const populateAvailableCollectionsList = async (boxList, loadFromState = false) 
             const hiddenChannel = rowEle.insertCell(2)
             hiddenChannel.innerHTML = JSON.stringify(availableCollectionsObj[bagId]);
             hiddenChannel.style.display = "none";
-            if (numRows % 2 == 0) {
+            if (numRows % 2 === 0) {
                 rowEle.style['background-color'] = "lightgrey";
             }
             numRows += 1;
@@ -178,7 +178,7 @@ const populateAvailableCollectionsList = async (boxList, loadFromState = false) 
             const rowCount = orphanTableEle.rows.length;
             const rowEle = orphanTableEle.insertRow();
 
-            if (rowCount % 2 == 0) {
+            if (rowCount % 2 === 0) {
                 rowEle.style['background-color'] = 'lightgrey';
             }
 
@@ -236,30 +236,8 @@ const populateBoxesToShipTable = () => {
     }
 }
 
-export const populateTempNotification = () => {
-    let checkDate = false;
-    const toToggle = document.getElementById('tempTubeReminder');
-    if (checkDate == true) {
-        toToggle.style.display = 'block';
-    }
-    else {
-        toToggle.style.display = 'none';
-    }
-}
-
-export const populateTempCheck = () => {
-    let checkDate = false;
-    const toToggle = document.getElementById('checkForTemp');
-    if (checkDate == true) {
-        toToggle.style.display = 'block';
-    }
-    else {
-        toToggle.style.display = 'none';
-    }
-}
-
 const populateShippingBoxContentsRows = (bagNum, cellNum, row, currBagId, fullTubeId, tubeType) => {
-    bagNum % 2 == 1 ? row.style['background-color'] = 'lightgrey' : row.style['background-color'] = 'white'; {
+    bagNum % 2 === 1 ? row.style['background-color'] = 'lightgrey' : row.style['background-color'] = 'white'; {
         row.insertCell(0).innerHTML = (cellNum === 0) ? currBagId : '';
         row.insertCell(1).innerHTML = fullTubeId;
         row.insertCell(2).innerHTML = tubeType;
@@ -284,7 +262,7 @@ export const populateViewShippingBoxContentsList = (selectedBoxId) => {
     const selectedLocation = appState.getState().selectedLocation;
     const shippingBoxContentsTable = document.getElementById('currTubeTable');
 
-    if (currBoxId != '') {
+    if (currBoxId !== '') {
         const currBox = detailedLocationBoxes[currBoxId];    
         const boxKeys = Object.keys(currBox).filter(key => key !== 'boxData' && key !== 'undefined');
         shippingBoxContentsTable.innerHTML = renderViewBoxContentsTableHeader(selectedLocation);
@@ -464,7 +442,7 @@ const renderBoxManifestHeader = (boxId, boxStartedTimestamp, boxLastModifiedTime
         { text: `Number of Specimens:  ${numTubes}` }
     ];
     
-    const createElements = (data, parent) => {
+    const createBoxManifestElements = (data, parent) => {
         for (const item of data) {
             const newP = document.createElement("p");
             newP.innerHTML = item.text;
@@ -483,8 +461,8 @@ const renderBoxManifestHeader = (boxId, boxStartedTimestamp, boxLastModifiedTime
         }
     }
     
-    createElements(dataCol1, div1);
-    createElements(dataCol3, div3);
+    createBoxManifestElements(dataCol1, div1);
+    createBoxManifestElements(dataCol3, div3);
     
     boxManifestCol1.appendChild(div1);
     boxManifestCol3.appendChild(div3);
@@ -553,9 +531,9 @@ const shouldAddModalRow = (isOrphan, splitTubeIdArray, tubeId) => {
     if (isOrphan) return true;
     if (splitTubeIdArray.length >= 2 && splitTubeIdArray[1] == '0008') {
         //look for all non-mouthwash (0007)
-        return tubeId != '0007' && tubeId != '0008';
+        return tubeId !== '0007' && tubeId !== '0008';
     } else {
-        return tubeId == '0007' && tubeId != '0009';
+        return tubeId === '0007' && tubeId !== '0009';
     }
 }
 
@@ -869,7 +847,7 @@ const buildShippingManifestHeader = (dataCol1, dataCol3) => {
     const div1 = document.createElement("div");
     const div3 = document.createElement("div");
     
-    const createElements = (data, parent) => {
+    const createShippingManifestElements = (data, parent) => {
         for (const item of data) {
             const newP = document.createElement("p");
             newP.innerHTML = item.text;
@@ -888,8 +866,8 @@ const buildShippingManifestHeader = (dataCol1, dataCol3) => {
         }
     }
     
-    createElements(dataCol1, div1);
-    createElements(dataCol3, div3);
+    createShippingManifestElements(dataCol1, div1);
+    createShippingManifestElements(dataCol3, div3);
     
     boxManifestCol1.appendChild(div1);
     boxManifestCol3.appendChild(div3);

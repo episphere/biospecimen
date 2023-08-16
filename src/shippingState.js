@@ -8,7 +8,6 @@ import conceptIds from './fieldToConceptIdMapping.js';
  * @param {object} availableCollectionsObj - the available specimen collections in the 'Available Collections' table
  * @param {array<string>} availableLocations - the list of locations for the healthcare provider
  * @param {array<object>} allBoxesList - the list of boxes for the healthcare provider
- * @param {object} detailedProviderBoxes - the list of boxes with bags and specimen data for the healthcare provider
  * @param {array} finalizedSpecimenList - the list of finalized specimens for the healthcare provider
  * @param {string} userName - the name of the logged in user
  */
@@ -59,8 +58,9 @@ export const updateShippingStateRemoveBagFromBox = (boxId, bagsToMove) => {
 /**
  * Update the state for allBoxesList and availableCollectionsObj.
  * Add the bag to the box.
- * @param {string} boxId - the box with the bag to be added
- * @param {array} bagToMove - the bag to be added to the box
+ * @param {string} boxId - the boxId of the bag to be added
+ * @param {array} bagId - the bagId to be added to the box
+ * @param {object} boxToUpdate - the box object to be updated
  */
 export const updateShippingStateAddBagToBox = (boxId, bagId, boxToUpdate) => {
     addBagToBox(boxId, boxToUpdate);

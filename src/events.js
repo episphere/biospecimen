@@ -186,7 +186,7 @@ export const addEventAddSpecimenToBox = () => {
             showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' }, true);
             return;
         }
-        if (masterSpecimenId == '') {
+        if (masterSpecimenId === '') {
             showNotifications({ title: 'Empty Entry or Scan', body: 'Please enter or scan a specimen bag ID or Full Specimen ID.' }, true);
             return;
         }
@@ -213,7 +213,7 @@ export const addEventAddSpecimenToBox = () => {
         const specimenTablesResult = buildSpecimenDataInModal(masterSpecimenId);
         const biospecimensList = specimenTablesResult.biospecimensList;
 
-        if (biospecimensList.length == 0) {
+        if (biospecimensList.length === 0) {
             showNotifications({ title: 'Item not found', body: `Item not reported as collected. Go to the Collection Dashboard to add specimen.` }, true);
             return;
         } else {
@@ -274,7 +274,7 @@ export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrpha
             hideAnimation();
             if (boxUpdateResponse.code === 200) {
                 updateShippingStateAddBagToBox(currBoxId, bagId, boxToUpdate);
-                startShipping(appState.getState().userName, true, currBoxId);
+                await startShipping(appState.getState().userName, true, currBoxId);
             } else {
                 showNotifications({ title: 'Error', body: 'Error updating box' }, true);
             }
@@ -1722,11 +1722,11 @@ export const addEventNavBarBoxManifest = (id) => {
     document.getElementById(id).addEventListener('click', e => {
         e.stopPropagation();
         if (btn.classList.contains('active')) return;
-        if (id == 'viewBoxManifestBlood') {
+        if (id === 'viewBoxManifestBlood') {
             //return box 1 info
             generateBoxManifest(document.getElementById('currTubeTable'), userName);
         }
-        else if (id == 'viewBoxManifestMouthwash') {
+        else if (id === 'viewBoxManifestMouthwash') {
             //return box 2 info
             generateBoxManifest(document.getElementById('mouthwashList'), userName);
         }

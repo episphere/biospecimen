@@ -95,20 +95,18 @@ export const getRecentBoxesShippedBySiteNotReceived = (boxes) => {
     // boxes are from searchBoxes endpoint
     if (boxes.length === 0) return [];
 
-    const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(item => {
-        const hasShippingShipDate = item[fieldToConceptIdMapping.shippingShipDate];
-        const hasNoSiteShipmentDateReceivedKey = !item[fieldToConceptIdMapping.siteShipmentDateReceived];
-        const hasNotReceivedSiteShipment = item[fieldToConceptIdMapping.siteShipmentReceived] === fieldToConceptIdMapping.no;
+    const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(boxObj => {
+        const hasShippingShipDate = boxObj[fieldToConceptIdMapping.shippingShipDate];
+        const hasNoSiteShipmentDateReceivedKey = !boxObj[fieldToConceptIdMapping.siteShipmentDateReceived];
+        const hasNotReceivedSiteShipment = boxObj[fieldToConceptIdMapping.siteShipmentReceived] === fieldToConceptIdMapping.no;
         return hasShippingShipDate && (hasNoSiteShipmentDateReceivedKey || hasNotReceivedSiteShipment);
     });
 
-    const sortBoxesBySubmitShipmentTime = filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => {
+    return filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => {
         const shipDateA = a[fieldToConceptIdMapping.shippingShipDate];
         const shipDateB = b[fieldToConceptIdMapping.shippingShipDate];
         return (shipDateA < shipDateB) ? 1 : -1;
     });
-
-    return sortBoxesBySubmitShipmentTime;
 }
 
 const createPackagesInTransitRows = (boxes, sumSamplesArr) => {
