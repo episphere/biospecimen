@@ -2546,6 +2546,7 @@ const findScannedIdInUnshippedBoxes = (allBoxesList, masterSpecimenId) => {
         dataObj['foundMatch'] = true;
         dataObj[conceptIds.shippingLocation] = box[conceptIds.shippingLocation];
         dataObj[conceptIds.shippingBoxId] = box[conceptIds.shippingBoxId];
+        dataObj['inputScanned'] = masterSpecimenId;
         return dataObj;
     }
     
