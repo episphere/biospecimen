@@ -64,7 +64,7 @@ const renderCollectionLocationList = () => {
                     <li><a class="dropdown-item" data-siteKey="hpRC" id="hpRC">HP Research Clinic</a></li>
                     <li><a class="dropdown-item" data-siteKey="hfhKRC" id="hfhKRC">HFH K-13 Research Clinic</a></li>
                     <li><a class="dropdown-item" data-siteKey="hfhPRC" id="hfhPRC">HFH Cancer Pavilion Research Clinic</a></li>
-                    <li><a class="dropdown-item" data-siteKey="hfhPRC" id="hfhLRC">HFH Livonia Research Clinic</a></li>
+                    <li><a class="dropdown-item" data-siteKey="hfhLRC" id="hfhLRC">HFH Livonia Research Clinic</a></li>
                     <li><a class="dropdown-item" data-siteKey="sfImag" id="sfImag">Sioux Falls Imagenetics</a></li>
                     <li><a class="dropdown-item" data-siteKey="ingHar" id="ingHar">Ingalls Harvey</a></li>
                     <li><a class="dropdown-item" data-siteKey="rivEas" id="rivEas">River East</a></li>
