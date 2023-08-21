@@ -21,14 +21,14 @@ export const baselineEmailTemplate = (data, isClinical) => {
     let loginDetails;
     const addLoginText = `Your login information for the MyConnect app is `
     
-    if(data['995036844'] === 'phone' && data['348474836']) {
-        loginDetails = addLoginText + redactPhoneLoginInfo(data['348474836']) + `.`;
+    if(data[995036844] === 'phone' && data[348474836]) {
+        loginDetails = addLoginText + redactPhoneLoginInfo(data[348474836]) + `.`;
     }
-    else if(data['995036844'] === 'password' && data['421823980']) {
-        loginDetails = addLoginText + redactEmailLoginInfo(data['421823980']) + `.`
+    else if(data[995036844] === 'password' && data[421823980]) {
+        loginDetails = addLoginText + redactEmailLoginInfo(data[421823980]) + `.`
     }
-    else if(data['995036844'] === 'passwordAndPhone' && data['421823980'] && data['348474836']) {
-        loginDetails = addLoginText + redactEmailLoginInfo(data['421823980']) + ` or ` + redactPhoneLoginInfo(data['348474836']) + `.`
+    else if(data[995036844] === 'passwordAndPhone' && data[421823980] && data[348474836]) {
+        loginDetails = addLoginText + redactEmailLoginInfo(data[421823980]) + ` or ` + redactPhoneLoginInfo(data[348474836]) + `.`
     }
 
     return `
