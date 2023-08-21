@@ -19,20 +19,16 @@ export const baselineEmailTemplate = (data, isClinical) => {
     }
 
     let loginDetails;
-                    
-    if(data[995036844] === 'phone' && data[348474836]) {
-        loginDetails = data[348474836];
-        loginDetails = "***-***-" + loginDetails.substring(loginDetails.length - 4);
+    const addLoginText = `Your login information for the MyConnect app is `
+    
+    if(data['995036844'] === 'phone' && data['348474836']) {
+        loginDetails = addLoginText + redactPhoneLoginInfo(data['348474836']) + `.`;
     }
-    else if(data[995036844] === 'password' && data[421823980]) {
-        loginDetails = data[421823980];
-
-        let amp = loginDetails.indexOf('@');    
-        for(let i = 0; i < amp; i++) {
-            if(i != 0 && i != 1 && i != amp - 1) {
-                loginDetails = loginDetails.substring(0, i) + "*" + loginDetails.substring(i + 1);
-            } 
-        }
+    else if(data['995036844'] === 'password' && data['421823980']) {
+        loginDetails = addLoginText + redactEmailLoginInfo(data['421823980']) + `.`
+    }
+    else if(data['995036844'] === 'passwordAndPhone' && data['421823980'] && data['348474836']) {
+        loginDetails = addLoginText + redactEmailLoginInfo(data['421823980']) + ` or ` + redactPhoneLoginInfo(data['348474836']) + `.`
     }
 
     return `
@@ -45,7 +41,7 @@ export const baselineEmailTemplate = (data, isClinical) => {
         A new survey about your experience with COVID-19 is also available on MyConnect. Please complete this survey as soon as you can.
         <br/>
         <br/>
-        Please use ${loginDetails} to access the survey on the MyConnect app. If you forgot your login information or have questions, please contact the <a href=${supportLocation}>Connect Support Center.</a>
+        ${loginDetails} If you forgot your login information or have questions, please contact the <a href=${supportLocation}>Connect Support Center.</a>
         <br/>
         <br/>
         Thank you for your commitment to helping us learn how to better prevent cancer.
@@ -66,3 +62,13 @@ export const baselineEmailTemplate = (data, isClinical) => {
         <em>This message is private. If you have received it by mistake, please let us know by emailing ConnectSupport@NORC.org, and please kindly delete the message. If you are not the right recipient, please do not share this message with anyone.</em>
     `;
 };
+
+const redactEmailLoginInfo = (participantEmail) => {
+    const [prefix, domain] = participantEmail.split("@");
+    const changedPrefix = prefix.length > 3
+        ? prefix.slice(0, 2) + "*".repeat(prefix.length - 3) + prefix.slice(-1)
+        : prefix.slice(0, -1) + "*";
+    return changedPrefix + "@" + domain;
+}
+
+const redactPhoneLoginInfo = (participantPhone) => { return "***-***-" + participantPhone.slice(-4); }
