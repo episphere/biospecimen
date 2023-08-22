@@ -1057,7 +1057,7 @@ export const getUpdatedParticipantData = async (participantData) => {
     return responseParticipant.data[0];
 }
 
-export const updateCollectionSettingData = async (biospecimenData, tubes, data) => {
+export const updateCollectionSettingData = async (biospecimenData, tubes, participantData) => {
   participantData = await getUpdatedParticipantData(participantData);
 
     let settings;
