@@ -89,8 +89,8 @@ const buildShippingInterface = async (userName, loadFromState, currBoxId) => {
 
     setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName);
 
-    populateViewShippingBoxContentsList(currBoxId), // 'View Shipping Box Contents' section
-    populateBoxesToShipTable(), // 'Select boxes to ship' section
+    populateViewShippingBoxContentsList(currBoxId); // 'View Shipping Box Contents' section
+    populateBoxesToShipTable(); // 'Select boxes to ship' section
     addShippingEventListeners();
 
     hideAnimation();
