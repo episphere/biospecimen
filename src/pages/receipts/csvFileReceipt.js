@@ -315,7 +315,7 @@ const updateResultMappings = (filteredResult, vialMappings) => {
   filteredResult['Sample Collection Center'] = (filteredResult[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical) 
               ? keyToNameObj[filteredResult[fieldToConceptIdMapping.healthcareProvider]] : keyToLocationObj[filteredResult[fieldToConceptIdMapping.collectionLocation]];
   filteredResult['Sample ID'] = filteredResult[fieldToConceptIdMapping.collectionId]?.split(' ')[0] || '';
-  filteredResult['Sequence #'] = filteredResult[fieldToConceptIdMapping.collectionId]?.split(' ')[1] || '';
+  filteredResult['Sequence'] = filteredResult[fieldToConceptIdMapping.collectionId]?.split(' ')[1] || '';
   filteredResult['BSI ID'] = filteredResult[fieldToConceptIdMapping.collectionId] || '';
   filteredResult['Subject ID'] = filteredResult['Connect_ID'];
   filteredResult['Date Received'] = formatISODateTime(filteredResult[fieldToConceptIdMapping.dateReceived]) || '';
@@ -347,7 +347,7 @@ const updateResultMappings = (filteredResult, vialMappings) => {
 
 const generateBSIqueryCSVData = (items) => {
   let csv = ``;
-  csv += `Study ID, Sample Collection Center, Sample ID, Sequence #, BSI ID, Subject ID, Date Received, Date Drawn, Vial Type, Additive/Preservative, Material Type, Volume, Volume Estimate, Volume Unit, Vial Warnings, Hemolyzed, Label Status, Visit\r\n`
+  csv += `Study ID, Sample Collection Center, Sample ID, Sequence, BSI ID, Subject ID, Date Received, Date Drawn, Vial Type, Additive/Preservative, Material Type, Volume, Volume Estimate, Volume Unit, Vial Warnings, Hemolyzed, Label Status, Visit\r\n`
   downloadCSVfile(items, csv, 'BSI-data-export')
 }
 
@@ -375,7 +375,7 @@ const downloadCSVfile = (items, csv, title) => {
 */ 
 
 const processInTransitXLSXData = (inTransitItems) => {
-  const header = ['Ship Date', 'Tracking Number', 'Shipped from Site', 'Shipped from Location', 'Shipped Date & Time', 'Expected Number of Samples', 'Temperature Monitor', 'Box Number', 'Specimen Bag ID Type', 'Full Specimen IDs', 'Material Type'];
+  const header = ['Ship Date', 'Tracking Number', 'Shipped from Site', 'Shipped from Location', 'Shipped Date & Time', 'Expected Number of Samples', 'Temperature Monitor', 'Box Number', 'Specimen Bag ID Type', 'BSI ID', 'Material Type'];
   const inTransitData = [header, ...inTransitItems.map(row => Object.values(row))];
   handleXLSXLibrary(inTransitData);
 };

@@ -115,6 +115,19 @@ export const findParticipant = async (query) => {
     return await response.json();
 }
 
+export const getDailyParticipant = async () => {
+  const idToken = await getIdToken();
+  const response = await fetch(`${api}api=getDailyReportParticipants`, {
+      method: "GET",
+      headers: {
+          Authorization:"Bearer "+idToken
+      }
+  });
+  return await response.json();
+}
+
+
+
 export const updateParticipant = async (dataObj) => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=updateParticipantDataNotSite`, {
@@ -2485,3 +2498,6 @@ export const logAPICallEndDev = (funcName) => {
     console.timeEnd(funcName);
   }
 }
+
+
+export const getDataAttributes = (el) => { return el.getAttribute('data-sitekey'); }
