@@ -88,8 +88,8 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 };
 
 /**
- * filteredBoxesBySubmitShipmentTimeAndNotReceived(): handle boxes with a received shipment flag with a default false value.
- * sortBoxesBySubmitShipmentTime(): sort method use direct comparison operator over the localeCompare for more speed.
+ * Get boxes that have been shipped by site and not yet received
+ * @param {array} boxes - array of boxes from searchBoxes endpoint with 'bptl' flag
  */
 export const getRecentBoxesShippedBySiteNotReceived = (boxes) => {
     // boxes are from searchBoxes endpoint
