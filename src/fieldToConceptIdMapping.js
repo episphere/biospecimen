@@ -72,7 +72,7 @@ export default {
         selectedVisit: 331584571,
         note: 338570265,
         isFinalized: 410912345,
-        shipTime: 556788178,
+        finalizedTime: 556788178,
         accessionId: 646899796,
         collectionSetting: 650516960,
         collectionTime: 678166505,

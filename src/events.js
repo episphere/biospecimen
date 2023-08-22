@@ -1644,13 +1644,14 @@ export const addEventFinalizeFormCntd = (specimenData) => {
     });
 }
 
+// update the existing object in 'biospecimen' collection with finalized flag and timestamp
 const finalizeHandler = async (biospecimenData, cntd) => {
 
     if (cntd) {
         showAnimation();
 
-        biospecimenData['410912345'] = 353358909;
-        biospecimenData['556788178'] = new Date().toISOString();
+        biospecimenData[conceptIds.collection.isFinalized] = conceptIds.yes;
+        biospecimenData[conceptIds.collection.finalizedTime] = new Date().toISOString();
 
         await updateSpecimen([biospecimenData]);
 
