@@ -946,12 +946,12 @@ export const shipmentTracking = async (boxIdAndBagsObj, userName, boxWithTempMon
     await populateCourierBox();
     addEventNavBarShipment("returnToPackaging", userName);
     addEventNavBarShipment("navBarShippingDash", userName);
-    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName, boxWithTempMonitor)
+    addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName, boxWithTempMonitor);
     await populateTrackingQuery(boxIdAndBagsObj);
-    addEventTrimTrackingNums()
-    addEventTrackingNumberScanAutoFocus()
-    addEventPreventTrackingConfirmPaste()
-    addEventCheckValidTrackInputs(boxIdAndBagsObj)
+    addEventTrimTrackingNums();
+    addEventTrackingNumberScanAutoFocus();
+    addEventPreventTrackingConfirmPaste();
+    addEventCheckValidTrackInputs(boxIdAndBagsObj);
     addEventSaveButton(boxIdAndBagsObj);
     addEventSaveAndContinueButton(boxIdAndBagsObj, userName, boxWithTempMonitor);
     hideAnimation();

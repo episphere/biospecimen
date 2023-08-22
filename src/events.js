@@ -204,7 +204,7 @@ export const addEventAddSpecimenToBox = () => {
         if(isScannedIdInUnshippedBoxes) {
             const boxNum = scannedIdInUnshippedBoxes[conceptIds.shippingBoxId];
             const siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInUnshippedBoxes[conceptIds.shippingLocation]];
-            const siteSpecificLocationName = siteSpecificLocation ? siteSpecificLocation : '';
+            const siteSpecificLocationName = siteSpecificLocation || '';
             const scannedInput = scannedIdInUnshippedBoxes['inputScanned'];
             showNotifications({ title:`${scannedInput} has already been recorded`, body: `${scannedInput} is recorded as being in ${boxNum} in ${siteSpecificLocationName}`}, true);
             return;

@@ -1,6 +1,5 @@
-import { appState } from './shared.js';
+import { appState, siteSpecificLocationToConceptId } from './shared.js';
 import { specimenCollection } from './tubeValidation.js';
-import { siteSpecificLocationToConceptId } from './shared.js';
 import conceptIds from './fieldToConceptIdMapping.js';
 
 /**
@@ -32,16 +31,12 @@ export const setAllShippingState = (availableCollectionsObj, availableLocations,
 }
 
 export const updateShippingStateSelectedLocation = (selectedLocation) => {
-    appState.setState({
-        selectedLocation: selectedLocation,
-    });
+    appState.setState({ selectedLocation: selectedLocation });
 
     const detailedProviderBoxes = appState.getState().detailedProviderBoxes;
     const detailedLocationBoxes = filterDetailBoxesByLocation(detailedProviderBoxes);
 
-    appState.setState({
-        detailedLocationBoxes: detailedLocationBoxes,
-    });
+    appState.setState({ detailedLocationBoxes: detailedLocationBoxes });
 }
 
 /**
@@ -109,12 +104,10 @@ const removeBagFromBox = (boxId, bagsToMove) => {
 
 // Remove the bag from the availableCollectionsObj when it has been added to a box.
 const removeBagFromAvailableCollections = (bagId) => {
-    const availableCollectionsObj = { ...appState.getState().availableCollectionsObj };
+    const availableCollectionsObj = appState.getState().availableCollectionsObj;
     delete availableCollectionsObj[bagId];
 
-    appState.setState({
-        availableCollectionsObj: availableCollectionsObj,
-    });
+    appState.setState({ availableCollectionsObj: availableCollectionsObj });
 }
 
 // Replace the previous box with the updated box when a bag is added.
@@ -130,9 +123,7 @@ const addBagToBox = (boxId, boxToUpdate) => {
         allBoxesList.push(boxToUpdate);
     }
 
-    appState.setState({
-        allBoxesList: allBoxesList,
-    });
+    appState.setState({ allBoxesList: allBoxesList });
 }
 
 export const updateShippingStateCreateBox = (boxToAdd) => {
