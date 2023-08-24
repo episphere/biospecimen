@@ -387,7 +387,7 @@ export const getInstituteSpecimensList = async (boxList) => {
             }
         }
 
-        if (tubesInBox.shipped.bloodUrine.length > 0 && tubesToAdd.bloodUrine.length > 0) {
+        if ((tubesInBox.shipped.bloodUrine.length > 0 || tubesInBox.notShipped.bloodUrine.length > 0) && tubesToAdd.bloodUrine.length > 0) {
             tubesToAdd.orphan=tubesToAdd.bloodUrine;
             tubesToAdd.bloodUrine=[];
         }
