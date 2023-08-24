@@ -1,4 +1,4 @@
-import { addBox, appState, conceptIdToSiteSpecificLocation, displayContactInformation, getAllBoxes, getLocationsInstitute, hideAnimation, locationConceptIDToLocationMap,
+import { addBox, appState, conceptIdToSiteSpecificLocation, displayContactInformation, getAllBoxes, getBoxes, getLocationsInstitute, hideAnimation, locationConceptIDToLocationMap,
         removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
         translateNumToType, userAuthorization } from "../shared.js"
 import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs,
@@ -214,7 +214,8 @@ const populateBoxesToShipTable = () => {
     
     if (Object.keys(detailedBoxes).length > 0) {
         const sortedBoxKeys = Object.keys(detailedBoxes).sort();
-        sortedBoxKeys.forEach((box, i) => {
+        let rowCount = 0;
+        sortedBoxKeys.forEach(box => {
             const currBox = detailedBoxes[box];
             const bagKeys = Object.keys(currBox).filter(key => key !== 'boxData' && key !== 'undefined').sort((a, b) => a.split(/\s+/)[1] - b.split(/\s+/)[1]);
             const boxStartedTimestamp = currBox.boxData[conceptIds.firstBagAddedToBoxTimestamp] ? formatTimestamp(Date.parse(currBox.boxData[conceptIds.firstBagAddedToBoxTimestamp])) : '';
@@ -222,15 +223,16 @@ const populateBoxesToShipTable = () => {
             const boxLocation = currBox.boxData[conceptIds.shippingLocation] ? locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]["siteSpecificLocation"] : '';
             const numTubesInBox = bagKeys.reduce((total, bagKey) => total + currBox[bagKey]['arrElements'].length, 0);
 
-            const currRow = table.insertRow(i + 1);
-            currRow.style['background-color'] = i % 2 === 1 ? 'lightgrey' : '';
-            
-            if (numTubesInBox > 0) {
+            if (numTubesInBox > 0) {   
+                const currRow = table.insertRow(rowCount + 1);
+                currRow.style['background-color'] = rowCount % 2 === 1 ? 'lightgrey' : '';
                 currRow.innerHTML += renderBoxesToShipRow(boxStartedTimestamp, boxLastModifiedTimestamp, box, boxLocation, numTubesInBox);
                 const currBoxButton = currRow.cells[6].querySelector(".boxManifestButton");
                 currBoxButton.addEventListener("click", async () => {
-                generateBoxManifest(currBox);
-            });
+                    generateBoxManifest(currBox);
+                });
+
+                rowCount++; 
             }
         });
     }
@@ -304,7 +306,7 @@ const handleRemoveBagButton = (currDeleteButton, currTubes, currBoxId) => {
         hideAnimation();
 
         if (removeBagResponse.code === 200) {
-            updateShippingStateRemoveBagFromBox(currBoxId, bagsToRemove);
+            updateShippingStateRemoveBagFromBox(currBoxId, currBagId, bagsToRemove);
             startShipping(appState.getState().userName, true, currBoxId);
         } else {
             showNotifications({ title: 'Error removing bag', body: 'We experienced an error removing this bag. Please try again.' });
@@ -658,38 +660,14 @@ export const populateModalSelect = (detailedLocationBoxes) => {
     addToBoxButton.removeAttribute("disabled")
     
     const boxIds = Object.keys(detailedLocationBoxes).sort(compareBoxIds);
-    const options = boxIds.map(boxId => `<option>${boxId}</option>`).join(''); 
+    const boxOptions = boxIds.map(boxId => `<option>${boxId}</option>`).join(''); 
 
-    if (options == '') {
+    if (boxOptions == '') {
         addToBoxButton.setAttribute('disabled', 'true');
     }
 
-    boxSelectEle.innerHTML = options;
+    boxSelectEle.innerHTML = boxOptions;
     boxSelectEle.value = selectedBoxId;
-}
-
-export const populateTempSelect = (boxes) => {
-    const boxDiv = document.getElementById("tempCheckList");
-    boxDiv.style.display = "block";
-    boxDiv.style.marginTop = "10px";
-    boxDiv.innerHTML = `<p>Select the box that contains the temperature monitor</p>
-        <select name="tempBox" id="tempBox">
-        <option disabled value> -- select a box -- </option>
-        </select>`;
-
-    const toPopulate = document.getElementById('tempBox')
-
-    for (let i = 0; i < boxes.length; i++) {
-        
-        const opt = document.createElement("option");
-        opt.value = boxes[i];
-        opt.innerHTML = boxes[i];
-        if(i === 0){
-            opt.selected = true;
-        }
-        // then append it to the select element
-        toPopulate.appendChild(opt);
-    }
 }
 
 export const formatTimestamp = (timestamp) => {
@@ -752,9 +730,10 @@ const sortSpecimenKeys = (a, b) => {
  * @param {boolean} isTempMonitorIncluded
  * @param {number} currShippingLocationNumber
  */
-export const generateShippingManifest = (boxIdArray, userName, isTempMonitorIncluded, currShippingLocationNumber) => {
+export const generateShippingManifest = async (boxIdArray, userName, isTempMonitorIncluded, currShippingLocationNumber) => {
     showAnimation();
-    const boxArray = appState.getState().allBoxesList;
+    const response = await getBoxes();
+    const boxArray = response.data;
     let siteAcronym = '';
     let boxIdAndBagsObjToDisplay = {};
 
