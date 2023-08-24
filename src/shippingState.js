@@ -89,9 +89,6 @@ const addBagToAvailableCollections = (boxId, bagId, bagsToMove) => {
     }
     
     appState.setState({ availableCollectionsObj });
-    // appState.setState({
-    //     availableCollectionsObj: {...availableCollectionsObj},
-    // });
 }
 
 // Remove the bag from the box when user has clicked 'remove bag' in the 'View Shipping Box Contents' table.
@@ -151,10 +148,6 @@ const addBagToBox = (boxId, bagId, boxToUpdate) => {
         availableCollectionsObj['unlabelled'].push(...strayTubesToAdd);
     }
 
-    // appState.setState({
-    //     allBoxesList: allBoxesList,
-    //     availableCollectionsObj: availableCollectionsObj
-    // });
     appState.setState({
         allBoxesList,
         availableCollectionsObj
