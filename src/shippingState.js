@@ -118,7 +118,7 @@ const removeBagFromBox = (boxId, bagId, bagsToMove) => {
 const removeBagFromAvailableCollections = (bagId) => {
     const availableCollectionsObj = appState.getState().availableCollectionsObj;
 
-    if (availableCollectionsObj.hasOwnProperty(bagId)) {
+    if (bagId in availableCollectionsObj) {
         delete availableCollectionsObj[bagId];
     } else if (availableCollectionsObj['unlabelled'] && availableCollectionsObj['unlabelled'].includes(bagId)) {
         availableCollectionsObj['unlabelled'] = availableCollectionsObj['unlabelled'].filter(id => id !== bagId);
