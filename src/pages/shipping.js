@@ -936,7 +936,7 @@ export const shipmentTracking = async (boxIdAndBagsObj, userName, boxWithTempMon
     hideAnimation();
 }
 
-export const finalShipmentTracking = (boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier) => {
+export const finalShipmentTracking = ({ boxIdAndBagsObj, boxIdAndTrackingObj, userName, boxWithTempMonitor, shipmentCourier }) => {
     if(document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
     
     removeActiveClass('navbar-btn', 'active')
@@ -948,9 +948,9 @@ export const finalShipmentTracking = (boxIdAndBagsObj, userName, boxWithTempMoni
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarAssignTracking("returnToTracking", userName, boxIdAndBagsObj, boxWithTempMonitor)
     addEventNavBarAssignTracking("navBarFinalizeShipment", userName, boxIdAndBagsObj, boxWithTempMonitor)
-    populateFinalCheck(boxIdAndBagsObj);
+    populateFinalCheck(boxIdAndTrackingObj);
     addEventReturnToReviewShipmentContents('navBarReviewShipmentContents', boxIdAndBagsObj, userName)
-    addEventCompleteShippingButton(boxIdAndBagsObj, userName, boxWithTempMonitor, shipmentCourier);
+    addEventCompleteShippingButton(boxIdAndTrackingObj, userName, boxWithTempMonitor, shipmentCourier);
     addEventBackToSearch('navBarShippingDash');
 }
 
