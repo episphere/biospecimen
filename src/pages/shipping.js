@@ -332,7 +332,11 @@ export const addNewBox = async () => {
 
     if (largestBoxIndexAtLocation == -1 || shouldUpdateBoxModal) {
         const boxToAdd = await createNewBox(boxList, siteLocationConversion, siteCode, largestBoxId, shouldUpdateBoxModal);
-        if (!boxToAdd) return false;
+        if (!boxToAdd) {
+            showNotifications({ title: 'ERROR ADDING BOX - PLEASE REFRESH YOUR BROWSER', body: 'Error: This box already exists. A member of your team may have recently created this box. Please refresh your browser and try again.' });
+            return false;
+        }
+
         updateShippingStateCreateBox(boxToAdd);
         return true;
     } else {
@@ -353,7 +357,10 @@ const createNewBox = async (boxList, pageLocationConversion, siteCode, largestBo
     };
 
     try {
-        await addBox(boxToAdd);
+        const addBoxResponse = await addBox(boxToAdd);
+        if (addBoxResponse.message !== 'Success!') {
+            return null;
+        }
     } catch (e) {
         console.error('Error adding box', e);
         return null;
