@@ -11,11 +11,9 @@ export default {
     city: 703385619,
     state: 634434746,
     zip: 892050548,
-    booleanZero: 104430631,
-    booleanOne: 353358909,
     verficationDate: 914594314,
     submitShipmentFlag: 145971562,
-    shipmentIsSubmitted: 145971562,
+    firstBagAddedToBoxTimestamp: 672863981,
     shippingShipDateModify: 555611076,
     shippingTrackingNumber: 959708259,
     shippingBoxId: 132929440,
@@ -73,8 +71,8 @@ export default {
         id: 820476880,
         selectedVisit: 331584571,
         note: 338570265,
-        isFinalized:410912345,
-        shipTime:556788178,
+        isFinalized: 410912345,
+        finalizedTime: 556788178,
         accessionId: 646899796,
         collectionSetting: 650516960,
         collectionTime: 678166505,
@@ -154,7 +152,7 @@ export default {
     dcam: 777644826,
     nci_mainCampus: 111111111,
     nci_frederick: 222222222,
-    siteCode:789843387,
+    siteCode: 789843387,
 
     collectionLocation: 951355211,
     bloodCollectionSetting: 592099155,
@@ -209,6 +207,52 @@ export default {
 
     clinicalSite: {
         bloodCollected: 693370086
+    },
+
+    collectionLocationMapping: {
+        777644826 : 'UC-DCAM',
+        692275326 : 'Marshfield',
+        813701399 : 'Weston',
+        698283667 : 'Lake Hallie',
+        834825425 : 'HP Research Clinic',
+        736183094 : 'HFH K-13 Research Clinic',
+        886364332 : 'HFH Cancer Pavilion Research Clinic',
+        706927479 : 'HFH Livonia Research Clinic',
+        589224449 : 'Sioux Falls Imagenetics',
+        145191545 : 'Ingalls Harvey',
+        489380324 : 'River East',
+        120264574 : 'South Loop',
+        691714762 : 'Rice Lake',
+        487512085 : 'Wisconsin Rapids',
+        983848564 : 'Colby Abbotsford',
+        261931804 : 'Minocqua',
+        665277300 : 'Merrill',
+        111111111 : 'NIH/NCI',
+        807835037 : 'Other'
+    },
+
+    nameToKeyObj : {
+        'ucDcam': 777644826,
+        'marshfield': 692275326,
+        'weston': 813701399,
+        'lakeHallie': 698283667,
+        'hpRC': 834825425,
+        'hfhKRC': 736183094,
+        'hfhPRC': 886364332,
+        'hfhPRC': 706927479,
+        'sfImag': 589224449,
+        'ingHar': 145191545,
+        'rivEas': 489380324,
+        'soLo': 120264574,
+        'riLa': 691714762,
+        'wisRapids': 487512085,
+        'colAbb': 983848564,
+        'mino': 261931804,
+        'merr': 665277300,
+        'nci': 111111111,
+        'other': 807835037,
+        'all': 1000
+
     }
 };
 
