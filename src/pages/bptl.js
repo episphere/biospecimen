@@ -44,9 +44,9 @@ const bptlScreenTemplate = (name, data, auth, route) => {
             <div class="row gx-5">
                 <div class="col">
                     <h4>Home Collection</h4>
-                    <div class="p-3 border bg-light"><button type="button" href="#kitassembly" class="btn btn-primary btn-lg" id="kitAssembly">Kit Assembly</button></div>
-                    <div class="p-3 border bg-light"><button type="button" href="#participantselection" class="btn btn-primary btn-lg" id="participantSelection">Kit Status</button></div>
-                    <div class="p-3 border bg-light"><button type="button" href="#kitshipment" class="btn btn-primary btn-lg" id="kitShipment">Kit Shipment</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#kitassembly" class="btn btn-primary btn-lg" id="kitAssembly" disabled>Kit Assembly</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#participantselection" class="btn btn-primary btn-lg" id="participantSelection" disabled>Kit Status</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#kitshipment" class="btn btn-primary btn-lg" id="kitShipment" disabled>Kit Shipment</button></div>
                 </div>
                 <div class="col">
                     <h4>Supplies</h4>
