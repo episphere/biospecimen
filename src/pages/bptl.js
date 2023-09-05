@@ -64,6 +64,7 @@ const bptlScreenTemplate = (name, data, auth, route) => {
                     <h4>Reports</h4>
                     <div class="p-3 border bg-light"><button type="button" href="#kitreports" id="kitreports" class="btn btn-primary btn-lg" disabled>Reports</button></div>
                     <div class="p-3 border bg-light"><button type="button" href="#collectionidsearch" id="collectionIdSearch" class="btn btn-primary btn-lg">Collection ID Search</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#bptlshipreports" id="bptlShipReports" class="btn btn-primary btn-lg">Shipping Report</button></div>
                 </div>
             </div>
         </div>
@@ -104,5 +105,9 @@ const redirectPageToLocation = () => {
   const collectionIdSearchRedirection = document.getElementById("collectionIdSearch");
   collectionIdSearchRedirection && collectionIdSearchRedirection.addEventListener("click", async () => {
       location.hash = "#collectionidsearch";
+    });
+  const shippingReportRedirection = document.getElementById("bptlShipReports");
+  shippingReportRedirection && shippingReportRedirection.addEventListener("click", async () => {
+      location.hash = "#bptlshipreports";
     });
 };

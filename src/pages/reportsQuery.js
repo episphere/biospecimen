@@ -1,6 +1,7 @@
 import { userAuthorization, removeActiveClass, restrictNonBiospecimenUser, hideAnimation, showAnimation, getNumPages, conceptIdToSiteSpecificLocation, searchSpecimenInstitute } from "./../shared.js";
 import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality, addEventFilter } from "./../events.js";
 import { homeNavBar, reportSideNavBar } from '../navbar.js';
+import { reportsNavbar } from "./reports/reportsNavbar.js";
 import conceptIds from '../fieldToConceptIdMapping.js';
 
 export const reportsQuery = (auth, route) => {
@@ -20,17 +21,21 @@ export const reportsQuery = (auth, route) => {
     });
 };
 
-export const startReport = async () => {
+export const startReport = async (source) => {
     showAnimation();
-    if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').classList.add('disabled');
-    
+    if (document.getElementById('navBarParticipantCheckIn') && source !== `bptlShippingReport`) document.getElementById('navBarParticipantCheckIn').classList.add('disabled')
     let template = `
-    <div class="container">
-    <div class="row">
-        <div class="col-lg-2" style="margin-bottom:20px">
-            <h2>Reports</h2>
-            ${reportSideNavBar()}
-        </div>
+    ${ source !== `bptlShippingReport` ? `
+        <div class="container">
+            <div class="row">
+            <div class="col-lg-2" style="margin-bottom:20px">
+                <h2>Reports</h2>
+                ${reportSideNavBar()}
+            </div>` : 
+            `${reportsNavbar()}
+                <div id="root root-margin">
+                    <h3 style="text-align: center; margin: 1rem 0;">Shipping Report Screen</h3>`
+    }
         <div class="col-lg-10">
             <div class="row">
                 <div class="col-lg" style="margin-bottom:20px">
@@ -42,6 +47,7 @@ export const startReport = async () => {
                     <span style="display:inline-block; margin:0 .75rem">to</span>
                     <input type="date" id="endDate" style="margin-right:30px; height:38px; padding:5px;">
                     <button id="submitFilter" class="btn btn-primary">Apply filter</button>
+                    <button id="clearFilter" class="btn btn-danger">Clear filter(s)</button>
                 </div>
             </div>
             <div class="row">
@@ -63,15 +69,17 @@ export const startReport = async () => {
     </div>
 </div>`;
     let numPages = await getNumPages(5, {});
+    console.log('num', source)
     document.getElementById('contentBody').innerHTML = template;
     removeActiveClass('navbar-btn', 'active');
-    addEventFilter();
-    populateBoxTable(0, {});
-    addPaginationFunctionality(numPages, {});
+    addEventFilter(source);
+    populateBoxTable(0, {}, source);
+    addPaginationFunctionality(1, {});
     hideAnimation();
+    clearEventFilter(source);
 };
 
-export const showReportsManifest = async (currPage) => {
+export const showReportsManifest = async (currPage, source) => {
     showAnimation();
     const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
     const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ?? [];
@@ -116,8 +124,16 @@ export const showReportsManifest = async (currPage) => {
             window.print();
         });
         document.getElementById('returnToReports').addEventListener('click', e => {
-            startReport();
+            startReport(source);
         });
         hideAnimation();
     
 };
+
+const clearEventFilter = (source) => {
+
+    let clearFilterButton = document.getElementById('clearFilter');
+    clearFilterButton.addEventListener('click', async () => {
+        startReport(source);
+    });
+}

@@ -14,5 +14,14 @@ export const activeReportsNavbar = () => {
         reportsNavItem.classList.add("active");
         reportsNavItem.style.backgroundColor = "#bbcffc85";
         reportsNavItem.style.borderRadius = "4px 4px 0 0";
-    } else return;
+    }
+    else if (location.hash === "#bptlshipreports") {
+        const reportsNavItem = document.getElementById("bptlShippingReportsNavItem");
+        reportsNavItem.classList.add("active");
+        reportsNavItem.style.backgroundColor = "#bbcffc85";
+        reportsNavItem.style.borderRadius = "4px 4px 0 0";
+    }  
+    
+    
+    else return;
 };

@@ -2271,9 +2271,9 @@ export const populateCourierBox = async () => {
 
 }
 
-export const populateBoxTable = async (page, filter) => {
+export const populateBoxTable = async (page, filter, source) => {
     showAnimation();
-    let pageStuff = await getPage(page, 5, '656548982', filter)
+    let pageStuff = await getPage(page, 5, '656548982', filter, source)
     let currTable = document.getElementById('boxTable')
     currTable.innerHTML = ''
     let rowCount = currTable.rows.length;
@@ -2329,16 +2329,16 @@ export const populateBoxTable = async (page, filter) => {
         currRow.insertCell(6).innerHTML = receivedDate;
         currRow.insertCell(7).innerHTML = convertConceptIdToPackageCondition(packagedCondition, packageConditonConversion);
         currRow.insertCell(8).innerHTML = currPage.hasOwnProperty('870456401') ? currPage['870456401'] : '' ;
-        addEventViewManifestButton('reportsViewManifest' + i, currPage);
+        addEventViewManifestButton('reportsViewManifest' + i, currPage, source);
 
     }
     hideAnimation();
 }
 
-export const addEventViewManifestButton = (buttonId, currPage) => {
+export const addEventViewManifestButton = (buttonId, currPage, source) => {
     let button = document.getElementById(buttonId);
     button.addEventListener('click', () => {
-        showReportsManifest(currPage);
+        showReportsManifest(currPage, source);
     });
 }
 
@@ -2472,7 +2472,7 @@ export const addPaginationFunctionality = (lastPage, filter) => {
 
 }
 
-export const addEventFilter = () => {
+export const addEventFilter = (source) => {
 
     let filterButton = document.getElementById('submitFilter');
     filterButton.addEventListener('click', async () => {
@@ -2499,7 +2499,7 @@ export const addEventFilter = () => {
             }
 
         }
-        populateBoxTable(0, filter);
+        populateBoxTable(0, filter, source);
         let numPages = await getNumPages(5, filter);
         addPaginationFunctionality(numPages, filter);
     });

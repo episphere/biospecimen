@@ -594,17 +594,20 @@ export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
     return response.json();
 }
 
-export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) => {
+export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters, source) => {
     const idToken = await getIdToken();
+    console.log('si2', source)
     let requestObj = {
         method: "POST",
         headers:{
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy, "filters":filters})
+        body: JSON.stringify(
+            {"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy, "filters":filters, "source": source}
+          )
     }
-    const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
+    const response = await fetch(`http://127.0.0.1:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=getBoxesPagination`, requestObj);
     return response.json();
 }
 
