@@ -1,7 +1,6 @@
 import { userNavBar, adminNavBar, nonUserNavBar, unAuthorizedUser } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
-import { shipmentTracking, shippingManifest } from "./pages/shipping.js"
-import { addEventClearScannedBarcode, addEventHideNotification } from "./events.js"
+import { generateShippingManifest } from "./pages/shipping.js"
 import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
 import { workflows, specimenCollection } from "./tubeValidation.js";
 import { signOut } from "./pages/signIn.js";
@@ -219,8 +218,10 @@ export const hideAnimation = () => {
 }
 
 export const userAuthorization = async (route, name) => {
+    logAPICallStartDev('userAuthorization');
     showAnimation();
     const response = await validateUser();
+    logAPICallEndDev('userAuthorization');
     if(response.code === 200) {
         const responseData = response.data;
         if(responseData.role === 'admin' || responseData.role === 'manager') document.getElementById('navbarNavAltMarkup').innerHTML = adminNavBar(name || responseData.email);
@@ -366,7 +367,7 @@ export const shippingPrintManifestReminder = (boxesToShip, userName, tempCheckSt
 `;
   const shipManifestConfirmButton = document.getElementById("shipManifestConfirm")
   shipManifestConfirmButton.addEventListener("click", async () => {
-    await shippingManifest(boxesToShip, userName, tempCheckStatus, currShippingLocationNumber);
+    await generateShippingManifest(boxesToShip, userName, tempCheckStatus, currShippingLocationNumber);
   })
 }
 
@@ -460,6 +461,7 @@ export const removeSingleError = (id) => {
 }
 
 export const storeSpecimen = async (array) => {
+    logAPICallStartDev('storeSpecimen');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -470,6 +472,7 @@ export const storeSpecimen = async (array) => {
         body: JSON.stringify(array)
     }
     const response = await fetch(`${api}api=addSpecimen`, requestObj);
+    logAPICallEndDev('storeSpecimen');
     return response.json();
 }
 
@@ -488,6 +491,7 @@ export const checkAccessionId = async (data) => {
 }
 
 export const updateSpecimen = async (array) => {
+    logAPICallStartDev('updateSpecimen');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -498,6 +502,7 @@ export const updateSpecimen = async (array) => {
         body: JSON.stringify(array)
     }
     const response = await fetch(`${api}api=updateSpecimen`, requestObj);
+    logAPICallEndDev('updateSpecimen');
     return response.json();
 }
 
@@ -530,6 +535,7 @@ export const addBox = async (box) =>{
 }
 
 export const updateBox = async (box) => {
+  logAPICallStartDev('updateBox');
   const idToken = await getIdToken();
   let requestObj = {
       method: "POST",
@@ -540,6 +546,7 @@ export const updateBox = async (box) => {
       body: JSON.stringify(convertToFirestoreBox(box))
   }
   const response = await fetch(`${api}api=updateBox`, requestObj);
+  logAPICallEndDev('updateBox');
   return response.json();
 }
 
@@ -606,32 +613,40 @@ export const bagConceptIdList = [
     conceptIds.bag15,
 ];
   
+const bagConversionKeys = [
+  conceptIds.scannedByFirstName,
+  conceptIds.scannedByLastName,
+  conceptIds.orphanBagFlag,
+];
+
 export const convertToOldBox = (inputBox) => {
+  // If the box already has a bags property, return early
   if (inputBox.bags) return inputBox;
 
+  // Otherwise, process the bags
   let bags = {};
   let outputBox = { ...inputBox };
   let hasOrphanBag = false;
   let orphanBag = { arrElements: [] };
 
   for (let bagConceptId of bagConceptIdList) {
+    // If there's no bag corresponding to the current bagConceptId, skip to the next one
     if (!inputBox[bagConceptId]) continue;
+
+    // Extract properties from inputBag
     let outputBag = {};
     const inputBag = inputBox[bagConceptId];
-    const keysNeeded = [
-      conceptIds.scannedByFirstName,
-      conceptIds.scannedByLastName,
-      conceptIds.orphanBagFlag,
-    ];
 
-    for (let k of keysNeeded) {
+    for (let k of bagConversionKeys) {
       if (inputBag[k]) outputBag[k] = inputBag[k];
     }
 
+    // Handle the orphanBag case
     if (inputBag[conceptIds.bagscan_orphanBag]) {
       hasOrphanBag = true;
       orphanBag = { ...orphanBag, ...outputBag };
       orphanBag.arrElements.push(...inputBag[conceptIds.tubesCollected]);
+    // Handle the regular bag case
     } else {
       outputBag.arrElements = inputBag[conceptIds.tubesCollected];
       let bagID;
@@ -647,18 +662,20 @@ export const convertToOldBox = (inputBox) => {
       bags[bagID] = outputBag;
     }
       
+    // Clean up the outputBox
     delete outputBox[bagConceptId];
   }
 
+  // Handle the orphanBag case
   if (hasOrphanBag) {
     bags['unlabelled'] = orphanBag;
   }
 
+  // Finalize the outputBox
   outputBox.bags = bags;
   const locationConceptID = inputBox[conceptIds.shippingLocation];
-  outputBox.siteAcronym =
-    locationConceptIDToLocationMap[locationConceptID]?.siteAcronym ||
-    'Not Found';
+  outputBox.siteAcronym = locationConceptIDToLocationMap[locationConceptID]?.siteAcronym || 'Not Found';
+
   return outputBox;
 };
 
@@ -728,45 +745,28 @@ export const convertToFirestoreBox = (inputBox) => {
   return outputBox;
 };
 
-// todo: fetch only the required un-shipped boxes
-export const getBoxes = async (box) => {
+// Fetches all boxes for site
+export const getBoxes = async () => {
+  logAPICallStartDev('getBoxes');
   const idToken = await getIdToken();
   const response = await fetch(`${api}api=searchBoxes`, {
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + idToken,
-    },
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + idToken,
+      },
   });
-  let res = await response.json();
-  let toReturn = {};
-  toReturn['data'] = [];
-  let data = res.data;
-  for (let i = 0; i < data.length; i++) {
-    let currJSON = convertToOldBox(data[i]);
-    if (
-      !currJSON.hasOwnProperty(conceptIds.submitShipmentFlag) ||
-      currJSON[conceptIds.submitShipmentFlag] != conceptIds.booleanOne
-    ) {
-      toReturn['data'].push(currJSON);
-    }
-  }
-  return toReturn;
-};
+  const res = await response.json();
 
-export const getAllBoxesWithoutConversion =  async (flag) => { // make new function to return filtered boxes
-  const idToken = await getIdToken();
-  if (flag !== `bptl`) flag = ``
-  const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + idToken,
-    }
-  });
-  let res = await response.json();
-  return res;
+  const boxesToReturn = res.data
+      .map(convertToOldBox)
+      .filter(box => box[conceptIds.submitShipmentFlag] !== conceptIds.yes);
+
+  logAPICallEndDev('getBoxes');
+  return { data: boxesToReturn };
 };
 
 export const getAllBoxes = async (flag) => {
+  logAPICallStartDev('getAllBoxes');
   const idToken = await getIdToken();
   if (flag !== `bptl`) flag = ``
   const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
@@ -776,15 +776,18 @@ export const getAllBoxes = async (flag) => {
     }
   });
   let res = await response.json();
-  for (let i = 0; i < res.data.length; i++) {
-    res.data[i] = convertToOldBox(res.data[i]);
-  }
+  res.data = res.data.map(convertToOldBox);
+  logAPICallEndDev('getAllBoxes');
   return res;
 };
 
+// searches boxes collection by login site (789843387) and Site-specific location id (560975149)
+// filters out any boxes where submitShipmentFlag is true
+// TODO: future: recommend adding 145971562 (shipment submitted flag = no) to all boxes on creation. Then we can rewrite the searchBoxesByLocation function to only return boxes where this variable is no (not shipped)
 export const getBoxesByLocation = async (location) => {
+    logAPICallStartDev('getBoxesByLocation');
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=searchBoxesByLocation`, {
+    const response = await fetch(`${api}api=searchBoxesByLocation&location=${location}`, {
         method: "POST",
         headers:{
             Authorization:"Bearer "+idToken,
@@ -794,13 +797,13 @@ export const getBoxesByLocation = async (location) => {
     });
 
     let res = await response.json();
-    for (let i = 0; i < res.data.length; i++) {
-        res.data[i] = convertToOldBox(res.data[i]);
-    }
+    res.data = res.data.map(convertToOldBox);
+    logAPICallEndDev('getBoxesByLocation');
     return res;
 }
 
 export const searchSpecimen = async (masterSpecimenId, allSitesFlag) => {
+    logAPICallStartDev('searchSpecimen');
     const idToken = await getIdToken();
     const specimenQuery =  `&masterSpecimenId=${masterSpecimenId}` + (allSitesFlag ? `&allSitesFlag=${allSitesFlag}`: ``)
     const response = await fetch(`${api}api=searchSpecimen${specimenQuery}`, {
@@ -809,6 +812,7 @@ export const searchSpecimen = async (masterSpecimenId, allSitesFlag) => {
             Authorization:"Bearer "+idToken
         }
     });
+    logAPICallEndDev('searchSpecimen');
     return response.json();
 }
 
@@ -824,8 +828,8 @@ export const getParticipantCollections = async (token) => {
 }
 
 export const removeBag = async(boxId, bags) => {
-    let currDate = new Date().toISOString();
-    let toPass = {boxId:boxId, bags:bags, date:currDate}
+    const currDate = new Date().toISOString();
+    const bagDataToRemove = {boxId:boxId, bags:bags, date:currDate}
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=removeBag`, {
         method: "POST",
@@ -833,18 +837,17 @@ export const removeBag = async(boxId, bags) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(toPass)
+        body: JSON.stringify(bagDataToRemove)
     });
     return await response.json();
-    
 }
 
 /**
  * Fetches biospecimen collection data from the database
  * @returns {object|array} returns a response object if response is 200 or an empty array
- * 
  */
 export const searchSpecimenInstitute = async () => {
+    logAPICallStartDev('searchSpecimenInstitute');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen`, {
     method: "GET",
@@ -852,12 +855,10 @@ export const searchSpecimenInstitute = async () => {
         Authorization:"Bearer "+idToken
         }
     });
-
+    logAPICallEndDev('searchSpecimenInstitute');
     if (response.status === 200) {
-        const responseObject = await response.json();
-        return responseObject;
-    }
-    else {
+        return await response.json();
+    } else {
         console.error("searchSpecimenInstitute's responseObject status code not 200!");
         return [];
     }
@@ -870,6 +871,7 @@ export const searchSpecimenInstitute = async () => {
  * 
  */
 export const searchSpecimenByRequestedSite = async (requestedSite) => {
+    logAPICallStartDev('searchSpecimenByRequestedSite');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}`, {
     method: "GET",
@@ -877,6 +879,7 @@ export const searchSpecimenByRequestedSite = async (requestedSite) => {
         Authorization:"Bearer "+idToken
         }
     });
+    logAPICallEndDev('searchSpecimenByRequestedSite');
     if (response.status === 200) {
         const responseObject = await response.json();
         return responseObject;
@@ -891,29 +894,30 @@ export const searchSpecimenByRequestedSite = async (requestedSite) => {
  * Fetches biospecimen collection data from the database, and removes '0008', '0009' and deviation tubes from each collection
  * @returns {Array} List of biospecimen collections
  */
+// * * this doesn't take long, but the searchSpecimenInstitute() call takes a while
 export const filterSpecimenCollectionList = async () => {
     const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
     const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ?? [];
     
     /* Filter collections with ShipFlag value yes */
-    let collectionList = searchSpecimenInstituteArray.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
+    const finalizedSpecimenList = searchSpecimenInstituteArray.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
     
     // loop over filtered data with shipFlag
-    for (let i = 0; i < collectionList.length; i++){
-        let currCollection = collectionList[i];
+    for (let i = 0; i < finalizedSpecimenList.length; i++){
+        const currCollection = finalizedSpecimenList[i];
 
-        if (currCollection['787237543']) {
-            delete currCollection['787237543']
+        if (currCollection[conceptIds.collection.bloodUrineBagScan]) {
+            delete currCollection[conceptIds.collection.bloodUrineBagScan]
         }
 
-        if (currCollection['223999569']) {
-            delete currCollection['223999569'] 
+        if (currCollection[conceptIds.collection.mouthwashBagScan]) {
+            delete currCollection[conceptIds.collection.mouthwashBagScan] 
         }
  
         for (let tubeCid of specimenCollection.tubeCidList) {
             if (!currCollection[tubeCid]) continue;
 
-            let currTube = currCollection[tubeCid];
+            const currTube = currCollection[tubeCid];
             // delete specimen key if tube collected key is no
             if (!currTube[conceptIds.collection.tube.isCollected] || currTube[conceptIds.collection.tube.isCollected] == conceptIds.no){
                 delete currCollection[tubeCid];
@@ -930,7 +934,8 @@ export const filterSpecimenCollectionList = async () => {
             }
         }
     }
-    return collectionList;
+
+    return finalizedSpecimenList;
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
@@ -949,6 +954,7 @@ export const removeMissingSpecimen = async (tubeId) => {
 }
 
 export const getLocationsInstitute = async () => {
+    logAPICallStartDev('getLocationsInstitute');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getLocations`, {
         method: "GET",
@@ -956,17 +962,19 @@ export const getLocationsInstitute = async () => {
             Authorization:"Bearer "+idToken
         }
     });
-    let res = await response.json();
-    let arr = res.response;
+    const res = await response.json();
+    const arr = res.response;
     let locations = [];
     for(let i = 0; i < arr.length; i++){
         let currJSON = arr[i];
-        locations = locations.concat(currJSON['560975149']);
+        locations = locations.concat(currJSON[conceptIds.shippingLocation]);
     }
+    logAPICallEndDev('getLocationsInstitute');
     return locations;
 }
 
 export const getNumPages = async (numPerPage, filter) => {
+    logAPICallStartDev('getNumPages');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getNumBoxesShipped`, {
         method: "POST",
@@ -978,6 +986,7 @@ export const getNumPages = async (numPerPage, filter) => {
     });
     let res = await response.json();
     let numBoxes = res.data;
+    logAPICallEndDev('getNumPages');
     return Math.ceil(numBoxes/numPerPage);
 }
 
@@ -1024,7 +1033,9 @@ export const getNextTempCheck = async () => {
 }
 
 export const generateBarCode = (id, connectId) => {
+    logAPICallStartDev('generateBarCode');
     JsBarcode(`#${id}`, connectId, {height: 30});
+    logAPICallEndDev('generateBarCode');
 }
 
 export const getUpdatedParticipantData = async (participantData) => {
@@ -1033,8 +1044,8 @@ export const getUpdatedParticipantData = async (participantData) => {
     return responseParticipant.data[0];
 }
 
-export const updateCollectionSettingData = async (biospecimenData, tubes, participantData) => { 
-    participantData = await getUpdatedParticipantData(participantData);
+export const updateCollectionSettingData = async (biospecimenData, tubes, participantData) => {
+  participantData = await getUpdatedParticipantData(participantData);
 
     let settings;
     let visit = biospecimenData[conceptIds.collection.selectedVisit];
@@ -1118,11 +1129,9 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
         uid: participantData?.state?.uid
     };
     await updateParticipant(settingData);
-
 }
 
 export const updateBaselineData = async (siteTubesList, data) => {
-
     data = await getUpdatedParticipantData(data);
 
     const response = await getParticipantCollections(data.token);
@@ -2012,7 +2021,6 @@ export const checkInParticipant = async (data, visitConcept) => {
 };
 
 export const checkOutParticipant = async (data) => {
-
     let visits = data['331584571'];
     const checkedInVisit = getCheckedInVisit(data);
     const user_uid = data.state.uid;
@@ -2090,6 +2098,7 @@ export const SSOConfig = (email) => {
 }
 
 export const getParticipantSelection = async (filter) => {
+    logAPICallStartDev('getParticipantSelection');
     const idToken = await getIdToken();
     const response = await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=getParticipantSelection&type=${filter}`, 
     {
@@ -2098,6 +2107,7 @@ export const getParticipantSelection = async (filter) => {
         Authorization: "Bearer " + idToken,
       },
     });
+    logAPICallEndDev('getParticipantSelection');
     return response.json();
   }
      
@@ -2209,12 +2219,38 @@ export const checkShipForage = async (shipSetForage, boxesToShip) => {
       }
   }    
    catch (e) {
-      console.log(e)
+      console.error(e)
       await localforage.setItem("shipData", shipSetForage)
   }
 }
 
-export const sortBiospecimensList = (biospecimensList, tubeOrder) => {
+// Modify to change tube order, tube ordered by color
+const tubeOrder = [      
+  "0001", //"SST/Gold or Red"
+  "0002", //"SST/Gold or Red"
+  "0011", //"SST/Gold or Red"
+  "0012", //"SST/Gold or Red"
+  "0021", //"SST/Gold or Red"
+  "0022", //"SST/Gold or Red"
+  "0031", //"SST/Gold or Red"
+  "0032", //"SST/Gold or Red"
+  "0003", //"Heparin/Green"
+  "0013", //"Heparin/Green"
+  "0004", //"EDTA/Lavender"
+  "0014", //"EDTA/Lavender"
+  "0024", //"EDTA/Lavender"
+  "0005", //"ACD/Yellow"
+  "0006", //"Urine/Yellow"
+  "0016", //"Urine Cup"
+  "0007", //"Mouthwash Container"
+  "0050", //"NA"
+  "0051", //"NA"
+  "0052", //"NA"
+  "0053", //"NA"
+  "0054", //"NA
+];
+
+export const sortBiospecimensList = (biospecimensList) => {
   const bioArr = []
   // push list of unordered ids
   biospecimensList.forEach(id => { bioArr.push({"tubeId": id}) })
@@ -2222,6 +2258,7 @@ export const sortBiospecimensList = (biospecimensList, tubeOrder) => {
   bioArr.sort((a, b) => tubeOrder.indexOf(a.tubeId) - tubeOrder.indexOf(b.tubeId))
   return bioArr.map(item => item.tubeId)
 }
+
 export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxErrorAlertEl) => {
   if (typeof alertState === "boolean") {
     if (alertState) {
@@ -2378,7 +2415,6 @@ export function addSelectionEventListener(elemId, pageAndElement) {
         const selection = event.target.value;
         const prevSelections = JSON.parse(localStorage.getItem('selections'));
         localStorage.setItem('selections', JSON.stringify({...prevSelections, [pageAndElement] : selection}));
-
     });
 
 }
@@ -2434,3 +2470,21 @@ export const restrictNonBiospecimenUser = () => {
   document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
   document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
 }
+
+export const isDev = () => !(location.host === urls.prod || location.host === urls.stage);
+
+export const logAPICallStartDev = (funcName) => {
+  if (isDev()) {
+    console.log(`calling ${funcName}`);
+    console.time(funcName);
+  }
+}
+
+export const logAPICallEndDev = (funcName) => {
+  if (isDev()) {
+    console.timeEnd(funcName);
+  }
+}
+
+
+export const getDataAttributes = (el) => { return el.getAttribute('data-sitekey'); }
