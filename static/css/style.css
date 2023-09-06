@@ -476,9 +476,3 @@ box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
 #reportTabs .nav-link:hover {
     background-color: #f8f9fa;
 }
-
-.scrollable-menu {
-    height: auto;
-    max-height: 200px;
-    overflow-x: hidden;
-}
