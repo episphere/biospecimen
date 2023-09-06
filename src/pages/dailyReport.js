@@ -116,7 +116,7 @@ const populateDailyReportTable = (dropdownHeader, dailyReportsData) => {
           <td>${item[fieldToConceptIdMapping.firstName]}</td>
           <td>${convertISODateTime(item[fieldToConceptIdMapping.checkInDateTime])}</td>
           <td>${item[fieldToConceptIdMapping.collection.id]}</td>
-          <td>${item[fieldToConceptIdMapping.collection.finalizedTime] !== undefined ? convertISODateTime(item[fieldToConceptIdMapping.collection.finalizedTime]) : ``}</td>
+          <td>${item[fieldToConceptIdMapping.collection.shipTime] !== undefined ? convertISODateTime(item[fieldToConceptIdMapping.collection.shipTime]) : ``}</td>
           <td>${item[fieldToConceptIdMapping.checkOutDateTime] !== undefined ? convertISODateTime(item[fieldToConceptIdMapping.checkOutDateTime]) : ``}</td>
         `;
       }
