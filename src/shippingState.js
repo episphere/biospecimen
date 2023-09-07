@@ -20,7 +20,7 @@ export const setAllShippingState = (availableCollectionsObj, availableLocations,
 
     appState.setState({
         allBoxesList: allBoxesList,
-        availableCollectionsObj: availableCollectionsObj,
+        availableCollectionsObj: availableCollectionsObj ?? {},
         availableLocations: availableLocations,
         boxesByLocationList: boxesByLocationList,
         detailedLocationBoxes: detailedLocationBoxes,
@@ -42,12 +42,13 @@ export const updateShippingStateSelectedLocation = (selectedLocation) => {
 /**
  * Update the state for allBoxesList and availableCollectionsObj.
  * Remove the bags from the box.
+ * Note: 'unlabelled' bags are stray tubes. They do not get added back to availableCollectionsObj.
  * @param {string} boxId - the box with the bag to be removed.
  * @param {array} bagsToMove - the bags to be removed from the box. 
  */
-export const updateShippingStateRemoveBagFromBox = (boxId, bagsToMove) => {
-    addBagToAvailableCollections(boxId, bagsToMove);
-    removeBagFromBox(boxId, bagsToMove);
+export const updateShippingStateRemoveBagFromBox = (boxId, bagId, bagsToMove) => {
+    addBagToAvailableCollections(boxId, bagId, bagsToMove);
+    removeBagFromBox(boxId, bagId, bagsToMove);
 }
 
 /**
@@ -58,7 +59,7 @@ export const updateShippingStateRemoveBagFromBox = (boxId, bagsToMove) => {
  * @param {object} boxToUpdate - the box object to be updated
  */
 export const updateShippingStateAddBagToBox = (boxId, bagId, boxToUpdate) => {
-    addBagToBox(boxId, boxToUpdate);
+    addBagToBox(boxId, bagId, boxToUpdate);
     removeBagFromAvailableCollections(bagId);
 }
 
@@ -67,34 +68,42 @@ export const updateShippingStateAddBagToBox = (boxId, bagId, boxToUpdate) => {
  * Build the bag and specimen data from detailedProviderBoxes data: availableCollectionsObj[bagId]: ['tube1Id', 'tube2Id', 'tube3Id']
  * Isolate the last four digits of tubeId to match availableCollectionsObj format.
  * Move object into availableCollectionsObj
+ * If object is 'unlabelled', it is a stray and it belongs in the 'unlabelled' section of availableCollectionsObj.
  * @param {*} boxId - the box with the bag being removed 
  * @param {*} bagsToMove - the bags being removed from the box
  */
-const addBagToAvailableCollections = (boxId, bagsToMove) => {
+const addBagToAvailableCollections = (boxId, bagId, bagsToMove) => {
     const availableCollectionsObj = appState.getState().availableCollectionsObj;
     const detailedProviderBoxes = appState.getState().detailedProviderBoxes;
 
-    for (const bagId of bagsToMove) {
-        const collectionToMove = detailedProviderBoxes[boxId][bagId].arrElements;
-        const tubeIdArray = collectionToMove.map(tubeId => tubeId.slice(-4));
-
-        availableCollectionsObj[bagId] = tubeIdArray;
+    if (bagId === 'unlabelled') {
+        const collectionToMove = detailedProviderBoxes[boxId]['unlabelled'].arrElements;
+        availableCollectionsObj['unlabelled'].push(...collectionToMove);
+    } else {
+        for (const bagLabel of bagsToMove) {
+            const collectionToMove = detailedProviderBoxes[boxId][bagLabel].arrElements;
+            const tubeIdArray = collectionToMove.map(tubeId => tubeId.slice(-4));
+    
+            availableCollectionsObj[bagLabel] = tubeIdArray;
+        }
     }
-
-    appState.setState({
-        availableCollectionsObj: {...availableCollectionsObj},
-    });
+    
+    appState.setState({ availableCollectionsObj });
 }
 
 // Remove the bag from the box when user has clicked 'remove bag' in the 'View Shipping Box Contents' table.
-const removeBagFromBox = (boxId, bagsToMove) => {
+const removeBagFromBox = (boxId, bagId, bagsToMove) => {
     const allBoxesList = appState.getState().allBoxesList;
     const boxIndex = allBoxesList.findIndex(box => box[conceptIds.shippingBoxId] === boxId);
 
     if (boxIndex !== -1) { 
-        for (const bagId of bagsToMove) {
-            delete allBoxesList[boxIndex].bags[bagId];
+        if (bagId === 'unlabelled') {
+            bagsToMove = ['unlabelled'];
         }
+
+        bagsToMove.forEach(bagLabel => {
+            delete allBoxesList[boxIndex].bags[bagLabel];
+        });
 
         appState.setState({
             allBoxesList: [...allBoxesList],
@@ -103,17 +112,24 @@ const removeBagFromBox = (boxId, bagsToMove) => {
 }
 
 // Remove the bag from the availableCollectionsObj when it has been added to a box.
+// Check if bagId is a direct key in availableCollectionsObj. If not, check if it's and element in the 'unlabelled' array.
 const removeBagFromAvailableCollections = (bagId) => {
     const availableCollectionsObj = appState.getState().availableCollectionsObj;
-    delete availableCollectionsObj[bagId];
+
+    if (bagId in availableCollectionsObj) {
+        delete availableCollectionsObj[bagId];
+    } else if (availableCollectionsObj['unlabelled'] && availableCollectionsObj['unlabelled'].includes(bagId)) {
+        availableCollectionsObj['unlabelled'] = availableCollectionsObj['unlabelled'].filter(id => id !== bagId);
+    }
 
     appState.setState({ availableCollectionsObj: availableCollectionsObj });
 }
 
 // Replace the previous box with the updated box when a bag is added.
 // If an existing box is not found, add it to the list.
-const addBagToBox = (boxId, boxToUpdate) => {
+const addBagToBox = (boxId, bagId, boxToUpdate) => {
     let allBoxesList = [...appState.getState().allBoxesList];
+    const availableCollectionsObj = appState.getState().availableCollectionsObj;
 
     allBoxesList = allBoxesList.map(box => 
         box[conceptIds.shippingBoxId] === boxId ? boxToUpdate : box
@@ -123,7 +139,28 @@ const addBagToBox = (boxId, boxToUpdate) => {
         allBoxesList.push(boxToUpdate);
     }
 
-    appState.setState({ allBoxesList: allBoxesList });
+    const strayTubesToAdd = getStrayTubesFromUncheckedModalBoxes(boxToUpdate, bagId);
+
+    if (strayTubesToAdd.length > 0) {
+        if (!availableCollectionsObj['unlabelled']) {
+            availableCollectionsObj['unlabelled'] = [];
+        }
+        availableCollectionsObj['unlabelled'].push(...strayTubesToAdd);
+    }
+
+    appState.setState({
+        allBoxesList,
+        availableCollectionsObj
+    });
+}
+
+const getStrayTubesFromUncheckedModalBoxes = (boxToUpdate, bagId) => {
+    const availableCollectionsObj = appState.getState().availableCollectionsObj;
+    const tubesInBoxArray = (boxToUpdate.bags[bagId]?.arrElements ?? []).map(tubeId => tubeId.slice(-4));
+    if (tubesInBoxArray.length === 0) return [];
+    const tubesInAvailableCollectionsList = availableCollectionsObj[bagId];
+    const strayTubesForCurrentCollection = tubesInAvailableCollectionsList.filter(tube => !tubesInBoxArray.includes(tube));
+    return [...strayTubesForCurrentCollection.map(tubeId => `${bagId.split(' ')[0]} ${tubeId}`)];
 }
 
 export const updateShippingStateCreateBox = (boxToAdd) => {
