@@ -321,7 +321,7 @@ const handleRemoveBagButton = (currDeleteButton, currTubes, currBoxId) => {
 // Box numbering is based on site (not location), always increment highest site box number.
 // Create the new box and update the modal if the location's largest box is not empty or if the location has no current boxes.
 export const addNewBox = async () => {
-    try{
+    try {
         const siteLocation = document.getElementById('selectLocationList').value;
         const siteLocationConversion = siteSpecificLocationToConceptId[siteLocation];
         const siteCode = siteSpecificLocation[siteLocation]["siteCode"];    
