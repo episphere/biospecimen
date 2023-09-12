@@ -390,7 +390,7 @@ const createNewBox = async (boxList, pageLocationConversion, siteCode, largestBo
                 boxList.push(boxToAdd);
                 return boxToAdd;
             } else if (addBoxResponse.code === 409) {
-                attempts ++;
+                attempts++;
                 await delayRetryAttempt(1000);
                 continue;
             } else {
