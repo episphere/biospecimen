@@ -260,6 +260,7 @@ export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrpha
         let boxIdAndBagsObj = {};
         for (let i = 0; i < boxList.length; i++) {
             const box = boxList[i];
+            if (!box['bags']) box['bags'] = {};
             boxIdAndBagsObj[box[conceptIds.shippingBoxId]] = box['bags'];
             locations[box[conceptIds.shippingBoxId]] = box[conceptIds.shippingLocation];
         }

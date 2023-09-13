@@ -533,20 +533,6 @@ export const checkDerivedVariables = async (array) => {
     return response.json();
 }
 
-export const addBox = async (box) =>{
-    const idToken = await getIdToken();
-    let requestObj = {
-        method: "POST",
-        headers:{
-            Authorization:"Bearer "+idToken,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(convertToFirestoreBox(box))
-    }
-    const response = await fetch(`${api}api=addBox`, requestObj);
-    return response.json();
-}
-
 export const updateBox = async (box) => {
   logAPICallStartDev('updateBox');
   const idToken = await getIdToken();
@@ -2499,5 +2485,42 @@ export const logAPICallEndDev = (funcName) => {
   }
 }
 
-
 export const getDataAttributes = (el) => { return el.getAttribute('data-sitekey'); }
+
+export const getSiteMostRecentBoxId = async () => {
+    try{
+        const idToken = await getIdToken();
+        const response = await fetch(`${api}api=getSiteMostRecentBoxId`, {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + idToken,
+            },
+        });
+
+        return await response.json();
+
+    } catch (e) {
+        console.error('Error getting site\'s most recent box id', e);
+        throw new Error(`Error getting site's most recent box id: ${e.message}`);
+    }
+}
+
+export const addBoxAndUpdateSiteDetails = async (boxAndSiteData) => {
+    try {
+        const idToken = await getIdToken();
+        const response = await fetch(`${api}api=addBoxAndUpdateSiteDetails`, {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + idToken,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(boxAndSiteData),
+        });
+        
+        return await response.json();
+
+    } catch (e) {
+        console.error('Error adding box', e);
+        return null;
+    }
+}

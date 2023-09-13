@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToLocationObj, baseAPI, keyToNameObj, convertISODateTime, formatISODateTime, getAllBoxes, getSiteAcronym, conceptIdToSiteSpecificLocation } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToLocationObj, baseAPI, keyToNameObj, convertISODateTime, formatISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar } from "../../navbar.js";
@@ -113,17 +113,22 @@ const confirmFileSelection = () => {
 }
 
 const csvFileButtonSubmit = () => {
-  document.getElementById("csvCreateFileButton").addEventListener("click", async (e)=> {
-    e.preventDefault();
-    let dateFilter = document.getElementById("csvDateInput").value
-    dateFilter = dateFilter+'T00:00:00.000Z'
-    showAnimation();
-    const results = await getBSIQueryData(dateFilter);
-    hideAnimation();
-    document.getElementById("csvDateInput").value = ``;
-    let modifiedResults = modifyBSIQueryResults(results.data);
-    generateBSIqueryCSVData(modifiedResults);
-  })
+    document.getElementById("csvCreateFileButton").addEventListener("click", async (e)=> {
+        e.preventDefault();
+        const dateFilter = document.getElementById("csvDateInput").value + 'T00:00:00.000Z'; 
+        showAnimation();
+
+        try {
+            const results = await getBSIQueryData(dateFilter);
+            document.getElementById("csvDateInput").value = '';
+            const modifiedResults = modifyBSIQueryResults(results.data);
+            generateBSIqueryCSVData(modifiedResults);
+            hideAnimation();
+        } catch (e) {
+            hideAnimation();
+            showNotifications({ title: 'Error', body: `Error fetching BSI Query Data -- ${e.message}` }, true);
+        }
+    });
 }
 
 const getCurrentDate = () => {
@@ -132,23 +137,24 @@ const getCurrentDate = () => {
 }
 
 const getBSIQueryData = async (filter) => {
-  const idToken = await getIdToken();
-  const response = await fetch(`${baseAPI}api=queryBsiData&type=${filter}`, {
-    method: "GET",
-    headers: {
-      Authorization: "Bearer" + idToken,
-    },
-  });
+    try {
+        const idToken = await getIdToken();
+        const response = await fetch(`${baseAPI}api=queryBsiData&type=${filter}`, {
+            method: "GET",
+            headers: {
+                Authorization: "Bearer " + idToken,
+            },
+        });
 
-  try {
-    if (response.status === 200) {
-      const bsiQueryData = await response.json();
-      return bsiQueryData
-    } 
-  } catch (e) { // if error return an empty array
-    console.log(e);
-    return [];
-  }
+        if (response.status !== 200) {
+            throw new Error(`Error fetching BSI Query Data. ${response.status}`);
+        }
+
+        return await response.json();    
+    } catch (e) {
+        console.error(e);
+        throw new Error(`Error fetching BSI Query Data: ${e.message}`);
+    }
 };
 
 
