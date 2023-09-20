@@ -57,32 +57,32 @@ const renderCollectionLocationList = () => {
                 Filter by Collection Location
                 </button>
                 <ul class="dropdown-menu scrollable-menu" id="dropdownMenuButtonSites" aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item" data-siteKey="all" id="all">All</a></li>
+                            <li><a class="dropdown-item" data-siteKey="all" id="all">All</a></li>
                         ${appState.getState().siteAcronym === 'MFC' ? `
-                        <li><a class="dropdown-item" data-siteKey="marshfield" id="marshfield">Marshfield</a></li>
-                        <li><a class="dropdown-item" data-siteKey="weston" id="weston">Weston</a></li>
-                        <li><a class="dropdown-item" data-siteKey="lakeHallie" id="lakeHallie">Lake Hallie</a></li>
-                        <li><a class="dropdown-item" data-siteKey="riLa" id="riLa">Rice Lake</a></li>
-                        <li><a class="dropdown-item" data-siteKey="wisRapids" id="wisRapids">Wisconsin Rapids</a></li>
-                        <li><a class="dropdown-item" data-siteKey="colAbb" id="colAbb">Colby Abbotsford</a></li>
-                        <li><a class="dropdown-item" data-siteKey="mino" id="mino">Minocqua</a></li>
-                        <li><a class="dropdown-item" data-siteKey="merr" id="merr">Merrill</a></li>`:
+                            <li><a class="dropdown-item" data-siteKey="marshfield" id="marshfield">Marshfield</a></li>
+                            <li><a class="dropdown-item" data-siteKey="weston" id="weston">Weston</a></li>
+                            <li><a class="dropdown-item" data-siteKey="lakeHallie" id="lakeHallie">Lake Hallie</a></li>
+                            <li><a class="dropdown-item" data-siteKey="riLa" id="riLa">Rice Lake</a></li>
+                            <li><a class="dropdown-item" data-siteKey="wisRapids" id="wisRapids">Wisconsin Rapids</a></li>
+                            <li><a class="dropdown-item" data-siteKey="colAbb" id="colAbb">Colby Abbotsford</a></li>
+                            <li><a class="dropdown-item" data-siteKey="mino" id="mino">Minocqua</a></li>
+                            <li><a class="dropdown-item" data-siteKey="merr" id="merr">Merrill</a></li>`:
                         appState.getState().siteAcronym === 'HP' ? `
-                        <li><a class="dropdown-item" data-siteKey="hpRC" id="hpRC">HP Research Clinic</a></li>`:
+                            <li><a class="dropdown-item" data-siteKey="hpRC" id="hpRC">HP Research Clinic</a></li>`:
                         appState.getState().siteAcronym === 'HFHS' ? `
-                        <li><a class="dropdown-item" data-siteKey="hfhKRC" id="hfhKRC">HFH K-13 Research Clinic</a></li>
-                        <li><a class="dropdown-item" data-siteKey="hfhPRC" id="hfhPRC">HFH Cancer Pavilion Research Clinic</a></li>
-                        <li><a class="dropdown-item" data-siteKey="hfhLRC" id="hfhLRC">HFH Livonia Research Clinic</a></li>`:
+                            <li><a class="dropdown-item" data-siteKey="hfhKRC" id="hfhKRC">HFH K-13 Research Clinic</a></li>
+                            <li><a class="dropdown-item" data-siteKey="hfhPRC" id="hfhPRC">HFH Cancer Pavilion Research Clinic</a></li>
+                            <li><a class="dropdown-item" data-siteKey="hfhLRC" id="hfhLRC">HFH Livonia Research Clinic</a></li>`:
                         appState.getState().siteAcronym === 'SFH' ? `
-                        <li><a class="dropdown-item" data-siteKey="sfImag" id="sfImag">Sioux Falls Imagenetics</a></li>`:
+                            <li><a class="dropdown-item" data-siteKey="sfImag" id="sfImag">Sioux Falls Imagenetics</a></li>`:
                         appState.getState().siteAcronym === 'UCM' ? `
-                        <li><a class="dropdown-item" data-siteKey="ucDcam" id="ucDcam">UC-DCAM</a></li>
-                        <li><a class="dropdown-item" data-siteKey="ingHar" id="ingHar">Ingalls Harvey</a></li>
-                        <li><a class="dropdown-item" data-siteKey="rivEas" id="rivEas">River East</a></li>
-                        <li><a class="dropdown-item" data-siteKey="soLo" id="soLo">South Loop</a></li>` :
+                            <li><a class="dropdown-item" data-siteKey="ucDcam" id="ucDcam">UC-DCAM</a></li>
+                            <li><a class="dropdown-item" data-siteKey="ingHar" id="ingHar">Ingalls Harvey</a></li>
+                            <li><a class="dropdown-item" data-siteKey="rivEas" id="rivEas">River East</a></li>
+                            <li><a class="dropdown-item" data-siteKey="soLo" id="soLo">South Loop</a></li>` :
                         appState.getState().siteAcronym === 'NIH' ? 
-                        `<li><a class="dropdown-item" data-siteKey="nci" id="nci">NIH/NCI</a></li>`:
-                        `<li><a class="dropdown-item" data-siteKey="other" id="other">Other</a></li>`}
+                            `<li><a class="dropdown-item" data-siteKey="nci" id="nci">NIH/NCI</a></li>`:
+                            `<li><a class="dropdown-item" data-siteKey="other" id="other">Other</a></li>`}
                 </ul>
             </div>
             `
@@ -92,7 +92,6 @@ const renderCollectionLocationList = () => {
 const initializeDailyReportTable = async () => {
     showAnimation();
     const dailyReportsData = await getDailyParticipant().then(res => res.data);
-    console.log('da', dailyReportsData)
     appState.setState({dailyReportsData: dailyReportsData}); // store inital daily reports data
     populateDailyReportTable(`Filter by Collection Location`, dailyReportsData);
 }

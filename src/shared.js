@@ -596,7 +596,6 @@ export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
 
 export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters, source) => {
     const idToken = await getIdToken();
-    console.log('si2', source)
     let requestObj = {
         method: "POST",
         headers:{
@@ -990,7 +989,7 @@ export const getLocationsInstitute = async () => {
 }
 
 export const getNumPages = async (numPerPage, filter) => {
-    logAPICallStartDev('getNumPages');
+   // logAPICallStartDev('getNumPages');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getNumBoxesShipped`, {
         method: "POST",
@@ -1002,7 +1001,7 @@ export const getNumPages = async (numPerPage, filter) => {
     });
     let res = await response.json();
     let numBoxes = res.data;
-    logAPICallEndDev('getNumPages');
+  //  logAPICallEndDev('getNumPages');
     return Math.ceil(numBoxes/numPerPage);
 }
 

@@ -69,12 +69,11 @@ export const startReport = async (source) => {
     </div>
 </div>`;
     let numPages = await getNumPages(5, {});
-    console.log('num', source)
     document.getElementById('contentBody').innerHTML = template;
     removeActiveClass('navbar-btn', 'active');
     addEventFilter(source);
     populateBoxTable(0, {}, source);
-    addPaginationFunctionality(1, {});
+    addPaginationFunctionality(numPages, {}, source);
     hideAnimation();
     clearEventFilter(source);
 };
