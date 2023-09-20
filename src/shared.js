@@ -592,7 +592,7 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters, s
             {"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy, "filters":filters, "source": source}
           )
     }
-    const response = await fetch(`http://127.0.0.1:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?api=getBoxesPagination`, requestObj);
+    const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
     return response.json();
 }
 
