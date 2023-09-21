@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, searchSpecimenByRequestedSiteAndBoxID, appState } from "../../shared.js";
+import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, searchSpecimenByRequestedSiteAndBoxId, appState } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -15,7 +15,7 @@ export const packagesInTransitScreen = async (auth, route) => {
 
 const packagesInTransitTemplate = async (username, auth, route) => {
     showAnimation();
-    const response = await getAllBoxes(`bptlPackagesInTransit`); 
+    const response = await getAllBoxes(`bptlPackagesInTransit`);
     hideAnimation();
     
     const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
@@ -189,7 +189,7 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, bagIdArr, manifestM
 
             manifestModalBodyEl.innerHTML = modalBody;
             showAnimation();
-            const searchSpecimenByRequestedSiteResponse = await searchSpecimenByRequestedSiteAndBoxID(loginSite, boxNumber);
+            const searchSpecimenByRequestedSiteResponse = await searchSpecimenByRequestedSiteAndBoxId(loginSite, boxNumber);
             const searchSpecimenInstituteArray = searchSpecimenByRequestedSiteResponse?.data ?? [];
 
             modalBody = 

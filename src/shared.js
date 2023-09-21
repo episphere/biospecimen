@@ -871,8 +871,8 @@ export const searchSpecimenInstitute = async () => {
  * @returns {object} returns a response object
  * 
  */
-export const searchSpecimenByRequestedSiteAndBoxID = async (requestedSite, boxId) => {
-    logAPICallStartDev('searchSpecimenByRequestedSiteAndBoxID');
+export const searchSpecimenByRequestedSiteAndBoxId = async (requestedSite, boxId) => {
+    logAPICallStartDev('searchSpecimenByRequestedSiteAndBoxId');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}&boxId=${boxId}`, {
     method: "GET",
@@ -880,7 +880,7 @@ export const searchSpecimenByRequestedSiteAndBoxID = async (requestedSite, boxId
         Authorization:"Bearer "+idToken
         }
     });
-    logAPICallEndDev('searchSpecimenByRequestedSiteAndBoxID');
+    logAPICallEndDev('searchSpecimenByRequestedSiteAndBoxId');
     if (response.status === 200) {
         const responseObject = await response.json();
         return responseObject;
