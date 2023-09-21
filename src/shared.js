@@ -764,20 +764,22 @@ export const getBoxes = async () => {
   return { data: boxesToReturn };
 };
 
-export const getAllBoxes = async (flag) => {
-  logAPICallStartDev('getAllBoxes');
-  const idToken = await getIdToken();
-  if (flag !== `bptl`) flag = ``
-  const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + idToken,
-    }
-  });
-  let res = await response.json();
-  res.data = res.data.map(convertToOldBox);
-  logAPICallEndDev('getAllBoxes');
-  return res;
+export const getAllBoxes = async (flagValue) => {
+    logAPICallStartDev('getAllBoxes');
+    const idToken = await getIdToken()
+    let flag = ``;
+
+    if (flagValue === `bptl` || flagValue === `bptlPackagesInTransit`) flag = flagValue;
+    const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
+        method: 'GET',
+        headers: {
+        Authorization: 'Bearer ' + idToken,
+        }
+    });
+    let res = await response.json();
+    res.data = res.data.map(convertToOldBox);
+    logAPICallEndDev('getAllBoxes');
+    return res;
 };
 
 // searches boxes collection by login site (789843387) and Site-specific location id (560975149)
@@ -869,16 +871,16 @@ export const searchSpecimenInstitute = async () => {
  * @returns {object} returns a response object
  * 
  */
-export const searchSpecimenByRequestedSite = async (requestedSite) => {
-    logAPICallStartDev('searchSpecimenByRequestedSite');
+export const searchSpecimenByRequestedSiteAndBoxID = async (requestedSite, boxId) => {
+    logAPICallStartDev('searchSpecimenByRequestedSiteAndBoxID');
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}`, {
+    const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}&boxId=${boxId}`, {
     method: "GET",
     headers: {
         Authorization:"Bearer "+idToken
         }
     });
-    logAPICallEndDev('searchSpecimenByRequestedSite');
+    logAPICallEndDev('searchSpecimenByRequestedSiteAndBoxID');
     if (response.status === 200) {
         const responseObject = await response.json();
         return responseObject;
