@@ -292,23 +292,21 @@ export const performSearch = async (query) => {
     if (response.code === 200 && verifiedParticipants.length > 0) {
       searchResults(verifiedParticipants);
     } else if (response.code === 200 && verifiedParticipants.length === 0) {
-      showNotifications(
-        {
-          title: 'Not found',
-          body: 'The participant with entered search criteria not found!'
-        },
-        true
-      );
+      showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'});
     }
 }
 
-export const showNotifications = (data, error) => {
+// show notifications in the UI. z-index controls the order of the modal
+// zIndex of 1000 is less than loading animation z-index of 9999. set zIndex to 10000 to show notifications on top of loading animation.
+// Current use: shimpent completion success notification. Show the success modal above the loading animation.
+export const showNotifications = (data, zIndex) => {
     const button = document.createElement('button');
     button.dataset.target = '#biospecimenModal';
     button.dataset.toggle = 'modal';
 
     document.getElementById('root').appendChild(button);
     button.click();
+    if (zIndex) document.getElementById('biospecimenModal').style.zIndex = zIndex;
     document.getElementById('root').removeChild(button);
     const header = document.getElementById('biospecimenModalHeader');
     const body = document.getElementById('biospecimenModalBody');
@@ -567,17 +565,24 @@ export const updateNewTempDate = async () =>{
  * @returns 
  */
 export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
-    const idToken = await getIdToken();
-    let requestObj = {
-        method: "POST",
-        headers:{
-            Authorization:"Bearer "+idToken,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({boxIdToTrackingNumberMap, shippingData})
+    try {
+        const requestBody = JSON.stringify({boxIdToTrackingNumberMap, shippingData});
+        const idToken = await getIdToken();
+        const requestObj = {
+            method: "POST",
+            headers:{
+                Authorization:"Bearer " + idToken,
+                "Content-Type": "application/json"
+            },
+            body: requestBody,
+        }
+        
+        const response = await fetch(`${api}api=ship`, requestObj);
+
+        return await response.json();
+    } catch (error) {
+        return {code: 500, message: error.message};
     }
-    const response = await fetch(`${api}api=ship`, requestObj);
-    return response.json();
 }
 
 export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) => {
@@ -1629,6 +1634,20 @@ export const nameToKeyObj =
     "allResults": 1000
 }
 
+export const keyToNameAbbreviationObj = {
+  452412599: "kpNW",
+  531629870: "hPartners",
+  657167265: "snfrdHealth",
+  548392715: "hfHealth",
+  303349821: "maClinic",
+  125001209: "kpCO",
+  809703864: "uChiM",
+  13: "nci",
+  300267574: "kpHI",
+  327912200: "kpGA",
+  1000: "allResults",
+}
+
 export const keyToNameObj = 
 {
     452412599 : "Kaiser Permanente Northwest",
@@ -1779,7 +1798,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                     document.getElementById('closeBarCodeScanner').click();
                     const masterSpecimenId = document.getElementById('masterSpecimenId').value;
                     if(masterSpecimenId == ''){
-                        showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+                        showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'})
                         return
                     }
                     let masterIdSplit = masterSpecimenId.split(/\s+/);
@@ -1812,7 +1831,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                     }
 
                     if(biospecimensList.length == 0){
-                        showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+                        showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'})
                         return
                     }
                     else{

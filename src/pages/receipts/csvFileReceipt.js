@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, nameToKeyObj, keyToLocationObj, baseAPI, keyToNameObj, convertISODateTime, formatISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameObj, convertISODateTime, formatISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar } from "../../navbar.js";
@@ -119,27 +119,21 @@ const csvFileButtonSubmit = () => {
         showAnimation();
 
         try {
-            const results = await getBSIQueryData(dateFilter);
-            document.getElementById("csvDateInput").value = '';
+            const results = await getSpecimensByReceivedDate(dateFilter);
             const modifiedResults = modifyBSIQueryResults(results.data);
             generateBSIqueryCSVData(modifiedResults);
             hideAnimation();
         } catch (e) {
             hideAnimation();
-            showNotifications({ title: 'Error', body: `Error fetching BSI Query Data -- ${e.message}` }, true);
+            showNotifications({ title: 'Error', body: `Error fetching BSI Query Data -- ${e.message}` });
         }
     });
 }
 
-const getCurrentDate = () => {
-  const currentDate = new Date().toLocaleDateString('en-CA');
-  return currentDate;
-}
-
-const getBSIQueryData = async (filter) => {
+const getSpecimensByReceivedDate = async (dateFilter) => {
     try {
         const idToken = await getIdToken();
-        const response = await fetch(`${baseAPI}api=queryBsiData&type=${filter}`, {
+        const response = await fetch(`${baseAPI}api=getSpecimensByReceivedDate&receivedTimestamp=${dateFilter}`, {
             method: "GET",
             headers: {
                 Authorization: "Bearer " + idToken,
@@ -147,27 +141,36 @@ const getBSIQueryData = async (filter) => {
         });
 
         if (response.status !== 200) {
-            throw new Error(`Error fetching BSI Query Data. ${response.status}`);
+          throw new Error(`Error fetching specimens by received date. ${response.status}`);
         }
 
-        return await response.json();    
+        return await response.json();
     } catch (e) {
         console.error(e);
-        throw new Error(`Error fetching BSI Query Data: ${e.message}`);
+        throw new Error(`Error fetching specimens by received date: ${e.message}`);
     }
-};
+}
 
+const getCurrentDate = () => {
+  const currentDate = new Date().toLocaleDateString('en-CA');
+  return currentDate;
+}
 
 const modifyBSIQueryResults = (results) => {
-  let filteredResults = results.filter(result =>  result.length !== 0 && (result[0][fieldToConceptIdMapping.collectionId] !== undefined && 
-                        result[0][fieldToConceptIdMapping.collectionId].split(' ')[1] !== '0008' && result[0][fieldToConceptIdMapping.collectionId].split(' ')[1] !== '0009')
-                        && result[0][fieldToConceptIdMapping.discardFlag] !== fieldToConceptIdMapping.yes && result[0][fieldToConceptIdMapping.deviationNotFound] !== fieldToConceptIdMapping.yes)
-  filteredResults = filteredResults.flat()
-  filteredResults.forEach(filteredResult => {
-      let vialMappings = getVialTypesMappings(filteredResult)
-      updateResultMappings(filteredResult, vialMappings)
-  })
-  return filteredResults
+    const csvDataArray = [];
+    results.forEach(result => {
+        const collectionType = result[fieldToConceptIdMapping.collectionType];
+        const healthcareProvider = result[fieldToConceptIdMapping.healthcareProvider];
+        const specimenKeysArray = Object.keys(result.specimens);
+            for (const specimenKey of specimenKeysArray) {
+                const [collectionId, tubeId] = result.specimens[specimenKey][fieldToConceptIdMapping.collectionId].split(' ') ?? ['', ''];
+                const vialMappings = getVialTypesMappings(tubeId, collectionType, healthcareProvider);
+                const csvRowsFromSpecimen = updateResultMappings(result, vialMappings, collectionId, tubeId);
+                csvDataArray.push(csvRowsFromSpecimen);
+            }
+    });
+
+    return csvDataArray;
 }
 
 /**
@@ -220,149 +223,167 @@ const materialTypeMapping = (specimenId) => {
   return materialTypeObject[tubeId] ?? '';
 }
 
-/**
- * Maps specimen id to material type based on last 4 digits, collection type & health care provider
- * @param {object} filteredResult - Object containg essential information (health care provider, collection type, & more)
- * @returns {array} Returns an array containing all the vial mapping
-*/ 
+const vialMapping = {
+    research: {
+        default: {
+            '0001': ['10 mL Serum separator tube', 'SST', 'Serum', '10'],
+            '0002': ['10 mL Serum separator tube', 'SST', 'Serum', '10'],
+            '0003': ['10 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '10'],
+            '0004': ['10 ml Vacutainer', 'EDTA', 'WHOLE BL', '10'],
+            '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
+            '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
+            '0007': ['15 ml Nalgene jar', 'Crest Alcohol Free', 'Saliva', '10'],
+        },
+    },
+    clinical: {
+        hfHealth: {
+            '0001': ['10 mL Serum separator tube', 'SST', 'Serum', '10'],
+            '0002': ['10 mL Serum separator tube', 'SST', 'Serum', '10'],
+            '0003': ['10 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '10'],
+            '0004': ['10 ml Vacutainer', 'EDTA', 'WHOLE BL', '10'],
+            '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
+            '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
+        },
+        kpCO: {
+            '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0002': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0011': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0012': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0003': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
+            '0013': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
+            '0004': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
+            '0006': ['6 ml Vacutainer', 'No Additive', 'Urine', '6'],
+        },
+        kpGA: {
+            '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0002': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0011': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0012': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0003': ['4.5 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4.5'],
+            '0013': ['4.5 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4.5'],
+            '0004': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
+            '0006': ['15ml Nalgene jar', 'No Additive', 'Urine', '10'],
+        },
+        kpHI: {
+            '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0002': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0011': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0012': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0003': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
+            '0013': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
+            '0004': ['3 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '3'],
+            '0014': ['3 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '3'],
+            '0024': ['3 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '3'],
+            '0005': ['10 ml Vacutainer', 'ACD', 'WHOLE BL', '10'],
+            '0006': ['15ml Nalgene jar', 'No Additive', 'Urine', '10'],
+        },
+        kpNW: {
+            '0001': ['3.5 mL Serum separator tube', 'SST', 'Serum', '3.5'],
+            '0002': ['3.5 mL Serum separator tube', 'SST', 'Serum', '3.5'],
+            '0011': ['3.5 mL Serum separator tube', 'SST', 'Serum', '3.5'],
+            '0012': ['3.5 mL Serum separator tube', 'SST', 'Serum', '3.5'],
+            '0021': ['3.5 mL Serum separator tube', 'SST', 'Serum', '3.5'],
+            '0003': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
+            '0013': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
+            '0004': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
+            '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
+        },
+        default: {
+            '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0002': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0011': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0012': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0021': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+            '0003': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
+            '0013': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
+            '0004': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0024': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
+            '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
+            '0007': ['15ml Nalgene jar', 'Crest Alcohol Free', 'Saliva', '10'],
+        },
+    }
+};
 
-const getVialTypesMappings = (filteredResult) => {
-  let vialMappingsHolder = []
-  const tubeId = filteredResult[fieldToConceptIdMapping.collectionId].split(' ')[1]
-  const collectionType = filteredResult[fieldToConceptIdMapping.collectionType]
-  const healthCareProvider = filteredResult[fieldToConceptIdMapping.healthcareProvider]
+const getVialTypesMappings = (tubeId, collectionType, healthcareProvider) => {
+    if (!collectionType || !tubeId) {
+        return ['', '', '', ''];
+    }
+    
+    const collectionTypeString = collectionType === fieldToConceptIdMapping.research ? 'research' : 'clinical';
+    const healthCareProviderString = healthcareProvider ? keyToNameAbbreviationObj[healthcareProvider] : 'default';
+    
+    if (collectionTypeString === 'research') {
+        return vialMapping[collectionTypeString].default[tubeId];
+    } else {
+        return vialMapping[collectionTypeString][healthCareProviderString]?.[tubeId] || vialMapping[collectionTypeString].default[tubeId];
+    }
+};
 
-  if (collectionType === fieldToConceptIdMapping.research && (tubeId === '0001' || tubeId === '0002' )) {
-    vialMappingsHolder.push('8.5 mL Serum separator tube', 'SST', 'Serum', '8.5')
-  } else if (collectionType === fieldToConceptIdMapping.research && tubeId === '0003') {
-    vialMappingsHolder.push('10 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '10')
-  } else if (collectionType === fieldToConceptIdMapping.research && tubeId === '0004') {
-    vialMappingsHolder.push('10 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '10')
-  } else if (collectionType === fieldToConceptIdMapping.research && tubeId === '0005') {
-    vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'WHOLE BL', '6')
-  } else if (collectionType === fieldToConceptIdMapping.research && tubeId === '0006') {
-    vialMappingsHolder.push('10 ml Vacutainer', 'No Additive', 'Urine', '10')
-  } else if (collectionType === fieldToConceptIdMapping.research && tubeId === '0007') {
-    vialMappingsHolder.push('15ml Nalgene jar', 'Crest Alcohol Free', 'Saliva', '15')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && (tubeId === '0001' || tubeId === '0002' || tubeId === '0011' || tubeId === '0012' || tubeId === '0021')) {
-    vialMappingsHolder.push('5 mL Serum separator tube', 'SST', 'Serum', '5')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && (tubeId === '0003' || tubeId === '0013')) {
-    vialMappingsHolder.push('4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && (tubeId === '0004' || tubeId === '0014' || tubeId === '0024')) {
-    vialMappingsHolder.push('4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && tubeId === '0005') {
-    vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'WHOLE BL', '6')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && tubeId === '0006') {
-    vialMappingsHolder.push('6 ml Vacutainer', 'No Additive', 'Urine', '10')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpCO"] && (tubeId === '0001' || tubeId === '0002' || tubeId === '0011' 
-  || tubeId === '0012' )) {
-    vialMappingsHolder.push('5 mL Serum separator tube', 'SST', 'Serum', '5')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpCO"] && (tubeId === '0003' || tubeId === '0013' )) {
-    vialMappingsHolder.push('4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpCO"] && (tubeId === '0004' || tubeId === '0014' )) {
-    vialMappingsHolder.push('4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpCO"] && (tubeId === '0005')) {
-    vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'WHOLE BL', '6')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpCO"] && (tubeId === '0001')) {
-    vialMappingsHolder.push('6 ml Vacutainer', 'No Additive', 'Urine', '6')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpNW"] && (tubeId === '0001' || tubeId === '0002' 
-  || tubeId === '0011' || tubeId === '0012' || tubeId === '0021' )) {
-    vialMappingsHolder.push('3.5 mL Serum separator tube', 'SST', 'Serum', '3.5')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpNW"] && (tubeId === '0013' || tubeId === '0003')) {
-    vialMappingsHolder.push('4 mL Serum separator tube', 'Lithium Heparin', 'WHOLE BL', '4')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpNW"] && (tubeId === '0014' || tubeId === '0004')) {
-    vialMappingsHolder.push('4 mL Serum separator tube', 'EDTA = K2', 'WHOLE BL', '4')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpNW"] && (tubeId === '0005')) {
-    vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'WHOLE BL', '6')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpNW"] && (tubeId === '0006')) {
-    vialMappingsHolder.push('10 ml Vacutainer', 'No Additive', 'Urine', '10')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpHI"] && (tubeId === '0001' || tubeId === '0002' 
-  || tubeId === '0011' || tubeId === '0012')) {
-    vialMappingsHolder.push('5 ml Serum separator tube', 'SST', 'Serum', '5')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpHI"] && (tubeId === '0003' || tubeId === '0013')) {
-    vialMappingsHolder.push('4 mL Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpHI"] && (tubeId === '0004' || tubeId === '0014' 
-  || tubeId === '0024')) {
-    vialMappingsHolder.push('3 mL Vacutainer', 'EDTA = K2', 'WHOLE BL', '3')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpHI"] && (tubeId === '0005')) {
-    vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'WHOLE BL', '6')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpHI"] && (tubeId === '0006')) {
-    vialMappingsHolder.push('15 ml Nalgene jar', 'No Additive', 'Urine', '10')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpGA"] && (tubeId === '0001' || tubeId === '0002' 
-  || tubeId === '0011' || tubeId === '0012' )) {
-    vialMappingsHolder.push('5 ml Serum separator tube', 'SST', 'Serum', '5')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpGA"] && (tubeId === '0003' || tubeId === '0013')) {
-    vialMappingsHolder.push('4.5 mL Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4.5')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpGA"] && (tubeId === '0004' || tubeId === '0014')) {
-    vialMappingsHolder.push('4 mL Vacutainer', 'EDTA = K2', 'WHOLE BL', '4')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpGA"] && (tubeId === '0005')) {
-    vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'WHOLE BL', '6')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["kpGA"] && (tubeId === '0006')) {
-    vialMappingsHolder.push('15 ml Nalgene jar', 'No Additive', 'Urine', '10')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["hfHealth"] && (tubeId === '0001' || tubeId === '0002')) {
-    vialMappingsHolder.push('10 ml Serum separator tube', 'SST', 'Serum', '10')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["hfHealth"] && (tubeId === '0003')) {
-    vialMappingsHolder.push('10 ml Vacutainer', 'Lithium Heparin', 'Whole Blood', '10')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["hfHealth"] && (tubeId === '0004')) {
-    vialMappingsHolder.push('10 ml Vacutainer', 'EDTA', 'Whole Blood', '10')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["hfHealth"] && (tubeId === '0005')) {
-    vialMappingsHolder.push('6 ml Vacutainer', 'ACD', 'Whole Blood', '6')
-  } else if (collectionType === fieldToConceptIdMapping.clinical && healthCareProvider === nameToKeyObj["hfHealth"] && (tubeId === '0006')) {
-    vialMappingsHolder.push('10 ml Vacutainer', 'No Additive', 'Urine', '6')
-  } else {
-    vialMappingsHolder.push('', '', '', '')
-  }
+const updateResultMappings = (filteredResult, vialMappings, collectionId, tubeId) => {
+    const collectionTypeValue = filteredResult[fieldToConceptIdMapping.collectionType];
+    const clinicalDateTime = filteredResult[fieldToConceptIdMapping.clinicalDateTimeDrawn];
+    const withdrawalDateTime = filteredResult[fieldToConceptIdMapping.dateWithdrawn];
 
-  return vialMappingsHolder
-}
-
-const updateResultMappings = (filteredResult, vialMappings) => {
-  filteredResult['Study ID'] = 'Connect Study';
-  filteredResult['Sample Collection Center'] = (filteredResult[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical) 
-              ? keyToNameObj[filteredResult[fieldToConceptIdMapping.healthcareProvider]] : keyToLocationObj[filteredResult[fieldToConceptIdMapping.collectionLocation]];
-  filteredResult['Sample ID'] = filteredResult[fieldToConceptIdMapping.collectionId]?.split(' ')[0] || '';
-  filteredResult['Sequence'] = filteredResult[fieldToConceptIdMapping.collectionId]?.split(' ')[1] || '';
-  filteredResult['BSI ID'] = filteredResult[fieldToConceptIdMapping.collectionId] || '';
-  filteredResult['Subject ID'] = filteredResult['Connect_ID'];
-  filteredResult['Date Received'] = formatISODateTime(filteredResult[fieldToConceptIdMapping.dateReceived]) || '';
-  filteredResult['Date Drawn'] = (filteredResult[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical) 
-              ? convertISODateTime(filteredResult[fieldToConceptIdMapping.clinicalDateTimeDrawn]) || '' : convertISODateTime(filteredResult[fieldToConceptIdMapping.dateWithdrawn]) || '';
-  filteredResult['Vial Type'] = vialMappings[0];
-  filteredResult['Additive/Preservative'] = vialMappings[1];
-  filteredResult['Material Type'] = vialMappings[2];
-  filteredResult['Volume'] = vialMappings[3];
-  filteredResult['Volume Estimate'] = 'Assumed';
-  filteredResult['Voume Unit'] = 'ml (cc)';
-  filteredResult['Vial Warnings'] = '';
-  filteredResult['Hermolyzed'] = '';
-  filteredResult['Label Status'] = 'Barcoded';
-  filteredResult['Visit'] = 'BL';
-  
-  // Delete unwanted properties
-  delete filteredResult[fieldToConceptIdMapping.healthcareProvider];
-  delete filteredResult[fieldToConceptIdMapping.collectionLocation];
-  delete filteredResult['Connect_ID'];
-  delete filteredResult[fieldToConceptIdMapping.collectionId];
-  delete filteredResult[fieldToConceptIdMapping.dateWithdrawn];
-  delete filteredResult[fieldToConceptIdMapping.clinicalDateTimeDrawn];
-  delete filteredResult[fieldToConceptIdMapping.dateReceived];
-  delete filteredResult[fieldToConceptIdMapping.collectionType];
-  delete filteredResult[fieldToConceptIdMapping.discardFlag];
-  delete filteredResult[fieldToConceptIdMapping.deviationNotFound];  
+    return {
+        'Study ID': 'Connect Study',
+        'Sample Collection Center': (collectionTypeValue === fieldToConceptIdMapping.clinical)
+            ? keyToNameObj[filteredResult[fieldToConceptIdMapping.healthcareProvider]]
+            : keyToLocationObj[filteredResult[fieldToConceptIdMapping.collectionLocation]],
+        'Sample ID': collectionId,
+        'Sequence': tubeId,
+        'BSI ID': `${collectionId} ${tubeId}`,
+        'Subject ID': filteredResult['Connect_ID'],
+        'Date Received': filteredResult[fieldToConceptIdMapping.dateReceived] ? formatISODateTime(filteredResult[fieldToConceptIdMapping.dateReceived]) : '',
+        'Date Drawn': collectionTypeValue === fieldToConceptIdMapping.clinical
+            ? (clinicalDateTime ? convertISODateTime(clinicalDateTime) : '')
+            : (withdrawalDateTime ? convertISODateTime(withdrawalDateTime) : ''),
+        'Vial Type': vialMappings[0],
+        'Additive/Preservative': vialMappings[1],
+        'Material Type': vialMappings[2],
+        'Volume': vialMappings[3],
+        'Volume Estimate': 'Assumed',
+        'Volume Unit': 'ml (cc)',
+        'Vial Warnings': '',
+        'Hemolyzed': '',
+        'Label Status': 'Barcoded',
+        'Visit': 'BL'
+    }
 }
 
 const generateBSIqueryCSVData = (items) => {
-  let csv = ``;
-  csv += `Study ID, Sample Collection Center, Sample ID, Sequence, BSI ID, Subject ID, Date Received, Date Drawn, Vial Type, Additive/Preservative, Material Type, Volume, Volume Estimate, Volume Unit, Vial Warnings, Hemolyzed, Label Status, Visit\r\n`
-  downloadCSVfile(items, csv, 'BSI-data-export')
+    const csv = 'Study ID, Sample Collection Center, Sample ID, Sequence, BSI ID, Subject ID, Date Received, Date Drawn, Vial Type, Additive/Preservative, Material Type, Volume, Volume Estimate, Volume Unit, Vial Warnings, Hemolyzed, Label Status, Visit\r\n';
+    downloadBSIQueryCSVFile(items, csv, 'BSI-data-export');
 }
 
 const generateInTransitCSVData = (items) => {
-  let csv = ``;
-  csv += `Ship Date, Tracking Number, Shipped from Site, Shipped from Location, Shipped Date & Time, Expected Number of Samples, Temperature Monitor, Box Number, Specimen Bag ID Type, Full Specimen IDs, Material Type\r\n`
-  downloadCSVfile(items, csv, 'In-Transit-CSV-data-export')
+    const csv = `Ship Date, Tracking Number, Shipped from Site, Shipped from Location, Shipped Date & Time, Expected Number of Samples, Temperature Monitor, Box Number, Specimen Bag ID Type, Full Specimen IDs, Material Type\r\n`;
+    downloadCSVfile(items, csv, 'In-Transit-CSV-data-export');
 }
 
+// If value contains a comma, quote or newline, enclose it in double quotes and replace inner double quotes
+const downloadBSIQueryCSVFile = (items, csv, title) => {
+    const csvData = items.map(row =>
+        Object.values(row).map(value => 
+            typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes('\r'))
+              ? `"${value.replace(/"/g, '""')}"`
+              : value
+        ).join(',')
+    ).join('\r\n');
+
+    csv += csvData;
+    
+    generateFileToDownload(csv, title, 'csv');
+}
+
+//TODO: refactor this to the downloadBSIQueryCSVFile format, then remove downloadBSIQueryCSVFile()
 const downloadCSVfile = (items, csv, title) => {
   for (let row = 0; row < (items.length); row++) {
     let keysAmount = Object.keys(items[row]).length

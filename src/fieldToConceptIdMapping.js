@@ -20,8 +20,9 @@ export default {
     shippingLocation: 560975149,
     scannedByFirstName: 469819603,
     scannedByLastName: 618036638,
-    shippedByFirstName: 948887825,
-    shippedByLastName: 885486943,
+    shippedByFirstName: 948887825, //TODO: this is actually shipperEmail. Update all refs in next release (cleanup)
+    shippedByLastName: 885486943, //TODO: this has been removed from the data dictionary remove in next release (cleanup)
+    shipmentCourier: 666553960,
     "FedEx": 712278213,
     "World Courier": 149772928,
 
