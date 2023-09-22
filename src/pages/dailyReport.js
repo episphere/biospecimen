@@ -85,7 +85,6 @@ const renderCollectionLocationList = () => {
                         <li><a class="dropdown-item" data-siteKey="orPark" id="orPark">Orland Park</a></li>`  :
                         appState.getState().siteAcronym === 'NIH' ? 
                         `<li><a class="dropdown-item" data-siteKey="nci" id="nci">NIH/NCI</a></li>
-                        <li><a class="dropdown-item" data-siteKey="rock" id="rock">Rockville</a></li>
                         `:
                         `<li><a class="dropdown-item" data-siteKey="other" id="other">Other</a></li>`}
                 </ul>
