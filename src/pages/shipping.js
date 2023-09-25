@@ -838,7 +838,7 @@ const tempSelectStringRender = ({boxIdArray, isTempMonitorIncluded}) => {
     return tempSelectString;
 }
 
-export const populateShippingManifestHeader = (userName, siteAcronym, currShippingLocationNumber) => { 
+export const populateShippingManifestHeader = (userName, siteAcronym, currShippingLocationNumber) => {
     const currContactInfo = locationConceptIDToLocationMap[currShippingLocationNumber]["contactInfo"][siteAcronym];
     const siteSpecificLocation = locationConceptIDToLocationMap[currShippingLocationNumber]["siteSpecificLocation"];
 
