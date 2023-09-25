@@ -342,8 +342,8 @@ export const addNewBox = async () => {
     
         const largestLocationBoxNum = largestBoxNum === -1 ? -1 : getLargestLocationBoxId(boxList, siteLocationConversion);
         const largestLocationBoxIndex = boxList.findIndex(box => box[conceptIds.shippingBoxId] === 'Box' + largestLocationBoxNum.toString());
-        const shouldCreateNewBox = Object.keys(boxList[largestLocationBoxIndex]['bags']).length !== 0 || largestLocationBoxIndex === -1;
-    
+        const shouldCreateNewBox = Object.keys(boxList[largestLocationBoxIndex]?.['bags'] ?? {}).length !== 0 || largestLocationBoxIndex === -1;
+
         if (shouldCreateNewBox) {
             const boxToAdd = await createNewBox(boxList, siteLocationConversion, siteCode, largestBoxNum, docId);
             if (!boxToAdd) {
@@ -369,6 +369,8 @@ export const addNewBox = async () => {
 
 // Create the new box and add it to firestore. If the box already exists, wait one second, increment the boxId, and try again up to 3 times.
 const createNewBox = async (boxList, pageLocationConversion, siteCode, largestBoxNum, docId) => {
+    console.log("boxList, pageLocationConversion, siteCode, largestBoxNum, docId", 
+    boxList,"---" ,pageLocationConversion, "---" ,siteCode,"---" , largestBoxNum, "---" ,docId)
     let attempts = 0;
     let maxAttempts = 3;
 
@@ -425,7 +427,10 @@ const getLargestBoxNumFromAllBoxes = async () => {
 // Find the largest shipping box id for the location
 // Return the highest numeric boxId or -1 if none exist
 const getLargestLocationBoxId = (boxesList, siteLocationId) => {
+    console.log("getLargestLocationBoxId --> boxesList, siteLocationId", boxesList, siteLocationId)
     const boxIdsForLocation = boxesList.filter(box => box[conceptIds.shippingLocation] === siteLocationId).map(box => parseInt(box[conceptIds.shippingBoxId].substring(3)));
+    console.log("siteLocation Test filter",  boxesList.filter(box => box[conceptIds.shippingLocation] === siteLocationId))
+    console.log("🚀 ~ file: shipping.js:436 ~ getLargestLocationBoxId ~ boxIdsForLocation:", boxIdsForLocation)
     return boxIdsForLocation.length > 0 ? Math.max(...boxIdsForLocation) : -1;
 }
 
@@ -838,7 +843,7 @@ const tempSelectStringRender = ({boxIdArray, isTempMonitorIncluded}) => {
     return tempSelectString;
 }
 
-export const populateShippingManifestHeader = (userName, siteAcronym, currShippingLocationNumber) => {
+export const populateShippingManifestHeader = (userName, siteAcronym, currShippingLocationNumber) => { 
     const currContactInfo = locationConceptIDToLocationMap[currShippingLocationNumber]["contactInfo"][siteAcronym];
     const siteSpecificLocation = locationConceptIDToLocationMap[currShippingLocationNumber]["siteSpecificLocation"];
 
