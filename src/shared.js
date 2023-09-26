@@ -764,20 +764,22 @@ export const getBoxes = async () => {
   return { data: boxesToReturn };
 };
 
-export const getAllBoxes = async (flag) => {
-  logAPICallStartDev('getAllBoxes');
-  const idToken = await getIdToken();
-  if (flag !== `bptl`) flag = ``
-  const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + idToken,
-    }
-  });
-  let res = await response.json();
-  res.data = res.data.map(convertToOldBox);
-  logAPICallEndDev('getAllBoxes');
-  return res;
+export const getAllBoxes = async (flagValue) => {
+    logAPICallStartDev('getAllBoxes');
+    const idToken = await getIdToken()
+    let flag = ``;
+
+    if (flagValue === `bptl` || flagValue === `bptlPackagesInTransit`) flag = flagValue;
+    const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
+        method: 'GET',
+        headers: {
+        Authorization: 'Bearer ' + idToken,
+        }
+    });
+    let res = await response.json();
+    res.data = res.data.map(convertToOldBox);
+    logAPICallEndDev('getAllBoxes');
+    return res;
 };
 
 // searches boxes collection by login site (789843387) and Site-specific location id (560975149)
@@ -864,21 +866,21 @@ export const searchSpecimenInstitute = async () => {
 }
 
 /**
- * Fetches biospecimen collection data from the database via login site number 
- * @param {number} login site number
- * @returns {object} returns a response object
- * 
+ * Fetches biospecimen collection data from the database via healthcare provider number and boxId
+ * @param {number} requestedSite - healthcare provider/site's number
+ * @param {str} boxId - boxId of the box
+ * @returns {object} returns a response object of biospecimen documents with matching collection ids from healthcare provider's box id
  */
-export const searchSpecimenByRequestedSite = async (requestedSite) => {
-    logAPICallStartDev('searchSpecimenByRequestedSite');
+export const searchSpecimenByRequestedSiteAndBoxId = async (requestedSite, boxId) => {
+    logAPICallStartDev('searchSpecimenByRequestedSiteAndBoxId');
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}`, {
+    const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}&boxId=${boxId}`, {
     method: "GET",
     headers: {
         Authorization:"Bearer "+idToken
         }
     });
-    logAPICallEndDev('searchSpecimenByRequestedSite');
+    logAPICallEndDev('searchSpecimenByRequestedSiteAndBoxId');
     if (response.status === 200) {
         const responseObject = await response.json();
         return responseObject;
