@@ -292,23 +292,21 @@ export const performSearch = async (query) => {
     if (response.code === 200 && verifiedParticipants.length > 0) {
       searchResults(verifiedParticipants);
     } else if (response.code === 200 && verifiedParticipants.length === 0) {
-      showNotifications(
-        {
-          title: 'Not found',
-          body: 'The participant with entered search criteria not found!'
-        },
-        true
-      );
+      showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'});
     }
 }
 
-export const showNotifications = (data, error) => {
+// show notifications in the UI. z-index controls the order of the modal
+// zIndex of 1000 is less than loading animation z-index of 9999. set zIndex to 10000 to show notifications on top of loading animation.
+// Current use: shimpent completion success notification. Show the success modal above the loading animation.
+export const showNotifications = (data, zIndex) => {
     const button = document.createElement('button');
     button.dataset.target = '#biospecimenModal';
     button.dataset.toggle = 'modal';
 
     document.getElementById('root').appendChild(button);
     button.click();
+    if (zIndex) document.getElementById('biospecimenModal').style.zIndex = zIndex;
     document.getElementById('root').removeChild(button);
     const header = document.getElementById('biospecimenModalHeader');
     const body = document.getElementById('biospecimenModalBody');
@@ -567,17 +565,24 @@ export const updateNewTempDate = async () =>{
  * @returns 
  */
 export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
-    const idToken = await getIdToken();
-    let requestObj = {
-        method: "POST",
-        headers:{
-            Authorization:"Bearer "+idToken,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({boxIdToTrackingNumberMap, shippingData})
+    try {
+        const requestBody = JSON.stringify({boxIdToTrackingNumberMap, shippingData});
+        const idToken = await getIdToken();
+        const requestObj = {
+            method: "POST",
+            headers:{
+                Authorization:"Bearer " + idToken,
+                "Content-Type": "application/json"
+            },
+            body: requestBody,
+        }
+        
+        const response = await fetch(`${api}api=ship`, requestObj);
+
+        return await response.json();
+    } catch (error) {
+        return {code: 500, message: error.message};
     }
-    const response = await fetch(`${api}api=ship`, requestObj);
-    return response.json();
 }
 
 export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters, source) => {
@@ -766,20 +771,22 @@ export const getBoxes = async () => {
   return { data: boxesToReturn };
 };
 
-export const getAllBoxes = async (flag) => {
-  logAPICallStartDev('getAllBoxes');
-  const idToken = await getIdToken();
-  if (flag !== `bptl`) flag = ``
-  const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + idToken,
-    }
-  });
-  let res = await response.json();
-  res.data = res.data.map(convertToOldBox);
-  logAPICallEndDev('getAllBoxes');
-  return res;
+export const getAllBoxes = async (flagValue) => {
+    logAPICallStartDev('getAllBoxes');
+    const idToken = await getIdToken()
+    let flag = ``;
+
+    if (flagValue === `bptl` || flagValue === `bptlPackagesInTransit`) flag = flagValue;
+    const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
+        method: 'GET',
+        headers: {
+        Authorization: 'Bearer ' + idToken,
+        }
+    });
+    let res = await response.json();
+    res.data = res.data.map(convertToOldBox);
+    logAPICallEndDev('getAllBoxes');
+    return res;
 };
 
 // searches boxes collection by login site (789843387) and Site-specific location id (560975149)
@@ -866,21 +873,21 @@ export const searchSpecimenInstitute = async () => {
 }
 
 /**
- * Fetches biospecimen collection data from the database via login site number 
- * @param {number} login site number
- * @returns {object} returns a response object
- * 
+ * Fetches biospecimen collection data from the database via healthcare provider number and boxId
+ * @param {number} requestedSite - healthcare provider/site's number
+ * @param {str} boxId - boxId of the box
+ * @returns {object} returns a response object of biospecimen documents with matching collection ids from healthcare provider's box id
  */
-export const searchSpecimenByRequestedSite = async (requestedSite) => {
-    logAPICallStartDev('searchSpecimenByRequestedSite');
+export const searchSpecimenByRequestedSiteAndBoxId = async (requestedSite, boxId) => {
+    logAPICallStartDev('searchSpecimenByRequestedSiteAndBoxId');
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}`, {
+    const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}&boxId=${boxId}`, {
     method: "GET",
     headers: {
         Authorization:"Bearer "+idToken
         }
     });
-    logAPICallEndDev('searchSpecimenByRequestedSite');
+    logAPICallEndDev('searchSpecimenByRequestedSiteAndBoxId');
     if (response.status === 200) {
         const responseObject = await response.json();
         return responseObject;
@@ -1229,6 +1236,7 @@ export const siteSpecificLocation = {
   "Ingalls Harvey": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "River East": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "South Loop": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
+  "Orland Park": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "Main Campus": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
   "Frederick": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
 }
@@ -1251,7 +1259,7 @@ export const locationConceptIDToLocationMap = {
     },
   },
   752948709: {
-    siteSpecificLocation: 'Henry Ford Main Campus', // Note: should this be changed to "Henry Ford One Place"?
+    siteSpecificLocation: 'Henry Ford Main Campus',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
     loginSiteName: 'Henry Ford Health System',
@@ -1540,6 +1548,19 @@ export const locationConceptIDToLocationMap = {
       }],
     },
   },
+  940329442: {
+    siteSpecificLocation: 'Orland Park',
+    siteAcronym: 'UCM',
+    siteCode: '809703864',
+    loginSiteName: 'University of Chicago Medicine',
+    contactInfo: {
+      "UCM":[{
+        "fullName":"N/A",
+        "email":"N/A",
+        "phone":["N/A"],
+      }],
+    },
+  },
   111111111: {
     siteSpecificLocation: 'Main Campus',
     siteAcronym: 'NIH',
@@ -1557,7 +1578,7 @@ export const locationConceptIDToLocationMap = {
     contactInfo: {
       "NIH":[],
     },
-  }
+  },
 };
 
 export const conceptIdToSiteSpecificLocation = {
@@ -1576,6 +1597,7 @@ export const conceptIdToSiteSpecificLocation = {
   145191545: "Ingalls Harvey",
   489380324: "River East",
   120264574: "South Loop",
+  940329442: "Orland Park",
   691714762: "Rice Lake",
   487512085: "Wisconsin Rapids",
   983848564: "Colby Abbotsford",
@@ -1585,7 +1607,7 @@ export const conceptIdToSiteSpecificLocation = {
   589224449: "Sioux Falls Imagenetics",
   777644826: "DCAM",
   111111111: "Main Campus",
-  222222222: "Frederick"
+  222222222: "Frederick",
 }
 
 export const siteSpecificLocationToConceptId = {
@@ -1608,12 +1630,13 @@ export const siteSpecificLocationToConceptId = {
   "Ingalls Harvey": 145191545,
   "River East": 489380324,
   "South Loop": 120264574,
+  "Orland Park": 940329442,
   "Rice Lake": 691714762,
   "Wisconsin Rapids": 487512085,
   "Colby Abbotsford": 983848564,
   "Minocqua": 261931804,
   "Merrill": 665277300,
-  "Fargo South University": 467088902
+  "Fargo South University": 467088902,
 }
 
 export const nameToKeyObj = 
@@ -1629,6 +1652,20 @@ export const nameToKeyObj =
     "kpHI": 300267574,
     "kpGA": 327912200,
     "allResults": 1000
+}
+
+export const keyToNameAbbreviationObj = {
+  452412599: "kpNW",
+  531629870: "hPartners",
+  657167265: "snfrdHealth",
+  548392715: "hfHealth",
+  303349821: "maClinic",
+  125001209: "kpCO",
+  809703864: "uChiM",
+  13: "nci",
+  300267574: "kpHI",
+  327912200: "kpGA",
+  1000: "allResults",
 }
 
 export const keyToNameObj = 
@@ -1649,6 +1686,7 @@ export const keyToLocationObj =
 {
     777644826: "UC-DCAM",
     692275326: "Marshfield",
+    567969985: "MF Pop-Up",
     698283667: "Lake Hallie",
     834825425: "HP Research Clinic",
     736183094: "HFH K-13 Research Clinic",
@@ -1658,6 +1696,8 @@ export const keyToLocationObj =
     145191545: "Ingalls Harvey",
     489380324: "River East",
     120264574: "South Loop",
+    319518299: "UCM Pop-Up",
+    940329442: "Orland Park",
     691714762: "Rice Lake",
     487512085: "Wisconsin Rapids",
     983848564: "Colby Abbotsford",
@@ -1781,7 +1821,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                     document.getElementById('closeBarCodeScanner').click();
                     const masterSpecimenId = document.getElementById('masterSpecimenId').value;
                     if(masterSpecimenId == ''){
-                        showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+                        showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'})
                         return
                     }
                     let masterIdSplit = masterSpecimenId.split(/\s+/);
@@ -1814,7 +1854,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                     }
 
                     if(biospecimensList.length == 0){
-                        showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'}, true)
+                        showNotifications({title: 'Not found', body: 'The participant with entered search criteria not found!'})
                         return
                     }
                     else{
@@ -1859,8 +1899,13 @@ export const disableInput = (id, disable) => {
 
 export const siteLocations = {
     'research': {
-        'UCM': [{location: 'UC-DCAM', concept: 777644826}, {location: 'Ingalls Harvey', concept: 145191545}, {location: 'River East', concept: 489380324}, {location: 'South Loop', concept: 120264574}],
-        'MFC': [{location: 'Marshfield', concept: 692275326}, {location: 'Lake Hallie', concept: 698283667}, {location: 'Weston', concept: 813701399}, {location: 'Rice Lake', concept: 691714762}, {location: 'Wisconsin Rapids', concept: 487512085}, {location: 'Colby Abbotsford', concept: 983848564}, {location: 'Minocqua', concept: 261931804}, {location: 'Merrill', concept: 665277300}],
+        'UCM': [{location: 'UC-DCAM', concept: 777644826}, {location: 'Ingalls Harvey', concept: 145191545}, {location: 'River East', concept: 489380324}, {location: 'South Loop', concept: 120264574},
+                {location: 'UCM Pop-Up', concept: 319518299}, {location: 'Orland Park', concept: 940329442}          
+              ],
+        'MFC': [{location: 'Marshfield', concept: 692275326}, {location: 'Lake Hallie', concept: 698283667}, {location: 'Weston', concept: 813701399}, {location: 'Rice Lake', concept: 691714762}, 
+                {location: 'Wisconsin Rapids', concept: 487512085}, {location: 'Colby Abbotsford', concept: 983848564}, {location: 'Minocqua', concept: 261931804}, {location: 'Merrill', concept: 665277300},
+                {location: 'MF Pop-Up', concept: 567969985}
+              ],
         'HP': [{location: 'HP Research Clinic', concept: 834825425}],
         'HFHS': [{location: 'HFH K-13 Research Clinic', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332},
                 {location: 'HFH Livonia Research Clinic', concept: 706927479}],

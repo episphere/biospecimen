@@ -142,7 +142,7 @@ export const addEventsearchSpecimen = () => {
         const biospecimen = await searchSpecimen(masterSpecimenId);
         if (biospecimen.code !== 200 || Object.keys(biospecimen.data).length === 0) {
             hideAnimation();
-            showNotifications({ title: 'Not found', body: 'Specimen not found!' }, true)
+            showNotifications({ title: 'Not found', body: 'Specimen not found!' })
             return
         }
         const biospecimenData = biospecimen.data;
@@ -150,14 +150,14 @@ export const addEventsearchSpecimen = () => {
         if(getWorkflow() === 'research') {
             if(biospecimenData[conceptIds.collection.collectionSetting] !== conceptIds.research) {
                 hideAnimation();
-                showNotifications({ title: 'Incorrect Dashboard', body: 'Clinical Collections cannot be viewed on Research Dashboard' }, true);
+                showNotifications({ title: 'Incorrect Dashboard', body: 'Clinical Collections cannot be viewed on Research Dashboard' });
                 return;
             }
         }
         else {
             if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
                 hideAnimation();
-                showNotifications({ title: 'Incorrect Dashboard', body: 'Research Collections cannot be viewed on Clinical Dashboard' }, true);
+                showNotifications({ title: 'Incorrect Dashboard', body: 'Research Collections cannot be viewed on Clinical Dashboard' });
                 return;
             }
         }
@@ -183,11 +183,11 @@ export const addEventAddSpecimenToBox = () => {
 
         const shippingLocationValue = document.getElementById('selectLocationList').value;
         if(shippingLocationValue === 'none') {
-            showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' }, true);
+            showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' });
             return;
         }
         if (masterSpecimenId === '') {
-            showNotifications({ title: 'Empty Entry or Scan', body: 'Please enter or scan a specimen bag ID or Full Specimen ID.' }, true);
+            showNotifications({ title: 'Empty Entry or Scan', body: 'Please enter or scan a specimen bag ID or Full Specimen ID.' });
             return;
         }
 
@@ -197,7 +197,7 @@ export const addEventAddSpecimenToBox = () => {
         const isScannedIdInUnshippedBoxes = scannedIdInUnshippedBoxes['foundMatch'];
         
         if (foundScannedIdShipped){
-            showNotifications({ title:'Item reported as already shipped', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.'}, true);
+            showNotifications({ title:'Item reported as already shipped', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.'});
             return;
         }
         
@@ -206,7 +206,7 @@ export const addEventAddSpecimenToBox = () => {
             const siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInUnshippedBoxes[conceptIds.shippingLocation]];
             const siteSpecificLocationName = siteSpecificLocation || '';
             const scannedInput = scannedIdInUnshippedBoxes['inputScanned'];
-            showNotifications({ title:`${scannedInput} has already been recorded`, body: `${scannedInput} is recorded as being in ${boxNum} in ${siteSpecificLocationName}`}, true);
+            showNotifications({ title:`${scannedInput} has already been recorded`, body: `${scannedInput} is recorded as being in ${boxNum} in ${siteSpecificLocationName}`});
             return;
         }
 
@@ -214,7 +214,7 @@ export const addEventAddSpecimenToBox = () => {
         const biospecimensList = specimenTablesResult.biospecimensList;
 
         if (biospecimensList.length === 0) {
-            showNotifications({ title: 'Item not found', body: `Item not reported as collected. Go to the Collection Dashboard to add specimen.` }, true);
+            showNotifications({ title: 'Item not found', body: `Item not reported as collected. Go to the Collection Dashboard to add specimen.` });
             return;
         } else {
             document.getElementById('submitMasterSpecimenId').click();
@@ -237,7 +237,7 @@ const addEventSubmitSpecimenBuildModal = () => {
         const tableIndex = specimenTablesResult.tableIndex;
 
         if (biospecimensList.length == 0) {
-            showNotifications({ title: 'Not found', body: 'The specimen with entered search criteria was not found!' }, true);
+            showNotifications({ title: 'Not found', body: 'The specimen with entered search criteria was not found!' });
             hideAnimation();
             const delay = ms => new Promise(res => setTimeout(res, ms));
             await delay(500);
@@ -277,7 +277,7 @@ export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrpha
                 updateShippingStateAddBagToBox(currBoxId, bagId, boxToUpdate);
                 await startShipping(appState.getState().userName, true, currBoxId);
             } else {
-                showNotifications({ title: 'Error', body: 'Error updating box' }, true);
+                showNotifications({ title: 'Error', body: 'Error updating box' });
             }
         }
     }, { once: true })
@@ -572,7 +572,7 @@ const addEventNewUserForm = (userEmail) => {
         }
         else if (response.code === 400 && response.message === 'User with this email already exists') {
             hideAnimation();
-            showNotifications({ title: 'User already exists!', body: `User with email: <b>${data.email}</b> already exists` }, true);
+            showNotifications({ title: 'User already exists!', body: `User with email: <b>${data.email}</b> already exists` });
         }
     })
 }
@@ -918,7 +918,7 @@ const btnsClicked = async (connectId, formData) => {
     hideAnimation();
 
     if (specimenData?.Connect_ID && parseInt(specimenData.Connect_ID) !== particpantData.Connect_ID) {
-        showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different Connect ID.' }, true)
+        showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different Connect ID.' })
         return;
     }
 
@@ -929,7 +929,7 @@ const btnsClicked = async (connectId, formData) => {
         const storeResponse = await storeSpecimen([formData]);  
         if (storeResponse.code === 400) {
             hideAnimation();
-            showNotifications({ title: 'Specimen already exists!', body: `Collection ID ${collectionID} is already associated with a different Connect ID` }, true);
+            showNotifications({ title: 'Specimen already exists!', body: `Collection ID ${collectionID} is already associated with a different Connect ID` });
             return;
         }
     }
@@ -2000,7 +2000,7 @@ export const addEventSaveAndContinueButton = async (boxIdAndBagsObj, userName, b
         const boxIdArray = Object.keys(boxIdAndBagsObj);
         const trackingNumConfirmEls = Array.from(document.getElementsByClassName("invalid"));
         if (trackingNumConfirmEls.length > 0) {
-          showNotifications({ title: 'Invalid Fields', body: 'Please add valid inputs to fields.' }, true);
+          showNotifications({ title: 'Invalid Fields', body: 'Please add valid inputs to fields.' });
           return;
         }
 
@@ -2008,7 +2008,7 @@ export const addEventSaveAndContinueButton = async (boxIdAndBagsObj, userName, b
             const trackingId = document.getElementById(boxId + "trackingId").value.toUpperCase();
             const trackingIdConfirm = document.getElementById(boxId + "trackingIdConfirm").value.toUpperCase();
             if (trackingId === '' || trackingIdConfirm === '') {
-                showNotifications({ title: 'Missing Fields', body: 'Please enter in shipment tracking numbers'}, true);
+                showNotifications({ title: 'Missing Fields', body: 'Please enter in shipment tracking numbers'});
                 return;
             }
         
@@ -2090,6 +2090,15 @@ export const addEventSaveButton = async (boxIdAndBagsObj) => {
     })
 }
 
+const validateShipperEmail = (email) => {
+    const finalizeSignInputEle = document.getElementById('finalizeSignInput');
+    if (finalizeSignInputEle.value.toUpperCase() !== email.toUpperCase()) {
+        showNotifications({ title: 'Error Shipping Box(es)', body: `Email mismatch. You entered: ${finalizeSignInputEle.value}, which does not match the email on record.` });
+        return false;
+    }
+    return true;
+}
+
 /**
  * Handle 'Sign' button click
  * @param {object} boxIdAndTrackingObj eg: {Box1: {959708259: '123456789012', specimens:{'CXA001234 0008':{...}} }}
@@ -2098,62 +2107,55 @@ export const addEventSaveButton = async (boxIdAndBagsObj) => {
  * @param {string} shipmentCourier name of shipment courier (eg: 'FedEx')
  */
 export const addEventCompleteShippingButton = (boxIdAndTrackingObj, userName, boxWithTempMonitor, shipmentCourier) => {
-    document.getElementById('finalizeModalSign').addEventListener('click', async () => {
-        const finalizeSignInputEle = document.getElementById('finalizeSignInput');
-        const [firstName, lastName] = userName.split(/\s+/);
-        const firstNameShipper = firstName ?? "";
-        const lastNameShipper = lastName ?? "";
-        const errorMessageEle = document.getElementById('finalizeModalError');
+    const finalizeModalSignElement = document.getElementById('finalizeModalSign');
+    const finalizeModalCancelElement = document.getElementById('finalizeModalCancel');
 
-        if (finalizeSignInputEle.value.toUpperCase() !== userName.toUpperCase()) {
-          errorMessageEle.style.display = "block";
-          return;
-        }
-
-        // Block subsequent requests before the first one is completed
-        if (requestsBlocker.isBlocking()) return;
-        requestsBlocker.block();
+    const finalizeAndShip = async () => {
+        if (!validateShipperEmail(userName)) return;
 
         const commonShippingData = {
-          666553960: conceptIds[shipmentCourier],
-          948887825: firstNameShipper,
-          885486943: lastNameShipper,
-          boxWithTempMonitor,
+            [conceptIds.shipmentCourier]: conceptIds[shipmentCourier],
+            [conceptIds.shippedByFirstName]: userName,
+            boxWithTempMonitor,
         };
-        let boxIdToTrackingNumberObj = {};
 
-        for (const boxId in boxIdAndTrackingObj) {
-          boxIdToTrackingNumberObj[boxId] = boxIdAndTrackingObj[boxId][conceptIds.shippingTrackingNumber];
+        const boxIdToTrackingNumberObj = Object.fromEntries(
+            Object.entries(boxIdAndTrackingObj).map(
+                ([boxId, value]) => [boxId, value[conceptIds.shippingTrackingNumber]]
+            )
+        );
+
+        try {
+            showAnimation();
+            const shipment = await ship(boxIdToTrackingNumberObj, commonShippingData);
+            hideAnimation();
+
+            if (shipment.code === 200) {
+                boxWithTempMonitor && (await updateNewTempDate());
+                finalizeModalCancelElement.click();
+                localforage.removeItem('shipData');
+                showNotifications({ title: 'Success Shipping Box(es)', body: 'Box(es) Shipped Successfully! No other changes can be made to the boxes that were just shipped.' }, 10000);
+                startShipping(userName);
+            } else {
+                showNotifications({ title: 'Error Shipping Box(es)', body: `There was an error shipping the box(es). Please try again: ${shipment.message}` });
+            }
+        } catch (error) {
+            showNotifications({ title: 'Error Shipping Box(es)', body: `There was an error shipping the box(es). Please try again: ${error}` });
         }
+    }
 
-        const shipment = await ship(boxIdToTrackingNumberObj, commonShippingData);
-
-        if (shipment.code === 200) {
-          boxWithTempMonitor && (await updateNewTempDate());
-          document.getElementById('finalizeModalCancel').click();
-          alert('This shipment is now finalized; no other changes can be made');
-          localforage.removeItem('shipData');
-          startShipping(userName);
-        } else {
-          errorMessageEle.style.display = 'block';
-          errorMessageEle.textContent =
-            'There was an error when saving the shipment data.';
-
-          if (shipment.code === 500) {
-            errorMessageEle.textContent =
-              'There was an error when saving the shipment data. Please sign again.';
-          }
-        }
-
-        requestsBlocker.unblock();
-    });
-
-    // Restore error message after closing the modal, in multiple clicks
-    document.getElementById('finalizeModalCancel').addEventListener('click', () => {
+    const finalizeModalCancelClickHandler = () => {
         const errorMessageEle = document.getElementById('finalizeModalError');
         errorMessageEle.style.display = "none";
         errorMessageEle.textContent = `*Please type in ${userName}`;
-    });
+    };
+
+    // Remove event listeners, then add them (ensure no duplicates)
+    finalizeModalSignElement.removeEventListener('click', finalizeAndShip);
+    finalizeModalCancelElement.removeEventListener('click', finalizeModalCancelClickHandler);
+
+    finalizeModalSignElement.addEventListener('click', finalizeAndShip);
+    finalizeModalCancelElement.addEventListener('click', finalizeModalCancelClickHandler);
 }
 
 export const populateFinalCheck = (boxIdAndTrackingObj) => {

@@ -20,8 +20,9 @@ export default {
     shippingLocation: 560975149,
     scannedByFirstName: 469819603,
     scannedByLastName: 618036638,
-    shippedByFirstName: 948887825,
-    shippedByLastName: 885486943,
+    shippedByFirstName: 948887825, //TODO: this is actually shipperEmail. Update all refs in next release (cleanup)
+    shippedByLastName: 885486943, //TODO: this has been removed from the data dictionary remove in next release (cleanup)
+    shipmentCourier: 666553960,
     "FedEx": 712278213,
     "World Courier": 149772928,
 
@@ -221,6 +222,9 @@ export default {
         589224449 : 'Sioux Falls Imagenetics',
         145191545 : 'Ingalls Harvey',
         489380324 : 'River East',
+        319518299 : 'UCM Pop-Up',
+        940329442 : 'Orland Park',
+        567969985 : 'MF Pop-Up',
         120264574 : 'South Loop',
         691714762 : 'Rice Lake',
         487512085 : 'Wisconsin Rapids',
@@ -251,6 +255,9 @@ export default {
         'merr': 665277300,
         'nci': 111111111,
         'other': 807835037,
+        "ucmPopUp": 319518299,
+        "orPark": 940329442,
+        "mfPopUp": 567969985,
         'all': 1000
 
     }
