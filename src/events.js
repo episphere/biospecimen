@@ -2274,9 +2274,9 @@ export const populateCourierBox = async () => {
 
 }
 
-export const populateBoxTable = async (page, filter) => {
+export const populateBoxTable = async (page, filter, source) => {
     showAnimation();
-    let pageStuff = await getPage(page, 5, '656548982', filter)
+    let pageStuff = await getPage(page, 5, '656548982', filter, source)
     let currTable = document.getElementById('boxTable')
     currTable.innerHTML = ''
     let rowCount = currTable.rows.length;
@@ -2332,16 +2332,16 @@ export const populateBoxTable = async (page, filter) => {
         currRow.insertCell(6).innerHTML = receivedDate;
         currRow.insertCell(7).innerHTML = convertConceptIdToPackageCondition(packagedCondition, packageConditonConversion);
         currRow.insertCell(8).innerHTML = currPage.hasOwnProperty('870456401') ? currPage['870456401'] : '' ;
-        addEventViewManifestButton('reportsViewManifest' + i, currPage);
+        addEventViewManifestButton('reportsViewManifest' + i, currPage, source);
 
     }
     hideAnimation();
 }
 
-export const addEventViewManifestButton = (buttonId, currPage) => {
+export const addEventViewManifestButton = (buttonId, currPage, source) => {
     let button = document.getElementById(buttonId);
     button.addEventListener('click', () => {
-        showReportsManifest(currPage);
+        showReportsManifest(currPage, source);
     });
 }
 
@@ -2435,7 +2435,7 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
     }
 }
 
-export const addPaginationFunctionality = (lastPage, filter) => {
+export const addPaginationFunctionality = (lastPage, filter, source) => {
     let paginationButtons = document.getElementById('paginationButtons');
     paginationButtons.innterHTML = ""
     paginationButtons.innerHTML = `<ul class="pagination">
@@ -2454,28 +2454,28 @@ export const addPaginationFunctionality = (lastPage, filter) => {
 
     first.addEventListener('click', () => {
         middleNumber.innerHTML = '1'
-        populateBoxTable(0, filter)
+        populateBoxTable(0, filter, source)
     })
 
     previous.addEventListener('click', () => {
         middleNumber.innerHTML = middleNumber.innerHTML == '1' ? '1' : parseInt(middleNumber.innerHTML) - 1;
-        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter)
+        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, source)
     })
 
     next.addEventListener('click', () => {
         middleNumber.innerHTML = parseInt(middleNumber.innerHTML) >= lastPage ? (lastPage == 0 ? 1 : lastPage.toString()) : parseInt(middleNumber.innerHTML) + 1;
-        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter)
+        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter, source)
     })
 
     final.addEventListener('click', () => {
         middleNumber.innerHTML = lastPage == 0 ? 1 : lastPage;
-        populateBoxTable(lastPage == 0 ? 0 : lastPage - 1, filter)
+        populateBoxTable(lastPage == 0 ? 0 : lastPage - 1, filter, source)
     })
 
 
 }
 
-export const addEventFilter = () => {
+export const addEventFilter = (source) => {
 
     let filterButton = document.getElementById('submitFilter');
     filterButton.addEventListener('click', async () => {
@@ -2502,7 +2502,7 @@ export const addEventFilter = () => {
             }
 
         }
-        populateBoxTable(0, filter);
+        populateBoxTable(0, filter, source);
         let numPages = await getNumPages(5, filter);
         addPaginationFunctionality(numPages, filter);
     });
