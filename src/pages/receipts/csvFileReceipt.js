@@ -152,8 +152,7 @@ const getSpecimensByReceivedDate = async (dateFilter) => {
 }
 
 const getCurrentDate = () => {
-  const currentDate = new Date().toLocaleDateString('en-CA');
-  return currentDate;
+  return new Date().toLocaleDateString('en-CA');
 }
 
 const modifyBSIQueryResults = (results) => {
