@@ -321,7 +321,7 @@ const handleRemoveBagButton = (currDeleteButton, currTubes, currBoxId) => {
 // Box numbering is based on site (not location), always increment highest site box number.
 // Create the new box and update the modal if the location's largest box is not empty or if the location has no current boxes.
 export const addNewBox = async () => {
-    try{
+    try {
         const siteLocation = document.getElementById('selectLocationList').value;
         const siteLocationConversion = siteSpecificLocationToConceptId[siteLocation];
         const siteCode = siteSpecificLocation[siteLocation]["siteCode"];    
@@ -342,8 +342,8 @@ export const addNewBox = async () => {
     
         const largestLocationBoxNum = largestBoxNum === -1 ? -1 : getLargestLocationBoxId(boxList, siteLocationConversion);
         const largestLocationBoxIndex = boxList.findIndex(box => box[conceptIds.shippingBoxId] === 'Box' + largestLocationBoxNum.toString());
-        const shouldCreateNewBox = Object.keys(boxList[largestLocationBoxIndex]['bags']).length !== 0 || largestLocationBoxIndex === -1;
-    
+        const shouldCreateNewBox = Object.keys(boxList[largestLocationBoxIndex]?.['bags'] ?? {}).length !== 0 || largestLocationBoxIndex === -1;
+
         if (shouldCreateNewBox) {
             const boxToAdd = await createNewBox(boxList, siteLocationConversion, siteCode, largestBoxNum, docId);
             if (!boxToAdd) {
@@ -390,7 +390,7 @@ const createNewBox = async (boxList, pageLocationConversion, siteCode, largestBo
                 boxList.push(boxToAdd);
                 return boxToAdd;
             } else if (addBoxResponse.code === 409) {
-                attempts ++;
+                attempts++;
                 await delayRetryAttempt(1000);
                 continue;
             } else {

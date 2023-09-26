@@ -103,7 +103,7 @@ const confirmFileSelection = () => {
       const radioVal = radio.value;
       document.getElementById('modalShowMoreData').querySelector('#closeModal').click(); // closes modal
       showAnimation();
-      const response = await getAllBoxes(`bptl`);
+      const response = await getAllBoxes(`bptlPackagesInTransit`);
       hideAnimation();
       const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
       let modifiedTransitResults = updateInTransitMapping(allBoxesShippedBySiteAndNotReceived);

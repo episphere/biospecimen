@@ -769,20 +769,22 @@ export const getBoxes = async () => {
   return { data: boxesToReturn };
 };
 
-export const getAllBoxes = async (flag) => {
-  logAPICallStartDev('getAllBoxes');
-  const idToken = await getIdToken();
-  if (flag !== `bptl`) flag = ``
-  const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + idToken,
-    }
-  });
-  let res = await response.json();
-  res.data = res.data.map(convertToOldBox);
-  logAPICallEndDev('getAllBoxes');
-  return res;
+export const getAllBoxes = async (flagValue) => {
+    logAPICallStartDev('getAllBoxes');
+    const idToken = await getIdToken()
+    let flag = ``;
+
+    if (flagValue === `bptl` || flagValue === `bptlPackagesInTransit`) flag = flagValue;
+    const response = await fetch(`${api}api=searchBoxes&source=${flag}`, {
+        method: 'GET',
+        headers: {
+        Authorization: 'Bearer ' + idToken,
+        }
+    });
+    let res = await response.json();
+    res.data = res.data.map(convertToOldBox);
+    logAPICallEndDev('getAllBoxes');
+    return res;
 };
 
 // searches boxes collection by login site (789843387) and Site-specific location id (560975149)
@@ -869,21 +871,21 @@ export const searchSpecimenInstitute = async () => {
 }
 
 /**
- * Fetches biospecimen collection data from the database via login site number 
- * @param {number} login site number
- * @returns {object} returns a response object
- * 
+ * Fetches biospecimen collection data from the database via healthcare provider number and boxId
+ * @param {number} requestedSite - healthcare provider/site's number
+ * @param {str} boxId - boxId of the box
+ * @returns {object} returns a response object of biospecimen documents with matching collection ids from healthcare provider's box id
  */
-export const searchSpecimenByRequestedSite = async (requestedSite) => {
-    logAPICallStartDev('searchSpecimenByRequestedSite');
+export const searchSpecimenByRequestedSiteAndBoxId = async (requestedSite, boxId) => {
+    logAPICallStartDev('searchSpecimenByRequestedSiteAndBoxId');
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}`, {
+    const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}&boxId=${boxId}`, {
     method: "GET",
     headers: {
         Authorization:"Bearer "+idToken
         }
     });
-    logAPICallEndDev('searchSpecimenByRequestedSite');
+    logAPICallEndDev('searchSpecimenByRequestedSiteAndBoxId');
     if (response.status === 200) {
         const responseObject = await response.json();
         return responseObject;
@@ -1232,6 +1234,7 @@ export const siteSpecificLocation = {
   "Ingalls Harvey": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "River East": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "South Loop": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
+  "Orland Park": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "Main Campus": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
   "Frederick": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
 }
@@ -1254,7 +1257,7 @@ export const locationConceptIDToLocationMap = {
     },
   },
   752948709: {
-    siteSpecificLocation: 'Henry Ford Main Campus', // Note: should this be changed to "Henry Ford One Place"?
+    siteSpecificLocation: 'Henry Ford Main Campus',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
     loginSiteName: 'Henry Ford Health System',
@@ -1543,6 +1546,19 @@ export const locationConceptIDToLocationMap = {
       }],
     },
   },
+  940329442: {
+    siteSpecificLocation: 'Orland Park',
+    siteAcronym: 'UCM',
+    siteCode: '809703864',
+    loginSiteName: 'University of Chicago Medicine',
+    contactInfo: {
+      "UCM":[{
+        "fullName":"N/A",
+        "email":"N/A",
+        "phone":["N/A"],
+      }],
+    },
+  },
   111111111: {
     siteSpecificLocation: 'Main Campus',
     siteAcronym: 'NIH',
@@ -1560,7 +1576,7 @@ export const locationConceptIDToLocationMap = {
     contactInfo: {
       "NIH":[],
     },
-  }
+  },
 };
 
 export const conceptIdToSiteSpecificLocation = {
@@ -1579,6 +1595,7 @@ export const conceptIdToSiteSpecificLocation = {
   145191545: "Ingalls Harvey",
   489380324: "River East",
   120264574: "South Loop",
+  940329442: "Orland Park",
   691714762: "Rice Lake",
   487512085: "Wisconsin Rapids",
   983848564: "Colby Abbotsford",
@@ -1588,7 +1605,7 @@ export const conceptIdToSiteSpecificLocation = {
   589224449: "Sioux Falls Imagenetics",
   777644826: "DCAM",
   111111111: "Main Campus",
-  222222222: "Frederick"
+  222222222: "Frederick",
 }
 
 export const siteSpecificLocationToConceptId = {
@@ -1611,12 +1628,13 @@ export const siteSpecificLocationToConceptId = {
   "Ingalls Harvey": 145191545,
   "River East": 489380324,
   "South Loop": 120264574,
+  "Orland Park": 940329442,
   "Rice Lake": 691714762,
   "Wisconsin Rapids": 487512085,
   "Colby Abbotsford": 983848564,
   "Minocqua": 261931804,
   "Merrill": 665277300,
-  "Fargo South University": 467088902
+  "Fargo South University": 467088902,
 }
 
 export const nameToKeyObj = 
