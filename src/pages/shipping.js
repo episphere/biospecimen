@@ -562,7 +562,7 @@ export const createShippingModalBody = (biospecimensList, masterBiospecimenId, i
     populateModalSelect(boxIdAndBagsObj);
 
     if (isBagEmpty) {
-        showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' }, true);
+        showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' });
         document.getElementById('shippingCloseButton').click();
         hideAnimation();
     }
@@ -800,7 +800,7 @@ export const generateShippingManifest = async (boxIdArray, userName, isTempMonit
         e.stopPropagation();
         const tempBoxElement = document.getElementById('tempBox');
         if (isTempMonitorIncluded && tempBoxElement.value === '') {
-            showNotifications({title: 'Missing field!', body: 'Please enter the box where the temperature monitor is being stored.'}, true);
+            showNotifications({title: 'Missing field!', body: 'Please enter the box where the temperature monitor is being stored.'});
             return;
         }
 

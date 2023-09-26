@@ -62,7 +62,7 @@ const searchSpecimenEvent = () => {
         const biospecimen = await searchSpecimen(masterSpecimenId, true);
         if (biospecimen.code !== 200 || Object.keys(biospecimen.data).length === 0) {
             hideAnimation();
-            showNotifications({ title: 'Not found', body: 'Specimen not found!' }, true)
+            showNotifications({ title: 'Not found', body: 'Specimen not found!' })
             return
         }
         const biospecimenData = biospecimen.data;
@@ -75,7 +75,7 @@ const searchSpecimenEvent = () => {
             finalizeTemplate(data, biospecimenData, true);
         }
         catch {
-            showNotifications({ title: 'Not found', body: 'Participant not found!' }, true)
+            showNotifications({ title: 'Not found', body: 'Participant not found!' })
         }
     })
 }
