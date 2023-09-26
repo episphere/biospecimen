@@ -1,10 +1,7 @@
 import { reportsNavbar } from "./reportsNavbar.js";
-import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
+import { nonUserNavBar } from "../../navbar.js";
 import { activeReportsNavbar } from "./activeReportsNavbar.js";
-import { showAnimation, hideAnimation, showNotifications,findParticipant, errorMessage, removeAllErrors, searchSpecimen, appState } from '../../shared.js';
-import { masterSpecimenIDRequirement } from '../../tubeValidation.js';
-import { finalizeTemplate } from '../finalize.js';
-import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
+import { appState } from '../../shared.js';
 import { startReport } from "../reportsQuery.js";
 
 export const bptlShipReportsScreen = async (auth, route) => {
@@ -28,6 +25,5 @@ export const bptlShipReportsScreenTemplate = async (username) => {
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
     activeReportsNavbar();
-   
 };
 
