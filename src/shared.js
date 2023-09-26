@@ -1665,6 +1665,7 @@ export const keyToLocationObj =
 {
     777644826: "UC-DCAM",
     692275326: "Marshfield",
+    567969985: "MF Pop-Up",
     698283667: "Lake Hallie",
     834825425: "HP Research Clinic",
     736183094: "HFH K-13 Research Clinic",
@@ -1674,6 +1675,8 @@ export const keyToLocationObj =
     145191545: "Ingalls Harvey",
     489380324: "River East",
     120264574: "South Loop",
+    319518299: "UCM Pop-Up",
+    940329442: "Orland Park",
     691714762: "Rice Lake",
     487512085: "Wisconsin Rapids",
     983848564: "Colby Abbotsford",
@@ -1875,8 +1878,13 @@ export const disableInput = (id, disable) => {
 
 export const siteLocations = {
     'research': {
-        'UCM': [{location: 'UC-DCAM', concept: 777644826}, {location: 'Ingalls Harvey', concept: 145191545}, {location: 'River East', concept: 489380324}, {location: 'South Loop', concept: 120264574}],
-        'MFC': [{location: 'Marshfield', concept: 692275326}, {location: 'Lake Hallie', concept: 698283667}, {location: 'Weston', concept: 813701399}, {location: 'Rice Lake', concept: 691714762}, {location: 'Wisconsin Rapids', concept: 487512085}, {location: 'Colby Abbotsford', concept: 983848564}, {location: 'Minocqua', concept: 261931804}, {location: 'Merrill', concept: 665277300}],
+        'UCM': [{location: 'UC-DCAM', concept: 777644826}, {location: 'Ingalls Harvey', concept: 145191545}, {location: 'River East', concept: 489380324}, {location: 'South Loop', concept: 120264574},
+                {location: 'UCM Pop-Up', concept: 319518299}, {location: 'Orland Park', concept: 940329442}          
+              ],
+        'MFC': [{location: 'Marshfield', concept: 692275326}, {location: 'Lake Hallie', concept: 698283667}, {location: 'Weston', concept: 813701399}, {location: 'Rice Lake', concept: 691714762}, 
+                {location: 'Wisconsin Rapids', concept: 487512085}, {location: 'Colby Abbotsford', concept: 983848564}, {location: 'Minocqua', concept: 261931804}, {location: 'Merrill', concept: 665277300},
+                {location: 'MF Pop-Up', concept: 567969985}
+              ],
         'HP': [{location: 'HP Research Clinic', concept: 834825425}],
         'HFHS': [{location: 'HFH K-13 Research Clinic', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332},
                 {location: 'HFH Livonia Research Clinic', concept: 706927479}],
