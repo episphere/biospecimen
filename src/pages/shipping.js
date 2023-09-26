@@ -342,8 +342,8 @@ export const addNewBox = async () => {
     
         const largestLocationBoxNum = largestBoxNum === -1 ? -1 : getLargestLocationBoxId(boxList, siteLocationConversion);
         const largestLocationBoxIndex = boxList.findIndex(box => box[conceptIds.shippingBoxId] === 'Box' + largestLocationBoxNum.toString());
-        const shouldCreateNewBox = Object.keys(boxList[largestLocationBoxIndex]['bags']).length !== 0 || largestLocationBoxIndex === -1;
-    
+        const shouldCreateNewBox = Object.keys(boxList[largestLocationBoxIndex]?.['bags'] ?? {}).length !== 0 || largestLocationBoxIndex === -1;
+
         if (shouldCreateNewBox) {
             const boxToAdd = await createNewBox(boxList, siteLocationConversion, siteCode, largestBoxNum, docId);
             if (!boxToAdd) {

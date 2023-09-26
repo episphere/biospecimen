@@ -1229,6 +1229,7 @@ export const siteSpecificLocation = {
   "Ingalls Harvey": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "River East": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "South Loop": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
+  "Orland Park": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "Main Campus": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
   "Frederick": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
 }
@@ -1251,7 +1252,7 @@ export const locationConceptIDToLocationMap = {
     },
   },
   752948709: {
-    siteSpecificLocation: 'Henry Ford Main Campus', // Note: should this be changed to "Henry Ford One Place"?
+    siteSpecificLocation: 'Henry Ford Main Campus',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
     loginSiteName: 'Henry Ford Health System',
@@ -1540,6 +1541,19 @@ export const locationConceptIDToLocationMap = {
       }],
     },
   },
+  940329442: {
+    siteSpecificLocation: 'Orland Park',
+    siteAcronym: 'UCM',
+    siteCode: '809703864',
+    loginSiteName: 'University of Chicago Medicine',
+    contactInfo: {
+      "UCM":[{
+        "fullName":"N/A",
+        "email":"N/A",
+        "phone":["N/A"],
+      }],
+    },
+  },
   111111111: {
     siteSpecificLocation: 'Main Campus',
     siteAcronym: 'NIH',
@@ -1557,7 +1571,7 @@ export const locationConceptIDToLocationMap = {
     contactInfo: {
       "NIH":[],
     },
-  }
+  },
 };
 
 export const conceptIdToSiteSpecificLocation = {
@@ -1576,6 +1590,7 @@ export const conceptIdToSiteSpecificLocation = {
   145191545: "Ingalls Harvey",
   489380324: "River East",
   120264574: "South Loop",
+  940329442: "Orland Park",
   691714762: "Rice Lake",
   487512085: "Wisconsin Rapids",
   983848564: "Colby Abbotsford",
@@ -1585,7 +1600,7 @@ export const conceptIdToSiteSpecificLocation = {
   589224449: "Sioux Falls Imagenetics",
   777644826: "DCAM",
   111111111: "Main Campus",
-  222222222: "Frederick"
+  222222222: "Frederick",
 }
 
 export const siteSpecificLocationToConceptId = {
@@ -1608,12 +1623,13 @@ export const siteSpecificLocationToConceptId = {
   "Ingalls Harvey": 145191545,
   "River East": 489380324,
   "South Loop": 120264574,
+  "Orland Park": 940329442,
   "Rice Lake": 691714762,
   "Wisconsin Rapids": 487512085,
   "Colby Abbotsford": 983848564,
   "Minocqua": 261931804,
   "Merrill": 665277300,
-  "Fargo South University": 467088902
+  "Fargo South University": 467088902,
 }
 
 export const nameToKeyObj = 
