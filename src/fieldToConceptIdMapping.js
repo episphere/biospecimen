@@ -20,8 +20,9 @@ export default {
     shippingLocation: 560975149,
     scannedByFirstName: 469819603,
     scannedByLastName: 618036638,
-    shippedByFirstName: 948887825,
-    shippedByLastName: 885486943,
+    shippedByFirstName: 948887825, //TODO: this is actually shipperEmail. Update all refs in next release (cleanup)
+    shippedByLastName: 885486943, //TODO: this has been removed from the data dictionary remove in next release (cleanup)
+    shipmentCourier: 666553960,
     "FedEx": 712278213,
     "World Courier": 149772928,
 
@@ -207,6 +208,58 @@ export default {
 
     clinicalSite: {
         bloodCollected: 693370086
+    },
+
+    collectionLocationMapping: {
+        777644826 : 'UC-DCAM',
+        692275326 : 'Marshfield',
+        813701399 : 'Weston',
+        698283667 : 'Lake Hallie',
+        834825425 : 'HP Research Clinic',
+        736183094 : 'HFH K-13 Research Clinic',
+        886364332 : 'HFH Cancer Pavilion Research Clinic',
+        706927479 : 'HFH Livonia Research Clinic',
+        589224449 : 'Sioux Falls Imagenetics',
+        145191545 : 'Ingalls Harvey',
+        489380324 : 'River East',
+        319518299 : 'UCM Pop-Up',
+        940329442 : 'Orland Park',
+        567969985 : 'MF Pop-Up',
+        120264574 : 'South Loop',
+        691714762 : 'Rice Lake',
+        487512085 : 'Wisconsin Rapids',
+        983848564 : 'Colby Abbotsford',
+        261931804 : 'Minocqua',
+        665277300 : 'Merrill',
+        111111111 : 'NIH/NCI',
+        807835037 : 'Other'
+    },
+
+    nameToKeyObj : {
+        'ucDcam': 777644826,
+        'marshfield': 692275326,
+        'weston': 813701399,
+        'lakeHallie': 698283667,
+        'hpRC': 834825425,
+        'hfhKRC': 736183094,
+        'hfhLRC': 706927479,
+        'hfhPRC': 886364332,
+        'sfImag': 589224449,
+        'ingHar': 145191545,
+        'rivEas': 489380324,
+        'soLo': 120264574,
+        'riLa': 691714762,
+        'wisRapids': 487512085,
+        'colAbb': 983848564,
+        'mino': 261931804,
+        'merr': 665277300,
+        'nci': 111111111,
+        'other': 807835037,
+        "ucmPopUp": 319518299,
+        "orPark": 940329442,
+        "mfPopUp": 567969985,
+        'all': 1000
+
     }
 };
 

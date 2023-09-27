@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, searchSpecimenByRequestedSite, appState } from "../../shared.js";
+import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, searchSpecimenByRequestedSiteAndBoxId, appState } from "../../shared.js";
 import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -15,7 +15,7 @@ export const packagesInTransitScreen = async (auth, route) => {
 
 const packagesInTransitTemplate = async (username, auth, route) => {
     showAnimation();
-    const response = await getAllBoxes(`bptl`);
+    const response = await getAllBoxes(`bptlPackagesInTransit`);
     hideAnimation();
     
     const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
@@ -94,15 +94,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
 export const getRecentBoxesShippedBySiteNotReceived = (boxes) => {
     // boxes are from searchBoxes endpoint
     if (boxes.length === 0) return [];
-
-    const filteredBoxesBySubmitShipmentTimeAndNotReceived = boxes.filter(boxObj => {
-        const hasShippingShipDate = boxObj[fieldToConceptIdMapping.shippingShipDate];
-        const hasNoSiteShipmentDateReceivedKey = !boxObj[fieldToConceptIdMapping.siteShipmentDateReceived];
-        const hasNotReceivedSiteShipment = boxObj[fieldToConceptIdMapping.siteShipmentReceived] === fieldToConceptIdMapping.no;
-        return hasShippingShipDate && (hasNoSiteShipmentDateReceivedKey || hasNotReceivedSiteShipment);
-    });
-
-    return filteredBoxesBySubmitShipmentTimeAndNotReceived.sort((a,b) => {
+    return boxes.sort((a,b) => {
         const shipDateA = a[fieldToConceptIdMapping.shippingShipDate];
         const shipDateB = b[fieldToConceptIdMapping.shippingShipDate];
         return (shipDateA < shipDateB) ? 1 : -1;
@@ -196,8 +188,8 @@ const manifestButton = (allBoxesShippedBySiteAndNotReceived, bagIdArr, manifestM
             } = packagesInTransitModalData
 
             manifestModalBodyEl.innerHTML = modalBody;
-            showAnimation()
-            const searchSpecimenByRequestedSiteResponse = await searchSpecimenByRequestedSite(loginSite);
+            showAnimation();
+            const searchSpecimenByRequestedSiteResponse = await searchSpecimenByRequestedSiteAndBoxId(loginSite, boxNumber);
             const searchSpecimenInstituteArray = searchSpecimenByRequestedSiteResponse?.data ?? [];
 
             modalBody = 
