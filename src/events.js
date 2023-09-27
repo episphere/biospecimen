@@ -2305,33 +2305,19 @@ export const populateBoxTable = async (page, filter, source) => {
         for (let j = 0; j < keys.length; j++) {
             numTubes += currPage['bags'][keys[j]]['arrElements'].length;
         }
-        let shippedDate = ''
-        let receivedDate = ''
-        let packagedCondition = ''
-
-        if (currPage.hasOwnProperty('656548982')) {
-            const shippedDateStr = currPage['656548982'];
-            shippedDate = retrieveDateFromIsoString(shippedDateStr)
-        }
-
-        if(currPage.hasOwnProperty('926457119')) {
-            const receivedDateStr = currPage['926457119']
-            receivedDate = retrieveDateFromIsoString(receivedDateStr)
-        }
-
-        if(currPage.hasOwnProperty('238268405')) {
-          packagedCondition = currPage['238268405']
-        }
+        const shippedDate = currPage['656548982'] ? retrieveDateFromIsoString(currPage['656548982']) : '';
+        const receivedDate = currPage['926457119'] ? retrieveDateFromIsoString(currPage['926457119']) : '';
+        const packagedCondition = currPage['238268405'] || '';
 
         currRow.insertCell(0).innerHTML = currPage[conceptIds.shippingTrackingNumber] ?? '';
         currRow.insertCell(1).innerHTML = shippedDate;
         currRow.insertCell(2).innerHTML = conceptIdToSiteSpecificLocation[currPage['560975149']];
         currRow.insertCell(3).innerHTML = currPage['132929440'];
         currRow.insertCell(4).innerHTML = '<button type="button" class="button btn btn-info" id="reportsViewManifest' + i + '">View manifest</button>';
-        currRow.insertCell(5).innerHTML = currPage.hasOwnProperty('333524031') ? "Yes" : "No"
+        currRow.insertCell(5).innerHTML = currPage['333524031'] === 353358909 ? "Yes" : "No"
         currRow.insertCell(6).innerHTML = receivedDate;
         currRow.insertCell(7).innerHTML = convertConceptIdToPackageCondition(packagedCondition, packageConditonConversion);
-        currRow.insertCell(8).innerHTML = currPage.hasOwnProperty('870456401') ? currPage['870456401'] : '' ;
+        currRow.insertCell(8).innerHTML = currPage['870456401'] || '' ;
         addEventViewManifestButton('reportsViewManifest' + i, currPage, source);
 
     }
