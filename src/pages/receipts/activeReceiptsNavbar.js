@@ -17,5 +17,5 @@ export const activeReceiptsNavbar = () => {
     csvFileReceiptNavItem.classList.add("active");
     csvFileReceiptNavItem.style.backgroundColor = "#bbcffc85";
     csvFileReceiptNavItem.style.borderRadius = "4px 4px 0 0";
-  } else return;
+  };
 };       

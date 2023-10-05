@@ -1,4 +1,4 @@
-import { addBox, appState, conceptIdToSiteSpecificLocation, displayContactInformation, getAllBoxes, getBoxes, getLocationsInstitute, hideAnimation, locationConceptIDToLocationMap,
+import { addBoxAndUpdateSiteDetails, appState, conceptIdToSiteSpecificLocation, displayContactInformation, getAllBoxes, getBoxes, getLocationsInstitute, getSiteMostRecentBoxId, hideAnimation, locationConceptIDToLocationMap,
         removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
         translateNumToType, userAuthorization } from "../shared.js"
 import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs,
@@ -314,87 +314,119 @@ const handleRemoveBagButton = (currDeleteButton, currTubes, currBoxId) => {
     });
 }
 
-// Calculate the highest existing boxId and ++ for the new box.
+// Get the highest existing boxId and ++ for the new box.
 // Create the box and add it to firestore. On success, add it to the relevant state objects (allBoxesList and boxesByLocationList, and detailedProviderBoxes).
-export const addNewBox = async () => {    
-    const siteLocation = document.getElementById('selectLocationList').value;
-    const siteLocationConversion = siteSpecificLocationToConceptId[siteLocation];
-    const siteCode = siteSpecificLocation[siteLocation]["siteCode"];
+// Important: 0 is a valid box number: only check for null and undefined boxId values, not falsy values.
+// Whether to create a new box is location specific (not site specific). Check whether location's most recent box is empty or populated.
+// Box numbering is based on site (not location), always increment highest site box number.
+// Create the new box and update the modal if the location's largest box is not empty or if the location has no current boxes.
+export const addNewBox = async () => {
+    try {
+        const siteLocation = document.getElementById('selectLocationList').value;
+        const siteLocationConversion = siteSpecificLocationToConceptId[siteLocation];
+        const siteCode = siteSpecificLocation[siteLocation]["siteCode"];    
+        const boxList = appState.getState().allBoxesList;
     
-    const boxList = appState.getState().allBoxesList;
+        const boxIdResponse = await getSiteMostRecentBoxId();
+        let docId = boxIdResponse.data.docId;
+        let largestBoxNum = boxIdResponse.data.mostRecentBoxId;
     
-    const { largestBoxIndex, largestBoxIndexAtLocation } = findLargestBoxData(boxList, siteLocation);
-    const shouldUpdateBoxModal = largestBoxIndexAtLocation !== -1 && Object.keys(boxList[largestBoxIndexAtLocation]['bags']).length !== 0;
-    
-    let largestBoxId;
-    if (shouldUpdateBoxModal) largestBoxId = boxList[largestBoxIndex][conceptIds.shippingBoxId];
-    else largestBoxId = largestBoxIndex !== -1 ? boxList[largestBoxIndex][conceptIds.shippingBoxId] : 'Box0';
-
-    if (largestBoxIndexAtLocation == -1 || shouldUpdateBoxModal) {
-        const boxToAdd = await createNewBox(boxList, siteLocationConversion, siteCode, largestBoxId, shouldUpdateBoxModal);
-        if (!boxToAdd) {
-            showNotifications({ title: 'ERROR ADDING BOX - PLEASE REFRESH YOUR BROWSER', body: 'Error: This box already exists. A member of your team may have recently created this box. Please refresh your browser and try again.' });
+        if (!docId) {
+            console.error('Error getting site details doc id');
             return false;
         }
+    
+        if (largestBoxNum == null) {
+            largestBoxNum = await getLargestBoxNumFromAllBoxes();
+        }
+    
+        const largestLocationBoxNum = largestBoxNum === -1 ? -1 : getLargestLocationBoxId(boxList, siteLocationConversion);
+        const largestLocationBoxIndex = boxList.findIndex(box => box[conceptIds.shippingBoxId] === 'Box' + largestLocationBoxNum.toString());
+        const shouldCreateNewBox = Object.keys(boxList[largestLocationBoxIndex]?.['bags'] ?? {}).length !== 0 || largestLocationBoxIndex === -1;
 
-        updateShippingStateCreateBox(boxToAdd);
-        return true;
-    } else {
+        if (shouldCreateNewBox) {
+            const boxToAdd = await createNewBox(boxList, siteLocationConversion, siteCode, largestBoxNum, docId);
+            if (!boxToAdd) {
+                showNotifications({ title: 'ERROR ADDING BOX - PLEASE REFRESH YOUR BROWSER', body: 'Error: This box already exists. A member of your team may have recently created this box. Please refresh your browser and try again.' });
+                return false;
+            }
+    
+            document.getElementById('shippingModalChooseBox').setAttribute('data-new-box', boxToAdd[conceptIds.shippingBoxId]);
+            updateShippingStateCreateBox(boxToAdd);
+            return true;
+        } else {
+            return false;
+        }
+    } catch (e) {
+        console.error('Error adding box', e);
+        showNotifications({
+            title: 'ERROR ADDING BOX',
+            body: 'An unexpected error occurred. Please try again later.'
+        });
         return false;
     }
 }
 
-const createNewBox = async (boxList, pageLocationConversion, siteCode, largestBoxId, updateBoxModal) => {
-    const newBoxNum = parseInt(largestBoxId.substring(3)) + 1;
-    const newBoxId = 'Box' + newBoxNum.toString();
+// Create the new box and add it to firestore. If the box already exists, wait one second, increment the boxId, and try again up to 3 times.
+const createNewBox = async (boxList, pageLocationConversion, siteCode, largestBoxNum, docId) => {
+    let attempts = 0;
+    let maxAttempts = 3;
+
     const boxToAdd = {
-        'bags': {},
-        [conceptIds.shippingBoxId]: newBoxId,
         [conceptIds.shippingLocation]: pageLocationConversion,
         [conceptIds.siteCode]: siteCode,
         [conceptIds.submitShipmentFlag]: conceptIds.no,
-        [conceptIds.siteShipmentReceived]: conceptIds.no
+        [conceptIds.siteShipmentReceived]: conceptIds.no,
+        ['siteDetailsDocRef']: docId,
     };
 
-    try {
-        const addBoxResponse = await addBox(boxToAdd);
-        if (addBoxResponse.message !== 'Success!') {
+    while (attempts < maxAttempts) {
+        largestBoxNum++;
+        boxToAdd[conceptIds.shippingBoxId] = 'Box' + largestBoxNum.toString();
+    
+        try {
+            const addBoxResponse = await addBoxAndUpdateSiteDetails(boxToAdd);
+            if (addBoxResponse.code === 200) {
+                boxList.push(boxToAdd);
+                return boxToAdd;
+            } else if (addBoxResponse.code === 409) {
+                attempts++;
+                await delayRetryAttempt(1000);
+                continue;
+            } else {
+                return null;
+            }
+        } catch (e) {
+            console.error('Error adding box', e);
             return null;
         }
-    } catch (e) {
-        console.error('Error adding box', e);
-        return null;
     }
-    
-    boxList.push(boxToAdd);
-    if (updateBoxModal) document.getElementById('shippingModalChooseBox').setAttribute('data-new-box', newBoxId);
 
-    return boxToAdd;
+    console.error('409 - Conflict! 3 Failed attempts creating new box.');
+    return null;
 }
 
-// Find the largest box among all boxes and the largest box at the specified location.
-const findLargestBoxData = (boxList, siteLocation) => {
-    let largestBoxId = 0; 
-    let largestBoxIndex = -1;
-    let largestLocationBoxId = 0; 
-    let largestBoxIndexAtLocation = -1;
+// Delay retry attempt for 1 second when box creation fails.
+const delayRetryAttempt = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    for (let i = 0; i < boxList.length; i++) {
-        const currBoxNum = parseInt(boxList[i][conceptIds.shippingBoxId].substring(3));
-        const currLocation = conceptIdToSiteSpecificLocation[boxList[i][conceptIds.shippingLocation]];
+// Find the largest box among all boxes. This is a fallback for new sites that have no boxes.
+// It should only execute once per new site, and only if the siteDetails collection's 'mostRecentBoxId' field is null.
+// -1 fallback value is handled in the parent function.
+const getLargestBoxNumFromAllBoxes = async () => {
+    const getAllBoxesResponse = await getAllBoxes();
+    const boxList = getAllBoxesResponse.data;
 
-        if (currBoxNum > largestBoxId) {
-            largestBoxId = currBoxNum;
-            largestBoxIndex = i;
-        }
+    return boxList.reduce((largestBoxNum, currentBox) => {
+        const currentBoxNum = parseInt(currentBox[conceptIds.shippingBoxId].substring(3));
+        return Math.max(largestBoxNum, currentBoxNum);
+    }, -1);
+}
 
-        if (currLocation == siteLocation && currBoxNum > largestLocationBoxId) {
-            largestLocationBoxId = currBoxNum;
-            largestBoxIndexAtLocation = i;
-        }
-    }
-
-    return { largestBoxIndex, largestBoxIndexAtLocation };
+// Find the largest shipping box id for the location
+// Return the highest numeric boxId or -1 if none exist
+const getLargestLocationBoxId = (boxesList, siteLocationId) => {
+    const boxIdsForLocation = boxesList.filter(box => box[conceptIds.shippingLocation] === siteLocationId).map(box => parseInt(box[conceptIds.shippingBoxId].substring(3)));
+    return boxIdsForLocation.length > 0 ? Math.max(...boxIdsForLocation) : -1;
 }
 
 export const generateBoxManifest = (currBox) => {
@@ -530,7 +562,7 @@ export const createShippingModalBody = (biospecimensList, masterBiospecimenId, i
     populateModalSelect(boxIdAndBagsObj);
 
     if (isBagEmpty) {
-        showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' }, true);
+        showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' });
         document.getElementById('shippingCloseButton').click();
         hideAnimation();
     }
@@ -768,7 +800,7 @@ export const generateShippingManifest = async (boxIdArray, userName, isTempMonit
         e.stopPropagation();
         const tempBoxElement = document.getElementById('tempBox');
         if (isTempMonitorIncluded && tempBoxElement.value === '') {
-            showNotifications({title: 'Missing field!', body: 'Please enter the box where the temperature monitor is being stored.'}, true);
+            showNotifications({title: 'Missing field!', body: 'Please enter the box where the temperature monitor is being stored.'});
             return;
         }
 
@@ -1104,7 +1136,7 @@ const renderSpecimenVerificationModal = () => {
                         <h4 style="margin-bottom:0.8rem">Select Box or Create New Box</h4>
                         <div id="create-box-success" class="alert alert-success" role="alert" style="display:none;">New box has been created
                         </div>
-                        <div id="create-box-error" class="alert alert-danger" role="alert" style="display:none;">Please add a specimen or specimens to last box
+                        <div id="create-box-error" class="alert alert-danger" role="alert" style="display:none;">Last created box is empty. Please add a specimen(s) to last box.
                         </div>
                         <select class="selectpicker" id="shippingModalChooseBox" data-new-box="" style="font-size:1.4rem;"></select>
                         <button type="button" class="btn btn-primary" id="modalAddBoxButton">Create New Box</button>

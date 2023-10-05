@@ -21,11 +21,15 @@ export const welcomeScreen = async (auth, route) => {
 }
 
 const clinicalOnlySiteArray = ['KPNW', 'KPCO', 'KPHI', 'KPGA'];
-const researchOnlySiteArray = ['MFC', 'UCM', 'HP', 'SFH'];
+const researchOnlySiteArray = ['MFC', 'UCM', 'SFH'];
 
 const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
     let dashboardSelectionStr = '';
+
+    if (location.host === urls.stage || location.host === urls.prod) { 
+        researchOnlySiteArray.push('HP')
+    }
 
     if (clinicalOnlySiteArray.includes(data.siteAcronym)) {
         dashboardSelectionStr = `                    
