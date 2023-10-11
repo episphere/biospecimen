@@ -1,7 +1,8 @@
-import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorkflow, getCheckedInVisit, updateSpecimen, appState, keyToNameObj } from "./../shared.js";
-import { addEventFinalizeForm, addEventFinalizeFormCntd, addEventReturnToCollectProcess } from "./../events.js";
+import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorkflow, updateSpecimen, appState, keyToNameObj } from "./../shared.js";
+import { addEventReturnToCollectProcess } from "./../events.js";
 import {searchTemplate} from "./dashboard.js";
-import { collectionIdSearchScreenTemplate } from "./reports/collectionIdSearch.js"
+import { collectionIdSearchScreenTemplate } from "./reports/collectionIdSearch.js";
+import conceptIds from "./../fieldToConceptIdMapping.js";
 
 export const finalizeTemplate = (data, specimenData, bptlCollectionFlag) => {
     removeActiveClass('navbar-btn', 'active')
@@ -174,8 +175,10 @@ export const finalizeTemplate = (data, specimenData, bptlCollectionFlag) => {
     });
 
     document.getElementById('finalizedConfirmButton') && document.getElementById('finalizedConfirmButton').addEventListener('click', async (e) => { 
-        specimenData['410912345'] = 353358909;
-        specimenData['556788178'] = new Date().toISOString();
+        specimenData[conceptIds.collection.isFinalized] = conceptIds.yes;
+        specimenData[conceptIds.collection.finalizedTime] = new Date().toISOString();
+        specimenData[conceptIds.boxedStatus] = conceptIds.notBoxed;
+        specimenData[conceptIds.strayTubesList] = [];
         await updateSpecimen([specimenData]);
     });
 

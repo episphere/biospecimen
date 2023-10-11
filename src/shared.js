@@ -532,19 +532,25 @@ export const checkDerivedVariables = async (array) => {
 }
 
 export const updateBox = async (box) => {
-  logAPICallStartDev('updateBox');
-  const idToken = await getIdToken();
-  let requestObj = {
-      method: "POST",
-      headers:{
-          Authorization:"Bearer "+idToken,
-          "Content-Type": "application/json"
-      },
-      body: JSON.stringify(convertToFirestoreBox(box))
-  }
-  const response = await fetch(`${api}api=updateBox`, requestObj);
-  logAPICallEndDev('updateBox');
-  return response.json();
+    try {
+        const idToken = await getIdToken();
+        const requestObj = {
+            method: "POST",
+            headers:{
+                Authorization:"Bearer "+idToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(convertToFirestoreBox(box)),
+        }  
+        const response = await fetch(`${api}api=updateBox`, requestObj);
+        if (!response.ok) {
+            throw new Error(`API responded with status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to update box:', error);
+        throw error;
+    }
 }
 
 export const updateNewTempDate = async () =>{
@@ -599,6 +605,7 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) =
     return response.json();
 }
 
+//TODO: expand this list to expand bag capacity
 export const bagConceptIdList = [
     conceptIds.bag1,
     conceptIds.bag2,
@@ -787,9 +794,117 @@ export const getAllBoxes = async (flagValue) => {
     return res;
 };
 
+export const getUnshippedBoxes = async (isBPTL = false) => {
+    logAPICallStartDev('getUnshippedBoxes');
+    try {
+        const idToken = await getIdToken();  
+        let queryString = `${api}api=getUnshippedBoxes`;
+        if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+        
+        const response = await fetch(queryString, {
+            method: 'GET',
+            headers: {
+            Authorization: 'Bearer ' + idToken,
+            }
+        });
+        const unshippedBoxRes = await response.json();
+        unshippedBoxRes.data = unshippedBoxRes.data.map(convertToOldBox);
+        logAPICallEndDev('getUnshippedBoxes');
+        return unshippedBoxRes;
+    } catch (error) {
+        console.error(error);
+        logAPICallEndDev('getUnshippedBoxes');
+        return {data: [], code: 500, message: error.message};
+    }
+};
+
+/**
+ * Get specimens by boxed status isolates only the specimens that need to be fetched/available in the shipping dashboard.
+ * @param {string} boxedStatus - boxed status of the specimens to fetch (notBoxed, partiallyBoxed, or boxed) 
+ * @param {*} isBPTL - boolean to indicate if the request is from BPTL
+ * @returns list of specimens
+ */
+export const getSpecimensByBoxedStatus = async (boxedStatus, isBPTL = false) => {
+    logAPICallStartDev('getSpecimensByBoxedStatus');
+    try {
+        const idToken = await getIdToken();  
+        let queryString = `${api}api=getSpecimensByBoxedStatus&boxedStatus=${boxedStatus}`;
+        if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+        
+        const response = await fetch(queryString, {
+            method: 'GET',
+            headers: {
+            Authorization: 'Bearer ' + idToken,
+            }
+        });
+
+        const specimensRes = await response.json();
+        logAPICallEndDev('getSpecimensByBoxedStatus');
+        return specimensRes;
+    } catch (error) {
+        console.error(error);
+        logAPICallEndDev('getSpecimensByBoxedStatus');
+        return {data: [], code: 500, message: error.message};
+    }
+};
+
+/**
+ * Get specimens from a list of boxes
+ * @param {*} boxList - list of boxes
+ * @param {*} isBPTL - boolean to indicate if the request is from BPTL
+ * @returns list of specimens
+ */
+export const getSpecimensInBoxes = async (boxList, isBPTL = false) => {
+  logAPICallStartDev('getSpecimensInBoxes');
+  const collectionIdList  = extractCollectionIdsFromBoxes(boxList);
+  const collectionIdQueryString = collectionIdList.join(',');
+
+  try {
+      const idToken = await getIdToken();  
+      let queryString = `${api}api=getSpecimensByCollectionIds&collectionIdsArray=${collectionIdQueryString}`;
+      if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+      
+      const response = await fetch(queryString, {
+          method: 'GET',
+          headers: {
+          Authorization: 'Bearer ' + idToken,
+          }
+      });
+
+      const specimensResponse = await response.json();
+      logAPICallEndDev('getSpecimensInBoxes');
+      return specimensResponse;
+  } catch (error) {
+      console.error(error);
+      logAPICallEndDev('getSpecimensInBoxes');
+      return {data: [], code: 500, message: error.message};
+  }
+};
+
+/**
+ * Extract collectionIds from a list of boxes
+ * @param {array} boxList - list of boxes to process
+ * @returns {array} - array of unique collectionIds
+ * Bag types: 787237543 (Biohazard Blood/Urine), 223999569 (Biohazard Mouthwash), 522094118 (Orphan)
+ */
+const extractCollectionIdsFromBoxes = (boxList) => {
+  const collectionIdSet = new Set();
+
+  boxList.forEach(box => {
+      const bags = Object.keys(box.bags).filter(bag => bag && bag !== 'undefined' && bag !== 'unlabelled');
+      const unlabelledTubes = box.bags.unlabelled?.arrElements || [];
+      
+      [...bags, ...unlabelledTubes].forEach(item => {
+          const collectionId = item.split(' ')[0];
+          collectionId && collectionIdSet.add(collectionId);
+      });
+  });
+
+  return Array.from(collectionIdSet);
+}
+
 // searches boxes collection by login site (789843387) and Site-specific location id (560975149)
 // filters out any boxes where submitShipmentFlag is true
-// TODO: future: recommend adding 145971562 (shipment submitted flag = no) to all boxes on creation. Then we can rewrite the searchBoxesByLocation function to only return boxes where this variable is no (not shipped)
 export const getBoxesByLocation = async (location) => {
     logAPICallStartDev('getBoxesByLocation');
     const idToken = await getIdToken();
@@ -833,20 +948,31 @@ export const getParticipantCollections = async (token) => {
     return response.json();
 }
 
-export const removeBag = async(boxId, bags) => {
-    const currDate = new Date().toISOString();
-    const bagDataToRemove = {boxId:boxId, bags:bags, date:currDate}
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=removeBag`, {
-        method: "POST",
-        headers: {
-            Authorization:"Bearer "+idToken,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(bagDataToRemove)
-    });
-    return await response.json();
-}
+export const removeBag = async (boxId, bags) => {
+    try {
+        const currDate = new Date().toISOString();
+        const bagDataToRemove = {boxId: boxId, bags: bags, date: currDate};
+        const idToken = await getIdToken();
+
+        const response = await fetch(`${api}api=removeBag`, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + idToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(bagDataToRemove)
+        });
+
+        if (!response.ok) {
+            throw new Error(`API responded with status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to remove bag:', error);
+        throw error;
+    }
+};
 
 /**
  * Fetches biospecimen collection data from the database
@@ -2490,25 +2616,6 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
         await sendClientEmail(emailData);
     }
 }
-
-/**
- * Block subsequent requests before the first request is completed, with a 5-second timeout.
- */
-export const requestsBlocker = {
-  isReqInProcess: false,
-  block() {
-    this.isReqInProcess = true;
-    setTimeout(() => {
-      this.isReqInProcess = false;
-    }, 5000);
-  },
-  unblock() {
-    this.isReqInProcess = false;
-  },
-  isBlocking() {
-    return this.isReqInProcess;
-  },
-};
 
 export const restrictNonBiospecimenUser = () => {
   document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";

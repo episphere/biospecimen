@@ -1,4 +1,4 @@
-import { addBoxAndUpdateSiteDetails, appState, conceptIdToSiteSpecificLocation, displayContactInformation, getAllBoxes, getBoxes, getLocationsInstitute, getSiteMostRecentBoxId, hideAnimation, locationConceptIDToLocationMap,
+import { addBoxAndUpdateSiteDetails, appState, conceptIdToSiteSpecificLocation, displayContactInformation, getAllBoxes, getBoxes, getSpecimensInBoxes, getUnshippedBoxes, getLocationsInstitute, getSiteMostRecentBoxId, getSpecimensByBoxedStatus, hideAnimation, locationConceptIDToLocationMap,
         removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
         translateNumToType, userAuthorization } from "../shared.js"
 import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs,
@@ -68,6 +68,31 @@ const buildShippingDOM = () => {
 const buildShippingInterface = async (userName, loadFromState, currBoxId) => {    
     showAnimation();
 
+    //TODO: implement notBoxed, partiallyBoxed, and boxed functionality per excel doc.
+        // √ TODO assign notBoxed property to specimen when it is finalized
+        // √ TODO write cloud function to update dev 'biospecimen' data: add 'boxed' property to each specimen doc.
+            // √ execute as a loop on a site-by-site basis (keep data size manageable)
+            // √ fetch all existing boxes for site
+            // √ fetch existing specimens for site
+            // √ filter similar to existing filtering function, but be sure to label everything into categories (for updating)
+            // √ for each box, find specimens in the box
+                // √ for each specimen doc, add boxed property
+                    // √ if all specimens are in boxes = boxed
+                    // √ if some specimens are in boxes = partiallyBoxed
+                    // √ if no specimens are in boxes = notBoxed
+                        // √ pay attention do unshippable deviations - be sure to handle these
+                        // √ dry runs are critical for this
+
+        //TODO: get site boxes: where boxes are unshipped (in process)
+        //const getBoxesResponse = await getUnshippedBoxes();
+        //TODO: get site specimens: where specimens are notBoxed
+        //const unboxedSpecimens = await getSpecimensByBoxedStatus('notBoxed');
+        //TODO: get site specimens: where specimens are partiallyBoxed: these are stray tubes.
+        //const partiallyBoxedSpecimens = await getSpecimensByBoxedStatus('partiallyBoxed');
+        // √ TODO get site specimens: where specimens are boxed and in unshipped boxes.
+        //const boxedSpecimens = await getSpecimensInBoxes(boxList);
+        
+
     let allBoxesList;
     let availableLocations;
 
@@ -76,8 +101,15 @@ const buildShippingInterface = async (userName, loadFromState, currBoxId) => {
         allBoxesList = appState.getState().allBoxesList;
     } else {
         const getAllBoxesResponse = await getAllBoxes();
+        // TODO: replace getAllBoxes with getUnshippedBoxes;
+        //const getAllBoxesResponse = await getUnshippedBoxes();
         allBoxesList = getAllBoxesResponse.data;
     }
+
+    // //// TEMP for TESTING ONLY
+    // const boxList = allBoxesList.filter(box => box[conceptIds.submitShipmentFlag] === conceptIds.no);
+    // const boxedSpecimens = await getSpecimensInBoxes(boxList);
+    // console.log('boxedSpecimens', boxedSpecimens);
 
     const promiseResponse = await Promise.all([
         populateAvailableCollectionsList(allBoxesList, loadFromState),
@@ -130,7 +162,7 @@ const populateAvailableCollectionsList = async (boxList, loadFromState = false) 
     if (!loadFromState) {
         ({ finalizedSpecimenList, availableCollectionsObj } = await getInstituteSpecimensList(boxList));
     }
-
+    console.log('finalizedSpecimenList', finalizedSpecimenList.filter(specimen => specimen['820476880'] == 'CXA441336'));
     const bagIdList = Object.keys(availableCollectionsObj).sort();
 
     const tableEle = document.getElementById("specimenList");
@@ -167,6 +199,7 @@ const populateAvailableCollectionsList = async (boxList, loadFromState = false) 
         specimenPanel.style.height = '550px';
 
         const orphanTubeIdList = availableCollectionsObj['unlabelled'];
+        console.log('orphanTubeIdList', orphanTubeIdList);
         const rowEle = orphanTableEle.insertRow();
         rowEle.insertCell(0).innerHTML = 'Stray tubes';
         rowEle.insertCell(1).innerHTML = orphanTubeIdList.length;
@@ -298,28 +331,42 @@ export const populateViewShippingBoxContentsList = (selectedBoxId) => {
 // Remove a bag from a box
 const handleRemoveBagButton = (currDeleteButton, currTubes, currBoxId) => {
     currDeleteButton.addEventListener("click", async e => {
+        e.preventDefault();
         showAnimation();
+        
         const row = e.target.closest('tr');
         const currBagId = row.cells[0].innerText;
-        const bagsToRemove = currBagId === "unlabelled" ? currTubes : [currBagId];        
-        const removeBagResponse = await removeBag(currBoxId, bagsToRemove);
-        hideAnimation();
+        const bagsToRemove = currBagId === "unlabelled" ? currTubes : [currBagId];
+        
+        try {
+            const removeBagResponse = await removeBag(currBoxId, bagsToRemove);
+            hideAnimation();
 
-        if (removeBagResponse.code === 200) {
-            updateShippingStateRemoveBagFromBox(currBoxId, currBagId, bagsToRemove);
-            startShipping(appState.getState().userName, true, currBoxId);
-        } else {
-            showNotifications({ title: 'Error removing bag', body: 'We experienced an error removing this bag. Please try again.' });
+            if (removeBagResponse.code === 200) {
+                updateShippingStateRemoveBagFromBox(currBoxId, currBagId, bagsToRemove);
+                await startShipping(appState.getState().userName, true, currBoxId);
+            } else {
+                console.error('Failed to remove bag.', removeBagResponse);
+                showNotifications({ title: 'Error removing bag', body: 'Error removing this bag. Please try again.' });
+            }
+        } catch (error) {
+            hideAnimation();
+            console.error('Failed to remove bag.', error);
+            showNotifications({ title: 'Error removing bag', body: `There was an error removing this bag. Please try again.` });
         }
     });
 }
 
-// Get the highest existing boxId and ++ for the new box.
-// Create the box and add it to firestore. On success, add it to the relevant state objects (allBoxesList and boxesByLocationList, and detailedProviderBoxes).
-// Important: 0 is a valid box number: only check for null and undefined boxId values, not falsy values.
-// Whether to create a new box is location specific (not site specific). Check whether location's most recent box is empty or populated.
-// Box numbering is based on site (not location), always increment highest site box number.
-// Create the new box and update the modal if the location's largest box is not empty or if the location has no current boxes.
+/**
+ * Add a new box with a new boxId.
+ * @returns {boolean} - true on success, false on failure.
+ * Get the highest existing boxId and ++ for the new box.
+ * Create the box and add it to firestore. On success, add it to the relevant state objects (allBoxesList and boxesByLocationList, and detailedProviderBoxes).
+ * Important: 0 is a valid box number: only check for null and undefined boxId values, not falsy values.
+ * The decision to create a new box is location specific (not site specific). Check whether location's most recent box is empty or populated.
+ * Box numbering is based on site (not location), always increment highest *site* box number.
+ * Create the new box and update the modal if the location's largest box is not empty or if the location has no current boxes.
+ */
 export const addNewBox = async () => {
     try {
         const siteLocation = document.getElementById('selectLocationList').value;
@@ -647,13 +694,14 @@ export const processCheckedModalElements = (boxIdAndBagsObj, bagId, boxId, isOrp
     return boxIdAndBagsObj;
 }
 
-export const prepareBoxToUpdate = (boxId, boxList, boxIdAndBagsObj, locations) => {
+export const prepareBoxToUpdate = (boxId, boxList, boxIdAndBagsObj, locations, addedTubes) => {
     const currTime = new Date().toISOString();
     const foundBox = boxList.find(box => box[conceptIds.shippingBoxId] == boxId) || {};
 
     return {
         ...foundBox,
         'bags': boxIdAndBagsObj[boxId],
+        'addedTubes': addedTubes,
         [conceptIds.shippingShipDateModify]: currTime,
         [conceptIds.shippingBoxId]: boxId,
         [conceptIds.shippingLocation]: locations[boxId],

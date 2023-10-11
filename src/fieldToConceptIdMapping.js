@@ -119,6 +119,7 @@ export default {
     notFoundSpecimenDeviation: 982885431,
 
     // shipment id
+    //TODO: expand this list to expand bag capacity
     bag1: 650224161,
     bag2: 136341211,
     bag3: 503046679,
@@ -260,6 +261,12 @@ export default {
         "mfPopUp": 567969985,
         'all': 1000
 
-    }
+    },
+
+    boxedStatus: 771580890,
+    notBoxed: 657483796,
+    partiallyBoxed: 775512390,
+    boxed: 210720511,
+    strayTubesList: 742186726,
 };
 
