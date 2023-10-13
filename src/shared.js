@@ -585,7 +585,7 @@ export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
     }
 }
 
-export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters, source) => {
+export const getPage = async (pageNumber, elementsPerPage, orderBy, filters, source) => {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -593,9 +593,7 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters, s
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(
-            {"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy, "filters":filters, "source": source}
-          )
+        body: JSON.stringify({pageNumber, elementsPerPage, orderBy, filters, source})
     }
     const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
     return response.json();
@@ -980,22 +978,19 @@ export const getLocationsInstitute = async () => {
     logAPICallEndDev('getLocationsInstitute');
     return locations;
 }
-
-export const getNumPages = async (numPerPage, filter) => {
-   // logAPICallStartDev('getNumPages');
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=getNumBoxesShipped`, {
-        method: "POST",
-        headers: {
-            Authorization:"Bearer "+idToken,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(filter)
-    });
-    let res = await response.json();
-    let numBoxes = res.data;
-  //  logAPICallEndDev('getNumPages');
-    return Math.ceil(numBoxes/numPerPage);
+export const getNumPages = async (numPerPage, filters, source) => {
+   const idToken = await getIdToken();
+   const response = await fetch(`${api}api=getNumBoxesShipped`, {
+       method: "POST",
+       headers: {
+           Authorization:"Bearer "+idToken,
+           "Content-Type": "application/json"
+       },
+       body: JSON.stringify({filters, source})
+   });
+   let res = await response.json();
+   let numBoxes = res.data;
+   return Math.ceil(numBoxes/numPerPage);
 }
 
 export const getSiteCouriers = async () => {
