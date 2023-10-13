@@ -2445,7 +2445,7 @@ export const addPaginationFunctionality = (lastPage, filter, source) => {
 
     previous.addEventListener('click', () => {
         middleNumber.innerHTML = middleNumber.innerHTML == '1' ? '1' : parseInt(middleNumber.innerHTML) - 1;
-        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, source)
+        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter, source)
     })
 
     next.addEventListener('click', () => {
@@ -2489,8 +2489,8 @@ export const addEventFilter = (source) => {
 
         }
         populateBoxTable(0, filter, source);
-        let numPages = await getNumPages(5, filter);
-        addPaginationFunctionality(numPages, filter);
+        let numPages = await getNumPages(5, filter, source);
+        addPaginationFunctionality(numPages, filter, source);
     });
 }
 
