@@ -586,6 +586,7 @@ export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
 }
 
 export const getPage = async (pageNumber, elementsPerPage, orderBy, filters, source) => {
+  try {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -597,6 +598,10 @@ export const getPage = async (pageNumber, elementsPerPage, orderBy, filters, sou
     }
     const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
     return response.json();
+  } 
+  catch (error) {
+    return {code: 500, message: error.message};
+  }
 }
 
 export const bagConceptIdList = [
@@ -979,18 +984,23 @@ export const getLocationsInstitute = async () => {
     return locations;
 }
 export const getNumPages = async (numPerPage, filters, source) => {
-   const idToken = await getIdToken();
-   const response = await fetch(`${api}api=getNumBoxesShipped`, {
-       method: "POST",
-       headers: {
-           Authorization:"Bearer "+idToken,
-           "Content-Type": "application/json"
-       },
-       body: JSON.stringify({filters, source})
-   });
-   let res = await response.json();
-   let numBoxes = res.data;
-   return Math.ceil(numBoxes/numPerPage);
+  try {
+    const idToken = await getIdToken();
+    const response = await fetch(`${api}api=getNumBoxesShipped`, {
+        method: "POST",
+        headers: {
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({filters, source})
+    });
+    let res = await response.json();
+    let numBoxes = res.data;
+    return Math.ceil(numBoxes/numPerPage);
+  }
+  catch (error) {
+    return {code: 500, message: error.message};
+  }
 }
 
 export const getSiteCouriers = async () => {
