@@ -517,7 +517,7 @@ export const updateSpecimen = async (array) => {
     return response.json();
 }
 
-export const checkDerivedVariables = async (array) => {
+export const checkDerivedVariables = async (participantObjToken) => {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -525,7 +525,7 @@ export const checkDerivedVariables = async (array) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(array)
+        body: JSON.stringify(participantObjToken)
     }
     const response = await fetch(`${api}api=checkDerivedVariables`, requestObj);
     return response.json();
