@@ -2290,7 +2290,8 @@ const tubeOrder = [
   "0004", //"EDTA/Lavender"
   "0014", //"EDTA/Lavender"
   "0024", //"EDTA/Lavender"
-  "0005", //"ACD/Yellow"
+  "0005", //"ACD/Yellow",
+  "0060", //"Streck Tube"
   "0006", //"Urine/Yellow"
   "0016", //"Urine Cup"
   "0007", //"Mouthwash Container"
@@ -2382,6 +2383,7 @@ export const translateNumToType = {
   "0003": "Heparin/Green",
   "0004": "EDTA/Lavender",
   "0005": "ACD/Yellow",
+  "0060": "Streck/Black-Tan",
   "0006": "Urine/Yellow",
   "0007": "Mouthwash Container",
   "0011": "SST/Gold or Red",
