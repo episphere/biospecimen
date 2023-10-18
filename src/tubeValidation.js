@@ -54,6 +54,7 @@ export const specimenCollection = {
     '0013': '958646668',
     '0014': '677469051',
     '0024': '683613884',
+    '0060': '505347689',
   },
   cidToNum: {
     299553921: '0001',
@@ -71,6 +72,7 @@ export const specimenCollection = {
     958646668: '0013',
     677469051: '0014',
     683613884: '0024',
+    505347689: '0060',
   },
   tubeNumList: [
     '0001',
@@ -87,6 +89,7 @@ export const specimenCollection = {
     '0013',
     '0014',
     '0024',
+    '0060',
   ],
   tubeCidList: [
     '299553921',
@@ -103,6 +106,7 @@ export const specimenCollection = {
     '958646668',
     '677469051',
     '683613884',
+    '505347689',
   ],
 };
 
@@ -321,6 +325,8 @@ const tube0009 = {
     'deviationChkBox': false
 };
 
+//TODO: define streck tube here and in workflows beneath
+
 export const workflows = {
     research : [
         tube0001,
@@ -407,6 +413,7 @@ export const additionalTubeIDRequirement = {
     length: 4
 }
 
+//TODO: add streck tube
 export const tubes = [
   tube0001,
   tube0002,

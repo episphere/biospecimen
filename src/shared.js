@@ -532,6 +532,7 @@ export const checkDerivedVariables = async (array) => {
 }
 
 export const updateBox = async (box) => {
+    //console.log('boxJSON', JSON.stringify(convertToFirestoreBox(box)));
     try {
         const idToken = await getIdToken();
         const requestObj = {
@@ -541,11 +542,14 @@ export const updateBox = async (box) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(convertToFirestoreBox(box)),
-        }  
+        }
+
         const response = await fetch(`${api}api=updateBox`, requestObj);
+        
         if (!response.ok) {
             throw new Error(`API responded with status: ${response.status}`);
         }
+        
         return await response.json();
     } catch (error) {
         console.error('Failed to update box:', error);
@@ -605,7 +609,6 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) =
     return response.json();
 }
 
-//TODO: expand this list to expand bag capacity
 export const bagConceptIdList = [
     conceptIds.bag1,
     conceptIds.bag2,
@@ -622,6 +625,31 @@ export const bagConceptIdList = [
     conceptIds.bag13,
     conceptIds.bag14,
     conceptIds.bag15,
+    conceptIds.bag16,
+    conceptIds.bag17,
+    conceptIds.bag18,
+    conceptIds.bag19,
+    conceptIds.bag20,
+    conceptIds.bag21,
+    conceptIds.bag22,
+    conceptIds.bag23,
+    conceptIds.bag24,
+    conceptIds.bag25,
+    conceptIds.bag26,
+    conceptIds.bag27,
+    conceptIds.bag28,
+    conceptIds.bag29,
+    conceptIds.bag30,
+    conceptIds.bag31,
+    conceptIds.bag32,
+    conceptIds.bag33,
+    conceptIds.bag34,
+    conceptIds.bag35,
+    conceptIds.bag36,
+    conceptIds.bag37,
+    conceptIds.bag38,
+    conceptIds.bag39,
+    conceptIds.bag40,
 ];
   
 const bagConversionKeys = [
@@ -796,27 +824,103 @@ export const getAllBoxes = async (flagValue) => {
 
 export const getUnshippedBoxes = async (isBPTL = false) => {
     logAPICallStartDev('getUnshippedBoxes');
-    try {
-        const idToken = await getIdToken();  
-        let queryString = `${api}api=getUnshippedBoxes`;
-        if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+    //TODO: remove mock data
+    const unshippedBoxRes = mockUnshippedBoxes;
+    unshippedBoxRes.data = unshippedBoxRes.data.map(convertToOldBox);
+    logAPICallEndDev('getUnshippedBoxes');
+    return unshippedBoxRes;
+    
+    //TODO: reactivate when API is ready
+    // try {
+    //     const idToken = await getIdToken();  
+    //     let queryString = `${api}api=getUnshippedBoxes`;
+    //     if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
         
-        const response = await fetch(queryString, {
-            method: 'GET',
-            headers: {
-            Authorization: 'Bearer ' + idToken,
-            }
-        });
-        const unshippedBoxRes = await response.json();
-        unshippedBoxRes.data = unshippedBoxRes.data.map(convertToOldBox);
-        logAPICallEndDev('getUnshippedBoxes');
-        return unshippedBoxRes;
-    } catch (error) {
-        console.error(error);
-        logAPICallEndDev('getUnshippedBoxes');
-        return {data: [], code: 500, message: error.message};
-    }
+    //     const response = await fetch(queryString, {
+    //         method: 'GET',
+    //         headers: {
+    //         Authorization: 'Bearer ' + idToken,
+    //         }
+    //     });
+    //     const unshippedBoxRes = await response.json();
+    //     unshippedBoxRes.data = unshippedBoxRes.data.map(convertToOldBox);
+    //     logAPICallEndDev('getUnshippedBoxes');
+    //     return unshippedBoxRes;
+    // } catch (error) {
+    //     console.error(error);
+    //     logAPICallEndDev('getUnshippedBoxes');
+    //     return {data: [], code: 500, message: error.message};
+    // }
 };
+
+// TODO: remove mock data
+const mockUnshippedBoxes = {
+    "data": [
+      {
+        "132929440": "Box96",
+        "145971562": 104430631,
+        "333524031": 104430631,
+        "555611076": "2023-10-12T16:57:11.035Z",
+        "560975149": 111111111,
+        "650224161": {
+          "223999569": "",
+          "234868461": [
+            "CXA123424 0005"
+          ],
+          "255283733": 353358909,
+          "469819603": "joe.armani@nih.gov",
+          "522094118": "CXA123424 0005",
+          "787237543": ""
+        },
+        "672863981": "2023-10-12T16:57:11.035Z",
+        "789843387": 13,
+        "842312685": 353358909
+      },
+      {
+        "132929440": "Box88",
+        "145971562": 104430631,
+        "333524031": 104430631,
+        "555611076": "2023-10-16T17:07:10.538Z",
+        "560975149": 222222222,
+        "650224161": {
+          "223999569": "",
+          "234868461": [
+            "CXA005771 0001"
+          ],
+          "255283733": 104430631,
+          "469819603": "joe.armani@nih.gov",
+          "522094118": "",
+          "787237543": "CXA005771 0008"
+        },
+        "672863981": "2023-09-13T21:12:04.671Z",
+        "789843387": 13,
+        "842312685": 104430631,
+        "siteDetailsDocRef": "ctc6i6X382gdftWDaR8K"
+      },
+      {
+        "132929440": "Box92",
+        "145971562": 104430631,
+        "333524031": 104430631,
+        "555611076": "2023-10-05T17:56:18.407Z",
+        "560975149": 222222222,
+        "650224161": {
+          "223999569": "CXA742008 0009",
+          "234868461": [
+            "CXA742008 0007"
+          ],
+          "255283733": 104430631,
+          "469819603": "joe.armani@nih.gov",
+          "522094118": "",
+          "787237543": ""
+        },
+        "672863981": "2023-09-26T18:15:03.863Z",
+        "789843387": 13,
+        "842312685": 104430631,
+        "siteDetailsDocRef": "ctc6i6X382gdftWDaR8K"
+      }
+    ],
+    "code": 200
+  }
 
 /**
  * Get specimens by boxed status isolates only the specimens that need to be fetched/available in the shipping dashboard.
@@ -825,28 +929,2736 @@ export const getUnshippedBoxes = async (isBPTL = false) => {
  * @returns list of specimens
  */
 export const getSpecimensByBoxedStatus = async (boxedStatus, isBPTL = false) => {
-    logAPICallStartDev('getSpecimensByBoxedStatus');
-    try {
-        const idToken = await getIdToken();  
-        let queryString = `${api}api=getSpecimensByBoxedStatus&boxedStatus=${boxedStatus}`;
-        if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
-        
-        const response = await fetch(queryString, {
-            method: 'GET',
-            headers: {
-            Authorization: 'Bearer ' + idToken,
-            }
-        });
-
-        const specimensRes = await response.json();
-        logAPICallEndDev('getSpecimensByBoxedStatus');
-        return specimensRes;
-    } catch (error) {
-        console.error(error);
-        logAPICallEndDev('getSpecimensByBoxedStatus');
-        return {data: [], code: 500, message: error.message};
+    //logAPICallStartDev('getSpecimensByBoxedStatus');
+    // TODO: remove this mock call
+    if (boxedStatus === '657483796') {
+        return buildAvailableCollectionsObject(mockUnboxedSpecimens.data, false);
+    } else if (boxedStatus === '775512390') {
+        //const partiallyBoxedSpecimens = getPartiallyBoxedSpecimens(mockPartiallyBoxedSpecimens.data);
+        return buildAvailableCollectionsObject(mockPartiallyBoxedSpecimens.data, true);
+    } else {
+        return 'BAD ARG IN getSpecimensByBoxedStatus()';
     }
+    // TODO: reactivate when API is ready
+    // try {
+    //     const idToken = await getIdToken();  
+    //     let queryString = `${api}api=getSpecimensByBoxedStatus&boxedStatus=${boxedStatus}`;
+    //     if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+        
+    //     const response = await fetch(queryString, {
+    //         method: 'GET',
+    //         headers: {
+    //         Authorization: 'Bearer ' + idToken,
+    //         }
+    //     });
+
+    //     const specimensRes = await response.json();
+    //     logAPICallEndDev('getSpecimensByBoxedStatus');
+    //     return specimensRes;
+    // } catch (error) {
+    //     console.error(error);
+    //     logAPICallEndDev('getSpecimensByBoxedStatus');
+    //     return {data: [], code: 500, message: error.message};
+    // }
 };
+
+/**
+ * Combine the Available Collections objects from the unboxed and partially boxed specimens.
+ * @param {object} obj1 - fetched and arranged available collections object.
+ * @param {object} obj2 - fetched and arranged available collections object.
+ * @returns {object} availableCollectionsObject - combined available collections object without duplicates
+ * Get unique keys from both objects. Combine and de-duplicate if key exists in both objects. Else take the key from the object that has it.
+ */
+export const combineAvailableCollectionsObjects = (obj1, obj2) => {
+    const availableCollectionsObject = {};
+    const availableCollectionKeys = [...new Set([...Object.keys(obj1), ...Object.keys(obj2)])];
+
+    for (let key of availableCollectionKeys) {
+        if (obj1[key] && obj2[key]) {
+            availableCollectionsObject[key] = [...new Set([...obj1[key], ...obj2[key]])];
+        } else if (obj1[key]) {
+            availableCollectionsObject[key] = obj1[key];
+        } else {
+            availableCollectionsObject[key] = obj2[key];
+        }
+    }
+    return availableCollectionsObject;
+}
+
+/**
+ * Build the available collections object. Remove unusable tubes.
+ * Filter tubes (available collections vs strays) for use in the shipping dashboard.
+ * @param {array<object>} specimensList - list of specimens from Firestore.
+ * @param {boolean} isPartiallyBoxed - boolean to indicate if the request is for partially boxed specimens. 
+ * @returns {object} { availableCollections, specimensList } - available collections object and the updated specimens list.
+ * Note: Mouthwash tubes are always solo. They belong in available collections. The tube number is always '0007', the bag number is always '0009'.
+ */
+const buildAvailableCollectionsObject = (specimensList, isPartiallyBoxed) => {
+    const availableCollections = {};
+    for (let specimen of specimensList) {
+        const usableTubesObj = arrangeFetchedTubes(specimen, isPartiallyBoxed);
+        const usableBagKeys = Object.keys(usableTubesObj);
+        for (const bagKey of usableBagKeys) {
+            if (!availableCollections[bagKey]) {
+                availableCollections[bagKey] = [];
+            }
+            availableCollections[bagKey] = [...availableCollections[bagKey], ...usableTubesObj[bagKey]];
+        }
+    }
+    return { availableCollections, specimensList };
+}
+
+/**
+ * Handle the fetched specimen docs. Remove the unusable (deviated or missing) tubes, then arrange remaining tubes for available collections and the stray tube list.
+ * This function mutates the specimen object from the calling function AND returns the usableTubes object.
+ * @param {object} specimen - specimen object
+ * @returns {object} usableTubes - usable tubes from the specimen that are usable
+ */
+const arrangeFetchedTubes = (specimen, isPartiallyBoxed) => {
+    const usableTubes = {};
+    
+    const collectionId = specimen[conceptIds.collection.id];
+    if (!collectionId) return;
+    const bloodUrineCollection = `${collectionId} 0008`;
+    const mouthwashCollection = `${collectionId} 0009`;
+    
+    const tubeDataObject = removeUnusableTubes(specimen);
+    const allTubeIdsInSpecimen = Object.values(tubeDataObject);
+
+    const allMouthwashTubes = allTubeIdsInSpecimen.filter(tubeId => tubeId.split(' ')[1] === '0007');
+    const allBloodUrineTubes = allTubeIdsInSpecimen.filter(tubeId => tubeId.split(' ')[1] !== '0007');
+    let strayTubeArray = specimen[conceptIds.strayTubesList] ?? [];
+
+    // Handle mouthwash tubes. Mouthwash tubes always belong in available collections.
+    // If mouthwash tube is in stray tubes (this happens for partiallyBoxed specimens when other tubes in the specimen are boxed first),
+    // add it to available collections and remove from stray tubes list.
+    if (allMouthwashTubes.length > 0) {
+        usableTubes[mouthwashCollection] = allMouthwashTubes.map(str => str.slice(-4));
+        
+        if (isPartiallyBoxed) {
+            const index = strayTubeArray.findIndex(str => str.endsWith('0007'));
+            if (index !== -1) {
+                const mouthwashTube = strayTubeArray[index];
+                strayTubeArray.splice(index, 1);
+            }
+        }
+    }
+    
+    // Compare all blood/urine tubes to stray tubes list.
+    // If all allBloodUrineTubes are in the strayTubesList, add them to available collections and remove from stray tubes list.
+    if (allBloodUrineTubes.length > 0) {
+        if (isPartiallyBoxed || strayTubeArray.length > 0) {
+            const areAllTubesInStrayTubeArray = allBloodUrineTubes.every(tubeId => strayTubeArray.includes(tubeId));
+            if (areAllTubesInStrayTubeArray) {
+                usableTubes[bloodUrineCollection] = allBloodUrineTubes.map(str => str.slice(-4));
+                strayTubeArray = strayTubeArray.filter(tubeId => !allBloodUrineTubes.includes(tubeId));
+            }
+        } else {
+            usableTubes[bloodUrineCollection] = allBloodUrineTubes.map(str => str.slice(-4));
+        }
+    }
+    
+    // Assign the 'unlabelled' tubes for use in the available collections object.
+    if (strayTubeArray.length !== 0) usableTubes['unlabelled'] = strayTubeArray;
+
+    return usableTubes;
+}
+
+const tubeDeviationFlags = [
+    conceptIds.collection.deviationType.broken,
+    conceptIds.collection.deviationType.discard,
+    conceptIds.collection.deviationType.insufficientVolume,
+    conceptIds.collection.deviationType.mislabel,
+    conceptIds.collection.deviationType.notFound,
+];
+
+/**
+ * Remove deviated unshippable tubes and missing tubes from the specimen object. Do not remove deviated shippable tubes.
+ * @param {object} specimen - specimen object from the Firestore.
+ */
+const removeUnusableTubes = (specimen) => {
+    const tubeDataObject = {};
+    tubeLoop: for (const tubeKey of specimenCollection.tubeCidList) {
+        const tube = specimen[tubeKey];
+
+        if (!tube || !tube[conceptIds.collection.tube.scannedId]) {
+            delete specimen[tubeKey];
+            continue;
+        }
+
+        if (tube[conceptIds.discardFlag] === conceptIds.yes) {
+            delete specimen[tubeKey];
+            continue;
+        }
+
+        if (tube[conceptIds.collection.tube.isMissing] === conceptIds.yes) {
+            delete specimen[tubeKey];
+            continue;
+        }
+
+        // This is a sanity check, but hasn't been needed in testing. All applicable tubes have been filtered by the discard flag.
+        const tubeDeviation = tube[conceptIds.collection.tube.deviation];
+        for (const deviationFlag of tubeDeviationFlags) {
+            if (tubeDeviation?.[deviationFlag] === conceptIds.yes) {
+                delete specimen[tubeKey];
+                continue tubeLoop;
+            }
+        }
+        tubeDataObject[tubeKey] = tube[conceptIds.collection.tube.scannedId];  
+    };
+    return tubeDataObject;
+}
+
+const mockUnboxedSpecimens = {
+    "data": [
+      {
+        "232343615": {
+          "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA975315 0012"
+        },
+        "299553921": {
+          "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA975315 0001"
+        },
+        "331584571": 266600170,
+        "338570265": "",
+        "376960806": {
+          "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA975315 0011"
+        },
+        "410912345": 353358909,
+        "454453939": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA975315 0004"
+        },
+        "556788178": "2023-09-20T18:02:58.831Z",
+        "589588440": {
+          "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 104430631,
+          "678857215": 104430631,
+          "762124027": 104430631
+        },
+        "646899796": 44558822,
+        "650516960": 664882224,
+        "652357376": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA975315 0005"
+        },
+        "677469051": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA975315 0014"
+        },
+        "683613884": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 104430631,
+          "678857215": 104430631,
+          "762124027": 104430631
+        },
+        "703954371": {
+          "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA975315 0002"
+        },
+        "742186726": [],
+        "771580890": 657483796,
+        "787237543": {
+          "593843561": 353358909,
+          "825582494": "CXA975315 0008"
+        },
+        "820476880": "CXA975315",
+        "827220437": 13,
+        "838567176": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA975315 0003"
+        },
+        "915838974": "2023-09-20T18:01:54.469Z",
+        "958646668": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA975315 0013"
+        },
+        "973670172": {
+          "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "956345366": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 104430631,
+          "678857215": 104430631,
+          "762124027": 104430631
+        },
+        "Connect_ID": 7550468890,
+        "siteAcronym": "NIH",
+        "id": "aabb9fd3-8d71-4b87-97a5-d1a02bb698f9",
+        "token": "5a45760f-cde1-4934-82de-3c1397639788"
+      },
+      {
+        "143615646": {
+          "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "684617815": 104430631,
+            "728366619": 104430631,
+            "742806035": 104430631,
+            "757246707": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA051919 0007"
+        },
+        "223999569": {
+          "593843561": 353358909,
+          "825582494": "CXA051919 0051"
+        },
+        "299553921": {
+          "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA051919 0001"
+        },
+        "331584571": 266600170,
+        "338570265": "",
+        "410912345": 353358909,
+        "454453939": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "338286049": "",
+          "593843561": 104430631,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "883732523": 234139565
+        },
+        "556788178": "2023-09-18T17:15:41.610Z",
+        "650516960": 534621077,
+        "652357376": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "338286049": "",
+          "593843561": 104430631,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "883732523": 234139565
+        },
+        "678166505": "2023-09-18T17:10:55.084Z",
+        "703954371": {
+          "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+          },
+          "338286049": "",
+          "593843561": 104430631,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "883732523": 234139565
+        },
+        "719427591": "dh",
+        "742186726": [],
+        "771580890": 657483796,
+        "787237543": {
+          "593843561": 353358909,
+          "825582494": "CXA051919 0050"
+        },
+        "820476880": "CXA051919",
+        "827220437": 13,
+        "838567176": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "338286049": "",
+          "593843561": 104430631,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "883732523": 234139565
+        },
+        "951355211": 222222222,
+        "973670172": {
+          "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "956345366": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA051919 0006"
+        },
+        "Connect_ID": 2290794981,
+        "siteAcronym": "NIH",
+        "id": "7c24488d-5e00-44ea-af18-5feeb25af943",
+        "token": "294602ea-14bd-4c84-8595-5b018764c07a"
+      },
+      {
+        "232343615": {
+          "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA800789 0012"
+        },
+        "299553921": {
+          "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 353358909,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+          },
+          "536710547": "",
+          "593843561": 353358909,
+          "678857215": 353358909,
+          "762124027": 353358909,
+          "825582494": "CXA800789 0001"
+        },
+        "331584571": 266600170,
+        "338570265": "",
+        "376960806": {
+          "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA800789 0011"
+        },
+        "410912345": 353358909,
+        "454453939": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA800789 0004"
+        },
+        "556788178": "2023-01-26T14:27:32.284Z",
+        "589588440": {
+          "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 104430631,
+          "678857215": 104430631,
+          "762124027": 104430631
+        },
+        "646899796": 41592630147,
+        "650516960": 664882224,
+        "652357376": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 104430631,
+          "678857215": 104430631,
+          "762124027": 104430631
+        },
+        "677469051": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA800789 0014"
+        },
+        "683613884": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 104430631,
+          "678857215": 104430631,
+          "762124027": 104430631
+        },
+        "703954371": {
+          "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA800789 0002"
+        },
+        "742186726": [],
+        "771580890": 657483796,
+        "787237543": {
+          "593843561": 353358909,
+          "825582494": "CXA800789 0008"
+        },
+        "820476880": "CXA800789",
+        "827220437": 13,
+        "838567176": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 353358909,
+          "678857215": 104430631,
+          "762124027": 104430631,
+          "825582494": "CXA800789 0003"
+        },
+        "915838974": "2023-01-26T14:26:03.290Z",
+        "928693120": 41592630149,
+        "958646668": {
+          "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+          },
+          "593843561": 104430631,
+          "678857215": 104430631,
+          "762124027": 104430631
+        },
+        "973670172": {
+          "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 353358909,
+            "757246707": 104430631,
+            "956345366": 104430631,
+            "982885431": 104430631
+          },
+          "536710547": "",
+          "593843561": 353358909,
+          "678857215": 353358909,
+          "762124027": 104430631,
+          "825582494": "CXA800789 0006"
+        },
+        "Connect_ID": 6525943593,
+        "siteAcronym": "NIH",
+        "id": "da4ed796-e8f3-43f1-9103-a91266dbab43",
+        "token": "d040982e-1448-46fd-bc62-428c55a8f518"
+      }
+    ],
+    "code": 200
+  }
+
+const mockPartiallyBoxedSpecimens = {
+    "data": [
+        {
+        "143615646": {
+            "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "684617815": 104430631,
+            "728366619": 104430631,
+            "742806035": 104430631,
+            "757246707": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA441336 0054",
+            "926457119": "2023-08-03T00:00:00.000Z"
+        },
+        "223999569": {
+            "593843561": 353358909,
+            "825582494": "CXA441336 0009"
+        },
+        "299553921": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 353358909,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "536710547": "",
+            "593843561": 353358909,
+            "678857215": 353358909,
+            "762124027": 353358909,
+            "825582494": "CXA441336 0050",
+            "926457119": "2023-08-03T00:00:00.000Z"
+        },
+        "331584571": 266600170,
+        "338570265": "",
+        "410912345": 353358909,
+        "454453939": {
+            "248868659": {
+            "242307474": 353358909,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "536710547": "",
+            "593843561": 353358909,
+            "678857215": 353358909,
+            "762124027": 104430631,
+            "825582494": "CXA441336 0004",
+            "926457119": "2023-09-13T00:00:00.000Z"
+        },
+        "556788178": "2023-07-17T16:52:31.339Z",
+        "650516960": 534621077,
+        "652357376": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "678166505": "2023-02-01T20:09:34.560Z",
+        "703954371": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA441336 0051",
+            "926457119": "2023-08-03T00:00:00.000Z"
+        },
+        "719427591": "GB",
+        "742186726": [
+            "CXA441336 0054",
+            "CXA441336 0051",
+            "CXA441336 0053"
+        ],
+        "771580890": 775512390,
+        "787237543": {
+            "593843561": 353358909,
+            "825582494": "CXA441336 0008"
+        },
+        "820476880": "CXA441336",
+        "827220437": 13,
+        "838567176": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA441336 0053"
+        },
+        "926457119": "2023-09-13T00:00:00.000Z",
+        "951355211": 111111111,
+        "973670172": {
+            "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "956345366": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA441336 0053",
+            "926457119": "2023-08-03T00:00:00.000Z"
+        },
+        "Connect_ID": 2290794981,
+        "siteAcronym": "NIH",
+        "id": "6683dda4-1c5e-49a1-860f-9c80052d5782",
+        "token": "294602ea-14bd-4c84-8595-5b018764c07a"
+        },
+        {
+        "143615646": {
+            "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "684617815": 104430631,
+            "728366619": 104430631,
+            "742806035": 104430631,
+            "757246707": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "223999569": {
+            "593843561": 104430631
+        },
+        "299553921": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA050519 0054",
+            "926457119": "2023-08-10T00:00:00.000Z"
+        },
+        "331584571": 266600170,
+        "338570265": "",
+        "410912345": 353358909,
+        "454453939": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "556788178": "2023-08-10T20:22:17.643Z",
+        "650516960": 534621077,
+        "652357376": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "678166505": "2023-08-10T20:21:44.985Z",
+        "703954371": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA050519 0054",
+            "926457119": "2023-08-10T00:00:00.000Z"
+        },
+        "719427591": "DH",
+        "742186726": [
+            "CXA050519 0054"
+        ],
+        "771580890": 775512390,
+        "787237543": {
+            "593843561": 353358909,
+            "825582494": "CXA050519 0054"
+        },
+        "820476880": "CXA050519",
+        "827220437": 13,
+        "838567176": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "926457119": "2023-08-10T00:00:00.000Z",
+        "951355211": 111111111,
+        "973670172": {
+            "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "956345366": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "Connect_ID": 7525826043,
+        "siteAcronym": "NIH",
+        "id": "05ebf454-17f4-4c7d-90ee-d8831554c629",
+        "token": "bcb953fa-b34e-4a90-9a63-8a71555479c9"
+        },
+        {
+        "232343615": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA333222 0012",
+            "926457119": "2023-08-07T00:00:00.000Z"
+        },
+        "299553921": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA333222 0001",
+            "926457119": "2023-08-07T00:00:00.000Z"
+        },
+        "331584571": 266600170,
+        "338570265": "",
+        "376960806": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA333222 0011",
+            "926457119": "2023-08-07T00:00:00.000Z"
+        },
+        "410912345": 353358909,
+        "454453939": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA333222 0004"
+        },
+        "556788178": "2022-11-14T20:10:44.545Z",
+        "589588440": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA333222 0021",
+            "926457119": "2023-08-07T00:00:00.000Z"
+        },
+        "646899796": 42115400033,
+        "650516960": 664882224,
+        "652357376": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA333222 0005",
+            "926457119": "2023-08-07T00:00:00.000Z"
+        },
+        "677469051": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA333222 0014"
+        },
+        "683613884": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA333222 0024"
+        },
+        "703954371": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA333222 0002",
+            "926457119": "2023-08-07T00:00:00.000Z"
+        },
+        "742186726": [
+            "CXA333222 0024"
+        ],
+        "771580890": 775512390,
+        "787237543": {
+            "593843561": 353358909,
+            "825582494": "CXA333222 0008"
+        },
+        "820476880": "CXA333222",
+        "827220437": 13,
+        "838567176": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA333222 0003",
+            "926457119": "2023-08-07T00:00:00.000Z"
+        },
+        "915838974": "2022-11-14T20:09:18.065Z",
+        "926457119": "2023-08-07T00:00:00.000Z",
+        "928693120": 42115400022,
+        "958646668": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA333222 0013",
+            "926457119": "2023-08-07T00:00:00.000Z"
+        },
+        "973670172": {
+            "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "956345366": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA333222 0006",
+            "926457119": "2023-08-07T00:00:00.000Z"
+        },
+        "Connect_ID": 3624590629,
+        "siteAcronym": "NIH",
+        "id": "011efa88-c94a-4462-a3ac-23772c796882",
+        "token": "386f6ed3-eca2-421c-a69c-1a67427c9851"
+        },
+        {
+        "143615646": {
+            "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "684617815": 104430631,
+            "728366619": 104430631,
+            "742806035": 104430631,
+            "757246707": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA754789 0007"
+        },
+        "223999569": {
+            "593843561": 353358909,
+            "825582494": "CXA754789 0009"
+        },
+        "299553921": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA754789 0001"
+        },
+        "331584571": 266600170,
+        "338570265": "",
+        "410912345": 353358909,
+        "454453939": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA754789 0004"
+        },
+        "505347689": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA754789 0060"
+        },
+        "556788178": "2023-10-16T19:16:24.261Z",
+        "650516960": 534621077,
+        "652357376": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA754789 0005"
+        },
+        "678166505": "2023-10-16T19:12:17.149Z",
+        "703954371": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA754789 0002"
+        },
+        "719427591": "brb",
+        "742186726": [],
+        "771580890": 775512390,
+        "787237543": {
+            "593843561": 353358909,
+            "825582494": "CXA754789 0008"
+        },
+        "820476880": "CXA754789",
+        "827220437": 13,
+        "838567176": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA754789 0003"
+        },
+        "951355211": 111111111,
+        "973670172": {
+            "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "956345366": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA754789 0006"
+        },
+        "Connect_ID": 2139426640,
+        "siteAcronym": "NIH",
+        "id": "540571f1-d36b-4d10-8c54-37fafd9be6c2",
+        "token": "e51bd309-f568-4aa5-885c-def7d668adbd"
+        },
+        {
+        "143615646": {
+            "248868659": {
+            "283900611": 353358909,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "684617815": 104430631,
+            "728366619": 353358909,
+            "742806035": 353358909,
+            "757246707": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 353358909,
+            "762124027": 104430631,
+            "825582494": "CXA741368 0007"
+        },
+        "223999569": {
+            "593843561": 353358909,
+            "825582494": "CXA741368 0009"
+        },
+        "299553921": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA741368 0001"
+        },
+        "331584571": 266600170,
+        "338570265": "",
+        "410912345": 353358909,
+        "454453939": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "556788178": "2022-11-21T17:22:38.322Z",
+        "650516960": 534621077,
+        "652357376": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "678166505": "2022-11-21T17:21:44.605Z",
+        "703954371": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA741368 0002"
+        },
+        "742186726": [
+            "CXA741368 0002",
+            "CXA741368 0006"
+        ],
+        "771580890": 775512390,
+        "787237543": {
+            "593843561": 353358909,
+            "825582494": "CXA741368 0008"
+        },
+        "820476880": "CXA741368",
+        "827220437": 13,
+        "838567176": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "951355211": 111111111,
+        "973670172": {
+            "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "956345366": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA741368 0006"
+        },
+        "Connect_ID": 1257517625,
+        "siteAcronym": "NIH",
+        "id": "cafb7cfc-9faa-4308-8403-7ac8fb3d3602",
+        "token": "8579ac19-2b7c-4685-a1d7-81faf9496f4f"
+        },
+        {
+        "143615646": {
+            "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "684617815": 104430631,
+            "728366619": 104430631,
+            "742806035": 104430631,
+            "757246707": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA959595 0007"
+        },
+        "223999569": {
+            "593843561": 353358909,
+            "825582494": "CXA959595 0009"
+        },
+        "299553921": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA959595 0001"
+        },
+        "331584571": 266600170,
+        "338570265": "",
+        "410912345": 353358909,
+        "454453939": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "338286049": "",
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "883732523": 234139565
+        },
+        "556788178": "2023-02-24T15:02:53.234Z",
+        "650516960": 534621077,
+        "652357376": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "338286049": "",
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "883732523": 234139565
+        },
+        "678166505": "2023-02-24T15:01:15.730Z",
+        "703954371": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "338286049": "",
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "883732523": 234139565
+        },
+        "742186726": [
+            "CXA959595 0006"
+        ],
+        "771580890": 775512390,
+        "787237543": {
+            "593843561": 353358909,
+            "825582494": "CXA959595 0008"
+        },
+        "820476880": "CXA959595",
+        "827220437": 13,
+        "838567176": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "338286049": "",
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "883732523": 234139565
+        },
+        "951355211": 111111111,
+        "973670172": {
+            "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "956345366": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA959595 0006"
+        },
+        "Connect_ID": 1418242905,
+        "siteAcronym": "NIH",
+        "id": "600c2c25-e1fc-4614-9a8c-ad3768029335",
+        "token": "31ddea49-31a6-4fa9-9016-7e8cb763fdfc"
+        },
+        {
+        "143615646": {
+            "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "684617815": 104430631,
+            "728366619": 104430631,
+            "742806035": 104430631,
+            "757246707": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA112233 0007",
+            "926457119": "2023-08-02T00:00:00.000Z"
+        },
+        "223999569": {
+            "593843561": 353358909,
+            "825582494": "CXA112233 0009"
+        },
+        "299553921": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 353358909,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "536710547": "",
+            "593843561": 353358909,
+            "678857215": 353358909,
+            "762124027": 353358909,
+            "825582494": "CXA112233 0001"
+        },
+        "331584571": 266600170,
+        "338570265": "",
+        "410912345": 353358909,
+        "454453939": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 353358909,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "536710547": "",
+            "593843561": 353358909,
+            "678857215": 353358909,
+            "762124027": 104430631,
+            "825582494": "CXA112233 0050"
+        },
+        "556788178": "2023-07-17T20:34:38.476Z",
+        "650516960": 534621077,
+        "652357376": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "678166505": "2023-07-17T20:32:38.338Z",
+        "703954371": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA112233 0002"
+        },
+        "719427591": "KW",
+        "742186726": [
+            "CXA112233 0050",
+            "CXA112233 0002"
+        ],
+        "771580890": 775512390,
+        "787237543": {
+            "593843561": 353358909,
+            "825582494": "CXA112233 0008"
+        },
+        "820476880": "CXA112233",
+        "827220437": 13,
+        "838567176": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA112233 0003"
+        },
+        "926457119": "2023-08-02T00:00:00.000Z",
+        "951355211": 111111111,
+        "973670172": {
+            "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "956345366": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA112233 0006"
+        },
+        "Connect_ID": 4104030650,
+        "siteAcronym": "NIH",
+        "id": "d6ad82a3-1b7d-4415-8542-943ebfdf4071",
+        "token": "e46b54fb-f100-4873-a107-1b3449c148e8"
+        },
+        {
+        "232343615": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "299553921": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA900600 0050"
+        },
+        "331584571": 266600170,
+        "338570265": "",
+        "376960806": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "410912345": 353358909,
+        "454453939": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "556788178": "2023-01-31T18:23:07.403Z",
+        "589588440": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "646899796": 88,
+        "650516960": 664882224,
+        "652357376": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "677469051": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "683613884": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "703954371": {
+            "248868659": {
+            "102695484": 104430631,
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "561005927": 104430631,
+            "635875253": 104430631,
+            "654002184": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "861162895": 104430631,
+            "912088602": 104430631,
+            "937362785": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 353358909,
+            "678857215": 104430631,
+            "762124027": 104430631,
+            "825582494": "CXA900600 0051"
+        },
+        "742186726": [
+            "CXA900600 0050",
+            "CXA900600 0051"
+        ],
+        "771580890": 775512390,
+        "787237543": {
+            "593843561": 353358909,
+            "825582494": "CXA900600 0008"
+        },
+        "820476880": "CXA900600",
+        "827220437": 13,
+        "838567176": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "915838974": "2023-01-31T18:22:23.405Z",
+        "928693120": 99,
+        "958646668": {
+            "248868659": {
+            "242307474": 104430631,
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "777486216": 104430631,
+            "810960823": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "973670172": {
+            "248868659": {
+            "283900611": 104430631,
+            "313097539": 104430631,
+            "453343022": 104430631,
+            "472864016": 104430631,
+            "550088682": 104430631,
+            "684617815": 104430631,
+            "690540566": 104430631,
+            "728366619": 104430631,
+            "757246707": 104430631,
+            "956345366": 104430631,
+            "982885431": 104430631
+            },
+            "593843561": 104430631,
+            "678857215": 104430631,
+            "762124027": 104430631
+        },
+        "Connect_ID": 3319146185,
+        "siteAcronym": "NIH",
+        "id": "8e35d09b-510b-4007-ac18-c88b69526c1b",
+        "token": "e87a77be-81d5-4901-8a2e-46e5e9222a6d"
+        }
+    ],
+    "code": 200
+}
 
 /**
  * Get specimens from a list of boxes
@@ -854,10 +3666,11 @@ export const getSpecimensByBoxedStatus = async (boxedStatus, isBPTL = false) => 
  * @param {*} isBPTL - boolean to indicate if the request is from BPTL
  * @returns list of specimens
  */
+// TODO: does this interfere with existing functionality??
 export const getSpecimensInBoxes = async (boxList, isBPTL = false) => {
   logAPICallStartDev('getSpecimensInBoxes');
-  const collectionIdList  = extractCollectionIdsFromBoxes(boxList);
-  const collectionIdQueryString = collectionIdList.join(',');
+  const { tubeIdSet, collectionIdSet } = extractCollectionIdsFromBoxes(boxList);
+  const collectionIdQueryString = Array.from(collectionIdSet).join(',');
 
   try {
       const idToken = await getIdToken();  
@@ -873,7 +3686,7 @@ export const getSpecimensInBoxes = async (boxList, isBPTL = false) => {
 
       const specimensResponse = await response.json();
       logAPICallEndDev('getSpecimensInBoxes');
-      return specimensResponse;
+      return isolateSpecimensInCurrentBoxes(specimensResponse.data, tubeIdSet);
   } catch (error) {
       console.error(error);
       logAPICallEndDev('getSpecimensInBoxes');
@@ -886,21 +3699,60 @@ export const getSpecimensInBoxes = async (boxList, isBPTL = false) => {
  * @param {array} boxList - list of boxes to process
  * @returns {array} - array of unique collectionIds
  * Bag types: 787237543 (Biohazard Blood/Urine), 223999569 (Biohazard Mouthwash), 522094118 (Orphan)
+ * For non-unlabelled bag keys, the first element's collectionId represents all collectionIds in the arrElements list.
  */
 const extractCollectionIdsFromBoxes = (boxList) => {
-  const collectionIdSet = new Set();
+    const tubeIdSet = new Set(); 
+    const collectionIdSet = new Set();
 
-  boxList.forEach(box => {
-      const bags = Object.keys(box.bags).filter(bag => bag && bag !== 'undefined' && bag !== 'unlabelled');
-      const unlabelledTubes = box.bags.unlabelled?.arrElements || [];
-      
-      [...bags, ...unlabelledTubes].forEach(item => {
-          const collectionId = item.split(' ')[0];
-          collectionId && collectionIdSet.add(collectionId);
-      });
-  });
+    boxList.forEach(box => {
+        const bagKeys = Object.keys(box.bags);
 
-  return Array.from(collectionIdSet);
+        bagKeys.forEach(key => {
+            const arrElements = box.bags[key]?.arrElements;
+            if (arrElements && arrElements.length) {
+                if (key === 'unlabelled') {
+                    arrElements.forEach(tube => {
+                        tubeIdSet.add(tube);
+                        const [collectionId] = tube.split(' ');
+                        collectionId && collectionIdSet.add(collectionId);
+                    });
+                } else {
+                    const [collectionId] = arrElements[0].split(' ');
+                    collectionId && collectionIdSet.add(collectionId);
+                    arrElements.forEach(tube => {
+                        tubeIdSet.add(tube);
+                    });
+                }
+            }
+        });
+    });
+
+    return { tubeIdSet, collectionIdSet };
+}
+
+const isolateSpecimensInCurrentBoxes = (specimensList, tubeIdSet) => {
+    const updatedSpecimensList = [];
+
+    for (const specimen of specimensList) {
+        for (const tubeId of specimenCollection.tubeCidList) {
+            if (!specimen.data[tubeId]) continue;
+            if (!specimen.data[tubeId][conceptIds.collection.tube.scannedId] || !tubeIdSet.has(specimen.data[tubeId][conceptIds.collection.tube.scannedId])) {
+                delete specimen.data[tubeId];
+            }    
+        }
+        updatedSpecimensList.push(specimen.data);
+    }
+    return updatedSpecimensList;
+}
+
+export const filterDuplicateSpecimensInList = (specimensList) => {
+    return specimensList.reduce((acc, curr) => {
+        if (!acc.some(obj => obj[conceptIds.collection.id] === curr[conceptIds.collection.id])) {
+            acc.push(curr);
+        }
+        return acc;
+    }, []);
 }
 
 // searches boxes collection by login site (789843387) and Site-specific location id (560975149)
@@ -952,6 +3804,7 @@ export const removeBag = async (boxId, bags) => {
     try {
         const currDate = new Date().toISOString();
         const bagDataToRemove = {boxId: boxId, bags: bags, date: currDate};
+        //console.log('bagDataJSON', JSON.stringify(bagDataToRemove));
         const idToken = await getIdToken();
 
         const response = await fetch(`${api}api=removeBag`, {
@@ -1020,54 +3873,6 @@ export const searchSpecimenByRequestedSiteAndBoxId = async (requestedSite, boxId
         console.error("getSpecimensByRequestedSite's responseObject status code not 200!");
         return {data:[]};
     }
-}
-
-/**
- * Fetches biospecimen collection data from the database, and removes '0008', '0009' and deviation tubes from each collection
- * @returns {Array} List of biospecimen collections
- */
-// * * this doesn't take long, but the searchSpecimenInstitute() call takes a while
-export const filterSpecimenCollectionList = async () => {
-    const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
-    const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ?? [];
-    
-    /* Filter collections with ShipFlag value yes */
-    const finalizedSpecimenList = searchSpecimenInstituteArray.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
-    
-    // loop over filtered data with shipFlag
-    for (let i = 0; i < finalizedSpecimenList.length; i++){
-        const currCollection = finalizedSpecimenList[i];
-
-        if (currCollection[conceptIds.collection.bloodUrineBagScan]) {
-            delete currCollection[conceptIds.collection.bloodUrineBagScan]
-        }
-
-        if (currCollection[conceptIds.collection.mouthwashBagScan]) {
-            delete currCollection[conceptIds.collection.mouthwashBagScan] 
-        }
- 
-        for (let tubeCid of specimenCollection.tubeCidList) {
-            if (!currCollection[tubeCid]) continue;
-
-            const currTube = currCollection[tubeCid];
-            // delete specimen key if tube collected key is no
-            if (!currTube[conceptIds.collection.tube.isCollected] || currTube[conceptIds.collection.tube.isCollected] == conceptIds.no){
-                delete currCollection[tubeCid];
-            }
-
-            // delete tube if it contains deviation concept ID that disallows shipping
-            const tubeDeviation = currTube[conceptIds.collection.tube.deviation];
-            if (tubeDeviation?.[conceptIds.brokenSpecimenDeviation] == conceptIds.yes || 
-                tubeDeviation?.[conceptIds.discardSpecimenDeviation] == conceptIds.yes || 
-                tubeDeviation?.[conceptIds.insufficientVolumeSpecimenDeviation] == conceptIds.yes|| 
-                tubeDeviation?.[conceptIds.mislabelledDiscardSpecimenDeviation] == conceptIds.yes || 
-                tubeDeviation?.[conceptIds.notFoundSpecimenDeviation] == conceptIds.yes) {
-                    delete currCollection[tubeCid];
-            }
-        }
-    }
-
-    return finalizedSpecimenList;
 }
 
 export const removeMissingSpecimen = async (tubeId) => {

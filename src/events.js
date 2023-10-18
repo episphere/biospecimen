@@ -1,5 +1,5 @@
 import { appState, performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant,
-        errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, filterSpecimenCollectionList, updateBox,
+        errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, updateBox,
         ship, disableInput, updateNewTempDate, getSiteTubesLists, getWorkflow, 
         getSiteCouriers, getPage, getNumPages, removeSingleError, displayContactInformation, checkShipForage, checkAlertState, retrieveDateFromIsoString,
         convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
@@ -267,11 +267,14 @@ export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrpha
 
         const currBoxId = updateBoxListModalUIValue();
         boxIdAndBagsObj = processCheckedModalElements(boxIdAndBagsObj, bagId, currBoxId, isOrphan, tableIndex);
-        const addedTubes = boxIdAndBagsObj[currBoxId][bagId].arrElements;
-        const collectionId = bagId.split(' ')[0];
 
-        if (boxIdAndBagsObj.hasOwnProperty(currBoxId)) {
+        const addedTubes = isOrphan
+            ? [boxIdAndBagsObj[currBoxId]['unlabelled'].arrElements.find(tubeId => tubeId === bagId)].filter(Boolean)
+            : boxIdAndBagsObj[currBoxId][bagId].arrElements || [];
+
+        if (boxIdAndBagsObj.hasOwnProperty(currBoxId) && addedTubes.length > 0) {
             const boxToUpdate = prepareBoxToUpdate(currBoxId, boxList, boxIdAndBagsObj, locations, addedTubes);
+            console.log('collectionId', bagId.split(' ')[0], 'addedTubes', addedTubes);
             showAnimation();
             try {
                 const boxUpdateResponse = await updateBox(boxToUpdate);
@@ -281,313 +284,15 @@ export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrpha
                     await startShipping(appState.getState().userName, true, currBoxId);
                 } else {
                     console.error('Failed to update box.', boxUpdateResponse);
-                    showNotifications({ title: 'Error Adding Specimen(s)', body: `There was an error adding ${collectionId}. Please try again.` });
+                    showNotifications({ title: 'Error Adding Specimen(s)', body: `There was an error adding ${bagId.split(' ')[0]}. Please try again.` });
                 }
             } catch (error) {
                 hideAnimation();
                 console.error('Failed to update box.', error);
-                showNotifications({ title: 'Error Adding Specimen(s)', body: `There was an error adding ${collectionId}. Please try again.` });
+                showNotifications({ title: 'Error Adding Specimen(s)', body: `There was an error adding ${bagId.split(' ')[0]}. Please try again.` });
             }
         }
     }, { once: true })
-}
-
-
-//TODO: this is a work in progress
-export const filterAllSpecimens = async (boxList) => {
-    //boxList is allBoxesList for a site
-
-    //not sure we need to sort boxList here.
-    boxList = boxList.sort((a,b) => compareBoxIds(a[conceptIds.shippingBoxId], b[conceptIds.shippingBoxId]));
-
-    // get finalized specimen list -> if specimens aren't finalized, we don't have enough data on them and don't want to worry about handling them yet.
-    const finalizedSpecimenList = await filterSpecimenCollectionList();
-
-    // so now we have all the boxes for a site and all the specimens for a site. We need to sort them based on 'boxed' status:
-    // 1. specimens that are in a box
-    // 2. specimens that are not in a box
-    // •need to handle deviated specimens in this format. They need to be handled at the cloud function level and in the app's automated data handling level.
-        // -if a specimen is deviated (unshippable), it should not prevent a specimen doc from being marked as 'boxed'.
-        // -if a specimen is deviated (unshippable), it should not be added to strayTubeArray in the specimen doc.
-            // -on that note, we should check if strayTubeArray is empty as a sanity check. If yes, and doc status is 'partiallyBoxed', that status should be 'boxed'. 
-    
-    //TODO find and document other corner cases.
-
-    // (1) mark all specimens as 'notBoxed'.
-    // extract specimens collections from boxes on a box-by-box basis.
-    // for each specimen collection:
-        // if specimens are in a box, are all specimens from that collection boxed?
-            // if specimens are not all boxed, which specimens are not boxed?
-                // -status of that specimenDoc = partiallyBoxed
-                // -those specimens go into strayTubeArray in that doc
-            // else if specimens are all boxed
-                // -status of that specimenDoc = boxed
-                // -strayTubeArray is empty in that doc
-
-    
-
-    const availableCollectionsObj = {};
-
-    // note: currently collections have no mouthwash specimens (0007)
-    // iterate each collection in the list
-    for (const currCollection of finalizedSpecimenList) {
-        const tubesInBox = {
-          shipped: {
-            bloodUrine: [],
-            mouthWash: [],
-            orphan: [],
-          },
-          notShipped: {
-            bloodUrine: [],
-            mouthWash: [],
-            orphan: [],
-          },
-        };
-
-        // For each collection, get its blood/urine, mouthwash, and orphan specimens that are in the box already
-        if (currCollection[conceptIds.collection.id]) {
-            // todo: save box id in collection and remove box iteration.
-            for (const box of boxList) {
-                let boxIsShipped = false;
-                if (box[conceptIds.submitShipmentFlag] == conceptIds.yes) {
-                    boxIsShipped = true;
-                }
-
-                const bagObjects = box.bags;
-                const bloodUrineBagId = currCollection[conceptIds.collection.id] + ' 0008';
-
-                if (bagObjects[bloodUrineBagId]) {
-                    const tubeIdList = bagObjects[bloodUrineBagId]['arrElements']
-                    if (tubeIdList.length > 0) {
-                        for (const tubeId of tubeIdList) {          
-                            const tubeNum = tubeId.split(/\s+/)[1] // tubeId (eg 'CXA002655 0001'); tubeNum (eg '0001')
-                            if (boxIsShipped ) {
-                                tubesInBox.shipped.bloodUrine.push(tubeNum);
-                            } else {
-                                tubesInBox.notShipped.bloodUrine.push(tubeNum);
-                            }
-                        }
-                    }
-                }
-
-                const mouthWashBagId = currCollection[conceptIds.collection.id] + ' 0009';
-                if (bagObjects[mouthWashBagId]) {
-                    const tubeIdList = bagObjects[mouthWashBagId]['arrElements']
-                    for (const tubeId of tubeIdList) {
-                        const tubeNum = tubeId.split(/\s+/)[1];
-                        if (boxIsShipped ) {
-                            tubesInBox.shipped.mouthWash.push(tubeNum);
-                        } else {
-                            tubesInBox.notShipped.mouthWash.push(tubeNum);
-                        }
-                    }
-                }
-
-                if (bagObjects['unlabelled']) {
-                    let tubeIdList = bagObjects['unlabelled']['arrElements']
-
-                    for (const tubeId of tubeIdList) {
-                        const [collectionIdFromTube, tubeNumber] = tubeId.split(/\s+/);
-
-                        if (collectionIdFromTube == currCollection[conceptIds.collection.id]) {
-                            if (boxIsShipped ) {
-                                tubesInBox.shipped.orphan.push(tubeNumber);
-                            } else {
-                                tubesInBox.notShipped.orphan.push(tubeNumber);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        const tubesToAdd={
-            bloodUrine: [],
-            mouthWash: [],
-            orphan: [],
-          }
-
-        for (let currCid of specimenCollection.tubeCidList) {
-            const currTubeNum = specimenCollection.cidToNum[currCid];
-            const currSpecimen = currCollection[currCid];
-
-            if (!currSpecimen) continue;
-
-            if (currTubeNum == '0007') {
-                if (tubesInBox.shipped.mouthWash.includes(currTubeNum) || tubesInBox.notShipped.mouthWash.includes(currTubeNum)) {
-                    continue;
-                } else {
-                    tubesToAdd.mouthWash.push(currTubeNum);
-                }
-            } else {
-                if (tubesInBox.shipped.bloodUrine.includes(currTubeNum) || tubesInBox.shipped.orphan.includes(currTubeNum) || tubesInBox.notShipped.bloodUrine.includes(currTubeNum) || tubesInBox.notShipped.orphan.includes(currTubeNum)) {
-                    continue;
-                } else {
-                    tubesToAdd.bloodUrine.push(currTubeNum);
-                }
-            }
-        }
-
-        if ((tubesInBox.shipped.bloodUrine.length > 0 || tubesInBox.notShipped.bloodUrine.length > 0) && tubesToAdd.bloodUrine.length > 0) {
-            tubesToAdd.orphan=tubesToAdd.bloodUrine;
-            tubesToAdd.bloodUrine=[];
-        }
-
-        for (const tubeNum of tubesToAdd.orphan) {
-            if (!availableCollectionsObj['unlabelled']) {
-                availableCollectionsObj['unlabelled'] = [];
-            }
-            availableCollectionsObj['unlabelled'].push(currCollection[conceptIds.collection.id] + ' ' + tubeNum);
-        }
-
-        if (tubesInBox.shipped.bloodUrine.length === 0 && tubesInBox.notShipped.bloodUrine.length ===0 && tubesToAdd.bloodUrine.length> 0) {
-            availableCollectionsObj[currCollection[conceptIds.collection.id] + ' 0008'] = tubesToAdd.bloodUrine;
-        }
-
-        if (tubesInBox.shipped.mouthWash.length === 0 && tubesInBox.notShipped.mouthWash.length ===0 && tubesToAdd.mouthWash.length > 0) {
-            availableCollectionsObj[currCollection[conceptIds.collection.id] + ' 0009'] = tubesToAdd.mouthWash;
-        }
-    }
-
-    return { finalizedSpecimenList, availableCollectionsObj };
-}
-
-
-
-
-
-
-
-
-
-
-export const getInstituteSpecimensList = async (boxList) => {
-    boxList = boxList.sort((a,b) => compareBoxIds(a[conceptIds.shippingBoxId], b[conceptIds.shippingBoxId]));
-
-    const finalizedSpecimenList = await filterSpecimenCollectionList();
-    const availableCollectionsObj = {};
-
-    // note: currently collections have no mouthwash specimens (0007)
-    for (const currCollection of finalizedSpecimenList) {
-        const tubesInBox = {
-          shipped: {
-            bloodUrine: [],
-            mouthWash: [],
-            orphan: [],
-          },
-          notShipped: {
-            bloodUrine: [],
-            mouthWash: [],
-            orphan: [],
-          },
-        };
-
-        // For each collection, get its blood/urine, mouthwash, and orphan specimens that are in the box already
-        if (currCollection[conceptIds.collection.id]) {
-            // todo: save box id in collection and remove box iteration.
-            for (const box of boxList) {
-                let boxIsShipped = false;
-                if (box[conceptIds.submitShipmentFlag] == conceptIds.yes) {
-                    boxIsShipped = true;
-                }
-
-                const bagObjects = box.bags;
-                const bloodUrineBagId = currCollection[conceptIds.collection.id] + ' 0008';
-
-                if (bagObjects[bloodUrineBagId]) {
-                    const tubeIdList = bagObjects[bloodUrineBagId]['arrElements']
-                    if (tubeIdList.length > 0) {
-                        for (const tubeId of tubeIdList) {          
-                            const tubeNum = tubeId.split(/\s+/)[1] // tubeId (eg 'CXA002655 0001'); tubeNum (eg '0001')
-                            if (boxIsShipped ) {
-                                tubesInBox.shipped.bloodUrine.push(tubeNum);
-                            } else {
-                                tubesInBox.notShipped.bloodUrine.push(tubeNum);
-                            }
-                        }
-                    }
-                }
-
-                const mouthWashBagId = currCollection[conceptIds.collection.id] + ' 0009';
-                if (bagObjects[mouthWashBagId]) {
-                    const tubeIdList = bagObjects[mouthWashBagId]['arrElements']
-                    for (const tubeId of tubeIdList) {
-                        const tubeNum = tubeId.split(/\s+/)[1];
-                        if (boxIsShipped ) {
-                            tubesInBox.shipped.mouthWash.push(tubeNum);
-                        } else {
-                            tubesInBox.notShipped.mouthWash.push(tubeNum);
-                        }
-                    }
-                }
-
-                if (bagObjects['unlabelled']) {
-                    let tubeIdList = bagObjects['unlabelled']['arrElements']
-
-                    for (const tubeId of tubeIdList) {
-                        const [collectionIdFromTube, tubeNumber] = tubeId.split(/\s+/);
-
-                        if (collectionIdFromTube == currCollection[conceptIds.collection.id]) {
-                            if (boxIsShipped ) {
-                                tubesInBox.shipped.orphan.push(tubeNumber);
-                            } else {
-                                tubesInBox.notShipped.orphan.push(tubeNumber);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        const tubesToAdd={
-            bloodUrine: [],
-            mouthWash: [],
-            orphan: [],
-          }
-
-        for (let currCid of specimenCollection.tubeCidList) {
-            const currTubeNum = specimenCollection.cidToNum[currCid];
-            const currSpecimen = currCollection[currCid];
-
-            if (!currSpecimen) continue;
-
-            if (currTubeNum == '0007') {
-                if (tubesInBox.shipped.mouthWash.includes(currTubeNum) || tubesInBox.notShipped.mouthWash.includes(currTubeNum)) {
-                    continue;
-                } else {
-                    tubesToAdd.mouthWash.push(currTubeNum);
-                }
-            } else {
-                if (tubesInBox.shipped.bloodUrine.includes(currTubeNum) || tubesInBox.shipped.orphan.includes(currTubeNum) || tubesInBox.notShipped.bloodUrine.includes(currTubeNum) || tubesInBox.notShipped.orphan.includes(currTubeNum)) {
-                    continue;
-                } else {
-                    tubesToAdd.bloodUrine.push(currTubeNum);
-                }
-            }
-        }
-
-        if ((tubesInBox.shipped.bloodUrine.length > 0 || tubesInBox.notShipped.bloodUrine.length > 0) && tubesToAdd.bloodUrine.length > 0) {
-            tubesToAdd.orphan=tubesToAdd.bloodUrine;
-            tubesToAdd.bloodUrine=[];
-        }
-
-        for (const tubeNum of tubesToAdd.orphan) {
-            if (!availableCollectionsObj['unlabelled']) {
-                availableCollectionsObj['unlabelled'] = [];
-            }
-            availableCollectionsObj['unlabelled'].push(currCollection[conceptIds.collection.id] + ' ' + tubeNum);
-        }
-
-        if (tubesInBox.shipped.bloodUrine.length === 0 && tubesInBox.notShipped.bloodUrine.length ===0 && tubesToAdd.bloodUrine.length> 0) {
-            availableCollectionsObj[currCollection[conceptIds.collection.id] + ' 0008'] = tubesToAdd.bloodUrine;
-        }
-
-        if (tubesInBox.shipped.mouthWash.length === 0 && tubesInBox.notShipped.mouthWash.length ===0 && tubesToAdd.mouthWash.length > 0) {
-            availableCollectionsObj[currCollection[conceptIds.collection.id] + ' 0009'] = tubesToAdd.mouthWash;
-        }
-    }
-
-    return { finalizedSpecimenList, availableCollectionsObj };
 }
 
 /**
