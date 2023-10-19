@@ -274,13 +274,12 @@ export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrpha
 
         if (boxIdAndBagsObj.hasOwnProperty(currBoxId) && addedTubes.length > 0) {
             const boxToUpdate = prepareBoxToUpdate(currBoxId, boxList, boxIdAndBagsObj, locations, addedTubes);
-            console.log('collectionId', bagId.split(' ')[0], 'addedTubes', addedTubes);
             showAnimation();
             try {
                 const boxUpdateResponse = await updateBox(boxToUpdate);
                 hideAnimation();
                 if (boxUpdateResponse.code === 200) {
-                    updateShippingStateAddBagToBox(currBoxId, bagId, boxToUpdate);
+                    updateShippingStateAddBagToBox(currBoxId, bagId, boxToUpdate, boxUpdateResponse.data);
                     await startShipping(appState.getState().userName, true, currBoxId);
                 } else {
                     console.error('Failed to update box.', boxUpdateResponse);

@@ -325,8 +325,6 @@ const tube0009 = {
     'deviationChkBox': false
 };
 
-//TODO: define streck tube here and in workflows beneath
-
 export const workflows = {
     research : [
         tube0001,
@@ -413,7 +411,6 @@ export const additionalTubeIDRequirement = {
     length: 4
 }
 
-//TODO: add streck tube
 export const tubes = [
   tube0001,
   tube0002,

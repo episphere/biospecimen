@@ -1,6 +1,6 @@
 import { addBoxAndUpdateSiteDetails, appState, conceptIdToSiteSpecificLocation, combineAvailableCollectionsObjects, displayContactInformation, filterDuplicateSpecimensInList, getAllBoxes, getBoxes, getSpecimensInBoxes, getUnshippedBoxes, getLocationsInstitute, getSiteMostRecentBoxId, getSpecimensByBoxedStatus, hideAnimation, locationConceptIDToLocationMap,
         removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
-        translateNumToType, userAuthorization } from "../shared.js"
+        translateNumToType, userAuthorization, getSiteAcronym } from "../shared.js"
 import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs,
         addEventCompleteShippingButton, addEventModalAddBox, addEventNavBarBoxManifest, addEventNavBarShipment, addEventNavBarShippingManifest, addEventNavBarAssignTracking, addEventLocationSelect,
         addEventPreventTrackingConfirmPaste, addEventReturnToPackaging, addEventReturnToReviewShipmentContents, addEventSaveButton, addEventSaveAndContinueButton, addEventShipPrintManifest,
@@ -30,9 +30,9 @@ export const shippingDashboard = (auth, route) => {
 
 /**
  * Entry point to the shipping dashboard. Check for a stored location and initialize the shipping page.
- * @param {string} userName - the logged in user's information.
+ * @param {string} userName - the logged in user's email.
  * @param {boolean} loadFromState - whether to load data from appState or fetch from the server.
- * @param {string} currBoxId - the current box being viewed.
+ * @param {string} currBoxId - the current box being viewed, to reload with this box active.
  */
 export const startShipping = async (userName, loadFromState = false, currBoxId) => {    
     buildShippingNavAndHeader();
@@ -96,6 +96,7 @@ const buildShippingInterface = async (userName, loadFromState, currBoxId) => {
 
         allBoxesList = promiseResponse[0].data;
         availableLocations = promiseResponse[1];
+
         [specimens.boxed, specimens.notBoxed, specimens.partiallyBoxed] = await Promise.all([
             getSpecimensInBoxes(allBoxesList),
             getSpecimensByBoxedStatus(conceptIds.notBoxed.toString()),
@@ -325,7 +326,7 @@ const handleRemoveBagButton = (currDeleteButton, currTubes, currBoxId) => {
             hideAnimation();
 
             if (removeBagResponse.code === 200) {
-                updateShippingStateRemoveBagFromBox(currBoxId, currBagId, bagsToRemove);
+                updateShippingStateRemoveBagFromBox(currBoxId, currBagId, bagsToRemove, removeBagResponse.data);
                 await startShipping(appState.getState().userName, true, currBoxId);
             } else {
                 console.error('Failed to remove bag.', removeBagResponse);
@@ -467,7 +468,7 @@ const getLargestLocationBoxId = (boxesList, siteLocationId) => {
 }
 
 export const generateBoxManifest = (currBox) => {
-    const currInstitute = currBox.boxData.siteAcronym; //TODO: this is showing up as undefined in some cases
+    const currInstitute = currBox.boxData.siteAcronym || getSiteAcronym();
     const currLocation = locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]["siteSpecificLocation"];
     const currContactInfo = locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]["contactInfo"];
 
@@ -1023,7 +1024,6 @@ export const finalShipmentTracking = ({ boxIdAndBagsObj, boxIdAndTrackingObj, us
     document.getElementById('contentBody').innerHTML = renderFinalShipmentTrackingTemplate(shipmentCourier, userName);
     
     addEventNavBarShipment("navBarShippingDash", userName);
-    //TODO: maybe this should call a different handler
     addEventNavBarAssignTracking("returnToTracking", userName, boxIdAndBagsObj, boxWithTempMonitor)
     addEventNavBarAssignTracking("navBarFinalizeShipment", userName, boxIdAndBagsObj, boxWithTempMonitor)
     populateFinalCheck(boxIdAndTrackingObj);

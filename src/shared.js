@@ -533,29 +533,47 @@ export const checkDerivedVariables = async (participantObjToken) => {
 
 export const updateBox = async (box) => {
     //console.log('boxJSON', JSON.stringify(convertToFirestoreBox(box)));
-    try {
-        const idToken = await getIdToken();
-        const requestObj = {
-            method: "POST",
-            headers:{
-                Authorization:"Bearer "+idToken,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(convertToFirestoreBox(box)),
-        }
+    //TODO: reactivate this
+    return mockUpdateBoxResponse;
+    // try {
+    //     const idToken = await getIdToken();
+    //     const requestObj = {
+    //         method: "POST",
+    //         headers:{
+    //             Authorization:"Bearer "+idToken,
+    //             "Content-Type": "application/json"
+    //         },
+    //         body: JSON.stringify(convertToFirestoreBox(box)),
+    //     }
 
-        const response = await fetch(`${api}api=updateBox`, requestObj);
+    //     const response = await fetch(`${api}api=updateBox`, requestObj);
         
-        if (!response.ok) {
-            throw new Error(`API responded with status: ${response.status}`);
-        }
+    //     if (!response.ok) {
+    //         throw new Error(`API responded with status: ${response.status}`);
+    //     }
         
-        return await response.json();
-    } catch (error) {
-        console.error('Failed to update box:', error);
-        throw error;
-    }
+    //     return await response.json();
+    // } catch (error) {
+    //     console.error('Failed to update box:', error);
+    //     throw error;
+    // }
 }
+
+//TODO: delete this!!
+const mockUpdateBoxResponse = {
+  "data": {
+    "742186726": [
+      "CXA112233 0050",
+      "AAAAAAAAA AAAA",
+      "BBBBBBBBB BBBB"
+    ],
+    "771580890": 775512390,
+    "820476880": "CXA112233"
+  },
+  "message": "Success!",
+  "code": 200
+}
+
 
 export const updateNewTempDate = async () =>{
     const idToken = await getIdToken();
@@ -978,7 +996,7 @@ export const combineAvailableCollectionsObjects = (obj1, obj2) => {
     const availableCollectionsObject = {};
     const availableCollectionKeys = [...new Set([...Object.keys(obj1), ...Object.keys(obj2)])];
 
-    for (let key of availableCollectionKeys) {
+    for (const key of availableCollectionKeys) {
         if (obj1[key] && obj2[key]) {
             availableCollectionsObject[key] = [...new Set([...obj1[key], ...obj2[key]])];
         } else if (obj1[key]) {
@@ -3666,14 +3684,12 @@ const mockPartiallyBoxedSpecimens = {
 }
 
 /**
- * Get specimens from a list of boxes
- * @param {*} boxList - list of boxes
- * @param {*} isBPTL - boolean to indicate if the request is from BPTL
- * @returns list of specimens
+ * Get specimens from a list of boxes.
+ * @param {*} boxList - list of current unshipped boxes for the shipping dashboard.
+ * @param {*} isBPTL - boolean to indicate if the request is from BPTL.
+ * @returns list of specimens objects with only the specimens in the current boxes.
  */
-// TODO: does this interfere with existing functionality??
 export const getSpecimensInBoxes = async (boxList, isBPTL = false) => {
-  logAPICallStartDev('getSpecimensInBoxes');
   const { tubeIdSet, collectionIdSet } = extractCollectionIdsFromBoxes(boxList);
   const collectionIdQueryString = Array.from(collectionIdSet).join(',');
 
@@ -3690,11 +3706,9 @@ export const getSpecimensInBoxes = async (boxList, isBPTL = false) => {
       });
 
       const specimensResponse = await response.json();
-      logAPICallEndDev('getSpecimensInBoxes');
       return isolateSpecimensInCurrentBoxes(specimensResponse.data, tubeIdSet);
   } catch (error) {
       console.error(error);
-      logAPICallEndDev('getSpecimensInBoxes');
       return {data: [], code: 500, message: error.message};
   }
 };
@@ -3806,31 +3820,52 @@ export const getParticipantCollections = async (token) => {
 }
 
 export const removeBag = async (boxId, bags) => {
-    try {
+    //try {
         const currDate = new Date().toISOString();
         const bagDataToRemove = {boxId: boxId, bags: bags, date: currDate};
         //console.log('bagDataJSON', JSON.stringify(bagDataToRemove));
         const idToken = await getIdToken();
 
-        const response = await fetch(`${api}api=removeBag`, {
-            method: "POST",
-            headers: {
-                Authorization: "Bearer " + idToken,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(bagDataToRemove)
-        });
+        //TODO: reactivate this
+        return mockRemoveBagResponse;
+    //     const response = await fetch(`${api}api=removeBag`, {
+    //         method: "POST",
+    //         headers: {
+    //             Authorization: "Bearer " + idToken,
+    //             "Content-Type": "application/json"
+    //         },
+    //         body: JSON.stringify(bagDataToRemove)
+    //     });
 
-        if (!response.ok) {
-            throw new Error(`API responded with status: ${response.status}`);
-        }
+    //     if (!response.ok) {
+    //         throw new Error(`API responded with status: ${response.status}`);
+    //     }
 
-        return await response.json();
-    } catch (error) {
-        console.error('Failed to remove bag:', error);
-        throw error;
-    }
+    //     return await response.json();
+    // } catch (error) {
+    //     console.error('Failed to remove bag:', error);
+    //     throw error;
+    // }
 };
+
+//TODO: delete this
+const mockRemoveBagResponse = {
+  "data": [
+    {
+      "742186726": [
+        "CXA112233 0002",
+        "CXA112233 0050",
+        "XXXXXXXXX XXXX",
+        "YYYYYYYYY YYYY",
+      ],
+      "771580890": 775512390,
+      "820476880": "CXA112233"
+    }
+  ],
+  "message": "Success!",
+  "code": 200
+}
+
 
 /**
  * Fetches biospecimen collection data from the database
