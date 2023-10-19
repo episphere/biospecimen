@@ -69,55 +69,58 @@ const buildShippingDOM = () => {
  * @param {*} loadFromState - whether to load data from state or from the server.
  * @param {*} currBoxId - the currently selected boxId.
  */
-const buildShippingInterface = async (userName, loadFromState, currBoxId) => {    
-    showAnimation();
+const buildShippingInterface = async (userName, loadFromState, currBoxId) => {
+    try {
+        showAnimation();
 
-    let allBoxesList;
-    let availableLocations;
-    let finalizedSpecimenList;
-    let availableCollectionsObj;
-    const specimens = {
-        notBoxed: {},
-        partiallyBoxed: {},
-        boxed: {},
-    };
-    
-    if (loadFromState) {
-        allBoxesList = appState.getState().allBoxesList;
-        availableLocations = appState.getState().availableLocations;
-        finalizedSpecimenList = appState.getState().finalizedSpecimenList;
-        availableCollectionsObj = appState.getState().availableCollectionsObj;
-        populateSelectLocationList(availableLocations, loadFromState);
-    } else {
-        const promiseResponse = await Promise.all([
-            getUnshippedBoxes(),
-            populateSelectLocationList(availableLocations, loadFromState)
-        ]);
+        let allBoxesList;
+        let availableLocations;
+        let finalizedSpecimenList;
+        let availableCollectionsObj;
+        const specimens = {
+            notBoxed: {},
+            partiallyBoxed: {},
+            boxed: {},
+        };
 
-        allBoxesList = promiseResponse[0].data;
-        availableLocations = promiseResponse[1];
+        if (loadFromState) {
+            allBoxesList = appState.getState().allBoxesList;
+            availableLocations = appState.getState().availableLocations;
+            finalizedSpecimenList = appState.getState().finalizedSpecimenList;
+            availableCollectionsObj = appState.getState().availableCollectionsObj;
+            populateSelectLocationList(availableLocations, loadFromState);
+        } else {
+            const promiseResponse = await Promise.all([
+                getUnshippedBoxes(),
+                populateSelectLocationList(availableLocations, loadFromState)
+            ]);
 
-        [specimens.boxed, specimens.notBoxed, specimens.partiallyBoxed] = await Promise.all([
-            getSpecimensInBoxes(allBoxesList),
-            getSpecimensByBoxedStatus(conceptIds.notBoxed.toString()),
-            getSpecimensByBoxedStatus(conceptIds.partiallyBoxed.toString()),
-        ]);
-        
-        finalizedSpecimenList = filterDuplicateSpecimensInList([...specimens.boxed, ...specimens.notBoxed.specimensList, ...specimens.partiallyBoxed.specimensList]);
-        availableCollectionsObj = combineAvailableCollectionsObjects(specimens.notBoxed.availableCollections, specimens.partiallyBoxed.availableCollections);        
+            allBoxesList = promiseResponse[0].data;
+            availableLocations = promiseResponse[1];
+
+            [specimens.boxed, specimens.notBoxed, specimens.partiallyBoxed] = await Promise.all([
+                getSpecimensInBoxes(allBoxesList),
+                getSpecimensByBoxedStatus(conceptIds.notBoxed.toString()),
+                getSpecimensByBoxedStatus(conceptIds.partiallyBoxed.toString()),
+            ]);
+
+            finalizedSpecimenList = filterDuplicateSpecimensInList([...specimens.boxed, ...specimens.notBoxed.specimensList, ...specimens.partiallyBoxed.specimensList]);
+            availableCollectionsObj = combineAvailableCollectionsObjects(specimens.notBoxed.availableCollections, specimens.partiallyBoxed.availableCollections);
+        }
+
+        populateAvailableCollectionsList(availableCollectionsObj, loadFromState);
+        setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName);
+        populateViewShippingBoxContentsList(currBoxId);
+        populateBoxesToShipTable();
+        addShippingEventListeners();
+
+    } catch (error) {
+        console.error("Error building shipping interface:", error);
+        showNotifications({ title: 'Error building shipping interface', body: 'An unexpected error occurred. Please refresh your browser to reload.' });
+    } finally {
+        hideAnimation();
     }
-
-    // console.log('AVAILABLECOLLECTIONS - availableCollectionsObject', availableCollectionsObj);
-    // console.log('AVAILABLECOLLECTIONS - finalizedSpecimenList', finalizedSpecimenList);
-
-    populateAvailableCollectionsList(availableCollectionsObj, loadFromState);
-    setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName);
-    populateViewShippingBoxContentsList(currBoxId);
-    populateBoxesToShipTable();
-    addShippingEventListeners();
-
-    hideAnimation();
-}
+};
 
 const addShippingEventListeners = () => {
     const userName = appState.getState().userName;
@@ -150,10 +153,9 @@ const getStoredLocationOnInit = () => {
     }
 
     const bagIdList = Object.keys(availableCollectionsObj).sort();
-
     const tableEle = document.getElementById("specimenList");
     tableEle.innerHTML = buildPopulateSpecimensHeader();
-    
+
     let numRows = 1;
     let orphanBagId;
 

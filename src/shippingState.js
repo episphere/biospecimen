@@ -13,14 +13,10 @@ import conceptIds from './fieldToConceptIdMapping.js';
 export const setAllShippingState = (availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName) => {
     const boxesByProviderList = filterUnshippedBoxes(allBoxesList);
     const boxesByLocationList = filterBoxListBoxesByLocation(boxesByProviderList);
-    const providerBoxesObj = createBoxAndBagsObj(boxesByProviderList); // provider-specific data in the 'select boxes to ship' section
+    const providerBoxesObj = createBoxAndBagsObj(boxesByProviderList);
     const providerBoxWithSpecimenData = addSpecimenDataToDetailBox(providerBoxesObj, finalizedSpecimenList);
     const detailedProviderBoxes = addBoxDataToDetailBox(providerBoxWithSpecimenData, boxesByProviderList);
     const detailedLocationBoxes = filterDetailBoxesByLocation(detailedProviderBoxes);
-
-    // console.log('availableCollectionsObj', availableCollectionsObj);
-    // console.log('detailedProviderBoxes', detailedProviderBoxes);
-    // console.log('finalizedSpecimenList', finalizedSpecimenList);
 
     appState.setState({
         allBoxesList: allBoxesList,
@@ -254,7 +250,7 @@ const createBoxAndBagsObj = (boxList) => {
 }
 
 /**
- * Add specimen details to the box object. This is used in generateBoxManifest (and TODO future: shipping reports)
+ * Add specimen details to the box object. This is used in generateBoxManifest.
  * @param {object} boxAndBagsObj - the basic box object with bag ids and tube ids (arrElements)
  * @param {object} finalizedSpecimenList - the list of specimen data where finalized === true
  * @returns {object} - the box object with specimen details added
