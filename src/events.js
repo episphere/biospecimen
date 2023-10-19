@@ -2157,9 +2157,9 @@ export const populateCourierBox = async () => {
 
 }
 
-export const populateBoxTable = async (page, filter) => {
+export const populateBoxTable = async (page, filter, source) => {
     showAnimation();
-    let pageStuff = await getPage(page, 5, '656548982', filter)
+    let pageStuff = await getPage(page, 5, '656548982', filter, source)
     let currTable = document.getElementById('boxTable')
     currTable.innerHTML = ''
     let rowCount = currTable.rows.length;
@@ -2188,43 +2188,29 @@ export const populateBoxTable = async (page, filter) => {
         for (let j = 0; j < keys.length; j++) {
             numTubes += currPage['bags'][keys[j]]['arrElements'].length;
         }
-        let shippedDate = ''
-        let receivedDate = ''
-        let packagedCondition = ''
-
-        if (currPage.hasOwnProperty('656548982')) {
-            const shippedDateStr = currPage['656548982'];
-            shippedDate = retrieveDateFromIsoString(shippedDateStr)
-        }
-
-        if(currPage.hasOwnProperty('926457119')) {
-            const receivedDateStr = currPage['926457119']
-            receivedDate = retrieveDateFromIsoString(receivedDateStr)
-        }
-
-        if(currPage.hasOwnProperty('238268405')) {
-          packagedCondition = currPage['238268405']
-        }
+        const shippedDate = currPage['656548982'] ? retrieveDateFromIsoString(currPage['656548982']) : '';
+        const receivedDate = currPage['926457119'] ? retrieveDateFromIsoString(currPage['926457119']) : '';
+        const packagedCondition = currPage['238268405'] || '';
 
         currRow.insertCell(0).innerHTML = currPage[conceptIds.shippingTrackingNumber] ?? '';
         currRow.insertCell(1).innerHTML = shippedDate;
         currRow.insertCell(2).innerHTML = conceptIdToSiteSpecificLocation[currPage['560975149']];
         currRow.insertCell(3).innerHTML = currPage['132929440'];
         currRow.insertCell(4).innerHTML = '<button type="button" class="button btn btn-info" id="reportsViewManifest' + i + '">View manifest</button>';
-        currRow.insertCell(5).innerHTML = currPage.hasOwnProperty('333524031') ? "Yes" : "No"
+        currRow.insertCell(5).innerHTML = currPage['333524031'] === 353358909 ? "Yes" : "No"
         currRow.insertCell(6).innerHTML = receivedDate;
         currRow.insertCell(7).innerHTML = convertConceptIdToPackageCondition(packagedCondition, packageConditonConversion);
-        currRow.insertCell(8).innerHTML = currPage.hasOwnProperty('870456401') ? currPage['870456401'] : '' ;
-        addEventViewManifestButton('reportsViewManifest' + i, currPage);
+        currRow.insertCell(8).innerHTML = currPage['870456401'] || '' ;
+        addEventViewManifestButton('reportsViewManifest' + i, currPage, source);
 
     }
     hideAnimation();
 }
 
-export const addEventViewManifestButton = (buttonId, currPage) => {
+export const addEventViewManifestButton = (buttonId, currPage, source) => {
     let button = document.getElementById(buttonId);
     button.addEventListener('click', () => {
-        showReportsManifest(currPage);
+        showReportsManifest(currPage, source);
     });
 }
 
@@ -2318,7 +2304,7 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
     }
 }
 
-export const addPaginationFunctionality = (lastPage, filter) => {
+export const addPaginationFunctionality = (lastPage, filter, source) => {
     let paginationButtons = document.getElementById('paginationButtons');
     paginationButtons.innterHTML = ""
     paginationButtons.innerHTML = `<ul class="pagination">
@@ -2337,28 +2323,28 @@ export const addPaginationFunctionality = (lastPage, filter) => {
 
     first.addEventListener('click', () => {
         middleNumber.innerHTML = '1'
-        populateBoxTable(0, filter)
+        populateBoxTable(0, filter, source)
     })
 
     previous.addEventListener('click', () => {
         middleNumber.innerHTML = middleNumber.innerHTML == '1' ? '1' : parseInt(middleNumber.innerHTML) - 1;
-        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter)
+        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter, source)
     })
 
     next.addEventListener('click', () => {
         middleNumber.innerHTML = parseInt(middleNumber.innerHTML) >= lastPage ? (lastPage == 0 ? 1 : lastPage.toString()) : parseInt(middleNumber.innerHTML) + 1;
-        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter)
+        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter, source)
     })
 
     final.addEventListener('click', () => {
         middleNumber.innerHTML = lastPage == 0 ? 1 : lastPage;
-        populateBoxTable(lastPage == 0 ? 0 : lastPage - 1, filter)
+        populateBoxTable(lastPage == 0 ? 0 : lastPage - 1, filter, source)
     })
 
 
 }
 
-export const addEventFilter = () => {
+export const addEventFilter = (source) => {
 
     let filterButton = document.getElementById('submitFilter');
     filterButton.addEventListener('click', async () => {
@@ -2385,9 +2371,9 @@ export const addEventFilter = () => {
             }
 
         }
-        populateBoxTable(0, filter);
-        let numPages = await getNumPages(5, filter);
-        addPaginationFunctionality(numPages, filter);
+        populateBoxTable(0, filter, source);
+        let numPages = await getNumPages(5, filter, source);
+        addPaginationFunctionality(numPages, filter, source);
     });
 }
 

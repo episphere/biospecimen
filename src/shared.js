@@ -517,7 +517,7 @@ export const updateSpecimen = async (array) => {
     return response.json();
 }
 
-export const checkDerivedVariables = async (array) => {
+export const checkDerivedVariables = async (participantObjToken) => {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -525,7 +525,7 @@ export const checkDerivedVariables = async (array) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(array)
+        body: JSON.stringify(participantObjToken)
     }
     const response = await fetch(`${api}api=checkDerivedVariables`, requestObj);
     return response.json();
@@ -595,7 +595,8 @@ export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
     }
 }
 
-export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) => {
+export const getPage = async (pageNumber, elementsPerPage, orderBy, filters, source) => {
+  try {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -603,10 +604,14 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters) =
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy, "filters":filters})
+        body: JSON.stringify({pageNumber, elementsPerPage, orderBy, filters, source})
     }
     const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
     return response.json();
+  } 
+  catch (error) {
+    return {code: 500, message: error.message};
+  }
 }
 
 export const bagConceptIdList = [
@@ -3909,9 +3914,8 @@ export const getLocationsInstitute = async () => {
     logAPICallEndDev('getLocationsInstitute');
     return locations;
 }
-
-export const getNumPages = async (numPerPage, filter) => {
-    logAPICallStartDev('getNumPages');
+export const getNumPages = async (numPerPage, filters, source) => {
+  try {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getNumBoxesShipped`, {
         method: "POST",
@@ -3919,12 +3923,15 @@ export const getNumPages = async (numPerPage, filter) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(filter)
+        body: JSON.stringify({filters, source})
     });
     let res = await response.json();
     let numBoxes = res.data;
-    logAPICallEndDev('getNumPages');
     return Math.ceil(numBoxes/numPerPage);
+  }
+  catch (error) {
+    return {code: 500, message: error.message};
+  }
 }
 
 export const getSiteCouriers = async () => {
