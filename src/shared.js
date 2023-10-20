@@ -852,17 +852,14 @@ export const getUnshippedBoxes = async (isBPTL = false) => {
 
 /**
  * Get specimens by boxed status isolates only the specimens that need to be fetched/available in the shipping dashboard.
- * @param {string} boxedStatus - boxed status of the specimens to fetch (notBoxed, partiallyBoxed, or boxed) 
- * @param {*} isBPTL - boolean to indicate if the request is from BPTL
- * @returns list of specimens
- * Note: isDev is used to determine if the request is from the dev environment. We filter out old stray tubes in stage and prod.
- * Don't filter out old stray tubes for the dev environment because we need the testing data.
+ * @param {string} boxedStatus - boxed status of the specimens to fetch (notBoxed, partiallyBoxed, or boxed) .
+ * @param {*} isBPTL - boolean to indicate if the request is from BPTL.
+ * @returns list of specimens.
  */
 export const getSpecimensByBoxedStatus = async (boxedStatus, isBPTL = false) => {
     try {
         const idToken = await getIdToken();
-        const isDev = isDev() ? 'true' : 'false';
-        let queryString = `${api}api=getSpecimensByBoxedStatus&boxedStatus=${boxedStatus}&isDev=${isDev}`;
+        let queryString = `${api}api=getSpecimensByBoxedStatus&boxedStatus=${boxedStatus}`;
         if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
         
         const response = await fetch(queryString, {
