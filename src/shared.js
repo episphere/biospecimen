@@ -838,12 +838,15 @@ export const getUnshippedBoxes = async (isBPTL = false) => {
             Authorization: 'Bearer ' + idToken,
             }
         });
+
+        if (!response.ok) throw new Error(`Unexpected server error: ${response.status}`);
+
         const unshippedBoxRes = await response.json();
         unshippedBoxRes.data = unshippedBoxRes.data.map(convertToOldBox);
         return unshippedBoxRes;
     } catch (error) {
         console.error(error);
-        return {data: [], code: 500, message: error.message};
+        throw error;
     }
 };
 
@@ -866,13 +869,15 @@ export const getSpecimensByBoxedStatus = async (boxedStatus, isBPTL = false) => 
             }
         });
 
+        if (!response.ok) throw new Error(`Unexpected server error: ${response.status}`);
+
         const specimensRes = await response.json();
         const hasStrayTubes = boxedStatus === conceptIds.partiallyBoxed.toString();
 
         return buildAvailableCollectionsObject(specimensRes.data, hasStrayTubes);
     } catch (error) {
         console.error(error);
-        return {data: [], code: 500, message: error.message};
+        throw error;
     }
 };
 
@@ -908,6 +913,7 @@ export const combineAvailableCollectionsObjects = (obj1, obj2) => {
  * Note: Mouthwash tubes are always solo. They belong in available collections. The tube number is always '0007', the bag number is always '0009'.
  */
 const buildAvailableCollectionsObject = (specimensList, isPartiallyBoxed) => {
+    if (!specimensList || specimensList.length === 0) return { availableCollections: {}, specimensList: [] };
     const availableCollections = {};
     for (let specimen of specimensList) {
         const usableTubesObj = arrangeFetchedTubes(specimen, isPartiallyBoxed);
@@ -1031,6 +1037,7 @@ const removeUnusableTubes = (specimen) => {
  */
 export const getSpecimensInBoxes = async (boxList, isBPTL = false) => {
   const { tubeIdSet, collectionIdSet } = extractCollectionIdsFromBoxes(boxList);
+  if (collectionIdSet.size === 0) return [];
   const collectionIdQueryString = Array.from(collectionIdSet).join(',');
 
   try {
@@ -1045,11 +1052,13 @@ export const getSpecimensInBoxes = async (boxList, isBPTL = false) => {
           }
       });
 
+      if (!response.ok) throw new Error(response.statusText);
+
       const specimensResponse = await response.json();
       return isolateSpecimensInCurrentBoxes(specimensResponse.data, tubeIdSet);
   } catch (error) {
       console.error(error);
-      return {data: [], code: 500, message: error.message};
+      throw error;
   }
 };
 
@@ -1091,6 +1100,7 @@ const extractCollectionIdsFromBoxes = (boxList) => {
 }
 
 const isolateSpecimensInCurrentBoxes = (specimensList, tubeIdSet) => {
+    if (!specimensList || specimensList.length === 0) return [];
     const updatedSpecimensList = [];
 
     for (const specimen of specimensList) {
