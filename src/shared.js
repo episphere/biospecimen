@@ -855,11 +855,14 @@ export const getUnshippedBoxes = async (isBPTL = false) => {
  * @param {string} boxedStatus - boxed status of the specimens to fetch (notBoxed, partiallyBoxed, or boxed) 
  * @param {*} isBPTL - boolean to indicate if the request is from BPTL
  * @returns list of specimens
+ * Note: isDev is used to determine if the request is from the dev environment. We filter out old stray tubes in stage and prod.
+ * Don't filter out old stray tubes for the dev environment because we need the testing data.
  */
 export const getSpecimensByBoxedStatus = async (boxedStatus, isBPTL = false) => {
     try {
         const idToken = await getIdToken();
-        let queryString = `${api}api=getSpecimensByBoxedStatus&boxedStatus=${boxedStatus}`;
+        const isDev = isDev() ? 'true' : 'false';
+        let queryString = `${api}api=getSpecimensByBoxedStatus&boxedStatus=${boxedStatus}&isDev=${isDev}`;
         if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
         
         const response = await fetch(queryString, {
@@ -2588,11 +2591,11 @@ const tubeOrder = [
   "0006", //"Urine/Yellow"
   "0016", //"Urine Cup"
   "0007", //"Mouthwash Container"
-  "0050", //"NA"
-  "0051", //"NA"
-  "0052", //"NA"
-  "0053", //"NA"
-  "0054", //"NA
+  "0050", //"Replacement label" - used for tubes 0001-0024, 0060 when original label is damaged/missing/unusable
+  "0051", //"Replacement label" - same as 0050
+  "0052", //"Replacement label" - same as 0050
+  "0053", //"Replacement label" - same as 0050
+  "0054", //"Replacement label" - same as 0050
 ];
 
 export const sortBiospecimensList = (biospecimensList) => {
