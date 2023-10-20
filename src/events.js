@@ -273,6 +273,13 @@ export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrpha
             : boxIdAndBagsObj[currBoxId][bagId].arrElements || [];
 
         if (boxIdAndBagsObj.hasOwnProperty(currBoxId) && addedTubes.length > 0) {
+            const labeledBagCount = Object.keys(boxIdAndBagsObj[currBoxId]).filter(key => key !== 'unlabelled' && key !== 'undefined').length ?? 0; // Labeled bags: Keys in boxIdAndBagsObj[currBoxId].
+            const unlabeledBagCount = boxIdAndBagsObj[currBoxId]?.['unlabelled']?.['arrElements']?.length ?? 0; // Unlabeled bags: Hold stray tubes. Each is a separate bag.
+            const bagCount = labeledBagCount + unlabeledBagCount;
+
+            const canAddBag = checkBagCount(bagCount, bagId, currBoxId);
+            if (!canAddBag) return;
+
             const boxToUpdate = prepareBoxToUpdate(currBoxId, boxList, boxIdAndBagsObj, locations, addedTubes);
             showAnimation();
             try {
@@ -292,6 +299,25 @@ export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrpha
             }
         }
     }, { once: true })
+}
+
+const checkBagCount = (bagCount, bagId, currBoxId) => {
+    const boxNumber = currBoxId.substring(3);
+    const remainingBagCount = 40 - bagCount;
+    const bagText = remainingBagCount !== 1 ? 'bags' : 'bag';
+
+    if (bagCount < 37) {
+        return true;
+    } else if (bagCount >= 37 && bagCount < 40) {
+        showNotifications({ title: 'Bag Added. Attention: This box is almost full.', body: `${bagId} has been added to box ${boxNumber}. Box ${boxNumber} is almost full. This box can accept ${remainingBagCount} more ${bagText}.` });
+        return true;
+    } else if (bagCount === 40) {
+        showNotifications({ title: 'Bag Added. Attention: This box is now full.', body: `${bagId} has been added to box ${boxNumber}. Box ${boxNumber} is now full. Please select another box or create a new box if you have more bags to pack.` });
+        return true;
+    } else {
+        showNotifications({ title: `ERROR: Bag not added. Box ${boxNumber} is full.`, body: `${bagId} has NOT been added. Box ${boxNumber} is already full. Please select another box or create a new box for any remaining bags to pack.` });
+        return false;
+    }
 }
 
 /**
