@@ -1,4 +1,4 @@
-import { appState, performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant,
+import { appState, performSearch, showAnimation, addBiospecimenUsers, getSpecimensByCollectionIds, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant,
         errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, updateBox,
         ship, disableInput, updateNewTempDate, getSiteTubesLists, getWorkflow, 
         getSiteCouriers, getPage, getNumPages, removeSingleError, displayContactInformation, checkShipForage, checkAlertState, retrieveDateFromIsoString,
@@ -192,29 +192,35 @@ export const addEventAddSpecimenToBox = () => {
         }
 
         const allBoxesList = appState.getState().allBoxesList; 
-        const foundScannedIdShipped = isScannedIdShipped(allBoxesList, masterSpecimenId);
-        const scannedIdInUnshippedBoxes = findScannedIdInUnshippedBoxes(allBoxesList, masterSpecimenId);
-        const isScannedIdInUnshippedBoxes = scannedIdInUnshippedBoxes['foundMatch'];
-        
-        if (foundScannedIdShipped){
-            showNotifications({ title:'Item reported as already shipped', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.'});
-            return;
-        }
-        
-        if(isScannedIdInUnshippedBoxes) {
-            const boxNum = scannedIdInUnshippedBoxes[conceptIds.shippingBoxId];
-            const siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInUnshippedBoxes[conceptIds.shippingLocation]];
-            const siteSpecificLocationName = siteSpecificLocation || '';
-            const scannedInput = scannedIdInUnshippedBoxes['inputScanned'];
-            showNotifications({ title:`${scannedInput} has already been recorded`, body: `${scannedInput} is recorded as being in ${boxNum} in ${siteSpecificLocationName}`});
-            return;
+
+        // Find the masterSpecimenId in available collections. Else, show a notification and return early.
+        const canAddSpecimen = searchAvailableCollectionsForSpecimen(masterSpecimenId);
+
+        if (!canAddSpecimen) {
+            // Check if the scanned id is already in an unshipped box. If not, check if the scanned id is already shipped. Show a notification and return early.
+            const scannedIdInUnshippedBoxes = findScannedIdInUnshippedBoxes(allBoxesList, masterSpecimenId);
+            const isScannedIdInUnshippedBoxes = scannedIdInUnshippedBoxes['foundMatch'];
+            if(isScannedIdInUnshippedBoxes) {
+                const boxNum = scannedIdInUnshippedBoxes[conceptIds.shippingBoxId];
+                const siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInUnshippedBoxes[conceptIds.shippingLocation]];
+                const siteSpecificLocationName = siteSpecificLocation || '';
+                const scannedInput = scannedIdInUnshippedBoxes['inputScanned'];
+                showNotifications({ title:`${scannedInput} has already been recorded`, body: `${scannedInput} is recorded as being in ${boxNum} in ${siteSpecificLocationName}`});
+                return;
+            } else {
+                const foundScannedIdShipped = await isScannedIdShipped(allBoxesList, masterSpecimenId);
+                if (foundScannedIdShipped){
+                    showNotifications({ title:'Item reported as already shipped', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.'});
+                    return;
+                }
+            }
         }
 
         const specimenTablesResult = buildSpecimenDataInModal(masterSpecimenId);
         const biospecimensList = specimenTablesResult.biospecimensList;
 
         if (biospecimensList.length === 0) {
-            showNotifications({ title: 'Item not found', body: `Item not reported as collected. Go to the Collection Dashboard to add specimen.` });
+            showNotifications({ title: 'Item not found', body: `Item not reported as collected or item is in an existing available collection. If item doesn't have a matching Specimen Bag ID in available collections, go to the Collection Dashboard to add specimen.` });
             return;
         } else {
             document.getElementById('submitMasterSpecimenId').click();
@@ -2409,13 +2415,11 @@ export const addEventFilter = (source) => {
  * @returns {boolean} true if the specimenId is found in the shipped boxes, false otherwise.
  * If the specimenId is a masterId, search for the key in the bags.
  * If the bag is unlabelled, search arrElements for the key.
- * If the specimen isn't a masterId, iterate the bags and search for the keys in the arrElements. 
- * TODO: future implementation will include shipped property on the specimen object
  */
-export const isScannedIdShipped = (allBoxesList, masterSpecimenId) => {
+export const isScannedIdShipped = async (allBoxesList, masterSpecimenId) => {
     if (!allBoxesList.length) return false;
 
-    const specimenIdType = masterSpecimenId.split(' ')[1];
+    const [collectionId, specimenIdType] = masterSpecimenId.split(' ');
     const isMasterId = ['0007', '0008', '0009'].includes(specimenIdType);
 
     for (const box of allBoxesList) {
@@ -2432,6 +2436,14 @@ export const isScannedIdShipped = (allBoxesList, masterSpecimenId) => {
                     return true;
                 }
             }
+        }
+    }
+
+    const searchedSpecimen = await getSpecimensByCollectionIds([collectionId]);
+    for (const specimen of searchedSpecimen) {
+        const specimenData = specimen.data;
+        if (specimenData[conceptIds.boxedStatus] === conceptIds.boxed) {
+            return true;
         }
     }
 
@@ -2619,4 +2631,19 @@ export const addDeviationTypeCommentsContentReports = (searchSpecimenInstituteAr
     if (bagsArrayIndex % 2 === 0) {
         currRow.style['background-color'] = 'lightgrey';
     }
+}
+
+const searchAvailableCollectionsForSpecimen = (specimenId) => {
+    const availableCollectionsObj = appState.getState().availableCollectionsObj;
+    if (specimenId.endsWith('0008') || specimenId.endsWith('0009')) {
+        const specimenCollection = availableCollectionsObj?.[specimenId];
+        if (specimenCollection) {
+            return true;
+        }
+    } else {
+        if (availableCollectionsObj?.['unlabelled'].includes(specimenId)) {
+            return true;
+        }
+    }
+    return false;
 }

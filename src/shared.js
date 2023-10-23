@@ -1030,9 +1030,42 @@ const removeUnusableTubes = (specimen) => {
 }
 
 /**
- * Get specimens from a list of boxes.
- * @param {*} boxList - list of current unshipped boxes for the shipping dashboard.
+ * Get specimens from an array of collectionIds.
+ * @param {array<string>} collectionIdsArray - list of collectionIds to fetch specimen documents.
  * @param {*} isBPTL - boolean to indicate if the request is from BPTL.
+ * @returns list of specimens objects.
+ */
+export const getSpecimensByCollectionIds = async (collectionIdsArray, isBPTL = false) => {
+  
+  if (collectionIdsArray.length === 0) return [];
+  const collectionIdQueryString = Array.from(collectionIdsArray).join(',');
+
+  try {
+      const idToken = await getIdToken();  
+      let queryString = `${api}api=getSpecimensByCollectionIds&collectionIdsArray=${collectionIdQueryString}`;
+      if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+      
+      const response = await fetch(queryString, {
+          method: 'GET',
+          headers: {
+          Authorization: 'Bearer ' + idToken,
+          }
+      });
+
+      if (!response.ok) throw new Error(response.statusText);
+
+      const specimensResponse = await response.json();
+      return specimensResponse.data;
+  } catch (error) {
+      console.error(error);
+      throw error;
+  }
+};
+
+/**
+ * Get specimens from a list of boxes.
+ * @param {array<object>} boxList - list of current unshipped boxes for the shipping dashboard.
+ * @param {boolean} isBPTL - boolean to indicate if the request is from BPTL.
  * @returns list of specimens objects with only the specimens in the current boxes.
  */
 export const getSpecimensInBoxes = async (boxList, isBPTL = false) => {
