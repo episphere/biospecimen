@@ -228,7 +228,7 @@ const materialTypeMapping = (specimenId) => {
   const tubeId = specimenId.split(' ')[1]
   const materialTypeObject = {'0001':'Serum', '0002':'Serum', '0011':'Serum', '0012':'Serum', '0021':'Serum', 
                               '0003': 'WHOLE BL', '0004': 'WHOLE BL', '0005': 'WHOLE BL', '0013': 'WHOLE BL', '0014' : 'WHOLE BL', '0024' : 'WHOLE BL',
-                              '0006':'Urine', '0007': 'Saliva'}
+                              '0006':'Urine', '0007': 'Saliva', '0060': 'WHOLE BL'}
   return materialTypeObject[tubeId] ?? '';
 }
 
@@ -252,6 +252,7 @@ const vialMapping = {
             '0004': ['10 ml Vacutainer', 'EDTA', 'WHOLE BL', '10'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
         kpCO: {
             '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
@@ -264,6 +265,7 @@ const vialMapping = {
             '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['6 ml Vacutainer', 'No Additive', 'Urine', '6'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
         kpGA: {
             '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
@@ -276,6 +278,7 @@ const vialMapping = {
             '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['15ml Nalgene jar', 'No Additive', 'Urine', '10'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
         kpHI: {
             '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
@@ -289,6 +292,7 @@ const vialMapping = {
             '0024': ['3 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '3'],
             '0005': ['10 ml Vacutainer', 'ACD', 'WHOLE BL', '10'],
             '0006': ['15ml Nalgene jar', 'No Additive', 'Urine', '10'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
         kpNW: {
             '0001': ['3.5 mL Serum separator tube', 'SST', 'Serum', '3.5'],
@@ -302,6 +306,7 @@ const vialMapping = {
             '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
         default: {
             '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],

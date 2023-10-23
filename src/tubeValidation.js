@@ -54,6 +54,7 @@ export const specimenCollection = {
     '0013': '958646668',
     '0014': '677469051',
     '0024': '683613884',
+    '0060': '505347689',
   },
   cidToNum: {
     299553921: '0001',
@@ -71,6 +72,7 @@ export const specimenCollection = {
     958646668: '0013',
     677469051: '0014',
     683613884: '0024',
+    505347689: '0060',
   },
   tubeNumList: [
     '0001',
@@ -87,6 +89,7 @@ export const specimenCollection = {
     '0013',
     '0014',
     '0024',
+    '0060',
   ],
   tubeCidList: [
     '299553921',
@@ -103,6 +106,7 @@ export const specimenCollection = {
     '958646668',
     '677469051',
     '683613884',
+    '505347689',
   ],
 };
 
@@ -321,6 +325,21 @@ const tube0009 = {
     'deviationChkBox': false
 };
 
+const tube0060 = {
+    'specimenType': 'Streck Tube',
+    'tubeType': 'Blood tube',
+    'readableValue': 'Streck Tube',
+    'image': './static/images/tube5.PNG',
+    'name': 'tube60',
+    'concept': specimenCollection.numToCid['0060'],
+    'id': '0060',
+    'tubeColor': 'Black-Tan',
+    'collectionChkBox': true,
+    'deviationChkBox': true,
+    'deviationOptions': deviationCollection2,
+    'tubeNotCollectedOptions': tubeNotCollectedOptions1
+};
+
 export const workflows = {
     research : [
         tube0001,
@@ -328,6 +347,7 @@ export const workflows = {
         tube0003,
         tube0004,
         tube0005,
+        tube0060,
         tube0006,
         tube0007,
         tube0008,
@@ -345,6 +365,7 @@ export const workflows = {
         tube0014,
         tube0024,
         tube0005,
+        tube0060,
         tube0006,
         tube0008
     ]
@@ -423,6 +444,7 @@ export const tubes = [
   tube0014,
   tube0021,
   tube0024,
+  tube0060,
 ];
 
 
