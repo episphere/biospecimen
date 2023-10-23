@@ -949,18 +949,22 @@ const arrangeFetchedTubes = (specimen, isPartiallyBoxed) => {
     const allBloodUrineTubes = allTubeIdsInSpecimen.filter(tubeId => tubeId.split(' ')[1] !== '0007');
     let strayTubeArray = specimen[conceptIds.strayTubesList] ?? [];
 
-    // Handle mouthwash tubes. Mouthwash tubes always belong in available collections.
+    // Handle mouthwash tubes. Mouthwash tubes always belong in available collections (not the stray tubes list).
     // If mouthwash tube is in stray tubes (this happens for partiallyBoxed specimens when other tubes in the specimen are boxed first),
-    // add it to available collections and remove from stray tubes list.
+    // Add it to available collections and remove from stray tubes list.
     if (allMouthwashTubes.length > 0) {
-        usableTubes[mouthwashCollection] = allMouthwashTubes.map(str => str.slice(-4));
-        
         if (isPartiallyBoxed) {
+            // Mouthwash tubes will be in the stray tubes array.
             const index = strayTubeArray.findIndex(str => str.endsWith('0007'));
             if (index !== -1) {
                 const mouthwashTube = strayTubeArray[index];
-                strayTubeArray.splice(index, 1);
+                if (mouthwashTube) {
+                    usableTubes[mouthwashCollection] = [mouthwashTube.slice(-4)];
+                    strayTubeArray.splice(index, 1);
+                }
             }
+        } else {
+            usableTubes[mouthwashCollection] = allMouthwashTubes.map(str => str.slice(-4));
         }
     }
     
