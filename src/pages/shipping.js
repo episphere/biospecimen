@@ -953,6 +953,31 @@ export const shipmentTracking = async (boxIdAndBagsObj, userName, boxWithTempMon
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveTracking" style="margin-right:.5rem;">Save</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="completeTracking">Save and Continue</button>
             </div>
+            <div class="modal fade" id="trackingSuccessModal" tabindex="-1" role="dialog" aria-labelledby="trackingSuccessModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                    <div class="modal-body text-center">
+                            <p class="h4 text-success">Success!</p>
+                            <p>Tracking input saved</p>
+                    </div>
+                    </div>
+            </div>
+        </div>
+
+        <div class="modal" id="errorModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="alert alert-danger">Error!</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <div class="modal-body">
+                Tracking Id's do not match in one of the boxes.
+                </div>
+            </div>
+        </div>
         </div>
     `;
 
@@ -1099,20 +1124,57 @@ const renderTempTubeReminder = () => {
 
 const renderSelectBoxes = () => {
     return `
-        <div class="row" style="margin-bottom:1rem">
-            <div class="col-9 no-gutters">
-                <h4 style="text-align:start;">Select one or more boxes to ship</h4>
+    <div class="modal fade" id="reminderModal" tabindex="-1" role="dialog" aria-labelledby="reminderModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reminderModalLabel">Reminder</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="col-3 no-gutters">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging" style="margin:auto;display:block;">Continue to Review Shipment Contents</button>
+                    <div class="modal-body">
+                        <div class="alert alert-warning" role="alert">
+                            Please Select 'Shipping Location'
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                    </div>
+                </div>
             </div>
         </div>
-        <div style="border: 1px solid black; overflow: auto; margin-bottom: 0.5rem; height: 400px;">
-            <table class="table table-bordered" style="width:100%;border:1px solid;" id="saveTable">
-            </table>
+    <!-- Button to trigger the modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#reminderModal" id="reminderButton" style="display: none;"> Show Reminder </button>
+        <div class="modal fade" id="myMModal" tabindex="-1" role="dialog" aria-labelledby="reminderModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="reminderModalLabel">Reminder</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning" role="alert">
+                    <p>Please select Box(es) to review and ship</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+            </div>
         </div>
+    </div>
+</div>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myMModal" id="myModal" style="display: none;">
+            Show Reminder
+        </button> 
+    <div style="border: 1px solid black; overflow: auto; margin-bottom: 0.5rem; height: 400px;">
+        <table class="table table-bordered" style="width:100%;border:1px solid;" id="saveTable">
+        </table>
+    </div>
     `;
-}
+    }
 
 const renderTempMonitorCheckbox = () => {
     return `

@@ -220,6 +220,28 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
                 <div class="ml-auto">
                     <button class="btn btn-info" data-connect-id="${participantData.Connect_ID}" type="button" id="collectionSave">Save</button>
                 </div>
+                
+                <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="successModalLabel">Success</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                                <div class="modal-body">
+                                <div class="alert alert-success" role="alert">
+                                    Collection specimen data has been saved
+                                </div>
+                                </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-auto">
                     <button class="btn btn-outline-primary" data-connect-id="${participantData.Connect_ID}" type="button" id="collectionNext">Go to Review</button>
                 </div>
@@ -254,5 +276,5 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
         } catch (error) {
             console.log("Error occured while trying to check out.");
         }
-     });
+    });
 }

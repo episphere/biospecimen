@@ -26,7 +26,7 @@ export const addEventSearchForm1 = () => {
     if (!form) return;
 
     if (isDeviceMobile) {
-      replaceDateInputWithMaskedInput(document.getElementById('dob'));
+        replaceDateInputWithMaskedInput(document.getElementById('dob'));
     }
 
     form.addEventListener('submit', e => {
@@ -292,16 +292,16 @@ export const getInstituteSpecimensList = async (boxList) => {
     // note: currently collections have no mouthwash specimens (0007)
     for (const currCollection of finalizedSpecimenList) {
         const tubesInBox = {
-          shipped: {
+            shipped: {
             bloodUrine: [],
             mouthWash: [],
             orphan: [],
-          },
-          notShipped: {
+            },
+            notShipped: {
             bloodUrine: [],
             mouthWash: [],
             orphan: [],
-          },
+            },
         };
 
         // For each collection, get its blood/urine, mouthwash, and orphan specimens that are in the box already
@@ -365,7 +365,7 @@ export const getInstituteSpecimensList = async (boxList) => {
             bloodUrine: [],
             mouthWash: [],
             orphan: [],
-          }
+            }
 
         for (let currCid of specimenCollection.tubeCidList) {
             const currTubeNum = specimenCollection.cidToNum[currCid];
@@ -671,28 +671,25 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
                         let collection = response.data.filter(res => res['331584571'] == visit.concept);
                         if (collection.length === 0) continue;
 
-                        const confirmRepeat = await swal({
-                            title: "Warning - Participant Previously Checked In",
-                            icon: "warning",
-                            text: "Participant " + data['399159511'] + " " + data['996038075'] + " was previously checked in on " + new Date(data['331584571'][visit.concept]['840048338']).toLocaleString() + " with Collection ID " + collection[0]['820476880'] + ".\r\nIf this is today, DO NOT check the participant in again.\r\nNote Collection ID above and see Check-In SOP for further instructions.\r\n\r\nIf this is is not today, you may check the participant in for an additional visit.",
-                            buttons: {
-                                cancel: {
-                                    text: "Cancel",
-                                    value: "cancel",
-                                    visible: true,
-                                    className: "btn btn-danger",
-                                    closeModal: true,
-                                },
-                                confirm: {
-                                    text: "Continue with Check-In",
-                                    value: 'confirmed',
-                                    visible: true,
-                                    closeModal: true,
-                                    className: "btn btn-success",
-                                }
-                            }
-                        });
 
+                        // Create a function to show the Bootstrap modal
+const showConfirmRepeatModal = () => {
+    const participantData = {
+        name: data['399159511'] + ' ' + data['996038075'],
+        checkInDate: new Date(data['331584571'][visit.concept]['840048338']).toLocaleString(),
+        collectionID: collection[0]['820476880'],
+    };
+    
+    $('#participantInfo').text('Participant ' + participantData.name);
+    $('#checkInDate').text(participantData.checkInDate);
+    $('#collectionID').text(participantData.collectionID);
+    $('#confirmRepeatModal').modal('show'); 
+    $('#continueCheckIn').on('click', function() {
+    $('#confirmRepeatModal').modal('hide'); 
+    });
+};
+
+    const confirmRepeat = showConfirmRepeatModal();
                         if (confirmRepeat === "cancel") return;
                     }
                 }
@@ -700,28 +697,17 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
 
             await checkInParticipant(data, visitConcept);
 
-            const confirmVal = await swal({
-                title: "Success",
-                icon: "success",
-                text: "Participant is checked in.",
-                buttons: {
-                    cancel: {
-                        text: "Close",
-                        value: "cancel",
-                        visible: true,
-                        className: "btn btn-default",
-                        closeModal: true,
-                    },
-                    confirm: {
-                        text: "Continue to Specimen Link",
-                        value: 'confirmed',
-                        visible: true,
-                        className: "",
-                        closeModal: true,
-                        className: "btn btn-success",
-                    }
-                },
-            });
+const showConfirmValModal = () => {
+    $('#confirmValModal').modal('show');
+
+    $('#continueSpecimenLink').on('click', function() {
+
+    $('#confirmValModal').modal('hide'); 
+    });
+};
+  // Call the function to show the modal
+    const confirmVal = showConfirmValModal();
+                
 
             if (confirmVal === "confirmed") {
                 const updatedResponse = await findParticipant(query);
@@ -1239,8 +1225,7 @@ export const addEventBiospecimenCollectionFormToggles = () => {
                 const allTubesCollected = Array.from(document.querySelectorAll('.tube-collected'))
                 const allBloodUrineCheckedArray = allTubesCollected.filter(
                     item => (item.getAttribute("data-tube-type") === "Blood tube" && item.checked) || (item.getAttribute("data-tube-type") === "Urine" && item.checked)
-                );
-               
+                );   
                 if (collected.checked) {
                     biohazardBagChkb.checked = true;
                     biohazardBagText.disabled = false;
@@ -1578,22 +1563,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
         finalizeTemplate(participantData, specimenData);
     }
     else {
-
-        await swal({
-            title: "Success",
-            icon: "success",
-            text: "Collection specimen data has been saved",
-            buttons: {
-                close: {
-                    text: "Close",
-                    value: "close",
-                    visible: true,
-                    className: "btn btn-success",
-                    closeModal: true,
-                }
-            },
-        });
-
+        $('#successModal').modal('show');
         hideAnimation();
     }
 }
@@ -1761,42 +1731,17 @@ export const addEventNavBarShippingManifest = (userName) => {
         }
 
         if (selectedLocation === 'none') {
-            await swal({
-                title: "Reminder",
-                icon: "warning",
-                text: "Please Select 'Shipping Location'",
-                className: "swal-no-box",
-                buttons: {
-                  confirm: {
-                    text: "OK",
-                    value: true,
-                    visible: true,
-                    closeModal: true,
-                    className: "swal-no-box-button",
-                  },
-                },
-              });
-              return
+            $('#reminderButton').click();
+            return;
         }
-
-        if(!boxesToShip.length) {
-          await swal({
-            title: "Reminder",
-            icon: "warning",
-            text: "Please select Box(es) to review and ship",
-            className: "swal-no-box",
-            buttons: {
-              confirm: {
-                text: "OK",
-                value: true,
-                visible: true,
-                closeModal: true,
-                className: "swal-no-box-button",
-              },
-            },
-          });
-          return
+        
+        
+        if (!boxesToShip.length) 
+        {
+            $('#myModal').click();
+            return;
         }
+        
 
         tempCheckStatus = tempCheckedEl.checked 
         // Push empty item with boxId and empty tracking number string
@@ -1841,57 +1786,57 @@ export const addEventTrackingNumberScanAutoFocus = () => {
 }
 
 export const addEventTrimTrackingNums = () => {
-  let boxTrackingIdEls = Array.from(document.getElementsByClassName("boxTrackingId"))
-  let boxTrackingIdConfirmEls = Array.from(document.getElementsByClassName("boxTrackingIdConfirm"))
-  const nonAlphaNumericMatch = /[^a-zA-Z0-9]/gm;
+    let boxTrackingIdEls = Array.from(document.getElementsByClassName("boxTrackingId"))
+    let boxTrackingIdConfirmEls = Array.from(document.getElementsByClassName("boxTrackingIdConfirm"))
+    const nonAlphaNumericMatch = /[^a-zA-Z0-9]/gm;
   // Trim Function here
-  boxTrackingIdEls.forEach(el => el.addEventListener("input", e => {
+    boxTrackingIdEls.forEach(el => el.addEventListener("input", e => {
     let inputTrack = e.target.value.trim()
     if(inputTrack.length >= 0) {
-      e.target.value = inputTrack.replace(nonAlphaNumericMatch, '')
+        e.target.value = inputTrack.replace(nonAlphaNumericMatch, '')
     }
     if(inputTrack.length > 12) {
-      e.target.value = inputTrack.slice(-12)
+        e.target.value = inputTrack.slice(-12)
     }
-  }))
-  boxTrackingIdConfirmEls.forEach(el => el.addEventListener("input", e => {
+    }))
+    boxTrackingIdConfirmEls.forEach(el => el.addEventListener("input", e => {
     let inputTrackConfirm = e.target.value.trim()
     if(inputTrackConfirm.length >= 0) {
-      e.target.value = inputTrackConfirm.replace(nonAlphaNumericMatch, '')
+        e.target.value = inputTrackConfirm.replace(nonAlphaNumericMatch, '')
     }
     if(inputTrackConfirm.length > 12) {
-      e.target.value = inputTrackConfirm.slice(-12)
+        e.target.value = inputTrackConfirm.slice(-12)
     }
-  }))
+    }))
 }
 
 export const addEventPreventTrackingConfirmPaste = () => {
-  let boxTrackingIdConfirmEls = Array.from(document.getElementsByClassName("boxTrackingIdConfirm"));
-  boxTrackingIdConfirmEls.forEach(el => {
+    let boxTrackingIdConfirmEls = Array.from(document.getElementsByClassName("boxTrackingIdConfirm"));
+    boxTrackingIdConfirmEls.forEach(el => {
     el.addEventListener("paste", e => e.preventDefault())
-  })
+    })
 }
 
 export const addEventCheckValidTrackInputs = (boxIdAndBagsObj) => {
 
-  let boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
+    let boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
   /* Check Tracking Numbers - ON SCREEN LOAD */
-  boxIdArray.forEach(box => {
+    boxIdArray.forEach(box => {
     let input = document.getElementById(box+"trackingId").value.trim()
     let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
     let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
     let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
     if(input.length !== 0 && input.length < 12) {
-      document.getElementById(box+"trackingId").classList.add("invalid")
-      inputErrorMsg.textContent = `Tracking number must be 12 digits`
+        document.getElementById(box+"trackingId").classList.add("invalid")
+        inputErrorMsg.textContent = `Tracking number must be 12 digits`
     }
     if(inputConfirm !== input ) {
-      document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
-      inputConfirmErrorMsg.textContent = `Tracking numbers must match`
+        document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
+        inputConfirmErrorMsg.textContent = `Tracking numbers must match`
     }
-  })
+    })
   /* Check Tracking Numbers - User Input */
-  boxIdArray.forEach(box => {
+    boxIdArray.forEach(box => {
     // box tracking id 
     document.getElementById(box+"trackingId").addEventListener("input", e => {
         let input = document.getElementById(box+"trackingId").value.trim()
@@ -1899,52 +1844,51 @@ export const addEventCheckValidTrackInputs = (boxIdAndBagsObj) => {
         let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg") 
         let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
 
-      if(input.length === 12) {
-          inputErrorMsg.textContent = ``
-          document.getElementById(box+"trackingId").classList.remove("invalid")
+        if(input.length === 12) {
+            inputErrorMsg.textContent = ``
+            document.getElementById(box+"trackingId").classList.remove("invalid")
 
-          if (input === inputConfirm) { 
+            if (input === inputConfirm) { 
             inputConfirmErrorMsg.textContent = ``
             document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
-          }
-          else {
+            }
+            else {
             inputConfirmErrorMsg.textContent = `Tracking numbers must match`
             document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
-          }
-      }
-      else if (input.length < 12 && input === inputConfirm) { 
+            }
+        }
+        else if (input.length < 12 && input === inputConfirm) { 
         inputConfirmErrorMsg.textContent = ``
         document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
         inputErrorMsg.textContent = `Tracking number must be 12 digits`
         document.getElementById(box+"trackingId").classList.add("invalid")
-      }
-      else if(input.length < 12 && input !== inputConfirm) {
+        }
+        else if(input.length < 12 && input !== inputConfirm) {
         inputErrorMsg.textContent = `Tracking number must be 12 digits`
         document.getElementById(box+"trackingId").classList.add("invalid")
         inputConfirmErrorMsg.textContent = `Tracking numbers must match`
         document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
-      }
-      else {
+        }
+        else {
         inputErrorMsg.textContent = `Tracking number must be 12 digits`
         document.getElementById(box+"trackingId").classList.add("invalid")
-      }
+        }
     })
     // box tracking id confirm
     document.getElementById(box + "trackingIdConfirm").addEventListener("input", e => {
-      let input = document.getElementById(box+"trackingId").value.trim()
-      let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
-      let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
-      
-      if(inputConfirm === input) {
-          inputConfirmErrorMsg.textContent = ``
-          document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
-      }
-      else {
+        let input = document.getElementById(box+"trackingId").value.trim()
+        let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+        let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+        if(inputConfirm === input) {
+            inputConfirmErrorMsg.textContent = ``
+            document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
+        }
+        else {
         document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
         inputConfirmErrorMsg.textContent = `Tracking numbers must match`
-      }
+        }
     })
-  })
+        })
 }
 
 export const populateTrackingQuery = async (boxIdAndBagsObj) => {
@@ -1956,12 +1900,12 @@ export const populateTrackingQuery = async (boxIdAndBagsObj) => {
 
     for(let box of shipData) {
       // if boxes has box id of localforage shipData push
-      if(boxIdArray.includes(box["boxId"])) {
+        if(boxIdArray.includes(box["boxId"])) {
         shipping[box["boxId"]] = {[conceptIds.shippingTrackingNumber]: box[conceptIds.shippingTrackingNumber], "confirmTrackNum": box["confirmTrackNum"] };
-      }
-      else {
+        }
+        else {
         shipping[box["boxId"]] = {[conceptIds.shippingTrackingNumber]: "" , confirmTrackNum: ""};
-      }
+        }
     }
     
     for(let i = 0; i < boxIdArray.length; i++){
@@ -2000,8 +1944,8 @@ export const addEventSaveAndContinueButton = async (boxIdAndBagsObj, userName, b
         const boxIdArray = Object.keys(boxIdAndBagsObj);
         const trackingNumConfirmEls = Array.from(document.getElementsByClassName("invalid"));
         if (trackingNumConfirmEls.length > 0) {
-          showNotifications({ title: 'Invalid Fields', body: 'Please add valid inputs to fields.' });
-          return;
+            showNotifications({ title: 'Invalid Fields', body: 'Please add valid inputs to fields.' });
+            return;
         }
 
         for (const boxId of boxIdArray) {
@@ -2013,13 +1957,13 @@ export const addEventSaveAndContinueButton = async (boxIdAndBagsObj, userName, b
             }
         
             shippingData.push({
-              [conceptIds.shippingTrackingNumber]: trackingId,
-              confirmTrackNum: trackingIdConfirm,
-              boxId
+                [conceptIds.shippingTrackingNumber]: trackingId,
+                confirmTrackNum: trackingIdConfirm,
+                boxId
             });
             boxIdAndTrackingObj[boxId] = {
-              [conceptIds.shippingTrackingNumber]: trackingId,
-              specimens: boxIdAndBagsObj[boxId]
+                [conceptIds.shippingTrackingNumber]: trackingId,
+                specimens: boxIdAndBagsObj[boxId]
             };
         }
 
@@ -2027,11 +1971,11 @@ export const addEventSaveAndContinueButton = async (boxIdAndBagsObj, userName, b
         if (isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxIdArray) && boxIdArray.length > 1)) {
             shippingDuplicateMessage();
             return;
-          }
+        }
 
         if (checkNonAlphanumericStr(boxIdArray)) {
-          shippingNonAlphaNumericStrMessage();
-          return;
+            shippingNonAlphaNumericStrMessage();
+            return;
         }
 
         localforage.setItem("shipData", shippingData);
@@ -2053,24 +1997,22 @@ export const addEventSaveButton = async (boxIdAndBagsObj) => {
             const trackingIdConfirm = document.getElementById(boxId + "trackingIdConfirm").value.toUpperCase();
     
             if (trackingId !== trackingIdConfirm) {
-              isMismatch = true;
-              break;
+                isMismatch = true;
+                break;
             }
 
             shippingData.push({[conceptIds.shippingTrackingNumber]: trackingId, confirmTrackNum: trackingIdConfirm, boxId});
             boxIdAndTrackingObj[boxId] = {
                 [conceptIds.shippingTrackingNumber]: trackingId,
                 specimens: boxIdAndBagsObj[boxId],
-              };
+            };
         }
 
         if (isMismatch) {
-            await swal({
-                title: 'Error!',
-                icon: 'error',
-                text: 'Tracking Ids do not match in one of the boxes.',
-                timer: 1600,
-              });
+                $('#errorModal').modal('show');
+                setTimeout(function () {
+                $('$errorModal').modal('hide');
+                }, 1600);
             return;
         }
 
@@ -2078,15 +2020,17 @@ export const addEventSaveButton = async (boxIdAndBagsObj) => {
         if(isDuplicateTrackingIdInDb || (checkFedexShipDuplicate(boxIdArray) && boxIdArray.length > 1)){
             shippingDuplicateMessage(isDuplicateTrackingIdInDb)
             return
-          }
-          
+            }
         localforage.setItem("shipData", shippingData);
-        await swal({
-          title: 'Success!',
-          icon: 'success',
-          text: 'Tracking input saved',
-          timer: 1600,
-        });
+        
+const showTrackingSuccessModal = () => {
+    
+    $('#trackingSuccessModal').modal('show');
+    setTimeout(function () {
+        $('#trackingSuccessModal').modal('hide');
+    }, 1600);
+    };
+    showTrackingSuccessModal();
     })
 }
 
@@ -2564,7 +2508,7 @@ const findScannedIdInUnshippedBoxes = (allBoxesList, masterSpecimenId) => {
     }
 
     return dataObj;
-  }
+    }
 
   /**
  * Function to add content to deviation type and comments cells in the manifest table
