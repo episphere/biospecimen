@@ -6,7 +6,7 @@ import { appState, performSearch, showAnimation, addBiospecimenUsers, getSpecime
         checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData,
         siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
         getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger,
-        packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput } from './shared.js';
+        packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
 import { addNewBox, buildSpecimenDataInModal, createShippingModalBody, startShipping, generateBoxManifest, populateViewShippingBoxContentsList,
@@ -308,16 +308,18 @@ export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrpha
 }
 
 const checkBagCount = (bagCount, bagId, currBoxId) => {
+    const maxBoxSize = bagConceptIdList.length;
+    const timeToAlert = maxBoxSize - 3;
     const boxNumber = currBoxId.substring(3);
-    const remainingBagCount = 40 - bagCount;
+    const remainingBagCount = maxBoxSize - bagCount;
     const bagText = remainingBagCount !== 1 ? 'bags' : 'bag';
 
-    if (bagCount < 37) {
+    if (bagCount < maxBoxSize - timeToAlert) {
         return true;
-    } else if (bagCount >= 37 && bagCount < 40) {
+    } else if (bagCount >= timeToAlert && bagCount < maxBoxSize) {
         showNotifications({ title: 'Bag Added. Attention: This box is almost full.', body: `${bagId} has been added to box ${boxNumber}. Box ${boxNumber} is almost full. This box can accept ${remainingBagCount} more ${bagText}.` });
         return true;
-    } else if (bagCount === 40) {
+    } else if (bagCount === maxBoxSize) {
         showNotifications({ title: 'Bag Added. Attention: This box is now full.', body: `${bagId} has been added to box ${boxNumber}. Box ${boxNumber} is now full. Please select another box or create a new box if you have more bags to pack.` });
         return true;
     } else {
