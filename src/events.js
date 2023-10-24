@@ -314,7 +314,7 @@ const checkBagCount = (bagCount, bagId, currBoxId) => {
     const remainingBagCount = maxBoxSize - bagCount;
     const bagText = remainingBagCount !== 1 ? 'bags' : 'bag';
 
-    if (bagCount < maxBoxSize - timeToAlert) {
+    if (bagCount < timeToAlert) {
         return true;
     } else if (bagCount >= timeToAlert && bagCount < maxBoxSize) {
         showNotifications({ title: 'Bag Added. Attention: This box is almost full.', body: `${bagId} has been added to box ${boxNumber}. Box ${boxNumber} is almost full. This box can accept ${remainingBagCount} more ${bagText}.` });
