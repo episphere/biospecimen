@@ -931,7 +931,8 @@ const buildAvailableCollectionsObject = (specimensList, isPartiallyBoxed) => {
 /**
  * Handle the fetched specimen docs. Remove the unusable (deviated or missing) tubes, then arrange remaining tubes for available collections and the stray tube list.
  * This function mutates the specimen object from the calling function AND returns the usableTubes object.
- * @param {object} specimen - specimen object
+ * @param {object} specimen - specimen object.
+ * @param {boolean} isPartiallyBoxed - boolean to indicate if the request is for partially boxed specimens.
  * @returns {object} usableTubes - usable tubes from the specimen that are usable
  */
 const arrangeFetchedTubes = (specimen, isPartiallyBoxed) => {

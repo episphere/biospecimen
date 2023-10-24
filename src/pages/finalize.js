@@ -1,4 +1,4 @@
-import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorkflow, updateSpecimen, appState, keyToNameObj } from "./../shared.js";
+import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorkflow, updateSpecimen, appState, keyToNameObj, showNotifications } from "./../shared.js";
 import { addEventReturnToCollectProcess } from "./../events.js";
 import {searchTemplate} from "./dashboard.js";
 import { collectionIdSearchScreenTemplate } from "./reports/collectionIdSearch.js";
@@ -174,12 +174,17 @@ export const finalizeTemplate = (data, specimenData, bptlCollectionFlag) => {
         openModal(modalId);
     });
 
-    document.getElementById('finalizedConfirmButton') && document.getElementById('finalizedConfirmButton').addEventListener('click', async (e) => { 
+    document.getElementById('finalizedConfirmButton') && document.getElementById('finalizedConfirmButton').addEventListener('click', async () => { 
+        try {
         specimenData[conceptIds.collection.isFinalized] = conceptIds.yes;
         specimenData[conceptIds.collection.finalizedTime] = new Date().toISOString();
         specimenData[conceptIds.boxedStatus] = conceptIds.notBoxed;
         specimenData[conceptIds.strayTubesList] = [];
         await updateSpecimen([specimenData]);
+        } catch (e) {
+            console.error(e);
+            showNotifications({ title: 'Error finalizing specimen.', body: `There was an error finalizing this specimen. Please try again. ${e}`});
+        }
     });
 
     document.querySelectorAll('#modal2 .modal-close').forEach(element => { 

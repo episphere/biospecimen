@@ -141,7 +141,7 @@ const getStoredLocationOnInit = () => {
 
 /**
  * Populate the 'Available Collections' table.
- * @param {array} boxList - list of available boxes.
+ * @param {object} availableCollectionsObj - object containing available collections where available collections are keys and values are arrays of tubeIds. Stray tubes are in the 'unlabelled' key.
  * @param {boolean} loadFromState - if true, load data from state instead of fetching from server.
  * Note: Orphan panel is currently hidden by request of the product team. Retain for future use.
  *       Future orphan panel use would require completed state management implementation in the 'currDeleteButton' event listener.
