@@ -81,51 +81,6 @@ export const checkInTemplate = async (data, checkOutFlag) => {
             <div class="col">
                 <button class="btn btn-outline-primary btn-block text-nowrap" ${!isCheckedIn ? `disabled` : visitCollections.length > 0 ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
             </div>
-            <div class="modal fade" id="confirmRepeatModal" tabindex="-1" role="dialog" aria-labelledby="confirmRepeatModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmRepeatModalLabel">Warning - Participant Previously Checked In</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Participant <span id="participantInfo"></span> was previously checked in on <span id="checkInDate"></span> with Collection ID <span id="collectionID"></span>.</p>
-                    <p>If this is today, DO NOT check the participant in again.</p>
-                    <p>Note Collection ID above and see Check-In SOP for further instructions.</p>
-                    <p>If this is not today, you may check the participant in for an additional visit.</p>
-                </div>
-                    <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success" id="continueCheckIn">Continue with Check-In</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-<div class="modal fade" id="confirmValModal" tabindex="-1" role="dialog" aria-labelledby="confirmValModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-        <div class="modal-header">
-                <h5 class="modal-title" id="confirmValModalLabel">Success</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-            <div class="modal-body">
-            Participant is checked in.
-        </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-success" id="continueSpecimenLink">Continue to Specimen Link</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
         </form>
     `;
 

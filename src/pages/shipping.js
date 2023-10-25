@@ -1124,6 +1124,18 @@ const renderTempTubeReminder = () => {
 
 const renderSelectBoxes = () => {
     return `
+    <div class="row" style="margin-bottom:1rem">
+    <div class="col-9 no-gutters">
+    <h4 style="text-align:start;">Select one or more boxes to ship</h4>
+    </div>
+    <div class="col-3 no-gutters">
+    <button type="button" class="btn btn-primary" data-dismiss="modal" id="completePackaging" style="margin:auto;display:block;">Continue to Review Shipment Contents</button>
+    </div>
+        </div>
+        <div style="border: 1px solid black; overflow: auto; margin-bottom: 0.5rem; height: 400px;">
+        <table class="table table-bordered" style="width:100%;border:1px solid;" id="saveTable">
+        </table>
+        </div>
     <div class="modal fade" id="reminderModal" tabindex="-1" role="dialog" aria-labelledby="reminderModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -1144,7 +1156,6 @@ const renderSelectBoxes = () => {
                 </div>
             </div>
         </div>
-    <!-- Button to trigger the modal -->
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#reminderModal" id="reminderButton" style="display: none;"> Show Reminder </button>
         <div class="modal fade" id="myMModal" tabindex="-1" role="dialog" aria-labelledby="reminderModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
