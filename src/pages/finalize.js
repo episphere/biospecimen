@@ -176,11 +176,11 @@ export const finalizeTemplate = (data, specimenData, bptlCollectionFlag) => {
 
     document.getElementById('finalizedConfirmButton') && document.getElementById('finalizedConfirmButton').addEventListener('click', async () => { 
         try {
-        specimenData[conceptIds.collection.isFinalized] = conceptIds.yes;
-        specimenData[conceptIds.collection.finalizedTime] = new Date().toISOString();
-        specimenData[conceptIds.boxedStatus] = conceptIds.notBoxed;
-        specimenData[conceptIds.strayTubesList] = [];
-        await updateSpecimen([specimenData]);
+            specimenData[conceptIds.collection.isFinalized] = conceptIds.yes;
+            specimenData[conceptIds.collection.finalizedTime] = new Date().toISOString();
+            specimenData[conceptIds.boxedStatus] = conceptIds.notBoxed;
+            specimenData[conceptIds.strayTubesList] = [];
+            await updateSpecimen([specimenData]);
         } catch (e) {
             console.error(e);
             showNotifications({ title: 'Error finalizing specimen.', body: `There was an error finalizing this specimen. Please try again. ${e}`});
