@@ -6,3 +6,6 @@ static/images/.DS_Store
 .hintrc
 .eslintrc.json
 scratch.js
+node_modules/
+package.json
+package-lock.json

@@ -532,19 +532,28 @@ export const checkDerivedVariables = async (participantObjToken) => {
 }
 
 export const updateBox = async (box) => {
-  logAPICallStartDev('updateBox');
-  const idToken = await getIdToken();
-  let requestObj = {
-      method: "POST",
-      headers:{
-          Authorization:"Bearer "+idToken,
-          "Content-Type": "application/json"
-      },
-      body: JSON.stringify(convertToFirestoreBox(box))
-  }
-  const response = await fetch(`${api}api=updateBox`, requestObj);
-  logAPICallEndDev('updateBox');
-  return response.json();
+    try {
+        const idToken = await getIdToken();
+        const requestObj = {
+            method: "POST",
+            headers:{
+                Authorization:"Bearer "+idToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(convertToFirestoreBox(box)),
+        }
+
+        const response = await fetch(`${api}api=updateBox`, requestObj);
+        
+        if (!response.ok) {
+            throw new Error(`API responded with status: ${response.status}`);
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to update box:', error);
+        throw error;
+    }
 }
 
 export const updateNewTempDate = async () =>{
@@ -620,6 +629,31 @@ export const bagConceptIdList = [
     conceptIds.bag13,
     conceptIds.bag14,
     conceptIds.bag15,
+    conceptIds.bag16,
+    conceptIds.bag17,
+    conceptIds.bag18,
+    conceptIds.bag19,
+    conceptIds.bag20,
+    conceptIds.bag21,
+    conceptIds.bag22,
+    conceptIds.bag23,
+    conceptIds.bag24,
+    conceptIds.bag25,
+    conceptIds.bag26,
+    conceptIds.bag27,
+    conceptIds.bag28,
+    conceptIds.bag29,
+    conceptIds.bag30,
+    conceptIds.bag31,
+    conceptIds.bag32,
+    conceptIds.bag33,
+    conceptIds.bag34,
+    conceptIds.bag35,
+    conceptIds.bag36,
+    conceptIds.bag37,
+    conceptIds.bag38,
+    conceptIds.bag39,
+    conceptIds.bag40,
 ];
   
 const bagConversionKeys = [
@@ -792,9 +826,344 @@ export const getAllBoxes = async (flagValue) => {
     return res;
 };
 
+export const getUnshippedBoxes = async (isBPTL = false) => {
+    try {
+        const idToken = await getIdToken();  
+        let queryString = `${api}api=getUnshippedBoxes`;
+        if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+        
+        const response = await fetch(queryString, {
+            method: 'GET',
+            headers: {
+            Authorization: 'Bearer ' + idToken,
+            }
+        });
+
+        if (!response.ok) throw new Error(`Unexpected server error: ${response.status}`);
+
+        const unshippedBoxRes = await response.json();
+        unshippedBoxRes.data = unshippedBoxRes.data.map(convertToOldBox);
+        return unshippedBoxRes;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+/**
+ * Get specimens by boxed status isolates only the specimens that need to be fetched/available in the shipping dashboard.
+ * @param {string} boxedStatus - boxed status of the specimens to fetch (notBoxed, partiallyBoxed, or boxed) .
+ * @param {*} isBPTL - boolean to indicate if the request is from BPTL.
+ * @returns list of specimens.
+ */
+export const getSpecimensByBoxedStatus = async (boxedStatus, isBPTL = false) => {
+    try {
+        const idToken = await getIdToken();
+        let queryString = `${api}api=getSpecimensByBoxedStatus&boxedStatus=${boxedStatus}`;
+        if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+        
+        const response = await fetch(queryString, {
+            method: 'GET',
+            headers: {
+            Authorization: 'Bearer ' + idToken,
+            }
+        });
+
+        if (!response.ok) throw new Error(`Unexpected server error: ${response.status}`);
+
+        const specimensRes = await response.json();
+        const hasStrayTubes = boxedStatus === conceptIds.partiallyBoxed.toString();
+
+        return buildAvailableCollectionsObject(specimensRes.data, hasStrayTubes);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+/**
+ * Combine the Available Collections objects from the unboxed and partially boxed specimens.
+ * @param {object} obj1 - fetched and arranged available collections object.
+ * @param {object} obj2 - fetched and arranged available collections object.
+ * @returns {object} availableCollectionsObject - combined available collections object without duplicates
+ * Get unique keys from both objects. Combine and de-duplicate if key exists in both objects. Else take the key from the object that has it.
+ */
+export const combineAvailableCollectionsObjects = (obj1, obj2) => {
+    const availableCollectionsObject = {};
+    const availableCollectionKeys = [...new Set([...Object.keys(obj1), ...Object.keys(obj2)])];
+
+    for (const key of availableCollectionKeys) {
+        if (obj1[key] && obj2[key]) {
+            availableCollectionsObject[key] = [...new Set([...obj1[key], ...obj2[key]])];
+        } else if (obj1[key]) {
+            availableCollectionsObject[key] = obj1[key];
+        } else {
+            availableCollectionsObject[key] = obj2[key];
+        }
+    }
+    return availableCollectionsObject;
+}
+
+/**
+ * Build the available collections object. Remove unusable tubes.
+ * Filter tubes (available collections vs strays) for use in the shipping dashboard.
+ * @param {array<object>} specimensList - list of specimens from Firestore.
+ * @param {boolean} isPartiallyBoxed - boolean to indicate if the request is for partially boxed specimens. 
+ * @returns {object} { availableCollections, specimensList } - available collections object and the updated specimens list.
+ * Note: Mouthwash tubes are always solo. They belong in available collections. The tube number is always '0007', the bag number is always '0009'.
+ */
+const buildAvailableCollectionsObject = (specimensList, isPartiallyBoxed) => {
+    if (!specimensList || specimensList.length === 0) return { availableCollections: {}, specimensList: [] };
+    const availableCollections = {};
+    for (let specimen of specimensList) {
+        const usableTubesObj = arrangeFetchedTubes(specimen, isPartiallyBoxed);
+        const usableBagKeys = Object.keys(usableTubesObj);
+        for (const bagKey of usableBagKeys) {
+            if (!availableCollections[bagKey]) {
+                availableCollections[bagKey] = [];
+            }
+            availableCollections[bagKey] = [...availableCollections[bagKey], ...usableTubesObj[bagKey]];
+        }
+    }
+    return { availableCollections, specimensList };
+}
+
+/**
+ * Handle the fetched specimen docs. Remove the unusable (deviated or missing) tubes, then arrange remaining tubes for available collections and the stray tube list.
+ * This function mutates the specimen object from the calling function AND returns the usableTubes object.
+ * @param {object} specimen - specimen object.
+ * @param {boolean} isPartiallyBoxed - boolean to indicate if the request is for partially boxed specimens.
+ * @returns {object} usableTubes - usable tubes from the specimen that are usable
+ */
+const arrangeFetchedTubes = (specimen, isPartiallyBoxed) => {
+    const usableTubes = {};
+    
+    const collectionId = specimen[conceptIds.collection.id];
+    if (!collectionId) return;
+    const bloodUrineCollection = `${collectionId} 0008`;
+    const mouthwashCollection = `${collectionId} 0009`;
+    
+    const tubeDataObject = removeUnusableTubes(specimen);
+    const allTubeIdsInSpecimen = Object.values(tubeDataObject);
+
+    const allMouthwashTubes = allTubeIdsInSpecimen.filter(tubeId => tubeId.split(' ')[1] === '0007');
+    const allBloodUrineTubes = allTubeIdsInSpecimen.filter(tubeId => tubeId.split(' ')[1] !== '0007');
+    let strayTubeArray = specimen[conceptIds.strayTubesList] ?? [];
+
+    // Handle mouthwash tubes. Mouthwash tubes always belong in available collections (not the stray tubes list).
+    // If mouthwash tube is in stray tubes (this happens for partiallyBoxed specimens when other tubes in the specimen are boxed first),
+    // Add it to available collections and remove from stray tubes list.
+    if (allMouthwashTubes.length > 0) {
+        if (isPartiallyBoxed) {
+            // Mouthwash tubes will be in the stray tubes array.
+            const index = strayTubeArray.findIndex(str => str.endsWith('0007'));
+            if (index !== -1) {
+                const mouthwashTube = strayTubeArray[index];
+                if (mouthwashTube) {
+                    usableTubes[mouthwashCollection] = [mouthwashTube.slice(-4)];
+                    strayTubeArray.splice(index, 1);
+                }
+            }
+        } else {
+            usableTubes[mouthwashCollection] = allMouthwashTubes.map(str => str.slice(-4));
+        }
+    }
+    
+    // Compare all blood/urine tubes to stray tubes list.
+    // If all allBloodUrineTubes are in the strayTubesList, add them to available collections and remove from stray tubes list.
+    if (allBloodUrineTubes.length > 0) {
+        if (isPartiallyBoxed || strayTubeArray.length > 0) {
+            const areAllTubesInStrayTubeArray = allBloodUrineTubes.every(tubeId => strayTubeArray.includes(tubeId));
+            if (areAllTubesInStrayTubeArray) {
+                usableTubes[bloodUrineCollection] = allBloodUrineTubes.map(str => str.slice(-4));
+                strayTubeArray = strayTubeArray.filter(tubeId => !allBloodUrineTubes.includes(tubeId));
+            }
+        } else {
+            usableTubes[bloodUrineCollection] = allBloodUrineTubes.map(str => str.slice(-4));
+        }
+    }
+    
+    // Assign the 'unlabelled' tubes for use in the available collections object.
+    if (strayTubeArray.length !== 0) usableTubes['unlabelled'] = strayTubeArray;
+
+    return usableTubes;
+}
+
+const tubeDeviationFlags = [
+    conceptIds.collection.deviationType.broken,
+    conceptIds.collection.deviationType.discard,
+    conceptIds.collection.deviationType.insufficientVolume,
+    conceptIds.collection.deviationType.mislabel,
+    conceptIds.collection.deviationType.notFound,
+];
+
+/**
+ * Remove deviated unshippable tubes and missing tubes from the specimen object. Do not remove deviated shippable tubes.
+ * @param {object} specimen - specimen object from the Firestore.
+ */
+const removeUnusableTubes = (specimen) => {
+    const tubeDataObject = {};
+    tubeLoop: for (const tubeKey of specimenCollection.tubeCidList) {
+        const tube = specimen[tubeKey];
+
+        if (!tube || !tube[conceptIds.collection.tube.scannedId]) {
+            delete specimen[tubeKey];
+            continue;
+        }
+
+        if (tube[conceptIds.discardFlag] === conceptIds.yes) {
+            delete specimen[tubeKey];
+            continue;
+        }
+
+        if (tube[conceptIds.collection.tube.isMissing] === conceptIds.yes) {
+            delete specimen[tubeKey];
+            continue;
+        }
+
+        // This is a sanity check, but hasn't been needed in testing. All applicable tubes have been filtered by the discard flag.
+        const tubeDeviation = tube[conceptIds.collection.tube.deviation];
+        for (const deviationFlag of tubeDeviationFlags) {
+            if (tubeDeviation?.[deviationFlag] === conceptIds.yes) {
+                delete specimen[tubeKey];
+                continue tubeLoop;
+            }
+        }
+        tubeDataObject[tubeKey] = tube[conceptIds.collection.tube.scannedId];  
+    };
+    return tubeDataObject;
+}
+
+/**
+ * Get specimens from an array of collectionIds.
+ * @param {array<string>} collectionIdsArray - list of collectionIds to fetch specimen documents.
+ * @param {*} isBPTL - boolean to indicate if the request is from BPTL.
+ * @returns list of specimens objects.
+ */
+export const getSpecimensByCollectionIds = async (collectionIdsArray, isBPTL = false) => {
+  
+  if (collectionIdsArray.length === 0) return [];
+  const collectionIdQueryString = Array.from(collectionIdsArray).join(',');
+
+  try {
+      const idToken = await getIdToken();  
+      let queryString = `${api}api=getSpecimensByCollectionIds&collectionIdsArray=${collectionIdQueryString}`;
+      if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+      
+      const response = await fetch(queryString, {
+          method: 'GET',
+          headers: {
+          Authorization: 'Bearer ' + idToken,
+          }
+      });
+
+      if (!response.ok) throw new Error(response.statusText);
+
+      const specimensResponse = await response.json();
+      return specimensResponse.data;
+  } catch (error) {
+      console.error(error);
+      throw error;
+  }
+};
+
+/**
+ * Get specimens from a list of boxes.
+ * @param {array<object>} boxList - list of current unshipped boxes for the shipping dashboard.
+ * @param {boolean} isBPTL - boolean to indicate if the request is from BPTL.
+ * @returns list of specimens objects with only the specimens in the current boxes.
+ */
+export const getSpecimensInBoxes = async (boxList, isBPTL = false) => {
+  const { tubeIdSet, collectionIdSet } = extractCollectionIdsFromBoxes(boxList);
+  if (collectionIdSet.size === 0) return [];
+  const collectionIdQueryString = Array.from(collectionIdSet).join(',');
+
+  try {
+      const idToken = await getIdToken();  
+      let queryString = `${api}api=getSpecimensByCollectionIds&collectionIdsArray=${collectionIdQueryString}`;
+      if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+      
+      const response = await fetch(queryString, {
+          method: 'GET',
+          headers: {
+          Authorization: 'Bearer ' + idToken,
+          }
+      });
+
+      if (!response.ok) throw new Error(response.statusText);
+
+      const specimensResponse = await response.json();
+      return isolateSpecimensInCurrentBoxes(specimensResponse.data, tubeIdSet);
+  } catch (error) {
+      console.error(error);
+      throw error;
+  }
+};
+
+/**
+ * Extract collectionIds from a list of boxes
+ * @param {array} boxList - list of boxes to process
+ * @returns {array} - array of unique collectionIds
+ * Bag types: 787237543 (Biohazard Blood/Urine), 223999569 (Biohazard Mouthwash), 522094118 (Orphan)
+ * For non-unlabelled bag keys, the first element's collectionId represents all collectionIds in the arrElements list.
+ */
+const extractCollectionIdsFromBoxes = (boxList) => {
+    const tubeIdSet = new Set(); 
+    const collectionIdSet = new Set();
+
+    boxList.forEach(box => {
+        const bagKeys = Object.keys(box.bags);
+
+        bagKeys.forEach(key => {
+            const arrElements = box.bags[key]?.arrElements;
+            if (arrElements && arrElements.length) {
+                if (key === 'unlabelled') {
+                    arrElements.forEach(tube => {
+                        tubeIdSet.add(tube);
+                        const [collectionId] = tube.split(' ');
+                        collectionId && collectionIdSet.add(collectionId);
+                    });
+                } else {
+                    const [collectionId] = arrElements[0].split(' ');
+                    collectionId && collectionIdSet.add(collectionId);
+                    arrElements.forEach(tube => {
+                        tubeIdSet.add(tube);
+                    });
+                }
+            }
+        });
+    });
+
+    return { tubeIdSet, collectionIdSet };
+}
+
+const isolateSpecimensInCurrentBoxes = (specimensList, tubeIdSet) => {
+    if (!specimensList || specimensList.length === 0) return [];
+    const updatedSpecimensList = [];
+
+    for (const specimen of specimensList) {
+        for (const tubeId of specimenCollection.tubeCidList) {
+            if (!specimen.data[tubeId]) continue;
+            if (!specimen.data[tubeId][conceptIds.collection.tube.scannedId] || !tubeIdSet.has(specimen.data[tubeId][conceptIds.collection.tube.scannedId])) {
+                delete specimen.data[tubeId];
+            }    
+        }
+        updatedSpecimensList.push(specimen.data);
+    }
+    return updatedSpecimensList;
+}
+
+export const filterDuplicateSpecimensInList = (specimensList) => {
+    return specimensList.reduce((acc, curr) => {
+        if (!acc.some(obj => obj[conceptIds.collection.id] === curr[conceptIds.collection.id])) {
+            acc.push(curr);
+        }
+        return acc;
+    }, []);
+}
+
 // searches boxes collection by login site (789843387) and Site-specific location id (560975149)
 // filters out any boxes where submitShipmentFlag is true
-// TODO: future: recommend adding 145971562 (shipment submitted flag = no) to all boxes on creation. Then we can rewrite the searchBoxesByLocation function to only return boxes where this variable is no (not shipped)
 export const getBoxesByLocation = async (location) => {
     logAPICallStartDev('getBoxesByLocation');
     const idToken = await getIdToken();
@@ -838,20 +1207,31 @@ export const getParticipantCollections = async (token) => {
     return response.json();
 }
 
-export const removeBag = async(boxId, bags) => {
-    const currDate = new Date().toISOString();
-    const bagDataToRemove = {boxId:boxId, bags:bags, date:currDate}
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=removeBag`, {
-        method: "POST",
-        headers: {
-            Authorization:"Bearer "+idToken,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(bagDataToRemove)
-    });
-    return await response.json();
-}
+export const removeBag = async (boxId, bags) => {
+    try {
+        const currDate = new Date().toISOString();
+        const bagDataToRemove = {boxId: boxId, bags: bags, date: currDate};
+        const idToken = await getIdToken();
+
+        const response = await fetch(`${api}api=removeBag`, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + idToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(bagDataToRemove)
+        });
+
+        if (!response.ok) {
+            throw new Error(`API responded with status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to remove bag:', error);
+        throw error;
+    }
+};
 
 /**
  * Fetches biospecimen collection data from the database
@@ -899,54 +1279,6 @@ export const searchSpecimenByRequestedSiteAndBoxId = async (requestedSite, boxId
         console.error("getSpecimensByRequestedSite's responseObject status code not 200!");
         return {data:[]};
     }
-}
-
-/**
- * Fetches biospecimen collection data from the database, and removes '0008', '0009' and deviation tubes from each collection
- * @returns {Array} List of biospecimen collections
- */
-// * * this doesn't take long, but the searchSpecimenInstitute() call takes a while
-export const filterSpecimenCollectionList = async () => {
-    const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
-    const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ?? [];
-    
-    /* Filter collections with ShipFlag value yes */
-    const finalizedSpecimenList = searchSpecimenInstituteArray.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
-    
-    // loop over filtered data with shipFlag
-    for (let i = 0; i < finalizedSpecimenList.length; i++){
-        const currCollection = finalizedSpecimenList[i];
-
-        if (currCollection[conceptIds.collection.bloodUrineBagScan]) {
-            delete currCollection[conceptIds.collection.bloodUrineBagScan]
-        }
-
-        if (currCollection[conceptIds.collection.mouthwashBagScan]) {
-            delete currCollection[conceptIds.collection.mouthwashBagScan] 
-        }
- 
-        for (let tubeCid of specimenCollection.tubeCidList) {
-            if (!currCollection[tubeCid]) continue;
-
-            const currTube = currCollection[tubeCid];
-            // delete specimen key if tube collected key is no
-            if (!currTube[conceptIds.collection.tube.isCollected] || currTube[conceptIds.collection.tube.isCollected] == conceptIds.no){
-                delete currCollection[tubeCid];
-            }
-
-            // delete tube if it contains deviation concept ID that disallows shipping
-            const tubeDeviation = currTube[conceptIds.collection.tube.deviation];
-            if (tubeDeviation?.[conceptIds.brokenSpecimenDeviation] == conceptIds.yes || 
-                tubeDeviation?.[conceptIds.discardSpecimenDeviation] == conceptIds.yes || 
-                tubeDeviation?.[conceptIds.insufficientVolumeSpecimenDeviation] == conceptIds.yes|| 
-                tubeDeviation?.[conceptIds.mislabelledDiscardSpecimenDeviation] == conceptIds.yes || 
-                tubeDeviation?.[conceptIds.notFoundSpecimenDeviation] == conceptIds.yes) {
-                    delete currCollection[tubeCid];
-            }
-        }
-    }
-
-    return finalizedSpecimenList;
 }
 
 export const removeMissingSpecimen = async (tubeId) => {
@@ -2295,11 +2627,11 @@ const tubeOrder = [
   "0006", //"Urine/Yellow"
   "0016", //"Urine Cup"
   "0007", //"Mouthwash Container"
-  "0050", //"NA"
-  "0051", //"NA"
-  "0052", //"NA"
-  "0053", //"NA"
-  "0054", //"NA
+  "0050", //"Replacement label" - used for tubes 0001-0024, 0060 when original label is damaged/missing/unusable
+  "0051", //"Replacement label" - same as 0050
+  "0052", //"Replacement label" - same as 0050
+  "0053", //"Replacement label" - same as 0050
+  "0054", //"Replacement label" - same as 0050
 ];
 
 export const sortBiospecimensList = (biospecimensList) => {
@@ -2499,25 +2831,6 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
         await sendClientEmail(emailData);
     }
 }
-
-/**
- * Block subsequent requests before the first request is completed, with a 5-second timeout.
- */
-export const requestsBlocker = {
-  isReqInProcess: false,
-  block() {
-    this.isReqInProcess = true;
-    setTimeout(() => {
-      this.isReqInProcess = false;
-    }, 5000);
-  },
-  unblock() {
-    this.isReqInProcess = false;
-  },
-  isBlocking() {
-    return this.isReqInProcess;
-  },
-};
 
 export const restrictNonBiospecimenUser = () => {
   document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
