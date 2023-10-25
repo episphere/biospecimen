@@ -200,7 +200,7 @@ export const addEventAddSpecimenToBox = () => {
             // Check if the scanned id is already in an unshipped box. If not, check if the scanned id is already shipped. Show a notification and return early.
             const scannedIdInUnshippedBoxes = findScannedIdInUnshippedBoxes(allBoxesList, masterSpecimenId);
             const isScannedIdInUnshippedBoxes = scannedIdInUnshippedBoxes['foundMatch'];
-            if(isScannedIdInUnshippedBoxes) {
+            if (isScannedIdInUnshippedBoxes) {
                 const boxNum = scannedIdInUnshippedBoxes[conceptIds.shippingBoxId];
                 const siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInUnshippedBoxes[conceptIds.shippingLocation]];
                 const siteSpecificLocationName = siteSpecificLocation || '';
