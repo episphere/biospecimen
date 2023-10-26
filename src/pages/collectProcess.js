@@ -74,7 +74,7 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
                         const tubeDeviated = (biospecimenData[obj.concept]?.[conceptIds.collection.tube.isDeviated] === conceptIds.yes);
 
                         let required = false;
-                        if (biospecimenData[obj.concept] && biospecimenData[obj.concept]?.[conceptIds.collection.tube.isCollected] !== conceptIds.no) { 
+                        if (biospecimenData[obj.concept]?.[conceptIds.collection.tube.isCollected] !== conceptIds.no) { 
                             required = true;
                         }
 
