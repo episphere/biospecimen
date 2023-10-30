@@ -4,6 +4,7 @@ import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar } from "../../navbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 import { getRecentBoxesShippedBySiteNotReceived } from "./packagesInTransit.js";
+import { specimenCollection } from "../../tubeValidation.js";
 
 export const csvFileReceiptScreen = async (auth) => {
   const user = auth.currentUser;
@@ -155,14 +156,24 @@ const getCurrentDate = () => {
   return new Date().toLocaleDateString('en-CA');
 }
 
+/**
+ * Tube Id's 0050-0054 are misc tubes. They are used by shipping sites in the event something happened to the original ID label.
+ * BPTL wants to know what the original ID label should be (Ex: 0001-0024, 0060, not 0050-0054).
+ * These need to be mapped to the key in the specimen object
+ */
+const miscTubeIdSet = new Set(['0050', '0051', '0052', '0053', '0054']);
+
 const modifyBSIQueryResults = (results) => {
     const csvDataArray = [];
     results.forEach(result => {
-        const collectionType = result[fieldToConceptIdMapping.collectionType];
-        const healthcareProvider = result[fieldToConceptIdMapping.healthcareProvider];
-        const specimenKeysArray = Object.keys(result.specimens);
+        const collectionType = result[fieldToConceptIdMapping.collectionType] || fieldToConceptIdMapping.research;
+        const healthcareProvider = result[fieldToConceptIdMapping.healthcareProvider] || 'default';
+        const specimenKeysArray = result.specimens && Object.keys(result.specimens).length > 0 ? Object.keys(result.specimens) : [];
             for (const specimenKey of specimenKeysArray) {
-                const [collectionId, tubeId] = result.specimens[specimenKey][fieldToConceptIdMapping.collectionId].split(' ') ?? ['', ''];
+                let [collectionId = '', tubeId = ''] = result.specimens[specimenKey]?.[fieldToConceptIdMapping.collectionId]?.split(' ') ?? [];
+                if (miscTubeIdSet.has(tubeId)) {
+                  tubeId = specimenCollection.cidToNum[specimenKey];
+                }
                 const vialMappings = getVialTypesMappings(tubeId, collectionType, healthcareProvider);
                 const csvRowsFromSpecimen = updateResultMappings(result, vialMappings, collectionId, tubeId);
                 csvDataArray.push(csvRowsFromSpecimen);
@@ -177,7 +188,6 @@ const modifyBSIQueryResults = (results) => {
  * @param {object} shippedBoxes - Shipped box object contains all the related specimen bags & more
  * @returns {array} Returns an array of objects with essential information for in transit csv
 */ 
-
 const updateInTransitMapping = (shippedBoxes) => {
   let holdProcessedResult = []
   shippedBoxes.forEach(shippedBox => {
@@ -218,7 +228,7 @@ const materialTypeMapping = (specimenId) => {
   const tubeId = specimenId.split(' ')[1]
   const materialTypeObject = {'0001':'Serum', '0002':'Serum', '0011':'Serum', '0012':'Serum', '0021':'Serum', 
                               '0003': 'WHOLE BL', '0004': 'WHOLE BL', '0005': 'WHOLE BL', '0013': 'WHOLE BL', '0014' : 'WHOLE BL', '0024' : 'WHOLE BL',
-                              '0006':'Urine', '0007': 'Saliva'}
+                              '0006':'Urine', '0007': 'Saliva', '0060': 'WHOLE BL'}
   return materialTypeObject[tubeId] ?? '';
 }
 
@@ -232,6 +242,7 @@ const vialMapping = {
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
             '0007': ['15 ml Nalgene jar', 'Crest Alcohol Free', 'Saliva', '10'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
     },
     clinical: {
@@ -242,6 +253,7 @@ const vialMapping = {
             '0004': ['10 ml Vacutainer', 'EDTA', 'WHOLE BL', '10'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
         kpCO: {
             '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
@@ -254,6 +266,7 @@ const vialMapping = {
             '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['6 ml Vacutainer', 'No Additive', 'Urine', '6'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
         kpGA: {
             '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
@@ -266,6 +279,7 @@ const vialMapping = {
             '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['15ml Nalgene jar', 'No Additive', 'Urine', '10'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
         kpHI: {
             '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
@@ -279,6 +293,7 @@ const vialMapping = {
             '0024': ['3 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '3'],
             '0005': ['10 ml Vacutainer', 'ACD', 'WHOLE BL', '10'],
             '0006': ['15ml Nalgene jar', 'No Additive', 'Urine', '10'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
         kpNW: {
             '0001': ['3.5 mL Serum separator tube', 'SST', 'Serum', '3.5'],
@@ -292,6 +307,7 @@ const vialMapping = {
             '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
         default: {
             '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
@@ -307,22 +323,24 @@ const vialMapping = {
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
             '0007': ['15ml Nalgene jar', 'Crest Alcohol Free', 'Saliva', '10'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
     }
 };
 
 const getVialTypesMappings = (tubeId, collectionType, healthcareProvider) => {
     if (!collectionType || !tubeId) {
+        console.warn('collectionType or tubeId is missing');
         return ['', '', '', ''];
     }
     
     const collectionTypeString = collectionType === fieldToConceptIdMapping.research ? 'research' : 'clinical';
-    const healthCareProviderString = healthcareProvider ? keyToNameAbbreviationObj[healthcareProvider] : 'default';
-    
+    const healthcareProviderString = keyToNameAbbreviationObj[healthcareProvider] || 'default';
+
     if (collectionTypeString === 'research') {
-        return vialMapping[collectionTypeString].default[tubeId];
+        return vialMapping[collectionTypeString]?.default?.[tubeId] || ['', '', '', ''];
     } else {
-        return vialMapping[collectionTypeString][healthCareProviderString]?.[tubeId] || vialMapping[collectionTypeString].default[tubeId];
+        return vialMapping[collectionTypeString]?.[healthcareProviderString]?.[tubeId] || vialMapping[collectionTypeString]?.default?.[tubeId] || ['', '', '', ''];
     }
 };
 
@@ -330,32 +348,45 @@ const updateResultMappings = (filteredResult, vialMappings, collectionId, tubeId
     const collectionTypeValue = filteredResult[fieldToConceptIdMapping.collectionType];
     const clinicalDateTime = filteredResult[fieldToConceptIdMapping.clinicalDateTimeDrawn];
     const withdrawalDateTime = filteredResult[fieldToConceptIdMapping.dateWithdrawn];
+    
+    const sampleCollectionCenter = (collectionTypeValue === fieldToConceptIdMapping.clinical)
+        ? (keyToNameObj[filteredResult[fieldToConceptIdMapping.healthcareProvider]] || '')
+        : (keyToLocationObj[filteredResult[fieldToConceptIdMapping.collectionLocation]] || '');
+
+    const dateReceived = filteredResult[fieldToConceptIdMapping.dateReceived]
+        ? formatISODateTime(filteredResult[fieldToConceptIdMapping.dateReceived])
+        : '';
+
+    const dateDrawn = (collectionTypeValue === fieldToConceptIdMapping.clinical)
+        ? (clinicalDateTime ? convertISODateTime(clinicalDateTime) : '')
+        : (withdrawalDateTime ? convertISODateTime(withdrawalDateTime) : '');
+
+    const vialType = vialMappings[0] || '';
+    const additivePreservative = vialMappings[1] || '';
+    const materialType = vialMappings[2] || '';
+    const volume = vialMappings[3] || '';
 
     return {
         'Study ID': 'Connect Study',
-        'Sample Collection Center': (collectionTypeValue === fieldToConceptIdMapping.clinical)
-            ? keyToNameObj[filteredResult[fieldToConceptIdMapping.healthcareProvider]]
-            : keyToLocationObj[filteredResult[fieldToConceptIdMapping.collectionLocation]],
-        'Sample ID': collectionId,
-        'Sequence': tubeId,
-        'BSI ID': `${collectionId} ${tubeId}`,
-        'Subject ID': filteredResult['Connect_ID'],
-        'Date Received': filteredResult[fieldToConceptIdMapping.dateReceived] ? formatISODateTime(filteredResult[fieldToConceptIdMapping.dateReceived]) : '',
-        'Date Drawn': collectionTypeValue === fieldToConceptIdMapping.clinical
-            ? (clinicalDateTime ? convertISODateTime(clinicalDateTime) : '')
-            : (withdrawalDateTime ? convertISODateTime(withdrawalDateTime) : ''),
-        'Vial Type': vialMappings[0],
-        'Additive/Preservative': vialMappings[1],
-        'Material Type': vialMappings[2],
-        'Volume': vialMappings[3],
+        'Sample Collection Center': sampleCollectionCenter,
+        'Sample ID': collectionId || '',
+        'Sequence': tubeId || '',
+        'BSI ID': `${collectionId} ${tubeId}` || '',
+        'Subject ID': filteredResult['Connect_ID'] || '',
+        'Date Received': dateReceived,
+        'Date Drawn': dateDrawn,
+        'Vial Type': vialType,
+        'Additive/Preservative': additivePreservative,
+        'Material Type': materialType,
+        'Volume': volume,
         'Volume Estimate': 'Assumed',
         'Volume Unit': 'ml (cc)',
         'Vial Warnings': '',
         'Hemolyzed': '',
         'Label Status': 'Barcoded',
         'Visit': 'BL'
-    }
-}
+    };
+};
 
 const generateBSIqueryCSVData = (items) => {
     const csv = 'Study ID, Sample Collection Center, Sample ID, Sequence, BSI ID, Subject ID, Date Received, Date Drawn, Vial Type, Additive/Preservative, Material Type, Volume, Volume Estimate, Volume Unit, Vial Warnings, Hemolyzed, Label Status, Visit\r\n';
