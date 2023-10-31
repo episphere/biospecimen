@@ -108,7 +108,7 @@ const processAssembledKit = () => {
       let obj = {};
       const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
      // const onlyFedexCourierType = identifyCourierType(scannedBarcode);
-      if (true) {
+      //if (true) { needs QC check comming soon!
         obj[conceptIds.supplyKitTrackingNum] = scannedBarcode
         obj[conceptIds.supplyKitId] = document.getElementById('supplyKitId').value.trim();
         obj[conceptIds.returnKitId] = document.getElementById('returnKitId').value.trim();
@@ -117,7 +117,7 @@ const processAssembledKit = () => {
         obj[conceptIds.kitType] = `Mouthwash`; //default to mouthwash until new collections are added
         obj[conceptIds.UKID] = "MW" + Math.random().toString(16).slice(2);
         storeAssembledKit(obj);
-      }
+      // }
       document.getElementById('scannedBarcode').value = ``
       document.getElementById('supplyKitId').value = ``
       document.getElementById('returnKitId').value = ``
@@ -155,7 +155,6 @@ const editAssembledKits = () => {
     Array.from(detailedRow).forEach(function(editKitBtn) {
       editKitBtn.addEventListener('click', () => {
         const editKitObj = JSON.parse(editKitBtn.getAttribute('data-kitObject'));
-        console.log('ddddd', editKitObj)
         document.getElementById('scannedBarcode').value = editKitObj[conceptIds.supplyKitTrackingNum]
         document.getElementById('supplyKitId').value = editKitObj[conceptIds.supplyKitId]
         document.getElementById('returnKitId').value = editKitObj[conceptIds.returnKitId]
@@ -169,10 +168,8 @@ const editAssembledKits = () => {
 }}
 
 const storeAssembledKit = async (kitData) => {
-  console.log('kitObject', kitData)
   const idToken = await getIdToken();
   let api = `addKitData`
-  console.log('ppState.getState().UKID', appState.getState().UKID)
   if(appState.getState().UKID !== ``) { 
     api = `updateKitData` 
     kitData[conceptIds.UKID] = appState.getState().UKID
@@ -200,7 +197,6 @@ const storeAssembledKit = async (kitData) => {
       localStorage.setItem('tmpKitData', JSON.stringify(filteredKitData))
     }
     else {
-      console.log('q23w4e5432')
       localStorage.setItem('tmpKitData', JSON.stringify(existingKitData))
     }
 

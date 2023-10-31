@@ -80,8 +80,8 @@ const generateParticipantCsvGetter = (name) => {
   const a = document.getElementById("generateCsv");
   if (a) {
       a.addEventListener("click", () => {
-          if (true) {
-            const numberToPrint = document.getElementById("numberToPrint").value;
+        const numberToPrint = document.getElementById("numberToPrint").value;
+          if (numberToPrint) {
             const arrayLengthToProcess = appState.getState().length
             if (arrayLengthToProcess >= numberToPrint) {
               const arrayToProcess = appState.getState().totalAddresses
