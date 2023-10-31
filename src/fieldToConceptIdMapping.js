@@ -286,6 +286,11 @@ export default {
         'all': 1000
 
     },
+    boxedStatus: 771580890,
+    notBoxed: 657483796,
+    partiallyBoxed: 775512390,
+    boxed: 210720511,
+    strayTubesList: 742186726,
 
     // home collection
     supplyKitTrackingNum: 531858099,
