@@ -260,6 +260,18 @@ export default {
         "mfPopUp": 567969985,
         'all': 1000
 
-    }
+    },
+
+    // home collection
+    supplyKitTrackingNum: 531858099,
+    supplyKitId: 690210658,
+    returnKitId: 194252513,
+    collectionCupId: 259846815,
+    collectionCardId: 786397882,
+    UKID: 687158491,
+    kitType: 379252329
+
+
+
 };
 
