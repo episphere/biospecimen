@@ -68,7 +68,7 @@ export const startReport = async (source) => {
         </div>
     </div>
 </div>`;
-    let numPages = await getNumPages(5, {}, source);
+    let numPages = await getNumPages(5, {});
     document.getElementById('contentBody').innerHTML = template;
     removeActiveClass('navbar-btn', 'active');
     addEventFilter(source);
