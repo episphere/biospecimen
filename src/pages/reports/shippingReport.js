@@ -12,6 +12,9 @@ export const bptlShipReportsScreen = async (auth, route) => {
     bptlShipReportsScreenTemplate(username);
 };
 
+// Source: bptlShippingReport; the flag is passed down to startReport & various helper functions
+// to distinguish shipping report functionality from bptl and biospecimen."
+
 export const bptlShipReportsScreenTemplate = async (username) => {
     const template = ` ${reportsNavbar()}
         <div id="root root-margin" style="padding-top: 25px;">

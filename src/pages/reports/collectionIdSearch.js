@@ -72,7 +72,7 @@ const searchSpecimenEvent = () => {
         try {
             const data = response.data[0];
             localStorage.setItem('workflow', biospecimenData[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical ? `clinical` : `research`);
-            finalizeTemplate(data, biospecimenData, true);
+            finalizeTemplate(data, biospecimenData, true); // Boolean flag: true; is passed down to finalizeTemplate & to distinguish collection id search from bptl and biospecimen."
         }
         catch {
             showNotifications({ title: 'Not found', body: 'Participant not found!' })
