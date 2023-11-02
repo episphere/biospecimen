@@ -1,12 +1,12 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { getIdToken, showAnimation, hideAnimation, baseAPI, appState } from "../../shared.js";
-import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
+import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
 
 const contentBody = document.getElementById("contentBody");
 
-export const printLabelsScreen = async (auth, route) => {
+export const printLabelsScreen = async (auth) => {
   const user = auth.currentUser;
   if (!user) return;
   const name = user.displayName ? user.displayName : user.email;
@@ -77,9 +77,9 @@ const getTotalAddressesToPrint = async () => {
 }
 
 const generateParticipantCsvGetter = (name) => {
-  const a = document.getElementById("generateCsv");
-  if (a) {
-      a.addEventListener("click", () => {
+  const generateCsvButton = document.getElementById("generateCsv");
+  if (generateCsvButton) {
+    generateCsvButton.addEventListener("click", () => {
         const numberToPrint = document.getElementById("numberToPrint").value;
           if (numberToPrint) {
             const arrayLengthToProcess = appState.getState().length
@@ -92,26 +92,23 @@ const generateParticipantCsvGetter = (name) => {
               printLabelsTemplate(name);
                 // Display success message
               const alertList = document.getElementById('alert_placeholder');
-              const template = `
+              alertList.innerHTML = `
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                   Success!
                   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>`;
-              alertList.innerHTML = template;
             }
             else {
-              let alertList = document.getElementById("alert_placeholder");
-              let template = ``;
-              template += `
+              const alertList = document.getElementById("alert_placeholder");
+              alertList.innerHTML =`
                       <div class="alert alert-warning alert-dismissible fade show" role="alert">
                         Out of bounds!
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                   <span aria-hidden="true">&times;</span>
                               </button>
                       </div>`;
-              alertList.innerHTML = template;
             } 
           }
       });

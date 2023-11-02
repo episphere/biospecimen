@@ -299,7 +299,14 @@ export default {
     collectionCupId: 259846815,
     collectionCardId: 786397882,
     UKID: 687158491,
-    kitType: 379252329
+    kitType: 379252329,
+    kitStatus: 221592017,
+    pending: 517216441,
+    addressPrinted: 849527480,
+    assigned: 241974920,
+    shipped: 277438316,
+    received: 375535639
+
 
 
 
