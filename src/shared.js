@@ -2481,7 +2481,7 @@ export const SSOConfig = (email) => {
 }
 
 export const getParticipantSelection = async (filter) => {
-    logAPICallStartDev('getParticipantSelection');
+
     const idToken = await getIdToken();
     const response = await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=getParticipantSelection&type=${filter}`, 
     {
@@ -2490,7 +2490,6 @@ export const getParticipantSelection = async (filter) => {
         Authorization: "Bearer " + idToken,
       },
     });
-    logAPICallEndDev('getParticipantSelection');
     return response.json();
   }
      
@@ -2581,6 +2580,10 @@ export const displayContactInformation = (currContactInfo) => {
   }
   else return ""
 }
+
+export const storeDateReceivedinISO = (date) => { // ("YYYY-MM-DD" to ISO format DateTime)
+    return new Date(date).toISOString();
+  }
 
 export const checkShipForage = async (shipSetForage, boxesToShip) => {
   let forageBoxIdArr = []
@@ -2890,4 +2893,26 @@ export const addBoxAndUpdateSiteDetails = async (boxAndSiteData) => {
         console.error('Error adding box', e);
         return null;
     }
+}
+
+export const triggerErrorModal = (message) => {
+    let alertList = document.getElementById("alert_placeholder");
+    alertList.innerHTML = `
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+        </div>`;
+}
+
+export const triggerSuccessModal = (message) => {
+    let alertList = document.getElementById("alert_placeholder");
+    alertList.innerHTML = `
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+        </div>`;
 }

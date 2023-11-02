@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, appState, baseAPI } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import conceptIds from '../../fieldToConceptIdMapping.js';
@@ -218,7 +218,7 @@ const editAssembledKits = () => {
     Array.from(detailedRow).forEach(function(editKitBtn) {
       editKitBtn.addEventListener('click', () => {
         const editKitObj = JSON.parse(editKitBtn.getAttribute('data-kitObject'));
-        document.getElementById('scannedBarcode').value = editKitObj[conceptIds.supplyKitTrackingNum]
+        document.getElementById('scannedBarcode').value = editKitObj[conceptIds.returnKitTrackingNum]
         document.getElementById('supplyKitId').value = editKitObj[conceptIds.supplyKitId]
         document.getElementById('returnKitId').value = editKitObj[conceptIds.returnKitId]
         document.getElementById('cupId').value = editKitObj[conceptIds.collectionCupId]
@@ -245,9 +245,10 @@ const storeAssembledKit = async (kitData) => {
   const collectionUnique = await checkCollecitonUniqueness(kitData[conceptIds.collectionCupId].replace(/\s/g, "\n"));
   hideAnimation();
   if (collectionUnique.data) {
-    kitData[conceptIds.kitStatus] = conceptIds.pending
+    kitData[conceptIds.kitStatus] = conceptIds.pending.toString();
     kitData[conceptIds.kitType] = `Mouthwash`; // default to mouthwash until new collections are added
     kitData[conceptIds.UKID] = "MW" + Math.random().toString(16).slice(2);
+    kitData[conceptIds.pendingDateTimeStamp] = new Date().toISOString();
     let api = `addKitData`
     if (appState.getState().UKID !== ``) { 
       api = `updateKitData` 
@@ -295,19 +296,6 @@ const storeAssembledKit = async (kitData) => {
     triggerErrorModal('The collection card and cup ID are already in use.')
     return false
   }
-}
-
-const triggerErrorModal = (message) => {
-    let alertList = document.getElementById("alert_placeholder");
-        let template = ``;
-        template += `
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                  ${message}
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                </div>`;
-        alertList.innerHTML = template;
 }
 
 const alertTemplate = (message, status = "warn", duration = 1000) => {

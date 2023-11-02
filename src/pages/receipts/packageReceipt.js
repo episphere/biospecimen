@@ -1,5 +1,5 @@
 import { userDashboard } from "../dashboard.js";
-import { getIdToken, showAnimation, hideAnimation, baseAPI , packageConditonConversion} from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, baseAPI , packageConditonConversion, storeDateReceivedinISO} from "../../shared.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
@@ -296,11 +296,6 @@ const identifyCourierType = (scannedBarcode) => {
   else {
     return false
 }}
-
-const storeDateReceivedinISO = (date) => { // ("YYYY-MM-DD" to ISO format DateTime)
-  const isoDateTime= new Date(date).toISOString();
-  return isoDateTime
-}
 
 const storePackageReceipt = async (data) => {
     showAnimation();

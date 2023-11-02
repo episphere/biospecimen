@@ -293,6 +293,7 @@ export default {
     strayTubesList: 742186726,
 
     // home collection
+    returnKitTrackingNum: 101010101,
     supplyKitTrackingNum: 531858099,
     supplyKitId: 690210658,
     returnKitId: 194252513,
@@ -305,10 +306,9 @@ export default {
     addressPrinted: 849527480,
     assigned: 241974920,
     shipped: 277438316,
-    received: 375535639
-
-
-
+    received: 375535639,
+    pendingDateTimeStamp: 341636034,
+    shippedDateTime: 661940160
 
 };
 

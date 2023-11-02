@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, baseAPI, appState } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, baseAPI, appState, triggerErrorModal } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
@@ -65,7 +65,7 @@ const initializeTotalAddressesToPrint = async () => {
   return totalAddresses.data.length
 }
 
-const getTotalAddressesToPrint = async () => {
+export const getTotalAddressesToPrint = async () => {
   const idToken = await getIdToken();
   const response = await fetch(`${baseAPI}api=totalAddressesToPrint`, {
       method: "GET",
@@ -101,14 +101,7 @@ const generateParticipantCsvGetter = (name) => {
                 </div>`;
             }
             else {
-              const alertList = document.getElementById("alert_placeholder");
-              alertList.innerHTML =`
-                      <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        Out of bounds!
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                  <span aria-hidden="true">&times;</span>
-                              </button>
-                      </div>`;
+              triggerErrorModal('Out of bounds!');
             } 
           }
       });
