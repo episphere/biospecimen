@@ -1,24 +1,28 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation } from "../../shared.js";
-import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
+import { getIdToken, showAnimation, hideAnimation, storeDateReceivedinISO, baseAPI, triggerSuccessModal } from "../../shared.js";
+import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
-import fieldMapping from "../../fieldToConceptIdMapping.js";
-
-const api =
-  "https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?";
+import conceptIds from "../../fieldToConceptIdMapping.js";
+import { 
+  displayPackageConditionListEmptyModal, displaySelectedPackageConditionListModal, checkAndDisplayCourierType,
+  checkSelectPackageConditionsList, targetAnchorTagEl, addListenersOnPageLoad, beforeUnloadMessage, 
+  enableCollectionCardFields, enableCollectionCheckBox  } from "../receipts/packageReceipt.js";
 
 const contentBody = document.getElementById("contentBody");
 
-export const kitsReceiptScreen = async (auth, route) => {
+export const kitsReceiptScreen = async (auth) => {
   const user = auth.currentUser;
   if (!user) return;
   const name = user.displayName ? user.displayName : user.email;
   showAnimation();
-  kitsReceiptTemplate(user, name, auth, route);
+  kitsReceiptTemplate(name);
   hideAnimation();
+  targetAnchorTagEl();
+  addListenersOnPageLoad();
+  formSubmit(); 
 }
 
-const kitsReceiptTemplate = async (user, name, auth, route) => {
+const kitsReceiptTemplate = async (name) => {
   let template = ``;
   template += homeCollectionNavbar();
   template += `
@@ -31,9 +35,9 @@ const kitsReceiptTemplate = async (user, name, auth, route) => {
                 <div class="mt-3" >
                 <br />
               <div class="row form-group">
-                <label class="col-form-label col-md-4" for="scannedBarcode">Scan FedEx/USPS Barcode</label>
+                <label class="col-form-label col-md-4" for="scannedBarcode">Scan Barcode</label>
                 <div style="display:inline-block;">
-                  <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" style="width: 600px;" placeholder="Scan a Fedex or USPS barcode">
+                  <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" style="width: 600px;" placeholder="Scan Barcode">
                   <span id="courierType" style="padding-left: 10px;"></span>
                   <br />
                   <br />
@@ -46,25 +50,15 @@ const kitsReceiptTemplate = async (user, name, auth, route) => {
                        <div style="display:inline-block; max-width:90%;"> 
                           <select required class="col form-control" id="packageCondition" style="width:100%" multiple="multiple" data-selected="[]">
                               <option id="select-dashboard" value="">-- Select Package Condition --</option>
-                              <option id="select-packageGoodCondition" value=${fieldMapping.packageGood}>Package in good condition</option>
-                              <option id="select-noIcePack" value=${fieldMapping.coldPacksNone}>No Ice Pack</option>
-                              <option id="select-warmIcePack" value=${fieldMapping.coldPacksWarm}>Warm Ice Pack</option>
-                              <option id="select-incorrectMaterialTypeSent" value=${fieldMapping.vialsIncorrectMaterialType}>Vials - Incorrect Material Type Sent</option>
-                              <option id="select-noLabelonVials" value=${fieldMapping.vialsMissingLabels}>No Label on Vials</option>
-                              <option id="select-returnedEmptyVials" value=${fieldMapping.vialsEmpty}>Returned Empty Vials</option>
-                              <option id="select-participantRefusal" value=${fieldMapping.participantRefusal}>Participant Refusal</option>
-                              <option id="select-crushed" value=${fieldMapping.crushed}>Crushed</option>
-                              <option id="select-damagedContainer" value=${fieldMapping.damagedContainer}>Damaged Container (outer and inner)</option>
-                              <option id="select-materialThawed" value=${fieldMapping.materialThawed}>Material Thawed</option>
-                              <option id="select-insufficientIce" value=${fieldMapping.coldPacksInsufficient}>Insufficient Ice</option>
-                              <option id="select-improperPackaging" value=${fieldMapping.improperPackaging}>Improper Packaging</option>
-                              <option id="select-damagedVials" value=${fieldMapping.damagedVials}>Damaged Vials</option>
-                              <option id="select-other" value=${fieldMapping.other}>Other</option>
-                              <option id="select-noPreNotification" value=${fieldMapping.noPreNotification}>No Pre-notification</option>
-                              <option id="select-noRefrigerant" value=${fieldMapping.noRefrigerant}>No Refrigerant</option>
-                              <option id="select-infoDoNotMatch" value=${fieldMapping.manifestDoNotMatch}>Manifest/Vial/Paperwork info do not match</option>
-                              <option id="select-shipmentDelay" value=${fieldMapping.shipmentDelay}>Shipment Delay</option>
-                              <option id="select-noManifestProvided" value=${fieldMapping.manifestNotProvided}>No Manifest provided</option>
+                              <option id="select-packageGoodCondition" value=${conceptIds.pkgGoodCondition}>Package in good condition</option>
+                              <option id="select-pkgCrushed" value=${conceptIds.pkgCrushed}>Package Crushed</option>
+                              <option id="select-pkgImproperPackaging" value=${conceptIds.pkgImproperPackaging}>Improper Packaging</option>
+                              <option id="select-pkgCollectionCupDamaged" value=${conceptIds.pkgCollectionCupDamaged}>Collection Cup Damaged</option>
+                              <option id="select-pkgCollectionCupLeaked" value=${conceptIds.pkgCollectionCupLeaked}>Collection Cup Leaked</option>
+                              <option id="select-pkgEmptyCupReturned" value=${conceptIds.pkgEmptyCupReturned}>Empty Cup Returned</option>
+                              <option id="select-pkgIncorrectMaterialType" value=${conceptIds.pkgIncorrectMaterialType}>Incorrect Material Type</option>
+                              <option id="select-pkgCollectionCupNotReturned" value=${conceptIds.pkgCollectionCupNotReturned}>Collection Cup Not Returned</option>
+                              <option id="select-pkgOther" value=${conceptIds.pkgOther}>Other</option>
                           </select>
                      </div>
                   </div>
@@ -118,15 +112,8 @@ template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
   activeHomeCollectionNavbar();
+  checkAndDisplayCourierType(true);
 };
-
-const addDefaultDateReceived = (getCurrentDate) => {
-  const dateReceivedEl = document.getElementById("dateReceived")
-  if(getCurrentDate()){
-    dateReceivedEl.value = getCurrentDate()
-  }
-  else dateReceivedEl.value = ""
-}
 
 // returns current date in default format ("YYYY-MM-DD")
 const getCurrentDate = () => {
@@ -138,3 +125,106 @@ const checkForPadding = (input) => { // adds 0 before single month & day to adhe
   if (input < 10) return `0`+input.toString();
   else return input;
 }
+
+const formSubmit = () => {
+  const form = document.getElementById("save");
+  form.addEventListener("click", (e) => {
+      e.preventDefault();
+      const modalHeaderEl = document.getElementById("modalHeader");
+      const modalBodyEl = document.getElementById("modalBody");
+      const isSelectPackageConditionsListEmpty = checkSelectPackageConditionsList();
+
+      if (isSelectPackageConditionsListEmpty) {
+          displayPackageConditionListEmptyModal(modalHeaderEl, modalBodyEl);
+      } else {
+          displaySelectedPackageConditionListModal(modalHeaderEl, modalBodyEl, true);
+      }
+  });
+};
+
+export const confirmKitReceipt = () => {
+  const a = document.getElementById('confirmReceipt');
+  if (a) {
+    a.addEventListener('click',  () => { 
+      let obj = {};
+      let packageConditions = [];
+      const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
+      const onlyUSPSCourierType = identifyCourierType(scannedBarcode);
+      if (onlyUSPSCourierType === true) {
+        obj[conceptIds.returnKitTrackingNum] = scannedBarcode
+        for (let option of document.getElementById('packageCondition').options) {
+          if (option.selected) {packageConditions.push(option.value)}
+        }
+        obj[`${conceptIds.pkgReceiptConditions}`] = packageConditions;
+      //  obj[conceptIds.pkgComments] = document.getElementById('receivePackageComments').value.trim();
+        obj[conceptIds.receivedDateTime] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
+        if(document.getElementById('collectionId').value) {
+          obj[conceptIds.collectionCupId] = document.getElementById('collectionId').value;
+          const dateCollectionCard = document.getElementById('dateCollectionCard').value;
+          const timeCollectionCard = document.getElementById('timeCollectionCard').value;
+          obj[conceptIds.collectionDateTimeStamp] = dateCollectionCard + 'T' + timeCollectionCard
+          document.getElementById('collectionCheckBox').checked === true ? 
+              obj[conceptIds.collectionCardFlag] = true : obj[conceptIds.collectionCardFlag] = false
+          obj[conceptIds.collectionAddtnlNotes] = document.getElementById('collectionComments').value;
+          }    
+        
+        window.removeEventListener("beforeunload",beforeUnloadMessage)
+        targetAnchorTagEl();
+        storePackageReceipt(obj);
+       } 
+    })
+  }
+
+
+}
+
+const identifyCourierType = (scannedBarcode) => {
+  if (scannedBarcode.length === 20 || scannedBarcode.length === 22) {
+     return true
+   }
+   else {
+     return false
+ }}
+
+ const storePackageReceipt = async (data) => {
+  showAnimation();
+  const idToken = await getIdToken();
+  const response = await fetch(`${baseAPI}api=kitReceipt`,
+      {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+              Authorization: "Bearer " + idToken,
+              "Content-Type": "application/json",
+          },
+      }
+  );
+  hideAnimation();
+  if (response.status === 200) {
+    triggerSuccessModal('Kit Receipted.')
+    document.getElementById("courierType").innerHTML = ``;
+    document.getElementById("scannedBarcode").value = "";
+    document.getElementById("packageCondition").value = "";
+    document.getElementById("receivePackageComments").value = "";
+    document.getElementById("dateReceived").value = getCurrentDate();
+    document.getElementById("collectionComments").value = "";
+    document.getElementById("collectionId").value = "";
+    enableCollectionCardFields()
+    enableCollectionCheckBox()
+    document.getElementById("packageCondition").setAttribute("data-selected","[]")
+    if (document.getElementById("collectionId").value) {
+      document.getElementById("collectionId").value = "";
+      document.getElementById("dateCollectionCard").value = "";
+      document.getElementById("timeCollectionCard").value = "";
+      document.getElementById("collectionCheckBox").checked = false;
+      document.getElementById("collectionComments").value = "";
+
+      enableCollectionCardFields();
+      enableCollectionCheckBox();
+      document.getElementById("packageCondition").setAttribute("data-selected","[]");
+
+    }
+} else {
+      alert("Error");
+  }
+};

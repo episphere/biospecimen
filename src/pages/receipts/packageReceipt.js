@@ -1,9 +1,11 @@
 import { userDashboard } from "../dashboard.js";
-import { getIdToken, showAnimation, hideAnimation, baseAPI , packageConditonConversion, storeDateReceivedinISO} from "../../shared.js";
-import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
+import { getIdToken, showAnimation, hideAnimation, baseAPI , packageConditonConversion, 
+  storeDateReceivedinISO, triggerErrorModal} from "../../shared.js";
+import { nonUserNavBar } from "../../navbar.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
 import fieldMapping from "../../fieldToConceptIdMapping.js";
+import { confirmKitReceipt } from "../homeCollection/kitsReceipt.js";
 
 
 const inputObject = {
@@ -134,7 +136,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
     activeReceiptsNavbar();
 };
 
-const checkAndDisplayCourierType = () => {
+export const checkAndDisplayCourierType = (isKitReceipt = false) => {
   const a = document.getElementById("scannedBarcode");
   let input = ""
   if (a) {
@@ -154,7 +156,7 @@ const checkAndDisplayCourierType = () => {
         // document.getElementById('collectionCheckBox').checked = false;
         // document.getElementById('collectionCheckBox').removeAttribute("disabled")
         // enableCollectionCardFields();
-        triggerErrorModal();
+        if(!isKitReceipt) triggerErrorModal('Scan limited only to FEDEX');
         return
       }
       // USPS
@@ -164,7 +166,7 @@ const checkAndDisplayCourierType = () => {
         // document.getElementById('collectionCheckBox').checked = false;
         // document.getElementById('collectionCheckBox').removeAttribute("disabled")
         // enableCollectionCardFields();
-        triggerErrorModal();
+        if(!isKitReceipt) triggerErrorModal('Scan limited only to FEDEX');
         return
       }
       // FEDEX
@@ -198,19 +200,6 @@ const checkAndDisplayCourierType = () => {
   }
 };
 
-const triggerErrorModal = () => {
-    let alertList = document.getElementById("alert_placeholder");
-        let template = ``;
-        template += `
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                Scan limited only to FEDEX
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                </div>`;
-        alertList.innerHTML = template;
-}
-
 const checkCardIncluded = () => {
   const a = document.getElementById('collectionCheckBox')
   if (a) {
@@ -226,7 +215,7 @@ const disableCollectionCardFields = () => {
   document.getElementById('collectionComments').disabled = true;
 }
 
-const enableCollectionCardFields = () => {
+export const enableCollectionCardFields = () => {
   document.getElementById('collectionId').disabled = false;
   document.getElementById('dateCollectionCard').disabled = false;
   document.getElementById('timeCollectionCard').disabled = false;
@@ -349,7 +338,7 @@ const storePackageReceipt = async (data) => {
     }
 };
 
-const enableCollectionCheckBox = () => {
+export const enableCollectionCheckBox = () => {
   const collectionCheckBoxEl = document.getElementById("collectionCheckBox")
   collectionCheckBoxEl.removeAttribute("disabled")
   collectionCheckBoxEl.checked = false
@@ -362,7 +351,7 @@ FUNCTIONS FOR UNSAVED CHANGES
 */
 
 /* TARGET ALL ANCHOR TAG ELEMENTS */ 
-const targetAnchorTagEl = (inputChange = false) => {
+export const targetAnchorTagEl = (inputChange = false) => {
   // Target all items with anchor tags, convert HTML Collection to a normal array of elements
   // Filter and remove current anchor tag with the current location.hash
   const allAnchorTags = Array.from(document.getElementsByTagName("a"));
@@ -381,7 +370,7 @@ const targetAnchorTagEl = (inputChange = false) => {
 }
 
 /* ADD EVENT LISTENERS TO INPUTS THAT CAN BE SUBMITTED WHEN PAGE LOADS */ 
-const addListenersOnPageLoad = () => {
+export const addListenersOnPageLoad = () => {
   // Receive Packages: barcode, packageconditions,receive package comments, date received
   const scannedBarcodeInputEl = document.getElementById("scannedBarcode");
   const packageConditionEl = document.getElementById("packageCondition");
@@ -430,7 +419,7 @@ const unsavedMessageConfirmation = (e) => {
 /*
 WINDOW
 */
-const beforeUnloadMessage = (e) => { 
+export const beforeUnloadMessage = (e) => { 
   e.preventDefault()
   // Chrome requires returnValue to be set.
   e.returnValue = "";
@@ -681,7 +670,7 @@ const controlCollectionCardField = (dropdownSelection) => {
     enableCollectionCardFields() 
   }
 } 
-const checkSelectPackageConditionsList = () => {
+export const checkSelectPackageConditionsList = () => {
     const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected')
     const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList)
     if(parseSelectPackageConditionsList.length === 0) {
@@ -690,7 +679,7 @@ const checkSelectPackageConditionsList = () => {
     else return false
 }
 
-const displayPackageConditionListEmptyModal = (modalHeaderEl,modalBodyEl) => {
+export const displayPackageConditionListEmptyModal = (modalHeaderEl,modalBodyEl) => {
     modalHeaderEl.innerHTML = `
     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">&times;</span>
@@ -712,10 +701,9 @@ const displayPackageConditionListEmptyModal = (modalHeaderEl,modalBodyEl) => {
     </div>`
 }
 
-const displaySelectedPackageConditionListModal = (modalHeaderEl,modalBodyEl) => {
+export const displaySelectedPackageConditionListModal = (modalHeaderEl,modalBodyEl, isKitReceipt) => {
     const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected');
     const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList);
-
     modalHeaderEl.innerHTML = `
     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">&times;</span>
@@ -739,7 +727,7 @@ const displaySelectedPackageConditionListModal = (modalHeaderEl,modalBodyEl) => 
     </div>`
     
     displaySelectedPackageConditionList(parseSelectPackageConditionsList);
-    clickConfirmPackageConditionListButton(modalHeaderEl,modalBodyEl);
+    clickConfirmPackageConditionListButton(modalHeaderEl,modalBodyEl, isKitReceipt);
 }
 
 const displayConfirmPackageReceiptModal = (modalHeaderEl,modalBodyEl) => {
@@ -768,10 +756,12 @@ const displaySelectedPackageConditionList = (parseSelectPackageConditionsList) =
     }
 }
 
-const clickConfirmPackageConditionListButton = (modalHeaderEl,modalBodyEl) => {
+const clickConfirmPackageConditionListButton = (modalHeaderEl,modalBodyEl, isKitReceipt) => {
     const confirmPackageConditionButtondocument = document.getElementById("confirmPackageConditionButton");
     confirmPackageConditionButtondocument.addEventListener("click", () => {
         displayConfirmPackageReceiptModal(modalHeaderEl,modalBodyEl);
-        confirmPackageReceipt();
+        if (isKitReceipt) { confirmKitReceipt(); }
+        else { confirmPackageReceipt(); }
+
     })    
 }

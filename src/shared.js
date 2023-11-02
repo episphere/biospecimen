@@ -2758,6 +2758,15 @@ export const packageConditonConversion = {
     "922995819": "Manifest/Vial/Paperwork info do not match",
     "958000780": "Shipment Delay",
     "853876696": "No Manifest provided",
+    "950521660": "Package in Good Condition",
+    "545319575": "Package Crushed",
+    "938338155": "Improper Packaging",
+    "205954477": "Collection Cup Damaged",
+    "289239334": "Collection Cup Leaked",
+    "992420392": "Empty Cup Returned",
+    "541085383": "Incorrect Material Type Returned",
+    "427719697": "Collection Cup Not Returned",
+    "100618603": "Other"
 }
 
 export const convertISODateTime = (isoDateTime) => {

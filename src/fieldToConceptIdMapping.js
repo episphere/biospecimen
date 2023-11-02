@@ -293,7 +293,7 @@ export default {
     strayTubesList: 742186726,
 
     // home collection
-    returnKitTrackingNum: 101010101,
+    returnKitTrackingNum: 972453354,
     supplyKitTrackingNum: 531858099,
     supplyKitId: 690210658,
     returnKitId: 194252513,
@@ -308,7 +308,21 @@ export default {
     shipped: 277438316,
     received: 375535639,
     pendingDateTimeStamp: 341636034,
-    shippedDateTime: 661940160
+    shippedDateTime: 661940160,
+    pkgReceiptConditions: 633640710,
+    pkgGoodCondition: 950521660,
+    pkgCrushed: 545319575,
+    pkgImproperPackaging: 938338155,
+    pkgCollectionCupDamaged: 205954477,
+    pkgCollectionCupLeaked: 289239334,
+    pkgEmptyCupReturned: 992420392,
+    pkgIncorrectMaterialType: 541085383,
+    pkgCollectionCupNotReturned: 427719697,
+    pkgOther: 100618603,
+    receivedDateTime: 826941471,
+    collectionDateTimeStamp: 678166505,
+    collectionCardFlag: 137401245,
+    collectionAddtnlNotes: 260133861
 
 };
 
