@@ -176,13 +176,6 @@ const processAssembledKit = () => {
           document.getElementById('cupId').value = ``
           document.getElementById('cardId').value = ``
         }
-        else {
-          document.getElementById('scannedBarcode').value = scannedBarcodeValue
-          document.getElementById('supplyKitId').value = supplyKitIdValue
-          document.getElementById('returnKitId').value = returnKitIdValue
-          document.getElementById('cupId').value = collectionCupIdValue
-          document.getElementById('cardId').value = collectionCupIdValue
-        }
       }
     })
   }

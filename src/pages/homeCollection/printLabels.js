@@ -62,7 +62,6 @@ const initializeTotalAddressesToPrint = async () => {
   appState.setState({'totalAddresses': totalAddresses.data})
   appState.setState({'length': totalAddresses.data.length })
   hideAnimation();
-  return totalAddresses.data.length
 }
 
 const getTotalAddressesToPrint = async () => {
@@ -116,20 +115,20 @@ const generateParticipantCsvGetter = (name) => {
 };
 
 const generateParticipantCsv = (items) => {
-let csv = ``;
-csv += `first_name, last_name, address_1, address_2, city, state, zip_code, study_site, \r\n`
-for (let row = 0; row < (items.length); row++) {
-  let keysAmount = Object.keys(items[row]).length
-  let keysCounter = 0
-  for(let key in items[row]) {
-      csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') 
-    keysCounter++
-  }}
-  let link = document.createElement("a");
-  link.id = "download-csv";
-  link.setAttribute("href","data:text/plain;charset=utf-8," + encodeURIComponent(csv));
-  link.setAttribute("download",`${new Date().toLocaleDateString()}-participant-address-export.csv`);
-  document.body.appendChild(link);
-  document.querySelector("#download-csv").click();
-  document.body.removeChild(link);
+  let csv = ``;
+  csv += `first_name, last_name, address_1, address_2, city, state, zip_code, study_site, \r\n`
+  for (let row = 0; row < (items.length); row++) {
+    let keysAmount = Object.keys(items[row]).length
+    let keysCounter = 0
+    for(let key in items[row]) {
+        csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') 
+      keysCounter++
+    }}
+    let link = document.createElement("a");
+    link.id = "download-csv";
+    link.setAttribute("href","data:text/plain;charset=utf-8," + encodeURIComponent(csv));
+    link.setAttribute("download",`${new Date().toLocaleDateString()}-participant-address-export.csv`);
+    document.body.appendChild(link);
+    document.querySelector("#download-csv").click();
+    document.body.removeChild(link);
   }
