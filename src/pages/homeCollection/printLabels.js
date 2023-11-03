@@ -121,14 +121,15 @@ const generateParticipantCsv = (items) => {
     let keysAmount = Object.keys(items[row]).length
     let keysCounter = 0
     for(let key in items[row]) {
-        csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') 
+      csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') 
       keysCounter++
-    }}
-    let link = document.createElement("a");
-    link.id = "download-csv";
-    link.setAttribute("href","data:text/plain;charset=utf-8," + encodeURIComponent(csv));
-    link.setAttribute("download",`${new Date().toLocaleDateString()}-participant-address-export.csv`);
-    document.body.appendChild(link);
-    document.querySelector("#download-csv").click();
-    document.body.removeChild(link);
+    }
   }
+  let link = document.createElement("a");
+  link.id = "download-csv";
+  link.setAttribute("href","data:text/plain;charset=utf-8," + encodeURIComponent(csv));
+  link.setAttribute("download",`${new Date().toLocaleDateString()}-participant-address-export.csv`);
+  document.body.appendChild(link);
+  document.querySelector("#download-csv").click();
+  document.body.removeChild(link);
+}
