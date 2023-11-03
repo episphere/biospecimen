@@ -2353,7 +2353,6 @@ export const addPaginationFunctionality = (lastPage, filter, source) => {
     let next = document.getElementById('nextPage');
     let final = document.getElementById('lastPage');
     let middleNumber = document.getElementById('middlePage');
-
     first.addEventListener('click', () => {
         middleNumber.innerHTML = '1'
         populateBoxTable(0, filter, source)

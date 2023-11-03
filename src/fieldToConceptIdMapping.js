@@ -286,11 +286,29 @@ export default {
         'all': 1000
 
     },
-
     boxedStatus: 771580890,
     notBoxed: 657483796,
     partiallyBoxed: 775512390,
     boxed: 210720511,
     strayTubesList: 742186726,
+
+    // home collection
+    supplyKitTrackingNum: 531858099,
+    supplyKitId: 690210658,
+    returnKitId: 194252513,
+    collectionCupId: 259846815,
+    collectionCardId: 786397882,
+    UKID: 687158491,
+    kitType: 379252329,
+    kitStatus: 221592017,
+    pending: 517216441,
+    addressPrinted: 849527480,
+    assigned: 241974920,
+    shipped: 277438316,
+    received: 375535639
+
+
+
+
 };
 
