@@ -109,10 +109,12 @@ const generateParticipantCsvGetter = (name) => {
 
 const generateParticipantCsv = (items) => {
   let csv = ``;
+  let participantsForKitUpdate = []
   csv += `first_name, last_name, address_1, address_2, city, state, zip_code, study_site, \r\n`
   for (let row = 0; row < (items.length); row++) {
     let keysAmount = Object.keys(items[row]).length
     let keysCounter = 0
+    participantsForKitUpdate.push(items[row]['connect_id'])
     for(let key in items[row]) {
       csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') 
       keysCounter++
@@ -125,4 +127,18 @@ const generateParticipantCsv = (items) => {
   document.body.appendChild(link);
   document.querySelector("#download-csv").click();
   document.body.removeChild(link);
+  setKitStatusToParticipant(participantsForKitUpdate)
+}
+
+const setKitStatusToParticipant = async (data) => {
+  const idToken = await getIdToken();
+  const response = await fetch(`${baseAPI}api=kitStatusToParticipant`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      Authorization: "Bearer " + idToken,
+      "Content-Type": "application/json",
+    },
+  });
+  return await response.json();
 }

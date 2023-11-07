@@ -163,7 +163,7 @@ const processAssembledKit = () => {
           triggerErrorModal('One or more fields are missing.');
         }
       else {
-        obj[conceptIds.supplyKitTrackingNum] = scannedBarcodeValue;
+        obj[conceptIds.returnKitTrackingNum] = scannedBarcodeValue;
         obj[conceptIds.supplyKitId] = supplyKitIdValue;
         obj[conceptIds.returnKitId] = returnKitIdValue;
         obj[conceptIds.collectionCupId] = collectionCupIdValue
@@ -192,7 +192,7 @@ const renderSidePane = () => {
     document.getElementById('sidePane').innerHTML +=
       `<ul style="overflow-y: scroll;">
         <br />
-        Scanned Barcode = ${ kitObject[conceptIds.supplyKitTrackingNum] } |
+        Scanned Barcode = ${ kitObject[conceptIds.returnKitTrackingNum] } |
         Supply Kit ID = ${ kitObject[conceptIds.supplyKitId] } |
         Return Kit ID = ${ kitObject[conceptIds.returnKitId] } |
         Cup Id = ${ kitObject[conceptIds.collectionCupId] } |
@@ -218,7 +218,7 @@ const editAssembledKits = () => {
         document.getElementById('cardId').value = editKitObj[conceptIds.collectionCardId]
         appState.setState({UKID: editKitObj[conceptIds.UKID]})
       });
-    }); // state to indicate if its an edit & pass the UKID as well 
+    }); // state to indicate if its an edit & also pass the UKID
 }}
 
 const checkCollecitonUniqueness = async (collectionUniqueId) => {

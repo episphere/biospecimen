@@ -200,6 +200,7 @@ const identifyCourierType = (scannedBarcode) => {
       }
   );
   hideAnimation();
+  
   if (response.status === 200) {
     triggerSuccessModal('Kit Receipted.')
     document.getElementById("courierType").innerHTML = ``;
@@ -225,6 +226,7 @@ const identifyCourierType = (scannedBarcode) => {
 
     }
 } else {
+  triggerSuccessModal('Kit Receipted.')
       alert("Error");
   }
 };

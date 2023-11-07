@@ -16,7 +16,7 @@ export const assignKitsScreen = async (auth) => {
 
 const assignKitsTemplate = async (name) => {
   showAnimation();
-  const response = await getTotalAddressesToPrint();
+  const response = await getEligibleParticipantsForKitAssignment();
   hideAnimation();
   let template = ``;
   template += homeCollectionNavbar();
@@ -157,15 +157,8 @@ const confirmAssignment = (participants) => {
         const filteredParticipants  = participants.filter((participant) => {
             return participant['connect_id'] !== obj['Connect_ID'];
         });
-        repopulateSidePaneRows(filteredParticipants)
+        populateSidePaneRows(filteredParticipants)
     }
-    else {
-        document.getElementById('fullName').value = obj['fullName'];
-        document.getElementById('address').value = obj['address'];
-        document.getElementById('Connect_ID').value = obj[conceptIds.supplyKitTrackingNum];
-        document.getElementById('scannedBarcode').value = obj[conceptIds.supplyKitId];
-        document.getElementById('scanSupplyKit').value =  obj['Connect_ID'];
-        }
     })
   }
 }
@@ -192,24 +185,13 @@ const processConfirmedAssignment = async (assignment) => {
     }
 }
 
-const repopulateSidePaneRows = (participants) => {
-  document.getElementById('sidePane').innerHTML = ``
-  participants.forEach((participant) => {
-    document.getElementById('sidePane').innerHTML += `<div>
-            <ul style="overflow-y: scroll;">
-            <br />
-              ${participant['first_name'] + ' ' + participant['last_name']} |
-              ${participant['address_1'] + ' ' + participant['address_2'] + ' ' + participant['city'] + ' ' + participant['state'] + ' ' + 
-                participant['zip_code']} | ${participant['connect_id']}
-              <button type="button" class="btn btn-link detailedRow"  data-firstName = '${participant.first_name}' data-lastName = '${participant.last_name}'
-              data-address1= '${participant.address_1}'
-              data-city= '${participant.city}'
-              data-state= '${participant.state}'
-              data-zipCode= '${participant.zip_code}'
-              data-connectId= '${participant.connect_id}'
-              id="selectParticipants">Select</button>
-            </ul>
-          </div>`
-  })
-  selectParticipants();
+export const getEligibleParticipantsForKitAssignment = async () => {
+  const idToken = await getIdToken();
+  const response = await fetch(`${baseAPI}api=getElgiblePtsForAssignment`, {
+      method: "GET",
+      headers: {
+          Authorization:"Bearer "+idToken
+      }
+  });
+  return await response.json();
 }
