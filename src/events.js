@@ -2249,7 +2249,7 @@ export const addEventViewManifestButton = (buttonId, currPage, source) => {
 }
 
 export const populateReportManifestHeader = (currPage) => {
-    let currShippingLocationNumber = currPage[conceptIds.shippingLocation];
+    const currShippingLocationNumber = currPage[conceptIds.shippingLocation];
     const currShippingLocationNumberObj = locationConceptIDToLocationMap[currShippingLocationNumber];
 
     let newDiv = document.createElement("div");
