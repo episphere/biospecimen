@@ -1660,13 +1660,13 @@ export const addEventNavBarShippingManifest = (userName) => {
         if (btn.classList.contains('active')) return;
         //get table info
         let boxesToShip = [];
-        let shipSetForage = []
-        let currTable = document.getElementById('saveTable')
-        let tempCheckStatus = ""
-        const currSiteSpecificName = document.getElementById('selectLocationList').value
-        const currShippingLocationNumber = siteSpecificLocationToConceptId[currSiteSpecificName]
+        let shipSetForage = [];
+        let currTable = document.getElementById('saveTable');
+        let tempCheckStatus = "";
+        const currSiteSpecificName = document.getElementById('selectLocationList').value;
+        const currShippingLocationNumber = siteSpecificLocationToConceptId[currSiteSpecificName];
         const currShippingLocationNumberObj = locationConceptIDToLocationMap[currShippingLocationNumber];
-        appState.setState(state => ({shipping: {...state.shipping, locationNumber: currShippingLocationNumber}})); // currShippingLocationNumber
+        appState.setState(state => ({shipping: {...state.shipping, locationNumber: currShippingLocationNumber}}));
         for (var r = 1; r < currTable.rows.length; r++) {
 
             let currCheck = currTable.rows[r].cells[0]
@@ -1715,11 +1715,11 @@ export const addEventNavBarShippingManifest = (userName) => {
           return
         }
 
-        tempCheckStatus = tempCheckedEl.checked 
+        tempCheckStatus = tempCheckedEl.checked;
         // Push empty item with boxId and empty tracking number string
         // shipSetForage used to handle empty localforage or no box id match
         boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, [conceptIds.shippingTrackingNumber]: "" }));
-        checkShipForage(shipSetForage,boxesToShip)
+        checkShipForage(shipSetForage,boxesToShip);
         //return box 1 info
         shippingPrintManifestReminder(boxesToShip, userName, tempCheckStatus, currShippingLocationNumberObj);
     });
