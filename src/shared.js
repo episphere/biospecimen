@@ -1788,8 +1788,7 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'National Cancer Institute',
     email: "connectstudytest@email.com",
     },
-
-};  
+};
 
 export const conceptIdToSiteSpecificLocation = {
   834825425: "HP Research Clinic",
@@ -2429,12 +2428,10 @@ export const allTubesCollected = (data) => {
     return flag;
 };
 
-export const displayManifestContactInfo = (currShippingLocationNumberObj) => { // displayManifestContactInformation
-    return `
-             <p style="font-weight:bold">Site Contact Information:</p>
-             <p>${currShippingLocationNumberObj.siteTeam}</p>
-             <p>Email: ${currShippingLocationNumberObj.email}</p>
-             `;
+export const displayManifestContactInfo = (currShippingLocationNumberObj) => {
+    return `<p style="font-weight:bold">Site Contact Information:</p>
+            <p>${currShippingLocationNumberObj.siteTeam}</p>
+            <p>Email: ${currShippingLocationNumberObj.email}</p>`;
 }
 
 export const checkShipForage = async (shipSetForage, boxesToShip) => {
