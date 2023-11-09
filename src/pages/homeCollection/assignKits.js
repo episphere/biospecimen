@@ -16,7 +16,6 @@ export const assignKitsScreen = async (auth) => {
 const assignKitsTemplate = async (name) => {
   showAnimation();
   const response = await getEligibleParticipantsForKitAssignment();
-  console.log('res',response)
   hideAnimation();
   let template = ``;
   template += homeCollectionNavbar();
@@ -82,7 +81,6 @@ checkTrackingNumberValid();
 }
 
 const populateSidePaneRows = (participants) => {
-  console.log('rs', participants)
   if (participants === false) { triggerErrorModal('No participants are currently available for kit assignment.') }
   else {
     document.getElementById('sidePane').innerHTML = ``

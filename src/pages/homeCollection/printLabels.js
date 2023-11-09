@@ -125,7 +125,7 @@ const generateParticipantCsv = (items) => {
 
 const setKitStatusToParticipant = async (data) => {
   const idToken = await getIdToken();
-  await fetch(`${baseAPI}api=kitStatusToParticipant`, {
+  const response = await fetch(`${baseAPI}api=kitStatusToParticipant`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
@@ -133,4 +133,5 @@ const setKitStatusToParticipant = async (data) => {
       "Content-Type": "application/json",
     },
   });
+  return await response.json();
 }

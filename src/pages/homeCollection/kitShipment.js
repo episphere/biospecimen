@@ -97,9 +97,8 @@ const cancelResponse = (cardBody) => {
 };
 
 const setShippedResponse = async (data) => {
-  showAnimation();
   const idToken = await getIdToken();
-  const response = await fetch(`${baseAPI}api=confirmShippment`, {
+  const response = await fetch(`${baseAPI}api=confirmShipment`, {
       method: "POST",
       body: JSON.stringify(data),
       headers: {
@@ -108,7 +107,6 @@ const setShippedResponse = async (data) => {
       },
     }
   );
-  hideAnimation();
   if (response.status === 200) {
     triggerSuccessModal('Shipment confirmed.')
     document.getElementById("scannedCode").value = ``;
