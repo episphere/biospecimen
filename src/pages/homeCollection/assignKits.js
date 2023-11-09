@@ -70,14 +70,13 @@ const assignKitsTemplate = async (name) => {
         <div id="sidePane" style="width: 700px; height: 400px; overflow: auto; border: 1px solid #000">
         </div>
       </div>
-</div>`;
+  </div>`;
 
-document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
-contentBody.innerHTML = template;
-activeHomeCollectionNavbar();
-populateSidePaneRows(response.data);
-confirmAssignment(response.data);
-checkTrackingNumberValid();
+  document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
+  contentBody.innerHTML = template;
+  activeHomeCollectionNavbar();
+  populateSidePaneRows(response.data);
+  checkTrackingNumberValid();
 }
 
 const populateSidePaneRows = (participants) => {
@@ -102,6 +101,7 @@ const populateSidePaneRows = (participants) => {
         </ul>`
     })
     selectParticipants();
+    confirmAssignment(participants);
   }
 }
 
@@ -156,15 +156,15 @@ const confirmAssignment = (participants) => {
         document.getElementById('Connect_ID').value = ``;
         document.getElementById('scannedBarcode').value = ``;
         document.getElementById('scanSupplyKit').value = ``;
+       
         const filteredParticipants  = participants.filter((participant) => {
-            return participant['connect_id'] !== participantObj['Connect_ID'];
+          return participant['connect_id'] !== parseInt(participantObj['Connect_ID']);
         });
-        console.log('filteredParticipants', filteredParticipants)
         populateSidePaneRows(filteredParticipants)
-    } 
-    else {
-      triggerErrorModal('Error while assigning a kit.')
-    }
+      } 
+      else {
+        triggerErrorModal('Error while assigning a kit.')
+      }
     })
   }
 }
