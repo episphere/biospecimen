@@ -32,7 +32,7 @@ const printLabelsTemplate = (name) => {
                         <div style="text-align: center;  padding-bottom: 25px; "> 
                           <input required type="text" name="numberToPrint" id="numberToPrint"  /> 
                         </div>
-                        <span> Labels to print: ${ appState.getState().length }  </span>
+                        <span> Labels to print: ${ appState.getState().length || 0}  </span>
                         <br />
                         <div class="mt-4 mb-4" style="display:inline-block;">
                           <button type="button" class="btn btn-primary" id="clearForm" disabled>View All Printed Labels</button>
@@ -59,6 +59,7 @@ const printLabelsTemplate = (name) => {
 const initializeTotalAddressesToPrint = async () => {
   showAnimation();
   const totalAddresses = await getTotalAddressesToPrint();
+  console.log('totadd', totalAddresses)
   appState.setState({'totalAddresses': totalAddresses.data})
   appState.setState({'length': totalAddresses.data.length })
   hideAnimation();
@@ -132,7 +133,7 @@ const generateParticipantCsv = (items) => {
 
 const setKitStatusToParticipant = async (data) => {
   const idToken = await getIdToken();
-  const response = await fetch(`${baseAPI}api=kitStatusToParticipant`, {
+  await fetch(`${baseAPI}api=kitStatusToParticipant`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
@@ -140,5 +141,4 @@ const setKitStatusToParticipant = async (data) => {
       "Content-Type": "application/json",
     },
   });
-  return await response.json();
 }

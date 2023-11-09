@@ -1,12 +1,9 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, storeDateReceivedinISO, baseAPI, triggerSuccessModal } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import conceptIds from "../../fieldToConceptIdMapping.js";
-import { 
-  displayPackageConditionListEmptyModal, displaySelectedPackageConditionListModal, checkAndDisplayCourierType,
-  checkSelectPackageConditionsList, targetAnchorTagEl, addListenersOnPageLoad, beforeUnloadMessage, 
-  enableCollectionCardFields, enableCollectionCheckBox  } from "../receipts/packageReceipt.js";
+import { displayPackageConditionListEmptyModal, displaySelectedPackageConditionListModal, checkAndDisplayCourierType, checkSelectPackageConditionsList, targetAnchorTagEl, addListenersOnPageLoad, beforeUnloadMessage, enableCollectionCardFields, enableCollectionCheckBox } from "../receipts/packageReceipt.js";
 
 const contentBody = document.getElementById("contentBody");
 
@@ -143,31 +140,30 @@ const formSubmit = () => {
 };
 
 export const confirmKitReceipt = () => {
-  const a = document.getElementById('confirmReceipt');
-  if (a) {
-    a.addEventListener('click',  () => { 
-      let obj = {};
+  const confirmReceiptBtn = document.getElementById('confirmReceipt');
+  if (confirmReceiptBtn) {
+    confirmReceiptBtn.addEventListener('click',  () => {
+      let kitObj = {};
       let packageConditions = [];
       const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
       const onlyUSPSCourierType = identifyCourierType(scannedBarcode);
       if (onlyUSPSCourierType === true) {
-        obj[conceptIds.returnKitTrackingNum] = scannedBarcode
+        kitObj[conceptIds.returnKitTrackingNum] = scannedBarcode
         for (let option of document.getElementById('packageCondition').options) {
           if (option.selected) {packageConditions.push(option.value)}
         }
-        obj[`${conceptIds.pkgReceiptConditions}`] = packageConditions;
-      //  obj[conceptIds.pkgComments] = document.getElementById('receivePackageComments').value.trim();
-        obj[conceptIds.receivedDateTime] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
+        kitObj[`${conceptIds.pkgReceiptConditions}`] = packageConditions;
+      //  kitObj[conceptIds.pkgComments] = document.getElementById('receivePackageComments').value.trim();
+        kitObj[conceptIds.receivedDateTime] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
         if(document.getElementById('collectionId').value) {
-          obj[conceptIds.collectionCupId] = document.getElementById('collectionId').value;
+          kitObj[conceptIds.collectionCupId] = document.getElementById('collectionId').value;
           const dateCollectionCard = document.getElementById('dateCollectionCard').value;
           const timeCollectionCard = document.getElementById('timeCollectionCard').value;
-          obj[conceptIds.collectionDateTimeStamp] = dateCollectionCard + 'T' + timeCollectionCard
+          kitObj[conceptIds.collectionDateTimeStamp] = dateCollectionCard + 'T' + timeCollectionCard
           document.getElementById('collectionCheckBox').checked === true ? 
-              obj[conceptIds.collectionCardFlag] = true : obj[conceptIds.collectionCardFlag] = false
-          obj[conceptIds.collectionAddtnlNotes] = document.getElementById('collectionComments').value;
-          }    
-        
+          kitObj[conceptIds.collectionCardFlag] = true : kitObj[conceptIds.collectionCardFlag] = false
+          kitObj[conceptIds.collectionAddtnlNotes] = document.getElementById('collectionComments').value;
+        }    
         window.removeEventListener("beforeunload",beforeUnloadMessage)
         targetAnchorTagEl();
         storePackageReceipt(obj);
@@ -178,29 +174,22 @@ export const confirmKitReceipt = () => {
 
 }
 
-const identifyCourierType = (scannedBarcode) => {
-  if (scannedBarcode.length === 20 || scannedBarcode.length === 22) {
-     return true
-   }
-   else {
-     return false
- }}
+const identifyCourierType = (scannedBarcode) => { return scannedBarcode.length === 20 || scannedBarcode.length === 22 }
 
- const storePackageReceipt = async (data) => {
+const storePackageReceipt = async (data) => {
   showAnimation();
   const idToken = await getIdToken();
   const response = await fetch(`${baseAPI}api=kitReceipt`,
-      {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: {
-              Authorization: "Bearer " + idToken,
-              "Content-Type": "application/json",
-          },
-      }
+    {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+            Authorization: "Bearer " + idToken,
+            "Content-Type": "application/json",
+        },
+    }
   );
   hideAnimation();
-  
   if (response.status === 200) {
     triggerSuccessModal('Kit Receipted.')
     document.getElementById("courierType").innerHTML = ``;
@@ -219,14 +208,12 @@ const identifyCourierType = (scannedBarcode) => {
       document.getElementById("timeCollectionCard").value = "";
       document.getElementById("collectionCheckBox").checked = false;
       document.getElementById("collectionComments").value = "";
-
       enableCollectionCardFields();
       enableCollectionCheckBox();
       document.getElementById("packageCondition").setAttribute("data-selected","[]");
-
     }
-} else {
-  triggerSuccessModal('Kit Receipted.')
-      alert("Error");
+  } 
+  else {
+    triggerErrorModal('Error during Kit receipt.')
   }
 };

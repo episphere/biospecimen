@@ -1,14 +1,6 @@
 import { nonUserNavBar } from "./../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import {
-  showAnimation,
-  hideAnimation,
-  getIdToken,
-  baseAPI,
-  storeDateReceivedinISO,
-  triggerSuccessModal,
-  triggerErrorModal
-} from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal } from "../../shared.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import conceptIds from '../../fieldToConceptIdMapping.js';
 
@@ -49,10 +41,8 @@ const verifyScannedCode = async () => {
   const scannedCodeInput = document.getElementById("scannedCode");
   if (scannedCodeInput) {
     scannedCodeInput.addEventListener("change", async () => {
-      showAnimation();
       const isScannedCodeValid = await checkScannedCodeValid(scannedCodeInput.value)
-      hideAnimation();
-      isScannedCodeValid.data.valid ? confirmPickupTemplate(isScannedCodeValid.data.UKID) : tryAgainTemplate();
+      isScannedCodeValid.data?.valid ? confirmPickupTemplate(isScannedCodeValid.data?.UKID) : tryAgainTemplate();
     });
   }
 };
@@ -91,7 +81,7 @@ const saveResponse = (UKID) => {
   data[conceptIds.UKID] = UKID;
   if (saveResponseBtn) {
     saveResponseBtn.addEventListener("click", (e) => {
-      data[conceptIds.shippedDateTime] = storeDateReceivedinISO(document.getElementById("inputDate").value);
+      data[conceptIds.shippedDateTime] = convertDateReceivedinISO(document.getElementById("inputDate").value);
       setShippedResponse(data);
     });
   }

@@ -1,6 +1,4 @@
-import { userDashboard } from "../dashboard.js";
-import { getIdToken, showAnimation, hideAnimation, baseAPI , packageConditonConversion, 
-  storeDateReceivedinISO, triggerErrorModal} from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, baseAPI , packageConditonConversion, convertDateReceivedinISO, triggerErrorModal} from "../../shared.js";
 import { nonUserNavBar } from "../../navbar.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
@@ -256,10 +254,10 @@ const confirmPackageReceipt = () => {
         if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode))) {  
           obj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
           obj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
-          obj[`${fieldMapping.siteShipmentDateReceived}`] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
+          obj[`${fieldMapping.siteShipmentDateReceived}`] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
         } else { 
           obj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
-          obj['dateReceived'] = storeDateReceivedinISO(document.getElementById('dateReceived').value);
+          obj['dateReceived'] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
           if(document.getElementById('collectionId').value) {
             obj['collectionId'] = document.getElementById('collectionId').value;
             obj['dateCollectionCard'] = document.getElementById('dateCollectionCard').value;
