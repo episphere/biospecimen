@@ -16,93 +16,95 @@ export const assignKitsScreen = async (auth) => {
 const assignKitsTemplate = async (name) => {
   showAnimation();
   const response = await getEligibleParticipantsForKitAssignment();
+  console.log('res',response)
   hideAnimation();
-  if (!response) triggerErrorModal('An error occurred while retrieving participants. Please try again.')
-  else {
-    let template = ``;
-    template += homeCollectionNavbar();
-    template += `
-                  <div class="row align-center welcome-screen-div">
-                          <div class="col"><h3 style="margin:1rem 0 1.5rem;">Assign Kits</h3></div>
-                  </div>`;
+  let template = ``;
+  template += homeCollectionNavbar();
+  template += `
+                <div class="row align-center welcome-screen-div">
+                        <div class="col"><h3 style="margin:1rem 0 1.5rem;">Assign Kits</h3></div>
+                </div>`;
 
-    template += `
-    <div class="row">
-        <div class="col">
-          <div id="alert_placeholder"></div>
-            <form>
-                  <div class="form-group row">
-                    <label for="fullName" class="col-md-4 col-form-label">Full Name</label>
-                    <div class="col-md-8">
-                      <input type="text" class="form-control" id="fullName" placeholder="Enter Full Name">
-                    </div>
-                  </div>
-                  <div class="form-group row">
-                    <label for="address" class="col-md-4 col-form-label">Address</label>
-                    <div class="col-md-8">
-                      <input type="text" class="form-control" id="address" placeholder="Enter Address">
-                    </div>
-                  </div>
-                  <div class="form-group row">
-                    <label for="Connect_ID" class="col-md-4 col-form-label">Connect_ID</label>
-                    <div class="col-md-8">
-                      <input type="text" class="form-control" id="Connect_ID" placeholder="Enter Connect ID">
-                    </div>
-                  </div>
-                  <div class="form-group row">
-                    <label for="scanSupplyKit" class="col-md-4 col-form-label">Scan Supply Kit</label>
-                    <div class="col-md-8">
-                      <input type="text" class="form-control" id="scanSupplyKit" placeholder="Scan Supply Kit ID">
-                    </div>
-                  </div>
-                  <div class="form-group row">
-                  <label for="scannedBarcode" class="col-md-4 col-form-label">Tracking Number</label>
+  template += `
+  <div class="row">
+      <div class="col">
+        <div id="alert_placeholder"></div>
+          <form>
+                <div class="form-group row">
+                  <label for="fullName" class="col-md-4 col-form-label">Full Name</label>
                   <div class="col-md-8">
-                    <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan FedEx Barcode">
-                    <span id="showErrorMsg" style="font-size: 14px;"></span>
+                    <input type="text" class="form-control" id="fullName" placeholder="Enter Full Name">
                   </div>
                 </div>
-          </form>
-          <div class="mt-4 mb-4" style="display:inline-block;">
-            <button type="button" class="btn btn-primary" id="clearForm" disabled>View Assigned Kits</button>
-            <button type="submit" class="btn btn-primary" id="confirmAssignment">Confirm Assignment</button>
-          </div>
+                <div class="form-group row">
+                  <label for="address" class="col-md-4 col-form-label">Address</label>
+                  <div class="col-md-8">
+                    <input type="text" class="form-control" id="address" placeholder="Enter Address">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="Connect_ID" class="col-md-4 col-form-label">Connect_ID</label>
+                  <div class="col-md-8">
+                    <input type="text" class="form-control" id="Connect_ID" placeholder="Enter Connect ID">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="scanSupplyKit" class="col-md-4 col-form-label">Scan Supply Kit</label>
+                  <div class="col-md-8">
+                    <input type="text" class="form-control" id="scanSupplyKit" placeholder="Scan Supply Kit ID">
+                  </div>
+                </div>
+                <div class="form-group row">
+                <label for="scannedBarcode" class="col-md-4 col-form-label">Tracking Number</label>
+                <div class="col-md-8">
+                  <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan FedEx Barcode">
+                  <span id="showErrorMsg" style="font-size: 14px;"></span>
+                </div>
+              </div>
+        </form>
+        <div class="mt-4 mb-4" style="display:inline-block;">
+          <button type="button" class="btn btn-primary" id="clearForm" disabled>View Assigned Kits</button>
+          <button type="submit" class="btn btn-primary" id="confirmAssignment">Confirm Assignment</button>
         </div>
-        <div class="col-6">
-          <div id="sidePane" style="width: 700px; height: 400px; overflow: auto; border: 1px solid #000">
-          </div>
+      </div>
+      <div class="col-6">
+        <div id="sidePane" style="width: 700px; height: 400px; overflow: auto; border: 1px solid #000">
         </div>
-  </div>`;
+      </div>
+</div>`;
 
-  document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
-  contentBody.innerHTML = template;
-  activeHomeCollectionNavbar();
-  populateSidePaneRows(response.data);
-  confirmAssignment(response.data);
-  checkTrackingNumberValid();
-  }
-};
+document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
+contentBody.innerHTML = template;
+activeHomeCollectionNavbar();
+populateSidePaneRows(response.data);
+confirmAssignment(response.data);
+checkTrackingNumberValid();
+}
 
 const populateSidePaneRows = (participants) => {
-  document.getElementById('sidePane').innerHTML = ``
-  document.getElementById('sidePane').innerHTML += `&nbsp;<b>Participants :</b> ${Object.keys(participants).length || 0}`
-  participants.forEach((participant) => {
-    document.getElementById('sidePane').innerHTML += `
-      <ul style="overflow-y: scroll;">
-      <br />
-        ${participant['first_name'] + ' ' + participant['last_name']} |
-        ${participant['address_1'] + ' ' + participant['address_2'] + ' ' + participant['city'] + ' ' + participant['state'] + ' ' + 
-          participant['zip_code']} | ${participant['connect_id']}
-        <button type="button" class="btn btn-link detailedRow"  data-firstName = '${participant.first_name}' data-lastName = '${participant.last_name}'
-        data-address1= '${participant.address_1}'
-        data-city= '${participant.city}'
-        data-state= '${participant.state}'
-        data-zipCode= '${participant.zip_code}'
-        data-connectId= '${participant.connect_id}'
-        id="selectParticipants">Select</button>
-      </ul>`
-  })
-  selectParticipants();
+  console.log('rs', participants)
+  if (participants === false) { triggerErrorModal('No participants are currently available for kit assignment.') }
+  else {
+    document.getElementById('sidePane').innerHTML = ``
+    document.getElementById('sidePane').innerHTML += `&nbsp;<b>Participants :</b> ${Object.keys(participants).length || 0}`
+    participants?.forEach((participant) => {
+      document.getElementById('sidePane').innerHTML += `
+        <ul style="overflow-y: scroll;">
+        <br />
+          ${participant['first_name'] + ' ' + participant['last_name']} |
+          ${participant['address_1'] + ' ' + participant['address_2'] + ' ' + participant['city'] + ' ' + participant['state'] + ' ' + 
+            participant['zip_code']} | ${participant['connect_id']}
+          <button type="button" class="btn btn-link detailedRow"  data-firstName = '${participant.first_name}' data-lastName = '${participant.last_name}'
+          data-address1= '${participant.address_1}'
+          data-city= '${participant.city}'
+          data-state= '${participant.state}'
+          data-zipCode= '${participant.zip_code}'
+          data-connectId= '${participant.connect_id}'
+          id="selectParticipants">Select</button>
+        </ul>`
+    })
+    selectParticipants();
+  }
 }
 
 const checkTrackingNumberValid = () => {
@@ -143,13 +145,13 @@ const confirmAssignment = (participants) => {
   const confirmAssignmentBtn = document.getElementById('confirmAssignment');
   if (confirmAssignmentBtn) {
     confirmAssignmentBtn.addEventListener('click', async () => { 
-      let obj = {};
-      obj['fullName'] = document.getElementById('fullName').value;
-      obj['address'] = document.getElementById('address').value;
-      obj[conceptIds.supplyKitTrackingNum] = document.getElementById('scannedBarcode').value.trim();
-      obj[conceptIds.supplyKitId] = document.getElementById('scanSupplyKit').value.trim();
-      obj['Connect_ID'] = document.getElementById('Connect_ID')?.value;
-      const assignmentStatus = await processConfirmedAssignment(obj);
+      let participantObj = {};
+      participantObj['fullName'] = document.getElementById('fullName').value;
+      participantObj['address'] = document.getElementById('address').value;
+      participantObj[conceptIds.supplyKitTrackingNum] = document.getElementById('scannedBarcode').value.trim();
+      participantObj[conceptIds.supplyKitId] = document.getElementById('scanSupplyKit').value.trim();
+      participantObj['Connect_ID'] = document.getElementById('Connect_ID')?.value;
+      const assignmentStatus = await processConfirmedAssignment(participantObj);
       if (assignmentStatus) {
         document.getElementById('fullName').value = ``;
         document.getElementById('address').value = ``;
@@ -157,9 +159,13 @@ const confirmAssignment = (participants) => {
         document.getElementById('scannedBarcode').value = ``;
         document.getElementById('scanSupplyKit').value = ``;
         const filteredParticipants  = participants.filter((participant) => {
-            return participant['connect_id'] !== obj['Connect_ID'];
+            return participant['connect_id'] !== participantObj['Connect_ID'];
         });
+        console.log('filteredParticipants', filteredParticipants)
         populateSidePaneRows(filteredParticipants)
+    } 
+    else {
+      triggerErrorModal('Error while assigning a kit.')
     }
     })
   }

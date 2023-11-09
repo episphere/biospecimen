@@ -240,7 +240,6 @@ const storeAssembledKit = async (kitData) => {
   hideAnimation();
   if (collectionUnique.data) {
     kitData[conceptIds.kitStatus] = conceptIds.pending.toString();
-    kitData[conceptIds.kitType] = `Mouthwash`; // default to mouthwash until new collections are added
     kitData[conceptIds.UKID] = "MW" + Math.random().toString(16).slice(2);
     kitData[conceptIds.pendingDateTimeStamp] = new Date().toISOString();
     let api = `addKitData`
