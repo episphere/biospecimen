@@ -83,7 +83,7 @@ const generateParticipantCsvGetter = (name) => {
           if (numberToPrint) {
             const arrayLengthToProcess = appState.getState().length
             if (arrayLengthToProcess >= numberToPrint) {
-              const arrayToProcess = appState.getState().totalAddresses
+              const arrayToProcess = appState.getState().totalAddresses.filter(obj => obj !== null)
               const remainingArrayToProcess = arrayToProcess.slice(numberToPrint, appState.getState().length)
               appState.setState({totalAddresses: remainingArrayToProcess })
               appState.setState({'length': remainingArrayToProcess.length })
@@ -104,6 +104,7 @@ const generateParticipantCsv = (items) => {
   let participantsForKitUpdate = []
   csv += `first_name, last_name, address_1, address_2, city, state, zip_code, connect_id, \r\n`
   for (let row = 0; row < (items.length); row++) {
+    console.log
     let keysAmount = Object.keys(items[row]).length
     let keysCounter = 0
     participantsForKitUpdate.push(items[row]['connect_id'])
