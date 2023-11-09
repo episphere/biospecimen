@@ -7,7 +7,7 @@ import { signOut } from "./pages/signIn.js";
 import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
-import { conceptIds } from './fieldToConceptIdMapping.js';
+import conceptIds from './fieldToConceptIdMapping.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
 
 
@@ -43,7 +43,7 @@ let api = '';
 
 if(location.host === urls.prod) api = 'https://api-myconnect.cancer.gov/biospecimen?';
 else if(location.host === urls.stage) api = 'https://api-myconnect-stage.cancer.gov/biospecimen?';
-else api = 'http://127.0.0.1:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
+else api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
 export const baseAPI = api;
 
 export const inactivityTime = () => {
@@ -2481,7 +2481,7 @@ export const SSOConfig = (email) => {
 }
 
 export const getParticipantSelection = async (filter) => {
-
+    logAPICallStartDev('getParticipantSelection');
     const idToken = await getIdToken();
     const response = await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=getParticipantSelection&type=${filter}`, 
     {
@@ -2490,6 +2490,7 @@ export const getParticipantSelection = async (filter) => {
         Authorization: "Bearer " + idToken,
       },
     });
+    logAPICallEndDev('getParticipantSelection');
     return response.json();
   }
      
@@ -2581,10 +2582,6 @@ export const displayContactInformation = (currContactInfo) => {
   else return ""
 }
 
-export const convertDateReceivedinISO = (date) => { // ("YYYY-MM-DD" to ISO format DateTime)
-    return new Date(date).toISOString();
-}
-
 export const checkShipForage = async (shipSetForage, boxesToShip) => {
   let forageBoxIdArr = []
   try {
@@ -2661,17 +2658,17 @@ export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxEr
 
 export const delay = ms => new Promise(res => setTimeout(res, ms));
 
-export const convertConceptIdToPackageCondition = (packagedCondition, packageConditionConversion) => {
+export const convertConceptIdToPackageCondition = (packagedCondition, packageConditonConversion) => {
   let listConditions = ''
   if(!packagedCondition) return listConditions
   for(let i = 0; i < packagedCondition.length; i++) {
     let isLastItem = false;
     if(i+1 === packagedCondition.length) { // if last item equals the final item
       isLastItem = true
-      if(isLastItem) listConditions += `<p>${packageConditionConversion[packagedCondition[i]]}</p>`
+      if(isLastItem) listConditions += `<p>${packageConditonConversion[packagedCondition[i]]}</p>`
     }
     else {
-      listConditions += `<p>${packageConditionConversion[packagedCondition[i]]},</p>`
+      listConditions += `<p>${packageConditonConversion[packagedCondition[i]]},</p>`
     }
 
   }
@@ -2737,6 +2734,28 @@ export const translateNumToType = {
   "0053": "NA",
   "0054": "NA"
 };
+
+export const packageConditonConversion = {
+    "679749262": "Package in good condition",
+    "405513630": "No Ice Pack",
+    "595987358": "Warm Ice Pack",
+    "200183516": "Vials - Incorrect Material Type Sent",
+    "399948893": "No Label on Vials",
+    "631290535": "Returned Empty Vials",
+    "442684673": "Participant Refusal",
+    "121149986": "Crushed",
+    "678483571": "Damaged Container (outer and inner)",
+    "289322354": "Material Thawed",
+    "909529446": "Insufficient Ice",
+    "847410060": "Improper Packaging",
+    "387564837": "Damaged Vials",
+    "933646000": "Other",
+    "842171722": "No Pre-notification",
+    "613022284": "No Refrigerant",
+    "922995819": "Manifest/Vial/Paperwork info do not match",
+    "958000780": "Shipment Delay",
+    "853876696": "No Manifest provided",
+}
 
 export const convertISODateTime = (isoDateTime) => {
     const date = new Date(isoDateTime);
@@ -2871,26 +2890,4 @@ export const addBoxAndUpdateSiteDetails = async (boxAndSiteData) => {
         console.error('Error adding box', e);
         return null;
     }
-}
-
-export const triggerErrorModal = (message) => {
-    let alertList = document.getElementById("alert_placeholder");
-    alertList.innerHTML = `
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-        </div>`;
-}
-
-export const triggerSuccessModal = (message) => {
-    let alertList = document.getElementById("alert_placeholder");
-    alertList.innerHTML = `
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-        </div>`;
 }
