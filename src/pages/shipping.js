@@ -7,7 +7,7 @@ import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBack
         addEventTrackingNumberScanAutoFocus, addEventTrimTrackingNums, compareBoxIds, populateCourierBox, populateFinalCheck, populateTrackingQuery } from "../events.js";     
 import { homeNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
 import { setAllShippingState, updateShippingStateCreateBox, updateShippingStateRemoveBagFromBox, updateShippingStateSelectedLocation } from '../shippingState.js';
-import conceptIds from '../fieldToConceptIdMapping.js';
+import { conceptIds } from '../fieldToConceptIdMapping.js';
 
 export const shippingDashboard = (auth, route) => {
     auth.onAuthStateChanged(async user => {

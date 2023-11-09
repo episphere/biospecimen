@@ -1,6 +1,6 @@
 import { appState, getSiteAcronym, siteSpecificLocationToConceptId } from './shared.js';
 import { specimenCollection } from './tubeValidation.js';
-import conceptIds from './fieldToConceptIdMapping.js';
+import { conceptIds } from './fieldToConceptIdMapping.js';
 
 /**
  * Update all shipping state variables in startShipping to provide access throughout the shipping dashboard

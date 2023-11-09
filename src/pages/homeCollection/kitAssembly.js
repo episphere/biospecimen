@@ -1,8 +1,8 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, appState, baseAPI } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
-import conceptIds from '../../fieldToConceptIdMapping.js';
+import { conceptIds } from '../../fieldToConceptIdMapping.js';
 
 const contentBody = document.getElementById("contentBody");
 localStorage.setItem('tmpKitData', JSON.stringify([]));
@@ -34,7 +34,7 @@ const kitAssemblyTemplate = async (name) => {
                         <div class="form-group row">
                           <label for="scannedBarcode" class="col-md-4 col-form-label">Tracking Number</label>
                           <div class="col-md-8">
-                            <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan USPS Barcode" required />
+                            <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan Barcode" required />
                             <span id="showErrorMsg" style="font-size: 14px;"></span>
                           </div>
                         </div>
@@ -150,7 +150,7 @@ const processAssembledKit = () => {
   const saveKitButton = document.getElementById('saveKit');
   if (saveKitButton) {
     saveKitButton.addEventListener('click', async () => { 
-      let obj = {};
+      let kitObj = {};
 
       const scannedBarcodeValue = document.getElementById('scannedBarcode').value.trim();
       const supplyKitIdValue = document.getElementById('supplyKitId').value.trim();
@@ -163,12 +163,13 @@ const processAssembledKit = () => {
           triggerErrorModal('One or more fields are missing.');
         }
       else {
-        obj[conceptIds.supplyKitTrackingNum] = scannedBarcodeValue;
-        obj[conceptIds.supplyKitId] = supplyKitIdValue;
-        obj[conceptIds.returnKitId] = returnKitIdValue;
-        obj[conceptIds.collectionCupId] = collectionCupIdValue
-        obj[conceptIds.collectionCardId] = collectionCardIdValue;
-        const responseStoredStatus = await storeAssembledKit(obj);
+        kitObj[conceptIds.returnKitTrackingNum] = scannedBarcodeValue;
+        kitObj[conceptIds.supplyKitId] = supplyKitIdValue;
+        kitObj[conceptIds.returnKitId] = returnKitIdValue;
+        kitObj[conceptIds.collectionCupId] = collectionCupIdValue
+        kitObj[conceptIds.collectionCardId] = collectionCardIdValue;
+        kitObj[conceptIds.kitType] = conceptIds.mouthwashKitType;
+        const responseStoredStatus = await storeAssembledKit(kitObj);
         if (responseStoredStatus) {
           document.getElementById('scannedBarcode').value = ``
           document.getElementById('supplyKitId').value = ``
@@ -192,7 +193,7 @@ const renderSidePane = () => {
     document.getElementById('sidePane').innerHTML +=
       `<ul style="overflow-y: scroll;">
         <br />
-        Scanned Barcode = ${ kitObject[conceptIds.supplyKitTrackingNum] } |
+        Scanned Barcode = ${ kitObject[conceptIds.returnKitTrackingNum] } |
         Supply Kit ID = ${ kitObject[conceptIds.supplyKitId] } |
         Return Kit ID = ${ kitObject[conceptIds.returnKitId] } |
         Cup Id = ${ kitObject[conceptIds.collectionCupId] } |
@@ -211,14 +212,14 @@ const editAssembledKits = () => {
     Array.from(detailedRow).forEach(function(editKitBtn) {
       editKitBtn.addEventListener('click', () => {
         const editKitObj = JSON.parse(editKitBtn.getAttribute('data-kitObject'));
-        document.getElementById('scannedBarcode').value = editKitObj[conceptIds.supplyKitTrackingNum]
+        document.getElementById('scannedBarcode').value = editKitObj[conceptIds.returnKitTrackingNum]
         document.getElementById('supplyKitId').value = editKitObj[conceptIds.supplyKitId]
         document.getElementById('returnKitId').value = editKitObj[conceptIds.returnKitId]
         document.getElementById('cupId').value = editKitObj[conceptIds.collectionCupId]
         document.getElementById('cardId').value = editKitObj[conceptIds.collectionCardId]
         appState.setState({UKID: editKitObj[conceptIds.UKID]})
       });
-    }); // state to indicate if its an edit & pass the UKID as well 
+    }); // state to indicate if its an edit & also pass the UKID
 }}
 
 const checkCollecitonUniqueness = async (collectionUniqueId) => {
@@ -238,9 +239,9 @@ const storeAssembledKit = async (kitData) => {
   const collectionUnique = await checkCollecitonUniqueness(kitData[conceptIds.collectionCupId].replace(/\s/g, "\n"));
   hideAnimation();
   if (collectionUnique.data) {
-    kitData[conceptIds.kitStatus] = conceptIds.pending
-    kitData[conceptIds.kitType] = `Mouthwash`; // default to mouthwash until new collections are added
+    kitData[conceptIds.kitStatus] = conceptIds.pending.toString();
     kitData[conceptIds.UKID] = "MW" + Math.random().toString(16).slice(2);
+    kitData[conceptIds.pendingDateTimeStamp] = new Date().toISOString();
     let api = `addKitData`
     if (appState.getState().UKID !== ``) { 
       api = `updateKitData` 
@@ -288,19 +289,6 @@ const storeAssembledKit = async (kitData) => {
     triggerErrorModal('The collection card and cup ID are already in use.')
     return false
   }
-}
-
-const triggerErrorModal = (message) => {
-    let alertList = document.getElementById("alert_placeholder");
-        let template = ``;
-        template += `
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                  ${message}
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                </div>`;
-        alertList.innerHTML = template;
 }
 
 const alertTemplate = (message, status = "warn", duration = 1000) => {

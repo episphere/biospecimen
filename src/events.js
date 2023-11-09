@@ -5,8 +5,7 @@ import { appState, performSearch, showAnimation, addBiospecimenUsers, getSpecime
         convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
         checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData,
         siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
-        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger,
-        packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList } from './shared.js';
+        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
 import { addNewBox, buildSpecimenDataInModal, createShippingModalBody, startShipping, generateBoxManifest, populateViewShippingBoxContentsList,
@@ -18,7 +17,7 @@ import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, totalCollectionIDLength, workflows, specimenCollection, deviationReasons, refusedShippingDeviationConceptList} from './tubeValidation.js';
 import { updateShippingStateAddBagToBox, updateShippingStateSelectedLocation } from './shippingState.js';
-import conceptIds from './fieldToConceptIdMapping.js';
+import { conceptIds, packageConditionConversion } from './fieldToConceptIdMapping.js';
 
 
 export const addEventSearchForm1 = () => {
@@ -2232,7 +2231,7 @@ export const populateBoxTable = async (page, filter, source) => {
         currRow.insertCell(4).innerHTML = '<button type="button" class="button btn btn-info" id="reportsViewManifest' + i + '">View manifest</button>';
         currRow.insertCell(5).innerHTML = currPage['333524031'] === 353358909 ? "Yes" : "No"
         currRow.insertCell(6).innerHTML = receivedDate;
-        currRow.insertCell(7).innerHTML = convertConceptIdToPackageCondition(packagedCondition, packageConditonConversion);
+        currRow.insertCell(7).innerHTML = convertConceptIdToPackageCondition(packagedCondition, packageConditionConversion);
         currRow.insertCell(8).innerHTML = currPage['870456401'] || '' ;
         addEventViewManifestButton('reportsViewManifest' + i, currPage, source);
 

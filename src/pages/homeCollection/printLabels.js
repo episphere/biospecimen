@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, baseAPI, appState } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, baseAPI, appState, triggerErrorModal, triggerSuccessModal } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
@@ -32,7 +32,7 @@ const printLabelsTemplate = (name) => {
                         <div style="text-align: center;  padding-bottom: 25px; "> 
                           <input required type="text" name="numberToPrint" id="numberToPrint"  /> 
                         </div>
-                        <span> Labels to print: ${ appState.getState().length }  </span>
+                        <span> Labels to print: ${ appState.getState().length || 0}  </span>
                         <br />
                         <div class="mt-4 mb-4" style="display:inline-block;">
                           <button type="button" class="btn btn-primary" id="clearForm" disabled>View All Printed Labels</button>
@@ -64,7 +64,7 @@ const initializeTotalAddressesToPrint = async () => {
   hideAnimation();
 }
 
-const getTotalAddressesToPrint = async () => {
+export const getTotalAddressesToPrint = async () => {
   const idToken = await getIdToken();
   const response = await fetch(`${baseAPI}api=totalAddressesToPrint`, {
       method: "GET",
@@ -89,25 +89,10 @@ const generateParticipantCsvGetter = (name) => {
               appState.setState({'length': remainingArrayToProcess.length })
               generateParticipantCsv(arrayToProcess.slice(0, numberToPrint));
               printLabelsTemplate(name);
-                // Display success message
-              const alertList = document.getElementById('alert_placeholder');
-              alertList.innerHTML = `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                  Success!
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>`;
+              triggerSuccessModal('Success!');                 // Display success message
             }
             else {
-              const alertList = document.getElementById("alert_placeholder");
-              alertList.innerHTML =`
-                      <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        Out of bounds!
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                  <span aria-hidden="true">&times;</span>
-                              </button>
-                      </div>`;
+              triggerErrorModal('Out of bounds!');
             } 
           }
       });
@@ -116,10 +101,12 @@ const generateParticipantCsvGetter = (name) => {
 
 const generateParticipantCsv = (items) => {
   let csv = ``;
-  csv += `first_name, last_name, address_1, address_2, city, state, zip_code, study_site, \r\n`
+  let participantsForKitUpdate = []
+  csv += `first_name, last_name, address_1, address_2, city, state, zip_code, connect_id, \r\n`
   for (let row = 0; row < (items.length); row++) {
     let keysAmount = Object.keys(items[row]).length
     let keysCounter = 0
+    participantsForKitUpdate.push(items[row]['connect_id'])
     for(let key in items[row]) {
       csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') 
       keysCounter++
@@ -132,4 +119,19 @@ const generateParticipantCsv = (items) => {
   document.body.appendChild(link);
   document.querySelector("#download-csv").click();
   document.body.removeChild(link);
+  const response = setKitStatusToParticipant(participantsForKitUpdate);
+  if (!response) triggerErrorModal('Error while updating participant(s) kit status.')
+}
+
+const setKitStatusToParticipant = async (data) => {
+  const idToken = await getIdToken();
+  const response = await fetch(`${baseAPI}api=kitStatusToParticipant`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      Authorization: "Bearer " + idToken,
+      "Content-Type": "application/json",
+    },
+  });
+  return await response.json();
 }
