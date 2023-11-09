@@ -84,6 +84,7 @@ const assignKitsTemplate = async (name) => {
 };
 
 const populateSidePaneRows = (participants) => {
+  document.getElementById('sidePane').innerHTML = ``
   document.getElementById('sidePane').innerHTML += `&nbsp;<b>Participants :</b> ${Object.keys(participants).length || 0}`
   participants.forEach((participant) => {
     document.getElementById('sidePane').innerHTML += `

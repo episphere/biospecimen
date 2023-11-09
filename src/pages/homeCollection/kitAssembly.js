@@ -150,7 +150,7 @@ const processAssembledKit = () => {
   const saveKitButton = document.getElementById('saveKit');
   if (saveKitButton) {
     saveKitButton.addEventListener('click', async () => { 
-      let obj = {};
+      let kitObj = {};
 
       const scannedBarcodeValue = document.getElementById('scannedBarcode').value.trim();
       const supplyKitIdValue = document.getElementById('supplyKitId').value.trim();
@@ -163,12 +163,13 @@ const processAssembledKit = () => {
           triggerErrorModal('One or more fields are missing.');
         }
       else {
-        obj[conceptIds.returnKitTrackingNum] = scannedBarcodeValue;
-        obj[conceptIds.supplyKitId] = supplyKitIdValue;
-        obj[conceptIds.returnKitId] = returnKitIdValue;
-        obj[conceptIds.collectionCupId] = collectionCupIdValue
-        obj[conceptIds.collectionCardId] = collectionCardIdValue;
-        const responseStoredStatus = await storeAssembledKit(obj);
+        kitObj[conceptIds.returnKitTrackingNum] = scannedBarcodeValue;
+        kitObj[conceptIds.supplyKitId] = supplyKitIdValue;
+        kitObj[conceptIds.returnKitId] = returnKitIdValue;
+        kitObj[conceptIds.collectionCupId] = collectionCupIdValue
+        kitObj[conceptIds.collectionCardId] = collectionCardIdValue;
+        kitObj[conceptIds.kitType] = conceptIds.mouthwashKitType;
+        const responseStoredStatus = await storeAssembledKit(kitObj);
         if (responseStoredStatus) {
           document.getElementById('scannedBarcode').value = ``
           document.getElementById('supplyKitId').value = ``

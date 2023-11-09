@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, baseAPI, appState, triggerErrorModal } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, baseAPI, appState, triggerErrorModal, triggerSuccessModal } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
@@ -59,7 +59,6 @@ const printLabelsTemplate = (name) => {
 const initializeTotalAddressesToPrint = async () => {
   showAnimation();
   const totalAddresses = await getTotalAddressesToPrint();
-  console.log('totadd', totalAddresses)
   appState.setState({'totalAddresses': totalAddresses.data})
   appState.setState({'length': totalAddresses.data.length })
   hideAnimation();
@@ -90,15 +89,7 @@ const generateParticipantCsvGetter = (name) => {
               appState.setState({'length': remainingArrayToProcess.length })
               generateParticipantCsv(arrayToProcess.slice(0, numberToPrint));
               printLabelsTemplate(name);
-                // Display success message
-              const alertList = document.getElementById('alert_placeholder');
-              alertList.innerHTML = `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                  Success!
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>`;
+              triggerSuccessModal('Success!');                 // Display success message
             }
             else {
               triggerErrorModal('Out of bounds!');
@@ -111,7 +102,7 @@ const generateParticipantCsvGetter = (name) => {
 const generateParticipantCsv = (items) => {
   let csv = ``;
   let participantsForKitUpdate = []
-  csv += `first_name, last_name, address_1, address_2, city, state, zip_code, study_site, \r\n`
+  csv += `first_name, last_name, address_1, address_2, city, state, zip_code, connect_id, \r\n`
   for (let row = 0; row < (items.length); row++) {
     let keysAmount = Object.keys(items[row]).length
     let keysCounter = 0
@@ -128,7 +119,8 @@ const generateParticipantCsv = (items) => {
   document.body.appendChild(link);
   document.querySelector("#download-csv").click();
   document.body.removeChild(link);
-  setKitStatusToParticipant(participantsForKitUpdate)
+  const response = setKitStatusToParticipant(participantsForKitUpdate);
+  if (!response) triggerErrorModal('Error while updating participant(s) kit status.')
 }
 
 const setKitStatusToParticipant = async (data) => {

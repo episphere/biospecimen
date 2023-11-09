@@ -166,7 +166,7 @@ export const confirmKitReceipt = () => {
         }    
         window.removeEventListener("beforeunload",beforeUnloadMessage)
         targetAnchorTagEl();
-        storePackageReceipt(obj);
+        storePackageReceipt(kitObj);
        } 
     })
   }
