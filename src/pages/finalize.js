@@ -2,7 +2,7 @@ import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWo
 import { addEventReturnToCollectProcess } from "./../events.js";
 import {searchTemplate} from "./dashboard.js";
 import { collectionIdSearchScreenTemplate } from "./reports/collectionIdSearch.js";
-import conceptIds from "./../fieldToConceptIdMapping.js";
+import { conceptIds } from "./../fieldToConceptIdMapping.js";
 
 export const finalizeTemplate = (data, specimenData, bptlCollectionFlag) => {
     removeActiveClass('navbar-btn', 'active')

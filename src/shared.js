@@ -7,7 +7,7 @@ import { signOut } from "./pages/signIn.js";
 import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
-import conceptIds from './fieldToConceptIdMapping.js';
+import { conceptIds } from './fieldToConceptIdMapping.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
 
 
@@ -2661,17 +2661,17 @@ export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxEr
 
 export const delay = ms => new Promise(res => setTimeout(res, ms));
 
-export const convertConceptIdToPackageCondition = (packagedCondition, packageConditonConversion) => {
+export const convertConceptIdToPackageCondition = (packagedCondition, packageConditionConversion) => {
   let listConditions = ''
   if(!packagedCondition) return listConditions
   for(let i = 0; i < packagedCondition.length; i++) {
     let isLastItem = false;
     if(i+1 === packagedCondition.length) { // if last item equals the final item
       isLastItem = true
-      if(isLastItem) listConditions += `<p>${packageConditonConversion[packagedCondition[i]]}</p>`
+      if(isLastItem) listConditions += `<p>${packageConditionConversion[packagedCondition[i]]}</p>`
     }
     else {
-      listConditions += `<p>${packageConditonConversion[packagedCondition[i]]},</p>`
+      listConditions += `<p>${packageConditionConversion[packagedCondition[i]]},</p>`
     }
 
   }
@@ -2737,37 +2737,6 @@ export const translateNumToType = {
   "0053": "NA",
   "0054": "NA"
 };
-
-export const packageConditonConversion = {
-    "679749262": "Package in good condition",
-    "405513630": "No Ice Pack",
-    "595987358": "Warm Ice Pack",
-    "200183516": "Vials - Incorrect Material Type Sent",
-    "399948893": "No Label on Vials",
-    "631290535": "Returned Empty Vials",
-    "442684673": "Participant Refusal",
-    "121149986": "Crushed",
-    "678483571": "Damaged Container (outer and inner)",
-    "289322354": "Material Thawed",
-    "909529446": "Insufficient Ice",
-    "847410060": "Improper Packaging",
-    "387564837": "Damaged Vials",
-    "933646000": "Other",
-    "842171722": "No Pre-notification",
-    "613022284": "No Refrigerant",
-    "922995819": "Manifest/Vial/Paperwork info do not match",
-    "958000780": "Shipment Delay",
-    "853876696": "No Manifest provided",
-    "950521660": "Package in Good Condition",
-    "545319575": "Package Crushed",
-    "938338155": "Improper Packaging",
-    "205954477": "Collection Cup Damaged",
-    "289239334": "Collection Cup Leaked",
-    "992420392": "Empty Cup Returned",
-    "541085383": "Incorrect Material Type Returned",
-    "427719697": "Collection Cup Not Returned",
-    "100618603": "Other"
-}
 
 export const convertISODateTime = (isoDateTime) => {
     const date = new Date(isoDateTime);

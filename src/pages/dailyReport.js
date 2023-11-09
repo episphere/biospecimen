@@ -1,6 +1,6 @@
 import { userAuthorization, removeActiveClass, hideAnimation, showAnimation, getDailyParticipant, convertISODateTime, restrictNonBiospecimenUser, getDataAttributes, appState } from "./../shared.js"
 import { homeNavBar, reportSideNavBar } from '../navbar.js';
-import fieldToConceptIdMapping from "../fieldToConceptIdMapping.js";
+import { conceptIds as fieldToConceptIdMapping } from "../fieldToConceptIdMapping.js";
 
 
 export const dailyReportTemplate = (auth, route) => {

@@ -1,8 +1,8 @@
-import { getIdToken, showAnimation, hideAnimation, baseAPI , packageConditonConversion, convertDateReceivedinISO, triggerErrorModal} from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, baseAPI, convertDateReceivedinISO, triggerErrorModal} from "../../shared.js";
 import { nonUserNavBar } from "../../navbar.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
-import fieldMapping from "../../fieldToConceptIdMapping.js";
+import { conceptIds as fieldMapping, packageConditionConversion } from "../../fieldToConceptIdMapping.js";
 import { confirmKitReceipt } from "../homeCollection/kitsReceipt.js";
 
 
@@ -746,9 +746,9 @@ const displayConfirmPackageReceiptModal = (modalHeaderEl,modalBodyEl) => {
 const displaySelectedPackageConditionList = (parseSelectPackageConditionsList) => {
     const packageConditionSpanListEl = document.getElementById('packageConditionSpanList');
     for (const packageConditionConceptId of parseSelectPackageConditionsList) {
-        if (packageConditonConversion[packageConditionConceptId]) {
+        if (packageConditionConversion[packageConditionConceptId]) {
             const listEl = document.createElement('li');
-            listEl.textContent = packageConditonConversion[packageConditionConceptId];
+            listEl.textContent = packageConditionConversion[packageConditionConceptId];
             packageConditionSpanListEl.appendChild(listEl);
         }
     }

@@ -2,7 +2,7 @@ import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
-import conceptIds from '../../fieldToConceptIdMapping.js';
+import { conceptIds } from '../../fieldToConceptIdMapping.js';
 
 const contentBody = document.getElementById("contentBody");
 localStorage.setItem('tmpKitData', JSON.stringify([]));

@@ -2,7 +2,7 @@ import { nonUserNavBar } from "./../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal } from "../../shared.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
-import conceptIds from '../../fieldToConceptIdMapping.js';
+import { conceptIds } from '../../fieldToConceptIdMapping.js';
 
 export const kitShipmentScreen = async (auth) => {
   const user = auth.currentUser;

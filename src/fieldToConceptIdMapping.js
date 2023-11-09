@@ -1,4 +1,4 @@
-export default {
+export const conceptIds = {
     firstName: 399159511,
     prefName: 153211406,
     middleName: 231676651,
@@ -327,3 +327,33 @@ export default {
 
 };
 
+export const packageConditionConversion = {
+    "679749262": "Package in good condition",
+    "405513630": "No Ice Pack",
+    "595987358": "Warm Ice Pack",
+    "200183516": "Vials - Incorrect Material Type Sent",
+    "399948893": "No Label on Vials",
+    "631290535": "Returned Empty Vials",
+    "442684673": "Participant Refusal",
+    "121149986": "Crushed",
+    "678483571": "Damaged Container (outer and inner)",
+    "289322354": "Material Thawed",
+    "909529446": "Insufficient Ice",
+    "847410060": "Improper Packaging",
+    "387564837": "Damaged Vials",
+    "933646000": "Other",
+    "842171722": "No Pre-notification",
+    "613022284": "No Refrigerant",
+    "922995819": "Manifest/Vial/Paperwork info do not match",
+    "958000780": "Shipment Delay",
+    "853876696": "No Manifest provided",
+    "950521660": "Package in Good Condition",
+    "545319575": "Package Crushed",
+    "938338155": "Improper Packaging",
+    "205954477": "Collection Cup Damaged",
+    "289239334": "Collection Cup Leaked",
+    "992420392": "Empty Cup Returned",
+    "541085383": "Incorrect Material Type Returned",
+    "427719697": "Collection Cup Not Returned",
+    "100618603": "Other"
+}
