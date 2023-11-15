@@ -2894,3 +2894,49 @@ export const triggerSuccessModal = (message) => {
                 </button>
         </div>`;
 }
+
+/**
+ * We've had isolated instances where sites save a new collection and placeholder tube data is missing from the biospecimenData object (specifically with the addition of streck tubes).
+ * This is a sanity check to compare expected vs existing data. If expected data is missing, we build the placeholder data. 
+ * @param {Array<object>} siteTubesList - list of tubes expected at the site. 
+ * @param {object} biospecimenData - biospecimenData object (specimen collection).
+ */
+export const checkTubeDataConsistency = (siteTubesList, biospecimenData) => {
+    siteTubesList?.forEach((tube) => {
+        // Check for tube.concept in biospecimenData keys. If missing, build the placeholder data.
+        if(!biospecimenData[tube.concept]) {
+            biospecimenData[tube.concept] = {
+                [conceptIds.collection.tube.isCollected]: conceptIds.no,
+                [conceptIds.collection.tube.isDeviated]: conceptIds.no,
+                [conceptIds.discardFlag]: conceptIds.no,
+                [conceptIds.collection.tube.deviation]: getDefaultDeviationOptions(tube.deviationOptions),
+            };
+            console.error('Issue: Tube not found in biospecimenData. Building placeholder data.', tube, 'Tube ConceptID:', tube.concept, '| Tube Details:', biospecimenData[tube.concept]);
+        }
+    });
+};
+
+/**
+ * Build out a single tube's placeholder data. This is a backup in case of an unexpected loading sequence in the collection entry process.
+ * @param {object} stockTubeData - tube object from siteTubesList. 
+ * @param {object} biospecimenTubeData - tube object from biospecimenData.
+ */
+export const fixMissingTubeData = (stockTubeData, biospecimenTubeData) => {
+    Object.assign(biospecimenTubeData, {
+        [conceptIds.collection.tube.isCollected]: conceptIds.no,
+        [conceptIds.collection.tube.isDeviated]: conceptIds.no,
+        [conceptIds.discardFlag]: conceptIds.no,
+        [conceptIds.collection.tube.deviation]: getDefaultDeviationOptions(stockTubeData.deviationOptions),
+    });
+    console.error('Issue: Tube not found in biospecimenData. Building placeholder data.', stockTubeData, '| Tube Details:', biospecimenTubeData);
+};
+
+const getDefaultDeviationOptions = (deviationOptions) => {
+    if (!deviationOptions || deviationOptions.length === 0) return {};
+
+    const defaultDeviationOptions = {};
+    deviationOptions.forEach(option => {
+        defaultDeviationOptions[option.concept] = conceptIds.no;
+    });
+    return defaultDeviationOptions;
+};
