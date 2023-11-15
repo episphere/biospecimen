@@ -60,7 +60,7 @@ export const baselineEmailTemplate = (data, isClinical) => {
 };
 
 export const baselineMWSurveyRemainderTemplate = (ptName) => {
-    const {appLocation, supportLocation} = getSupportUrls();
+    const { appLocation, supportLocation } = getSupportUrls();
     return `
         Dear ${ptName || 'User'},
         <br/>
@@ -71,7 +71,7 @@ export const baselineMWSurveyRemainderTemplate = (ptName) => {
 }
 
 export const baselineMWKitRemainderTemplate = (ptName) => {
-    const {appLocation, supportLocation} = getSupportUrls();
+    const { appLocation, supportLocation } = getSupportUrls();
     return `
         Dear ${ptName || 'User'},
         <br/>
