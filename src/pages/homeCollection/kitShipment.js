@@ -111,11 +111,11 @@ const setShippedResponse = async (data) => {
     triggerSuccessModal('Shipment confirmed.')
     document.getElementById("scannedCode").value = ``;
     document.getElementById("cardBody").innerHTML = ``;
-    const returnedPtInfo = await response.json().then(data => {
-      return data.response.ptEmailObj
-    })
+    
+    const returnedPtInfo = await response.json().then(data => { return data.response })
+
     const emailData = {
-      email: 'abhinav.jonnada@nih.gov',
+      email: returnedPtInfo.prefEmail,
       subject: "Next step for Connect: Your mouthwash home collection kit and survey",
       message: baselineMWKitRemainderTemplate(returnedPtInfo.ptName),
       notificationType: "email",

@@ -211,13 +211,12 @@ const storePackageReceipt = async (data) => {
       enableCollectionCheckBox();
       document.getElementById("packageCondition").setAttribute("data-selected","[]");
     }
-    const returnedPtInfo = await response.json().then(data => {
-      return data.response.ptEmailObj
-    })
+    
+    const returnedPtInfo = await response.json().then(data => { return data.response })
 
     if(returnedPtInfo.surveyStatus !== conceptIds.modules.submitted) {
       const emailData = {
-        email: 'abhinav.jonnada@nih.gov',
+        email: returnedPtInfo.prefEmail,
         subject: "We have your kit! Next, please complete your mouthwash sample survey",
         message: baselineMWSurveyRemainderTemplate(returnedPtInfo.ptName),
         notificationType: "email",
