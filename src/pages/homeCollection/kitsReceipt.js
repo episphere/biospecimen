@@ -1,5 +1,6 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, sendClientEmail } from "../../shared.js";
+import { baselineMWSurveyRemainderTemplate } from "../../emailTemplates.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from "../../fieldToConceptIdMapping.js";
@@ -170,8 +171,6 @@ export const confirmKitReceipt = () => {
        } 
     })
   }
-
-
 }
 
 const identifyCourierType = (scannedBarcode) => { return scannedBarcode.length === 20 || scannedBarcode.length === 22 }
@@ -212,6 +211,31 @@ const storePackageReceipt = async (data) => {
       enableCollectionCheckBox();
       document.getElementById("packageCondition").setAttribute("data-selected","[]");
     }
+    const returnedPtInfo = await response.json().then(data => {
+      return data.response.ptEmailObj
+    })
+
+    if(returnedPtInfo.surveyStatus !== conceptIds.modules.submitted) {
+      const emailData = {
+        email: 'abhinav.jonnada@nih.gov',
+        subject: "We have your kit! Next, please complete your mouthwash sample survey",
+        message: baselineMWSurveyRemainderTemplate(returnedPtInfo.ptName),
+        notificationType: "email",
+        time: new Date().toISOString(),
+        attempt: "1st contact",
+        category: "Biospecimen Home Collection Survey Reminder",
+        token: returnedPtInfo.token,
+        uid: returnedPtInfo.uid,
+        read: false
+      };
+      try {
+        await(sendClientEmail(emailData));
+      }
+      catch (e) {
+        console.error(`Error sending email to user ${returnedPtInfo.prefEmail} \d`, e);
+        throw new Error(`Error sending email to user ${returnedPtInfo.prefEmail}: ${e.message}`);
+    }
+  }
   } 
   else {
     triggerErrorModal('Error during Kit receipt.')

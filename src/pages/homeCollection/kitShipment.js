@@ -111,7 +111,28 @@ const setShippedResponse = async (data) => {
     triggerSuccessModal('Shipment confirmed.')
     document.getElementById("scannedCode").value = ``;
     document.getElementById("cardBody").innerHTML = ``;
-    return true;
+    const returnedPtInfo = await response.json().then(data => {
+      return data.response.ptEmailObj
+    })
+    const emailData = {
+      email: 'abhinav.jonnada@nih.gov',
+      subject: "Next step for Connect: Your mouthwash home collection kit and survey",
+      message: baselineMWKitRemainderTemplate(returnedPtInfo.ptName),
+      notificationType: "email",
+      time: new Date().toISOString(),
+      attempt: "1st contact",
+      category: "Biospecimen Home Collection Kit Reminder",
+      token: returnedPtInfo.token,
+      uid: returnedPtInfo.uid,
+      read: false
+    };
+    try {
+      await(sendClientEmail(emailData));
+    }
+    catch (e) {
+      console.error(`Error sending email to user ${returnedPtInfo.prefEmail} \d`, e);
+      throw new Error(`Error sending email to user ${returnedPtInfo.prefEmail}: ${e.message}`);
+    }
   } else {
     triggerErrorModal('Error')
   }
