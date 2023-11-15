@@ -30,7 +30,7 @@ const redactEmailLoginInfo = (participantEmail) => {
 const redactPhoneLoginInfo = (participantPhone) => { return "***-***-" + participantPhone.slice(-4); }
 
 export const baselineEmailTemplate = (data, isClinical) => {
-    const {appLocation, supportLocation} = getSupportUrls();
+    const { appLocation, supportLocation } = getSupportUrls();
 
     let loginDetails;
     const addLoginText = `Your login information for the MyConnect app is `

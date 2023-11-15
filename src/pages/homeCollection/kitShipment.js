@@ -1,7 +1,8 @@
 import { nonUserNavBar } from "./../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal, sendClientEmail, processPtDetails } from "../../shared.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
+import { baselineMWKitRemainderTemplate } from "../../emailTemplates.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
 
 export const kitShipmentScreen = async (auth) => {
@@ -111,8 +112,8 @@ const setShippedResponse = async (data) => {
     triggerSuccessModal('Shipment confirmed.')
     document.getElementById("scannedCode").value = ``;
     document.getElementById("cardBody").innerHTML = ``;
-    
-    const returnedPtInfo = await response.json().then(data => { return data.response })
+
+    const returnedPtInfo = await processPtDetails(response);
 
     const emailData = {
       email: returnedPtInfo.prefEmail,
@@ -126,6 +127,7 @@ const setShippedResponse = async (data) => {
       uid: returnedPtInfo.uid,
       read: false
     };
+
     try {
       await(sendClientEmail(emailData));
     }

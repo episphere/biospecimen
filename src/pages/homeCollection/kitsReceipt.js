@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, sendClientEmail } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, sendClientEmail, processPtDetails } from "../../shared.js";
 import { baselineMWSurveyRemainderTemplate } from "../../emailTemplates.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
@@ -211,10 +211,10 @@ const storePackageReceipt = async (data) => {
       enableCollectionCheckBox();
       document.getElementById("packageCondition").setAttribute("data-selected","[]");
     }
-    
-    const returnedPtInfo = await response.json().then(data => { return data.response })
 
-    if(returnedPtInfo.surveyStatus !== conceptIds.modules.submitted) {
+    const returnedPtInfo = await processPtDetails(response);
+
+    if (returnedPtInfo.surveyStatus !== conceptIds.modules.submitted) {
       const emailData = {
         email: returnedPtInfo.prefEmail,
         subject: "We have your kit! Next, please complete your mouthwash sample survey",
