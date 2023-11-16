@@ -215,16 +215,16 @@ const editAssembledKits = () => {
         document.getElementById('scannedBarcode').value = editKitObj[conceptIds.returnKitTrackingNum]
         document.getElementById('supplyKitId').value = editKitObj[conceptIds.supplyKitId]
         document.getElementById('returnKitId').value = editKitObj[conceptIds.returnKitId]
-        document.getElementById('cupId').value = editKitObj[conceptIds.collectionCupId]
-        document.getElementById('cardId').value = editKitObj[conceptIds.collectionCardId]
+        document.getElementById('cupId').value =  editKitObj[conceptIds.collectionCupId].slice(0, -3) + " " + editKitObj[conceptIds.collectionCupId].slice(-3)
+        document.getElementById('cardId').value = editKitObj[conceptIds.collectionCardId].slice(0, -3) + " " + editKitObj[conceptIds.collectionCardId].slice(-3)
         appState.setState({UKID: editKitObj[conceptIds.UKID]})
       });
     }); // state to indicate if its an edit & also pass the UKID
 }}
 
-const checkCollecitonUniqueness = async (collectionUniqueId) => {
+const checkUniqueness = async (supplyKitId, collectionId) => {
   const idToken = await getIdToken();
-  const response = await fetch(`${baseAPI}api=collectionUniqueness&id=${collectionUniqueId}`, {
+  const response = await fetch(`${baseAPI}api=collectionUniqueness&supply=${supplyKitId}&collection=${collectionId}`, {
       method: "GET",
       headers: {
           Authorization:"Bearer "+idToken
@@ -236,9 +236,9 @@ const checkCollecitonUniqueness = async (collectionUniqueId) => {
 const storeAssembledKit = async (kitData) => {
   const idToken = await getIdToken();
   showAnimation();
-  const collectionUnique = await checkCollecitonUniqueness(kitData[conceptIds.collectionCupId].replace(/\s/g, "\n"));
+  const collectionUnique = appState.getState().UKID !== '' ? { data: true } : await checkUniqueness(kitData[conceptIds.supplyKitId], kitData[conceptIds.collectionCupId].replace(/\s/g, "\n"));
   hideAnimation();
-  if (collectionUnique.data) {
+  if (collectionUnique.data === true) {
     kitData[conceptIds.kitStatus] = conceptIds.pending.toString();
     kitData[conceptIds.UKID] = "MW" + Math.random().toString(16).slice(2);
     kitData[conceptIds.pendingDateTimeStamp] = new Date().toISOString();
@@ -285,7 +285,11 @@ const storeAssembledKit = async (kitData) => {
       return false
     }
   } 
-  else {
+  else if (collectionUnique.data === 'duplicate supplykit id'){
+    triggerErrorModal('The supply kit and return kit are already in use.')
+    return false
+  }
+  else if (collectionUnique.data === 'duplicate collection id'){
     triggerErrorModal('The collection card and cup ID are already in use.')
     return false
   }

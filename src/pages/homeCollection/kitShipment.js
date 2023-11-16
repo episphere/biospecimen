@@ -63,7 +63,7 @@ const confirmPickupTemplate = (UKID) => {
                         <button type="submit" class="btn btn-primary" id="saveResponse">Save</button>
                       </div>`;
   saveResponse(UKID);
-  cancelResponse(cardBody);
+  cancelResponse();
 };
 
 const tryAgainTemplate = () => {
@@ -73,6 +73,7 @@ const tryAgainTemplate = () => {
                     <span> Couldn't find scanned tracking number </span>
                     <br />
                 </div>`;
+  verifyScannedCode();
 };
 
 const saveResponse = (UKID) => {
@@ -87,11 +88,11 @@ const saveResponse = (UKID) => {
   }
 };
 
-const cancelResponse = (cardBody) => {
+const cancelResponse = () => {
   const cancelButton = document.getElementById("cancelResponse");
   if (cancelButton) {
     cancelButton.addEventListener("click", (e) => {
-      cardBody.innerHTML = ``;
+      location.reload();
     });
   }
 };
@@ -111,6 +112,7 @@ const setShippedResponse = async (data) => {
     triggerSuccessModal('Shipment confirmed.')
     document.getElementById("scannedCode").value = ``;
     document.getElementById("cardBody").innerHTML = ``;
+    verifyScannedCode();
     return true;
   } else {
     triggerErrorModal('Error')

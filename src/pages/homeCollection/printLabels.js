@@ -92,7 +92,7 @@ const generateParticipantCsvGetter = (name) => {
               triggerSuccessModal('Success!');                 // Display success message
             }
             else {
-              triggerErrorModal('Out of bounds!');
+              triggerErrorModal('No labels to print');
             } 
           }
       });
