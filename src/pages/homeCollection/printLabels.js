@@ -83,7 +83,7 @@ const generateParticipantCsvGetter = (name) => {
           if (numberToPrint) {
             const arrayLengthToProcess = appState.getState().length
             if (arrayLengthToProcess >= numberToPrint) {
-              const arrayToProcess = appState.getState().totalAddresses
+              const arrayToProcess = appState.getState().totalAddresses.filter(obj => obj !== null)
               const remainingArrayToProcess = arrayToProcess.slice(numberToPrint, appState.getState().length)
               appState.setState({totalAddresses: remainingArrayToProcess })
               appState.setState({'length': remainingArrayToProcess.length })
