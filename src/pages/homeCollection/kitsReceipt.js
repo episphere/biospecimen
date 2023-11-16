@@ -1,6 +1,6 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, sendClientEmail, processPtDetails } from "../../shared.js";
-import { baselineMWSurveyRemainderTemplate } from "../../emailTemplates.js";
+import { baselineMWSurveyRemainderTemplate, baselineMWThankYouTemplate } from "../../emailTemplates.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from "../../fieldToConceptIdMapping.js";
@@ -190,6 +190,7 @@ const storePackageReceipt = async (data) => {
   );
   hideAnimation();
   if (response.status === 200) {
+
     triggerSuccessModal('Kit Receipted.')
     document.getElementById("courierType").innerHTML = ``;
     document.getElementById("scannedBarcode").value = "";
@@ -202,6 +203,7 @@ const storePackageReceipt = async (data) => {
     enableCollectionCheckBox()
     document.getElementById("packageCondition").setAttribute("data-selected","[]")
     if (document.getElementById("collectionId").value) {
+
       document.getElementById("collectionId").value = "";
       document.getElementById("dateCollectionCard").value = "";
       document.getElementById("timeCollectionCard").value = "";
@@ -213,29 +215,34 @@ const storePackageReceipt = async (data) => {
     }
 
     const returnedPtInfo = await processPtDetails(response);
-
+    let emailData = {
+      email: returnedPtInfo.prefEmail,
+      notificationType: "email",
+      time: new Date().toISOString(),
+      attempt: "1st contact",
+      token: returnedPtInfo.token,
+      uid: returnedPtInfo.uid,
+      read: false
+    };
+    
     if (returnedPtInfo.surveyStatus !== conceptIds.modules.submitted) {
-      const emailData = {
-        email: returnedPtInfo.prefEmail,
-        subject: "We have your kit! Next, please complete your mouthwash sample survey",
-        message: baselineMWSurveyRemainderTemplate(returnedPtInfo.ptName),
-        notificationType: "email",
-        time: new Date().toISOString(),
-        attempt: "1st contact",
-        category: "Biospecimen Home Collection Survey Reminder",
-        token: returnedPtInfo.token,
-        uid: returnedPtInfo.uid,
-        read: false
-      };
-      try {
-        await(sendClientEmail(emailData));
-      }
-      catch (e) {
-        console.error(`Error sending email to user ${returnedPtInfo.prefEmail} \d`, e);
-        throw new Error(`Error sending email to user ${returnedPtInfo.prefEmail}: ${e.message}`);
+      emailData.subject = "We have your kit! Next, please complete your mouthwash sample survey";
+      emailData.message = baselineMWSurveyRemainderTemplate(returnedPtInfo.ptName);
+      emailData.category = "Biospecimen Home Collection Survey Reminder";
+    } else {
+      emailData.subject = "Thanks for your mouthwash sample and survey!";
+      emailData.message = baselineMWThankYouTemplate(returnedPtInfo.ptName);
+      emailData.category = "Biospecimen Home Collection Acknowledgement";
     }
+    
+    try {
+      await sendClientEmail(emailData);
+    } catch (e) {
+      console.error(`Error sending email to user ${returnedPtInfo.prefEmail} \d`, e);
+      throw new Error(`Error sending email to user ${returnedPtInfo.prefEmail}: ${e.message}`);
+    }
+
   }
-  } 
   else {
     triggerErrorModal('Error during Kit receipt.')
   }

@@ -90,6 +90,22 @@ export const baselineMWKitRemainderTemplate = (ptName) => {
 
 }
 
+export const baselineMWThankYouTemplate = (ptName) => {
+    const { supportLocation } = getSupportUrls();
+    return `
+        Dear ${ptName || 'User'},
+        <br/>
+        <br/>
+        We received your mouthwash sample and survey responses. Thank you! Over time, we'll use the information you shared for cancer prevention research as part of Connect.
+        <br/>
+        <br/>
+        Thanks for taking the time to complete your home collection.
+        <br/>
+        <br/>
+        We appreciate your participation in Connect! Have questions? Please contact the <a href=${supportLocation}>Connect Support Center.</a>
+        ${returnFooterTemplate()}`
+}
+
 const returnFooterTemplate = () => {
     return `<br/>
             <br/>
