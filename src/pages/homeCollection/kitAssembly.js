@@ -162,15 +162,12 @@ const processAssembledKit = () => {
       ? document.getElementById('cupId').value.trim() : 0;
       const collectionCardIdValue = (document.getElementById('cardId').value.trim() !== undefined) 
       ? document.getElementById('cardId').value.trim() : 0;
-
       if (scannedBarcodeValue.length === 0 || supplyKitIdValue.length === 0 ||  returnKitIdValue.length === 0 ||
-        collectionCupIdValue.length === 0 || collectionCardIdValue.length === 0) {
-          console.log('jucnsjf', supplyKitIdValue.length)
+        collectionCupIdValue.length === 0 || collectionCardIdValue.length === 0 || document.getElementById('dropdownSites').innerHTML !== 'Mouthwash') {
           triggerErrorModal('One or more fields are missing.');
           return
         }
       else {
-        console.log('jucnxxxxxsjf', supplyKitIdValue.length)
         kitObj[conceptIds.returnKitTrackingNum] = scannedBarcodeValue;
         kitObj[conceptIds.supplyKitId] = supplyKitIdValue;
         kitObj[conceptIds.returnKitId] = returnKitIdValue;
