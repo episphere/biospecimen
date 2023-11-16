@@ -152,17 +152,25 @@ const processAssembledKit = () => {
     saveKitButton.addEventListener('click', async () => { 
       let kitObj = {};
 
-      const scannedBarcodeValue = document.getElementById('scannedBarcode').value.trim();
-      const supplyKitIdValue = document.getElementById('supplyKitId').value.trim();
-      const returnKitIdValue = document.getElementById('returnKitId').value.trim();
-      const collectionCupIdValue = document.getElementById('cupId').value;
-      const collectionCardIdValue = document.getElementById('cardId').value;
+      const scannedBarcodeValue = (document.getElementById('scannedBarcode').value.trim() !== undefined) 
+      ? document.getElementById('scannedBarcode').value.trim() : 0;
+      const supplyKitIdValue = (document.getElementById('supplyKitId').value.trim() !== undefined) 
+      ? document.getElementById('supplyKitId').value.trim() : 0;
+      const returnKitIdValue = (document.getElementById('returnKitId').value.trim() !== undefined) 
+      ? document.getElementById('returnKitId').value.trim() : 0;
+      const collectionCupIdValue = (document.getElementById('cupId').value.trim() !== undefined) 
+      ? document.getElementById('cupId').value.trim() : 0;
+      const collectionCardIdValue = (document.getElementById('cardId').value.trim() !== undefined) 
+      ? document.getElementById('cardId').value.trim() : 0;
 
       if (scannedBarcodeValue.length === 0 || supplyKitIdValue.length === 0 ||  returnKitIdValue.length === 0 ||
         collectionCupIdValue.length === 0 || collectionCardIdValue.length === 0) {
+          console.log('jucnsjf', supplyKitIdValue.length)
           triggerErrorModal('One or more fields are missing.');
+          return
         }
       else {
+        console.log('jucnxxxxxsjf', supplyKitIdValue.length)
         kitObj[conceptIds.returnKitTrackingNum] = scannedBarcodeValue;
         kitObj[conceptIds.supplyKitId] = supplyKitIdValue;
         kitObj[conceptIds.returnKitId] = returnKitIdValue;
@@ -236,7 +244,7 @@ const checkUniqueness = async (supplyKitId, collectionId) => {
 const storeAssembledKit = async (kitData) => {
   const idToken = await getIdToken();
   showAnimation();
-  const collectionUnique = appState.getState().UKID !== '' ? { data: true } : await checkUniqueness(kitData[conceptIds.supplyKitId], kitData[conceptIds.collectionCupId].replace(/\s/g, "\n"));
+  const collectionUnique = appState.getState().UKID !== '' ? { data: true } : await checkUniqueness(kitData[conceptIds.supplyKitId], kitData?.[conceptIds.collectionCupId].replace(/\s/g, "\n"));
   hideAnimation();
   if (collectionUnique.data === true) {
     kitData[conceptIds.kitStatus] = conceptIds.pending.toString();
