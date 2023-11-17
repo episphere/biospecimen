@@ -137,7 +137,6 @@ const setShippedResponse = async (data) => {
       console.error(`Error sending email to user ${returnedPtInfo.prefEmail} \d`, e);
       throw new Error(`Error sending email to user ${returnedPtInfo.prefEmail}: ${e.message}`);
     }
-    verifyScannedCode();
     return true;
   } else {
     triggerErrorModal('Error in shipping: Please check the tracking number.')
