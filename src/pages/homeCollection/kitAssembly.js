@@ -248,7 +248,7 @@ const storeAssembledKit = async (kitData) => {
   const collectionUnique = appState.getState().UKID !== '' ? { data: true } : await checkUniqueness(kitData[conceptIds.supplyKitId], kitData?.[conceptIds.collectionCupId].replace(/\s/g, "\n"));
   hideAnimation();
   if (collectionUnique.data === true) {
-    kitData[conceptIds.kitStatus] = conceptIds.pending.toString();
+    kitData[conceptIds.kitStatus] = conceptIds.pending;
     kitData[conceptIds.UKID] = "MW" + Math.random().toString(16).slice(2);
     kitData[conceptIds.pendingDateTimeStamp] = new Date().toISOString();
     let api = `addKitData`
