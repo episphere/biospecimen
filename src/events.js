@@ -1345,7 +1345,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
         const tubes = siteTubesList.filter(tube => tube.concept === input.id.replace('Id', ''));
         
         const tubeConceptId = input.id.replace('Id', '');
-        if (biospecimenData[tubeConceptId] === undefined) {
+        if (tubeConceptId && biospecimenData[tubeConceptId] === undefined) {
             const tubePlaceholderData = siteTubesList.find(stockTube => stockTube.concept === tubeConceptId);
             fixMissingTubeData(tubePlaceholderData, biospecimenData[tubeConceptId] = {});
         }
@@ -1383,7 +1383,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
             focus = false;
         }
 
-        if (input.required) biospecimenData[tubeConceptId][conceptIds.collection.tube.scannedId] = `${masterID} ${tubeID}`.trim();
+        if (tubeConceptId && input.required) biospecimenData[tubeConceptId][conceptIds.collection.tube.scannedId] = `${masterID} ${tubeID}`.trim();
     });
 
     if ((hasError && cntd == true) || hasCntdError) return;
