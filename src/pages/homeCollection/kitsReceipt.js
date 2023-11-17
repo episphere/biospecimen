@@ -244,7 +244,10 @@ const storePackageReceipt = async (data) => {
     }
 
   }
+  else if (returnedPtInfo.status === 'Check Collection ID') {
+    triggerErrorModal('Error during kit receipt. Please check the collection ID.')
+  }
   else {
-    triggerErrorModal('Error during kit receipt. Please check the tracking number, collection ID, and other fields.')
+    triggerErrorModal('Error during kit receipt. Please check the tracking number and other fields.')
   }
 };
