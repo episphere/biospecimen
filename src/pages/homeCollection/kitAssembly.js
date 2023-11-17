@@ -289,13 +289,21 @@ const storeAssembledKit = async (kitData) => {
       triggerErrorModal(`Failed to save the kit.`);
       return false
     }
-  } 
+  }
+  else if (collectionUnique.data === 'Check Collection ID'){
+    triggerErrorModal('Check collection ID format.')
+    return false
+  }
   else if (collectionUnique.data === 'duplicate supplykit id'){
     triggerErrorModal('The supply kit and return kit are already in use.')
     return false
   }
   else if (collectionUnique.data === 'duplicate collection id'){
     triggerErrorModal('The collection card and cup ID are already in use.')
+    return false
+  }
+  else {
+    triggerErrorModal('Error')
     return false
   }
 }
