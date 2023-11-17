@@ -151,17 +151,21 @@ const processAssembledKit = () => {
   if (saveKitButton) {
     saveKitButton.addEventListener('click', async () => { 
       let kitObj = {};
+      const queryScannedBarcodeValue = document.getElementById('scannedBarcode')?.value?.trim();
+      const scannedBarcodeValue = (queryScannedBarcodeValue !== undefined) ? queryScannedBarcodeValue : 0;
 
-      const scannedBarcodeValue = (document.getElementById('scannedBarcode').value.trim() !== undefined) 
-      ? document.getElementById('scannedBarcode').value.trim() : 0;
-      const supplyKitIdValue = (document.getElementById('supplyKitId').value.trim() !== undefined) 
-      ? document.getElementById('supplyKitId').value.trim() : 0;
-      const returnKitIdValue = (document.getElementById('returnKitId').value.trim() !== undefined) 
-      ? document.getElementById('returnKitId').value.trim() : 0;
-      const collectionCupIdValue = (document.getElementById('cupId').value.trim() !== undefined) 
-      ? document.getElementById('cupId').value.trim() : 0;
-      const collectionCardIdValue = (document.getElementById('cardId').value.trim() !== undefined) 
-      ? document.getElementById('cardId').value.trim() : 0;
+      const querySupplyKitIdValue = document.getElementById('supplyKitId').value.trim();
+      const supplyKitIdValue = (querySupplyKitIdValue !== undefined) ? querySupplyKitIdValue: 0;
+
+      const queryReturnKitIdValue = document.getElementById('returnKitId')?.value?.trim();
+      const returnKitIdValue = (queryReturnKitIdValue !== undefined) ? queryReturnKitIdValue : 0;
+
+      const queryCollectionCupIdValue = document.getElementById('cupId')?.value?.trim();
+      const collectionCupIdValue = (queryCollectionCupIdValue !== undefined) ? queryCollectionCupIdValue : 0;
+
+      const queryCollectionCardIdValue = document.getElementById('cardId')?.value?.trim();
+      const collectionCardIdValue = (queryCollectionCardIdValue !== undefined) ? queryCollectionCardIdValue : 0;
+
       if (scannedBarcodeValue.length === 0 || supplyKitIdValue.length === 0 ||  returnKitIdValue.length === 0 ||
         collectionCupIdValue.length === 0 || collectionCardIdValue.length === 0 || document.getElementById('dropdownSites').innerHTML !== 'Mouthwash') {
           triggerErrorModal('One or more fields are missing.');
@@ -229,7 +233,7 @@ const editAssembledKits = () => {
 
 const checkUniqueness = async (supplyKitId, collectionId) => {
   const idToken = await getIdToken();
-  const response = await fetch(`${baseAPI}api=collectionUniqueness&supply=${supplyKitId}&collection=${collectionId}`, {
+  const response = await fetch(`${baseAPI}api=collectionUniqueness&supplyKitId=${supplyKitId}&collectionId=${collectionId}`, {
       method: "GET",
       headers: {
           Authorization:"Bearer "+idToken

@@ -112,15 +112,15 @@ template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false
   contentBody.innerHTML = template;
   activeHomeCollectionNavbar();
   checkAndDisplayCourierType(true);
-  performQCcheck();
+  performCollectionIdcheck();
 };
 
-const performQCcheck = () => {
+const performCollectionIdcheck = () => {
   const collectionIdField = document.getElementById('collectionId');
   if (collectionIdField) {
     collectionIdField.addEventListener("input", (e) => {
       if (collectionIdField.value.length < 14) {
-        document.getElementById('showErrorMsg').innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> Enter correct Collection ID`
+        document.getElementById('showErrorMsg').innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> Enter Correct Collection ID`
       }
     })
   }

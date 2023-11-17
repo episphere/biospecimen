@@ -11,7 +11,7 @@ export const printLabelsScreen = async (auth) => {
   if (!user) return;
   const name = user.displayName ? user.displayName : user.email;
   showAnimation();
-  appState.setState({'length': 0 })
+  appState.setState({'totalAddressesLength': 0 })
   await initializeTotalAddressesToPrint();
   printLabelsTemplate(name);
   hideAnimation();
@@ -31,7 +31,7 @@ const printLabelsTemplate = (name) => {
                         <div style="text-align: center;  padding-bottom: 25px; "> 
                           <input required type="text" name="numberToPrint" id="numberToPrint"  /> 
                         </div>
-                        <span> Labels to print: ${ appState.getState().length || 0 }  </span>
+                        <span> Labels to print: ${ appState.getState().totalAddressesLength || 0 }  </span>
                         <br />
                         <div class="mt-4 mb-4" style="display:inline-block;">
                           <button type="button" class="btn btn-primary" id="clearForm" disabled>View All Printed Labels</button>
@@ -50,7 +50,7 @@ const printLabelsTemplate = (name) => {
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
   activeHomeCollectionNavbar();
-  if (appState.getState().length === 0) triggerErrorModal('No labels to print');
+  if (appState.getState().totalAddressesLength === 0) triggerErrorModal('No labels to print');
   generateParticipantCsvGetter(name);
 };
 
@@ -59,7 +59,7 @@ const initializeTotalAddressesToPrint = async () => {
   const totalAddresses = await getTotalAddressesToPrint();
   const processedAddresses = totalAddresses.data.filter(obj => obj.length !== 0)
   appState.setState({'totalAddresses': processedAddresses})
-  appState.setState({'length': processedAddresses.length })
+  appState.setState({'totalAddressesLength': processedAddresses.length })
   hideAnimation();
 }
 
@@ -80,12 +80,12 @@ const generateParticipantCsvGetter = (name) => {
     generateCsvButton.addEventListener("click", () => {
         const numberToPrint = document.getElementById("numberToPrint").value;
           if (numberToPrint) {
-            const arrayLengthToProcess = appState.getState().length
+            const arrayLengthToProcess = appState.getState().totalAddressesLength
             if (arrayLengthToProcess >= numberToPrint) {
               const arrayToProcess = appState.getState().totalAddresses.filter(obj => obj.length !== 0)
-              const remainingArrayToProcess = arrayToProcess.slice(numberToPrint, appState.getState().length)
+              const remainingArrayToProcess = arrayToProcess.slice(numberToPrint, appState.getState().totalAddressesLength)
               appState.setState({totalAddresses: remainingArrayToProcess })
-              appState.setState({'length': remainingArrayToProcess.length })
+              appState.setState({'totalAddressesLength': remainingArrayToProcess.length })
               generateParticipantCsv(arrayToProcess.slice(0, numberToPrint));
               printLabelsTemplate(name);
               triggerSuccessModal('Success!');                 // Display success message
