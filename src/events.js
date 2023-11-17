@@ -7,12 +7,11 @@ import {
     checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData,
     siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
     getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger,
-    packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, requestsBlocker
+    packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput
 } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
-import {
-    addNewBox, buildSpecimenDataInModal, createShippingModalBody, startShipping, generateBoxManifest, populateViewShippingBoxContentsList,
+import { addNewBox, buildSpecimenDataInModal, createShippingModalBody, startShipping, generateBoxManifest, populateViewShippingBoxContentsList,
     renderShippingModalHeader, generateShippingManifest, finalShipmentTracking, populateModalSelect, prepareBoxToUpdate, processCheckedModalElements, shipmentTracking, updateBoxListModalUIValue
 } from './pages/shipping.js';
 import { userListTemplate } from './pages/users.js';
@@ -20,7 +19,7 @@ import { checkInTemplate } from './pages/checkIn.js';
 import { specimenTemplate } from './pages/specimen.js';
 import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
-import { additionalTubeIDRequirement, masterSpecimenIDRequirement, totalCollectionIDLength, workflows, specimenCollection, deviationReasons, refusedShippingDeviationConceptList } from './tubeValidation.js';
+import { additionalTubeIDRequirement, masterSpecimenIDRequirement, totalCollectionIDLength, workflows, specimenCollection, deviationReasons, refusedShippingDeviationConceptList} from './tubeValidation.js';
 import { updateShippingStateAddBagToBox, updateShippingStateSelectedLocation } from './shippingState.js';
 import conceptIds from './fieldToConceptIdMapping.js';
 
@@ -43,14 +42,14 @@ export const addEventSearchForm1 = () => {
         if (dob.length === 10) {
             if (isDeviceMobile) {
                 // handle mobile device date input
-                const [mm, dd, yyyy] = dob.split('/');
+                const [mm,dd,yyyy] = dob.split('/');
                 dob = `${yyyy}${mm}${dd}`;
             } else {
                 // handle large screen date input
-                const [yyyy, mm, dd] = dob.split('-');
+                const [yyyy,mm,dd] = dob.split('-');
                 dob = `${yyyy}${mm}${dd}`;
             }
-        } else if (dob.length > 0) {
+        } else if (dob.length>0) {
             // todo: if the dob string is not valid, remind the user to enter a valid date
             return;
         }
@@ -109,22 +108,22 @@ export const addEventClearAll = () => {
     btnClearAll.addEventListener('click', () => {
 
         const firstName = document.getElementById('firstName');
-        if (firstName) firstName.value = '';
+        if(firstName) firstName.value = '';
 
         const lastName = document.getElementById('lastName');
-        if (lastName) lastName.value = '';
+        if(lastName) lastName.value = '';
 
         const dob = document.getElementById('dob');
-        if (dob) dob.value = '';
+        if(dob) dob.value = '';
 
         const connectID = document.getElementById('connectId');
-        if (connectID) connectID.value = '';
+        if(connectID) connectID.value = '';
 
         const email = document.getElementById('email');
-        if (email) email.value = '';
+        if(email) email.value = '';
 
         const phone = document.getElementById('phone');
-        if (phone) phone.value = '';
+        if(phone) phone.value = '';
     });
 };
 
@@ -136,7 +135,7 @@ export const addEventsearchSpecimen = () => {
         removeAllErrors();
         let masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase();
 
-        if (masterSpecimenId.length > masterSpecimenIDRequirement.length) masterSpecimenId = masterSpecimenId.substring(0, masterSpecimenIDRequirement.length);
+        if(masterSpecimenId.length > masterSpecimenIDRequirement.length) masterSpecimenId = masterSpecimenId.substring(0, masterSpecimenIDRequirement.length);
 
         if (!masterSpecimenIDRequirement.regExp.test(masterSpecimenId) || masterSpecimenId.length !== masterSpecimenIDRequirement.length) {
             errorMessage('masterSpecimenId', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, true);
@@ -186,7 +185,7 @@ export const addEventAddSpecimenToBox = () => {
         const masterSpecimenId = masterSpecimenIdInput.value.toUpperCase().trim();
 
         const shippingLocationValue = document.getElementById('selectLocationList').value;
-        if (shippingLocationValue === 'none') {
+        if(shippingLocationValue === 'none') {
             showNotifications({ title: 'Shipping Location Not Selected', body: 'Please select a shipping location from the dropdown.' });
             return;
         }
@@ -200,17 +199,17 @@ export const addEventAddSpecimenToBox = () => {
         const scannedIdInUnshippedBoxes = findScannedIdInUnshippedBoxes(allBoxesList, masterSpecimenId);
         const isScannedIdInUnshippedBoxes = scannedIdInUnshippedBoxes['foundMatch'];
 
-        if (foundScannedIdShipped) {
-            showNotifications({ title: 'Item reported as already shipped', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.' });
+        if(foundScannedIdShipped){
+            showNotifications({ title:'Item reported as already shipped', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.' });
             return;
         }
 
-        if (isScannedIdInUnshippedBoxes) {
+        if(isScannedIdInUnshippedBoxes) {
             const boxNum = scannedIdInUnshippedBoxes[conceptIds.shippingBoxId];
             const siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInUnshippedBoxes[conceptIds.shippingLocation]];
             const siteSpecificLocationName = siteSpecificLocation || '';
             const scannedInput = scannedIdInUnshippedBoxes['inputScanned'];
-            showNotifications({ title: `${scannedInput} has already been recorded`, body: `${scannedInput} is recorded as being in ${boxNum} in ${siteSpecificLocationName}` });
+            showNotifications({ title:`${scannedInput} has already been recorded`, body: `${scannedInput} is recorded as being in ${boxNum} in ${siteSpecificLocationName}` });
             return;
         }
 
@@ -288,7 +287,7 @@ export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrpha
 }
 
 export const getInstituteSpecimensList = async (boxList) => {
-    boxList = boxList.sort((a, b) => compareBoxIds(a[conceptIds.shippingBoxId], b[conceptIds.shippingBoxId]));
+    boxList = boxList.sort((a,b) => compareBoxIds(a[conceptIds.shippingBoxId], b[conceptIds.shippingBoxId]));
 
     const finalizedSpecimenList = await filterSpecimenCollectionList();
     const availableCollectionsObj = {};
@@ -325,7 +324,7 @@ export const getInstituteSpecimensList = async (boxList) => {
                     if (tubeIdList.length > 0) {
                         for (const tubeId of tubeIdList) {
                             const tubeNum = tubeId.split(/\s+/)[1] // tubeId (eg 'CXA002655 0001'); tubeNum (eg '0001')
-                            if (boxIsShipped) {
+                            if (boxIsShipped ) {
                                 tubesInBox.shipped.bloodUrine.push(tubeNum);
                             } else {
                                 tubesInBox.notShipped.bloodUrine.push(tubeNum);
@@ -339,7 +338,7 @@ export const getInstituteSpecimensList = async (boxList) => {
                     const tubeIdList = bagObjects[mouthWashBagId]['arrElements']
                     for (const tubeId of tubeIdList) {
                         const tubeNum = tubeId.split(/\s+/)[1];
-                        if (boxIsShipped) {
+                        if (boxIsShipped ) {
                             tubesInBox.shipped.mouthWash.push(tubeNum);
                         } else {
                             tubesInBox.notShipped.mouthWash.push(tubeNum);
@@ -354,7 +353,7 @@ export const getInstituteSpecimensList = async (boxList) => {
                         const [collectionIdFromTube, tubeNumber] = tubeId.split(/\s+/);
 
                         if (collectionIdFromTube == currCollection[conceptIds.collection.id]) {
-                            if (boxIsShipped) {
+                            if (boxIsShipped ) {
                                 tubesInBox.shipped.orphan.push(tubeNumber);
                             } else {
                                 tubesInBox.notShipped.orphan.push(tubeNumber);
@@ -365,7 +364,7 @@ export const getInstituteSpecimensList = async (boxList) => {
             }
         }
 
-        const tubesToAdd = {
+        const tubesToAdd={
             bloodUrine: [],
             mouthWash: [],
             orphan: [],
@@ -393,8 +392,8 @@ export const getInstituteSpecimensList = async (boxList) => {
         }
 
         if ((tubesInBox.shipped.bloodUrine.length > 0 || tubesInBox.notShipped.bloodUrine.length > 0) && tubesToAdd.bloodUrine.length > 0) {
-            tubesToAdd.orphan = tubesToAdd.bloodUrine;
-            tubesToAdd.bloodUrine = [];
+            tubesToAdd.orphan=tubesToAdd.bloodUrine;
+            tubesToAdd.bloodUrine=[];
         }
 
         for (const tubeNum of tubesToAdd.orphan) {
@@ -404,11 +403,11 @@ export const getInstituteSpecimensList = async (boxList) => {
             availableCollectionsObj['unlabelled'].push(currCollection[conceptIds.collection.id] + ' ' + tubeNum);
         }
 
-        if (tubesInBox.shipped.bloodUrine.length === 0 && tubesInBox.notShipped.bloodUrine.length === 0 && tubesToAdd.bloodUrine.length > 0) {
+        if (tubesInBox.shipped.bloodUrine.length === 0 && tubesInBox.notShipped.bloodUrine.length ===0 && tubesToAdd.bloodUrine.length > 0) {
             availableCollectionsObj[currCollection[conceptIds.collection.id] + ' 0008'] = tubesToAdd.bloodUrine;
         }
 
-        if (tubesInBox.shipped.mouthWash.length === 0 && tubesInBox.notShipped.mouthWash.length === 0 && tubesToAdd.mouthWash.length > 0) {
+        if (tubesInBox.shipped.mouthWash.length === 0 && tubesInBox.notShipped.mouthWash.length ===0 && tubesToAdd.mouthWash.length > 0) {
             availableCollectionsObj[currCollection[conceptIds.collection.id] + ' 0009'] = tubesToAdd.mouthWash;
         }
     }
@@ -426,7 +425,7 @@ export const addEventLocationSelect = (elemId, pageAndElement) => {
     const selectionChangeHandler = (event) => {
         const selection = event.target.value;
         const prevSelections = JSON.parse(localStorage.getItem('selections'));
-        localStorage.setItem('selections', JSON.stringify({ ...prevSelections, [pageAndElement]: selection }));
+        localStorage.setItem('selections', JSON.stringify({...prevSelections, [pageAndElement] : selection}));
         if (selection) {
             updateShippingStateSelectedLocation(selection);
             const detailedLocationBoxes = appState.getState().detailedLocationBoxes;
@@ -649,7 +648,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
         const response = await findParticipant(query);
         const data = response.data[0];
 
-        if (isCheckedIn) {
+        if(isCheckedIn) {
 
             checkOutParticipant(data);
 
@@ -664,12 +663,12 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
 
             const visitConcept = document.getElementById('visit-select').value;
 
-            for (const visit of visitType) {
-                if (data['331584571'] && data['331584571'][visit.concept]) {
+            for(const visit of visitType) {
+                if(data['331584571'] && data['331584571'][visit.concept]) {
                     const visitTime = new Date(data['331584571'][visit.concept]['840048338']);
                     const now = new Date();
 
-                    if (now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
+                    if(now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
 
                         const response = await getParticipantCollections(data.token);
                         let collection = response.data.filter(res => res['331584571'] == visit.concept);
@@ -741,7 +740,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
 export const addEventVisitSelection = () => {
 
     const visitSelection = document.getElementById('visit-select');
-    if (visitSelection) {
+    if(visitSelection) {
         visitSelection.addEventListener('change', () => {
 
             const checkInButton = document.getElementById('checkInComplete');
@@ -832,7 +831,7 @@ const btnsClicked = async (connectId, formData) => {
 
     let scanSpecimenID = document.getElementById('scanSpecimenID')?.value && document.getElementById('scanSpecimenID')?.value.toUpperCase();
 
-    if (scanSpecimenID && scanSpecimenID.length > masterSpecimenIDRequirement.length) scanSpecimenID = scanSpecimenID.substring(0, masterSpecimenIDRequirement.length);
+    if(scanSpecimenID && scanSpecimenID.length > masterSpecimenIDRequirement.length) scanSpecimenID = scanSpecimenID.substring(0, masterSpecimenIDRequirement.length);
 
     const scanSpecimenID2 = document.getElementById('scanSpecimenID2')?.value && document.getElementById('scanSpecimenID2')?.value.toUpperCase();
     const collectionLocation = document.getElementById('collectionLocation');
@@ -1021,7 +1020,7 @@ const clinicalBtnsClicked = async (formData) => {
         const header = document.getElementById('biospecimenModalHeader');
         const body = document.getElementById('biospecimenModalBody');
         header.innerHTML = `Urine Accession Id is Missing`
-        let template = `You have not entered a Urine Accession Id. Do you want to continue?`
+        let template =  `You have not entered a Urine Accession Id. Do you want to continue?`
         template += `
         <br />
         <div style="display:inline-block; margin-top:20px;">
@@ -1057,7 +1056,7 @@ const clinicalBtnsClicked = async (formData) => {
         const header = document.getElementById('biospecimenModalHeader');
         const body = document.getElementById('biospecimenModalBody');
         header.innerHTML = `Blood Accession Id is Missing`
-        let template = `You have not entered a Blood Accession Id. Do you want to continue?`
+        let template =  `You have not entered a Blood Accession Id. Do you want to continue?`
         template += `
         <br />
         <div style="display:inline-block; margin-top:20px;">
@@ -1084,11 +1083,10 @@ const clinicalBtnsClicked = async (formData) => {
     }
 }
 
-const triggerConfirmationModal = (accessionID2, accessionID4, participantName, hasError, confirmVal, selectedVisit, formData, connectId) => {
+const triggerConfirmationModal =  (accessionID2, accessionID4, participantName, hasError, confirmVal, selectedVisit, formData, connectId) => {
     if (!hasError && confirmVal === 'Yes') {
         confirmationModal(accessionID2, accessionID4, participantName, selectedVisit, formData, connectId)
-    }
-}
+    }}
 
 const confirmationModal = (accessionID2, accessionID4, participantName, selectedVisit, formData, connectId) => {
     const button = document.createElement('button');
@@ -1100,8 +1098,8 @@ const confirmationModal = (accessionID2, accessionID4, participantName, selected
     const header = document.getElementById('modalHeader');
     const body = document.getElementById('modalBody');
     header.innerHTML = `Confirm Accession ID`
-    let template = `Blood Accession ID: ${accessionID2.value ? accessionID2.value : 'N/A'} <br />
-    Urine Accession ID: ${accessionID4.value ? accessionID4.value : 'N/A'} <br />
+    let template =  `Blood Accession ID: ${accessionID2.value ? accessionID2.value : 'N/A' } <br />
+    Urine Accession ID: ${accessionID4.value ? accessionID4.value : 'N/A' } <br />
     Confirm ID is correct for participant: ${participantName}`
     template += `
     <br />
@@ -1124,7 +1122,7 @@ const confirmationModal = (accessionID2, accessionID4, participantName, selected
 }
 
 const proceedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
-    const bloodAccessionId = await checkAccessionId({ accessionId: +accessionID1.value, accessionIdType: '646899796' });
+    const bloodAccessionId = await checkAccessionId({accessionId: +accessionID1.value, accessionIdType: '646899796' });
     if (bloodAccessionId.code == 200) {
         if (bloodAccessionId.data) {
             hideAnimation();
@@ -1137,7 +1135,7 @@ const proceedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, 
             const header = document.getElementById('biospecimenModalHeader');
             const body = document.getElementById('biospecimenModalBody');
             header.innerHTML = `Existing Accession ID`
-            let template = `Accession ID entered is already assigned to Collection ID ${bloodAccessionId?.data?.[820476880]}. Choose an action`
+            let template =  `Accession ID entered is already assigned to Collection ID ${bloodAccessionId?.data?.[820476880]}. Choose an action`
             template += `
             <br />
             <div style="display:inline-block; margin-top:20px;">
@@ -1155,7 +1153,7 @@ const proceedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, 
             const yesBtn = document.getElementById('addCollection');
             yesBtn.addEventListener("click", async e => {
                 formData.collectionId = bloodAccessionId?.data?.[820476880];
-                formData['331584571'] = selectedVisit;
+                formData['331584571'] =  selectedVisit;
 
                 btnsClicked(connectId, formData); // needs code reformat/enhancement
                 await redirectSpecimenPage(accessionID1, accessionID3, selectedVisit, formData, connectId)
@@ -1170,9 +1168,9 @@ const proceedToSpecimenPage = async (accessionID1, accessionID3, selectedVisit, 
 }
 
 const redirectSpecimenPage = async (accessionID1, accessionID3, selectedVisit, formData, connectId) => {
-    if (accessionID1?.value) formData = { ...formData, '646899796': +accessionID1.value || '' };
-    if (accessionID3?.value) formData['928693120'] = +accessionID3.value || '';
-    if (selectedVisit) formData['331584571'] = +selectedVisit;
+    if(accessionID1?.value) formData = { ...formData, '646899796': +accessionID1.value || '' };
+    if(accessionID3?.value) formData['928693120'] = +accessionID3.value || '';
+    if(selectedVisit) formData['331584571'] = +selectedVisit;
     let query = `connectId=${parseInt(connectId)}`;
     const response = await findParticipant(query);
     const data = response.data[0];
@@ -1250,7 +1248,7 @@ export const addEventBiospecimenCollectionFormToggles = () => {
                     biohazardBagChkb.checked = true;
                     biohazardBagText.disabled = false;
                 }
-                else if (collected.checked === false && biohazardBagChkb.checked === true && allBloodUrineCheckedArray.length) {
+                else if(collected.checked === false && biohazardBagChkb.checked === true && allBloodUrineCheckedArray.length) {
                     biohazardBagChkb.checked = true;
                     biohazardBagText.disabled = false;
                 }
@@ -1275,7 +1273,7 @@ export const addEventBiospecimenCollectionFormToggles = () => {
         });
     });
 
-    reasonNotCollectedDropdown.forEach(reasonDropdown => {
+    reasonNotCollectedDropdown.forEach( reasonDropdown => {
         const collectedId = document.getElementById(reasonDropdown.id).id.replace('Reason', '');
         const collected = document.getElementById(collectedId);
         const specimenId = document.getElementById(`${collectedId}Id`);
@@ -1361,7 +1359,7 @@ export const addEventBiospecimenCollectionFormText = (participantData, biospecim
             let value = getValue(`${input.id}`).toUpperCase();
             if (value.length != 0) {
 
-                const tubeCheckBox = document.getElementById(input.id.replace('Id', ''));
+                const tubeCheckBox = document.getElementById(input.id.replace('Id',''));
 
                 if (tubeCheckBox) input.required = tubeCheckBox.checked;
 
@@ -1388,7 +1386,7 @@ export const addEventBiospecimenCollectionFormText = (participantData, biospecim
                 const inputFieldsEnabled = inputFields.filter(i => i.disabled === false);
                 const inputIndex = inputFieldsEnabled.indexOf(input);
 
-                if (inputIndex != inputFieldsEnabled.length - 1) {
+                if(inputIndex != inputFieldsEnabled.length - 1) {
                     inputFieldsEnabled[inputIndex + 1].focus();
                 }
             }
@@ -1404,7 +1402,7 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
     let siteTubesList = getSiteTubesLists(formData);
 
     siteTubesList.forEach((dt) => {
-        if (biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = { [tube.isCollected]: conceptIds.no };
+        if (biospecimenData[`${dt.concept}`] === undefined) biospecimenData[`${dt.concept}`] = {[tube.isCollected]: conceptIds.no};
 
         if (biospecimenData[dt.concept][tube.deviation] === undefined && dt.deviationOptions) {
             biospecimenData[dt.concept][tube.deviation] = {};
@@ -1432,7 +1430,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
     let hasCntdError = false;
 
     inputFields.forEach(input => {
-        const tubes = siteTubesList.filter(tube => tube.concept === input.id.replace('Id', ''));
+        const tubes = siteTubesList.filter(tube => tube.concept === input.id.replace('Id',''));
 
         let value = getValue(`${input.id}`).toUpperCase();
         const masterID = value.substr(0, masterSpecimenIDRequirement.length);
@@ -1507,7 +1505,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
 
         // Deviation Checkbox
         if (deviated) {
-            if (deviated.checked) {
+            if(deviated.checked) {
                 biospecimenData[tube.id][conceptIds.collection.tube.isDeviated] = conceptIds.yes;
                 biospecimenData[tube.id][conceptIds.collection.tube.deviationComments] = comment.value.trim();
             } else {
@@ -1518,7 +1516,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
             const tubeData = siteTubesList.filter(td => td.concept === tube.id)[0];
             const deviationSelections = Array.from(deviation).filter(dev => dev.selected).map(dev => parseInt(dev.value));
 
-            if (tubeData.deviationOptions) {
+            if(tubeData.deviationOptions) {
                 tubeData.deviationOptions.forEach(option => {
                     biospecimenData[tube.id][conceptIds.collection.tube.deviation][option.concept] = (deviationSelections.indexOf(option.concept) != -1 ? conceptIds.yes : conceptIds.no);
                 });
@@ -1569,11 +1567,11 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
 
     await updateCollectionSettingData(biospecimenData, siteTubesList, participantData);
 
-    if (baselineVisit && clinicalResearchSetting) {
+    if(baselineVisit && clinicalResearchSetting) {
         await updateBaselineData(siteTubesList, participantData);
     }
 
-    await checkDerivedVariables({ "token": participantData["token"] });
+    await checkDerivedVariables({"token": participantData["token"] });
 
     if (cntd) {
 
@@ -1596,7 +1594,7 @@ export const addEventSelectAllCollection = () => {
     checkbox.addEventListener('click', () => {
 
         Array.from(document.getElementsByClassName('tube-collected')).forEach(chk => {
-            if (!chk.disabled && chk.id !== `${conceptIds.collection.mouthwashBagScan}`) {
+            if(!chk.disabled && chk.id !== `${conceptIds.collection.mouthwashBagScan}`) {
                 chk.checked = checkbox.checked;
 
                 const event = new CustomEvent('change');
@@ -1703,7 +1701,7 @@ export const addEventShipPrintManifest = (id) => {
     const btn = document.getElementById(id)
     btn.addEventListener('click', e => {
         window.print()
-        if (e.target.classList.contains("print-manifest")) {
+        if(e.target.classList.contains("print-manifest")) {
             e.target.classList.remove("print-manifest")
         } else return
     })
@@ -1740,7 +1738,7 @@ export const addEventNavBarShippingManifest = (userName) => {
         let tempCheckStatus = ""
         const currSiteSpecificName = document.getElementById('selectLocationList').value
         const currShippingLocationNumber = siteSpecificLocationToConceptId[currSiteSpecificName]
-        appState.setState(state => ({ shipping: { ...state.shipping, locationNumber: currShippingLocationNumber } }));
+        appState.setState(state => ({shipping: {...state.shipping, locationNumber: currShippingLocationNumber }}));
         for (var r = 1; r < currTable.rows.length; r++) {
 
             let currCheck = currTable.rows[r].cells[0]
@@ -1769,7 +1767,7 @@ export const addEventNavBarShippingManifest = (userName) => {
         // Push empty item with boxId and empty tracking number string
         // shipSetForage used to handle empty localforage or no box id match
         boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, [conceptIds.shippingTrackingNumber]: "" }));
-        checkShipForage(shipSetForage, boxesToShip)
+        checkShipForage(shipSetForage,boxesToShip)
         //return box 1 info
         shippingPrintManifestReminder(boxesToShip, userName, tempCheckStatus, currShippingLocationNumber);
     });
@@ -1800,9 +1798,9 @@ export const addEventNavBarAssignTracking = (element, userName, boxIdAndBagsObj,
 
 export const addEventTrackingNumberScanAutoFocus = () => {
     let arrInputs = Array.from(document.getElementsByClassName('shippingTrackingInput'))
-    for (let i = 0; i < arrInputs.length - 1; i++) {
+    for(let i = 0; i < arrInputs.length - 1; i++ ) {
         arrInputs[i].addEventListener("keydown", e => {
-            if (e.keyCode == 13) arrInputs[i + 1].focus()
+            if(e.keyCode == 13) arrInputs[i+1].focus()
         })
     }
 }
@@ -1814,19 +1812,19 @@ export const addEventTrimTrackingNums = () => {
     // Trim Function here
     boxTrackingIdEls.forEach(el => el.addEventListener("input", e => {
         let inputTrack = e.target.value.trim()
-        if (inputTrack.length >= 0) {
+        if(inputTrack.length >= 0) {
             e.target.value = inputTrack.replace(nonAlphaNumericMatch, '')
         }
-        if (inputTrack.length > 12) {
+        if(inputTrack.length > 12) {
             e.target.value = inputTrack.slice(-12)
         }
     }))
     boxTrackingIdConfirmEls.forEach(el => el.addEventListener("input", e => {
         let inputTrackConfirm = e.target.value.trim()
-        if (inputTrackConfirm.length >= 0) {
+        if(inputTrackConfirm.length >= 0) {
             e.target.value = inputTrackConfirm.replace(nonAlphaNumericMatch, '')
         }
-        if (inputTrackConfirm.length > 12) {
+        if(inputTrackConfirm.length > 12) {
             e.target.value = inputTrackConfirm.slice(-12)
         }
     }))
@@ -1844,15 +1842,15 @@ export const addEventCheckValidTrackInputs = (boxIdAndBagsObj) => {
     let boxIdArray = Object.keys(boxIdAndBagsObj).sort(compareBoxIds);
     /* Check Tracking Numbers - ON SCREEN LOAD */
     boxIdArray.forEach(box => {
-        let input = document.getElementById(box + "trackingId").value.trim()
-        let inputConfirm = document.getElementById(box + "trackingIdConfirm").value.trim()
-        let inputErrorMsg = document.getElementById(box + "trackingIdErrorMsg")
-        let inputConfirmErrorMsg = document.getElementById(box + "trackingIdConfirmErrorMsg")
-        if (input.length !== 0 && input.length < 12) {
-            document.getElementById(box + "trackingId").classList.add("invalid")
+        let input = document.getElementById(box+"trackingId").value.trim()
+        let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+        let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+        let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
+        if(input.length !== 0 && input.length < 12) {
+            document.getElementById(box+"trackingId").classList.add("invalid")
             inputErrorMsg.textContent = `Tracking number must be 12 digits`
         }
-        if (inputConfirm !== input) {
+        if(inputConfirm !== input ) {
             document.getElementById(box + "trackingIdConfirm").classList.add("invalid")
             inputConfirmErrorMsg.textContent = `Tracking numbers must match`
         }
@@ -1860,40 +1858,40 @@ export const addEventCheckValidTrackInputs = (boxIdAndBagsObj) => {
     /* Check Tracking Numbers - User Input */
     boxIdArray.forEach(box => {
         // box tracking id 
-        document.getElementById(box + "trackingId").addEventListener("input", e => {
-            let input = document.getElementById(box + "trackingId").value.trim()
-            let inputConfirm = document.getElementById(box + "trackingIdConfirm").value.trim()
-            let inputErrorMsg = document.getElementById(box + "trackingIdErrorMsg")
-            let inputConfirmErrorMsg = document.getElementById(box + "trackingIdConfirmErrorMsg")
+        document.getElementById(box+"trackingId").addEventListener("input", e => {
+            let input = document.getElementById(box+"trackingId").value.trim()
+            let inputConfirm = document.getElementById(box+"trackingIdConfirm").value.trim()
+            let inputErrorMsg = document.getElementById(box+"trackingIdErrorMsg")
+            let inputConfirmErrorMsg = document.getElementById(box+"trackingIdConfirmErrorMsg")
 
-            if (input.length === 12) {
+            if(input.length === 12) {
                 inputErrorMsg.textContent = ``
-                document.getElementById(box + "trackingId").classList.remove("invalid")
+                document.getElementById(box+"trackingId").classList.remove("invalid")
 
-                if (input === inputConfirm) {
+                if(input === inputConfirm) {
                     inputConfirmErrorMsg.textContent = ``
-                    document.getElementById(box + "trackingIdConfirm").classList.remove("invalid")
+                    document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
                 }
                 else {
                     inputConfirmErrorMsg.textContent = `Tracking numbers must match`
-                    document.getElementById(box + "trackingIdConfirm").classList.add("invalid")
+                    document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
                 }
             }
             else if (input.length < 12 && input === inputConfirm) {
                 inputConfirmErrorMsg.textContent = ``
-                document.getElementById(box + "trackingIdConfirm").classList.remove("invalid")
+                document.getElementById(box+"trackingIdConfirm").classList.remove("invalid")
                 inputErrorMsg.textContent = `Tracking number must be 12 digits`
-                document.getElementById(box + "trackingId").classList.add("invalid")
+                document.getElementById(box+"trackingId").classList.add("invalid")
             }
             else if (input.length < 12 && input !== inputConfirm) {
                 inputErrorMsg.textContent = `Tracking number must be 12 digits`
-                document.getElementById(box + "trackingId").classList.add("invalid")
+                document.getElementById(box+"trackingId").classList.add("invalid")
                 inputConfirmErrorMsg.textContent = `Tracking numbers must match`
-                document.getElementById(box + "trackingIdConfirm").classList.add("invalid")
+                document.getElementById(box+"trackingIdConfirm").classList.add("invalid")
             }
             else {
                 inputErrorMsg.textContent = `Tracking number must be 12 digits`
-                document.getElementById(box + "trackingId").classList.add("invalid")
+                document.getElementById(box+"trackingId").classList.add("invalid")
             }
         })
         // box tracking id confirm
@@ -1920,9 +1918,9 @@ export const populateTrackingQuery = async (boxIdAndBagsObj) => {
     let shipping = {}
     let shipData = await localforage.getItem("shipData")
 
-    for (let box of shipData) {
+    for(let box of shipData) {
         // if boxes has box id of localforage shipData push
-        if (boxIdArray.includes(box["boxId"])) {
+        if(boxIdArray.includes(box["boxId"])) {
             shipping[box["boxId"]] = { [conceptIds.shippingTrackingNumber]: box[conceptIds.shippingTrackingNumber], "confirmTrackNum": box["confirmTrackNum"] };
         }
         else {
@@ -1930,13 +1928,13 @@ export const populateTrackingQuery = async (boxIdAndBagsObj) => {
         }
     }
 
-    for (let i = 0; i < boxIdArray.length; i++) {
+    for(let i = 0; i < boxIdArray.length; i++){
         let trackNum = boxIdArray[i] && shipping?.[boxIdArray[i]]?.[conceptIds.shippingTrackingNumber];
         let trackNumConfirm = boxIdArray[i] && shipping?.[boxIdArray[i]]?.["confirmTrackNum"];
-        toBeInnerHTML += `
+        toBeInnerHTML +=`
         <div class = "row" style="justify-content:space-around">
                             <div class="form-group" style="margin-top:30px; width:380px;">
-                                <label style="float:left;margin-top:5px">`+ 'Enter / Scan Shipping Tracking Number for ' + `<span style="font-weight:600;display:block;">${boxIdArray[i]}</span>` + `</label>
+                                <label style="float:left;margin-top:5px">`+'Enter / Scan Shipping Tracking Number for ' + `<span style="font-weight:600;display:block;">${boxIdArray[i]}</span>` + `</label>
                                 <br>
                                 <div style="float:left;">
                                     <input class="form-control boxTrackingId shippingTrackingInput" type="text" id="` + boxIdArray[i] + 'trackingId' + `" placeholder="Enter/Scan Tracking Number" value="${trackNum ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type tracking number" autocomplete="off"/>
@@ -1945,7 +1943,7 @@ export const populateTrackingQuery = async (boxIdAndBagsObj) => {
                                 </div>
                             </div>
                             <div class="form-group" style="margin-top:30px; width:380px;">
-                                <label style="float:left;margin-top:5px">`+ 'Confirm Shipping Tracking Number for ' + `<span style="font-weight:600;display:block;">${boxIdArray[i]}</span>` + `</label>
+                                <label style="float:left;margin-top:5px">`+'Confirm Shipping Tracking Number for ' + `<span style="font-weight:600;display:block;">${boxIdArray[i]}</span>` + `</label>
                                 <br>
                                 <div style="float:left;">
                                     <input class="form-control boxTrackingIdConfirm shippingTrackingInput" type="text" id="` + boxIdArray[i] + 'trackingIdConfirm' + `" placeholder="Enter/Scan Tracking Number" value="${trackNumConfirm ?? ""}" data-toggle="tooltip" data-placement="top" title="Scan or manually type to confirm the correct tracking number" autocomplete="off"/>
@@ -1974,7 +1972,7 @@ export const addEventSaveAndContinueButton = async (boxIdAndBagsObj, userName, b
             const trackingId = document.getElementById(boxId + "trackingId").value.toUpperCase();
             const trackingIdConfirm = document.getElementById(boxId + "trackingIdConfirm").value.toUpperCase();
             if (trackingId === '' || trackingIdConfirm === '') {
-                showNotifications({ title: 'Missing Fields', body: 'Please enter in shipment tracking numbers' });
+                showNotifications({ title: 'Missing Fields', body: 'Please enter in shipment tracking numbers'});
                 return;
             }
 
@@ -2002,7 +2000,7 @@ export const addEventSaveAndContinueButton = async (boxIdAndBagsObj, userName, b
 
         localforage.setItem("shipData", shippingData);
         const shipmentCourier = document.getElementById('courierSelect').value;
-        finalShipmentTracking({ boxIdAndBagsObj, boxIdAndTrackingObj, userName, boxWithTempMonitor, shipmentCourier });
+        finalShipmentTracking({boxIdAndBagsObj, boxIdAndTrackingObj, userName, boxWithTempMonitor, shipmentCourier });
     })
 
 }
@@ -2023,7 +2021,7 @@ export const addEventSaveButton = async (boxIdAndBagsObj) => {
                 break;
             }
 
-            shippingData.push({ [conceptIds.shippingTrackingNumber]: trackingId, confirmTrackNum: trackingIdConfirm, boxId });
+            shippingData.push({[conceptIds.shippingTrackingNumber]: trackingId, confirmTrackNum: trackingIdConfirm, boxId});
             boxIdAndTrackingObj[boxId] = {
                 [conceptIds.shippingTrackingNumber]: trackingId,
                 specimens: boxIdAndBagsObj[boxId],
@@ -2516,7 +2514,7 @@ const findScannedIdInUnshippedBoxes = (allBoxesList, masterSpecimenId) => {
 
     const specimenIdType = masterSpecimenId.split(' ')[1];
     const isMasterId = ['0007', '0008', '0009'].includes(specimenIdType);
-    let dataObj = { "inputScanned": masterSpecimenId };
+    let dataObj = { "inputScanned": masterSpecimenId};
 
     for (const box of allBoxesList) {
         if (box[conceptIds.submitShipmentFlag] === conceptIds.yes) continue;
