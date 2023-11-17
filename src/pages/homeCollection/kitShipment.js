@@ -1,7 +1,8 @@
 import { nonUserNavBar } from "./../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse } from "../../shared.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
+import { baselineMWKitRemainderTemplate } from "../../emailTemplates.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
 
 export const kitShipmentScreen = async (auth) => {
@@ -41,8 +42,10 @@ const verifyScannedCode = async () => {
   const scannedCodeInput = document.getElementById("scannedCode");
   if (scannedCodeInput) {
     scannedCodeInput.addEventListener("change", async () => {
+      showAnimation();
       const isScannedCodeValid = await checkScannedCodeValid(scannedCodeInput.value)
       isScannedCodeValid.data?.valid ? confirmPickupTemplate(isScannedCodeValid.data?.UKID) : tryAgainTemplate();
+      hideAnimation();
     });
   }
 };
@@ -107,13 +110,34 @@ const setShippedResponse = async (data) => {
       },
     }
   );
-  if (response.status === 200) {
+  const returnedPtInfo = await processResponse(response);
+  if (returnedPtInfo.status === true) {
     triggerSuccessModal('Shipment confirmed.')
     document.getElementById("scannedCode").value = ``;
     document.getElementById("cardBody").innerHTML = ``;
-    return true;
+
+    const emailData = {
+      email: returnedPtInfo.prefEmail,
+      subject: "Next step for Connect: Your mouthwash home collection kit and survey",
+      message: baselineMWKitRemainderTemplate(returnedPtInfo.ptName),
+      notificationType: "email",
+      time: new Date().toISOString(),
+      attempt: "1st contact",
+      category: "Biospecimen Home Collection Kit Reminder",
+      token: returnedPtInfo.token,
+      uid: returnedPtInfo.uid,
+      read: false
+    };
+
+    try {
+      await(sendClientEmail(emailData));
+    }
+    catch (e) {
+      console.error(`Error sending email to user ${returnedPtInfo.prefEmail} \d`, e);
+      throw new Error(`Error sending email to user ${returnedPtInfo.prefEmail}: ${e.message}`);
+    }
   } else {
-    triggerErrorModal('Error')
+    triggerErrorModal('Error in shipping: Please check the tracking number.')
   }
 };
 
