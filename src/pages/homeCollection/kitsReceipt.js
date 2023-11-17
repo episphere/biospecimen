@@ -168,7 +168,7 @@ export const confirmKitReceipt = () => {
         kitObj[`${conceptIds.pkgReceiptConditions}`] = packageConditions;
       //  kitObj[conceptIds.pkgComments] = document.getElementById('receivePackageComments').value.trim();
         kitObj[conceptIds.receivedDateTime] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
-        if(document.getElementById('collectionId').value){
+        if (document.getElementById('collectionId').value) {
           kitObj[conceptIds.collectionCupId] = document.getElementById('collectionId').value;
           const dateCollectionCard = document.getElementById('dateCollectionCard').value;
           const timeCollectionCard = document.getElementById('timeCollectionCard').value;
@@ -183,8 +183,6 @@ export const confirmKitReceipt = () => {
        } 
     })
   }
-
-
 }
 
 const identifyCourierType = (scannedBarcode) => { return scannedBarcode.length === 20 || scannedBarcode.length === 22 }
