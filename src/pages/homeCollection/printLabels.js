@@ -20,7 +20,7 @@ export const printLabelsScreen = async (auth) => {
 const printLabelsTemplate = (name) => {
   let template = ``;
   template += homeCollectionNavbar();
-  template += ` <div class="row align-center welcome-screen-div">
+  template += `<div class="row align-center welcome-screen-div">
                   <div class="col">
                   <div id="alert_placeholder"></div>
                     <h3 style="margin:1rem 0 1.5rem;">Print Labels</h3>
