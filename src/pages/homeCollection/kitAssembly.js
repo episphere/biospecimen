@@ -224,8 +224,8 @@ const editAssembledKits = () => {
         document.getElementById('scannedBarcode').value = editKitObj[conceptIds.returnKitTrackingNum]
         document.getElementById('supplyKitId').value = editKitObj[conceptIds.supplyKitId]
         document.getElementById('returnKitId').value = editKitObj[conceptIds.returnKitId]
-        document.getElementById('cupId').value = editKitObj[conceptIds.collectionCupId].slice(0, -3) + " " + editKitObj[conceptIds.collectionCupId].slice(-3)
-        document.getElementById('cardId').value = editKitObj[conceptIds.collectionCardId].slice(0, -3) + " " + editKitObj[conceptIds.collectionCardId].slice(-3)
+        document.getElementById('cupId').value = editKitObj[conceptIds.collectionCupId].slice(0, -4) + " " + editKitObj[conceptIds.collectionCupId].slice(-4)
+        document.getElementById('cardId').value = editKitObj[conceptIds.collectionCardId].slice(0, -4) + " " + editKitObj[conceptIds.collectionCardId].slice(-4)
         appState.setState({UKID: editKitObj[conceptIds.UKID]})
       });
     }); // state to indicate if its an edit & also pass the UKID
