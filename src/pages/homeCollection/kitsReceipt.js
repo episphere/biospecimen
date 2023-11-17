@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, sendClientEmail, processPtDetails } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse } from "../../shared.js";
 import { baselineMWSurveyRemainderTemplate, baselineMWThankYouTemplate } from "../../emailTemplates.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
@@ -189,8 +189,10 @@ const storePackageReceipt = async (data) => {
     }
   );
   hideAnimation();
-  if (response.status === 200) {
 
+  const returnedPtInfo = await processResponse(response);
+
+  if (returnedPtInfo.status === true) {
     triggerSuccessModal('Kit Receipted.')
     document.getElementById("courierType").innerHTML = ``;
     document.getElementById("scannedBarcode").value = "";
@@ -214,7 +216,6 @@ const storePackageReceipt = async (data) => {
       document.getElementById("packageCondition").setAttribute("data-selected","[]");
     }
 
-    const returnedPtInfo = await processPtDetails(response);
     let emailData = {
       email: returnedPtInfo.prefEmail,
       notificationType: "email",
@@ -244,6 +245,6 @@ const storePackageReceipt = async (data) => {
 
   }
   else {
-    triggerErrorModal('Error during Kit receipt.')
+    triggerErrorModal('Error during kit receipt. Please check the tracking number, collection ID, and other fields.')
   }
 };

@@ -1,6 +1,6 @@
 import { nonUserNavBar } from "./../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal, sendClientEmail, processPtDetails } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse } from "../../shared.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { baselineMWKitRemainderTemplate } from "../../emailTemplates.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -42,8 +42,10 @@ const verifyScannedCode = async () => {
   const scannedCodeInput = document.getElementById("scannedCode");
   if (scannedCodeInput) {
     scannedCodeInput.addEventListener("change", async () => {
+      showAnimation();
       const isScannedCodeValid = await checkScannedCodeValid(scannedCodeInput.value)
       isScannedCodeValid.data?.valid ? confirmPickupTemplate(isScannedCodeValid.data?.UKID) : tryAgainTemplate();
+      hideAnimation();
     });
   }
 };
@@ -108,12 +110,11 @@ const setShippedResponse = async (data) => {
       },
     }
   );
-  if (response.status === 200) {
+  const returnedPtInfo = await processResponse(response);
+  if (returnedPtInfo.status === true) {
     triggerSuccessModal('Shipment confirmed.')
     document.getElementById("scannedCode").value = ``;
     document.getElementById("cardBody").innerHTML = ``;
-
-    const returnedPtInfo = await processPtDetails(response);
 
     const emailData = {
       email: returnedPtInfo.prefEmail,
@@ -136,7 +137,7 @@ const setShippedResponse = async (data) => {
       throw new Error(`Error sending email to user ${returnedPtInfo.prefEmail}: ${e.message}`);
     }
   } else {
-    triggerErrorModal('Error')
+    triggerErrorModal('Error in shipping: Please check the tracking number.')
   }
 };
 

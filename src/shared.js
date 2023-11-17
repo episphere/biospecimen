@@ -2894,7 +2894,8 @@ export const triggerSuccessModal = (message) => {
                 </button>
         </div>`;
 }
-export const processPtDetails = async (response) => {
+
+export const processResponse = async (response) => {
     const data = await response.json();
     return data.response;
 }
