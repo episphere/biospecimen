@@ -2940,3 +2940,8 @@ const getDefaultDeviationOptions = (deviationOptions) => {
     });
     return defaultDeviationOptions;
 };
+
+export const processResponse = async (response) => {
+    const data = await response.json();
+    return data.response;
+}
