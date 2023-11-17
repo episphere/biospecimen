@@ -66,7 +66,7 @@ const confirmPickupTemplate = (UKID) => {
                         <button type="submit" class="btn btn-primary" id="saveResponse">Save</button>
                       </div>`;
   saveResponse(UKID);
-  cancelResponse(cardBody);
+  cancelResponse();
 };
 
 const tryAgainTemplate = () => {
@@ -76,6 +76,7 @@ const tryAgainTemplate = () => {
                     <span> Couldn't find scanned tracking number </span>
                     <br />
                 </div>`;
+  verifyScannedCode();
 };
 
 const saveResponse = (UKID) => {
@@ -90,11 +91,11 @@ const saveResponse = (UKID) => {
   }
 };
 
-const cancelResponse = (cardBody) => {
+const cancelResponse = () => {
   const cancelButton = document.getElementById("cancelResponse");
   if (cancelButton) {
     cancelButton.addEventListener("click", (e) => {
-      cardBody.innerHTML = ``;
+      location.reload();
     });
   }
 };
@@ -136,6 +137,7 @@ const setShippedResponse = async (data) => {
       console.error(`Error sending email to user ${returnedPtInfo.prefEmail} \d`, e);
       throw new Error(`Error sending email to user ${returnedPtInfo.prefEmail}: ${e.message}`);
     }
+    return true;
   } else {
     triggerErrorModal('Error in shipping: Please check the tracking number.')
   }
