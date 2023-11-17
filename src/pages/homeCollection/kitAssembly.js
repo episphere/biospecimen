@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -261,7 +261,8 @@ const storeAssembledKit = async (kitData) => {
       },
     });
 
-    if (response.status === 200) {
+    const responseStatus = await processResponse(response);
+    if (responseStatus === true) {
       alertTemplate(`Kit saved successfully!`, `success`);
       const existingKitData = JSON.parse(localStorage.getItem('tmpKitData'));
       existingKitData.push(kitData);
@@ -281,12 +282,11 @@ const storeAssembledKit = async (kitData) => {
       else {
         localStorage.setItem('tmpKitData', JSON.stringify(existingKitData))
       }
-
       renderSidePane();
       return true
     }
     else {
-      alertTemplate(`Kit saved unsuccessfully!`, `warn`);
+      triggerErrorModal(`Failed to save the kit.`);
       return false
     }
   } 

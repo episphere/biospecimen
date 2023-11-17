@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, triggerErrorModal, triggerSuccessModal, baseAPI } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, triggerErrorModal, triggerSuccessModal, baseAPI, processResponse } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -181,12 +181,13 @@ const processConfirmedAssignment = async (assignment) => {
         },
     });
     hideAnimation();
-    if (response.status === 200) {
-        triggerSuccessModal('Kit assigned to participant.')
+    const responseStatus = await processResponse(response);
+    if (responseStatus === true) {
+        triggerSuccessModal('The kit has been assigned to the participant.')
         return true
     }
     else {
-        triggerErrorModal(`Can't assign kit to participant.`)
+        triggerErrorModal(`Unable to assign a kit to the participant. Please check the supply kit and connect the ID.`)
         return false
     }
 }
