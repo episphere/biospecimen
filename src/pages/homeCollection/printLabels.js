@@ -90,8 +90,11 @@ const generateParticipantCsvGetter = (name) => {
               printLabelsTemplate(name);
               triggerSuccessModal('Success!');                 // Display success message
             }
+            else if (appState.getState().totalAddressesLength === 0) {
+              triggerErrorModal(`No labels to print`)
+            }
             else {
-              triggerErrorModal('No labels to print');
+              triggerErrorModal(`Max labels to print: ${arrayLengthToProcess}`);
             } 
           }
       });
