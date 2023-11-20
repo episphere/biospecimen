@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -151,16 +151,25 @@ const processAssembledKit = () => {
   if (saveKitButton) {
     saveKitButton.addEventListener('click', async () => { 
       let kitObj = {};
+      const queryScannedBarcodeValue = document.getElementById('scannedBarcode')?.value?.trim();
+      const scannedBarcodeValue = (queryScannedBarcodeValue !== undefined) ? queryScannedBarcodeValue : 0;
 
-      const scannedBarcodeValue = document.getElementById('scannedBarcode').value.trim();
-      const supplyKitIdValue = document.getElementById('supplyKitId').value.trim();
-      const returnKitIdValue = document.getElementById('returnKitId').value.trim();
-      const collectionCupIdValue = document.getElementById('cupId').value;
-      const collectionCardIdValue = document.getElementById('cardId').value;
+      const querySupplyKitIdValue = document.getElementById('supplyKitId').value.trim();
+      const supplyKitIdValue = (querySupplyKitIdValue !== undefined) ? querySupplyKitIdValue: 0;
+
+      const queryReturnKitIdValue = document.getElementById('returnKitId')?.value?.trim();
+      const returnKitIdValue = (queryReturnKitIdValue !== undefined) ? queryReturnKitIdValue : 0;
+
+      const queryCollectionCupIdValue = document.getElementById('cupId')?.value?.trim();
+      const collectionCupIdValue = (queryCollectionCupIdValue !== undefined) ? queryCollectionCupIdValue : 0;
+
+      const queryCollectionCardIdValue = document.getElementById('cardId')?.value?.trim();
+      const collectionCardIdValue = (queryCollectionCardIdValue !== undefined) ? queryCollectionCardIdValue : 0;
 
       if (scannedBarcodeValue.length === 0 || supplyKitIdValue.length === 0 ||  returnKitIdValue.length === 0 ||
-        collectionCupIdValue.length === 0 || collectionCardIdValue.length === 0) {
+        collectionCupIdValue.length === 0 || collectionCardIdValue.length === 0 || document.getElementById('dropdownSites').innerHTML !== 'Mouthwash') {
           triggerErrorModal('One or more fields are missing.');
+          return
         }
       else {
         kitObj[conceptIds.returnKitTrackingNum] = scannedBarcodeValue;
@@ -215,16 +224,16 @@ const editAssembledKits = () => {
         document.getElementById('scannedBarcode').value = editKitObj[conceptIds.returnKitTrackingNum]
         document.getElementById('supplyKitId').value = editKitObj[conceptIds.supplyKitId]
         document.getElementById('returnKitId').value = editKitObj[conceptIds.returnKitId]
-        document.getElementById('cupId').value = editKitObj[conceptIds.collectionCupId]
-        document.getElementById('cardId').value = editKitObj[conceptIds.collectionCardId]
+        document.getElementById('cupId').value = editKitObj[conceptIds.collectionCupId].slice(0, -4) + " " + editKitObj[conceptIds.collectionCupId].slice(-4)
+        document.getElementById('cardId').value = editKitObj[conceptIds.collectionCardId].slice(0, -4) + " " + editKitObj[conceptIds.collectionCardId].slice(-4)
         appState.setState({UKID: editKitObj[conceptIds.UKID]})
       });
     }); // state to indicate if its an edit & also pass the UKID
 }}
 
-const checkCollecitonUniqueness = async (collectionUniqueId) => {
+const checkUniqueness = async (supplyKitId, collectionId) => {
   const idToken = await getIdToken();
-  const response = await fetch(`${baseAPI}api=collectionUniqueness&id=${collectionUniqueId}`, {
+  const response = await fetch(`${baseAPI}api=collectionUniqueness&supplyKitId=${supplyKitId}&collectionId=${collectionId}`, {
       method: "GET",
       headers: {
           Authorization:"Bearer "+idToken
@@ -236,10 +245,10 @@ const checkCollecitonUniqueness = async (collectionUniqueId) => {
 const storeAssembledKit = async (kitData) => {
   const idToken = await getIdToken();
   showAnimation();
-  const collectionUnique = await checkCollecitonUniqueness(kitData[conceptIds.collectionCupId].replace(/\s/g, "\n"));
+  const collectionUnique = appState.getState().UKID !== '' ? { data: true } : await checkUniqueness(kitData[conceptIds.supplyKitId], kitData?.[conceptIds.collectionCupId].replace(/\s/g, "\n"));
   hideAnimation();
-  if (collectionUnique.data) {
-    kitData[conceptIds.kitStatus] = conceptIds.pending.toString();
+  if (collectionUnique.data === true) {
+    kitData[conceptIds.kitStatus] = conceptIds.pending;
     kitData[conceptIds.UKID] = "MW" + Math.random().toString(16).slice(2);
     kitData[conceptIds.pendingDateTimeStamp] = new Date().toISOString();
     let api = `addKitData`
@@ -256,7 +265,8 @@ const storeAssembledKit = async (kitData) => {
       },
     });
 
-    if (response.status === 200) {
+    const responseStatus = await processResponse(response);
+    if (responseStatus === true) {
       alertTemplate(`Kit saved successfully!`, `success`);
       const existingKitData = JSON.parse(localStorage.getItem('tmpKitData'));
       existingKitData.push(kitData);
@@ -276,17 +286,28 @@ const storeAssembledKit = async (kitData) => {
       else {
         localStorage.setItem('tmpKitData', JSON.stringify(existingKitData))
       }
-
       renderSidePane();
       return true
     }
     else {
-      alertTemplate(`Kit saved unsuccessfully!`, `warn`);
+      triggerErrorModal(`Failed to save the kit.`);
       return false
     }
-  } 
-  else {
+  }
+  else if (collectionUnique.data === 'Check Collection ID'){
+    triggerErrorModal('Check collection ID format.')
+    return false
+  }
+  else if (collectionUnique.data === 'duplicate supplykit id'){
+    triggerErrorModal('The supply kit and return kit are already in use.')
+    return false
+  }
+  else if (collectionUnique.data === 'duplicate collection id'){
     triggerErrorModal('The collection card and cup ID are already in use.')
+    return false
+  }
+  else {
+    triggerErrorModal('Error')
     return false
   }
 }

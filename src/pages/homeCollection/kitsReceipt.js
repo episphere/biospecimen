@@ -76,6 +76,7 @@ const kitsReceiptTemplate = async (name) => {
                       <div class="row form-group">
                           <label class="col-form-label col-md-4" for="collectionId">Collection ID</label>
                           <input autocomplete="off" class="col-md-8 form-control" type="text" id="collectionId" placeholder="Scan or Enter a Collection ID">
+                          <span id="showErrorMsg" style="font-size: 14px;"></span>
                       </div>
                       <div class="row form-group">
                           <label class="col-form-label col-md-4" for="dateCollectionCard">Enter Collection Date from Collection Card</label>
@@ -111,7 +112,19 @@ template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false
   contentBody.innerHTML = template;
   activeHomeCollectionNavbar();
   checkAndDisplayCourierType(true);
+  performCollectionIdcheck();
 };
+
+const performCollectionIdcheck = () => {
+  const collectionIdField = document.getElementById('collectionId');
+  if (collectionIdField) {
+    collectionIdField.addEventListener("input", (e) => {
+      if (collectionIdField.value.length < 14) {
+        document.getElementById('showErrorMsg').innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> Enter Correct Collection ID`
+      }
+    })
+  }
+}
 
 // returns current date in default format ("YYYY-MM-DD")
 const getCurrentDate = () => {
@@ -154,9 +167,9 @@ export const confirmKitReceipt = () => {
           if (option.selected) {packageConditions.push(option.value)}
         }
         kitObj[`${conceptIds.pkgReceiptConditions}`] = packageConditions;
-      //  kitObj[conceptIds.pkgComments] = document.getElementById('receivePackageComments').value.trim();
+        kitObj[conceptIds.pkgComments] = document.getElementById('receivePackageComments').value.trim();
         kitObj[conceptIds.receivedDateTime] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
-        if(document.getElementById('collectionId').value) {
+        if (document.getElementById('collectionId').value) {
           kitObj[conceptIds.collectionCupId] = document.getElementById('collectionId').value;
           const dateCollectionCard = document.getElementById('dateCollectionCard').value;
           const timeCollectionCard = document.getElementById('timeCollectionCard').value;
@@ -164,7 +177,7 @@ export const confirmKitReceipt = () => {
           document.getElementById('collectionCheckBox').checked === true ? 
           kitObj[conceptIds.collectionCardFlag] = true : kitObj[conceptIds.collectionCardFlag] = false
           kitObj[conceptIds.collectionAddtnlNotes] = document.getElementById('collectionComments').value;
-        }    
+        }
         window.removeEventListener("beforeunload",beforeUnloadMessage)
         targetAnchorTagEl();
         storePackageReceipt(kitObj);

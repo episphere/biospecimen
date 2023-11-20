@@ -323,7 +323,8 @@ export const conceptIds = {
     receivedDateTime: 826941471,
     collectionDateTimeStamp: 678166505,
     collectionCardFlag: 137401245,
-    collectionAddtnlNotes: 260133861
+    collectionAddtnlNotes: 260133861,
+    pkgComments: 870456401,
 
 };
 
