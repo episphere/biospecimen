@@ -1,6 +1,6 @@
 import { appState, performSearch, showAnimation, addBiospecimenUsers, getSpecimensByCollectionIds, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant,
         errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, updateBox,
-        ship, disableInput, updateNewTempDate, getSiteTubesLists, getWorkflow, 
+        ship, disableInput, updateNewTempDate, getSiteTubesLists, getWorkflow, fixMissingTubeData,
         getSiteCouriers, getPage, getNumPages, removeSingleError, displayManifestContactInfo, checkShipForage, checkAlertState, retrieveDateFromIsoString,
         convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
         checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData,
@@ -1342,7 +1342,13 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
     let hasCntdError = false;
 
     inputFields.forEach(input => {
-        const tubes = siteTubesList.filter(tube => tube.concept === input.id.replace('Id', ''));
+        const tubeConceptId = input.id.replace('Id', '');
+        const tubes = siteTubesList.filter(tube => tube.concept === tubeConceptId);
+        
+        if (tubeConceptId && biospecimenData[tubeConceptId] === undefined) {
+            const tubePlaceholderData = siteTubesList.find(stockTube => stockTube.concept === tubeConceptId);
+            fixMissingTubeData(tubePlaceholderData, biospecimenData[tubeConceptId] = {});
+        }
 
         let value = getValue(`${input.id}`).toUpperCase();
         const masterID = value.substr(0, masterSpecimenIDRequirement.length);
@@ -1377,7 +1383,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
             focus = false;
         }
 
-        if (input.required) biospecimenData[`${input.id.replace('Id', '')}`][conceptIds.collection.tube.scannedId] = `${masterID} ${tubeID}`.trim();
+        if (tubeConceptId && input.required) biospecimenData[tubeConceptId][conceptIds.collection.tube.scannedId] = `${masterID} ${tubeID}`.trim();
     });
 
     if ((hasError && cntd == true) || hasCntdError) return;
