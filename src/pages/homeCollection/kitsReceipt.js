@@ -167,7 +167,7 @@ export const confirmKitReceipt = () => {
           if (option.selected) {packageConditions.push(option.value)}
         }
         kitObj[`${conceptIds.pkgReceiptConditions}`] = packageConditions;
-      //  kitObj[conceptIds.pkgComments] = document.getElementById('receivePackageComments').value.trim();
+        kitObj[conceptIds.pkgComments] = document.getElementById('receivePackageComments').value.trim();
         kitObj[conceptIds.receivedDateTime] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
         if (document.getElementById('collectionId').value) {
           kitObj[conceptIds.collectionCupId] = document.getElementById('collectionId').value;
