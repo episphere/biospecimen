@@ -1583,339 +1583,211 @@ export const locationConceptIDToLocationMap = {
     siteSpecificLocation: 'HP Research Clinic',
     siteAcronym: 'HP',
     siteCode: '531629870',
+    siteTeam: 'HealthPartners Connect Study Team',
     loginSiteName: 'HealthPartners Research Clinic',
-    contactInfo: {
-      "HP":[{
-        "fullName":"Erin Schwartz",
-        "email":"Erin.C.Schwartz@HealthPartners.com",
-        "phone":[
-         "Office: (651) 495-6371",
-         "Cell: (612) 836-7885"
-        ]
-      }],
-    },
+    email: 'communityresearchdepartment@healthpartners.com',
   },
   752948709: {
     siteSpecificLocation: 'Henry Ford Main Campus',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
+    siteTeam: 'Henry Ford Connect Study Team',
     loginSiteName: 'Henry Ford Health System',
-    contactInfo: {
-      "HFHS":[{
-        "fullName":"Kathleen Dawson",
-        "email":"kdawson7@hfhs.org",
-        "phone":["248-910-6716"],
-      }]
-    },
+    email: 'ConnectBioHFH@hfhs.org',
   },
   570271641: {
     siteSpecificLocation: 'Henry Ford West Bloomfield Hospital',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
+    siteTeam: 'Henry Ford Connect Study Team',
     loginSiteName: 'Henry Ford Health System',
-    contactInfo: {
-      "HFHS":[{
-        "fullName":"Kathleen Dawson",
-        "email":"kdawson7@hfhs.org",
-        "phone":["248-910-6716"],
-      }]
-    },
+    email: 'ConnectBioHFH@hfhs.org',
   },
   838480167: {
     siteSpecificLocation: 'Henry Ford Medical Center-Fairlane',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
+    siteTeam: 'Henry Ford Connect Study Team',
     loginSiteName: 'Henry Ford Health System',
-    contactInfo: {
-      "HFHS":[{
-        "fullName":"Kathleen Dawson",
-        "email":"kdawson7@hfhs.org",
-        "phone":["248-910-6716"],
-      }]
-    },
+    email: 'ConnectBioHFH@hfhs.org',
   },
   706927479: {
     siteSpecificLocation: 'HFH Livonia Research Clinic',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
+    siteTeam: 'Henry Ford Connect Study Team',
     loginSiteName: 'Henry Ford Health System',
-    contactInfo: {
-      "HFHS":[{
-        "fullName":"Attn Kirsti Autio",
-        "email":"kautio1@hfhs.org",
-        "phone":["313-876-7385"],
-      }]
-    },
+    email: 'ConnectBioHFH@hfhs.org',
   },
   763273112: {
     siteSpecificLocation: 'KPCO RRL',
     siteAcronym: 'KPCO',
     siteCode: '125001209',
+    siteTeam: 'KPCO Connect Study Team',
     loginSiteName: 'Kaiser Permanente Colorado',
-    contactInfo: {
-      "KPCO":[{
-        "fullName":"Brooke Thompson",
-        "email":"Brooke.x.thompson@kp.org",
-        "phone":["720-369-4316"],
-      }],
-    },
+    email: 'Connect-Study-KPCO@kp.org',
   },
   767775934: {
     siteSpecificLocation: 'KPGA RRL',
     siteAcronym: 'KPGA',
     siteCode: '327912200',
+    siteTeam: 'KPGA Connect Study Team',
     loginSiteName: 'Kaiser Permanente Georgia',
-    contactInfo: {
-      "KPGA":[{
-        "fullName":"Laura Gonzalez Paz",
-        "email":"Laura.M.Gonzalezpaz@kp.org",
-        "phone":["561-860-6240"],
-      }],
-    },
+    email: 'KPGAConnectBio@kp.org',
   },
   531313956: {
     siteSpecificLocation: 'KPHI RRL',
     siteAcronym: 'KPHI',
     siteCode: '300267574',
+    siteTeam: 'KPHI Connect Study Team',
     loginSiteName: 'Kaiser Permanente Hawaii',
-    contactInfo: {
-      "KPHI":[{
-        "fullName":"Cyndee Yonehara",
-        "email":"Cyndee.H.Yonehara@kp.org",
-        "phone":["Mobile: 808-341-5736"],
-      }],
-    },
+    email: 'ConnectBioKPHI@KaiserPermanente.onmicrosoft.com'
   },
   715632875: {
     siteSpecificLocation: 'KPNW RRL',
     siteAcronym: 'KPNW',
     siteCode: '452412599',
+    siteTeam: 'KPNW Connect Study Team',
     loginSiteName: 'Kaiser Permanente Northwest',
-    contactInfo: {
-      "KPNW":[{
-        "fullName":"Sarah Vertrees",
-        "email":"sarah.vertrees@kpchr.org",
-        "phone":["503-261-4144"],
-      }],
-    },
+    email: 'CHR_Connect_KPNW_Bio@kpchr.org',
   },
   692275326: {
     siteSpecificLocation: 'Marshfield',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"Lisa Ott",
-        "email": "ott.lisa@marshfieldclinic.org",
-        "phone":["715-387-9135"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   698283667:{
     siteSpecificLocation: 'Lake Hallie',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"Anna Zachow",
-        "email":"Zachow.anna@marshfieldresearch.org",
-        "phone":["715-898-9444"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   813701399:{
     siteSpecificLocation: 'Weston',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"Christopher Rayburn",
-        "email":"rayburn.christopher@marshfieldresearch.org",
-        "phone":["715-847-3364"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   691714762:{
     siteSpecificLocation: 'Rice Lake',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   487512085:{
     siteSpecificLocation: 'Wisconsin Rapids',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   983848564:{
     siteSpecificLocation: 'Colby Abbotsford',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   261931804:{
     siteSpecificLocation: 'Minocqua',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   665277300:{
     siteSpecificLocation: 'Merrill',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   589224449: {
     siteSpecificLocation: 'Sioux Falls Imagenetics',
     siteAcronym: 'SFH',
     siteCode: '657167265',
+    siteTeam: 'Sanford Connect Study Team',
     loginSiteName: 'Sanford Health',
-    contactInfo: {
-      "SFH":[{
-        "fullName":"Kimberly (Kay) Spellmeyer",
-        "email":"kimberly.spellmeyer@sanfordhealth.org",
-        "phone":["605-312-6100"],
-      },{
-        "fullName":"Madison (Maddi) Mayer",
-        "email":" Madison.mayer@sanfordhealth.org",
-        "phone":["701-234-6718"],
-      }],
-    },
+    email: 'connectstudy@sanfordhealth.org',
   },
   467088902: {
     siteSpecificLocation: 'Fargo South University',
     siteAcronym: 'SFH',
     siteCode: '657167265',
+    siteTeam: 'Sanford Connect Study Team',
     loginSiteName: 'Sanford Health',
-    contactInfo: {
-      "SFH":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectstudy@sanfordhealth.org',
   },
   777644826: {
     siteSpecificLocation: 'DCAM',
     siteAcronym: 'UCM',
     siteCode: '809703864',
+    siteTeam: 'UChicago Connect Study Team',
     loginSiteName: 'University of Chicago Medicine',
-    contactInfo: {
-      "UCM":[{
-        "fullName":"Jaime King",
-        "email":"jaimeking@bsd.uchicago.edu",
-        "phone":["(773) 702-5073"],
-      }],
-    },
+    email: 'connectbiospecimen@bsd.uchicago.edu',
   },
   145191545: {
     siteSpecificLocation: 'Ingalls Harvey',
     siteAcronym: 'UCM',
     siteCode: '809703864',
+    siteTeam: 'UChicago Connect Study Team',
     loginSiteName: 'University of Chicago Medicine',
-    contactInfo: {
-      "UCM":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectbiospecimen@bsd.uchicago.edu',
   },
   489380324: {
     siteSpecificLocation: 'River East',
     siteAcronym: 'UCM',
     siteCode: '809703864',
+    siteTeam: 'UChicago Connect Study Team',
     loginSiteName: 'University of Chicago Medicine',
-    contactInfo: {
-      "UCM":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectbiospecimen@bsd.uchicago.edu',
   },
   120264574: {
     siteSpecificLocation: 'South Loop',
     siteAcronym: 'UCM',
     siteCode: '809703864',
+    siteTeam: 'UChicago Connect Study Team',
     loginSiteName: 'University of Chicago Medicine',
-    contactInfo: {
-      "UCM":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectbiospecimen@bsd.uchicago.edu',
+
   },
   940329442: {
     siteSpecificLocation: 'Orland Park',
     siteAcronym: 'UCM',
     siteCode: '809703864',
+    siteTeam: 'UChicago Connect Study Team',
     loginSiteName: 'University of Chicago Medicine',
-    contactInfo: {
-      "UCM":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectbiospecimen@bsd.uchicago.edu',
   },
   111111111: {
     siteSpecificLocation: 'Main Campus',
     siteAcronym: 'NIH',
     siteCode: '13',
+    siteTeam: "NIH Connect Study Team",
     loginSiteName: 'National Cancer Institute',
-    contactInfo: {
-      "NIH":[],
-    },
+    email: "connectstudytest@email.com",
   },
   222222222: {
     siteSpecificLocation: 'Frederick',
     siteAcronym: 'NIH',
     siteCode: '13',
+    siteTeam: "NIH Connect Study Team",
     loginSiteName: 'National Cancer Institute',
-    contactInfo: {
-      "NIH":[],
+    email: "connectstudytest@email.com",
     },
-  },
 };
 
 export const conceptIdToSiteSpecificLocation = {
@@ -2203,18 +2075,11 @@ export const addEventBarCodeScanner = (id, start, end) => {
                 if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,masterSpecimenIDRequirement.length))) return;
                 if(!elementID) return;
                 if(elementID === 'scanSpecimenID') {
-                    // disableInput('enterSpecimenID1', true);
-                    // disableInput('enterSpecimenID2', true);
-                    // addEventClearScannedBarcode('clearScanSpecimenID');
                     document.getElementById(elementID).dataset.isscanned = 'true';
                 }
                 document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end-1) : result.codeResult.code;
                 Quagga.stop();
                 document.querySelector('[data-dismiss="modal"]').click();
-            }
-            else {
-                // disableInput('enterSpecimenID1', false);
-                // disableInput('enterSpecimenID2', false);
             }
         });
         
@@ -2555,30 +2420,10 @@ export const allTubesCollected = (data) => {
     return flag;
 };
 
-export const displayContactInformation = (currContactInfo) => {
-  if(currContactInfo.length){
-    let contactStr = ""
-    contactStr += `<p style="font-weight:bold">Site Contact Information:</p>`
-    // iterate over length of existing site's contact array
-    for(let i= 0; i < currContactInfo.length; i++) {
-    contactStr += `<p>Full Name: ${currContactInfo[i].fullName}</p>`
-    contactStr += `<p>Email: ${currContactInfo[i].email}</p>`
-    
-    let numPhones = currContactInfo[i].phone.length
-    if(numPhones === 1){
-      contactStr += `<p>Phone: ${currContactInfo[i].phone}</p>`  
-    }
-    else if(numPhones > 1){
-      contactStr += `<p>Phone:</p>`
-      for(let j = 0; j < numPhones; j++){
-        contactStr += `<p>${currContactInfo[i].phone[j]}</p>`
-      }
-    }
-    else contactStr += `<p>Phone:</p>`
-  }
-    return contactStr
-  }
-  else return ""
+export const displayManifestContactInfo = (currShippingLocationNumberObj) => {
+    return `<p style="font-weight:bold">Site Contact Information:</p>
+            <p>${currShippingLocationNumberObj.siteTeam}</p>
+            <p>Email: ${currShippingLocationNumberObj.email}</p>`;
 }
 
 export const convertDateReceivedinISO = (date) => { // ("YYYY-MM-DD" to ISO format DateTime)
