@@ -1342,9 +1342,9 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
     let hasCntdError = false;
 
     inputFields.forEach(input => {
-        const tubes = siteTubesList.filter(tube => tube.concept === input.id.replace('Id', ''));
-        
         const tubeConceptId = input.id.replace('Id', '');
+        const tubes = siteTubesList.filter(tube => tube.concept === tubeConceptId);
+        
         if (tubeConceptId && biospecimenData[tubeConceptId] === undefined) {
             const tubePlaceholderData = siteTubesList.find(stockTube => stockTube.concept === tubeConceptId);
             fixMissingTubeData(tubePlaceholderData, biospecimenData[tubeConceptId] = {});

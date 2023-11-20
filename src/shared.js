@@ -2904,7 +2904,7 @@ export const triggerSuccessModal = (message) => {
 export const checkTubeDataConsistency = (siteTubesList, biospecimenData) => {
     siteTubesList?.forEach((tube) => {
         // Check for tube.concept in biospecimenData keys. If missing, build the placeholder data.
-        if(!biospecimenData[tube.concept]) {
+        if (!biospecimenData[tube.concept]) {
             biospecimenData[tube.concept] = {
                 [conceptIds.collection.tube.isCollected]: conceptIds.no,
                 [conceptIds.collection.tube.isDeviated]: conceptIds.no,
