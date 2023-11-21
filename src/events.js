@@ -1,14 +1,11 @@
-import {
-    appState, performSearch, showAnimation, addBiospecimenUsers, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant,
-    errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, filterSpecimenCollectionList, updateBox,
-    ship, disableInput, updateNewTempDate, getSiteTubesLists, getWorkflow,
-    getSiteCouriers, getPage, getNumPages, removeSingleError, displayContactInformation, checkShipForage, checkAlertState, retrieveDateFromIsoString,
-    convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
-    checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData,
-    siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
-    getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger,
-    packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput
-} from './shared.js';
+import { appState, performSearch, showAnimation, addBiospecimenUsers, getSpecimensByCollectionIds, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant,
+        errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, updateBox,
+        ship, disableInput, updateNewTempDate, getSiteTubesLists, getWorkflow, fixMissingTubeData,
+        getSiteCouriers, getPage, getNumPages, removeSingleError, displayManifestContactInfo, checkShipForage, checkAlertState, retrieveDateFromIsoString,
+        convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
+        checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData,
+        siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
+        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
 import { addNewBox, buildSpecimenDataInModal, createShippingModalBody, startShipping, generateBoxManifest, populateViewShippingBoxContentsList,
@@ -21,7 +18,7 @@ import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, totalCollectionIDLength, workflows, specimenCollection, deviationReasons, refusedShippingDeviationConceptList} from './tubeValidation.js';
 import { updateShippingStateAddBagToBox, updateShippingStateSelectedLocation } from './shippingState.js';
-import conceptIds from './fieldToConceptIdMapping.js';
+import { conceptIds, packageConditionConversion } from './fieldToConceptIdMapping.js';
 
 
 export const addEventSearchForm1 = () => {
@@ -194,30 +191,36 @@ export const addEventAddSpecimenToBox = () => {
             return;
         }
 
-        const allBoxesList = appState.getState().allBoxesList;
-        const foundScannedIdShipped = isScannedIdShipped(allBoxesList, masterSpecimenId);
-        const scannedIdInUnshippedBoxes = findScannedIdInUnshippedBoxes(allBoxesList, masterSpecimenId);
-        const isScannedIdInUnshippedBoxes = scannedIdInUnshippedBoxes['foundMatch'];
+        const allBoxesList = appState.getState().allBoxesList; 
 
-        if(foundScannedIdShipped){
-            showNotifications({ title:'Item reported as already shipped', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.' });
-            return;
-        }
+        // Find the masterSpecimenId in available collections. Else, show a notification and return early.
+        const canAddSpecimen = searchAvailableCollectionsForSpecimen(masterSpecimenId);
 
-        if(isScannedIdInUnshippedBoxes) {
-            const boxNum = scannedIdInUnshippedBoxes[conceptIds.shippingBoxId];
-            const siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInUnshippedBoxes[conceptIds.shippingLocation]];
-            const siteSpecificLocationName = siteSpecificLocation || '';
-            const scannedInput = scannedIdInUnshippedBoxes['inputScanned'];
-            showNotifications({ title:`${scannedInput} has already been recorded`, body: `${scannedInput} is recorded as being in ${boxNum} in ${siteSpecificLocationName}` });
-            return;
+        if (!canAddSpecimen) {
+            // Check if the scanned id is already in an unshipped box. If not, check if the scanned id is already shipped. Show a notification and return early.
+            const scannedIdInUnshippedBoxes = findScannedIdInUnshippedBoxes(allBoxesList, masterSpecimenId);
+            const isScannedIdInUnshippedBoxes = scannedIdInUnshippedBoxes['foundMatch'];
+            if (isScannedIdInUnshippedBoxes) {
+                const boxNum = scannedIdInUnshippedBoxes[conceptIds.shippingBoxId];
+                const siteSpecificLocation = conceptIdToSiteSpecificLocation[scannedIdInUnshippedBoxes[conceptIds.shippingLocation]];
+                const siteSpecificLocationName = siteSpecificLocation || '';
+                const scannedInput = scannedIdInUnshippedBoxes['inputScanned'];
+                showNotifications({ title:`${scannedInput} has already been recorded`, body: `${scannedInput} is recorded as being in ${boxNum} in ${siteSpecificLocationName}`});
+                return;
+            } else {
+                const foundScannedIdShipped = await isScannedIdShipped(allBoxesList, masterSpecimenId);
+                if (foundScannedIdShipped){
+                    showNotifications({ title:'Item reported as already shipped', body: 'Please enter or scan another specimen bag ID or Full Specimen ID.'});
+                    return;
+                }
+            }
         }
 
         const specimenTablesResult = buildSpecimenDataInModal(masterSpecimenId);
         const biospecimensList = specimenTablesResult.biospecimensList;
 
         if (biospecimensList.length === 0) {
-            showNotifications({ title: 'Item not found', body: `Item not reported as collected. Go to the Collection Dashboard to add specimen.` });
+            showNotifications({ title: 'Item not found', body: `Item not reported as collected or item is in an existing available collection. If item doesn't have a matching Specimen Bag ID in available collections, go to the Collection Dashboard to add specimen.` });
             return;
         } else {
             document.getElementById('submitMasterSpecimenId').click();
@@ -255,7 +258,7 @@ const addEventSubmitSpecimenBuildModal = () => {
 
 export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrphan) => {
     const submitButton = document.getElementById('addToBoxButton');
-    submitButton.addEventListener('click', async e => {
+    submitButton && submitButton.addEventListener('click', async e => {
         e.preventDefault();
 
         const boxList = appState.getState().allBoxesList;
@@ -271,148 +274,58 @@ export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrpha
         const currBoxId = updateBoxListModalUIValue();
         boxIdAndBagsObj = processCheckedModalElements(boxIdAndBagsObj, bagId, currBoxId, isOrphan, tableIndex);
 
-        if (boxIdAndBagsObj.hasOwnProperty(currBoxId)) {
-            const boxToUpdate = prepareBoxToUpdate(currBoxId, boxList, boxIdAndBagsObj, locations);
+        const addedTubes = isOrphan
+            ? [boxIdAndBagsObj[currBoxId]['unlabelled'].arrElements.find(tubeId => tubeId === bagId)].filter(Boolean)
+            : boxIdAndBagsObj[currBoxId][bagId].arrElements || [];
+
+        if (boxIdAndBagsObj.hasOwnProperty(currBoxId) && addedTubes.length > 0) {
+            const labeledBagCount = Object.keys(boxIdAndBagsObj[currBoxId]).filter(key => key !== 'unlabelled' && key !== 'undefined').length ?? 0; // Labeled bags: Keys in boxIdAndBagsObj[currBoxId].
+            const unlabeledBagCount = boxIdAndBagsObj[currBoxId]?.['unlabelled']?.['arrElements']?.length ?? 0; // Unlabeled bags: Hold stray tubes. Each is a separate bag.
+            const bagCount = labeledBagCount + unlabeledBagCount;
+
+            const canAddBag = checkBagCount(bagCount, bagId, currBoxId);
+            if (!canAddBag) return;
+
+            const boxToUpdate = prepareBoxToUpdate(currBoxId, boxList, boxIdAndBagsObj, locations, addedTubes);
             showAnimation();
-            const boxUpdateResponse = await updateBox(boxToUpdate);
-            hideAnimation();
-            if (boxUpdateResponse.code === 200) {
-                updateShippingStateAddBagToBox(currBoxId, bagId, boxToUpdate);
-                await startShipping(appState.getState().userName, true, currBoxId);
-            } else {
-                showNotifications({ title: 'Error', body: 'Error updating box' });
+            try {
+                const boxUpdateResponse = await updateBox(boxToUpdate);
+                hideAnimation();
+                if (boxUpdateResponse.code === 200) {
+                    updateShippingStateAddBagToBox(currBoxId, bagId, boxToUpdate, boxUpdateResponse.data);
+                    await startShipping(appState.getState().userName, true, currBoxId);
+                } else {
+                    console.error('Failed to update box.', boxUpdateResponse);
+                    showNotifications({ title: 'Error Adding Specimen(s)', body: `There was an error adding ${bagId.split(' ')[0]}. Please try again.` });
+                }
+            } catch (error) {
+                hideAnimation();
+                console.error('Failed to update box.', error);
+                showNotifications({ title: 'Error Adding Specimen(s)', body: `There was an error adding ${bagId.split(' ')[0]}. Please try again.` });
             }
         }
     }, { once: true })
 }
 
-export const getInstituteSpecimensList = async (boxList) => {
-    boxList = boxList.sort((a,b) => compareBoxIds(a[conceptIds.shippingBoxId], b[conceptIds.shippingBoxId]));
+const checkBagCount = (bagCount, bagId, currBoxId) => {
+    const maxBoxSize = bagConceptIdList.length;
+    const timeToAlert = maxBoxSize - 3;
+    const boxNumber = currBoxId.substring(3);
+    const remainingBagCount = maxBoxSize - bagCount;
+    const bagText = remainingBagCount !== 1 ? 'bags' : 'bag';
 
-    const finalizedSpecimenList = await filterSpecimenCollectionList();
-    const availableCollectionsObj = {};
-
-    // note: currently collections have no mouthwash specimens (0007)
-    for (const currCollection of finalizedSpecimenList) {
-        const tubesInBox = {
-            shipped: {
-                bloodUrine: [],
-                mouthWash: [],
-                orphan: [],
-            },
-            notShipped: {
-                bloodUrine: [],
-                mouthWash: [],
-                orphan: [],
-            },
-        };
-
-        // For each collection, get its blood/urine, mouthwash, and orphan specimens that are in the box already
-        if (currCollection[conceptIds.collection.id]) {
-            // todo: save box id in collection and remove box iteration.
-            for (const box of boxList) {
-                let boxIsShipped = false;
-                if (box[conceptIds.submitShipmentFlag] == conceptIds.yes) {
-                    boxIsShipped = true;
-                }
-
-                const bagObjects = box.bags;
-                const bloodUrineBagId = currCollection[conceptIds.collection.id] + ' 0008';
-
-                if (bagObjects[bloodUrineBagId]) {
-                    const tubeIdList = bagObjects[bloodUrineBagId]['arrElements']
-                    if (tubeIdList.length > 0) {
-                        for (const tubeId of tubeIdList) {
-                            const tubeNum = tubeId.split(/\s+/)[1] // tubeId (eg 'CXA002655 0001'); tubeNum (eg '0001')
-                            if (boxIsShipped ) {
-                                tubesInBox.shipped.bloodUrine.push(tubeNum);
-                            } else {
-                                tubesInBox.notShipped.bloodUrine.push(tubeNum);
-                            }
-                        }
-                    }
-                }
-
-                const mouthWashBagId = currCollection[conceptIds.collection.id] + ' 0009';
-                if (bagObjects[mouthWashBagId]) {
-                    const tubeIdList = bagObjects[mouthWashBagId]['arrElements']
-                    for (const tubeId of tubeIdList) {
-                        const tubeNum = tubeId.split(/\s+/)[1];
-                        if (boxIsShipped ) {
-                            tubesInBox.shipped.mouthWash.push(tubeNum);
-                        } else {
-                            tubesInBox.notShipped.mouthWash.push(tubeNum);
-                        }
-                    }
-                }
-
-                if (bagObjects['unlabelled']) {
-                    let tubeIdList = bagObjects['unlabelled']['arrElements']
-
-                    for (const tubeId of tubeIdList) {
-                        const [collectionIdFromTube, tubeNumber] = tubeId.split(/\s+/);
-
-                        if (collectionIdFromTube == currCollection[conceptIds.collection.id]) {
-                            if (boxIsShipped ) {
-                                tubesInBox.shipped.orphan.push(tubeNumber);
-                            } else {
-                                tubesInBox.notShipped.orphan.push(tubeNumber);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        const tubesToAdd={
-            bloodUrine: [],
-            mouthWash: [],
-            orphan: [],
-        }
-
-        for (let currCid of specimenCollection.tubeCidList) {
-            const currTubeNum = specimenCollection.cidToNum[currCid];
-            const currSpecimen = currCollection[currCid];
-
-            if (!currSpecimen) continue;
-
-            if (currTubeNum == '0007') {
-                if (tubesInBox.shipped.mouthWash.includes(currTubeNum) || tubesInBox.notShipped.mouthWash.includes(currTubeNum)) {
-                    continue;
-                } else {
-                    tubesToAdd.mouthWash.push(currTubeNum);
-                }
-            } else {
-                if (tubesInBox.shipped.bloodUrine.includes(currTubeNum) || tubesInBox.shipped.orphan.includes(currTubeNum) || tubesInBox.notShipped.bloodUrine.includes(currTubeNum) || tubesInBox.notShipped.orphan.includes(currTubeNum)) {
-                    continue;
-                } else {
-                    tubesToAdd.bloodUrine.push(currTubeNum);
-                }
-            }
-        }
-
-        if ((tubesInBox.shipped.bloodUrine.length > 0 || tubesInBox.notShipped.bloodUrine.length > 0) && tubesToAdd.bloodUrine.length > 0) {
-            tubesToAdd.orphan=tubesToAdd.bloodUrine;
-            tubesToAdd.bloodUrine=[];
-        }
-
-        for (const tubeNum of tubesToAdd.orphan) {
-            if (!availableCollectionsObj['unlabelled']) {
-                availableCollectionsObj['unlabelled'] = [];
-            }
-            availableCollectionsObj['unlabelled'].push(currCollection[conceptIds.collection.id] + ' ' + tubeNum);
-        }
-
-        if (tubesInBox.shipped.bloodUrine.length === 0 && tubesInBox.notShipped.bloodUrine.length ===0 && tubesToAdd.bloodUrine.length > 0) {
-            availableCollectionsObj[currCollection[conceptIds.collection.id] + ' 0008'] = tubesToAdd.bloodUrine;
-        }
-
-        if (tubesInBox.shipped.mouthWash.length === 0 && tubesInBox.notShipped.mouthWash.length ===0 && tubesToAdd.mouthWash.length > 0) {
-            availableCollectionsObj[currCollection[conceptIds.collection.id] + ' 0009'] = tubesToAdd.mouthWash;
-        }
+    if (bagCount < timeToAlert) {
+        return true;
+    } else if (bagCount >= timeToAlert && bagCount < maxBoxSize) {
+        showNotifications({ title: 'Bag Added. Attention: This box is almost full.', body: `${bagId} has been added to box ${boxNumber}. Box ${boxNumber} is almost full. This box can accept ${remainingBagCount} more ${bagText}.` });
+        return true;
+    } else if (bagCount === maxBoxSize) {
+        showNotifications({ title: 'Bag Added. Attention: This box is now full.', body: `${bagId} has been added to box ${boxNumber}. Box ${boxNumber} is now full. Please select another box or create a new box if you have more bags to pack.` });
+        return true;
+    } else {
+        showNotifications({ title: `ERROR: Bag not added. Box ${boxNumber} is full.`, body: `${bagId} has NOT been added. Box ${boxNumber} is already full. Please select another box or create a new box for any remaining bags to pack.` });
+        return false;
     }
-
-    return { finalizedSpecimenList, availableCollectionsObj };
 }
 
 /**
@@ -1430,7 +1343,13 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
     let hasCntdError = false;
 
     inputFields.forEach(input => {
-        const tubes = siteTubesList.filter(tube => tube.concept === input.id.replace('Id',''));
+        const tubeConceptId = input.id.replace('Id', '');
+        const tubes = siteTubesList.filter(tube => tube.concept === tubeConceptId);
+        
+        if (tubeConceptId && biospecimenData[tubeConceptId] === undefined) {
+            const tubePlaceholderData = siteTubesList.find(stockTube => stockTube.concept === tubeConceptId);
+            fixMissingTubeData(tubePlaceholderData, biospecimenData[tubeConceptId] = {});
+        }
 
         let value = getValue(`${input.id}`).toUpperCase();
         const masterID = value.substr(0, masterSpecimenIDRequirement.length);
@@ -1465,7 +1384,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
             focus = false;
         }
 
-        if (input.required) biospecimenData[`${input.id.replace('Id', '')}`][conceptIds.collection.tube.scannedId] = `${masterID} ${tubeID}`.trim();
+        if (tubeConceptId && input.required) biospecimenData[tubeConceptId][conceptIds.collection.tube.scannedId] = `${masterID} ${tubeID}`.trim();
     });
 
     if ((hasError && cntd == true) || hasCntdError) return;
@@ -1733,12 +1652,13 @@ export const addEventNavBarShippingManifest = (userName) => {
         if (btn.classList.contains('active')) return;
         //get table info
         let boxesToShip = [];
-        let shipSetForage = []
-        let currTable = document.getElementById('saveTable')
-        let tempCheckStatus = ""
-        const currSiteSpecificName = document.getElementById('selectLocationList').value
-        const currShippingLocationNumber = siteSpecificLocationToConceptId[currSiteSpecificName]
-        appState.setState(state => ({shipping: {...state.shipping, locationNumber: currShippingLocationNumber }}));
+        let shipSetForage = [];
+        let currTable = document.getElementById('saveTable');
+        let tempCheckStatus = "";
+        const currSiteSpecificName = document.getElementById('selectLocationList').value;
+        const currShippingLocationNumber = siteSpecificLocationToConceptId[currSiteSpecificName];
+        const currShippingLocationNumberObj = locationConceptIDToLocationMap[currShippingLocationNumber];
+        appState.setState(state => ({shipping: {...state.shipping, locationNumber: currShippingLocationNumber}}));
         for (var r = 1; r < currTable.rows.length; r++) {
 
             let currCheck = currTable.rows[r].cells[0]
@@ -1763,13 +1683,13 @@ export const addEventNavBarShippingManifest = (userName) => {
         }
 
 
-        tempCheckStatus = tempCheckedEl.checked
+        tempCheckStatus = tempCheckedEl.checked;
         // Push empty item with boxId and empty tracking number string
         // shipSetForage used to handle empty localforage or no box id match
         boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, [conceptIds.shippingTrackingNumber]: "" }));
-        checkShipForage(shipSetForage,boxesToShip)
+        checkShipForage(shipSetForage,boxesToShip);
         //return box 1 info
-        shippingPrintManifestReminder(boxesToShip, userName, tempCheckStatus, currShippingLocationNumber);
+        shippingPrintManifestReminder(boxesToShip, userName, tempCheckStatus, currShippingLocationNumberObj);
     });
 }
 
@@ -2288,8 +2208,8 @@ export const populateBoxTable = async (page, filter, source) => {
         currRow.insertCell(4).innerHTML = '<button type="button" class="button btn btn-info" id="reportsViewManifest' + i + '">View manifest</button>';
         currRow.insertCell(5).innerHTML = currPage['333524031'] === 353358909 ? "Yes" : "No"
         currRow.insertCell(6).innerHTML = receivedDate;
-        currRow.insertCell(7).innerHTML = convertConceptIdToPackageCondition(packagedCondition, packageConditonConversion);
-        currRow.insertCell(8).innerHTML = currPage['870456401'] || '';
+        currRow.insertCell(7).innerHTML = convertConceptIdToPackageCondition(packagedCondition, packageConditionConversion);
+        currRow.insertCell(8).innerHTML = currPage['870456401'] || '' ;
         addEventViewManifestButton('reportsViewManifest' + i, currPage, source);
 
     }
@@ -2303,59 +2223,44 @@ export const addEventViewManifestButton = (buttonId, currPage, source) => {
     });
 }
 
-
 export const populateReportManifestHeader = (currPage) => {
-    let column1 = document.getElementById("boxManifestCol1")
-    let column2 = document.getElementById("boxManifestCol3")
-    let siteAcronym = currPage["siteAcronym"]
+    const currShippingLocationNumber = currPage[conceptIds.shippingLocation];
+    const currShippingLocationNumberObj = locationConceptIDToLocationMap[currShippingLocationNumber];
 
-    let currShippingLocationNumber = currPage['560975149']
-    const currContactInfo = locationConceptIDToLocationMap[currShippingLocationNumber]["contactInfo"][siteAcronym]
-
-    let newDiv = document.createElement("div")
+    let newDiv = document.createElement("div");
     let newP = document.createElement("p");
-    newP.innerHTML = currPage['132929440'] + " Manifest";
-    newP.setAttribute("style", "font-size: 1.5rem; font-weight:bold;")
+    newP.innerHTML = currPage[conceptIds.shippingBoxId] + " Manifest";
+    newP.setAttribute("style", "font-size: 1.5rem; font-weight:bold;");
     document.getElementById('boxManifestCol1').appendChild(newP);
 
-    let toInsertDateStarted = ''
-    if (currPage.hasOwnProperty('672863981')) { // 672863981 - Autogenerated date/time when first bag added to box
-        let dateStarted = Date.parse(currPage['672863981'])
+    let toInsertDateStarted = '';
+    if (currPage.hasOwnProperty(conceptIds.firstBagAddedToBoxTimestamp)) {
+        const dateStarted = Date.parse(currPage[conceptIds.firstBagAddedToBoxTimestamp]);
+        const currentdate = new Date(dateStarted);
 
-        let currentdate = new Date(dateStarted);
-        let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
-        let hour = parseInt(currentdate.getHours()) % 12;
         toInsertDateStarted = (currentdate.getMonth() + 1) + "/"
             + currentdate.getDate() + "/"
             + currentdate.getFullYear()
-        /*+ " "  
-        + hour.toString()+ ":"  
-        + currentdate.getMinutes() + ampm;
-*/
     }
-    let toInsertDateShipped = ''
-    if (currPage.hasOwnProperty('656548982')) { // 656548982 - Autogenerated date/time stamp for submit shipment time
-        let dateStarted = currPage['656548982']
 
-        let currentdate = new Date(dateStarted);
-        let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
-        let hour = parseInt(currentdate.getHours()) % 12;
+    let toInsertDateShipped = ''
+    if (currPage.hasOwnProperty(conceptIds.shippingShipDate)) {
+        const dateStarted = currPage[conceptIds.shippingShipDate];
+        const currentdate = new Date(dateStarted);
+
         toInsertDateShipped = (currentdate.getMonth() + 1) + "/"
             + currentdate.getDate() + "/"
             + currentdate.getFullYear()
-        /*+ " "  
-        + hour.toString()+ ":"  
-        + currentdate.getMinutes() + ampm;
-*/
     }
+
     newP = document.createElement("p");
     newP.innerHTML = "Date Started: " + toInsertDateStarted;
     document.getElementById('boxManifestCol1').appendChild(newP);
     newP = document.createElement("p");
     newP.innerHTML = "Date Shipped: " + toInsertDateShipped;
     document.getElementById('boxManifestCol1').appendChild(newP);
-    newDiv.innerHTML = displayContactInformation(currContactInfo)
-    document.getElementById('boxManifestCol1').appendChild(newDiv)
+    newDiv.innerHTML = displayManifestContactInfo(currShippingLocationNumberObj);
+    document.getElementById('boxManifestCol1').appendChild(newDiv);
 }
 
 export const populateReportManifestTable = (currPage, searchSpecimenInstituteArray) => {
@@ -2409,7 +2314,6 @@ export const addPaginationFunctionality = (lastPage, filter, source) => {
     let next = document.getElementById('nextPage');
     let final = document.getElementById('lastPage');
     let middleNumber = document.getElementById('middlePage');
-
     first.addEventListener('click', () => {
         middleNumber.innerHTML = '1'
         populateBoxTable(0, filter, source)
@@ -2417,7 +2321,7 @@ export const addPaginationFunctionality = (lastPage, filter, source) => {
 
     previous.addEventListener('click', () => {
         middleNumber.innerHTML = middleNumber.innerHTML == '1' ? '1' : parseInt(middleNumber.innerHTML) - 1;
-        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, source)
+        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter, source)
     })
 
     next.addEventListener('click', () => {
@@ -2461,8 +2365,8 @@ export const addEventFilter = (source) => {
 
         }
         populateBoxTable(0, filter, source);
-        let numPages = await getNumPages(5, filter);
-        addPaginationFunctionality(numPages, filter);
+        let numPages = await getNumPages(5, filter, source);
+        addPaginationFunctionality(numPages, filter, source);
     });
 }
 
@@ -2473,13 +2377,11 @@ export const addEventFilter = (source) => {
  * @returns {boolean} true if the specimenId is found in the shipped boxes, false otherwise.
  * If the specimenId is a masterId, search for the key in the bags.
  * If the bag is unlabelled, search arrElements for the key.
- * If the specimen isn't a masterId, iterate the bags and search for the keys in the arrElements. 
- * TODO: future implementation will include shipped property on the specimen object
  */
-export const isScannedIdShipped = (allBoxesList, masterSpecimenId) => {
+export const isScannedIdShipped = async (allBoxesList, masterSpecimenId) => {
     if (!allBoxesList.length) return false;
 
-    const specimenIdType = masterSpecimenId.split(' ')[1];
+    const [collectionId, specimenIdType] = masterSpecimenId.split(' ');
     const isMasterId = ['0007', '0008', '0009'].includes(specimenIdType);
 
     for (const box of allBoxesList) {
@@ -2496,6 +2398,14 @@ export const isScannedIdShipped = (allBoxesList, masterSpecimenId) => {
                     return true;
                 }
             }
+        }
+    }
+
+    const searchedSpecimen = await getSpecimensByCollectionIds([collectionId]);
+    for (const specimen of searchedSpecimen) {
+        const specimenData = specimen.data;
+        if (specimenData[conceptIds.boxedStatus] === conceptIds.boxed) {
+            return true;
         }
     }
 
@@ -2683,4 +2593,19 @@ export const addDeviationTypeCommentsContentReports = (searchSpecimenInstituteAr
     if (bagsArrayIndex % 2 === 0) {
         currRow.style['background-color'] = 'lightgrey';
     }
+}
+
+const searchAvailableCollectionsForSpecimen = (specimenId) => {
+    const availableCollectionsObj = appState.getState().availableCollectionsObj;
+    if (specimenId.endsWith('0008') || specimenId.endsWith('0009')) {
+        const specimenCollection = availableCollectionsObj?.[specimenId];
+        if (specimenCollection) {
+            return true;
+        }
+    } else {
+        if (availableCollectionsObj?.['unlabelled'].includes(specimenId)) {
+            return true;
+        }
+    }
+    return false;
 }

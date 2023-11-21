@@ -2,7 +2,7 @@ import { userAuthorization, removeActiveClass, restrictNonBiospecimenUser, hideA
 import { populateBoxTable, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality, addEventFilter } from "./../events.js";
 import { homeNavBar, reportSideNavBar } from '../navbar.js';
 import { reportsNavbar } from "./reports/reportsNavbar.js";
-import conceptIds from '../fieldToConceptIdMapping.js';
+import { conceptIds } from '../fieldToConceptIdMapping.js';
 
 export const reportsQuery = (auth, route) => {
     auth.onAuthStateChanged(async user => {
@@ -68,7 +68,7 @@ export const startReport = async (source) => {
         </div>
     </div>
 </div>`;
-    let numPages = await getNumPages(5, {});
+    let numPages = await getNumPages(5, {}, source);
     document.getElementById('contentBody').innerHTML = template;
     removeActiveClass('navbar-btn', 'active');
     addEventFilter(source);

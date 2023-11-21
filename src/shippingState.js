@@ -1,6 +1,6 @@
-import { appState, siteSpecificLocationToConceptId } from './shared.js';
+import { appState, getSiteAcronym, siteSpecificLocationToConceptId } from './shared.js';
 import { specimenCollection } from './tubeValidation.js';
-import conceptIds from './fieldToConceptIdMapping.js';
+import { conceptIds } from './fieldToConceptIdMapping.js';
 
 /**
  * Update all shipping state variables in startShipping to provide access throughout the shipping dashboard
@@ -13,7 +13,7 @@ import conceptIds from './fieldToConceptIdMapping.js';
 export const setAllShippingState = (availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName) => {
     const boxesByProviderList = filterUnshippedBoxes(allBoxesList);
     const boxesByLocationList = filterBoxListBoxesByLocation(boxesByProviderList);
-    const providerBoxesObj = createBoxAndBagsObj(boxesByProviderList); // provider-specific data in the 'select boxes to ship' section
+    const providerBoxesObj = createBoxAndBagsObj(boxesByProviderList);
     const providerBoxWithSpecimenData = addSpecimenDataToDetailBox(providerBoxesObj, finalizedSpecimenList);
     const detailedProviderBoxes = addBoxDataToDetailBox(providerBoxWithSpecimenData, boxesByProviderList);
     const detailedLocationBoxes = filterDetailBoxesByLocation(detailedProviderBoxes);
@@ -44,11 +44,13 @@ export const updateShippingStateSelectedLocation = (selectedLocation) => {
  * Remove the bags from the box.
  * Note: 'unlabelled' bags are stray tubes. They do not get added back to availableCollectionsObj.
  * @param {string} boxId - the box with the bag to be removed.
- * @param {array} bagsToMove - the bags to be removed from the box. 
+ * @param {array} bagsToMove - the bags to be removed from the box.
+ * @param {object} removeBagResponse - the response array from the remove bag function
  */
-export const updateShippingStateRemoveBagFromBox = (boxId, bagId, bagsToMove) => {
+export const updateShippingStateRemoveBagFromBox = (boxId, bagId, bagsToMove, removeBagResponse) => {
     addBagToAvailableCollections(boxId, bagId, bagsToMove);
     removeBagFromBox(boxId, bagId, bagsToMove);
+    updateFinalizedSpecimenList(removeBagResponse);
 }
 
 /**
@@ -57,10 +59,12 @@ export const updateShippingStateRemoveBagFromBox = (boxId, bagId, bagsToMove) =>
  * @param {string} boxId - the boxId of the bag to be added
  * @param {array} bagId - the bagId to be added to the box
  * @param {object} boxToUpdate - the box object to be updated
+ * @param {object} updateBoxResponse - the response object from the update box function
  */
-export const updateShippingStateAddBagToBox = (boxId, bagId, boxToUpdate) => {
+export const updateShippingStateAddBagToBox = (boxId, bagId, boxToUpdate, updateBoxResponse) => {
     addBagToBox(boxId, bagId, boxToUpdate);
     removeBagFromAvailableCollections(bagId);
+    updateFinalizedSpecimenList([updateBoxResponse]);
 }
 
 /**
@@ -183,6 +187,26 @@ export const updateShippingStateCreateBox = (boxToAdd) => {
     });
 }
 
+/**
+ * Update the finalizedSpecimenList state for changes in boxedStatus and strayTubesList after updateBox and removeBag operations.
+ * @param {array<object>} specimenData - the list of specimen update objects to be updated in the finalizedSpecimenList. Properties in each object: { collectionId, boxedStatus, strayTubesList }. 
+ */
+const updateFinalizedSpecimenList = (specimenData) => {
+    const finalizedSpecimenList = appState.getState().finalizedSpecimenList;
+
+    for (let specimen of specimenData) {
+        const specimenToUpdate = finalizedSpecimenList.find(specimenInList => specimenInList[conceptIds.collection.id] === specimen[conceptIds.collection.id]);
+
+        if (specimenToUpdate) {
+            const updatedSpecimen = { ...specimen };
+            delete updatedSpecimen[conceptIds.collection.id];
+            Object.assign(specimenToUpdate, updatedSpecimen);
+        }
+    }
+
+    appState.setState({ finalizedSpecimenList });
+}
+
 const filterUnshippedBoxes = (boxList) => {
     return boxList.filter(box => box[conceptIds.submitShipmentFlag] !== conceptIds.yes);
 }
@@ -226,7 +250,7 @@ const createBoxAndBagsObj = (boxList) => {
 }
 
 /**
- * Add specimen details to the box object. This is used in generateBoxManifest (and TODO future: shipping reports)
+ * Add specimen details to the box object. This is used in generateBoxManifest.
  * @param {object} boxAndBagsObj - the basic box object with bag ids and tube ids (arrElements)
  * @param {object} finalizedSpecimenList - the list of specimen data where finalized === true
  * @returns {object} - the box object with specimen details added
@@ -254,7 +278,9 @@ const addSpecimenDataToDetailBox = (boxAndBagsObj, finalizedSpecimenList) => {
                         [conceptIds.collection.id]: foundSpecimenDetailsBag[conceptIds.collection.id],
                         [conceptIds.healthcareProvider]: foundSpecimenDetailsBag[conceptIds.healthcareProvider],
                         [conceptIds.collectionLocation]: foundSpecimenDetailsBag[conceptIds.collectionLocation],
-                        [conceptIds.collection.note]: foundSpecimenDetailsBag[conceptIds.collection.note]
+                        [conceptIds.collection.note]: foundSpecimenDetailsBag[conceptIds.collection.note],
+                        [conceptIds.boxedStatus]: foundSpecimenDetailsBag[conceptIds.boxedStatus],
+                        [conceptIds.strayTubesList]: foundSpecimenDetailsBag[conceptIds.strayTubesList],
                     };
                     
                     for (let specimenId of bag.arrElements) {
@@ -289,7 +315,7 @@ const addBoxDataToDetailBox = (boxAndBagsObj, boxList) => {
             [conceptIds.submitShipmentFlag]: boxInList[conceptIds.submitShipmentFlag] ?? conceptIds.no,
             [conceptIds.siteShipmentReceived]: boxInList[conceptIds.siteShipmentReceived] ?? conceptIds.no,
             [conceptIds.shippedByFirstName]: boxInList[conceptIds.shippedByFirstName] ?? '',
-            'siteAcronym': boxInList['siteAcronym']
+            'siteAcronym': boxInList['siteAcronym'] || getSiteAcronym(),
         };
 
         boxAndBagsObj[boxObj]['boxData'] = boxData;

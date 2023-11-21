@@ -7,7 +7,7 @@ import { signOut } from "./pages/signIn.js";
 import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
-import conceptIds from './fieldToConceptIdMapping.js';
+import { conceptIds } from './fieldToConceptIdMapping.js';
 import { baselineEmailTemplate } from "./emailTemplates.js";
 
 
@@ -517,7 +517,7 @@ export const updateSpecimen = async (array) => {
     return response.json();
 }
 
-export const checkDerivedVariables = async (array) => {
+export const checkDerivedVariables = async (participantObjToken) => {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -525,26 +525,35 @@ export const checkDerivedVariables = async (array) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(array)
+        body: JSON.stringify(participantObjToken)
     }
     const response = await fetch(`${api}api=checkDerivedVariables`, requestObj);
     return response.json();
 }
 
 export const updateBox = async (box) => {
-  logAPICallStartDev('updateBox');
-  const idToken = await getIdToken();
-  let requestObj = {
-      method: "POST",
-      headers:{
-          Authorization:"Bearer "+idToken,
-          "Content-Type": "application/json"
-      },
-      body: JSON.stringify(convertToFirestoreBox(box))
-  }
-  const response = await fetch(`${api}api=updateBox`, requestObj);
-  logAPICallEndDev('updateBox');
-  return response.json();
+    try {
+        const idToken = await getIdToken();
+        const requestObj = {
+            method: "POST",
+            headers:{
+                Authorization:"Bearer "+idToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(convertToFirestoreBox(box)),
+        }
+
+        const response = await fetch(`${api}api=updateBox`, requestObj);
+        
+        if (!response.ok) {
+            throw new Error(`API responded with status: ${response.status}`);
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to update box:', error);
+        throw error;
+    }
 }
 
 export const updateNewTempDate = async () =>{
@@ -585,7 +594,8 @@ export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
     }
 }
 
-export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters, source) => {
+export const getPage = async (pageNumber, elementsPerPage, orderBy, filters, source) => {
+  try {
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -593,12 +603,14 @@ export const getPage = async (pageNumber, numElementsOnPage, orderBy, filters, s
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(
-            {"pageNumber": pageNumber, "elementsPerPage": numElementsOnPage, "orderBy":orderBy, "filters":filters, "source": source}
-          )
+        body: JSON.stringify({pageNumber, elementsPerPage, orderBy, filters, source})
     }
     const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
     return response.json();
+  } 
+  catch (error) {
+    return {code: 500, message: error.message};
+  }
 }
 
 export const bagConceptIdList = [
@@ -617,6 +629,31 @@ export const bagConceptIdList = [
     conceptIds.bag13,
     conceptIds.bag14,
     conceptIds.bag15,
+    conceptIds.bag16,
+    conceptIds.bag17,
+    conceptIds.bag18,
+    conceptIds.bag19,
+    conceptIds.bag20,
+    conceptIds.bag21,
+    conceptIds.bag22,
+    conceptIds.bag23,
+    conceptIds.bag24,
+    conceptIds.bag25,
+    conceptIds.bag26,
+    conceptIds.bag27,
+    conceptIds.bag28,
+    conceptIds.bag29,
+    conceptIds.bag30,
+    conceptIds.bag31,
+    conceptIds.bag32,
+    conceptIds.bag33,
+    conceptIds.bag34,
+    conceptIds.bag35,
+    conceptIds.bag36,
+    conceptIds.bag37,
+    conceptIds.bag38,
+    conceptIds.bag39,
+    conceptIds.bag40,
 ];
   
 const bagConversionKeys = [
@@ -789,9 +826,344 @@ export const getAllBoxes = async (flagValue) => {
     return res;
 };
 
+export const getUnshippedBoxes = async (isBPTL = false) => {
+    try {
+        const idToken = await getIdToken();  
+        let queryString = `${api}api=getUnshippedBoxes`;
+        if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+        
+        const response = await fetch(queryString, {
+            method: 'GET',
+            headers: {
+            Authorization: 'Bearer ' + idToken,
+            }
+        });
+
+        if (!response.ok) throw new Error(`Unexpected server error: ${response.status}`);
+
+        const unshippedBoxRes = await response.json();
+        unshippedBoxRes.data = unshippedBoxRes.data.map(convertToOldBox);
+        return unshippedBoxRes;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+/**
+ * Get specimens by boxed status isolates only the specimens that need to be fetched/available in the shipping dashboard.
+ * @param {string} boxedStatus - boxed status of the specimens to fetch (notBoxed, partiallyBoxed, or boxed) .
+ * @param {*} isBPTL - boolean to indicate if the request is from BPTL.
+ * @returns list of specimens.
+ */
+export const getSpecimensByBoxedStatus = async (boxedStatus, isBPTL = false) => {
+    try {
+        const idToken = await getIdToken();
+        let queryString = `${api}api=getSpecimensByBoxedStatus&boxedStatus=${boxedStatus}`;
+        if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+        
+        const response = await fetch(queryString, {
+            method: 'GET',
+            headers: {
+            Authorization: 'Bearer ' + idToken,
+            }
+        });
+
+        if (!response.ok) throw new Error(`Unexpected server error: ${response.status}`);
+
+        const specimensRes = await response.json();
+        const hasStrayTubes = boxedStatus === conceptIds.partiallyBoxed.toString();
+
+        return buildAvailableCollectionsObject(specimensRes.data, hasStrayTubes);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+/**
+ * Combine the Available Collections objects from the unboxed and partially boxed specimens.
+ * @param {object} obj1 - fetched and arranged available collections object.
+ * @param {object} obj2 - fetched and arranged available collections object.
+ * @returns {object} availableCollectionsObject - combined available collections object without duplicates
+ * Get unique keys from both objects. Combine and de-duplicate if key exists in both objects. Else take the key from the object that has it.
+ */
+export const combineAvailableCollectionsObjects = (obj1, obj2) => {
+    const availableCollectionsObject = {};
+    const availableCollectionKeys = [...new Set([...Object.keys(obj1), ...Object.keys(obj2)])];
+
+    for (const key of availableCollectionKeys) {
+        if (obj1[key] && obj2[key]) {
+            availableCollectionsObject[key] = [...new Set([...obj1[key], ...obj2[key]])];
+        } else if (obj1[key]) {
+            availableCollectionsObject[key] = obj1[key];
+        } else {
+            availableCollectionsObject[key] = obj2[key];
+        }
+    }
+    return availableCollectionsObject;
+}
+
+/**
+ * Build the available collections object. Remove unusable tubes.
+ * Filter tubes (available collections vs strays) for use in the shipping dashboard.
+ * @param {array<object>} specimensList - list of specimens from Firestore.
+ * @param {boolean} isPartiallyBoxed - boolean to indicate if the request is for partially boxed specimens. 
+ * @returns {object} { availableCollections, specimensList } - available collections object and the updated specimens list.
+ * Note: Mouthwash tubes are always solo. They belong in available collections. The tube number is always '0007', the bag number is always '0009'.
+ */
+const buildAvailableCollectionsObject = (specimensList, isPartiallyBoxed) => {
+    if (!specimensList || specimensList.length === 0) return { availableCollections: {}, specimensList: [] };
+    const availableCollections = {};
+    for (let specimen of specimensList) {
+        const usableTubesObj = arrangeFetchedTubes(specimen, isPartiallyBoxed);
+        const usableBagKeys = Object.keys(usableTubesObj);
+        for (const bagKey of usableBagKeys) {
+            if (!availableCollections[bagKey]) {
+                availableCollections[bagKey] = [];
+            }
+            availableCollections[bagKey] = [...availableCollections[bagKey], ...usableTubesObj[bagKey]];
+        }
+    }
+    return { availableCollections, specimensList };
+}
+
+/**
+ * Handle the fetched specimen docs. Remove the unusable (deviated or missing) tubes, then arrange remaining tubes for available collections and the stray tube list.
+ * This function mutates the specimen object from the calling function AND returns the usableTubes object.
+ * @param {object} specimen - specimen object.
+ * @param {boolean} isPartiallyBoxed - boolean to indicate if the request is for partially boxed specimens.
+ * @returns {object} usableTubes - usable tubes from the specimen that are usable
+ */
+const arrangeFetchedTubes = (specimen, isPartiallyBoxed) => {
+    const usableTubes = {};
+    
+    const collectionId = specimen[conceptIds.collection.id];
+    if (!collectionId) return;
+    const bloodUrineCollection = `${collectionId} 0008`;
+    const mouthwashCollection = `${collectionId} 0009`;
+    
+    const tubeDataObject = removeUnusableTubes(specimen);
+    const allTubeIdsInSpecimen = Object.values(tubeDataObject);
+
+    const allMouthwashTubes = allTubeIdsInSpecimen.filter(tubeId => tubeId.split(' ')[1] === '0007');
+    const allBloodUrineTubes = allTubeIdsInSpecimen.filter(tubeId => tubeId.split(' ')[1] !== '0007');
+    let strayTubeArray = specimen[conceptIds.strayTubesList] ?? [];
+
+    // Handle mouthwash tubes. Mouthwash tubes always belong in available collections (not the stray tubes list).
+    // If mouthwash tube is in stray tubes (this happens for partiallyBoxed specimens when other tubes in the specimen are boxed first),
+    // Add it to available collections and remove from stray tubes list.
+    if (allMouthwashTubes.length > 0) {
+        if (isPartiallyBoxed) {
+            // Mouthwash tubes will be in the stray tubes array.
+            const index = strayTubeArray.findIndex(str => str.endsWith('0007'));
+            if (index !== -1) {
+                const mouthwashTube = strayTubeArray[index];
+                if (mouthwashTube) {
+                    usableTubes[mouthwashCollection] = [mouthwashTube.slice(-4)];
+                    strayTubeArray.splice(index, 1);
+                }
+            }
+        } else {
+            usableTubes[mouthwashCollection] = allMouthwashTubes.map(str => str.slice(-4));
+        }
+    }
+    
+    // Compare all blood/urine tubes to stray tubes list.
+    // If all allBloodUrineTubes are in the strayTubesList, add them to available collections and remove from stray tubes list.
+    if (allBloodUrineTubes.length > 0) {
+        if (isPartiallyBoxed || strayTubeArray.length > 0) {
+            const areAllTubesInStrayTubeArray = allBloodUrineTubes.every(tubeId => strayTubeArray.includes(tubeId));
+            if (areAllTubesInStrayTubeArray) {
+                usableTubes[bloodUrineCollection] = allBloodUrineTubes.map(str => str.slice(-4));
+                strayTubeArray = strayTubeArray.filter(tubeId => !allBloodUrineTubes.includes(tubeId));
+            }
+        } else {
+            usableTubes[bloodUrineCollection] = allBloodUrineTubes.map(str => str.slice(-4));
+        }
+    }
+    
+    // Assign the 'unlabelled' tubes for use in the available collections object.
+    if (strayTubeArray.length !== 0) usableTubes['unlabelled'] = strayTubeArray;
+
+    return usableTubes;
+}
+
+const tubeDeviationFlags = [
+    conceptIds.collection.deviationType.broken,
+    conceptIds.collection.deviationType.discard,
+    conceptIds.collection.deviationType.insufficientVolume,
+    conceptIds.collection.deviationType.mislabel,
+    conceptIds.collection.deviationType.notFound,
+];
+
+/**
+ * Remove deviated unshippable tubes and missing tubes from the specimen object. Do not remove deviated shippable tubes.
+ * @param {object} specimen - specimen object from the Firestore.
+ */
+const removeUnusableTubes = (specimen) => {
+    const tubeDataObject = {};
+    tubeLoop: for (const tubeKey of specimenCollection.tubeCidList) {
+        const tube = specimen[tubeKey];
+
+        if (!tube || !tube[conceptIds.collection.tube.scannedId]) {
+            delete specimen[tubeKey];
+            continue;
+        }
+
+        if (tube[conceptIds.discardFlag] === conceptIds.yes) {
+            delete specimen[tubeKey];
+            continue;
+        }
+
+        if (tube[conceptIds.collection.tube.isMissing] === conceptIds.yes) {
+            delete specimen[tubeKey];
+            continue;
+        }
+
+        // This is a sanity check, but hasn't been needed in testing. All applicable tubes have been filtered by the discard flag.
+        const tubeDeviation = tube[conceptIds.collection.tube.deviation];
+        for (const deviationFlag of tubeDeviationFlags) {
+            if (tubeDeviation?.[deviationFlag] === conceptIds.yes) {
+                delete specimen[tubeKey];
+                continue tubeLoop;
+            }
+        }
+        tubeDataObject[tubeKey] = tube[conceptIds.collection.tube.scannedId];  
+    };
+    return tubeDataObject;
+}
+
+/**
+ * Get specimens from an array of collectionIds.
+ * @param {array<string>} collectionIdsArray - list of collectionIds to fetch specimen documents.
+ * @param {*} isBPTL - boolean to indicate if the request is from BPTL.
+ * @returns list of specimens objects.
+ */
+export const getSpecimensByCollectionIds = async (collectionIdsArray, isBPTL = false) => {
+  
+  if (collectionIdsArray.length === 0) return [];
+  const collectionIdQueryString = Array.from(collectionIdsArray).join(',');
+
+  try {
+      const idToken = await getIdToken();  
+      let queryString = `${api}api=getSpecimensByCollectionIds&collectionIdsArray=${collectionIdQueryString}`;
+      if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+      
+      const response = await fetch(queryString, {
+          method: 'GET',
+          headers: {
+          Authorization: 'Bearer ' + idToken,
+          }
+      });
+
+      if (!response.ok) throw new Error(response.statusText);
+
+      const specimensResponse = await response.json();
+      return specimensResponse.data;
+  } catch (error) {
+      console.error(error);
+      throw error;
+  }
+};
+
+/**
+ * Get specimens from a list of boxes.
+ * @param {array<object>} boxList - list of current unshipped boxes for the shipping dashboard.
+ * @param {boolean} isBPTL - boolean to indicate if the request is from BPTL.
+ * @returns list of specimens objects with only the specimens in the current boxes.
+ */
+export const getSpecimensInBoxes = async (boxList, isBPTL = false) => {
+  const { tubeIdSet, collectionIdSet } = extractCollectionIdsFromBoxes(boxList);
+  if (collectionIdSet.size === 0) return [];
+  const collectionIdQueryString = Array.from(collectionIdSet).join(',');
+
+  try {
+      const idToken = await getIdToken();  
+      let queryString = `${api}api=getSpecimensByCollectionIds&collectionIdsArray=${collectionIdQueryString}`;
+      if (isBPTL) queryString += `&isBPTL=${isBPTL}`;
+      
+      const response = await fetch(queryString, {
+          method: 'GET',
+          headers: {
+          Authorization: 'Bearer ' + idToken,
+          }
+      });
+
+      if (!response.ok) throw new Error(response.statusText);
+
+      const specimensResponse = await response.json();
+      return isolateSpecimensInCurrentBoxes(specimensResponse.data, tubeIdSet);
+  } catch (error) {
+      console.error(error);
+      throw error;
+  }
+};
+
+/**
+ * Extract collectionIds from a list of boxes
+ * @param {array} boxList - list of boxes to process
+ * @returns {array} - array of unique collectionIds
+ * Bag types: 787237543 (Biohazard Blood/Urine), 223999569 (Biohazard Mouthwash), 522094118 (Orphan)
+ * For non-unlabelled bag keys, the first element's collectionId represents all collectionIds in the arrElements list.
+ */
+const extractCollectionIdsFromBoxes = (boxList) => {
+    const tubeIdSet = new Set(); 
+    const collectionIdSet = new Set();
+
+    boxList.forEach(box => {
+        const bagKeys = Object.keys(box.bags);
+
+        bagKeys.forEach(key => {
+            const arrElements = box.bags[key]?.arrElements;
+            if (arrElements && arrElements.length) {
+                if (key === 'unlabelled') {
+                    arrElements.forEach(tube => {
+                        tubeIdSet.add(tube);
+                        const [collectionId] = tube.split(' ');
+                        collectionId && collectionIdSet.add(collectionId);
+                    });
+                } else {
+                    const [collectionId] = arrElements[0].split(' ');
+                    collectionId && collectionIdSet.add(collectionId);
+                    arrElements.forEach(tube => {
+                        tubeIdSet.add(tube);
+                    });
+                }
+            }
+        });
+    });
+
+    return { tubeIdSet, collectionIdSet };
+}
+
+const isolateSpecimensInCurrentBoxes = (specimensList, tubeIdSet) => {
+    if (!specimensList || specimensList.length === 0) return [];
+    const updatedSpecimensList = [];
+
+    for (const specimen of specimensList) {
+        for (const tubeId of specimenCollection.tubeCidList) {
+            if (!specimen.data[tubeId]) continue;
+            if (!specimen.data[tubeId][conceptIds.collection.tube.scannedId] || !tubeIdSet.has(specimen.data[tubeId][conceptIds.collection.tube.scannedId])) {
+                delete specimen.data[tubeId];
+            }    
+        }
+        updatedSpecimensList.push(specimen.data);
+    }
+    return updatedSpecimensList;
+}
+
+export const filterDuplicateSpecimensInList = (specimensList) => {
+    return specimensList.reduce((acc, curr) => {
+        if (!acc.some(obj => obj[conceptIds.collection.id] === curr[conceptIds.collection.id])) {
+            acc.push(curr);
+        }
+        return acc;
+    }, []);
+}
+
 // searches boxes collection by login site (789843387) and Site-specific location id (560975149)
 // filters out any boxes where submitShipmentFlag is true
-// TODO: future: recommend adding 145971562 (shipment submitted flag = no) to all boxes on creation. Then we can rewrite the searchBoxesByLocation function to only return boxes where this variable is no (not shipped)
 export const getBoxesByLocation = async (location) => {
     logAPICallStartDev('getBoxesByLocation');
     const idToken = await getIdToken();
@@ -835,20 +1207,31 @@ export const getParticipantCollections = async (token) => {
     return response.json();
 }
 
-export const removeBag = async(boxId, bags) => {
-    const currDate = new Date().toISOString();
-    const bagDataToRemove = {boxId:boxId, bags:bags, date:currDate}
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=removeBag`, {
-        method: "POST",
-        headers: {
-            Authorization:"Bearer "+idToken,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(bagDataToRemove)
-    });
-    return await response.json();
-}
+export const removeBag = async (boxId, bags) => {
+    try {
+        const currDate = new Date().toISOString();
+        const bagDataToRemove = {boxId: boxId, bags: bags, date: currDate};
+        const idToken = await getIdToken();
+
+        const response = await fetch(`${api}api=removeBag`, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + idToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(bagDataToRemove)
+        });
+
+        if (!response.ok) {
+            throw new Error(`API responded with status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to remove bag:', error);
+        throw error;
+    }
+};
 
 /**
  * Fetches biospecimen collection data from the database
@@ -898,54 +1281,6 @@ export const searchSpecimenByRequestedSiteAndBoxId = async (requestedSite, boxId
     }
 }
 
-/**
- * Fetches biospecimen collection data from the database, and removes '0008', '0009' and deviation tubes from each collection
- * @returns {Array} List of biospecimen collections
- */
-// * * this doesn't take long, but the searchSpecimenInstitute() call takes a while
-export const filterSpecimenCollectionList = async () => {
-    const searchSpecimenInstituteResponse = await searchSpecimenInstitute();
-    const searchSpecimenInstituteArray = searchSpecimenInstituteResponse?.data ?? [];
-    
-    /* Filter collections with ShipFlag value yes */
-    const finalizedSpecimenList = searchSpecimenInstituteArray.filter(item => item[conceptIds.collection.isFinalized] === conceptIds.yes);
-    
-    // loop over filtered data with shipFlag
-    for (let i = 0; i < finalizedSpecimenList.length; i++){
-        const currCollection = finalizedSpecimenList[i];
-
-        if (currCollection[conceptIds.collection.bloodUrineBagScan]) {
-            delete currCollection[conceptIds.collection.bloodUrineBagScan]
-        }
-
-        if (currCollection[conceptIds.collection.mouthwashBagScan]) {
-            delete currCollection[conceptIds.collection.mouthwashBagScan] 
-        }
- 
-        for (let tubeCid of specimenCollection.tubeCidList) {
-            if (!currCollection[tubeCid]) continue;
-
-            const currTube = currCollection[tubeCid];
-            // delete specimen key if tube collected key is no
-            if (!currTube[conceptIds.collection.tube.isCollected] || currTube[conceptIds.collection.tube.isCollected] == conceptIds.no){
-                delete currCollection[tubeCid];
-            }
-
-            // delete tube if it contains deviation concept ID that disallows shipping
-            const tubeDeviation = currTube[conceptIds.collection.tube.deviation];
-            if (tubeDeviation?.[conceptIds.brokenSpecimenDeviation] == conceptIds.yes || 
-                tubeDeviation?.[conceptIds.discardSpecimenDeviation] == conceptIds.yes || 
-                tubeDeviation?.[conceptIds.insufficientVolumeSpecimenDeviation] == conceptIds.yes|| 
-                tubeDeviation?.[conceptIds.mislabelledDiscardSpecimenDeviation] == conceptIds.yes || 
-                tubeDeviation?.[conceptIds.notFoundSpecimenDeviation] == conceptIds.yes) {
-                    delete currCollection[tubeCid];
-            }
-        }
-    }
-
-    return finalizedSpecimenList;
-}
-
 export const removeMissingSpecimen = async (tubeId) => {
     //https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=searchSpecimen
     let toPass = {tubeId: tubeId};
@@ -980,9 +1315,8 @@ export const getLocationsInstitute = async () => {
     logAPICallEndDev('getLocationsInstitute');
     return locations;
 }
-
-export const getNumPages = async (numPerPage, filter) => {
-   // logAPICallStartDev('getNumPages');
+export const getNumPages = async (numPerPage, filters, source) => {
+  try {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getNumBoxesShipped`, {
         method: "POST",
@@ -990,12 +1324,15 @@ export const getNumPages = async (numPerPage, filter) => {
             Authorization:"Bearer "+idToken,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(filter)
+        body: JSON.stringify({filters, source})
     });
     let res = await response.json();
     let numBoxes = res.data;
-  //  logAPICallEndDev('getNumPages');
     return Math.ceil(numBoxes/numPerPage);
+  }
+  catch (error) {
+    return {code: 500, message: error.message};
+  }
 }
 
 export const getSiteCouriers = async () => {
@@ -1246,339 +1583,211 @@ export const locationConceptIDToLocationMap = {
     siteSpecificLocation: 'HP Research Clinic',
     siteAcronym: 'HP',
     siteCode: '531629870',
+    siteTeam: 'HealthPartners Connect Study Team',
     loginSiteName: 'HealthPartners Research Clinic',
-    contactInfo: {
-      "HP":[{
-        "fullName":"Erin Schwartz",
-        "email":"Erin.C.Schwartz@HealthPartners.com",
-        "phone":[
-         "Office: (651) 495-6371",
-         "Cell: (612) 836-7885"
-        ]
-      }],
-    },
+    email: 'communityresearchdepartment@healthpartners.com',
   },
   752948709: {
     siteSpecificLocation: 'Henry Ford Main Campus',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
+    siteTeam: 'Henry Ford Connect Study Team',
     loginSiteName: 'Henry Ford Health System',
-    contactInfo: {
-      "HFHS":[{
-        "fullName":"Kathleen Dawson",
-        "email":"kdawson7@hfhs.org",
-        "phone":["248-910-6716"],
-      }]
-    },
+    email: 'ConnectBioHFH@hfhs.org',
   },
   570271641: {
     siteSpecificLocation: 'Henry Ford West Bloomfield Hospital',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
+    siteTeam: 'Henry Ford Connect Study Team',
     loginSiteName: 'Henry Ford Health System',
-    contactInfo: {
-      "HFHS":[{
-        "fullName":"Kathleen Dawson",
-        "email":"kdawson7@hfhs.org",
-        "phone":["248-910-6716"],
-      }]
-    },
+    email: 'ConnectBioHFH@hfhs.org',
   },
   838480167: {
     siteSpecificLocation: 'Henry Ford Medical Center-Fairlane',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
+    siteTeam: 'Henry Ford Connect Study Team',
     loginSiteName: 'Henry Ford Health System',
-    contactInfo: {
-      "HFHS":[{
-        "fullName":"Kathleen Dawson",
-        "email":"kdawson7@hfhs.org",
-        "phone":["248-910-6716"],
-      }]
-    },
+    email: 'ConnectBioHFH@hfhs.org',
   },
   706927479: {
     siteSpecificLocation: 'HFH Livonia Research Clinic',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
+    siteTeam: 'Henry Ford Connect Study Team',
     loginSiteName: 'Henry Ford Health System',
-    contactInfo: {
-      "HFHS":[{
-        "fullName":"Attn Kirsti Autio",
-        "email":"kautio1@hfhs.org",
-        "phone":["313-876-7385"],
-      }]
-    },
+    email: 'ConnectBioHFH@hfhs.org',
   },
   763273112: {
     siteSpecificLocation: 'KPCO RRL',
     siteAcronym: 'KPCO',
     siteCode: '125001209',
+    siteTeam: 'KPCO Connect Study Team',
     loginSiteName: 'Kaiser Permanente Colorado',
-    contactInfo: {
-      "KPCO":[{
-        "fullName":"Brooke Thompson",
-        "email":"Brooke.x.thompson@kp.org",
-        "phone":["720-369-4316"],
-      }],
-    },
+    email: 'Connect-Study-KPCO@kp.org',
   },
   767775934: {
     siteSpecificLocation: 'KPGA RRL',
     siteAcronym: 'KPGA',
     siteCode: '327912200',
+    siteTeam: 'KPGA Connect Study Team',
     loginSiteName: 'Kaiser Permanente Georgia',
-    contactInfo: {
-      "KPGA":[{
-        "fullName":"Laura Gonzalez Paz",
-        "email":"Laura.M.Gonzalezpaz@kp.org",
-        "phone":["561-860-6240"],
-      }],
-    },
+    email: 'KPGAConnectBio@kp.org',
   },
   531313956: {
     siteSpecificLocation: 'KPHI RRL',
     siteAcronym: 'KPHI',
     siteCode: '300267574',
+    siteTeam: 'KPHI Connect Study Team',
     loginSiteName: 'Kaiser Permanente Hawaii',
-    contactInfo: {
-      "KPHI":[{
-        "fullName":"Cyndee Yonehara",
-        "email":"Cyndee.H.Yonehara@kp.org",
-        "phone":["Mobile: 808-341-5736"],
-      }],
-    },
+    email: 'ConnectBioKPHI@KaiserPermanente.onmicrosoft.com'
   },
   715632875: {
     siteSpecificLocation: 'KPNW RRL',
     siteAcronym: 'KPNW',
     siteCode: '452412599',
+    siteTeam: 'KPNW Connect Study Team',
     loginSiteName: 'Kaiser Permanente Northwest',
-    contactInfo: {
-      "KPNW":[{
-        "fullName":"Sarah Vertrees",
-        "email":"sarah.vertrees@kpchr.org",
-        "phone":["503-261-4144"],
-      }],
-    },
+    email: 'CHR_Connect_KPNW_Bio@kpchr.org',
   },
   692275326: {
     siteSpecificLocation: 'Marshfield',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"Lisa Ott",
-        "email": "ott.lisa@marshfieldclinic.org",
-        "phone":["715-387-9135"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   698283667:{
     siteSpecificLocation: 'Lake Hallie',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"Anna Zachow",
-        "email":"Zachow.anna@marshfieldresearch.org",
-        "phone":["715-898-9444"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   813701399:{
     siteSpecificLocation: 'Weston',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"Christopher Rayburn",
-        "email":"rayburn.christopher@marshfieldresearch.org",
-        "phone":["715-847-3364"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   691714762:{
     siteSpecificLocation: 'Rice Lake',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   487512085:{
     siteSpecificLocation: 'Wisconsin Rapids',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   983848564:{
     siteSpecificLocation: 'Colby Abbotsford',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   261931804:{
     siteSpecificLocation: 'Minocqua',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   665277300:{
     siteSpecificLocation: 'Merrill',
     siteAcronym: 'MFC',
     siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
     loginSiteName: 'Marshfield Cancer Center',
-    contactInfo: {
-      "MFC":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectstudy@marshfieldresearch.org'
   },
   589224449: {
     siteSpecificLocation: 'Sioux Falls Imagenetics',
     siteAcronym: 'SFH',
     siteCode: '657167265',
+    siteTeam: 'Sanford Connect Study Team',
     loginSiteName: 'Sanford Health',
-    contactInfo: {
-      "SFH":[{
-        "fullName":"Kimberly (Kay) Spellmeyer",
-        "email":"kimberly.spellmeyer@sanfordhealth.org",
-        "phone":["605-312-6100"],
-      },{
-        "fullName":"Madison (Maddi) Mayer",
-        "email":" Madison.mayer@sanfordhealth.org",
-        "phone":["701-234-6718"],
-      }],
-    },
+    email: 'connectstudy@sanfordhealth.org',
   },
   467088902: {
     siteSpecificLocation: 'Fargo South University',
     siteAcronym: 'SFH',
     siteCode: '657167265',
+    siteTeam: 'Sanford Connect Study Team',
     loginSiteName: 'Sanford Health',
-    contactInfo: {
-      "SFH":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectstudy@sanfordhealth.org',
   },
   777644826: {
     siteSpecificLocation: 'DCAM',
     siteAcronym: 'UCM',
     siteCode: '809703864',
+    siteTeam: 'UChicago Connect Study Team',
     loginSiteName: 'University of Chicago Medicine',
-    contactInfo: {
-      "UCM":[{
-        "fullName":"Jaime King",
-        "email":"jaimeking@bsd.uchicago.edu",
-        "phone":["(773) 702-5073"],
-      }],
-    },
+    email: 'connectbiospecimen@bsd.uchicago.edu',
   },
   145191545: {
     siteSpecificLocation: 'Ingalls Harvey',
     siteAcronym: 'UCM',
     siteCode: '809703864',
+    siteTeam: 'UChicago Connect Study Team',
     loginSiteName: 'University of Chicago Medicine',
-    contactInfo: {
-      "UCM":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectbiospecimen@bsd.uchicago.edu',
   },
   489380324: {
     siteSpecificLocation: 'River East',
     siteAcronym: 'UCM',
     siteCode: '809703864',
+    siteTeam: 'UChicago Connect Study Team',
     loginSiteName: 'University of Chicago Medicine',
-    contactInfo: {
-      "UCM":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectbiospecimen@bsd.uchicago.edu',
   },
   120264574: {
     siteSpecificLocation: 'South Loop',
     siteAcronym: 'UCM',
     siteCode: '809703864',
+    siteTeam: 'UChicago Connect Study Team',
     loginSiteName: 'University of Chicago Medicine',
-    contactInfo: {
-      "UCM":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectbiospecimen@bsd.uchicago.edu',
+
   },
   940329442: {
     siteSpecificLocation: 'Orland Park',
     siteAcronym: 'UCM',
     siteCode: '809703864',
+    siteTeam: 'UChicago Connect Study Team',
     loginSiteName: 'University of Chicago Medicine',
-    contactInfo: {
-      "UCM":[{
-        "fullName":"N/A",
-        "email":"N/A",
-        "phone":["N/A"],
-      }],
-    },
+    email: 'connectbiospecimen@bsd.uchicago.edu',
   },
   111111111: {
     siteSpecificLocation: 'Main Campus',
     siteAcronym: 'NIH',
     siteCode: '13',
+    siteTeam: "NIH Connect Study Team",
     loginSiteName: 'National Cancer Institute',
-    contactInfo: {
-      "NIH":[],
-    },
+    email: "connectstudytest@email.com",
   },
   222222222: {
     siteSpecificLocation: 'Frederick',
     siteAcronym: 'NIH',
     siteCode: '13',
+    siteTeam: "NIH Connect Study Team",
     loginSiteName: 'National Cancer Institute',
-    contactInfo: {
-      "NIH":[],
+    email: "connectstudytest@email.com",
     },
-  },
 };
 
 export const conceptIdToSiteSpecificLocation = {
@@ -1866,18 +2075,11 @@ export const addEventBarCodeScanner = (id, start, end) => {
                 if(!masterSpecimenIDRequirement.regExp.test(barcode.substr(0,masterSpecimenIDRequirement.length))) return;
                 if(!elementID) return;
                 if(elementID === 'scanSpecimenID') {
-                    // disableInput('enterSpecimenID1', true);
-                    // disableInput('enterSpecimenID2', true);
-                    // addEventClearScannedBarcode('clearScanSpecimenID');
                     document.getElementById(elementID).dataset.isscanned = 'true';
                 }
                 document.getElementById(elementID).value = start !== undefined && end !== undefined ? result.codeResult.code.substr(start, end-1) : result.codeResult.code;
                 Quagga.stop();
                 document.querySelector('[data-dismiss="modal"]').click();
-            }
-            else {
-                // disableInput('enterSpecimenID1', false);
-                // disableInput('enterSpecimenID2', false);
             }
         });
         
@@ -2144,7 +2346,7 @@ export const SSOConfig = (email) => {
 }
 
 export const getParticipantSelection = async (filter) => {
-    logAPICallStartDev('getParticipantSelection');
+
     const idToken = await getIdToken();
     const response = await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=getParticipantSelection&type=${filter}`, 
     {
@@ -2153,7 +2355,6 @@ export const getParticipantSelection = async (filter) => {
         Authorization: "Bearer " + idToken,
       },
     });
-    logAPICallEndDev('getParticipantSelection');
     return response.json();
   }
      
@@ -2219,30 +2420,14 @@ export const allTubesCollected = (data) => {
     return flag;
 };
 
-export const displayContactInformation = (currContactInfo) => {
-  if(currContactInfo.length){
-    let contactStr = ""
-    contactStr += `<p style="font-weight:bold">Site Contact Information:</p>`
-    // iterate over length of existing site's contact array
-    for(let i= 0; i < currContactInfo.length; i++) {
-    contactStr += `<p>Full Name: ${currContactInfo[i].fullName}</p>`
-    contactStr += `<p>Email: ${currContactInfo[i].email}</p>`
-    
-    let numPhones = currContactInfo[i].phone.length
-    if(numPhones === 1){
-      contactStr += `<p>Phone: ${currContactInfo[i].phone}</p>`  
-    }
-    else if(numPhones > 1){
-      contactStr += `<p>Phone:</p>`
-      for(let j = 0; j < numPhones; j++){
-        contactStr += `<p>${currContactInfo[i].phone[j]}</p>`
-      }
-    }
-    else contactStr += `<p>Phone:</p>`
-  }
-    return contactStr
-  }
-  else return ""
+export const displayManifestContactInfo = (currShippingLocationNumberObj) => {
+    return `<p style="font-weight:bold">Site Contact Information:</p>
+            <p>${currShippingLocationNumberObj.siteTeam}</p>
+            <p>Email: ${currShippingLocationNumberObj.email}</p>`;
+}
+
+export const convertDateReceivedinISO = (date) => { // ("YYYY-MM-DD" to ISO format DateTime)
+    return new Date(date).toISOString();
 }
 
 export const checkShipForage = async (shipSetForage, boxesToShip) => {
@@ -2285,15 +2470,16 @@ const tubeOrder = [
   "0004", //"EDTA/Lavender"
   "0014", //"EDTA/Lavender"
   "0024", //"EDTA/Lavender"
-  "0005", //"ACD/Yellow"
+  "0005", //"ACD/Yellow",
+  "0060", //"Streck Tube"
   "0006", //"Urine/Yellow"
   "0016", //"Urine Cup"
   "0007", //"Mouthwash Container"
-  "0050", //"NA"
-  "0051", //"NA"
-  "0052", //"NA"
-  "0053", //"NA"
-  "0054", //"NA
+  "0050", //"Replacement label" - used for tubes 0001-0024, 0060 when original label is damaged/missing/unusable
+  "0051", //"Replacement label" - same as 0050
+  "0052", //"Replacement label" - same as 0050
+  "0053", //"Replacement label" - same as 0050
+  "0054", //"Replacement label" - same as 0050
 ];
 
 export const sortBiospecimensList = (biospecimensList) => {
@@ -2320,17 +2506,17 @@ export const checkAlertState = (alertState, createBoxSuccessAlertEl, createBoxEr
 
 export const delay = ms => new Promise(res => setTimeout(res, ms));
 
-export const convertConceptIdToPackageCondition = (packagedCondition, packageConditonConversion) => {
+export const convertConceptIdToPackageCondition = (packagedCondition, packageConditionConversion) => {
   let listConditions = ''
   if(!packagedCondition) return listConditions
   for(let i = 0; i < packagedCondition.length; i++) {
     let isLastItem = false;
     if(i+1 === packagedCondition.length) { // if last item equals the final item
       isLastItem = true
-      if(isLastItem) listConditions += `<p>${packageConditonConversion[packagedCondition[i]]}</p>`
+      if(isLastItem) listConditions += `<p>${packageConditionConversion[packagedCondition[i]]}</p>`
     }
     else {
-      listConditions += `<p>${packageConditonConversion[packagedCondition[i]]},</p>`
+      listConditions += `<p>${packageConditionConversion[packagedCondition[i]]},</p>`
     }
 
   }
@@ -2377,6 +2563,7 @@ export const translateNumToType = {
   "0003": "Heparin/Green",
   "0004": "EDTA/Lavender",
   "0005": "ACD/Yellow",
+  "0060": "Streck/Black-Tan",
   "0006": "Urine/Yellow",
   "0007": "Mouthwash Container",
   "0011": "SST/Gold or Red",
@@ -2395,28 +2582,6 @@ export const translateNumToType = {
   "0053": "NA",
   "0054": "NA"
 };
-
-export const packageConditonConversion = {
-    "679749262": "Package in good condition",
-    "405513630": "No Ice Pack",
-    "595987358": "Warm Ice Pack",
-    "200183516": "Vials - Incorrect Material Type Sent",
-    "399948893": "No Label on Vials",
-    "631290535": "Returned Empty Vials",
-    "442684673": "Participant Refusal",
-    "121149986": "Crushed",
-    "678483571": "Damaged Container (outer and inner)",
-    "289322354": "Material Thawed",
-    "909529446": "Insufficient Ice",
-    "847410060": "Improper Packaging",
-    "387564837": "Damaged Vials",
-    "933646000": "Other",
-    "842171722": "No Pre-notification",
-    "613022284": "No Refrigerant",
-    "922995819": "Manifest/Vial/Paperwork info do not match",
-    "958000780": "Shipment Delay",
-    "853876696": "No Manifest provided",
-}
 
 export const convertISODateTime = (isoDateTime) => {
     const date = new Date(isoDateTime);
@@ -2493,25 +2658,6 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
     }
 }
 
-/**
- * Block subsequent requests before the first request is completed, with a 5-second timeout.
- */
-export const requestsBlocker = {
-  isReqInProcess: false,
-  block() {
-    this.isReqInProcess = true;
-    setTimeout(() => {
-      this.isReqInProcess = false;
-    }, 5000);
-  },
-  unblock() {
-    this.isReqInProcess = false;
-  },
-  isBlocking() {
-    return this.isReqInProcess;
-  },
-};
-
 export const restrictNonBiospecimenUser = () => {
   document.getElementById("contentBody").innerHTML = "Authorization failed you lack permissions to use this dashboard!";
   document.getElementById("navbarNavAltMarkup").innerHTML = unAuthorizedUser();
@@ -2570,4 +2716,77 @@ export const addBoxAndUpdateSiteDetails = async (boxAndSiteData) => {
         console.error('Error adding box', e);
         return null;
     }
+}
+
+export const triggerErrorModal = (message) => {
+    let alertList = document.getElementById("alert_placeholder");
+    alertList.innerHTML = `
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+        </div>`;
+}
+
+export const triggerSuccessModal = (message) => {
+    let alertList = document.getElementById("alert_placeholder");
+    alertList.innerHTML = `
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+        </div>`;
+}
+
+/**
+ * We've had isolated instances where sites save a new collection and placeholder tube data is missing from the biospecimenData object (specifically with the addition of streck tubes).
+ * This is a sanity check to compare expected vs existing data. If expected data is missing, we build the placeholder data. 
+ * @param {Array<object>} siteTubesList - list of tubes expected at the site. 
+ * @param {object} biospecimenData - biospecimenData object (specimen collection).
+ */
+export const checkTubeDataConsistency = (siteTubesList, biospecimenData) => {
+    siteTubesList?.forEach((tube) => {
+        // Check for tube.concept in biospecimenData keys. If missing, build the placeholder data.
+        if (!biospecimenData[tube.concept]) {
+            biospecimenData[tube.concept] = {
+                [conceptIds.collection.tube.isCollected]: conceptIds.no,
+                [conceptIds.collection.tube.isDeviated]: conceptIds.no,
+                [conceptIds.discardFlag]: conceptIds.no,
+                [conceptIds.collection.tube.deviation]: getDefaultDeviationOptions(tube.deviationOptions),
+            };
+            console.error('Issue: Tube not found in biospecimenData. Building placeholder data.', tube, 'Tube ConceptID:', tube.concept, '| Tube Details:', biospecimenData[tube.concept]);
+        }
+    });
+};
+
+/**
+ * Build out a single tube's placeholder data. This is a backup in case of an unexpected loading sequence in the collection entry process.
+ * @param {object} stockTubeData - tube object from siteTubesList. 
+ * @param {object} biospecimenTubeData - tube object from biospecimenData.
+ */
+export const fixMissingTubeData = (stockTubeData, biospecimenTubeData) => {
+    Object.assign(biospecimenTubeData, {
+        [conceptIds.collection.tube.isCollected]: conceptIds.no,
+        [conceptIds.collection.tube.isDeviated]: conceptIds.no,
+        [conceptIds.discardFlag]: conceptIds.no,
+        [conceptIds.collection.tube.deviation]: getDefaultDeviationOptions(stockTubeData.deviationOptions),
+    });
+    console.error('Issue: Tube not found in biospecimenData. Building placeholder data.', stockTubeData, '| Tube Details:', biospecimenTubeData);
+};
+
+const getDefaultDeviationOptions = (deviationOptions) => {
+    if (!deviationOptions || deviationOptions.length === 0) return {};
+
+    const defaultDeviationOptions = {};
+    deviationOptions.forEach(option => {
+        defaultDeviationOptions[option.concept] = conceptIds.no;
+    });
+    return defaultDeviationOptions;
+};
+
+export const processResponse = async (response) => {
+    const data = await response.json();
+    return data.response;
 }

@@ -1,13 +1,13 @@
-import { addBoxAndUpdateSiteDetails, appState, conceptIdToSiteSpecificLocation, displayContactInformation, getAllBoxes, getBoxes, getLocationsInstitute, getSiteMostRecentBoxId, hideAnimation, locationConceptIDToLocationMap,
+import { addBoxAndUpdateSiteDetails, appState, conceptIdToSiteSpecificLocation, combineAvailableCollectionsObjects, displayManifestContactInfo, filterDuplicateSpecimensInList, getAllBoxes, getBoxes, getSpecimensInBoxes, getUnshippedBoxes, getLocationsInstitute, getSiteMostRecentBoxId, getSpecimensByBoxedStatus, hideAnimation, locationConceptIDToLocationMap,
         removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
-        translateNumToType, userAuthorization } from "../shared.js"
+        translateNumToType, userAuthorization, getSiteAcronym } from "../shared.js"
 import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs,
         addEventCompleteShippingButton, addEventModalAddBox, addEventNavBarBoxManifest, addEventNavBarShipment, addEventNavBarShippingManifest, addEventNavBarAssignTracking, addEventLocationSelect,
         addEventPreventTrackingConfirmPaste, addEventReturnToPackaging, addEventReturnToReviewShipmentContents, addEventSaveButton, addEventSaveAndContinueButton, addEventShipPrintManifest,
-        addEventTrackingNumberScanAutoFocus, addEventTrimTrackingNums, compareBoxIds, getInstituteSpecimensList, populateCourierBox, populateFinalCheck, populateTrackingQuery } from "../events.js";     
+        addEventTrackingNumberScanAutoFocus, addEventTrimTrackingNums, compareBoxIds, populateCourierBox, populateFinalCheck, populateTrackingQuery } from "../events.js";     
 import { homeNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
 import { setAllShippingState, updateShippingStateCreateBox, updateShippingStateRemoveBagFromBox, updateShippingStateSelectedLocation } from '../shippingState.js';
-import conceptIds from '../fieldToConceptIdMapping.js';
+import { conceptIds } from '../fieldToConceptIdMapping.js';
 
 export const shippingDashboard = (auth, route) => {
     auth.onAuthStateChanged(async user => {
@@ -28,7 +28,12 @@ export const shippingDashboard = (auth, route) => {
     });
 }
 
-// Check for a stored location and initialize the shipping page.
+/**
+ * Entry point to the shipping dashboard. Check for a stored location and initialize the shipping page.
+ * @param {string} userName - the logged in user's email.
+ * @param {boolean} loadFromState - whether to load data from appState or fetch from the server.
+ * @param {string} currBoxId - the current box being viewed, to reload with this box active.
+ */
 export const startShipping = async (userName, loadFromState = false, currBoxId) => {    
     buildShippingNavAndHeader();
     getStoredLocationOnInit();
@@ -58,43 +63,64 @@ const buildShippingDOM = () => {
 }
 
 /**
- * NOTE: allBoxesList is used because the larger filter iterates ALL boxes and removes specimens that belong to the shipped boxes.
- * TODO: future change: add shipped property and only pull unshipped.
+ * Build the shipping dashboard interface. Pull box, specimen, and location data. Build the UI.
  * This will run asyncronously when pulling new data (loadFromState = false) and synchronously when loading from state (loadFromState = true).
  * @param {*} userName - the logged-in userName.
  * @param {*} loadFromState - whether to load data from state or from the server.
  * @param {*} currBoxId - the currently selected boxId.
  */
-const buildShippingInterface = async (userName, loadFromState, currBoxId) => {    
-    showAnimation();
+const buildShippingInterface = async (userName, loadFromState, currBoxId) => {
+    try {
+        showAnimation();
 
-    let allBoxesList;
-    let availableLocations;
+        let allBoxesList;
+        let availableLocations;
+        let finalizedSpecimenList;
+        let availableCollectionsObj;
+        const specimens = {
+            notBoxed: {},
+            partiallyBoxed: {},
+            boxed: {},
+        };
 
-    if (loadFromState) {
-        availableLocations = appState.getState().availableLocations;
-        allBoxesList = appState.getState().allBoxesList;
-    } else {
-        const getAllBoxesResponse = await getAllBoxes();
-        allBoxesList = getAllBoxesResponse.data;
+        if (loadFromState) {
+            allBoxesList = appState.getState().allBoxesList;
+            availableLocations = appState.getState().availableLocations;
+            finalizedSpecimenList = appState.getState().finalizedSpecimenList;
+            availableCollectionsObj = appState.getState().availableCollectionsObj;
+            populateSelectLocationList(availableLocations, loadFromState);
+        } else {
+            const promiseResponse = await Promise.all([
+                getUnshippedBoxes(),
+                populateSelectLocationList(availableLocations, loadFromState)
+            ]);
+
+            allBoxesList = promiseResponse[0].data;
+            availableLocations = promiseResponse[1];
+
+            [specimens.boxed, specimens.notBoxed, specimens.partiallyBoxed] = await Promise.all([
+                getSpecimensInBoxes(allBoxesList),
+                getSpecimensByBoxedStatus(conceptIds.notBoxed.toString()),
+                getSpecimensByBoxedStatus(conceptIds.partiallyBoxed.toString()),
+            ]);
+
+            finalizedSpecimenList = filterDuplicateSpecimensInList([...specimens.boxed, ...specimens.notBoxed.specimensList, ...specimens.partiallyBoxed.specimensList]);
+            availableCollectionsObj = combineAvailableCollectionsObjects(specimens.notBoxed.availableCollections, specimens.partiallyBoxed.availableCollections);
+        }
+
+        populateAvailableCollectionsList(availableCollectionsObj, loadFromState);
+        setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName);
+        populateViewShippingBoxContentsList(currBoxId);
+        populateBoxesToShipTable();
+        addShippingEventListeners();
+
+    } catch (error) {
+        console.error("Error building shipping interface:", error);
+        showNotifications({ title: 'Error building shipping interface', body: 'An unexpected error occurred. Please refresh your browser to reload.' });
+    } finally {
+        hideAnimation();
     }
-
-    const promiseResponse = await Promise.all([
-        populateAvailableCollectionsList(allBoxesList, loadFromState),
-        populateSelectLocationList(availableLocations, loadFromState),
-    ]);
-
-    const { finalizedSpecimenList, availableCollectionsObj } = promiseResponse[0];
-    availableLocations = promiseResponse[1];
-
-    setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName);
-
-    populateViewShippingBoxContentsList(currBoxId); // 'View Shipping Box Contents' section
-    populateBoxesToShipTable(); // 'Select boxes to ship' section
-    addShippingEventListeners();
-
-    hideAnimation();
-}
+};
 
 const addShippingEventListeners = () => {
     const userName = appState.getState().userName;
@@ -115,27 +141,21 @@ const getStoredLocationOnInit = () => {
 
 /**
  * Populate the 'Available Collections' table.
- * @param {array} boxList - list of available boxes.
+ * @param {object} availableCollectionsObj - object containing available collections where available collections are keys and values are arrays of tubeIds. Stray tubes are in the 'unlabelled' key.
  * @param {boolean} loadFromState - if true, load data from state instead of fetching from server.
- * @returns {array} finalizedSpecimenList - the list of specimens with the finalized flag.
- * @returns {object} availableCollectionsObj - obj to populate the 'Available Collections' table.
- * If finalizedSpecimenList or availableCollectionsObj are empty (such as initial load), fetched from server.
  * Note: Orphan panel is currently hidden by request of the product team. Retain for future use.
  *       Future orphan panel use would require completed state management implementation in the 'currDeleteButton' event listener.
  */
-const populateAvailableCollectionsList = async (boxList, loadFromState = false) => {
-    let finalizedSpecimenList = appState.getState().finalizedSpecimenList ?? [];
-    let availableCollectionsObj = appState.getState().availableCollectionsObj ?? {};
+    const populateAvailableCollectionsList = async (availableCollectionsObj, loadFromState = false) => {
 
-    if (!loadFromState) {
-        ({ finalizedSpecimenList, availableCollectionsObj } = await getInstituteSpecimensList(boxList));
+    if (loadFromState) {
+        availableCollectionsObj = appState.getState().availableCollectionsObj ?? {};
     }
 
     const bagIdList = Object.keys(availableCollectionsObj).sort();
-
     const tableEle = document.getElementById("specimenList");
     tableEle.innerHTML = buildPopulateSpecimensHeader();
-    
+
     let numRows = 1;
     let orphanBagId;
 
@@ -203,8 +223,6 @@ const populateAvailableCollectionsList = async (boxList, loadFromState = false) 
         orphanPanel.style.display = 'none'
         specimenPanel.style.height = '550px'
     }
-
-    return { finalizedSpecimenList, availableCollectionsObj };
 }
 
 const populateBoxesToShipTable = () => {
@@ -298,28 +316,42 @@ export const populateViewShippingBoxContentsList = (selectedBoxId) => {
 // Remove a bag from a box
 const handleRemoveBagButton = (currDeleteButton, currTubes, currBoxId) => {
     currDeleteButton.addEventListener("click", async e => {
+        e.preventDefault();
         showAnimation();
+        
         const row = e.target.closest('tr');
         const currBagId = row.cells[0].innerText;
-        const bagsToRemove = currBagId === "unlabelled" ? currTubes : [currBagId];        
-        const removeBagResponse = await removeBag(currBoxId, bagsToRemove);
-        hideAnimation();
+        const bagsToRemove = currBagId === "unlabelled" ? currTubes : [currBagId];
+        
+        try {
+            const removeBagResponse = await removeBag(currBoxId, bagsToRemove);
+            hideAnimation();
 
-        if (removeBagResponse.code === 200) {
-            updateShippingStateRemoveBagFromBox(currBoxId, currBagId, bagsToRemove);
-            startShipping(appState.getState().userName, true, currBoxId);
-        } else {
-            showNotifications({ title: 'Error removing bag', body: 'We experienced an error removing this bag. Please try again.' });
+            if (removeBagResponse.code === 200) {
+                updateShippingStateRemoveBagFromBox(currBoxId, currBagId, bagsToRemove, removeBagResponse.data);
+                await startShipping(appState.getState().userName, true, currBoxId);
+            } else {
+                console.error('Failed to remove bag.', removeBagResponse);
+                showNotifications({ title: 'Error removing bag', body: 'Error removing this bag. Please try again.' });
+            }
+        } catch (error) {
+            hideAnimation();
+            console.error('Failed to remove bag.', error);
+            showNotifications({ title: 'Error removing bag', body: `There was an error removing this bag. Please try again.` });
         }
     });
 }
 
-// Get the highest existing boxId and ++ for the new box.
-// Create the box and add it to firestore. On success, add it to the relevant state objects (allBoxesList and boxesByLocationList, and detailedProviderBoxes).
-// Important: 0 is a valid box number: only check for null and undefined boxId values, not falsy values.
-// Whether to create a new box is location specific (not site specific). Check whether location's most recent box is empty or populated.
-// Box numbering is based on site (not location), always increment highest site box number.
-// Create the new box and update the modal if the location's largest box is not empty or if the location has no current boxes.
+/**
+ * Add a new box with a new boxId.
+ * @returns {boolean} - true on success, false on failure.
+ * Get the highest existing boxId and ++ for the new box.
+ * Create the box and add it to firestore. On success, add it to the relevant state objects (allBoxesList and boxesByLocationList, and detailedProviderBoxes).
+ * Important: 0 is a valid box number: only check for null and undefined boxId values, not falsy values.
+ * The decision to create a new box is location specific (not site specific). Check whether location's most recent box is empty or populated.
+ * Box numbering is based on site (not location), always increment highest *site* box number.
+ * Create the new box and update the modal if the location's largest box is not empty or if the location has no current boxes.
+ */
 export const addNewBox = async () => {
     try {
         const siteLocation = document.getElementById('selectLocationList').value;
@@ -409,9 +441,12 @@ const createNewBox = async (boxList, pageLocationConversion, siteCode, largestBo
 // Delay retry attempt for 1 second when box creation fails.
 const delayRetryAttempt = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Find the largest box among all boxes. This is a fallback for new sites that have no boxes.
-// It should only execute once per new site, and only if the siteDetails collection's 'mostRecentBoxId' field is null.
-// -1 fallback value is handled in the parent function.
+/**
+ * Find the largest box among all boxes. This is a fallback for new sites that have no boxes.
+ * It should only execute once per new site, and only if the siteDetails collection's 'mostRecentBoxId' field is null.
+ * -1 fallback value is handled in the parent function.
+ * @returns {number} - largest box number from all existing boxes.
+ */
 const getLargestBoxNumFromAllBoxes = async () => {
     const getAllBoxesResponse = await getAllBoxes();
     const boxList = getAllBoxesResponse.data;
@@ -422,24 +457,29 @@ const getLargestBoxNumFromAllBoxes = async () => {
     }, -1);
 }
 
-// Find the largest shipping box id for the location
-// Return the highest numeric boxId or -1 if none exist
+/**
+ * Find the largest shipping box id for the location
+ * Return the highest numeric boxId or -1 if none exist
+ * @param {array<object>} boxesList - list of all boxes 
+ * @param {number} siteLocationId - the shipping location Id for the site
+ * @returns {number} - the largest boxId for the location
+ */
 const getLargestLocationBoxId = (boxesList, siteLocationId) => {
     const boxIdsForLocation = boxesList.filter(box => box[conceptIds.shippingLocation] === siteLocationId).map(box => parseInt(box[conceptIds.shippingBoxId].substring(3)));
     return boxIdsForLocation.length > 0 ? Math.max(...boxIdsForLocation) : -1;
 }
 
 export const generateBoxManifest = (currBox) => {
-    const currInstitute = currBox.boxData.siteAcronym;
+    const currInstitute = currBox.boxData.siteAcronym || getSiteAcronym();
+    const currShippingLocationNumberObj = locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]
     const currLocation = locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]["siteSpecificLocation"];
-    const currContactInfo = locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]["contactInfo"];
 
     removeActiveClass('navbar-btn', 'active');
     const navBarBoxManifestBtn = document.getElementById('navBarBoxManifest');
     navBarBoxManifestBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = renderBoxManifestTemplate(currInstitute, currLocation);
 
-    populateBoxManifestHeader(currBox, currContactInfo);
+    populateBoxManifestHeader(currBox, currShippingLocationNumberObj);
     populateBoxManifestTable(currBox);
     document.getElementById('printBox').addEventListener('click', e => {
         window.print();
@@ -448,7 +488,7 @@ export const generateBoxManifest = (currBox) => {
     addEventReturnToPackaging();
 }
 
-export const populateBoxManifestHeader = (currBox, currContactInfo) => {
+export const populateBoxManifestHeader = (currBox, currShippingLocationNumberObj) => {
     if(!currBox) return;
 
     const currKeys = Object.keys(currBox).filter(key => key !== 'boxData' && key !== 'undefined');
@@ -459,12 +499,12 @@ export const populateBoxManifestHeader = (currBox, currContactInfo) => {
     const boxStartedTimestamp = formatTimestamp(currBox.boxData[conceptIds.firstBagAddedToBoxTimestamp]);
     const boxLastModifiedTimestamp = formatTimestamp(currBox.boxData[conceptIds.shippingShipDateModify]);
 
-    renderBoxManifestHeader(boxId, boxStartedTimestamp, boxLastModifiedTimestamp, numBags, numTubes, currContactInfo);
+    renderBoxManifestHeader(boxId, boxStartedTimestamp, boxLastModifiedTimestamp, numBags, numTubes, currShippingLocationNumberObj);
 }
 
 // Render the box manifest header.
 // CreateParent divs, create list of data to be appended, create the new elements, append.
-const renderBoxManifestHeader = (boxId, boxStartedTimestamp, boxLastModifiedTimestamp, numBags, numTubes, currContactInfo) => {
+const renderBoxManifestHeader = (boxId, boxStartedTimestamp, boxLastModifiedTimestamp, numBags, numTubes, currShippingLocationNumberObj) => {
     const boxManifestCol1 = document.getElementById('boxManifestCol1');
     const boxManifestCol3 = document.getElementById('boxManifestCol3');
     
@@ -475,7 +515,7 @@ const renderBoxManifestHeader = (boxId, boxStartedTimestamp, boxLastModifiedTime
         { text: `${boxId} Manifest`, style: { fontWeight: '700', fontSize: '1.5rem' } },
         { text: `Date Started: ${boxStartedTimestamp}` },
         { text: `Last Modified: ${boxLastModifiedTimestamp}` },
-        { text: displayContactInformation(currContactInfo), isHTML: true }
+        { text: displayManifestContactInfo(currShippingLocationNumberObj), isHTML: true }
     ];
     
     const dataCol3 = [
@@ -647,13 +687,14 @@ export const processCheckedModalElements = (boxIdAndBagsObj, bagId, boxId, isOrp
     return boxIdAndBagsObj;
 }
 
-export const prepareBoxToUpdate = (boxId, boxList, boxIdAndBagsObj, locations) => {
+export const prepareBoxToUpdate = (boxId, boxList, boxIdAndBagsObj, locations, addedTubes) => {
     const currTime = new Date().toISOString();
     const foundBox = boxList.find(box => box[conceptIds.shippingBoxId] == boxId) || {};
 
     return {
         ...foundBox,
         'bags': boxIdAndBagsObj[boxId],
+        'addedTubes': addedTubes,
         [conceptIds.shippingShipDateModify]: currTime,
         [conceptIds.shippingBoxId]: boxId,
         [conceptIds.shippingLocation]: locations[boxId],
@@ -838,16 +879,15 @@ const tempSelectStringRender = ({boxIdArray, isTempMonitorIncluded}) => {
     return tempSelectString;
 }
 
-export const populateShippingManifestHeader = (userName, siteAcronym, currShippingLocationNumber) => {
-    const currContactInfo = locationConceptIDToLocationMap[currShippingLocationNumber]["contactInfo"][siteAcronym];
-    const siteSpecificLocation = locationConceptIDToLocationMap[currShippingLocationNumber]["siteSpecificLocation"];
+export const populateShippingManifestHeader = (userName, siteAcronym, currShippingLocationNumberObj) => {
+    const siteSpecificLocation = currShippingLocationNumberObj["siteSpecificLocation"];
 
     const currentDateTime = formatTimestamp();
     const dataCol1 = [
         { text: "Shipment Manifest", style: { fontWeight: '700', fontSize: '1.5rem' } },
         { text: `Current Date/Time: ${currentDateTime}` },
         { text: `Sender: ${userName}` },
-        { text: displayContactInformation(currContactInfo), isHTML: true }
+        { text: displayManifestContactInfo(currShippingLocationNumberObj), isHTML: true }
     ];
     
     const dataCol3 = [

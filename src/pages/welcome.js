@@ -27,10 +27,6 @@ const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
     let dashboardSelectionStr = '';
 
-    if (location.host === urls.stage || location.host === urls.prod) { 
-        researchOnlySiteArray.push('HP')
-    }
-
     if (clinicalOnlySiteArray.includes(data.siteAcronym)) {
         dashboardSelectionStr = `                    
             <select required disabled class="col form-control" id="dashboardSelection">
