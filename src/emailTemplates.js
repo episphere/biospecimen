@@ -48,7 +48,7 @@ export const baselineEmailTemplate = (data, isClinical) => {
         Dear ${data['153211406'] || data['399159511']},
         <br/>
         <br/>
-        Thank you for donating your samples for the Connect for Cancer Prevention Study! Next, please visit the <a href=${appLocation}>MyConnect app</a> to answer the ${isClinical ? 'Baseline Blood and Urine Sample Survey' : 'Baseline Blood, Urine, and Mouthwash Sample Survey'}. This short survey asks questions about the day that you donated samples, so it is important to complete it as soon as you can.
+        Thank you for donating your samples for the Connect for Cancer Prevention Study! Next, please visit the <a href=${appLocation}>MyConnect</a> to answer the ${isClinical ? 'Baseline Blood and Urine Sample Survey' : 'Baseline Blood, Urine, and Mouthwash Sample Survey'}. This short survey asks questions about the day that you donated samples, so it is important to complete it as soon as you can.
         <br/>
         <br/>
         A new survey about your experience with COVID-19 is also available on MyConnect. Please complete this survey as soon as you can.
@@ -65,7 +65,7 @@ export const baselineMWSurveyRemainderTemplate = (ptName) => {
         Dear ${ptName || 'User'},
         <br/>
         <br/>
-        Thank you for completing your mouthwash home collection kit! We have your sample. Next, please share some information about the day you collected your sample. Visit <a href=${appLocation}>MyConnect app</a> and log in using to complete a short survey. This survey asks questions about the day you collected your sample, so it is important to complete it as soon as you can.
+        Thank you for completing your mouthwash home collection kit! We have your sample. Next, please share some information about the day you collected your sample. Visit <a href=${appLocation}>MyConnect</a> and log in using to complete a short survey. This survey asks questions about the day you collected your sample, so it is important to complete it as soon as you can.
         Have questions? Please contact the <a href=${supportLocation}>Connect Support Center.</a>
         ${returnFooterTemplate()}`
 }
@@ -85,7 +85,7 @@ export const baselineMWKitRemainderTemplate = (ptName) => {
         The mouthwash sample is an interesting new way to collect both human cells and microbial cells that are naturally shed in your mouth. Studying this sample may help researchers learn more about the causes of cancer, develop methods for detecting cancer early, and possibly conduct research on other health conditions.
         <br/>
         <br/>
-        For more information about collecting your sample, visit <a href=${appLocation}>MyConnect app</a> Have questions? Please contact the <a href=${supportLocation}>Connect Support Center.</a>
+        For more information about collecting your sample, visit <a href=${appLocation}>MyConnect</a>. Have questions? Please contact the <a href=${supportLocation}>Connect Support Center.</a>
         ${returnFooterTemplate()}`
 
 }
