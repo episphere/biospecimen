@@ -1,23 +1,21 @@
-import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
+import { nonUserNavBar } from "./../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import {
-  showAnimation,
-  hideAnimation,
-  getIdToken,
-  getParticipantSelection,
-} from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse } from "../../shared.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
+import { baselineMWKitRemainderTemplate } from "../../emailTemplates.js";
+import { conceptIds } from '../../fieldToConceptIdMapping.js';
 
-export const kitShipmentScreen = async (auth, route) => {
+export const kitShipmentScreen = async (auth) => {
   const user = auth.currentUser;
-  let uspsHit = ``;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  kitShipmentTemplate(username, auth, route);
-  verifyScannedCode(uspsHit);
+  showAnimation();
+  kitShipmentTemplate(username);
+  verifyScannedCode();
+  hideAnimation();
 };
 
-const kitShipmentTemplate = async (name, auth, route) => {
+const kitShipmentTemplate = async (name) => {
   let template = ``;
   template += homeCollectionNavbar();
   template += ` 
@@ -27,7 +25,7 @@ const kitShipmentTemplate = async (name, auth, route) => {
                       <div class="container-fluid" style="padding-top: 50px;">     
                           <div class="card">
                           <div class="card-body">
-                          <span> <h3 style="text-align: center; margin: 0 0 1rem;">Scan USPS tracking number</h3> </span>
+                          <span> <h3 style="text-align: center; margin: 0 0 1rem;">Scan tracking number</h3> </span>
                             <div style="text-align: center;  padding-bottom: 25px; "> 
                               <span id="fieldModified"> Scan Barcode</span>  : <input required type="text" name="scannedCode" id="scannedCode"  /> </div>
                               <div class="card text-center" id="cardBody" style="width: 40%; margin-left: 30%; margin-right: 30%;"> </div>
@@ -40,29 +38,23 @@ const kitShipmentTemplate = async (name, auth, route) => {
   activeHomeCollectionNavbar()
 };
 
-const verifyScannedCode = async (uspsHit) => {
-  const a = document.getElementById("scannedCode");
-  const response = await getParticipantSelection("all");
-  const assignedParticipants = response.data;
-  if (a) {
-    a.addEventListener("change", () => {
-      uspsHit = assignedParticipants.filter(
-        (i) =>
-          parseInt(i.usps_trackingNum) === parseInt(a.value) &&
-          i.kit_status != "shipped"
-      );
-      uspsHit.length != 0 ? confirmPickupTemplate(uspsHit) : tryAgainTemplate();
+const verifyScannedCode = async () => {
+  const scannedCodeInput = document.getElementById("scannedCode");
+  if (scannedCodeInput) {
+    scannedCodeInput.addEventListener("change", async () => {
+      showAnimation();
+      const isScannedCodeValid = await checkScannedCodeValid(scannedCodeInput.value)
+      isScannedCodeValid.data?.valid ? confirmPickupTemplate(isScannedCodeValid.data?.UKID) : tryAgainTemplate();
+      hideAnimation();
     });
   }
 };
 
-const confirmPickupTemplate = (uspsHit) => {
-  const a = document.getElementById("cardBody");
-  let date = currentDate();
-  let template = ``;
-  template += `        
+const confirmPickupTemplate = (UKID) => {
+  const cardBody = document.getElementById("cardBody");
+  cardBody.innerHTML = `        
                   <div class="card-body">
-                      <span id="pickupDate"> Pickup Date </span>  : <input required type="text" name="inputDate" id="inputDate" value=${date} style="text-align:center" />
+                      <span id="pickupDate"> Pickup Date </span>  : <input required type="text" name="inputDate" id="inputDate" value=${new Date().toLocaleDateString()} style="text-align:center" />
                         <br />
                         <div class="form-check" style="padding-top: 20px;">
                             <input class="form-check-input" name="options" type="checkbox" id="defaultCheck" checked>
@@ -73,51 +65,44 @@ const confirmPickupTemplate = (uspsHit) => {
                         <button type="submit" class="btn btn-danger" id="cancelResponse">Cancel</button>
                         <button type="submit" class="btn btn-primary" id="saveResponse">Save</button>
                       </div>`;
-  a.innerHTML = template;
-  saveResponse(uspsHit);
-  cancelResponse(a);
+  saveResponse(UKID);
+  cancelResponse();
 };
 
 const tryAgainTemplate = () => {
-  const a = document.getElementById("cardBody");
-  let template = ``;
-  template += `        
+  const cardBody = document.getElementById("cardBody");
+  cardBody.innerHTML = `        
                 <div class="card-body">
-                    <span> Couldn't find USPS Tracking Number </span>
+                    <span> Couldn't find scanned tracking number </span>
                     <br />
                 </div>`;
-  a.innerHTML = template;
+  verifyScannedCode();
 };
 
-const saveResponse = (uspsHit) => {
-  const a = document.getElementById("saveResponse");
+const saveResponse = (UKID) => {
+  const saveResponseBtn = document.getElementById("saveResponse");
   let data = {};
-  data.id = uspsHit && uspsHit[0].id;
-  if (a) {
-    a.addEventListener("click", (e) => {
-      data.pickup_date = document.getElementById("inputDate").value;
-      data.confirm_pickup = document.getElementById("defaultCheck").checked;
+  data[conceptIds.UKID] = UKID;
+  if (saveResponseBtn) {
+    saveResponseBtn.addEventListener("click", (e) => {
+      data[conceptIds.shippedDateTime] = convertDateReceivedinISO(document.getElementById("inputDate").value);
       setShippedResponse(data);
     });
   }
 };
 
-const cancelResponse = (cardBody) => {
+const cancelResponse = () => {
   const cancelButton = document.getElementById("cancelResponse");
-  let template = ``;
   if (cancelButton) {
     cancelButton.addEventListener("click", (e) => {
-      cardBody.innerHTML = template;
+      location.reload();
     });
   }
 };
 
 const setShippedResponse = async (data) => {
-  showAnimation();
   const idToken = await getIdToken();
-  const response = await await fetch(
-    `https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=shipped`,
-    {
+  const response = await fetch(`${baseAPI}api=confirmShipment`, {
       method: "POST",
       body: JSON.stringify(data),
       headers: {
@@ -126,27 +111,45 @@ const setShippedResponse = async (data) => {
       },
     }
   );
-  hideAnimation();
-  if (response.status === 200) {
-    let alertList = document.getElementById("alert_placeholder");
-    let template = ``;
-    template += `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                  Response saved!
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                </div>`;
-    alertList.innerHTML = template;
+  const returnedPtInfo = await processResponse(response);
+  if (returnedPtInfo.status === true) {
+    triggerSuccessModal('Shipment confirmed.')
     document.getElementById("scannedCode").value = ``;
     document.getElementById("cardBody").innerHTML = ``;
-    return true; // return success modal screen
+
+    const emailData = {
+      email: returnedPtInfo.prefEmail,
+      subject: "Next step for Connect: Your mouthwash home collection kit and survey",
+      message: baselineMWKitRemainderTemplate(returnedPtInfo.ptName),
+      notificationType: "email",
+      time: new Date().toISOString(),
+      attempt: "1st contact",
+      category: "Biospecimen Home Collection Kit Reminder",
+      token: returnedPtInfo.token,
+      uid: returnedPtInfo.uid,
+      read: false
+    };
+
+    try {
+      await(sendClientEmail(emailData));
+    }
+    catch (e) {
+      console.error(`Error sending email to user ${returnedPtInfo.prefEmail} \d`, e);
+      throw new Error(`Error sending email to user ${returnedPtInfo.prefEmail}: ${e.message}`);
+    }
+    return true;
   } else {
-    alert("Error");
+    triggerErrorModal('Error in shipping: Please check the tracking number.')
   }
 };
 
-const currentDate = () => {
-  let date = new Date().toLocaleDateString();
-  return date;
-};
+const checkScannedCodeValid = async (scannedCode) => {
+  const idToken = await getIdToken();
+  const response = await fetch(`${baseAPI}api=verifyScannedCode&id=${scannedCode}`, {
+      method: "GET",
+      headers: {
+          Authorization:"Bearer "+idToken
+      }
+  });
+  return await response.json();
+}

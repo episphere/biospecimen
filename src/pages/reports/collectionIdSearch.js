@@ -4,7 +4,7 @@ import { activeReportsNavbar } from "./activeReportsNavbar.js";
 import { showAnimation, hideAnimation, showNotifications,findParticipant, errorMessage, removeAllErrors, searchSpecimen, appState } from '../../shared.js';
 import { masterSpecimenIDRequirement } from '../../tubeValidation.js';
 import { finalizeTemplate } from '../finalize.js';
-import fieldToConceptIdMapping from "../../fieldToConceptIdMapping.js";
+import { conceptIds as fieldToConceptIdMapping } from "../../fieldToConceptIdMapping.js";
 
 export const collectionIdSearchScreen = async (auth, route) => {
     const user = auth.currentUser;

@@ -1,12 +1,11 @@
 import { appState, performSearch, showAnimation, addBiospecimenUsers, getSpecimensByCollectionIds, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant,
         errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, updateBox,
-        ship, disableInput, updateNewTempDate, getSiteTubesLists, getWorkflow, 
-        getSiteCouriers, getPage, getNumPages, removeSingleError, displayContactInformation, checkShipForage, checkAlertState, retrieveDateFromIsoString,
+        ship, disableInput, updateNewTempDate, getSiteTubesLists, getWorkflow, fixMissingTubeData,
+        getSiteCouriers, getPage, getNumPages, removeSingleError, displayManifestContactInfo, checkShipForage, checkAlertState, retrieveDateFromIsoString,
         convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
         checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData,
         siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
-        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger,
-        packageConditonConversion, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList } from './shared.js';
+        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
 import { addNewBox, buildSpecimenDataInModal, createShippingModalBody, startShipping, generateBoxManifest, populateViewShippingBoxContentsList,
@@ -18,7 +17,7 @@ import { tubeCollectedTemplate } from './pages/collectProcess.js';
 import { finalizeTemplate } from './pages/finalize.js';
 import { additionalTubeIDRequirement, masterSpecimenIDRequirement, totalCollectionIDLength, workflows, specimenCollection, deviationReasons, refusedShippingDeviationConceptList} from './tubeValidation.js';
 import { updateShippingStateAddBagToBox, updateShippingStateSelectedLocation } from './shippingState.js';
-import conceptIds from './fieldToConceptIdMapping.js';
+import { conceptIds, packageConditionConversion } from './fieldToConceptIdMapping.js';
 
 
 export const addEventSearchForm1 = () => {
@@ -1343,7 +1342,13 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
     let hasCntdError = false;
 
     inputFields.forEach(input => {
-        const tubes = siteTubesList.filter(tube => tube.concept === input.id.replace('Id', ''));
+        const tubeConceptId = input.id.replace('Id', '');
+        const tubes = siteTubesList.filter(tube => tube.concept === tubeConceptId);
+        
+        if (tubeConceptId && biospecimenData[tubeConceptId] === undefined) {
+            const tubePlaceholderData = siteTubesList.find(stockTube => stockTube.concept === tubeConceptId);
+            fixMissingTubeData(tubePlaceholderData, biospecimenData[tubeConceptId] = {});
+        }
 
         let value = getValue(`${input.id}`).toUpperCase();
         const masterID = value.substr(0, masterSpecimenIDRequirement.length);
@@ -1378,7 +1383,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
             focus = false;
         }
 
-        if (input.required) biospecimenData[`${input.id.replace('Id', '')}`][conceptIds.collection.tube.scannedId] = `${masterID} ${tubeID}`.trim();
+        if (tubeConceptId && input.required) biospecimenData[tubeConceptId][conceptIds.collection.tube.scannedId] = `${masterID} ${tubeID}`.trim();
     });
 
     if ((hasError && cntd == true) || hasCntdError) return;
@@ -1660,11 +1665,12 @@ export const addEventNavBarShippingManifest = (userName) => {
         if (btn.classList.contains('active')) return;
         //get table info
         let boxesToShip = [];
-        let shipSetForage = []
-        let currTable = document.getElementById('saveTable')
-        let tempCheckStatus = ""
-        const currSiteSpecificName = document.getElementById('selectLocationList').value
-        const currShippingLocationNumber = siteSpecificLocationToConceptId[currSiteSpecificName]
+        let shipSetForage = [];
+        let currTable = document.getElementById('saveTable');
+        let tempCheckStatus = "";
+        const currSiteSpecificName = document.getElementById('selectLocationList').value;
+        const currShippingLocationNumber = siteSpecificLocationToConceptId[currSiteSpecificName];
+        const currShippingLocationNumberObj = locationConceptIDToLocationMap[currShippingLocationNumber];
         appState.setState(state => ({shipping: {...state.shipping, locationNumber: currShippingLocationNumber}}));
         for (var r = 1; r < currTable.rows.length; r++) {
 
@@ -1714,13 +1720,13 @@ export const addEventNavBarShippingManifest = (userName) => {
           return
         }
 
-        tempCheckStatus = tempCheckedEl.checked 
+        tempCheckStatus = tempCheckedEl.checked;
         // Push empty item with boxId and empty tracking number string
         // shipSetForage used to handle empty localforage or no box id match
         boxesToShip.forEach(box => shipSetForage.push({ "boxId": box, [conceptIds.shippingTrackingNumber]: "" }));
-        checkShipForage(shipSetForage,boxesToShip)
+        checkShipForage(shipSetForage,boxesToShip);
         //return box 1 info
-        shippingPrintManifestReminder(boxesToShip, userName, tempCheckStatus, currShippingLocationNumber);
+        shippingPrintManifestReminder(boxesToShip, userName, tempCheckStatus, currShippingLocationNumberObj);
     });
 }
 
@@ -2232,7 +2238,7 @@ export const populateBoxTable = async (page, filter, source) => {
         currRow.insertCell(4).innerHTML = '<button type="button" class="button btn btn-info" id="reportsViewManifest' + i + '">View manifest</button>';
         currRow.insertCell(5).innerHTML = currPage['333524031'] === 353358909 ? "Yes" : "No"
         currRow.insertCell(6).innerHTML = receivedDate;
-        currRow.insertCell(7).innerHTML = convertConceptIdToPackageCondition(packagedCondition, packageConditonConversion);
+        currRow.insertCell(7).innerHTML = convertConceptIdToPackageCondition(packagedCondition, packageConditionConversion);
         currRow.insertCell(8).innerHTML = currPage['870456401'] || '' ;
         addEventViewManifestButton('reportsViewManifest' + i, currPage, source);
 
@@ -2247,59 +2253,44 @@ export const addEventViewManifestButton = (buttonId, currPage, source) => {
     });
 }
 
-
 export const populateReportManifestHeader = (currPage) => {
-    let column1 = document.getElementById("boxManifestCol1")
-    let column2 = document.getElementById("boxManifestCol3")
-    let siteAcronym = currPage["siteAcronym"]
+    const currShippingLocationNumber = currPage[conceptIds.shippingLocation];
+    const currShippingLocationNumberObj = locationConceptIDToLocationMap[currShippingLocationNumber];
 
-    let currShippingLocationNumber = currPage['560975149']
-    const currContactInfo = locationConceptIDToLocationMap[currShippingLocationNumber]["contactInfo"][siteAcronym]
-
-    let newDiv = document.createElement("div")
+    let newDiv = document.createElement("div");
     let newP = document.createElement("p");
-    newP.innerHTML = currPage['132929440'] + " Manifest";
-    newP.setAttribute("style", "font-size: 1.5rem; font-weight:bold;")
+    newP.innerHTML = currPage[conceptIds.shippingBoxId] + " Manifest";
+    newP.setAttribute("style", "font-size: 1.5rem; font-weight:bold;");
     document.getElementById('boxManifestCol1').appendChild(newP);
 
-    let toInsertDateStarted = ''
-    if (currPage.hasOwnProperty('672863981')) { // 672863981 - Autogenerated date/time when first bag added to box
-        let dateStarted = Date.parse(currPage['672863981'])
+    let toInsertDateStarted = '';
+    if (currPage.hasOwnProperty(conceptIds.firstBagAddedToBoxTimestamp)) {
+        const dateStarted = Date.parse(currPage[conceptIds.firstBagAddedToBoxTimestamp]);
+        const currentdate = new Date(dateStarted);
 
-        let currentdate = new Date(dateStarted);
-        let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
-        let hour = parseInt(currentdate.getHours()) % 12;
         toInsertDateStarted = (currentdate.getMonth() + 1) + "/"
             + currentdate.getDate() + "/"
             + currentdate.getFullYear()
-        /*+ " "  
-        + hour.toString()+ ":"  
-        + currentdate.getMinutes() + ampm;
-*/
     }
-    let toInsertDateShipped = ''
-    if (currPage.hasOwnProperty('656548982')) { // 656548982 - Autogenerated date/time stamp for submit shipment time
-        let dateStarted = currPage['656548982']
 
-        let currentdate = new Date(dateStarted);
-        let ampm = parseInt(currentdate.getHours()) / 12 >= 1 ? "PM" : "AM";
-        let hour = parseInt(currentdate.getHours()) % 12;
+    let toInsertDateShipped = ''
+    if (currPage.hasOwnProperty(conceptIds.shippingShipDate)) {
+        const dateStarted = currPage[conceptIds.shippingShipDate];
+        const currentdate = new Date(dateStarted);
+
         toInsertDateShipped = (currentdate.getMonth() + 1) + "/"
             + currentdate.getDate() + "/"
             + currentdate.getFullYear()
-        /*+ " "  
-        + hour.toString()+ ":"  
-        + currentdate.getMinutes() + ampm;
-*/
     }
+
     newP = document.createElement("p");
     newP.innerHTML = "Date Started: " + toInsertDateStarted;
     document.getElementById('boxManifestCol1').appendChild(newP);
     newP = document.createElement("p");
     newP.innerHTML = "Date Shipped: " + toInsertDateShipped;
     document.getElementById('boxManifestCol1').appendChild(newP);
-    newDiv.innerHTML = displayContactInformation(currContactInfo)
-    document.getElementById('boxManifestCol1').appendChild(newDiv)
+    newDiv.innerHTML = displayManifestContactInfo(currShippingLocationNumberObj);
+    document.getElementById('boxManifestCol1').appendChild(newDiv);
 }
 
 export const populateReportManifestTable = (currPage, searchSpecimenInstituteArray) => {
@@ -2353,7 +2344,6 @@ export const addPaginationFunctionality = (lastPage, filter, source) => {
     let next = document.getElementById('nextPage');
     let final = document.getElementById('lastPage');
     let middleNumber = document.getElementById('middlePage');
-
     first.addEventListener('click', () => {
         middleNumber.innerHTML = '1'
         populateBoxTable(0, filter, source)

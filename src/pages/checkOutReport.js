@@ -1,7 +1,7 @@
 import { userAuthorization, removeActiveClass, hideAnimation, showAnimation, findParticipant, convertISODateTime, restrictNonBiospecimenUser } from "./../shared.js"
 import { checkInTemplate } from './checkIn.js';
 import { homeNavBar, reportSideNavBar } from '../navbar.js';
-import fieldToConceptIdMapping from "../fieldToConceptIdMapping.js";
+import { conceptIds as fieldToConceptIdMapping } from "../fieldToConceptIdMapping.js";
 
 
 export const checkOutReportTemplate = (auth, route) => {

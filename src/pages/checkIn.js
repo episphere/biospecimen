@@ -1,6 +1,6 @@
 import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getCollectionsByVisit, getParticipantCollections, getSiteTubesLists } from "./../shared.js";
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
-import conceptIds from '../fieldToConceptIdMapping.js';
+import { conceptIds } from '../fieldToConceptIdMapping.js';
 
 export const checkInTemplate = async (data, checkOutFlag) => {
     removeActiveClass('navbar-btn', 'active')

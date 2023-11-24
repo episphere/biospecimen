@@ -1,5 +1,4 @@
 import { getIdToken, findParticipant, showAnimation, hideAnimation} from "../../shared.js";
-import fieldMapping from "../../fieldToConceptIdMapping.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
 import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
