@@ -49,7 +49,7 @@ const bptlScreenTemplate = (name, data, auth, route) => {
                     <div class="p-3 border bg-light"><button type="button" href="#assignkits" class="btn btn-primary btn-lg" id="assignKits">Assign Kits</button></div>
                     <div class="p-3 border bg-light"><button type="button" href="#kitshipment" class="btn btn-primary btn-lg" id="kitShipment">Ship Kits</button></div>
                     <div class="p-3 border bg-light"><button type="button" href="#kitsreceipt" class="btn btn-primary btn-lg" id="kitsReceipt">Kits Receipt</button></div>
-                    <div class="p-3 border bg-light"><button type="button" href="#participantselection" class="btn btn-primary btn-lg" id="participantSelection">Reports</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#participantselection" class="btn btn-primary btn-lg" id="participantSelection" disabled>Reports</button></div>
                 </div>
                 <div class="col">
                     <h4>Supplies</h4>
