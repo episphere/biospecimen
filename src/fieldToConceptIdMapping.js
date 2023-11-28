@@ -325,6 +325,7 @@ export const conceptIds = {
     collectionCardFlag: 137401245,
     collectionAddtnlNotes: 260133861,
     pkgComments: 870456401,
+    kitPkgComments: 755095663
 
 };
 
