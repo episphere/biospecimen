@@ -70,7 +70,7 @@ const kitsReceiptTemplate = async (name) => {
                   </div>
                   <div id="collectionCard">
                       <div class="row form-group">
-                          <label class="col-form-label col-md-4 for="collectionCheckBox">Check if card not included</label>
+                          <label class="col-form-label col-md-4 for="collectionCheckBox">Check if card missing</label>
                           <input type="checkbox" name="collectionCheckBox" id="collectionCheckBox">
                       </div>
                       <div class="row form-group">
