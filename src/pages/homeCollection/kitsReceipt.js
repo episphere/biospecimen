@@ -70,7 +70,7 @@ const kitsReceiptTemplate = async (name) => {
                   </div>
                   <div id="collectionCard">
                       <div class="row form-group">
-                          <label class="col-form-label col-md-4 for="collectionCheckBox">Check if card not included</label>
+                          <label class="col-form-label col-md-4 for="collectionCheckBox">Check if Collection Card Missing</label>
                           <input type="checkbox" name="collectionCheckBox" id="collectionCheckBox">
                       </div>
                       <div class="row form-group">
@@ -167,7 +167,7 @@ export const confirmKitReceipt = () => {
           if (option.selected) {packageConditions.push(option.value)}
         }
         kitObj[`${conceptIds.pkgReceiptConditions}`] = packageConditions;
-        kitObj[conceptIds.pkgComments] = document.getElementById('receivePackageComments').value.trim();
+        kitObj[conceptIds.kitPkgComments] = document.getElementById('receivePackageComments').value.trim();
         kitObj[conceptIds.receivedDateTime] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
         if (document.getElementById('collectionId').value) {
           kitObj[conceptIds.collectionCupId] = document.getElementById('collectionId').value;
