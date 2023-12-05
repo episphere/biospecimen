@@ -1,4 +1,4 @@
-import { addBoxAndUpdateSiteDetails, appState, conceptIdToSiteSpecificLocation, combineAvailableCollectionsObjects, displayContactInformation, filterDuplicateSpecimensInList, getAllBoxes, getBoxes, getSpecimensInBoxes, getUnshippedBoxes, getLocationsInstitute, getSiteMostRecentBoxId, getSpecimensByBoxedStatus, hideAnimation, locationConceptIDToLocationMap,
+import { addBoxAndUpdateSiteDetails, appState, conceptIdToSiteSpecificLocation, combineAvailableCollectionsObjects, displayManifestContactInfo, filterDuplicateSpecimensInList, getAllBoxes, getBoxes, getSpecimensInBoxes, getUnshippedBoxes, getLocationsInstitute, getSiteMostRecentBoxId, getSpecimensByBoxedStatus, hideAnimation, locationConceptIDToLocationMap,
         removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
         translateNumToType, userAuthorization, getSiteAcronym } from "../shared.js"
 import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs,
@@ -7,7 +7,7 @@ import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBack
         addEventTrackingNumberScanAutoFocus, addEventTrimTrackingNums, compareBoxIds, populateCourierBox, populateFinalCheck, populateTrackingQuery } from "../events.js";     
 import { homeNavBar, shippingNavBar, unAuthorizedUser} from '../navbar.js';
 import { setAllShippingState, updateShippingStateCreateBox, updateShippingStateRemoveBagFromBox, updateShippingStateSelectedLocation } from '../shippingState.js';
-import conceptIds from '../fieldToConceptIdMapping.js';
+import { conceptIds } from '../fieldToConceptIdMapping.js';
 
 export const shippingDashboard = (auth, route) => {
     auth.onAuthStateChanged(async user => {
@@ -471,15 +471,15 @@ const getLargestLocationBoxId = (boxesList, siteLocationId) => {
 
 export const generateBoxManifest = (currBox) => {
     const currInstitute = currBox.boxData.siteAcronym || getSiteAcronym();
+    const currShippingLocationNumberObj = locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]
     const currLocation = locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]["siteSpecificLocation"];
-    const currContactInfo = locationConceptIDToLocationMap[currBox.boxData[conceptIds.shippingLocation]]["contactInfo"];
 
     removeActiveClass('navbar-btn', 'active');
     const navBarBoxManifestBtn = document.getElementById('navBarBoxManifest');
     navBarBoxManifestBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = renderBoxManifestTemplate(currInstitute, currLocation);
 
-    populateBoxManifestHeader(currBox, currContactInfo);
+    populateBoxManifestHeader(currBox, currShippingLocationNumberObj);
     populateBoxManifestTable(currBox);
     document.getElementById('printBox').addEventListener('click', e => {
         window.print();
@@ -488,7 +488,7 @@ export const generateBoxManifest = (currBox) => {
     addEventReturnToPackaging();
 }
 
-export const populateBoxManifestHeader = (currBox, currContactInfo) => {
+export const populateBoxManifestHeader = (currBox, currShippingLocationNumberObj) => {
     if(!currBox) return;
 
     const currKeys = Object.keys(currBox).filter(key => key !== 'boxData' && key !== 'undefined');
@@ -499,12 +499,12 @@ export const populateBoxManifestHeader = (currBox, currContactInfo) => {
     const boxStartedTimestamp = formatTimestamp(currBox.boxData[conceptIds.firstBagAddedToBoxTimestamp]);
     const boxLastModifiedTimestamp = formatTimestamp(currBox.boxData[conceptIds.shippingShipDateModify]);
 
-    renderBoxManifestHeader(boxId, boxStartedTimestamp, boxLastModifiedTimestamp, numBags, numTubes, currContactInfo);
+    renderBoxManifestHeader(boxId, boxStartedTimestamp, boxLastModifiedTimestamp, numBags, numTubes, currShippingLocationNumberObj);
 }
 
 // Render the box manifest header.
 // CreateParent divs, create list of data to be appended, create the new elements, append.
-const renderBoxManifestHeader = (boxId, boxStartedTimestamp, boxLastModifiedTimestamp, numBags, numTubes, currContactInfo) => {
+const renderBoxManifestHeader = (boxId, boxStartedTimestamp, boxLastModifiedTimestamp, numBags, numTubes, currShippingLocationNumberObj) => {
     const boxManifestCol1 = document.getElementById('boxManifestCol1');
     const boxManifestCol3 = document.getElementById('boxManifestCol3');
     
@@ -515,7 +515,7 @@ const renderBoxManifestHeader = (boxId, boxStartedTimestamp, boxLastModifiedTime
         { text: `${boxId} Manifest`, style: { fontWeight: '700', fontSize: '1.5rem' } },
         { text: `Date Started: ${boxStartedTimestamp}` },
         { text: `Last Modified: ${boxLastModifiedTimestamp}` },
-        { text: displayContactInformation(currContactInfo), isHTML: true }
+        { text: displayManifestContactInfo(currShippingLocationNumberObj), isHTML: true }
     ];
     
     const dataCol3 = [
@@ -879,16 +879,15 @@ const tempSelectStringRender = ({boxIdArray, isTempMonitorIncluded}) => {
     return tempSelectString;
 }
 
-export const populateShippingManifestHeader = (userName, siteAcronym, currShippingLocationNumber) => {
-    const currContactInfo = locationConceptIDToLocationMap[currShippingLocationNumber]["contactInfo"][siteAcronym];
-    const siteSpecificLocation = locationConceptIDToLocationMap[currShippingLocationNumber]["siteSpecificLocation"];
+export const populateShippingManifestHeader = (userName, siteAcronym, currShippingLocationNumberObj) => {
+    const siteSpecificLocation = currShippingLocationNumberObj["siteSpecificLocation"];
 
     const currentDateTime = formatTimestamp();
     const dataCol1 = [
         { text: "Shipment Manifest", style: { fontWeight: '700', fontSize: '1.5rem' } },
         { text: `Current Date/Time: ${currentDateTime}` },
         { text: `Sender: ${userName}` },
-        { text: displayContactInformation(currContactInfo), isHTML: true }
+        { text: displayManifestContactInfo(currShippingLocationNumberObj), isHTML: true }
     ];
     
     const dataCol3 = [

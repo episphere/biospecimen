@@ -44,9 +44,12 @@ const bptlScreenTemplate = (name, data, auth, route) => {
             <div class="row gx-5">
                 <div class="col">
                     <h4>Home Collection</h4>
-                    <div class="p-3 border bg-light"><button type="button" href="#kitassembly" class="btn btn-primary btn-lg" id="kitAssembly">Kit Assembly</button></div>
-                    <div class="p-3 border bg-light"><button type="button" href="#participantselection" class="btn btn-primary btn-lg" id="participantSelection">Kit Status</button></div>
-                    <div class="p-3 border bg-light"><button type="button" href="#kitshipment" class="btn btn-primary btn-lg" id="kitShipment">Kit Shipment</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#kitassembly" class="btn btn-primary btn-lg" id="kitAssembly">Assemble Kits</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#printlabels" class="btn btn-primary btn-lg" id="printLabels">Print Labels</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#assignkits" class="btn btn-primary btn-lg" id="assignKits">Assign Kits</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#kitshipment" class="btn btn-primary btn-lg" id="kitShipment">Ship Kits</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#kitsreceipt" class="btn btn-primary btn-lg" id="kitsReceipt">Kits Receipt</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#participantselection" class="btn btn-primary btn-lg" id="participantSelection" disabled>Reports</button></div>
                 </div>
                 <div class="col">
                     <h4>Supplies</h4>
@@ -78,13 +81,25 @@ const redirectPageToLocation = () => {
   kitAssemblyRedirection && kitAssemblyRedirection.addEventListener("click", async () => {
       location.hash = "#kitassembly";
     });
-  const participantSelectionRedirection = document.getElementById("participantSelection");
-  participantSelectionRedirection && participantSelectionRedirection.addEventListener("click", async () => {
-      location.hash = "#participantselection";
+  const printLabelsRedirection = document.getElementById("printLabels");
+  printLabelsRedirection && printLabelsRedirection.addEventListener("click", async () => {
+      location.hash = "#printlabels";
+    });
+  const assignKitsRedirection = document.getElementById("assignKits");
+  assignKitsRedirection && assignKitsRedirection.addEventListener("click", async () => {
+      location.hash = "#assignkits";
     });
   const kitShipmentRedirection = document.getElementById("kitShipment");
   kitShipmentRedirection && kitShipmentRedirection.addEventListener("click", async () => {
       location.hash = "#kitshipment";
+    });
+  const kitsReceiptRedirection = document.getElementById("kitsReceipt");
+  kitsReceiptRedirection && kitsReceiptRedirection.addEventListener("click", async () => {
+    location.hash = "#kitsreceipt";
+  });
+  const participantSelectionRedirection = document.getElementById("participantSelection");
+  participantSelectionRedirection && participantSelectionRedirection.addEventListener("click", async () => {
+      location.hash = "#participantselection";
     });
   const packagesInTransitRedirection = document.getElementById("packagesInTransit");
   packagesInTransitRedirection && packagesInTransitRedirection.addEventListener("click", async () => {

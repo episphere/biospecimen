@@ -1,7 +1,7 @@
 import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormEditAll, addEventBiospecimenCollectionFormText } from './../events.js'
-import { removeActiveClass, generateBarCode, addEventBarCodeScanner, visitType, getSiteTubesLists, getWorkflow, getCheckedInVisit, findParticipant, checkedIn } from '../shared.js';
+import { checkTubeDataConsistency, removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorkflow, findParticipant, checkedIn } from '../shared.js';
 import { checkInTemplate } from './checkIn.js';
-import conceptIds from '../fieldToConceptIdMapping.js';
+import { conceptIds } from '../fieldToConceptIdMapping.js';
 
 export const tubeCollectedTemplate = (participantData, biospecimenData) => {
     const isCheckedIn = checkedIn(participantData);
@@ -63,6 +63,8 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
                     <tbody>`
                     
                     let siteTubesList = getSiteTubesLists(biospecimenData);
+                    checkTubeDataConsistency(siteTubesList, biospecimenData);
+
                     const collectionFinalized = (biospecimenData[conceptIds.collection.isFinalized] === conceptIds.yes);
                     
                     if(!siteTubesList || siteTubesList?.length === 0) siteTubesList = [];
