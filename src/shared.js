@@ -2585,13 +2585,14 @@ export const translateNumToType = {
 
 export const convertISODateTime = (isoDateTime) => {
     const date = new Date(isoDateTime);
-    return setZeroDateTime(date.getMonth() + 1)+ '/' + setZeroDateTime(date.getDate()) + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + setZeroDateTime(date.getMinutes())
-}
+    return setZeroDateTime(date.getUTCMonth() + 1) + '/' + setZeroDateTime(date.getUTCDate()) + '/' + date.getUTCFullYear() + ' ' + setZeroDateTime(date.getUTCHours()) + ':' + setZeroDateTime(date.getUTCMinutes())
+};
 
-const setZeroDateTime = (dateTimeInput) => { // append 0 before min if single digit min
-    if (dateTimeInput < 10) dateTimeInput = '0' + dateTimeInput;
-    return dateTimeInput
-}
+// append 0 before min. if single digit min. or hour
+const setZeroDateTime = (dateTimeInput) => {
+    return dateTimeInput < 10 ? '0' + dateTimeInput : dateTimeInput.toString();
+};
+
 
 export const formatISODateTime = (dateReceived) => {
     let extractDate = dateReceived.split("T")[0]

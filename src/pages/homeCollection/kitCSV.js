@@ -5,7 +5,7 @@ import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
 import { receiptedCSVFileTemplate, downloadCSVfile } from '../receipts/csvFileReceipt.js';
 
-export const kitCsvScreen = async (auth) => {
+export const kitCsvScreen = (auth) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
@@ -15,7 +15,7 @@ export const kitCsvScreen = async (auth) => {
   hideAnimation();
 };
 
-const kitCsvTemplate = async (name) => {
+const kitCsvTemplate = (name) => {
   let template = ``;
   template += homeCollectionNavbar();
 
@@ -35,6 +35,7 @@ const csvFileButtonSubmit = () => {
       const dateFilter = document.getElementById("csvDateInput").value + 'T00:00:00.000Z'; 
       showAnimation();
       try {
+        console.log('dateFilter', dateFilter)
           const results = await getKitsByReceivedDate(dateFilter);
           const modifiedResults = modifyKitQueryResults(results.data);
           generateKitCSVData(modifiedResults);
