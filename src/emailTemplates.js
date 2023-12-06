@@ -103,26 +103,34 @@ export const baselineMWThankYouTemplate = (ptName) => {
         <br/>
         <br/>
         We appreciate your participation in Connect! Have questions? Please contact the <a href=${supportLocation}>Connect Support Center.</a>
-        ${returnFooterTemplate()}`
+        ${returnFooterTemplate(true)}`
 }
 
-const returnFooterTemplate = () => {
-    return `<br/>
+const returnFooterTemplate = (thankYouTemplate) => {
+    const commonFooter = `
+        <br/>
+        <br/>
+        Sincerely,
+        <br/>
+        the Connect team at the National Cancer Institute
+        <br/>
+        9609 Medical Center Drive, Rockville MD 20850
+        <br/>
+        <img src="https://raw.githubusercontent.com/episphere/connectApp/master/images/new_logo.png" style="width:150px;height:40px;">
+        <br/>
+        <br/>
+        <em>To protect your information, we follow federal privacy rules, including the <a href="https://www.justice.gov/archives/opcl/overview-privacy-act-1974-2015-edition">Privacy Act</a> and the <a href="https://grants.nih.gov/grants/guide/notice-files/NOT-OD-19-050.html">Common Rule</a>.</em>
+        <br/>
+        <br/>
+        <em>This message is private. If you have received it by mistake, please let us know by emailing ConnectSupport@NORC.org, and please kindly delete the message. If you are not the right recipient, please do not share this message with anyone.</em>`;
+
+    return (!thankYouTemplate)
+        ? `${commonFooter}`
+        : `
+            <br/>
             <br/>
             Thank you for your commitment to helping us learn how to better prevent cancer.
             <br/>
             <br/>
-            Sincerely,
-            <br/>
-            the Connect team at the National Cancer Institute
-            <br/>
-            9609 Medical Center Drive, Rockville MD 20850
-            <br/>
-            <img src="https://raw.githubusercontent.com/episphere/connectApp/master/images/new_logo.png" style="width:150px;height:40px;">
-            <br/>
-            <br/>
-            <em>To protect your information, we follow federal privacy rules, including the <a href="https://www.justice.gov/archives/opcl/overview-privacy-act-1974-2015-edition">Privacy Act</a> and the <a href="https://grants.nih.gov/grants/guide/notice-files/NOT-OD-19-050.html">Common Rule</a>.</em>
-            <br/>
-            <br/>
-            <em>This message is private. If you have received it by mistake, please let us know by emailing ConnectSupport@NORC.org, and please kindly delete the message. If you are not the right recipient, please do not share this message with anyone.</em>`
-}
+            ${commonFooter}`;
+};
