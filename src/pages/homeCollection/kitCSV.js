@@ -1,6 +1,6 @@
 import { nonUserNavBar } from "../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { showAnimation, hideAnimation, getIdToken, baseAPI, keyToNameObj, keyToNameAbbreviationObj, triggerSuccessModal, triggerErrorModal, getCurrentDate, convertISODateTime } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, baseAPI, keyToNameObj, keyToNameAbbreviationObj, triggerErrorModal, convertISODateTime } from "../../shared.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
 import { receiptedCSVFileTemplate, downloadCSVfile } from '../receipts/csvFileReceipt.js';
@@ -26,7 +26,7 @@ const kitCsvTemplate = async (name) => {
   
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
-  activeHomeCollectionNavbar()
+  activeHomeCollectionNavbar();
 };
 
 const csvFileButtonSubmit = () => {
@@ -73,9 +73,9 @@ const modifyKitQueryResults = (kitsData) => {
   kitsData.forEach(kitData => {
     const sampleCollectionCenter = keyToNameObj[kitData[conceptIds.healthcareProvider]];
     const collectionId = kitData[conceptIds.collection.id]; // CNA899209
-    const bsiID =  kitData[conceptIds.collection.mouthwashTube1][conceptIds.collection.tube.scannedId]; // CNA899209 0007
-    const tubeID =  bsiID.split(' ')[1]; // 0007
-    const Connect_ID = kitData['Connect_ID']
+    const bsiID = kitData[conceptIds.collection.mouthwashTube1][conceptIds.collection.tube.scannedId]; // CNA899209 0007
+    const tubeID = bsiID.split(' ')[1]; // 0007
+    const Connect_ID = kitData['Connect_ID'];
     const dateReceived = convertISODateTime(kitData[conceptIds.collection.mouthwashTube1][conceptIds.receivedDateTime]);
     const dateDrawn = convertISODateTime(kitData[conceptIds.dateWithdrawn]);
     const vialMappings = getVialTypesMapping('home', keyToNameAbbreviationObj[kitData[conceptIds.healthcareProvider]], tubeID);
