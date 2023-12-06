@@ -2719,7 +2719,7 @@ export const addBoxAndUpdateSiteDetails = async (boxAndSiteData) => {
 }
 
 export const triggerErrorModal = (message) => {
-    let alertList = document.getElementById("alert_placeholder");
+    const alertList = document.getElementById("alert_placeholder");
     alertList.innerHTML = `
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             ${message}
@@ -2730,7 +2730,7 @@ export const triggerErrorModal = (message) => {
 }
 
 export const triggerSuccessModal = (message) => {
-    let alertList = document.getElementById("alert_placeholder");
+    const alertList = document.getElementById("alert_placeholder");
     alertList.innerHTML = `
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             ${message}
@@ -2790,3 +2790,8 @@ export const processResponse = async (response) => {
     const data = await response.json();
     return data.response;
 }
+
+export const getCurrentDate = () => {
+    return new Date().toLocaleDateString('en-CA');
+}
+  
