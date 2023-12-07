@@ -135,7 +135,7 @@ const confirmAssignment = (participants) => {
         document.getElementById('Connect_ID').value = ``;
         document.getElementById('scannedBarcode').value = ``;
         document.getElementById('scanSupplyKit').value = ``;
-        document.getElementById("showErrorMsg").innerHTML = ``
+        document.getElementById("showErrorMsg").innerHTML = ``;
        
         const filteredParticipants  = participants.filter((participant) => {
           return participant['connect_id'] !== parseInt(participantObj['Connect_ID']);
