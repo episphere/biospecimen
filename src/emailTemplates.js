@@ -106,7 +106,7 @@ export const baselineMWThankYouTemplate = (ptName) => {
         ${returnFooterTemplate(true)}`
 }
 
-const returnFooterTemplate = (thankYouTemplate) => {
+const returnFooterTemplate = (isThankYouTemplate) => {
     const commonFooter = `
         <br/>
         <br/>
@@ -124,7 +124,7 @@ const returnFooterTemplate = (thankYouTemplate) => {
         <br/>
         <em>This message is private. If you have received it by mistake, please let us know by emailing ConnectSupport@NORC.org, and please kindly delete the message. If you are not the right recipient, please do not share this message with anyone.</em>`;
 
-    return (!thankYouTemplate)
+    return (!isThankYouTemplate)
         ? `${commonFooter}`
         : `
             <br/>
