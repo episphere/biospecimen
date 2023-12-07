@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberValid } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -35,7 +35,7 @@ const kitAssemblyTemplate = async (name) => {
                           <label for="scannedBarcode" class="col-md-4 col-form-label">Tracking Number</label>
                           <div class="col-md-8">
                             <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan Barcode" required />
-                            <span id="showErrorMsg" style="font-size: 14px;"></span>
+                            <span id="showMsg" style="font-size: 14px;"></span>
                           </div>
                         </div>
                         <div class="form-group row">
@@ -94,7 +94,7 @@ const kitAssemblyTemplate = async (name) => {
   processAssembledKit();
   enableEnterKeystroke();
   dropdownTrigger('Select Kit Type');
-  checkTrackingNumberValid();
+  checkTrackingNumberSource();
   performQCcheck('returnKitId', 'supplyKitId', 'showReturnKitErrorMsg', `Supply Kit & Return Kit need to be same`);
   performQCcheck('cardId', 'cupId', 'showCardIdErrorMsg', `Cup ID & Card ID need to be same`);
 };
@@ -158,12 +158,12 @@ const processAssembledKit = () => {
         kitObj[conceptIds.kitType] = conceptIds.mouthwashKitType;
         const responseStoredStatus = await storeAssembledKit(kitObj);
         if (responseStoredStatus) {
-          document.getElementById('scannedBarcode').value = ``
-          document.getElementById('supplyKitId').value = ``
-          document.getElementById('returnKitId').value = ``
-          document.getElementById('cupId').value = ``
-          document.getElementById('cardId').value = ``
-          document.getElementById("showErrorMsg").innerHTML = ``
+          document.getElementById('scannedBarcode').value = ``;
+          document.getElementById('supplyKitId').value = ``;
+          document.getElementById('returnKitId').value = ``;
+          document.getElementById('cupId').value = ``;
+          document.getElementById('cardId').value = ``;
+          document.getElementById("showMsg").innerHTML = ``;
         }
       }
     })

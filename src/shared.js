@@ -2740,27 +2740,31 @@ export const triggerSuccessModal = (message) => {
         </div>`;
 }
 
-export const checkTrackingNumberValid = () => {
+export const checkTrackingNumberSource = () => {
     const scannedBarcode = document.getElementById("scannedBarcode");
     if (!scannedBarcode) {
       return;
     }
     scannedBarcode.addEventListener("input", (e) => {
       const input = e.target.value.trim();
-      const showErrorMsg = document.getElementById('showErrorMsg');
+      const showMsg = document.getElementById('showMsg');
       if (input.length === 0) {
-        showErrorMsg.innerHTML = "";
+        showMsg.innerHTML = "";
         return;
       }
       if (input.length === 22 || input.length === 20) {
-        showErrorMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: blue;"></i>USPS`;
+        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: blue;"></i>USPS`;
         return;
       }
       if (input.length === 12) {
-        showErrorMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
+        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
         return;
       }
-      showErrorMsg.innerHTML = "";
+    //   if (uspsFirstThreeNumbersCheck(input) || (input.length === 34 && uspsFirstThreeNumbersCheck(input))) {
+    //     document.getElementById('showMsg').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
+    //     return
+    //   }
+      showMsg.innerHTML = "";
     });
 }
 

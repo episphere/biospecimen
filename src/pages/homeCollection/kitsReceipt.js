@@ -1,10 +1,10 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource } from "../../shared.js";
 import { baselineMWSurveyRemainderTemplate, baselineMWThankYouTemplate } from "../../emailTemplates.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from "../../fieldToConceptIdMapping.js";
-import { displayPackageConditionListEmptyModal, displaySelectedPackageConditionListModal, checkAndDisplayCourierType, checkSelectPackageConditionsList, targetAnchorTagEl, addListenersOnPageLoad, beforeUnloadMessage, enableCollectionCardFields, enableCollectionCheckBox } from "../receipts/packageReceipt.js";
+import { displayPackageConditionListEmptyModal, displaySelectedPackageConditionListModal, checkSelectPackageConditionsList, targetAnchorTagEl, addListenersOnPageLoad, beforeUnloadMessage, enableCollectionCardFields, enableCollectionCheckBox } from "../receipts/packageReceipt.js";
 
 const contentBody = document.getElementById("contentBody");
 
@@ -36,7 +36,7 @@ const kitsReceiptTemplate = async (name) => {
                     <label class="col-form-label col-md-4" for="scannedBarcode">Scan Barcode</label>
                     <div style="display:inline-block;">
                       <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" style="width: 600px;" placeholder="Scan Barcode">
-                      <span id="courierType" style="padding-left: 10px;"></span>
+                      <span id="showMsg" style="padding-left: 10px;"></span>
                       <br />
                       <br />
                       <span><h6><i>Press command/control while clicking with the mouse to make multiple selections</i></h6></span>
@@ -76,7 +76,7 @@ const kitsReceiptTemplate = async (name) => {
                       <div class="row form-group">
                           <label class="col-form-label col-md-4" for="collectionId">Collection ID</label>
                           <input autocomplete="off" class="col-md-8 form-control" type="text" id="collectionId" placeholder="Scan or Enter a Collection ID">
-                          <span id="showErrorMsg" style="font-size: 14px;"></span>
+                          <span id="showCollectionErrorMsg" style="font-size: 14px;"></span>
                       </div>
                       <div class="row form-group">
                           <label class="col-form-label col-md-4" for="dateCollectionCard">Enter Collection Date from Collection Card</label>
@@ -111,7 +111,7 @@ template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
   activeHomeCollectionNavbar();
-  checkAndDisplayCourierType();
+  checkTrackingNumberSource();
   performCollectionIdcheck();
 };
 
@@ -120,7 +120,7 @@ const performCollectionIdcheck = () => {
   if (collectionIdField) {
     collectionIdField.addEventListener("input", (e) => {
       if (collectionIdField.value.length < 14) {
-        document.getElementById('showErrorMsg').innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> Enter Correct Collection ID`
+        document.getElementById('showCollectionErrorMsg').innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> Enter Correct Collection ID`
       }
     })
   }
