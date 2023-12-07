@@ -29,19 +29,19 @@ const kitsReceiptTemplate = async (name) => {
                 </div>`;
 
                 template += `  <div id="root root-margin" style="padding-top: 25px;">
-                <div id="alert_placeholder"></div>
-                <div class="mt-3" >
-                <br />
-              <div class="row form-group">
-                <label class="col-form-label col-md-4" for="scannedBarcode">Scan Barcode</label>
-                <div style="display:inline-block;">
-                  <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" style="width: 600px;" placeholder="Scan Barcode">
-                  <span id="courierType" style="padding-left: 10px;"></span>
+                  <div id="alert_placeholder"></div>
+                  <div class="mt-3" >
                   <br />
-                  <br />
-                  <span><h6><i>Press command/control while clicking with the mouse to make multiple selections</i></h6></span>
-                </div>
-              </div>
+                  <div class="row form-group">
+                    <label class="col-form-label col-md-4" for="scannedBarcode">Scan Barcode</label>
+                    <div style="display:inline-block;">
+                      <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" style="width: 600px;" placeholder="Scan Barcode">
+                      <span id="courierType" style="padding-left: 10px;"></span>
+                      <br />
+                      <br />
+                      <span><h6><i>Press command/control while clicking with the mouse to make multiple selections</i></h6></span>
+                    </div>
+                  </div>
                   
                   <div class="row form-group">
                       <label class="col-form-label col-md-4" for="packageCondition">Select Package Condition</label>
@@ -111,7 +111,7 @@ template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
   activeHomeCollectionNavbar();
-  checkAndDisplayCourierType(true);
+  checkAndDisplayCourierType();
   performCollectionIdcheck();
 };
 
@@ -160,33 +160,28 @@ export const confirmKitReceipt = () => {
       let kitObj = {};
       let packageConditions = [];
       const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
-      const onlyUSPSCourierType = identifyCourierType(scannedBarcode);
-      if (onlyUSPSCourierType === true) {
-        kitObj[conceptIds.returnKitTrackingNum] = scannedBarcode
-        for (let option of document.getElementById('packageCondition').options) {
-          if (option.selected) {packageConditions.push(option.value)}
-        }
-        kitObj[`${conceptIds.pkgReceiptConditions}`] = packageConditions;
-        kitObj[conceptIds.kitPkgComments] = document.getElementById('receivePackageComments').value.trim();
-        kitObj[conceptIds.receivedDateTime] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
-        if (document.getElementById('collectionId').value) {
-          kitObj[conceptIds.collectionCupId] = document.getElementById('collectionId').value;
-          const dateCollectionCard = document.getElementById('dateCollectionCard').value;
-          const timeCollectionCard = document.getElementById('timeCollectionCard').value;
-          kitObj[conceptIds.collectionDateTimeStamp] = dateCollectionCard + 'T' + timeCollectionCard
-          document.getElementById('collectionCheckBox').checked === true ? 
-          kitObj[conceptIds.collectionCardFlag] = true : kitObj[conceptIds.collectionCardFlag] = false
-          kitObj[conceptIds.collectionAddtnlNotes] = document.getElementById('collectionComments').value;
-        }
-        window.removeEventListener("beforeunload",beforeUnloadMessage)
-        targetAnchorTagEl();
-        storePackageReceipt(kitObj);
-       } 
+      kitObj[conceptIds.returnKitTrackingNum] = scannedBarcode
+      for (let option of document.getElementById('packageCondition').options) {
+        if (option.selected) {packageConditions.push(option.value)}
+      }
+      kitObj[`${conceptIds.pkgReceiptConditions}`] = packageConditions;
+      kitObj[conceptIds.kitPkgComments] = document.getElementById('receivePackageComments').value.trim();
+      kitObj[conceptIds.receivedDateTime] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
+      if (document.getElementById('collectionId').value) {
+        kitObj[conceptIds.collectionCupId] = document.getElementById('collectionId').value;
+        const dateCollectionCard = document.getElementById('dateCollectionCard').value;
+        const timeCollectionCard = document.getElementById('timeCollectionCard').value;
+        kitObj[conceptIds.collectionDateTimeStamp] = dateCollectionCard + 'T' + timeCollectionCard
+        document.getElementById('collectionCheckBox').checked === true ? 
+        kitObj[conceptIds.collectionCardFlag] = true : kitObj[conceptIds.collectionCardFlag] = false
+        kitObj[conceptIds.collectionAddtnlNotes] = document.getElementById('collectionComments').value;
+      }
+      window.removeEventListener("beforeunload",beforeUnloadMessage)
+      targetAnchorTagEl();
+      storePackageReceipt(kitObj);
     })
   }
 }
-
-const identifyCourierType = (scannedBarcode) => { return scannedBarcode.length === 20 || scannedBarcode.length === 22 }
 
 const storePackageReceipt = async (data) => {
   showAnimation();
@@ -204,7 +199,6 @@ const storePackageReceipt = async (data) => {
   hideAnimation();
 
   const returnedPtInfo = await processResponse(response);
-
   if (returnedPtInfo.status === true) {
     triggerSuccessModal('Kit Receipted.')
     document.getElementById("courierType").innerHTML = ``;

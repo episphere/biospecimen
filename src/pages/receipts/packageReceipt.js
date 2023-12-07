@@ -134,7 +134,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
     activeReceiptsNavbar();
 };
 
-export const checkAndDisplayCourierType = (isKitReceipt = false) => {
+export const checkAndDisplayCourierType = () => {
   const a = document.getElementById("scannedBarcode");
   let input = ""
   if (a) {
@@ -154,32 +154,20 @@ export const checkAndDisplayCourierType = (isKitReceipt = false) => {
         // document.getElementById('collectionCheckBox').checked = false;
         // document.getElementById('collectionCheckBox').removeAttribute("disabled")
         // enableCollectionCardFields();
-        if(!isKitReceipt) triggerErrorModal('Scan limited only to FEDEX');
         return
       }
       // USPS
       else if (input.length === 22 || input.length === 20) {
         // console.log(uspsFirstThreeNumbersCheck(input))
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
+        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true" style="color: blue;"></i> USPS`
         // document.getElementById('collectionCheckBox').checked = false;
         // document.getElementById('collectionCheckBox').removeAttribute("disabled")
         // enableCollectionCardFields();
-        if(!isKitReceipt) triggerErrorModal('Scan limited only to FEDEX');
         return
       }
       // FEDEX
       else if (input.length === 12) {
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
-        // document.getElementById('collectionCheckBox').checked = false;
-        // document.getElementById('collectionCheckBox').disabled = true;
-        // checkCardIncluded();
-        // disableCollectionCardFields();
-        return
-      }
-      // FEDEX
-      else if (input.length > 12) {
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX`
-        e.target.value = input.slice(-12)
+        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true" style="color: orange;"></i> FEDEX` 
         // document.getElementById('collectionCheckBox').checked = false;
         // document.getElementById('collectionCheckBox').disabled = true;
         // checkCardIncluded();
