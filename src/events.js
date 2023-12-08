@@ -145,7 +145,6 @@ export const addEventsearchSpecimen = () => {
             return
         }
         const biospecimenData = biospecimen.data;
-        console.log("🚀 ~ file: events.js:148 ~ addEventsearchSpecimen ~ biospecimenData:", biospecimenData)
 
         if(getWorkflow() === 'research') {
             if(biospecimenData[conceptIds.collection.collectionSetting] !== conceptIds.research) {
