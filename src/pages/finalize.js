@@ -21,6 +21,12 @@ export const finalizeTemplate = (data, specimenData, bptlCollectionFlag) => {
             <div class="col">
                 <div class="row"><h5>${data['996038075'] && data['996038075']}, ${data['399159511'] && data['399159511']}</h5></div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
+                <div class="row">
+                    ${specimenData[conceptIds.collection.bloodAccessNumber] ? `Blood Accesion ID: ${specimenData[conceptIds.collection.bloodAccessNumber]}` : ''}
+                </div>
+                <div class="row">
+                    ${specimenData[conceptIds.collection.urineAccessNumber] ? `Urine Accession ID: ${specimenData[conceptIds.collection.urineAccessNumber]}` : ''}
+                </div>
                 <div class="row">Collection ID: ${specimenData['820476880']}</div>
                 <div class="row">Collection ID Link Date/Time: ${getWorkflow() === 'research' ? new Date(specimenData['678166505']).toLocaleString(): new Date(specimenData['915838974']).toLocaleString()}</div>
                 ${getWorkflow() === 'research' ? `

@@ -17,10 +17,10 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
                 <div class="row"><h5>${participantData[conceptIds.lastName]}, ${participantData[conceptIds.firstName]}</h5></div>
                 <div class="row">Connect ID: <svg id="connectIdBarCode"></svg></div>
                 <div class="row">
-                    ${biospecimenData[conceptIds.collection.bloodAccessNumber] ? `Blood Accesion ID: ${biospecimenData[conceptIds.collection.bloodAccessNumber].toString()}` : ''}
+                    ${biospecimenData[conceptIds.collection.bloodAccessNumber] ? `Blood Accesion ID: ${biospecimenData[conceptIds.collection.bloodAccessNumber]}` : ''}
                 </div>
                 <div class="row">
-                    ${biospecimenData[conceptIds.collection.urineAccessNumber] ? `Urine Accession ID: ${biospecimenData[conceptIds.collection.urineAccessNumber].toString()}` : ''}
+                    ${biospecimenData[conceptIds.collection.urineAccessNumber] ? `Urine Accession ID: ${biospecimenData[conceptIds.collection.urineAccessNumber]}` : ''}
                 </div>
                 <div class="row">Collection ID: ${biospecimenData[conceptIds.collection.id]}</div>
                 <div class="row">Collection ID Link Date/Time: ${getWorkflow() === 'research' ? new Date(biospecimenData[conceptIds.collection.collectionTime]).toLocaleString(): new Date(biospecimenData[conceptIds.collection.scannedTime]).toLocaleString()}</div>
