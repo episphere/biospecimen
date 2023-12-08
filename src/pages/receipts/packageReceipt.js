@@ -1,4 +1,4 @@
-import { getIdToken, showAnimation, hideAnimation, baseAPI, convertDateReceivedinISO, triggerErrorModal} from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, baseAPI, convertDateReceivedinISO, checkTrackingNumberSource } from "../../shared.js";
 import { nonUserNavBar } from "../../navbar.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
@@ -16,7 +16,7 @@ export const packageReceiptScreen = async (auth, route) => {
   const username = user.displayName ? user.displayName : user.email;
   packageReceiptTemplate(username, auth, route);
   addDefaultDateReceived(getCurrentDate);
-  checkAndDisplayCourierType();
+  checkTrackingNumberSource();
   checkCardIncluded();
   disableCollectionCardFields();
   enableCollectionCardFields();
@@ -48,7 +48,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
                       <label class="col-form-label col-md-4" for="scannedBarcode">Scan FedEx/USPS Barcode</label>
                       <div style="display:inline-block;">
                         <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" style="width: 600px;" placeholder="Scan a Fedex or USPS barcode">
-                        <span id="courierType" style="padding-left: 10px;"></span>
+                        <span id="showMsg" style="padding-left: 10px;"></span>
                         <br />
                         <br />
                         <span><h6><i>Press command/control while clicking with the mouse to make multiple selections</i></h6></span>
@@ -132,70 +132,6 @@ const packageReceiptTemplate = async (name, auth, route) => {
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
     activeReceiptsNavbar();
-};
-
-export const checkAndDisplayCourierType = (isKitReceipt = false) => {
-  const a = document.getElementById("scannedBarcode");
-  let input = ""
-  if (a) {
-    a.addEventListener("input", (e) => {
-      input = e.target.value.trim()
-      // None
-      if(input.length === 0){
-        document.getElementById('courierType').innerHTML = ``
-        // enableCollectionCardFields();
-        // document.getElementById('collectionCheckBox').checked = false;
-        return
-      }
-      // USPS
-      else if (uspsFirstThreeNumbersCheck(input) || (input.length === 34 && uspsFirstThreeNumbersCheck(input))) {
-        // console.log(uspsFirstThreeNumbersCheck(input))
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
-        // document.getElementById('collectionCheckBox').checked = false;
-        // document.getElementById('collectionCheckBox').removeAttribute("disabled")
-        // enableCollectionCardFields();
-        if(!isKitReceipt) triggerErrorModal('Scan limited only to FEDEX');
-        return
-      }
-      // USPS
-      else if (input.length === 22 || input.length === 20) {
-        // console.log(uspsFirstThreeNumbersCheck(input))
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
-        // document.getElementById('collectionCheckBox').checked = false;
-        // document.getElementById('collectionCheckBox').removeAttribute("disabled")
-        // enableCollectionCardFields();
-        if(!isKitReceipt) triggerErrorModal('Scan limited only to FEDEX');
-        return
-      }
-      // FEDEX
-      else if (input.length === 12) {
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
-        // document.getElementById('collectionCheckBox').checked = false;
-        // document.getElementById('collectionCheckBox').disabled = true;
-        // checkCardIncluded();
-        // disableCollectionCardFields();
-        return
-      }
-      // FEDEX
-      else if (input.length > 12) {
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX`
-        e.target.value = input.slice(-12)
-        // document.getElementById('collectionCheckBox').checked = false;
-        // document.getElementById('collectionCheckBox').disabled = true;
-        // checkCardIncluded();
-        // disableCollectionCardFields();
-        return
-      }
-      // None
-      else {
-        document.getElementById('courierType').innerHTML = ``
-        // document.getElementById('collectionCheckBox').checked = false;
-        // document.getElementById('collectionCheckBox').removeAttribute("disabled")
-        // enableCollectionCardFields();
-        return
-      }
-    }) 
-  }
 };
 
 const checkCardIncluded = () => {
