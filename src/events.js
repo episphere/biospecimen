@@ -1333,6 +1333,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
     removeAllErrors();
 
     if (getWorkflow() === 'research' && biospecimenData[conceptIds.collection.collectionTime] === undefined) biospecimenData[conceptIds.collection.collectionTime] = new Date().toISOString();
+
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
     const siteTubesList = getSiteTubesLists(biospecimenData);
 
@@ -1478,14 +1479,13 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
 
     showAnimation();
     await updateSpecimen([biospecimenData]);
-
     const baselineVisit = (biospecimenData[conceptIds.collection.selectedVisit] === conceptIds.baseline.visitId);
     const clinicalResearchSetting = (biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research || biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical);
 
     await updateCollectionSettingData(biospecimenData, siteTubesList, participantData);
 
     if(baselineVisit && clinicalResearchSetting) {
-        await updateBaselineData(siteTubesList, participantData, );
+        await updateBaselineData(siteTubesList, participantData);
     }
 
     await checkDerivedVariables({"token": participantData["token"]});

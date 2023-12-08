@@ -1516,10 +1516,10 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
 
     const settingData = {
         [conceptIds.collectionDetails]: settings,
-        uid: participantData?.state?.uid,
+        uid: participantData?.state?.uid
     };
 
-    // update derived variable if specimens unchecked after accidently checking them
+    // update derived variable if specimens unchecked after accidently checking them & derived varibales set to yes
     if (Object.keys(derivedVariables).length !== 0) {
         Object.assign(settingData, derivedVariables);
     }
@@ -1529,8 +1529,10 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
 
 export const updateBaselineData = async (siteTubesList, data) => {
     data = await getUpdatedParticipantData(data);
+
     const response = await getParticipantCollections(data.token);
     const baselineCollections = response.data.filter(collection => collection['331584571'] === 266600170);
+
     const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
     const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
@@ -1539,6 +1541,7 @@ export const updateBaselineData = async (siteTubesList, data) => {
     let urineCollected = (data['167958071'] === 353358909);
     let mouthwashCollected = (data['684635302'] === 353358909);
     let allBaselineCollected = (data['254109640'] === conceptIds.yes);
+    
     baselineCollections.forEach(collection => {
 
         if(!bloodCollected) {
