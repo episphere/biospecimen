@@ -2585,8 +2585,7 @@ export const translateNumToType = {
 
 export const convertISODateTime = (isoDateTime) => {
     const date = new Date(isoDateTime);
-    return date.toLocaleString('en-US');
-    // setZeroDateTime(date.getUTCMonth() + 1) + '/' + setZeroDateTime(date.getUTCDate()) + '/' + date.getUTCFullYear() + ' ' + setZeroDateTime(date.getUTCHours()) + ':' + setZeroDateTime(date.getUTCMinutes())
+    return setZeroDateTime(date.getUTCMonth() + 1) + '/' + setZeroDateTime(date.getUTCDate()) + '/' + date.getUTCFullYear() + ' ' + setZeroDateTime(date.getUTCHours()) + ':' + setZeroDateTime(date.getUTCMinutes())
 };
 
 // append 0 before min. if single digit min. or hour
@@ -2594,13 +2593,11 @@ const setZeroDateTime = (dateTimeInput) => {
     return dateTimeInput < 10 ? '0' + dateTimeInput : dateTimeInput.toString();
 };
 
-
 export const formatISODateTime = (dateReceived) => {
     let extractDate = dateReceived.split("T")[0]
     extractDate = extractDate.split('-')
     const formattedDateTimeStamp = extractDate[1]+'/'+extractDate[2]+'/'+extractDate[0]
     return formattedDateTimeStamp
-
 }
 
 export const numericInputValidator = (elemArr) => {
