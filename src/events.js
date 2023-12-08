@@ -1479,6 +1479,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
 
     showAnimation();
     await updateSpecimen([biospecimenData]);
+    
     const baselineVisit = (biospecimenData[conceptIds.collection.selectedVisit] === conceptIds.baseline.visitId);
     const clinicalResearchSetting = (biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research || biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical);
 
