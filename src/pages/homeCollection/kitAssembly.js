@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -35,7 +35,7 @@ const kitAssemblyTemplate = async (name) => {
                           <label for="scannedBarcode" class="col-md-4 col-form-label">Tracking Number</label>
                           <div class="col-md-8">
                             <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan Barcode" required />
-                            <span id="showErrorMsg" style="font-size: 14px;"></span>
+                            <span id="showMsg" style="font-size: 14px;"></span>
                           </div>
                         </div>
                         <div class="form-group row">
@@ -94,7 +94,7 @@ const kitAssemblyTemplate = async (name) => {
   processAssembledKit();
   enableEnterKeystroke();
   dropdownTrigger('Select Kit Type');
-  checkTrackingNumberValid();
+  checkTrackingNumberSource();
   performQCcheck('returnKitId', 'supplyKitId', 'showReturnKitErrorMsg', `Supply Kit & Return Kit need to be same`);
   performQCcheck('cardId', 'cupId', 'showCardIdErrorMsg', `Cup ID & Card ID need to be same`);
 };
@@ -123,28 +123,6 @@ const performQCcheck = (inputBox2, inputBox1, errorTag, errorMsg) => {
     })
   }
 }
-
-const checkTrackingNumberValid = () => {
-  const checkTrackingNumber = document.getElementById("scannedBarcode");
-  if (checkTrackingNumber) {
-    checkTrackingNumber.addEventListener("input", (e) => {
-      const input = e.target.value.trim()
-      if (input.length > 22 || input.length < 20) {
-        document.getElementById('showErrorMsg').innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> Scan limited only to USPS`
-        return
-      }
-      else if(input.length === 0){
-        document.getElementById('showErrorMsg').innerHTML = ``
-        return
-      }
-      else {
-        document.getElementById('showErrorMsg').innerHTML = ``
-        return
-      }
-    })
-  }
-};
-
 
 const processAssembledKit = () => {
   const saveKitButton = document.getElementById('saveKit');
@@ -180,11 +158,12 @@ const processAssembledKit = () => {
         kitObj[conceptIds.kitType] = conceptIds.mouthwashKitType;
         const responseStoredStatus = await storeAssembledKit(kitObj);
         if (responseStoredStatus) {
-          document.getElementById('scannedBarcode').value = ``
-          document.getElementById('supplyKitId').value = ``
-          document.getElementById('returnKitId').value = ``
-          document.getElementById('cupId').value = ``
-          document.getElementById('cardId').value = ``
+          document.getElementById('scannedBarcode').value = ``;
+          document.getElementById('supplyKitId').value = ``;
+          document.getElementById('returnKitId').value = ``;
+          document.getElementById('cupId').value = ``;
+          document.getElementById('cardId').value = ``;
+          document.getElementById("showMsg").innerHTML = ``;
         }
       }
     })
