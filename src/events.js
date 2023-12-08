@@ -145,6 +145,7 @@ export const addEventsearchSpecimen = () => {
             return
         }
         const biospecimenData = biospecimen.data;
+        console.log("🚀 ~ file: events.js:148 ~ addEventsearchSpecimen ~ biospecimenData:", biospecimenData)
 
         if(getWorkflow() === 'research') {
             if(biospecimenData[conceptIds.collection.collectionSetting] !== conceptIds.research) {
@@ -152,8 +153,7 @@ export const addEventsearchSpecimen = () => {
                 showNotifications({ title: 'Incorrect Dashboard', body: 'Clinical Collections cannot be viewed on Research Dashboard' });
                 return;
             }
-        }
-        else {
+        } else {
             if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
                 hideAnimation();
                 showNotifications({ title: 'Incorrect Dashboard', body: 'Research Collections cannot be viewed on Clinical Dashboard' });
