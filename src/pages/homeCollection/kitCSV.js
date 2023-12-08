@@ -32,10 +32,10 @@ const kitCsvTemplate = (name) => {
 const csvFileButtonSubmit = () => {
   document.getElementById("csvCreateFileButton").addEventListener("click", async (e)=> {
       e.preventDefault();
-      const dateFilter = document.getElementById("csvDateInput").value + 'T00:00:00.000Z'; 
+      const dateString = document.getElementById("csvDateInput").value + 'T00:00:00.000Z'; 
       showAnimation();
       try {
-          const results = await getKitsByReceivedDate(dateFilter);
+          const results = await getKitsByReceivedDate(dateString);
           const modifiedResults = modifyKitQueryResults(results.data);
           generateKitCSVData(modifiedResults);
           hideAnimation();
@@ -46,10 +46,10 @@ const csvFileButtonSubmit = () => {
   });
 }
 
-const getKitsByReceivedDate = async (dateFilter) => {
+const getKitsByReceivedDate = async (dateString) => {
   try {
     const idToken = await getIdToken();
-    const response = await fetch(`${baseAPI}api=getKitsByReceivedDate&receivedDateTimestamp=${dateFilter}`, {
+    const response = await fetch(`${baseAPI}api=getKitsByReceivedDate&receivedDateTimestamp=${dateString}`, {
         method: "GET",
         headers: {
             Authorization: "Bearer " + idToken,
