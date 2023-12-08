@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource, getCurrentDate } from "../../shared.js";
 import { baselineMWSurveyRemainderTemplate, baselineMWThankYouTemplate } from "../../emailTemplates.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
@@ -124,17 +124,6 @@ const performCollectionIdcheck = () => {
       }
     })
   }
-}
-
-// returns current date in default format ("YYYY-MM-DD")
-const getCurrentDate = () => {
-  const currentDate = new Date();
-  return currentDate.getFullYear() + "-" + checkForPadding(parseInt(currentDate.getMonth() + 1)) + "-" + checkForPadding(currentDate.getDate())
-}
-
-const checkForPadding = (input) => { // adds 0 before single month & day to adhere to HTML date format
-  if (input < 10) return `0`+input.toString();
-  else return input;
 }
 
 const formSubmit = () => {
