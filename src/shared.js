@@ -1390,9 +1390,10 @@ export const getUpdatedParticipantData = async (participantData) => {
 }
 
 export const updateCollectionSettingData = async (biospecimenData, tubes, participantData) => {
-  participantData = await getUpdatedParticipantData(participantData);
+    participantData = await getUpdatedParticipantData(participantData);
 
     let settings;
+    let derivedVariables = {};
     let visit = biospecimenData[conceptIds.collection.selectedVisit];
 
     const bloodTubes = tubes.filter(tube => tube.tubeType === "Blood tube");
@@ -1408,8 +1409,11 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
             [visit]: {}
         }
     }
-
+   // console.log('bio', biospecimenData)
+    console.log('settt', settings[visit])
+    console.log('visit', visit)
     if (!settings[visit][conceptIds.bloodCollectionSetting]) {
+        console.log('bloood')
         bloodTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
@@ -1431,15 +1435,40 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
             }
         });
     }
-        
+    // else if (settings[visit][conceptIds.baseline.bloodCollectedTime] !== '' || settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime] !== ''){
+    //     console.log('blooodnooooo')
+    //     bloodTubes.forEach(tube => {
+    //         console.log('tube', participantData[conceptIds.baseline.bloodCollected])
+    //         console.log('bllllooo', biospecimenData[tube.concept][conceptIds.collection.tube.isCollected])
+    //         if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.no && participantData[conceptIds.baseline.bloodCollected] === conceptIds.yes) {
+    //             if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+    //                 console.log('blooodnoooooyoyooyo')
+    //                 settings[visit][conceptIds.baseline.bloodCollectedTime] = '';
+    //             }
+    //             else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
+    //                 settings[visit][conceptIds.clinicalDashboard.bloodCollected] = conceptIds.no;
+    //                 settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime] = '';
+    //                 settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
+
+    //                 if(!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+    //                     settings[visit][conceptIds.anySpecimenCollectedTime] = '';
+    //                 }
+    //             }
+    //             derivedVariables[conceptIds.baseline.bloodCollected] = conceptIds.no;
+    //         }
+    //     });
+    // }
+
     if (!settings[visit][conceptIds.urineCollectionSetting]) {
         urineTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
+                console.log('bingo')
 
                 settings[visit][conceptIds.urineCollectionSetting] = biospecimenData[conceptIds.collection.collectionSetting];
 
                 if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
                     settings[visit][conceptIds.baseline.urineCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
+                    console.log('bingo111')
                 }
                 else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
                     settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.yes;
@@ -1454,8 +1483,31 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
             }
         });
     }
+    else if (settings[visit][conceptIds.baseline.urineCollectedTime] !== '' ||  settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] !== ''){
+        urineTubes.forEach(tube => {
+            if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.no && participantData[conceptIds.baseline.urineCollected] === conceptIds.yes) {
+                console.log('bingo1113456789')
+                if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+                    console.log('bingo11198765456')
+                    settings[visit][conceptIds.baseline.urineCollectedTime] = '';
+                }
+                else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
+                    settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.no;
+                    settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] = '';
+                    settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
+
+                    if(!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                        settings[visit][conceptIds.anySpecimenCollectedTime] = '';
+                    }
+                }
+                derivedVariables[conceptIds.baseline.urineCollected] = conceptIds.no;
+            }
+        })
+    }
+
 
     if (!settings[visit][conceptIds.mouthwashCollectionSetting]) {
+        console.log('hittt')
         mouthwashTubes.forEach(tube => {
             if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
 
@@ -1463,25 +1515,40 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
 
                 if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
                     settings[visit][conceptIds.baseline.mouthwashCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
-
                 }
             }
         });
     }
+    else if (settings[visit][conceptIds.baseline.mouthwashCollectedTime] !== '' && participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes){
+        console.log('misss')
+        mouthwashTubes.forEach(tube => {
+            if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.no &&  participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes) {
+                if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+                    settings[visit][conceptIds.baseline.mouthwashCollectedTime] = '';
+                }
+                derivedVariables[conceptIds.baseline.mouthwashCollected] = conceptIds.no;
+            }
+        })
+    }
 
     const settingData = {
         [conceptIds.collectionDetails]: settings,
-        uid: participantData?.state?.uid
+        uid: participantData?.state?.uid,
     };
+
+    // update derived variable if specimens unchecked after accidently checking them
+    if (Object.keys(derivedVariables).length !== 0) {
+        Object.assign(settingData, derivedVariables);
+    }
+
+    console.log('settingData', settingData)
     await updateParticipant(settingData);
 }
 
 export const updateBaselineData = async (siteTubesList, data) => {
     data = await getUpdatedParticipantData(data);
-    console.log('data', data)
     const response = await getParticipantCollections(data.token);
     const baselineCollections = response.data.filter(collection => collection['331584571'] === 266600170);
-    console.log('res', response)
     const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
     const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
@@ -1490,7 +1557,6 @@ export const updateBaselineData = async (siteTubesList, data) => {
     let urineCollected = (data['167958071'] === 353358909);
     let mouthwashCollected = (data['684635302'] === 353358909);
     let allBaselineCollected = (data['254109640'] === conceptIds.yes);
-    console.log('mouthwashCollected', mouthwashCollected)
     baselineCollections.forEach(collection => {
 
         if(!bloodCollected) {
@@ -1510,8 +1576,6 @@ export const updateBaselineData = async (siteTubesList, data) => {
         }
         if(!mouthwashCollected) {
             mouthwashTubes.forEach(tube => {
-                console.log('tube', tube)
-                console.log('colllec',collection[tube.concept]['593843561'] )
                 if(collection[tube.concept]['593843561'] === 353358909) {
                     mouthwashCollected = true;
                 }
@@ -1533,8 +1597,6 @@ export const updateBaselineData = async (siteTubesList, data) => {
         '254109640': allBaselineCollected ? conceptIds.yes : conceptIds.no,
         uid: data.state.uid
     };
-
-    console.log('base', baselineData)
         
     await updateParticipant(baselineData);
 }
