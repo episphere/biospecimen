@@ -1091,6 +1091,7 @@ const redirectSpecimenPage = async (accessionID1, accessionID3, selectedVisit, f
 export const addEventBiospecimenCollectionForm = (participantData, biospecimenData) => {
     const collectionSaveExit = document.getElementById('collectionSave');
     collectionSaveExit.addEventListener('click', () => {
+        console.log('12344567')
         collectionSubmission(participantData, biospecimenData);
     });
 
@@ -1333,7 +1334,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
     removeAllErrors();
 
     if (getWorkflow() === 'research' && biospecimenData[conceptIds.collection.collectionTime] === undefined) biospecimenData[conceptIds.collection.collectionTime] = new Date().toISOString();
-
+    console.log('1research7')
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
     const siteTubesList = getSiteTubesLists(biospecimenData);
 
@@ -1484,8 +1485,10 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
     const clinicalResearchSetting = (biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research || biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical);
 
     await updateCollectionSettingData(biospecimenData, siteTubesList, participantData);
-
+    console.log('baselineVisit', baselineVisit)
+    console.log('clinicalResearchSetting', clinicalResearchSetting)
     if(baselineVisit && clinicalResearchSetting) {
+        console.log('baseline', participantData)
         await updateBaselineData(siteTubesList, participantData);
     }
 

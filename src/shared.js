@@ -1478,10 +1478,10 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
 
 export const updateBaselineData = async (siteTubesList, data) => {
     data = await getUpdatedParticipantData(data);
-
+    console.log('data', data)
     const response = await getParticipantCollections(data.token);
     const baselineCollections = response.data.filter(collection => collection['331584571'] === 266600170);
-    
+    console.log('res', response)
     const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
     const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
@@ -1490,7 +1490,7 @@ export const updateBaselineData = async (siteTubesList, data) => {
     let urineCollected = (data['167958071'] === 353358909);
     let mouthwashCollected = (data['684635302'] === 353358909);
     let allBaselineCollected = (data['254109640'] === conceptIds.yes);
-
+    console.log('mouthwashCollected', mouthwashCollected)
     baselineCollections.forEach(collection => {
 
         if(!bloodCollected) {
@@ -1510,6 +1510,8 @@ export const updateBaselineData = async (siteTubesList, data) => {
         }
         if(!mouthwashCollected) {
             mouthwashTubes.forEach(tube => {
+                console.log('tube', tube)
+                console.log('colllec',collection[tube.concept]['593843561'] )
                 if(collection[tube.concept]['593843561'] === 353358909) {
                     mouthwashCollected = true;
                 }
@@ -1531,6 +1533,8 @@ export const updateBaselineData = async (siteTubesList, data) => {
         '254109640': allBaselineCollected ? conceptIds.yes : conceptIds.no,
         uid: data.state.uid
     };
+
+    console.log('base', baselineData)
         
     await updateParticipant(baselineData);
 }
