@@ -2585,7 +2585,8 @@ export const translateNumToType = {
 
 export const convertISODateTime = (isoDateTime) => {
     const date = new Date(isoDateTime);
-    return setZeroDateTime(date.getUTCMonth() + 1) + '/' + setZeroDateTime(date.getUTCDate()) + '/' + date.getUTCFullYear() + ' ' + setZeroDateTime(date.getUTCHours()) + ':' + setZeroDateTime(date.getUTCMinutes())
+    return date.toLocaleString('en-US');
+    // setZeroDateTime(date.getUTCMonth() + 1) + '/' + setZeroDateTime(date.getUTCDate()) + '/' + date.getUTCFullYear() + ' ' + setZeroDateTime(date.getUTCHours()) + ':' + setZeroDateTime(date.getUTCMinutes())
 };
 
 // append 0 before min. if single digit min. or hour

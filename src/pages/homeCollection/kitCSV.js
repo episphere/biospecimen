@@ -35,7 +35,6 @@ const csvFileButtonSubmit = () => {
       const dateFilter = document.getElementById("csvDateInput").value + 'T00:00:00.000Z'; 
       showAnimation();
       try {
-        console.log('dateFilter', dateFilter)
           const results = await getKitsByReceivedDate(dateFilter);
           const modifiedResults = modifyKitQueryResults(results.data);
           generateKitCSVData(modifiedResults);
