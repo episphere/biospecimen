@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, triggerErrorModal, triggerSuccessModal, baseAPI, processResponse } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, triggerErrorModal, triggerSuccessModal, baseAPI, processResponse, checkTrackingNumberSource } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -56,8 +56,8 @@ const assignKitsTemplate = async (name) => {
                 <div class="form-group row">
                 <label for="scannedBarcode" class="col-md-4 col-form-label">Tracking Number</label>
                 <div class="col-md-8">
-                  <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan FedEx Barcode">
-                  <span id="showErrorMsg" style="font-size: 14px;"></span>
+                  <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan Barcode">
+                  <span id="showMsg" style="font-size: 14px;"></span>
                 </div>
               </div>
         </form>
@@ -76,7 +76,7 @@ const assignKitsTemplate = async (name) => {
   contentBody.innerHTML = template;
   activeHomeCollectionNavbar();
   populateSidePaneRows(response.data);
-  checkTrackingNumberValid();
+  checkTrackingNumberSource();
 }
 
 const populateSidePaneRows = (participants) => {
@@ -104,27 +104,6 @@ const populateSidePaneRows = (participants) => {
     confirmAssignment(participants);
   }
 }
-
-const checkTrackingNumberValid = () => {
-    const checkTrackingNumber = document.getElementById("scannedBarcode");
-    if (checkTrackingNumber) {
-      checkTrackingNumber.addEventListener("input", (e) => {
-        const input = e.target.value.trim()
-        if (input.length !== 12 ) {
-          document.getElementById('showErrorMsg').innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> Scan limited only to Fedex`
-          return
-        }
-        else if(input.length === 0){
-          document.getElementById('showErrorMsg').innerHTML = ``
-          return
-        }
-        else {
-          document.getElementById('showErrorMsg').innerHTML = ``
-          return
-        }
-      })
-    }
-  };
 
 const selectParticipants = () => {
   const detailedRow = Array.from(document.getElementsByClassName('detailedRow'));
@@ -156,6 +135,7 @@ const confirmAssignment = (participants) => {
         document.getElementById('Connect_ID').value = ``;
         document.getElementById('scannedBarcode').value = ``;
         document.getElementById('scanSupplyKit').value = ``;
+        document.getElementById("showMsg").innerHTML = ``;
        
         const filteredParticipants  = participants.filter((participant) => {
           return participant['connect_id'] !== parseInt(participantObj['Connect_ID']);

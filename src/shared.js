@@ -2744,6 +2744,34 @@ export const triggerSuccessModal = (message) => {
         </div>`;
 }
 
+export const checkTrackingNumberSource = () => {
+    const scannedBarcode = document.getElementById("scannedBarcode");
+    if (!scannedBarcode) {
+      return;
+    }
+    scannedBarcode.addEventListener("input", (e) => {
+      const input = e.target.value.trim();
+      const showMsg = document.getElementById('showMsg');
+      if (input.length === 0) {
+        showMsg.innerHTML = "";
+        return;
+      }
+      if (input.length === 22 || input.length === 20) {
+        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: blue;"></i>USPS`;
+        return;
+      }
+      if (input.length === 12) {
+        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
+        return;
+      }
+    //   if (uspsFirstThreeNumbersCheck(input) || (input.length === 34 && uspsFirstThreeNumbersCheck(input))) {
+    //     document.getElementById('showMsg').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
+    //     return
+    //   }
+      showMsg.innerHTML = "";
+    });
+}
+
 /**
  * We've had isolated instances where sites save a new collection and placeholder tube data is missing from the biospecimenData object (specifically with the addition of streck tubes).
  * This is a sanity check to compare expected vs existing data. If expected data is missing, we build the placeholder data. 
