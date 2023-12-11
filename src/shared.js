@@ -1400,6 +1400,10 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     const urineTubes = tubes.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = tubes.filter(tube => tube.tubeType === "Mouthwash");
 
+    let bloodTubesLength = 0
+    let urineTubesLength = 0
+    let mouthwashTubesLength = 0
+
     if (participantData[conceptIds.collectionDetails]) {
         settings = participantData[conceptIds.collectionDetails];
         if (!settings[visit]) settings[visit] = {};
@@ -1429,6 +1433,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
                         settings[visit][conceptIds.anySpecimenCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
                     }
                 }
+                bloodTubesLength += 1
             }
         });
     }
@@ -1456,6 +1461,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
                         settings[visit][conceptIds.anySpecimenCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
                     }
                 }
+                urineTubesLength += 1
             }
         });
     }
@@ -1474,9 +1480,17 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
                 else if (isClinical) {
                     settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.no;
                     delete settings[visit][conceptIds.clinicalDashboard.urineCollectedTime];
+
+                    if (bloodTubesLength === 0 && mouthwashTubesLength === 0) {
+                        settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
+                        if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                            delete settings[visit][conceptIds.anySpecimenCollectedTime];
+                        }
+                    }
                 }
                 derivedVariables[conceptIds.baseline.urineCollected] = conceptIds.no;
             }
+            urineTubesLength -= 1
         })
     }
 
@@ -1491,6 +1505,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
                 if (isResearch) {
                     settings[visit][conceptIds.baseline.mouthwashCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
                 }
+            mouthwashTubesLength += 1
             }
         });
     }
@@ -1504,6 +1519,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
                     delete settings[visit][conceptIds.baseline.mouthwashCollectedTime];
                 }
                 derivedVariables[conceptIds.baseline.mouthwashCollected] = conceptIds.no;
+                mouthwashTubesLength -= 1
             }
         })
     }
