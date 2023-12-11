@@ -353,35 +353,61 @@ const handleAlreadyReceivedPackage = (receiptedPackageData) => {
 const clearPackageReceiptForm = (isSuccess) => {
     if (isSuccess) {
         const alertList = document.getElementById("alert_placeholder");
-        const template = `
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                Response saved!
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>`;
-        alertList.innerHTML = template;
+        if (alertList) {
+            alertList.innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    Response saved!
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>`;
+        }
     }
-    document.getElementById("courierType").innerHTML = ``;
-    document.getElementById("scannedBarcode").value = "";
-    document.getElementById("packageCondition").value = "";
-    document.getElementById("receivePackageComments").value = "";
-    document.getElementById("dateReceived").value = getCurrentDate();
-    document.getElementById("collectionComments").value = "";
-    document.getElementById("collectionId").value = "";
+    const courierType = document.getElementById("courierType");
+    if (courierType) courierType.innerHTML = '';
+
+    const scannedBarcode = document.getElementById("scannedBarcode");
+    if (scannedBarcode) scannedBarcode.value = '';
+    
+    const packageCondition = document.getElementById("packageCondition");
+    if (packageCondition) packageCondition.value = '';
+    
+    const receivePackageComments = document.getElementById("receivePackageComments");
+    if (receivePackageComments) receivePackageComments.value = '';
+    
+    const dateReceived = document.getElementById("dateReceived");
+    if (dateReceived) dateReceived.value = getCurrentDate();
+    
+    const collectionComments = document.getElementById("collectionComments");
+    if (collectionComments) collectionComments.value = '';
+
+    const collectionId = document.getElementById("collectionId");
+    if (collectionId) collectionId.value = '';
+    
     enableCollectionCardFields()
     enableCollectionCheckBox()
-    document.getElementById("packageCondition").setAttribute("data-selected","[]")
-    if (document.getElementById("collectionId").value) {
-        document.getElementById("collectionId").value = "";
-        document.getElementById("dateCollectionCard").value = "";
-        document.getElementById("timeCollectionCard").value = "";
-        document.getElementById("collectionCheckBox").checked = false;
-        document.getElementById("collectionComments").value = "";
+
+    if (packageCondition) packageCondition.setAttribute("data-selected","[]")
+
+    // TODO: Handled null case, maybe this logic can be removed, but I'm not aware of the impact re: enableCollectionCardFields() and enableCollectionCheckBox(). Leaving for now.
+    if (collectionId.value) {
+        collectionId.value = '';
+        const dateCollectionCard = document.getElementById("dateCollectionCard");
+        if (dateCollectionCard) dateCollectionCard.value = '';
+
+        const timeCollectionCard = document.getElementById("timeCollectionCard");
+        if (timeCollectionCard) timeCollectionCard.value = '';
+
+        const collectionCheckBox = document.getElementById("collectionCheckBox");
+        if (collectionCheckBox) collectionCheckBox.checked = false;
+
+        const collectionComments = document.getElementById("collectionComments");
+        if (collectionComments) collectionComments.value = '';
 
         enableCollectionCardFields();
         enableCollectionCheckBox();
-        document.getElementById("packageCondition").setAttribute("data-selected","[]");
+
+        if (packageCondition) packageCondition.setAttribute("data-selected","[]");
     }
 }
 
