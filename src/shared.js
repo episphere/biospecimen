@@ -1474,11 +1474,6 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
                 else if (isClinical) {
                     settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.no;
                     delete settings[visit][conceptIds.clinicalDashboard.urineCollectedTime];
-                    settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
-
-                    if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
-                        delete settings[visit][conceptIds.anySpecimenCollectedTime];
-                    }
                 }
                 derivedVariables[conceptIds.baseline.urineCollected] = conceptIds.no;
             }
