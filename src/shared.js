@@ -1436,23 +1436,23 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     if (!settings[visit][conceptIds.urineCollectionSetting]) {
         urineTubes.forEach(tube => {
             const tubeIsCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
-            const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting] ;
+            const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
             const isResearch = collectionSetting === conceptIds.research;
             const isClinical = collectionSetting === conceptIds.clinical;
     
-            if(tubeIsCollected) {
-                settings[visit][conceptIds.urineCollectionSetting] = biospecimenData[conceptIds.collection.collectionSetting];
+            if (tubeIsCollected) {
+                settings[visit][conceptIds.urineCollectionSetting] = collectionSetting;
 
-                if(isResearch) {
+                if (isResearch) {
                     settings[visit][conceptIds.baseline.urineCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
                 }
-                else if(isClinical) {
+                else if (isClinical) {
                     settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.yes;
                     settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
 
                     settings[visit][conceptIds.anySpecimenCollected] = conceptIds.yes;
 
-                    if(!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                    if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
                         settings[visit][conceptIds.anySpecimenCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
                     }
                 }
@@ -1460,24 +1460,23 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
         });
     }
     else if (settings[visit][conceptIds.baseline.urineCollectedTime] !== '' ||  settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] !== ''){
+        const participantUrineCollected = participantData[conceptIds.baseline.urineCollected] === conceptIds.yes;
+        const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
+        const isResearch = collectionSetting === conceptIds.research;
+        const isClinical = collectionSetting === conceptIds.clinical;
         urineTubes.forEach(tube => {
             const tubeIsNotCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.no;
-            const participantUrineCollected = participantData[conceptIds.baseline.urineCollected] === conceptIds.yes;
-            const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
-            const isResearch = collectionSetting === conceptIds.research;
-            const isClinical = collectionSetting === conceptIds.clinical;
-
-            if(tubeIsNotCollected && participantUrineCollected) {
+            if (tubeIsNotCollected && participantUrineCollected) {
                 delete settings[visit][conceptIds.urineCollectionSetting];
                 if(isResearch) {
                     delete settings[visit][conceptIds.baseline.urineCollectedTime];
                 }
-                else if(isClinical) {
+                else if (isClinical) {
                     settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.no;
                     delete settings[visit][conceptIds.clinicalDashboard.urineCollectedTime];
                     settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
 
-                    if(!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                    if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
                         delete settings[visit][conceptIds.anySpecimenCollectedTime];
                     }
                 }
@@ -1492,21 +1491,21 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
             const isTubeCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
             const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
             const isResearch = collectionSetting === conceptIds.research;
-            if(isTubeCollected) {
+            if (isTubeCollected) {
                 settings[visit][conceptIds.mouthwashCollectionSetting] = collectionSetting;
-                if(isResearch) {
+                if (isResearch) {
                     settings[visit][conceptIds.baseline.mouthwashCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
                 }
             }
         });
     }
     else if (settings[visit][conceptIds.baseline.mouthwashCollectedTime] !== '' && participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes){
+        const isParticipantMouthwashCollected = participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes;
         mouthwashTubes.forEach(tube => {
             const isTubeNotCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.no;
-            const isParticipantMouthwashCollected = participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes;
-            if(isTubeNotCollected &&  isParticipantMouthwashCollected) {
+            if (isTubeNotCollected &&  isParticipantMouthwashCollected) {
                 delete settings[visit][conceptIds.mouthwashCollectionSetting]
-                if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+                if (biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
                     delete settings[visit][conceptIds.baseline.mouthwashCollectedTime];
                 }
                 derivedVariables[conceptIds.baseline.mouthwashCollected] = conceptIds.no;
@@ -1514,15 +1513,13 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
         })
     }
 
-    const settingData = {
+    let settingData = {
         [conceptIds.collectionDetails]: settings,
         uid: participantData?.state?.uid
     };
 
     // update derived variable if specimens unchecked after accidently checking them & derived varibales set to yes
-    if (Object.keys(derivedVariables).length !== 0) {
-        Object.assign(settingData, derivedVariables);
-    }
+    if (Object.keys(derivedVariables).length !== 0) settingData = { ...settingData, ...derivedVariables };
 
     await updateParticipant(settingData);
 }
@@ -1541,7 +1538,7 @@ export const updateBaselineData = async (siteTubesList, data) => {
     let urineCollected = (data['167958071'] === 353358909);
     let mouthwashCollected = (data['684635302'] === 353358909);
     let allBaselineCollected = (data['254109640'] === conceptIds.yes);
-    
+
     baselineCollections.forEach(collection => {
 
         if(!bloodCollected) {
