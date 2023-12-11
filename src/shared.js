@@ -1481,7 +1481,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
                     settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.no;
                     delete settings[visit][conceptIds.clinicalDashboard.urineCollectedTime];
 
-                    if (bloodTubesLength === 0 && mouthwashTubesLength === 0) {
+                    if (bloodTubesLength === 0 && mouthwashTubesLength === 0) { // the anySpecimenCollected variable will only be updated to NO if mouthwash & blood specimens are not present.
                         settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
                         if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
                             delete settings[visit][conceptIds.anySpecimenCollectedTime];
