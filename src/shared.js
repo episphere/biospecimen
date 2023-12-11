@@ -2876,13 +2876,15 @@ export const triggerErrorModal = (message) => {
 
 export const triggerSuccessModal = (message) => {
     const alertList = document.getElementById("alert_placeholder");
-    alertList.innerHTML = `
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-        </div>`;
+    if (alertList) {
+        alertList.innerHTML = `
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+            </div>`;
+    }
 }
 
 export const checkTrackingNumberSource = () => {

@@ -1,4 +1,4 @@
-import { getIdToken, showAnimation, hideAnimation, baseAPI, convertDateReceivedinISO, checkTrackingNumberSource, getCurrentDate, locationConceptIDToLocationMap, retrieveDateFromIsoString, showNotificationsCancelOrContinue, showNotificationsSelectableList, triggerErrorModal, showNotifications, validIso8601Format } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, baseAPI, convertDateReceivedinISO, checkTrackingNumberSource, getCurrentDate, locationConceptIDToLocationMap, retrieveDateFromIsoString, showNotificationsCancelOrContinue, showNotificationsSelectableList, triggerSuccessModal, showNotifications, validIso8601Format } from "../../shared.js";
 import { nonUserNavBar } from "../../navbar.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
@@ -352,17 +352,9 @@ const handleAlreadyReceivedPackage = (receiptedPackageData) => {
 
 const clearPackageReceiptForm = (isSuccess) => {
     if (isSuccess) {
-        const alertList = document.getElementById("alert_placeholder");
-        if (alertList) {
-            alertList.innerHTML = `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    Response saved!
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>`;
-        }
+        triggerSuccessModal('Package Receipted Successfully');
     }
+
     const courierType = document.getElementById("courierType");
     if (courierType) courierType.innerHTML = '';
 
@@ -384,10 +376,10 @@ const clearPackageReceiptForm = (isSuccess) => {
     const collectionId = document.getElementById("collectionId");
     if (collectionId) collectionId.value = '';
     
-    enableCollectionCardFields()
-    enableCollectionCheckBox()
+    enableCollectionCardFields();
+    enableCollectionCheckBox();
 
-    if (packageCondition) packageCondition.setAttribute("data-selected","[]")
+    if (packageCondition) packageCondition.setAttribute("data-selected","[]");
 
     // TODO: Handled null case, maybe this logic can be removed, but I'm not aware of the impact re: enableCollectionCardFields() and enableCollectionCheckBox(). Leaving for now.
     if (collectionId.value) {
