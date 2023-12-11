@@ -329,6 +329,152 @@ export const showNotifications = (data, zIndex) => {
 `;
 }
 
+/**
+ * Show a notification modal with cancel and continue options. Initial use in BPTL receipted shipment flow. See storeSpecimenPackageReceipt() for usage example.
+ * @param {object} message - message object with title and body.
+ * @param {*} zIndex - z-index of the modal.
+ * @param {function} onCancel - callback function to execute on cancel. Example: reset the UI.
+ * @param {function} onContinue - callback function to execute on continue. Example: process a retry POST request.
+ */
+export const showNotificationsCancelOrContinue = (message, zIndex, onCancel, onContinue) => {
+    const button = document.createElement('button');
+    button.dataset.target = '#biospecimenModal';
+    button.dataset.toggle = 'modal';
+
+    document.getElementById('root').appendChild(button);
+    button.click();
+    if (zIndex) document.getElementById('biospecimenModal').style.zIndex = zIndex;
+    const header = document.getElementById('biospecimenModalHeader');
+    const body = document.getElementById('biospecimenModalBody');
+    header.innerHTML = `<h5 class="modal-title">${message.title}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>`;
+    body.innerHTML = `
+        <div class="row">
+            <div class="col">
+                ${message.body}
+            </div>
+        </div>
+        <br><br>
+        <div class="row">
+            <div class="ml-auto" style="margin-right: 1rem;">
+                <button type="button" class="btn btn-outline-dark" id="modalCancelBtn" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="modalContinueBtn">Continue</button>
+            </div>
+        </div>`;
+
+    document.getElementById('modalCancelBtn').addEventListener('click', () => {
+        $('#biospecimenModal').modal('hide');
+        if (onCancel) onCancel();
+    });
+
+    document.getElementById('modalContinueBtn').addEventListener('click', async () => {
+        try {
+            $('#biospecimenModal').modal('hide');
+            if (onContinue) await onContinue();
+        } catch (error) {
+            console.error('Error in modalContinueBtn event listener:', error);
+            showNotifications({ title: 'Error', body: `Error: please try again. ${error}` });
+        }
+    });
+
+    document.getElementById('root').removeChild(button);
+};
+
+/**
+ * Build a list of user-selectable items. User selection continues process.
+ * Initial used in BPTL receipted shipment flow. See storeSpecimenPackageReceipt() -> handleDuplicateTrackingNumbers() for usage example.
+ * @param {object} message - modal message object with title and body. 
+ * @param {array<object>} items - array of items to display in the modal. Each item has properties id, originSite, shipDate, and receivedDate.
+ * @param {*} onCancel - callback function to execute on cancel. Example: reset the UI.
+ * @param {*} onContinue - callback function to execute on continue. Example: process a retry POST request.
+ * @param {*} zIndex - z-index of the modal.
+ * Detail of items list: [{}, {}, {}, ...] where each item has shape {id: string, shipmentTimestamp:string, originSite: string, shipDate: string, receivedDate: string}.
+ * The shipmentTimestamp is an ISO 8601 string. Pass through for Firestore query.
+ */
+export const showNotificationsSelectableList = (message, items, onCancel, onContinue, zIndex) => {
+    const button = document.createElement('button');
+    button.dataset.target = '#biospecimenModal';
+    button.dataset.toggle = 'modal';
+
+    document.getElementById('root').appendChild(button);
+    button.click();
+    if (zIndex) document.getElementById('biospecimenModal').style.zIndex = zIndex;
+    
+    const header = document.getElementById('biospecimenModalHeader');
+    const body = document.getElementById('biospecimenModalBody');
+    header.innerHTML = `
+        <h5 class="modal-title">${message.title}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>`;
+    
+    // Generate list of items
+    const modalBodyText = `
+        <div class="row">
+            <div class="col">
+                ${message.body}
+            </div>
+        </div><br><br>`;
+
+    const errorMessageText = `
+        <div id="modalErrorMessage" style="color: red; display: none; font-size: 1.5em;"></div><br>`;
+
+    let itemListHtml = '<ul class="list-group">';
+    items.forEach((item, index) => {
+        itemListHtml += `
+            <li class="list-group-item list-group-item-action" data-index="${index}">
+                ${item.id} | ${item.originSite}<br>
+                Ship Date: ${item.shipDate}<br>
+                Received Date: ${item.receivedDate}<br>
+            </li>`;
+    });
+    itemListHtml += '</ul><br><br>';
+
+    const modalBodyButtons = `
+        <div class="row">
+            <div class="ml-auto" style="margin-right: 1rem;">
+                <button type="button" class="btn btn-outline-dark" id="modalCancelBtn" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="modalContinueBtn">Continue</button>
+            </div>
+        </div>`;
+
+    // Set body content
+    body.innerHTML = modalBodyText + errorMessageText+ itemListHtml + modalBodyButtons;
+    const errorMessageDiv = document.getElementById('modalErrorMessage'); // This div is hidden by default
+
+    // Add event listeners to each list item
+    const listItems = body.querySelectorAll('.list-group-item');
+
+    listItems.forEach(item => {
+        item.addEventListener('click', function() {
+            listItems.forEach(li => li.classList.remove('active'));
+            this.classList.add('active');
+            errorMessageDiv.style.display = 'none';
+        });
+    });
+
+    document.getElementById('modalCancelBtn').addEventListener('click', () => {
+        $('#biospecimenModal').modal('hide');
+        if (onCancel) onCancel();
+    });
+
+    document.getElementById('modalContinueBtn').addEventListener('click', async () => {
+        const selectedItemIndex = body.querySelector('.list-group-item.active')?.getAttribute('data-index');
+        if (selectedItemIndex) {
+            errorMessageDiv.style.display = 'none';
+            $('#biospecimenModal').modal('hide');
+            if (onContinue) await onContinue(items[selectedItemIndex]);
+        } else {
+            errorMessageDiv.textContent = 'Please select an item from the list.';
+            errorMessageDiv.style.display = 'block';
+        }
+    });
+
+    document.getElementById('root').removeChild(button);
+};
+
 export const errorMessage = (id, msg, focus, offset) => {
     const currentElement = document.getElementById(id);
     const parentElement = currentElement.parentNode;
@@ -2789,13 +2935,15 @@ export const triggerErrorModal = (message) => {
 
 export const triggerSuccessModal = (message) => {
     const alertList = document.getElementById("alert_placeholder");
-    alertList.innerHTML = `
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-        </div>`;
+    if (alertList) {
+        alertList.innerHTML = `
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+            </div>`;
+    }
 }
 
 export const checkTrackingNumberSource = () => {
@@ -2880,4 +3028,6 @@ export const processResponse = async (response) => {
 export const getCurrentDate = () => {
     return new Date().toLocaleDateString('en-CA');
 }
+
+export const validIso8601Format = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/;
   
