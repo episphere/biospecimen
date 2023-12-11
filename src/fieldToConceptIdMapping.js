@@ -85,6 +85,7 @@ export const conceptIds = {
         phlebotomistInitials: 719427591,
         mouthwashBagScan: 223999569,
         mouthwashTube1: 143615646,
+        urineTube1: 973670172,
         bloodUrineBagScan: 787237543,
         
         tube: {
