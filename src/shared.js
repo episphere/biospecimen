@@ -1416,14 +1416,16 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
 
     if (!settings[visit][conceptIds.bloodCollectionSetting]) {
         bloodTubes.forEach(tube => {
-            if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
-
-                settings[visit][conceptIds.bloodCollectionSetting] = biospecimenData[conceptIds.collection.collectionSetting];
-
-                if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+            const tubeIsCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
+            const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
+            const isResearch = collectionSetting === conceptIds.research;
+            const isClinical = collectionSetting === conceptIds.clinical;
+            if(tubeIsCollected) {
+                settings[visit][conceptIds.bloodCollectionSetting] = collectionSetting;
+                if(isResearch) {
                     settings[visit][conceptIds.baseline.bloodCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
                 }
-                else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
+                else if(isClinical) {
                     settings[visit][conceptIds.clinicalDashboard.bloodCollected] = conceptIds.yes;
                     settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
 
@@ -1436,6 +1438,38 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
                 bloodTubesLength += 1
             }
         });
+    }
+    else if (settings[visit][conceptIds.baseline.bloodCollectedTime] !== '' ||  settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime] !== ''){
+        const participantBloodCollected = participantData[conceptIds.baseline.bloodCollected] === conceptIds.yes;
+        const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
+        const isResearch = collectionSetting === conceptIds.research;
+        const isClinical = collectionSetting === conceptIds.clinical;
+        let totalBloodTubesAvail = 6; // 6 blood tubes are available. Update this number if more blood tubes are added
+        bloodTubes.forEach(tube => {
+            const tubeIsNotCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.no;
+            if (tubeIsNotCollected && participantBloodCollected) {
+                totalBloodTubesAvail -= 1 // counter keeps track of unchecked blood tubes
+                if (totalBloodTubesAvail === 0) { // derived variables & timestamp are updated only if all the blood tubes are unchecked
+                    delete settings[visit][conceptIds.bloodCollectionSetting];
+                    if (isResearch) {
+                        delete settings[visit][conceptIds.baseline.bloodCollectedTime];
+                    }
+                    else if (isClinical) {
+                        settings[visit][conceptIds.clinicalDashboard.bloodCollected] = conceptIds.no;
+                        delete settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime];
+
+                        if (urineTubesLength === 0 && mouthwashTubesLength === 0) { // the anySpecimenCollected variable will only be updated to NO if mouthwash & urine specimens are not present.
+                            settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
+                            if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                                delete settings[visit][conceptIds.anySpecimenCollectedTime];
+                            }
+                        }
+                    }
+                    derivedVariables[conceptIds.baseline.bloodCollected] = conceptIds.no;
+                    bloodTubesLength = totalBloodTubesAvail;
+                }
+            }
+        })
     }
 
     if (!settings[visit][conceptIds.urineCollectionSetting]) {
