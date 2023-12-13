@@ -1561,11 +1561,11 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     }
 
     if (!settings[visit][conceptIds.bloodCollectionSetting]) {
+        const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
+        const isResearch = collectionSetting === conceptIds.research;
+        const isClinical = collectionSetting === conceptIds.clinical;
         bloodTubes.forEach(tube => {
             const tubeIsCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
-            const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
-            const isResearch = collectionSetting === conceptIds.research;
-            const isClinical = collectionSetting === conceptIds.clinical;
             if(tubeIsCollected) {
                 settings[visit][conceptIds.bloodCollectionSetting] = collectionSetting;
                 if(isResearch) {
@@ -1590,40 +1590,34 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
         const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
         const isResearch = collectionSetting === conceptIds.research;
         const isClinical = collectionSetting === conceptIds.clinical;
-        let totalBloodTubesAvail = 6; // 6 blood tubes are available. Update this number if more blood tubes are added
-        bloodTubes.forEach(tube => {
-            const tubeIsNotCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.no;
-            if (tubeIsNotCollected && participantBloodCollected) {
-                totalBloodTubesAvail -= 1 // counter keeps track of unchecked blood tubes
-                if (totalBloodTubesAvail === 0) { // derived variables & timestamp are updated only if all the blood tubes are unchecked
-                    delete settings[visit][conceptIds.bloodCollectionSetting];
-                    if (isResearch) {
-                        delete settings[visit][conceptIds.baseline.bloodCollectedTime];
-                    }
-                    else if (isClinical) {
-                        settings[visit][conceptIds.clinicalDashboard.bloodCollected] = conceptIds.no;
-                        delete settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime];
+        const totalBloodTubesAvail = bloodTubes.filter((tube) => biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes);
+        if (totalBloodTubesAvail.length === 0 && participantBloodCollected) {
+            delete settings[visit][conceptIds.bloodCollectionSetting]; // derived variables & timestamp are updated only if all the blood tubes are unchecked
+            if (isResearch) {
+                delete settings[visit][conceptIds.baseline.bloodCollectedTime];
+            }
+            else if (isClinical) {
+                settings[visit][conceptIds.clinicalDashboard.bloodCollected] = conceptIds.no;
+                delete settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime];
 
-                        if (urineTubesLength === 0 && mouthwashTubesLength === 0) { // the anySpecimenCollected variable will only be updated to NO if mouthwash & urine specimens are not present.
-                            settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
-                            if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
-                                delete settings[visit][conceptIds.anySpecimenCollectedTime];
-                            }
-                        }
+                if (urineTubesLength === 0 && mouthwashTubesLength === 0) { // anySpecimenCollected variable will only be updated to NO if mouthwash & urine specimens are not present.
+                    settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
+                    if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                        delete settings[visit][conceptIds.anySpecimenCollectedTime];
                     }
-                    derivedVariables[conceptIds.baseline.bloodCollected] = conceptIds.no;
-                    bloodTubesLength = totalBloodTubesAvail;
                 }
             }
-        })
+            derivedVariables[conceptIds.baseline.bloodCollected] = conceptIds.no;
+            bloodTubesLength = totalBloodTubesAvail.length;
+        }
     }
 
     if (!settings[visit][conceptIds.urineCollectionSetting]) {
+        const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
+        const isResearch = collectionSetting === conceptIds.research;
+        const isClinical = collectionSetting === conceptIds.clinical;
         urineTubes.forEach(tube => {
             const tubeIsCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
-            const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
-            const isResearch = collectionSetting === conceptIds.research;
-            const isClinical = collectionSetting === conceptIds.clinical;
     
             if (tubeIsCollected) {
                 settings[visit][conceptIds.urineCollectionSetting] = collectionSetting;
@@ -1650,36 +1644,33 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
         const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
         const isResearch = collectionSetting === conceptIds.research;
         const isClinical = collectionSetting === conceptIds.clinical;
-        urineTubes.forEach(tube => {
-            const tubeIsNotCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.no;
-            if (tubeIsNotCollected && participantUrineCollected) {
-                delete settings[visit][conceptIds.urineCollectionSetting];
-                if(isResearch) {
-                    delete settings[visit][conceptIds.baseline.urineCollectedTime];
-                }
-                else if (isClinical) {
-                    settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.no;
-                    delete settings[visit][conceptIds.clinicalDashboard.urineCollectedTime];
+        const totalUrineTubesAvail = urineTubes.filter((tube) => biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes);
+        if (totalUrineTubesAvail.length === 0 && participantUrineCollected) {
+            delete settings[visit][conceptIds.urineCollectionSetting];
+            if(isResearch) {
+                delete settings[visit][conceptIds.baseline.urineCollectedTime];
+            }
+            else if (isClinical) {
+                settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.no;
+                delete settings[visit][conceptIds.clinicalDashboard.urineCollectedTime];
 
-                    if (bloodTubesLength === 0 && mouthwashTubesLength === 0) { // the anySpecimenCollected variable will only be updated to NO if mouthwash & blood specimens are not present.
-                        settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
-                        if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
-                            delete settings[visit][conceptIds.anySpecimenCollectedTime];
-                        }
+                if (bloodTubesLength === 0 && mouthwashTubesLength === 0) { // anySpecimenCollected variable will only be updated to NO if mouthwash & blood specimens are not present.
+                    settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
+                    if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                        delete settings[visit][conceptIds.anySpecimenCollectedTime];
                     }
                 }
-                derivedVariables[conceptIds.baseline.urineCollected] = conceptIds.no;
             }
-            urineTubesLength -= 1
-        })
+            derivedVariables[conceptIds.baseline.urineCollected] = conceptIds.no;
+            urineTubesLength = totalUrineTubesAvail.length;
+        }  
     }
 
-
     if (!settings[visit][conceptIds.mouthwashCollectionSetting]) {
+        const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
+        const isResearch = collectionSetting === conceptIds.research;
         mouthwashTubes.forEach(tube => {
             const isTubeCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
-            const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
-            const isResearch = collectionSetting === conceptIds.research;
             if (isTubeCollected) {
                 settings[visit][conceptIds.mouthwashCollectionSetting] = collectionSetting;
                 if (isResearch) {
@@ -1689,19 +1680,18 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
             }
         });
     }
-    else if (settings[visit][conceptIds.baseline.mouthwashCollectedTime] !== '' && participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes){
+    else if (settings[visit][conceptIds.baseline.mouthwashCollectedTime] !== '' && participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes) {
         const isParticipantMouthwashCollected = participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes;
-        mouthwashTubes.forEach(tube => {
-            const isTubeNotCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.no;
-            if (isTubeNotCollected &&  isParticipantMouthwashCollected) {
-                delete settings[visit][conceptIds.mouthwashCollectionSetting]
-                if (biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
-                    delete settings[visit][conceptIds.baseline.mouthwashCollectedTime];
-                }
-                derivedVariables[conceptIds.baseline.mouthwashCollected] = conceptIds.no;
-                mouthwashTubesLength -= 1
+        const isResearch = biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research;
+        const totalMouthwasTubesAvail = mouthwashTubes.filter((tube) => biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes);
+        if (totalMouthwasTubesAvail.length === 0 &&  isParticipantMouthwashCollected) {
+            delete settings[visit][conceptIds.mouthwashCollectionSetting]
+            if (isResearch) {
+                delete settings[visit][conceptIds.baseline.mouthwashCollectedTime];
             }
-        })
+            derivedVariables[conceptIds.baseline.mouthwashCollected] = conceptIds.no;
+            mouthwashTubesLength = totalMouthwasTubesAvail.length;
+        }
     }
 
     let settingData = {
@@ -1710,8 +1700,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     };
 
     // update derived variable if specimens unchecked after accidently checking them & derived varibales set to yes
-    if (Object.keys(derivedVariables).length !== 0) settingData = { ...settingData, ...derivedVariables };
-
+    settingData = { ...settingData, ...derivedVariables };
     await updateParticipant(settingData);
 }
 
