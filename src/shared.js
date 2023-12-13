@@ -1550,6 +1550,10 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     let urineTubesLength = 0
     let mouthwashTubesLength = 0
 
+    const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
+    const isResearch = collectionSetting === conceptIds.research;
+    const isClinical = collectionSetting === conceptIds.clinical;
+
     if (participantData[conceptIds.collectionDetails]) {
         settings = participantData[conceptIds.collectionDetails];
         if (!settings[visit]) settings[visit] = {};
@@ -1561,9 +1565,6 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     }
 
     if (!settings[visit][conceptIds.bloodCollectionSetting]) {
-        const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
-        const isResearch = collectionSetting === conceptIds.research;
-        const isClinical = collectionSetting === conceptIds.clinical;
         bloodTubes.forEach(tube => {
             const tubeIsCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
             if(tubeIsCollected) {
@@ -1587,9 +1588,6 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     }
     else if (settings[visit][conceptIds.baseline.bloodCollectedTime] !== '' ||  settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime] !== ''){
         const participantBloodCollected = participantData[conceptIds.baseline.bloodCollected] === conceptIds.yes;
-        const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
-        const isResearch = collectionSetting === conceptIds.research;
-        const isClinical = collectionSetting === conceptIds.clinical;
         const totalBloodTubesAvail = bloodTubes.filter((tube) => biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes);
         if (totalBloodTubesAvail.length === 0 && participantBloodCollected) {
             delete settings[visit][conceptIds.bloodCollectionSetting]; // derived variables & timestamp are updated only if all the blood tubes are unchecked
@@ -1613,15 +1611,10 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     }
 
     if (!settings[visit][conceptIds.urineCollectionSetting]) {
-        const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
-        const isResearch = collectionSetting === conceptIds.research;
-        const isClinical = collectionSetting === conceptIds.clinical;
         urineTubes.forEach(tube => {
             const tubeIsCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
-    
             if (tubeIsCollected) {
                 settings[visit][conceptIds.urineCollectionSetting] = collectionSetting;
-
                 if (isResearch) {
                     settings[visit][conceptIds.baseline.urineCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
                 }
@@ -1639,11 +1632,8 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
             }
         });
     }
-    else if (settings[visit][conceptIds.baseline.urineCollectedTime] !== '' ||  settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] !== ''){
+    else if (settings[visit][conceptIds.baseline.urineCollectedTime] !== '' ||  settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] !== '') {
         const participantUrineCollected = participantData[conceptIds.baseline.urineCollected] === conceptIds.yes;
-        const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
-        const isResearch = collectionSetting === conceptIds.research;
-        const isClinical = collectionSetting === conceptIds.clinical;
         const totalUrineTubesAvail = urineTubes.filter((tube) => biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes);
         if (totalUrineTubesAvail.length === 0 && participantUrineCollected) {
             delete settings[visit][conceptIds.urineCollectionSetting];
@@ -1667,8 +1657,6 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     }
 
     if (!settings[visit][conceptIds.mouthwashCollectionSetting]) {
-        const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
-        const isResearch = collectionSetting === conceptIds.research;
         mouthwashTubes.forEach(tube => {
             const isTubeCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
             if (isTubeCollected) {
@@ -1682,7 +1670,6 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     }
     else if (settings[visit][conceptIds.baseline.mouthwashCollectedTime] !== '' && participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes) {
         const isParticipantMouthwashCollected = participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes;
-        const isResearch = biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research;
         const totalMouthwasTubesAvail = mouthwashTubes.filter((tube) => biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes);
         if (totalMouthwasTubesAvail.length === 0 &&  isParticipantMouthwashCollected) {
             delete settings[visit][conceptIds.mouthwashCollectionSetting]
