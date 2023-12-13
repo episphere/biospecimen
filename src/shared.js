@@ -1699,7 +1699,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
         uid: participantData?.state?.uid
     };
 
-    // update derived variable if specimens unchecked after accidently checking them & derived varibales set to yes
+    // Update derived variables to 'NO' from 'YES'. After specimens, are unchecked after checking them.
     settingData = { ...settingData, ...derivedVariables };
     await updateParticipant(settingData);
 }
