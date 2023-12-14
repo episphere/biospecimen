@@ -190,7 +190,7 @@ const storePackageReceipt = async (data) => {
   const returnedPtInfo = await processResponse(response);
   if (returnedPtInfo.status === true) {
     triggerSuccessModal('Kit Receipted.')
-    document.getElementById("courierType").innerHTML = ``;
+    document.getElementById("showMsg").innerHTML = "";
     document.getElementById("scannedBarcode").value = "";
     document.getElementById("packageCondition").value = "";
     document.getElementById("receivePackageComments").value = "";
