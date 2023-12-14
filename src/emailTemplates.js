@@ -65,7 +65,7 @@ export const baselineMWSurveyRemainderTemplate = (ptName) => {
         Dear ${ptName || 'User'},
         <br/>
         <br/>
-        Thank you for completing your mouthwash home collection kit! We have your sample. Next, please share some information about the day you collected your sample. Visit <a href=${appLocation}>MyConnect</a> and log in using to complete a short survey. This survey asks questions about the day you collected your sample, so it is important to complete it as soon as you can.
+        Thank you for completing your mouthwash home collection kit! We have your sample. Next, please <a href=${appLocation}>share some information</a> about the day you collected your sample. Visit <a href=${appLocation}>MyConnect</a> and log in using to complete a short survey. This survey asks questions about the day you collected your sample, so it is important to complete it as soon as you can.
         Have questions? Please contact the <a href=${supportLocation}>Connect Support Center.</a>
         ${returnFooterTemplate()}`
 }
