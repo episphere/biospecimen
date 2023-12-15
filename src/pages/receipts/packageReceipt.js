@@ -1,4 +1,4 @@
-import { getIdToken, showAnimation, hideAnimation, baseAPI, convertDateReceivedinISO, triggerErrorModal} from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, baseAPI, convertDateReceivedinISO, checkTrackingNumberSource, getCurrentDate, locationConceptIDToLocationMap, retrieveDateFromIsoString, showNotificationsCancelOrContinue, showNotificationsSelectableList, triggerSuccessModal, showNotifications, validIso8601Format } from "../../shared.js";
 import { nonUserNavBar } from "../../navbar.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
@@ -16,7 +16,7 @@ export const packageReceiptScreen = async (auth, route) => {
   const username = user.displayName ? user.displayName : user.email;
   packageReceiptTemplate(username, auth, route);
   addDefaultDateReceived(getCurrentDate);
-  checkAndDisplayCourierType();
+  checkTrackingNumberSource();
   checkCardIncluded();
   disableCollectionCardFields();
   enableCollectionCardFields();
@@ -48,7 +48,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
                       <label class="col-form-label col-md-4" for="scannedBarcode">Scan FedEx/USPS Barcode</label>
                       <div style="display:inline-block;">
                         <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" style="width: 600px;" placeholder="Scan a Fedex or USPS barcode">
-                        <span id="courierType" style="padding-left: 10px;"></span>
+                        <span id="showMsg" style="padding-left: 10px;"></span>
                         <br />
                         <br />
                         <span><h6><i>Press command/control while clicking with the mouse to make multiple selections</i></h6></span>
@@ -134,70 +134,6 @@ const packageReceiptTemplate = async (name, auth, route) => {
     activeReceiptsNavbar();
 };
 
-export const checkAndDisplayCourierType = (isKitReceipt = false) => {
-  const a = document.getElementById("scannedBarcode");
-  let input = ""
-  if (a) {
-    a.addEventListener("input", (e) => {
-      input = e.target.value.trim()
-      // None
-      if(input.length === 0){
-        document.getElementById('courierType').innerHTML = ``
-        // enableCollectionCardFields();
-        // document.getElementById('collectionCheckBox').checked = false;
-        return
-      }
-      // USPS
-      else if (uspsFirstThreeNumbersCheck(input) || (input.length === 34 && uspsFirstThreeNumbersCheck(input))) {
-        // console.log(uspsFirstThreeNumbersCheck(input))
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
-        // document.getElementById('collectionCheckBox').checked = false;
-        // document.getElementById('collectionCheckBox').removeAttribute("disabled")
-        // enableCollectionCardFields();
-        if(!isKitReceipt) triggerErrorModal('Scan limited only to FEDEX');
-        return
-      }
-      // USPS
-      else if (input.length === 22 || input.length === 20) {
-        // console.log(uspsFirstThreeNumbersCheck(input))
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
-        // document.getElementById('collectionCheckBox').checked = false;
-        // document.getElementById('collectionCheckBox').removeAttribute("disabled")
-        // enableCollectionCardFields();
-        if(!isKitReceipt) triggerErrorModal('Scan limited only to FEDEX');
-        return
-      }
-      // FEDEX
-      else if (input.length === 12) {
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX` 
-        // document.getElementById('collectionCheckBox').checked = false;
-        // document.getElementById('collectionCheckBox').disabled = true;
-        // checkCardIncluded();
-        // disableCollectionCardFields();
-        return
-      }
-      // FEDEX
-      else if (input.length > 12) {
-        document.getElementById('courierType').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> FEDEX`
-        e.target.value = input.slice(-12)
-        // document.getElementById('collectionCheckBox').checked = false;
-        // document.getElementById('collectionCheckBox').disabled = true;
-        // checkCardIncluded();
-        // disableCollectionCardFields();
-        return
-      }
-      // None
-      else {
-        document.getElementById('courierType').innerHTML = ``
-        // document.getElementById('collectionCheckBox').checked = false;
-        // document.getElementById('collectionCheckBox').removeAttribute("disabled")
-        // enableCollectionCardFields();
-        return
-      }
-    }) 
-  }
-};
-
 const checkCardIncluded = () => {
   const a = document.getElementById('collectionCheckBox')
   if (a) {
@@ -238,42 +174,51 @@ const formSubmit = () => {
 };
 
 const confirmPackageReceipt = () => {
-  const a = document.getElementById('confirmReceipt');
-  if (a) {
-    a.addEventListener('click',  () => { 
-      let obj = {};
-      let packageConditions = [];
-      const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
-      const onlyFedexCourierType = identifyCourierType(scannedBarcode);
-      if (onlyFedexCourierType === true) {
-        obj['scannedBarcode'] = scannedBarcode
-        for (let option of document.getElementById('packageCondition').options) {
-          if (option.selected) {packageConditions.push(option.value)}
-        }
-        obj[`${fieldMapping.packageCondition}`] = packageConditions;
-        if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode))) {  
-          obj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
-          obj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
-          obj[`${fieldMapping.siteShipmentDateReceived}`] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
-        } else { 
-          obj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
-          obj['dateReceived'] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
-          if(document.getElementById('collectionId').value) {
-            obj['collectionId'] = document.getElementById('collectionId').value;
-            obj['dateCollectionCard'] = document.getElementById('dateCollectionCard').value;
-            obj['timeCollectionCard'] = document.getElementById('timeCollectionCard').value;
-            document.getElementById('collectionCheckBox').checked === true ? 
-                obj['collectionCheckBox'] = true : obj['collectionCheckBox'] = false
-            obj['collectionComments'] = document.getElementById('collectionComments').value;
-          }    
-        }
-        window.removeEventListener("beforeunload",beforeUnloadMessage)
-        targetAnchorTagEl();
-        storePackageReceipt(obj);
-       } 
-    })
+  const confirmReceiptEle = document.getElementById('confirmReceipt');
+  if (confirmReceiptEle) {
+      confirmReceiptEle.addEventListener('click',  async () => { 
+          try {
+              let receiptedPackageObj = {};
+              let packageConditions = [];
+              const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
+              const onlyFedexCourierType = identifyCourierType(scannedBarcode);
+              if (onlyFedexCourierType === true) {
+                  receiptedPackageObj['scannedBarcode'] = scannedBarcode
+                  for (let option of document.getElementById('packageCondition').options) {
+                      if (option.selected) {packageConditions.push(option.value)}
+                  }
+
+                  receiptedPackageObj[`${fieldMapping.packageCondition}`] = packageConditions;
+                  
+                  if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode))) {  
+                      receiptedPackageObj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
+                      receiptedPackageObj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
+                      receiptedPackageObj[`${fieldMapping.siteShipmentDateReceived}`] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
+                  } else { 
+                      receiptedPackageObj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
+                      receiptedPackageObj['dateReceived'] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
+                      if(document.getElementById('collectionId').value) {
+                          receiptedPackageObj['collectionId'] = document.getElementById('collectionId').value;
+                          receiptedPackageObj['dateCollectionCard'] = document.getElementById('dateCollectionCard').value;
+                          receiptedPackageObj['timeCollectionCard'] = document.getElementById('timeCollectionCard').value;
+                          document.getElementById('collectionCheckBox').checked === true ? 
+                          receiptedPackageObj['collectionCheckBox'] = true : receiptedPackageObj['collectionCheckBox'] = false
+                          receiptedPackageObj['collectionComments'] = document.getElementById('collectionComments').value;
+                      }    
+                  }
+                  
+                  window.removeEventListener("beforeunload",beforeUnloadMessage)
+                  targetAnchorTagEl();
+                  await storeSpecimenPackageReceipt(receiptedPackageObj);
+              }
+          } catch (error) {
+              console.error(error)
+              showNotifications({ title: 'Error', body: `Error: please try again. ${error}` });
+          }
+      });
   }
 }
+
 
 
 const identifyCourierType = (scannedBarcode) => {
@@ -284,57 +229,179 @@ const identifyCourierType = (scannedBarcode) => {
     return false
 }}
 
-const storePackageReceipt = async (data) => {
-    showAnimation();
-    const idToken = await getIdToken();
-    const response = await fetch(`${baseAPI}api=storeReceipt`,
-        {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: {
-                Authorization: "Bearer " + idToken,
-                "Content-Type": "application/json",
-            },
-        }
-    );
-    hideAnimation();
-    if (response.status === 200) {
-        let alertList = document.getElementById("alert_placeholder");
-        let template = ``;
-        template += `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                  Response saved!
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                </div>`;
-        alertList.innerHTML = template;
-        document.getElementById("courierType").innerHTML = ``;
-        document.getElementById("scannedBarcode").value = "";
-        document.getElementById("packageCondition").value = "";
-        document.getElementById("receivePackageComments").value = "";
-        document.getElementById("dateReceived").value = getCurrentDate();
-        document.getElementById("collectionComments").value = "";
-        document.getElementById("collectionId").value = "";
-        enableCollectionCardFields()
-        enableCollectionCheckBox()
-        document.getElementById("packageCondition").setAttribute("data-selected","[]")
-        if (document.getElementById("collectionId").value) {
-          document.getElementById("collectionId").value = "";
-          document.getElementById("dateCollectionCard").value = "";
-          document.getElementById("timeCollectionCard").value = "";
-          document.getElementById("collectionCheckBox").checked = false;
-          document.getElementById("collectionComments").value = "";
-    
-          enableCollectionCardFields();
-          enableCollectionCheckBox();
-          document.getElementById("packageCondition").setAttribute("data-selected","[]");
-    
-        }
-    } else {
-        alert("Error");
-    }
+const storeSpecimenPackageReceipt = async (receiptedPackageData) => {
+  try {
+      showAnimation();
+      const idToken = await getIdToken();
+      const response = await fetch(`${baseAPI}api=storeSpecimenReceipt`, {
+          method: "POST",
+          body: JSON.stringify(receiptedPackageData),
+          headers: {
+              Authorization: "Bearer " + idToken,
+              "Content-Type": "application/json",
+          },
+      });
+
+      const responseData = await response.json();
+      hideAnimation();
+      
+      if (responseData.code === 200) {
+          clearPackageReceiptForm(true);
+      } else if (responseData.code === 409) {
+          switch (responseData.message) {
+              case 'Multiple Results': // Multiple boxes found with the same tracking number
+                  handleDuplicateTrackingNumbers(responseData.data, receiptedPackageData);
+                  break;
+              case 'Box Already Received': // Box has already been marked as received
+                  handleAlreadyReceivedPackage(receiptedPackageData);
+                  break;
+              default:
+                  throw new Error('Bad arg in response data message. Please report this error.');
+          }    
+      } else {
+          showNotifications({ title: `Error: ${responseData.code}` , body: `Error: ${responseData.message}` });
+      }
+  } catch (error) {
+      hideAnimation();
+      console.error('Error: please try again.', error);
+      showNotifications({ title: 'Error', body: `Error: please try again. ${error}` });
+  }
 };
+
+/**
+ * Handles a case where multiple boxes are found with the same tracking number.
+ * It can happen if a fedex tracking number is reused (by accident or recycled and duplicated).
+ * @param {array<object>} boxWithDuplicateTrackingList - The list of boxes with the same tracking number.
+ * @param {object} receiptedPackageData - The package receipt data to be saved.
+ */
+const handleDuplicateTrackingNumbers = (boxWithDuplicateTrackingList, receiptedPackageData) => {
+    const modalMessage = {
+        title: 'Multiple Boxes Found (Duplicate Tracking Number)',
+        body: 'IMPORTANT: Multiple boxes were found with the same tracking number. Please select the correct box and click continue. The most recent ship date (top of the list) is likely to be the correct box, but please verify.',
+    };
+
+    // Sort boxes by ship date (most recent first) for display in UI. Most recent ship date is highly likely to be the correct box.
+    boxWithDuplicateTrackingList.sort((a, b) => {
+        const dateA = a.boxData[fieldMapping.shippingShipDate] ?? '';
+        const dateB = b.boxData[fieldMapping.shippingShipDate] ?? '';  
+        if (dateA === '') return 1;
+        if (dateB === '') return -1;
+
+        return dateB.localeCompare(dateA);
+    });
+
+    let boxDetailsList = [];
+    for (const box of boxWithDuplicateTrackingList) {
+        const boxId = box.boxData[fieldMapping.shippingBoxId] ?? '';
+        const shipmentTimestamp = box.boxData[fieldMapping.shippingShipDate] ?? '';
+        const originSite = locationConceptIDToLocationMap[box.boxData[fieldMapping.shippingLocation]]?.loginSiteName ?? '';
+        const shipDate = validIso8601Format.test(box.boxData[fieldMapping.shippingShipDate]) ? retrieveDateFromIsoString(box.boxData[fieldMapping.shippingShipDate]) : '';
+        const receivedDate = validIso8601Format.test(box.boxData[fieldMapping.siteShipmentDateReceived]) ? retrieveDateFromIsoString(box.boxData[fieldMapping.siteShipmentDateReceived]) : 'Not yet received';
+        
+        const boxDetailObj = {
+            id: boxId,
+            shipmentTimestamp: shipmentTimestamp,
+            originSite: originSite,
+            shipDate: shipDate,
+            receivedDate: receivedDate,
+        };
+
+        boxDetailsList.push(boxDetailObj);
+    }
+
+    const onContinue = async (selectedBoxDetails) => {
+        if (!selectedBoxDetails) {
+            showNotifications({ title: 'Error', body: `Error: please select a box and try again.` });
+            return;
+        }
+        receiptedPackageData['shipmentTimestamp'] = selectedBoxDetails.shipmentTimestamp;
+  
+        await storeSpecimenPackageReceipt(receiptedPackageData);
+    };
+
+    const onCancel = () => {
+        clearPackageReceiptForm(false);
+    };
+
+    showNotificationsSelectableList(modalMessage, boxDetailsList, onCancel, onContinue);
+}
+
+/**
+ * Handles the case where the package has already been marked as received. This is likely an accidental scan (has happened at receiving facility).
+ * Build a noticfication modal with cancel or continue options.
+ * @param {Object} receiptedPackageData - The package receipt data to be saved.
+ */
+const handleAlreadyReceivedPackage = (receiptedPackageData) => {
+    const modalMessage = {
+        title: 'Package Already Received',
+        body: 'IMPORTANT: This package has already been marked as received. Do you want to continue? Click Cancel to discard changes or click Continue to overwrite the existing receipt.',
+    };
+
+    const onCancel = () => {
+        clearPackageReceiptForm(false);
+    };
+
+    // Define what happens when the user clicks "Continue"
+    const onContinue = async () => {
+        receiptedPackageData['forceWriteOverride'] = true;
+        await storeSpecimenPackageReceipt(receiptedPackageData);
+    };
+
+    showNotificationsCancelOrContinue(modalMessage, null, onCancel, onContinue);
+}
+
+const clearPackageReceiptForm = (isSuccess) => {
+    if (isSuccess) {
+        triggerSuccessModal('Package Receipted Successfully');
+    }
+
+    const courierType = document.getElementById("courierType");
+    if (courierType) courierType.innerHTML = '';
+
+    const scannedBarcode = document.getElementById("scannedBarcode");
+    if (scannedBarcode) scannedBarcode.value = '';
+    
+    const packageCondition = document.getElementById("packageCondition");
+    if (packageCondition) packageCondition.value = '';
+    
+    const receivePackageComments = document.getElementById("receivePackageComments");
+    if (receivePackageComments) receivePackageComments.value = '';
+    
+    const dateReceived = document.getElementById("dateReceived");
+    if (dateReceived) dateReceived.value = getCurrentDate();
+    
+    const collectionComments = document.getElementById("collectionComments");
+    if (collectionComments) collectionComments.value = '';
+
+    const collectionId = document.getElementById("collectionId");
+    if (collectionId) collectionId.value = '';
+    
+    enableCollectionCardFields();
+    enableCollectionCheckBox();
+
+    if (packageCondition) packageCondition.setAttribute("data-selected","[]");
+
+    // TODO: Handled null case, maybe this logic can be removed, but I'm not aware of the impact re: enableCollectionCardFields() and enableCollectionCheckBox(). Leaving for now.
+    if (collectionId.value) {
+        collectionId.value = '';
+        const dateCollectionCard = document.getElementById("dateCollectionCard");
+        if (dateCollectionCard) dateCollectionCard.value = '';
+
+        const timeCollectionCard = document.getElementById("timeCollectionCard");
+        if (timeCollectionCard) timeCollectionCard.value = '';
+
+        const collectionCheckBox = document.getElementById("collectionCheckBox");
+        if (collectionCheckBox) collectionCheckBox.checked = false;
+
+        const collectionComments = document.getElementById("collectionComments");
+        if (collectionComments) collectionComments.value = '';
+
+        enableCollectionCardFields();
+        enableCollectionCheckBox();
+
+        if (packageCondition) packageCondition.setAttribute("data-selected","[]");
+    }
+}
 
 export const enableCollectionCheckBox = () => {
   const collectionCheckBoxEl = document.getElementById("collectionCheckBox")
@@ -625,17 +692,6 @@ const addDefaultDateReceived = (getCurrentDate) => {
     dateReceivedEl.value = getCurrentDate()
   }
   else dateReceivedEl.value = ""
-}
-
-// returns current date in default format ("YYYY-MM-DD")
-const getCurrentDate = () => {
-  const currentDate = new Date();
-  return currentDate.getFullYear() + "-" + checkForPadding(parseInt(currentDate.getMonth() + 1)) + "-" + checkForPadding(currentDate.getDate())
-}
-
-const checkForPadding = (input) => { // adds 0 before single month & day to adhere to HTML date format
-  if (input < 10) return `0`+input.toString();
-  else return input;
 }
 
 const uspsFirstThreeNumbersCheck = (input) => {

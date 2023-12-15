@@ -20,6 +20,9 @@ export const homeCollectionNavbar = () => {
                     <li class="nav-item">
                       <a class="nav-link" aria-current="page" href="#kitsreceipt" id="kitsReceipt">Kits Receipt</a>
                     </li>
+                    <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="#kitscsv" id="kitsCsv">Create .csv File</a>
+                  </li>
                 </ul>`;
   return template;
 };

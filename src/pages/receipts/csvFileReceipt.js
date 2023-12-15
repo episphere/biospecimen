@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameObj, convertISODateTime, formatISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameObj, convertISODateTime, formatISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, triggerSuccessModal } from "../../shared.js";
 import { conceptIds as fieldToConceptIdMapping } from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar } from "../../navbar.js";
@@ -46,23 +46,27 @@ template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false
               </div>
           </div>`
 
-  template += `<span> <h4 style="text-align: center; margin: 1rem 0;">Receipted CSV File</h4> </span>
-                  <div class="container-fluid">
-                    <div class="card bg-light mb-3 mt-3 mx-auto" style="max-width:50rem;">
-                      <div class="card-body" style="padding: 4rem 2.5rem;">
-                        <form class="form">
-                        <div class="form-group d-flex flex-wrap align-items-center justify-content-center m-0">
-                          <label for="csvDateInput" style="display:inline-block;margin-bottom:0; margin-right:5%; font-size:1.3rem;">Enter a Date</label>
-                          <input type="date" name="csvDate" id="csvDateInput" describedby="enterEmail" style="margin-right:5%; padding:0.2rem;" value="${getCurrentDate()}" max="${getCurrentDate()}"/>
-                          <button id="csvCreateFileButton" class="btn btn-primary">Create File</button>
-                        </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>`
+  template += receiptedCSVFileTemplate();
   
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
+}
+
+export const receiptedCSVFileTemplate = () => {
+  return `<span> <h4 style="text-align: center; margin: 1rem 0;">Receipted CSV File</h4> </span>
+    <div class="container-fluid">
+      <div class="card bg-light mb-3 mt-3 mx-auto" style="max-width:50rem;">
+        <div class="card-body" style="padding: 4rem 2.5rem;">
+          <form class="form">
+          <div class="form-group d-flex flex-wrap align-items-center justify-content-center m-0">
+            <label for="csvDateInput" style="display:inline-block;margin-bottom:0; margin-right:5%; font-size:1.3rem;">Enter a Date</label>
+            <input type="date" name="csvDate" id="csvDateInput" describedby="enterEmail" style="margin-right:5%; padding:0.2rem;" value="${getCurrentDate()}" max="${getCurrentDate()}"/>
+            <button id="csvCreateFileButton" class="btn btn-primary">Create File</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>`
 }
 
 const getInTransitFileType = () => {
@@ -152,9 +156,6 @@ const getSpecimensByReceivedDate = async (dateFilter) => {
     }
 }
 
-const getCurrentDate = () => {
-  return new Date().toLocaleDateString('en-CA');
-}
 
 /**
  * Tube Id's 0050-0054 are misc tubes. They are used by shipping sites in the event something happened to the original ID label.
@@ -390,7 +391,7 @@ const updateResultMappings = (filteredResult, vialMappings, collectionId, tubeId
 
 const generateBSIqueryCSVData = (items) => {
     const csv = 'Study ID, Sample Collection Center, Sample ID, Sequence, BSI ID, Subject ID, Date Received, Date Drawn, Vial Type, Additive/Preservative, Material Type, Volume, Volume Estimate, Volume Unit, Vial Warnings, Hemolyzed, Label Status, Visit\r\n';
-    downloadBSIQueryCSVFile(items, csv, 'BSI-data-export');
+    downloadCSVfile(items, csv, 'BSI-data-export');
 }
 
 const generateInTransitCSVData = (items) => {
@@ -398,32 +399,21 @@ const generateInTransitCSVData = (items) => {
     downloadCSVfile(items, csv, 'In-Transit-CSV-data-export');
 }
 
-// If value contains a comma, quote or newline, enclose it in double quotes and replace inner double quotes
-const downloadBSIQueryCSVFile = (items, csv, title) => {
-    const csvData = items.map(row =>
-        Object.values(row).map(value => 
-            typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes('\r'))
-              ? `"${value.replace(/"/g, '""')}"`
-              : value
-        ).join(',')
-    ).join('\r\n');
+// If rowValue contains a comma, quote or newline, enclose in double quotes & replace with inner double quotes
+export const downloadCSVfile = (items, csv, title) => {
+  const csvData = items.map((item) => {
+    const rowData = Object.values(item).map((rowValue) => { // store processed row data
+      if (typeof rowValue === 'string' && /[",\n\r]/.test(rowValue)) { // use regex for string handling
+        return `"${rowValue.replaceAll('"', '""')}"`; // use replaceAll for reduced code duplication
+      }
+      return rowValue;
+    });
+    return rowData.join(',');
+  });
 
-    csv += csvData;
-    
-    generateFileToDownload(csv, title, 'csv');
-}
-
-//TODO: refactor this to the downloadBSIQueryCSVFile format, then remove downloadBSIQueryCSVFile()
-const downloadCSVfile = (items, csv, title) => {
-  for (let row = 0; row < (items.length); row++) {
-    let keysAmount = Object.keys(items[row]).length
-    let keysCounter = 0
-    for(let key in items[row]) {
-      csv += items[row][key] + (keysCounter + 1 < keysAmount ? ',' : '\r\n') 
-      keysCounter++
-    }}
-    generateFileToDownload(csv, title, 'csv')
-}
+  csv += csvData.join('\r\n');
+  generateFileToDownload(csv, title, 'csv');
+};
 
 /**
  * Process data to the format required by xlsx library. Map function converts each row of inTransitItems into an array of values using Object.values
@@ -492,13 +482,5 @@ const generateFileToDownload = (blob, title, fileType) => {
   document.body.removeChild(link);
 
   // Display success message
-  const alertList = document.getElementById('alert_placeholder');
-  const template = `
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-      Success!
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>`;
-  alertList.innerHTML = template;
+  triggerSuccessModal(`${title} file downloaded successfully!`);
 }
