@@ -365,13 +365,13 @@ export const showNotificationsCancelOrContinue = (message, zIndex, onCancel, onC
         </div>`;
 
     document.getElementById('modalCancelBtn').addEventListener('click', () => {
-        $('#biospecimenModal').modal('hide');
+        closeBiospecimenModal();
         if (onCancel) onCancel();
     });
 
     document.getElementById('modalContinueBtn').addEventListener('click', async () => {
         try {
-            $('#biospecimenModal').modal('hide');
+            closeBiospecimenModal();
             if (onContinue) await onContinue();
         } catch (error) {
             console.error('Error in modalContinueBtn event listener:', error);
@@ -456,7 +456,7 @@ export const showNotificationsSelectableList = (message, items, onCancel, onCont
     });
 
     document.getElementById('modalCancelBtn').addEventListener('click', () => {
-        $('#biospecimenModal').modal('hide');
+        closeBiospecimenModal();
         if (onCancel) onCancel();
     });
 
@@ -464,7 +464,7 @@ export const showNotificationsSelectableList = (message, items, onCancel, onCont
         const selectedItemIndex = body.querySelector('.list-group-item.active')?.getAttribute('data-index');
         if (selectedItemIndex) {
             errorMessageDiv.style.display = 'none';
-            $('#biospecimenModal').modal('hide');
+            closeBiospecimenModal();
             if (onContinue) await onContinue(items[selectedItemIndex]);
         } else {
             errorMessageDiv.textContent = 'Please select an item from the list.';
@@ -473,6 +473,60 @@ export const showNotificationsSelectableList = (message, items, onCancel, onCont
     });
 
     document.getElementById('root').removeChild(button);
+};
+
+export const showTimedNotifications = (data, zIndex, timeInMilliseconds = 2600) => {
+    const button = document.createElement('button');
+    button.dataset.target = '#biospecimenModal';
+    button.dataset.toggle = 'modal';
+    const rootElement = document.getElementById('root');
+    rootElement.appendChild(button);
+    button.click();
+
+    if (zIndex) {
+        document.getElementById('biospecimenModal').style.zIndex = zIndex;
+    }
+    rootElement.removeChild(button);
+    const header = document.getElementById('biospecimenModalHeader');
+    const body = document.getElementById('biospecimenModalBody');
+    header.innerHTML = `<h5 class="modal-title text-center">${data.title}</h5>`;
+    body.innerHTML = `
+        <div class="row">
+            <div class="col text-center">${data.body}
+            </div>
+        </div>
+        </br></br>
+        <div class="row">
+            <div class="ml-auto" style="margin-right: 1rem;">
+                <button type="button" class="btn btn-outline-dark" data-dismiss="modal" aria-label="Close" style="display:none">Close</button>
+            </div>
+        </div>`;
+
+    // Programmatically close the modal on a timer.
+    setTimeout(() => {
+        const closeButton = document.querySelector('#biospecimenModal .btn[data-dismiss="modal"]');
+        if (closeButton) {
+            closeButton.click();
+        }
+    }, timeInMilliseconds);
+};
+
+const closeBiospecimenModal = () => {
+    const modal = document.getElementById('biospecimenModal');
+    const backdrop = document.querySelector('.modal-backdrop');
+
+    modal.style.display = 'none';
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.removeAttribute('aria-modal');
+    modal.removeAttribute('role');
+
+    if (backdrop) {
+        backdrop.style.display = 'none';
+        backdrop.classList.remove('show');
+    }
+
+    document.body.classList.remove('modal-open');
 };
 
 export const errorMessage = (id, msg, focus, offset) => {
@@ -1311,7 +1365,6 @@ export const filterDuplicateSpecimensInList = (specimensList) => {
 // searches boxes collection by login site (789843387) and Site-specific location id (560975149)
 // filters out any boxes where submitShipmentFlag is true
 export const getBoxesByLocation = async (location) => {
-    logAPICallStartDev('getBoxesByLocation');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchBoxesByLocation&location=${location}`, {
         method: "POST",
@@ -1324,8 +1377,45 @@ export const getBoxesByLocation = async (location) => {
 
     let res = await response.json();
     res.data = res.data.map(convertToOldBox);
-    logAPICallEndDev('getBoxesByLocation');
     return res;
+}
+
+/**
+ * Collection ID search for editing unfinalized collections returns specimenData and participantData.
+ * @param {string} collectionId - collectionId to search for in Firestore biospecimen collection.
+ * @param {boolean} isBPTL - indicates if the request is from BPTL.
+ * @returns 
+ */
+export const getSpecimenAndParticipant = async (collectionId, isBPTL = false) => {
+    showAnimation();
+    try {
+        const idToken = await getIdToken();
+        const specimenQuery = `&collectionId=${collectionId}` + (isBPTL ? `&isBPTL=${isBPTL}` : '')
+        const response = await fetch(`${api}api=getSpecimenAndParticipant${specimenQuery}`, {
+            method: "GET",
+            headers: {
+                Authorization: "Bearer " + idToken
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        const responseJSON = await response.json();
+
+        if (!responseJSON.data || responseJSON.data.length !== 2) {
+            throw new Error(`Unexpected response from server: ${responseJSON.message}`);
+        }
+
+        hideAnimation();
+        const [specimenData, participantData] = responseJSON.data;
+        return { specimenData, participantData };
+    } catch (error) {
+        hideAnimation();
+        console.error(`Error retrieving specimen and participant. ${error}`);
+        throw error;
+    }
 }
 
 export const searchSpecimen = async (masterSpecimenId, allSitesFlag) => {
@@ -1524,9 +1614,7 @@ export const getNextTempCheck = async () => {
 }
 
 export const generateBarCode = (id, connectId) => {
-    logAPICallStartDev('generateBarCode');
-    JsBarcode(`#${id}`, connectId, {height: 30});
-    logAPICallEndDev('generateBarCode');
+    JsBarcode(`#${id}`, connectId, { height: 30 });
 }
 
 export const getUpdatedParticipantData = async (participantData) => {
@@ -3040,4 +3128,111 @@ export const getCurrentDate = () => {
 }
 
 export const validIso8601Format = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/;
-  
+
+/**
+ * Traverse two objects and compare values. Useful for checking if changes have been made to a data structure or the values within it.
+ * @param {object} originalData - The original object to compare against (deep copy prior to edits).
+ * @param {object} currentData - The current object to compare against after edits (on form submission or similar).
+ * @returns {boolean} - True if the objects are different in shape or values. False if they are the same.
+ */
+// TODO: update comments here
+export const hasObjectChanged = (originalData, currentData) => {
+    // Check if both are the same value (covers primitives and same object reference)
+    if (originalData === currentData) {
+        return false;
+    }
+
+    const areBothObjects = (obj) => (typeof obj === 'object' && obj !== null);
+    
+    if (!areBothObjects(originalData) || !areBothObjects(currentData)) {
+        return originalData !== currentData;
+    }
+
+    // Check if one is an array and the other is not
+    if (Array.isArray(originalData) !== Array.isArray(currentData)) {
+        return true;
+    }
+
+    // If both are arrays
+    if (Array.isArray(originalData) && Array.isArray(currentData)) {
+        if (originalData.length !== currentData.length) {
+            return true;
+        }
+        for (let i = 0; i < originalData.length; i++) {
+            if (hasObjectChanged(originalData[i], currentData[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // If both are objects (not arrays)
+    const originalKeys = Object.keys(originalData);
+    const currentKeys = Object.keys(currentData);
+
+    // Check for added or removed keys
+    if (originalKeys.length !== currentKeys.length) {
+        return true;
+    }
+
+    // Recursively check each key in the original object
+    for (const key of originalKeys) {
+        if (!(key in currentData)) {
+            return true;
+        }
+
+        if (hasObjectChanged(originalData[key], currentData[key])) {
+            return true;
+        }
+    }
+
+    // No changes detected
+    return false;
+};
+
+/**
+ * Specimen Re-finalization (found strays) - check if a tube is being added to a collection.
+ * @param {object} originalSpecimenData - specimen data before editing form.
+ * @param {object} currentSpecimenData - specimen data after editing form.
+ * @returns {array} - list of tubes that have been added.
+ * Why is this needed?: Re-finalization impacts the specimen collection's boxedStatus, which is used for determining collections to fetch in the shipping dashboard.
+ */
+export const getAddedStrayTubes = (originalSpecimenData, currentSpecimenData) => {
+    const originalCollectedTubesSet = new Set(
+        Object.keys(originalSpecimenData).filter(key =>
+            specimenCollection.tubeCidList.includes(key) && originalSpecimenData[key][conceptIds.collection.tube.isCollected] === conceptIds.yes
+        )
+    );
+
+    return Object.keys(currentSpecimenData).filter(key =>
+        specimenCollection.tubeCidList.includes(key) &&
+        currentSpecimenData[key][conceptIds.collection.tube.isCollected] === conceptIds.yes &&
+        !originalCollectedTubesSet.has(key)).map(tubeKey => currentSpecimenData[tubeKey][conceptIds.collection.tube.scannedId]
+    );
+}
+
+/**
+ * Helper function for collectionId search (getSpecimenAndParticipant()).
+ * @param {object} specimenData - specimen data object.
+ * @param {object} participantData - participant data object.
+ * @returns {boolean} - True if both objects are found. False if either is missing.
+ */
+export const validateSpecimenAndParticipantResponse = (specimenData, participantData) => {
+    if (!specimenData || !participantData) {
+        if (!specimenData) showNotifications({ title: 'Not found', body: 'Specimen not found!' });
+        else showNotifications({ title: 'Not found', body: 'Participant not found!' });
+        return false;
+    }
+
+    if (getWorkflow() === 'research' && specimenData[conceptIds.collection.collectionSetting] !== conceptIds.research) {
+        hideAnimation();
+        showNotifications({ title: 'Incorrect Dashboard', body: 'Clinical Collections cannot be viewed on Research Dashboard' });
+        return false;
+    } else if (getWorkflow() === 'clinical' && specimenData[conceptIds.collection.collectionSetting] !== conceptIds.clinical) {
+        hideAnimation();
+        showNotifications({ title: 'Incorrect Dashboard', body: 'Research Collections cannot be viewed on Clinical Dashboard' });
+        return false;
+    }
+
+    return true;
+}

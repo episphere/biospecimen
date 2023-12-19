@@ -180,16 +180,22 @@ export const finalizeTemplate = (participantData, specimenData, bptlCollectionFl
         openModal(modalId);
     });
 
-    document.getElementById('finalizedConfirmButton') && document.getElementById('finalizedConfirmButton').addEventListener('click', async () => { 
+    // If specimen has not been finalized, finalize it as normal.
+    // Occasionally, a stray tube is found and an already-finalized collection gets updated. In this case, don't update the properties associated with finalizing.
+    document.getElementById('finalizedConfirmButton') && document.getElementById('finalizedConfirmButton').addEventListener('click', async () => {
         try {
-            specimenData[conceptIds.collection.isFinalized] = conceptIds.yes;
-            specimenData[conceptIds.collection.finalizedTime] = new Date().toISOString();
-            specimenData[conceptIds.boxedStatus] = conceptIds.notBoxed;
-            specimenData[conceptIds.strayTubesList] = [];
-            await updateSpecimen([specimenData]);
+            const isPreviouslyFinalized = specimenData[conceptIds.collection.isFinalized] == conceptIds.yes;
+
+            if (!isPreviouslyFinalized) {
+                specimenData[conceptIds.collection.isFinalized] = conceptIds.yes;
+                specimenData[conceptIds.collection.finalizedTime] = new Date().toISOString();
+                specimenData[conceptIds.boxedStatus] = conceptIds.notBoxed;
+                specimenData[conceptIds.strayTubesList] = [];
+                await updateSpecimen([specimenData]);
+            }
         } catch (e) {
             console.error(e);
-            showNotifications({ title: 'Error finalizing specimen.', body: `There was an error finalizing this specimen. Please try again. ${e}`});
+            showNotifications({ title: 'Error finalizing specimen.', body: `There was an error finalizing this specimen. Please try again. ${e}` });
         }
     });
 
@@ -199,8 +205,6 @@ export const finalizeTemplate = (participantData, specimenData, bptlCollectionFl
         });
     });
 
-    // addEventFinalizeForm(specimenData);
-    // addEventFinalizeFormCntd(specimenData);
     addEventReturnToCollectProcess();
     document.querySelector('body').scrollIntoView(true);
 
