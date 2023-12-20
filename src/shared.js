@@ -1493,28 +1493,31 @@ export const updateBaselineData = async (siteTubesList, data) => {
 
     baselineCollections.forEach(collection => {
 
-        if(!bloodCollected) {
+        if (!bloodCollected) {
             bloodTubes.forEach(tube => {
-                if(collection[tube.concept]['593843561'] === 353358909) {
+                const tubeConceptData = collection[tube.concept];
+                if (tubeConceptData && tubeConceptData['593843561'] === 353358909) {
                     bloodCollected = true;
                 }
             });
-        }
-
-        if(!urineCollected) {
+        } 
+        if (!urineCollected) {
             urineTubes.forEach(tube => {
-                if(collection[tube.concept]['593843561'] === 353358909) {
+                const tubeConceptData = collection[tube.concept];
+                if (tubeConceptData && tubeConceptData['593843561'] === 353358909) {
                     urineCollected = true;
                 }
             });
         }
-        if(!mouthwashCollected) {
+        if (!mouthwashCollected) {
             mouthwashTubes.forEach(tube => {
-                if(collection[tube.concept]['593843561'] === 353358909) {
+                const tubeConceptData = collection[tube.concept];
+                if (tubeConceptData && tubeConceptData['593843561'] === 353358909) {
                     mouthwashCollected = true;
                 }
             });
         }
+        
     });
 
     if (baselineCollections.length > 0 && baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research) {
@@ -2790,3 +2793,86 @@ export const processResponse = async (response) => {
     const data = await response.json();
     return data.response;
 }
+
+export const showTimedNotifications = (data, zIndex, timeInMilliseconds = 1600) => {
+    const button = document.createElement('button');
+    button.dataset.target = '#biospecimenModal';
+    button.dataset.toggle = 'modal';
+    const rootElement = document.getElementById('root');
+    rootElement.appendChild(button);
+    button.click();
+
+    if (zIndex) {
+        document.getElementById('biospecimenModal').style.zIndex = zIndex;
+    }
+    rootElement.removeChild(button);
+    const header = document.getElementById('biospecimenModalHeader');
+    const body = document.getElementById('biospecimenModalBody');
+    header.innerHTML = `<h5 class="modal-title">${data.title}</h5>`;
+    body.innerHTML = `
+        <div class="row">
+            <div class="col">${data.body}
+            </div>
+        </div>
+        </br></br>
+        <div class="row">
+            <div class="ml-auto" style="margin-right: 1rem;">
+                <button type="button" class="btn btn-outline-dark" data-dismiss="modal" aria-label="Close" style="display:none">Close</button>
+            </div>
+        </div>`;
+
+    setTimeout(() => {
+        const closeButton = document.querySelector('#biospecimenModal .btn[data-dismiss="modal"]');
+        if (closeButton) {
+            closeButton.click();
+        }
+    }, timeInMilliseconds);
+};
+
+export const showNotification = (title, body, closeButtonName, continueButtonName, continueAction) => {
+    const modalContainer = document.createElement('div');
+    modalContainer.classList.add('modal', 'fade');
+    modalContainer.id = 'customModal'; // Change the ID as needed
+    modalContainer.tabIndex = '-1';
+    modalContainer.role = 'dialog';
+    modalContainer.setAttribute('aria-labelledby', 'customModalTitle');
+    modalContainer.setAttribute('aria-hidden', 'true');
+  
+    const modalContent = document.createElement('div');
+    modalContent.classList.add('modal-dialog', 'modal-dialog-centered');
+    modalContent.setAttribute('role', 'document');
+  
+    modalContent.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">${title}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          ${body}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-dismiss="modal" id="closeBtn">${closeButtonName}</button>
+          <button type="button" class="btn btn-success" data-value="confirmed" data-dismiss="modal" id="continueBtn">${continueButtonName}</button>
+        </div>
+      </div>
+    `;
+  
+    document.body.appendChild(modalContainer);
+    modalContainer.appendChild(modalContent);
+    modalContainer.classList.add('show');
+    modalContainer.style.display = 'block';
+
+    const closeBtn = document.getElementById('closeBtn');
+    closeBtn.addEventListener('click', async () => {
+        document.body.removeChild(modalContainer);
+    });
+        
+    const continueBtn = document.getElementById('continueBtn');
+    continueBtn.addEventListener('click', async () => {
+    continueAction();
+    document.body.removeChild(modalContainer);
+    });
+};
