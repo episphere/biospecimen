@@ -79,11 +79,13 @@ export const conceptIds = {
         collectionTime: 678166505,
         scannedTime: 915838974,
         receivedDate: 926457119,
+        bloodAccessNumber: 646899796,
         urineAccessNumber: 928693120,
         reasonNotCollectedOther: 181769837,
         phlebotomistInitials: 719427591,
         mouthwashBagScan: 223999569,
         mouthwashTube1: 143615646,
+        urineTube1: 973670172,
         bloodUrineBagScan: 787237543,
         
         tube: {
