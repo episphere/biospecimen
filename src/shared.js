@@ -1791,7 +1791,7 @@ export const siteSpecificLocation = {
   "South Loop": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "Orland Park": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "Main Campus": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
-  "Rockville": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
+//   "Rockville": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"}, Uncomment for testing when future locations are added
 }
 
 export const locationConceptIDToLocationMap = {
@@ -2004,14 +2004,14 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'National Cancer Institute',
     email: "connectstudytest@email.com",
   },
-  222222222: {
-    siteSpecificLocation: 'Rockville',
-    siteAcronym: 'NIH',
-    siteCode: '13',
-    siteTeam: "NIH Connect Study Team",
-    loginSiteName: 'National Cancer Institute',
-    email: "connectstudytest@email.com",
-    },
+//   222222222: { Uncomment for testing when future locations are added
+//     siteSpecificLocation: 'Rockville',
+//     siteAcronym: 'NIH',
+//     siteCode: '13',
+//     siteTeam: "NIH Connect Study Team",
+//     loginSiteName: 'National Cancer Institute',
+//     email: "connectstudytest@email.com",
+//     },
 };
 
 export const conceptIdToSiteSpecificLocation = {
@@ -2041,7 +2041,7 @@ export const conceptIdToSiteSpecificLocation = {
   589224449: "Sioux Falls Imagenetics",
   777644826: "DCAM",
   111111111: "Main Campus",
-  222222222: "Rockville",
+//   222222222: "Rockville",
 }
 
 export const siteSpecificLocationToConceptId = {
@@ -2071,7 +2071,7 @@ export const siteSpecificLocationToConceptId = {
   "Minocqua": 261931804,
   "Merrill": 665277300,
   "Fargo South University": 467088902,
-  "Rockville": 222222222
+//   "Rockville": 222222222
 }
 
 export const nameToKeyObj = 
@@ -2122,7 +2122,7 @@ export const keyToLocationObj =
     777644826: "UC-DCAM",
     692275326: "Marshfield",
     567969985: "MF Pop-Up",
-    222222222: "Rockville",
+    // 222222222: "Rockville",
     698283667: "Lake Hallie",
     834825425: "HP Research Clinic",
     736183094: "HFH K-13 Research Clinic",
