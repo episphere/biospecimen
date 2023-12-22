@@ -3135,20 +3135,17 @@ export const validIso8601Format = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/;
  * @param {object} currentData - The current object to compare against after edits (on form submission or similar).
  * @returns {boolean} - True if the objects are different in shape or values. False if they are the same.
  */
-// TODO: update comments here
 export const hasObjectChanged = (originalData, currentData) => {
-    // Check if both are the same value (covers primitives and same object reference)
+    // Check if both are the same value (for primitives & same object refs)
     if (originalData === currentData) {
         return false;
     }
 
     const areBothObjects = (obj) => (typeof obj === 'object' && obj !== null);
-    
     if (!areBothObjects(originalData) || !areBothObjects(currentData)) {
         return originalData !== currentData;
     }
 
-    // Check if one is an array and the other is not
     if (Array.isArray(originalData) !== Array.isArray(currentData)) {
         return true;
     }
@@ -3166,16 +3163,13 @@ export const hasObjectChanged = (originalData, currentData) => {
         return false;
     }
 
-    // If both are objects (not arrays)
+    // If both are objects, check for added or removed keys, then recursively check each key.
     const originalKeys = Object.keys(originalData);
     const currentKeys = Object.keys(currentData);
-
-    // Check for added or removed keys
     if (originalKeys.length !== currentKeys.length) {
         return true;
     }
 
-    // Recursively check each key in the original object
     for (const key of originalKeys) {
         if (!(key in currentData)) {
             return true;
