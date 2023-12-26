@@ -111,7 +111,7 @@ template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
   activeHomeCollectionNavbar();
-  checkTrackingNumberSource();
+  checkTrackingNumberSource('isKitReceipt');
   performCollectionIdcheck();
 };
 
