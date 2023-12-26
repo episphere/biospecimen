@@ -2967,7 +2967,7 @@ export const triggerSuccessModal = (message) => {
     }
 }
 
-export const checkTrackingNumberSource = () => {
+export const checkTrackingNumberSource = (source) => {
     const scannedBarcode = document.getElementById("scannedBarcode");
     if (!scannedBarcode) {
       return;
@@ -2979,11 +2979,16 @@ export const checkTrackingNumberSource = () => {
         showMsg.innerHTML = "";
         return;
       }
-      if (input.length === 22 || input.length === 20) {
+      if (input.length === 22 || input.length === 20 && source === 'isKitReceipt') {
         showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: blue;"></i>USPS`;
         return;
       }
       if (input.length === 12) {
+        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
+        return;
+      }
+      if (input.length > 12 && source === 'isPkgReceipt') {
+        e.target.value = input.slice(-12);
         showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
         return;
       }
