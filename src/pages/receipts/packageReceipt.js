@@ -16,7 +16,7 @@ export const packageReceiptScreen = async (auth, route) => {
   const username = user.displayName ? user.displayName : user.email;
   packageReceiptTemplate(username, auth, route);
   addDefaultDateReceived(getCurrentDate);
-  checkTrackingNumberSource('isPkgReceipt');
+  checkTrackingNumberSource();
   checkCardIncluded();
   disableCollectionCardFields();
   enableCollectionCardFields();
