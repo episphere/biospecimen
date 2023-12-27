@@ -2958,34 +2958,35 @@ export const triggerSuccessModal = (message) => {
 
 export const checkTrackingNumberSource = (source) => {
     const scannedBarcode = document.getElementById("scannedBarcode");
+    const showMsg = document.getElementById('showMsg');
     if (!scannedBarcode) {
       return;
     }
     scannedBarcode.addEventListener("input", (e) => {
       const input = e.target.value.trim();
-      const showMsg = document.getElementById('showMsg');
       if (input.length === 0) {
         showMsg.innerHTML = "";
         return;
       }
-      if (input.length === 22 || input.length === 20 && source === 'isKitReceipt') {
+      if (input.length === 22 || input.length === 20) {
         showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: blue;"></i>USPS`;
-        return;
       }
-      if (input.length === 12) {
+      else if (input.length === 12) {
         showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
-        return;
       }
-      if (input.length > 12 && source === 'isPkgReceipt') {
+      else if (input.length > 12 && source === 'isPkgReceipt') {
         e.target.value = input.slice(-12);
         showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
-        return;
       }
+      else {
+        showMsg.innerHTML = "";
+      }
+    
+    // Additional checks can be added here if needed
     //   if (uspsFirstThreeNumbersCheck(input) || (input.length === 34 && uspsFirstThreeNumbersCheck(input))) {
     //     document.getElementById('showMsg').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
     //     return
     //   }
-      showMsg.innerHTML = "";
     });
 }
 
