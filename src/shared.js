@@ -2967,7 +2967,7 @@ export const triggerSuccessModal = (message) => {
     }
 }
 
-export const checkTrackingNumberSource = (source) => {
+export const checkTrackingNumberSource = () => {
     const scannedBarcode = document.getElementById("scannedBarcode");
     const showMsg = document.getElementById('showMsg');
     if (!scannedBarcode) {
@@ -2985,7 +2985,7 @@ export const checkTrackingNumberSource = (source) => {
       else if (input.length === 12) {
         showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
       }
-      else if (input.length > 12 && source === 'isPkgReceipt') {
+      else if (input.length === 34) {
         e.target.value = input.slice(-12);
         showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
       }
