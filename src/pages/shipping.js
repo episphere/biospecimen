@@ -1,6 +1,6 @@
 import { addBoxAndUpdateSiteDetails, appState, conceptIdToSiteSpecificLocation, combineAvailableCollectionsObjects, displayManifestContactInfo, filterDuplicateSpecimensInList, getAllBoxes, getBoxes, getSpecimensInBoxes, getUnshippedBoxes, getLocationsInstitute, getSiteMostRecentBoxId, getSpecimensByBoxedStatus, hideAnimation, locationConceptIDToLocationMap,
         removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
-        translateNumToType, userAuthorization, getSiteAcronym } from "../shared.js"
+        translateNumToType, userAuthorization, getSiteAcronym, findReplacementTubeLabels } from "../shared.js"
 import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs,
         addEventCompleteShippingButton, addEventModalAddBox, addEventNavBarBoxManifest, addEventNavBarShipment, addEventNavBarShippingManifest, addEventNavBarAssignTracking, addEventLocationSelect,
         addEventPreventTrackingConfirmPaste, addEventReturnToPackaging, addEventReturnToReviewShipmentContents, addEventSaveButton, addEventSaveAndContinueButton, addEventShipPrintManifest,
@@ -77,6 +77,7 @@ const buildShippingInterface = async (userName, loadFromState, currBoxId) => {
         let availableLocations;
         let finalizedSpecimenList;
         let availableCollectionsObj;
+        let replacementTubeLabelObj;
         const specimens = {
             notBoxed: {},
             partiallyBoxed: {},
@@ -88,6 +89,7 @@ const buildShippingInterface = async (userName, loadFromState, currBoxId) => {
             availableLocations = appState.getState().availableLocations;
             finalizedSpecimenList = appState.getState().finalizedSpecimenList;
             availableCollectionsObj = appState.getState().availableCollectionsObj;
+            replacementTubeLabelObj = appState.getState().replacementTubeLabelObj;
             populateSelectLocationList(availableLocations, loadFromState);
         } else {
             const promiseResponse = await Promise.all([
@@ -103,13 +105,13 @@ const buildShippingInterface = async (userName, loadFromState, currBoxId) => {
                 getSpecimensByBoxedStatus(conceptIds.notBoxed.toString()),
                 getSpecimensByBoxedStatus(conceptIds.partiallyBoxed.toString()),
             ]);
-
             finalizedSpecimenList = filterDuplicateSpecimensInList([...specimens.boxed, ...specimens.notBoxed.specimensList, ...specimens.partiallyBoxed.specimensList]);
             availableCollectionsObj = combineAvailableCollectionsObjects(specimens.notBoxed.availableCollections, specimens.partiallyBoxed.availableCollections);
+            replacementTubeLabelObj = findReplacementTubeLabels(finalizedSpecimenList);
         }
 
         populateAvailableCollectionsList(availableCollectionsObj, loadFromState);
-        setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName);
+        setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName, replacementTubeLabelObj);
         populateViewShippingBoxContentsList(currBoxId);
         populateBoxesToShipTable();
         addShippingEventListeners();
@@ -289,13 +291,19 @@ export const populateViewShippingBoxContentsList = (selectedBoxId) => {
 
         if (selectedLocation !== 'none') {
             //set up the table
+            const replacementTubeLabelObj = appState.getState().replacementTubeLabelObj;
             for (let bagNum = 0; bagNum < boxKeys.length; bagNum++) {
                 const currBagId = boxKeys[bagNum];
                 const currTubes = currBox[boxKeys[bagNum]]['arrElements'];
                 for (let tubeNum = 0; tubeNum < currTubes.length; tubeNum++) {
                     const fullTubeId = currTubes[tubeNum];
                     const tubeTypeStringArr = fullTubeId.split(' ');
-                    const tubeType = translateNumToType[tubeTypeStringArr[1]] ? translateNumToType[tubeTypeStringArr[1]] : 'N/A';
+                    const tubeId = tubeTypeStringArr[1];
+                    let tubeType = Object.prototype.hasOwnProperty.call(translateNumToType, tubeId) ? translateNumToType[tubeId] : 'N/A';
+                    if (Object.prototype.hasOwnProperty.call(replacementTubeLabelObj, fullTubeId)) {
+                        let [,originalTubeId] = replacementTubeLabelObj[fullTubeId].split(' '); 
+                        tubeType = Object.prototype.hasOwnProperty.call(translateNumToType, originalTubeId) ? translateNumToType[originalTubeId] : tubeType;
+                    }
                     const rowCount = shippingBoxContentsTable.rows.length;
                     const row = shippingBoxContentsTable.insertRow(rowCount);
                     
@@ -589,12 +597,12 @@ export const createShippingModalBody = (biospecimensList, masterBiospecimenId, i
     
     const tubeTable = document.createElement('table');
     const splitTubeIdArray = masterBiospecimenId.split(/\s+/); /* Ex. ['CXA000133', '0008']*/
+    const replacementTubeLabelObj = appState.getState().replacementTubeLabelObj;
     let isBagEmpty = true;
-    
     biospecimensList = sortBiospecimensList(biospecimensList);
     for (const specimenId of biospecimensList) {
         if (shouldAddModalRow(isOrphan, splitTubeIdArray, specimenId)) {
-            isBagEmpty = addRowToModalTable(isBagEmpty, tubeTable, splitTubeIdArray, specimenId);
+            isBagEmpty = addRowToModalTable(isBagEmpty, tubeTable, splitTubeIdArray, specimenId, replacementTubeLabelObj);
         }
     }
 
@@ -618,11 +626,15 @@ const shouldAddModalRow = (isOrphan, splitTubeIdArray, tubeId) => {
     }
 }
 
-const addRowToModalTable = (isBagEmpty, tubeTable, splitTubeIdArray, tubeId) => {
+const addRowToModalTable = (isBagEmpty, tubeTable, splitTubeIdArray, tubeId, replacementTubeLabelObj) => {
     isBagEmpty = false;
     const rowCount = tubeTable.rows.length;
     const row = tubeTable.insertRow(rowCount);
-    const tubeType = translateNumToType.hasOwnProperty(tubeId) ? translateNumToType[tubeId] : 'N/A';
+    let tubeType = Object.prototype.hasOwnProperty.call(translateNumToType, tubeId) ? translateNumToType[tubeId] : 'N/A';
+    if (Object.prototype.hasOwnProperty.call(replacementTubeLabelObj, splitTubeIdArray[0]+' '+tubeId)) {
+        let [,originalTubeId] = replacementTubeLabelObj[splitTubeIdArray[0]+' '+tubeId].split(' '); 
+        tubeType = Object.prototype.hasOwnProperty.call(translateNumToType, originalTubeId) ? translateNumToType[originalTubeId] : tubeType;
+    }
 
     row.insertCell(0).innerHTML = `${splitTubeIdArray[0]} ${tubeId}`;
     row.insertCell(1).innerHTML = tubeType;
@@ -780,14 +792,20 @@ const populateSelectLocationList = async (availableLocations, loadFromState) => 
 const populateBoxManifestTable = (currBox) => {
     const boxManifestTable = document.getElementById('boxManifestTable');
     const bagList = Object.keys(currBox).filter(key => key !== 'boxData' && key !== 'undefined').sort(sortSpecimenKeys);
+    const replacementTubeLabelObj = appState.getState().replacementTubeLabelObj;
     bagList.forEach((bagKey, bagIndex) => {
         const bagIndexStart = bagIndex + 1;
         const tubesList = currBox[bagKey].arrElements;
         for (let i = 0; i < tubesList.length; i++) {
             const tubeDetail = currBox[bagKey].specimenDetails[tubesList[i]];
             const currRow = boxManifestTable.insertRow(i + 1);
-            const tubeId = tubesList[i].split(' ');
-            const tubeTypeAndColor = translateNumToType[tubeId[1]] ? translateNumToType[tubeId[1]] : 'N/A';
+            const fullTubeId = tubesList[i];
+            const tubeId = fullTubeId.split(' ');
+            let tubeTypeAndColor = Object.prototype.hasOwnProperty.call(translateNumToType, tubeId[1]) ? translateNumToType[tubeId[1]] : 'N/A';
+            if (Object.prototype.hasOwnProperty.call(replacementTubeLabelObj, fullTubeId)) {
+                let [,originalTubeId] = replacementTubeLabelObj[fullTubeId].split(' '); 
+                tubeTypeAndColor = Object.prototype.hasOwnProperty.call(translateNumToType, originalTubeId) ? translateNumToType[originalTubeId] : tubeTypeAndColor;
+            }
             currRow.insertCell(0).innerHTML = i === 0 ? bagKey : '';
             currRow.insertCell(1).innerHTML = tubesList[i];
             currRow.insertCell(2).innerHTML = tubeTypeAndColor;

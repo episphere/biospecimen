@@ -929,6 +929,33 @@ const buildAvailableCollectionsObject = (specimensList, isPartiallyBoxed) => {
 }
 
 /**
+ * Build the available collections object. Remove unusable tubes.
+ * Filter tubes (available collections vs strays) for use in the shipping dashboard.
+ * @param {array<object>} specimensList - list of specimens from Firestore.
+ * @returns {object} { availableCollections, specimensList } - available collections object and the updated specimens list.
+ * Note: Mouthwash tubes are always solo. They belong in available collections. The tube number is always '0007', the bag number is always '0009'.
+ */
+export const findReplacementTubeLabels = (specimensList) => {
+    if (!specimensList || specimensList.length === 0) return { availableCollections: {}, specimensList: [] };
+    const replaceMentTubeLabels = {};
+    const replaceMentLabelRegExp = new RegExp('005[0-4]$');
+    for (let specimen of specimensList) {
+        const collectionId = specimen[conceptIds.collection.id];
+        if (!collectionId) return;
+
+        const tubeDataObject = removeUnusableTubes(specimen);
+        Object.keys(tubeDataObject).forEach(tubeCid => {
+            let scannedTubeLabel = tubeDataObject[tubeCid];
+            if (replaceMentLabelRegExp.test(scannedTubeLabel)) {
+                replaceMentTubeLabels[scannedTubeLabel] = collectionId + ' ' + specimenCollection.cidToNum[tubeCid];
+            }
+        })
+        
+    }
+    return replaceMentTubeLabels;
+}
+
+/**
  * Handle the fetched specimen docs. Remove the unusable (deviated or missing) tubes, then arrange remaining tubes for available collections and the stray tube list.
  * This function mutates the specimen object from the calling function AND returns the usableTubes object.
  * @param {object} specimen - specimen object.

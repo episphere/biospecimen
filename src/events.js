@@ -5,7 +5,7 @@ import { appState, performSearch, showAnimation, addBiospecimenUsers, getSpecime
         convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
         checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData,
         siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
-        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList } from './shared.js';
+        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, findReplacementTubeLabels } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
 import { addNewBox, buildSpecimenDataInModal, createShippingModalBody, startShipping, generateBoxManifest, populateViewShippingBoxContentsList,
@@ -2295,6 +2295,7 @@ export const populateReportManifestHeader = (currPage) => {
 
 export const populateReportManifestTable = (currPage, searchSpecimenInstituteArray) => {
     const currTable = document.getElementById('boxManifestTable');
+    const replacementTubeLabelObj = findReplacementTubeLabels(searchSpecimenInstituteArray);
     let bags = Object.keys(currPage['bags']);    
     let rowCount = 1;
     for (let i = 0; i < bags.length; i++) {
@@ -2310,8 +2311,14 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
             currRow.insertCell(1).innerHTML = currTube;
             let thisId = currTube.split(' ');
             let toAddType = 'N/A';
-            if (translateNumToType.hasOwnProperty(thisId[1])) {
+            if (Object.prototype.hasOwnProperty.call(translateNumToType, thisId[1])) {
                 toAddType = translateNumToType[thisId[1]];
+            }
+            if (Object.prototype.hasOwnProperty.call(replacementTubeLabelObj, currTube)) {
+                const [, originalTubeId] = replacementTubeLabelObj[currTube].split(' ');
+                if (Object.prototype.hasOwnProperty.call(translateNumToType, originalTubeId)) {
+                    toAddType = translateNumToType[originalTubeId];
+                }
             }
             currRow.insertCell(2).innerHTML = toAddType;
             let fullScannerName = '';
