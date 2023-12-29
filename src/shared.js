@@ -1870,6 +1870,7 @@ export const siteSpecificLocation = {
   "Colby Abbotsford": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "Minocqua": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "Merrill": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
+  "MF Pop-Up": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "Sioux Falls Imagenetics": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
   "Fargo South University": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
   "DCAM": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
@@ -2018,6 +2019,14 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'Marshfield Cancer Center',
     email: 'connectstudy@marshfieldresearch.org'
   },
+  567969985:{
+    siteSpecificLocation: 'MF Pop-Up',
+    siteAcronym: 'MFC',
+    siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
+    loginSiteName: 'Marshfield Cancer Center',
+    email: 'connectstudy@marshfieldresearch.org'
+  },
   589224449: {
     siteSpecificLocation: 'Sioux Falls Imagenetics',
     siteAcronym: 'SFH',
@@ -2083,7 +2092,7 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'National Cancer Institute',
     email: "connectstudytest@email.com",
   },
-  222222222: {
+  222222222: { 
     siteSpecificLocation: 'Frederick',
     siteAcronym: 'NIH',
     siteCode: '13',
@@ -2109,6 +2118,7 @@ export const conceptIdToSiteSpecificLocation = {
   145191545: "Ingalls Harvey",
   489380324: "River East",
   120264574: "South Loop",
+  567969985: 'MF Pop-Up',
   940329442: "Orland Park",
   691714762: "Rice Lake",
   487512085: "Wisconsin Rapids",
@@ -2132,11 +2142,11 @@ export const siteSpecificLocationToConceptId = {
   "KPHI RRL": 531313956,
   "KPNW RRL": 715632875,
   "Marshfield": 692275326,
+  "MF Pop-Up": 567969985,
   "Lake Hallie": 698283667,
   "Sioux Falls Imagenetics": 589224449,
   "DCAM": 777644826, 
   "Main Campus": 111111111,
-  "Frederick": 222222222,
   "HFH Livonia Research Clinic": 706927479,
   "Weston": 813701399,
   "Ingalls Harvey": 145191545,
@@ -2149,6 +2159,7 @@ export const siteSpecificLocationToConceptId = {
   "Minocqua": 261931804,
   "Merrill": 665277300,
   "Fargo South University": 467088902,
+  "Frederick": 222222222,
 }
 
 export const nameToKeyObj = 
@@ -3046,29 +3057,35 @@ export const triggerSuccessModal = (message) => {
 
 export const checkTrackingNumberSource = () => {
     const scannedBarcode = document.getElementById("scannedBarcode");
+    const showMsg = document.getElementById('showMsg');
     if (!scannedBarcode) {
       return;
     }
     scannedBarcode.addEventListener("input", (e) => {
       const input = e.target.value.trim();
-      const showMsg = document.getElementById('showMsg');
       if (input.length === 0) {
         showMsg.innerHTML = "";
         return;
       }
       if (input.length === 22 || input.length === 20) {
         showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: blue;"></i>USPS`;
-        return;
       }
-      if (input.length === 12) {
+      else if (input.length === 12) {
         showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
-        return;
       }
+      else if (input.length === 34) {
+        e.target.value = input.slice(-12);
+        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
+      }
+      else {
+        showMsg.innerHTML = "";
+      }
+    
+    // Additional checks can be added here if needed
     //   if (uspsFirstThreeNumbersCheck(input) || (input.length === 34 && uspsFirstThreeNumbersCheck(input))) {
     //     document.getElementById('showMsg').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
     //     return
     //   }
-      showMsg.innerHTML = "";
     });
 }
 
