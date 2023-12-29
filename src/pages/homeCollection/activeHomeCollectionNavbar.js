@@ -5,6 +5,7 @@ export const activeHomeCollectionNavbar = () => {
   const printLabelsNavItem = document.getElementById("printLabels")
   const assignKitsNavItem = document.getElementById("assignKits")
   const kitsReceiptNavItem = document.getElementById("kitsReceipt")
+  const kitsCsvNavItem = document.getElementById("kitsCsv")
 
   if (location.hash === "#kitassembly") {
       kitAssemblyNavItem.classList.add("active");
@@ -30,6 +31,11 @@ export const activeHomeCollectionNavbar = () => {
     kitsReceiptNavItem.classList.add("active");
     kitsReceiptNavItem.style.backgroundColor = "#bbcffc85";
     kitsReceiptNavItem.style.borderRadius = "4px 4px 0 0";
+  }
+  else if (location.hash === "#kitscsv"){
+    kitsCsvNavItem.classList.add("active");
+    kitsCsvNavItem.style.backgroundColor = "#bbcffc85";
+    kitsCsvNavItem.style.borderRadius = "4px 4px 0 0";
   }
   else if (location.hash === "#participantselection" || 
            location.hash === "#allParticipants" || 

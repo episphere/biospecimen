@@ -1,6 +1,6 @@
 import { nonUserNavBar } from "./../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource } from "../../shared.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { baselineMWKitRemainderTemplate } from "../../emailTemplates.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -12,6 +12,7 @@ export const kitShipmentScreen = async (auth) => {
   showAnimation();
   kitShipmentTemplate(username);
   verifyScannedCode();
+  checkTrackingNumberSource();
   hideAnimation();
 };
 
@@ -27,7 +28,9 @@ const kitShipmentTemplate = async (name) => {
                           <div class="card-body">
                           <span> <h3 style="text-align: center; margin: 0 0 1rem;">Scan tracking number</h3> </span>
                             <div style="text-align: center;  padding-bottom: 25px; "> 
-                              <span id="fieldModified"> Scan Barcode</span>  : <input required type="text" name="scannedCode" id="scannedCode"  /> </div>
+                              <span id="fieldModified"> Scan Barcode</span>  : <input required type="text" name="scannedBarcode" id="scannedBarcode"  /> 
+                              <span id="showMsg" style="font-size: 14px;"></span>
+                              </div>
                               <div class="card text-center" id="cardBody" style="width: 40%; margin-left: 30%; margin-right: 30%;"> </div>
                           </div>
                         </div>
@@ -35,11 +38,11 @@ const kitShipmentTemplate = async (name) => {
              </div>`;
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
-  activeHomeCollectionNavbar()
+  activeHomeCollectionNavbar();
 };
 
 const verifyScannedCode = async () => {
-  const scannedCodeInput = document.getElementById("scannedCode");
+  const scannedCodeInput = document.getElementById("scannedBarcode");
   if (scannedCodeInput) {
     scannedCodeInput.addEventListener("change", async () => {
       showAnimation();
@@ -114,8 +117,9 @@ const setShippedResponse = async (data) => {
   const returnedPtInfo = await processResponse(response);
   if (returnedPtInfo.status === true) {
     triggerSuccessModal('Shipment confirmed.')
-    document.getElementById("scannedCode").value = ``;
+    document.getElementById("scannedBarcode").value = ``;
     document.getElementById("cardBody").innerHTML = ``;
+    document.getElementById("showMsg").innerHTML = ``;
 
     const emailData = {
       email: returnedPtInfo.prefEmail,

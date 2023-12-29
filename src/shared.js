@@ -329,6 +329,152 @@ export const showNotifications = (data, zIndex) => {
 `;
 }
 
+/**
+ * Show a notification modal with cancel and continue options. Initial use in BPTL receipted shipment flow. See storeSpecimenPackageReceipt() for usage example.
+ * @param {object} message - message object with title and body.
+ * @param {*} zIndex - z-index of the modal.
+ * @param {function} onCancel - callback function to execute on cancel. Example: reset the UI.
+ * @param {function} onContinue - callback function to execute on continue. Example: process a retry POST request.
+ */
+export const showNotificationsCancelOrContinue = (message, zIndex, onCancel, onContinue) => {
+    const button = document.createElement('button');
+    button.dataset.target = '#biospecimenModal';
+    button.dataset.toggle = 'modal';
+
+    document.getElementById('root').appendChild(button);
+    button.click();
+    if (zIndex) document.getElementById('biospecimenModal').style.zIndex = zIndex;
+    const header = document.getElementById('biospecimenModalHeader');
+    const body = document.getElementById('biospecimenModalBody');
+    header.innerHTML = `<h5 class="modal-title">${message.title}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>`;
+    body.innerHTML = `
+        <div class="row">
+            <div class="col">
+                ${message.body}
+            </div>
+        </div>
+        <br><br>
+        <div class="row">
+            <div class="ml-auto" style="margin-right: 1rem;">
+                <button type="button" class="btn btn-outline-dark" id="modalCancelBtn" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="modalContinueBtn">Continue</button>
+            </div>
+        </div>`;
+
+    document.getElementById('modalCancelBtn').addEventListener('click', () => {
+        $('#biospecimenModal').modal('hide');
+        if (onCancel) onCancel();
+    });
+
+    document.getElementById('modalContinueBtn').addEventListener('click', async () => {
+        try {
+            $('#biospecimenModal').modal('hide');
+            if (onContinue) await onContinue();
+        } catch (error) {
+            console.error('Error in modalContinueBtn event listener:', error);
+            showNotifications({ title: 'Error', body: `Error: please try again. ${error}` });
+        }
+    });
+
+    document.getElementById('root').removeChild(button);
+};
+
+/**
+ * Build a list of user-selectable items. User selection continues process.
+ * Initial used in BPTL receipted shipment flow. See storeSpecimenPackageReceipt() -> handleDuplicateTrackingNumbers() for usage example.
+ * @param {object} message - modal message object with title and body. 
+ * @param {array<object>} items - array of items to display in the modal. Each item has properties id, originSite, shipDate, and receivedDate.
+ * @param {*} onCancel - callback function to execute on cancel. Example: reset the UI.
+ * @param {*} onContinue - callback function to execute on continue. Example: process a retry POST request.
+ * @param {*} zIndex - z-index of the modal.
+ * Detail of items list: [{}, {}, {}, ...] where each item has shape {id: string, shipmentTimestamp:string, originSite: string, shipDate: string, receivedDate: string}.
+ * The shipmentTimestamp is an ISO 8601 string. Pass through for Firestore query.
+ */
+export const showNotificationsSelectableList = (message, items, onCancel, onContinue, zIndex) => {
+    const button = document.createElement('button');
+    button.dataset.target = '#biospecimenModal';
+    button.dataset.toggle = 'modal';
+
+    document.getElementById('root').appendChild(button);
+    button.click();
+    if (zIndex) document.getElementById('biospecimenModal').style.zIndex = zIndex;
+    
+    const header = document.getElementById('biospecimenModalHeader');
+    const body = document.getElementById('biospecimenModalBody');
+    header.innerHTML = `
+        <h5 class="modal-title">${message.title}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>`;
+    
+    // Generate list of items
+    const modalBodyText = `
+        <div class="row">
+            <div class="col">
+                ${message.body}
+            </div>
+        </div><br><br>`;
+
+    const errorMessageText = `
+        <div id="modalErrorMessage" style="color: red; display: none; font-size: 1.5em;"></div><br>`;
+
+    let itemListHtml = '<ul class="list-group">';
+    items.forEach((item, index) => {
+        itemListHtml += `
+            <li class="list-group-item list-group-item-action" data-index="${index}">
+                ${item.id} | ${item.originSite}<br>
+                Ship Date: ${item.shipDate}<br>
+                Received Date: ${item.receivedDate}<br>
+            </li>`;
+    });
+    itemListHtml += '</ul><br><br>';
+
+    const modalBodyButtons = `
+        <div class="row">
+            <div class="ml-auto" style="margin-right: 1rem;">
+                <button type="button" class="btn btn-outline-dark" id="modalCancelBtn" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="modalContinueBtn">Continue</button>
+            </div>
+        </div>`;
+
+    // Set body content
+    body.innerHTML = modalBodyText + errorMessageText+ itemListHtml + modalBodyButtons;
+    const errorMessageDiv = document.getElementById('modalErrorMessage'); // This div is hidden by default
+
+    // Add event listeners to each list item
+    const listItems = body.querySelectorAll('.list-group-item');
+
+    listItems.forEach(item => {
+        item.addEventListener('click', function() {
+            listItems.forEach(li => li.classList.remove('active'));
+            this.classList.add('active');
+            errorMessageDiv.style.display = 'none';
+        });
+    });
+
+    document.getElementById('modalCancelBtn').addEventListener('click', () => {
+        $('#biospecimenModal').modal('hide');
+        if (onCancel) onCancel();
+    });
+
+    document.getElementById('modalContinueBtn').addEventListener('click', async () => {
+        const selectedItemIndex = body.querySelector('.list-group-item.active')?.getAttribute('data-index');
+        if (selectedItemIndex) {
+            errorMessageDiv.style.display = 'none';
+            $('#biospecimenModal').modal('hide');
+            if (onContinue) await onContinue(items[selectedItemIndex]);
+        } else {
+            errorMessageDiv.textContent = 'Please select an item from the list.';
+            errorMessageDiv.style.display = 'block';
+        }
+    });
+
+    document.getElementById('root').removeChild(button);
+};
+
 export const errorMessage = (id, msg, focus, offset) => {
     const currentElement = document.getElementById(id);
     const parentElement = currentElement.parentNode;
@@ -1417,14 +1563,23 @@ export const getUpdatedParticipantData = async (participantData) => {
 }
 
 export const updateCollectionSettingData = async (biospecimenData, tubes, participantData) => {
-  participantData = await getUpdatedParticipantData(participantData);
+    participantData = await getUpdatedParticipantData(participantData);
 
     let settings;
+    let derivedVariables = {};
     let visit = biospecimenData[conceptIds.collection.selectedVisit];
 
     const bloodTubes = tubes.filter(tube => tube.tubeType === "Blood tube");
     const urineTubes = tubes.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = tubes.filter(tube => tube.tubeType === "Mouthwash");
+
+    let bloodTubesLength = 0
+    let urineTubesLength = 0
+    let mouthwashTubesLength = 0
+
+    const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
+    const isResearch = collectionSetting === conceptIds.research;
+    const isClinical = collectionSetting === conceptIds.clinical;
 
     if (participantData[conceptIds.collectionDetails]) {
         settings = participantData[conceptIds.collectionDetails];
@@ -1438,14 +1593,13 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
 
     if (!settings[visit][conceptIds.bloodCollectionSetting]) {
         bloodTubes.forEach(tube => {
-            if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
-
-                settings[visit][conceptIds.bloodCollectionSetting] = biospecimenData[conceptIds.collection.collectionSetting];
-
-                if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+            const tubeIsCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
+            if(tubeIsCollected) {
+                settings[visit][conceptIds.bloodCollectionSetting] = collectionSetting;
+                if(isResearch) {
                     settings[visit][conceptIds.baseline.bloodCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
                 }
-                else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
+                else if(isClinical) {
                     settings[visit][conceptIds.clinicalDashboard.bloodCollected] = conceptIds.yes;
                     settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
 
@@ -1455,51 +1609,112 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
                         settings[visit][conceptIds.anySpecimenCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
                     }
                 }
+                bloodTubesLength += 1
             }
         });
     }
-        
+    else if (settings[visit][conceptIds.baseline.bloodCollectedTime] !== '' ||  settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime] !== ''){
+        const participantBloodCollected = participantData[conceptIds.baseline.bloodCollected] === conceptIds.yes;
+        const totalBloodTubesAvail = bloodTubes.filter((tube) => biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes);
+        if (totalBloodTubesAvail.length === 0 && participantBloodCollected) {
+            delete settings[visit][conceptIds.bloodCollectionSetting]; // derived variables & timestamp are updated only if all the blood tubes are unchecked
+            if (isResearch) {
+                delete settings[visit][conceptIds.baseline.bloodCollectedTime];
+            }
+            else if (isClinical) {
+                settings[visit][conceptIds.clinicalDashboard.bloodCollected] = conceptIds.no;
+                delete settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime];
+
+                if (urineTubesLength === 0 && mouthwashTubesLength === 0) { // anySpecimenCollected variable will only be updated to NO if mouthwash & urine specimens are not present.
+                    settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
+                    if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                        delete settings[visit][conceptIds.anySpecimenCollectedTime];
+                    }
+                }
+            }
+            derivedVariables[conceptIds.baseline.bloodCollected] = conceptIds.no;
+            bloodTubesLength = totalBloodTubesAvail.length;
+        }
+    }
+
     if (!settings[visit][conceptIds.urineCollectionSetting]) {
         urineTubes.forEach(tube => {
-            if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
-
-                settings[visit][conceptIds.urineCollectionSetting] = biospecimenData[conceptIds.collection.collectionSetting];
-
-                if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+            const tubeIsCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
+            if (tubeIsCollected) {
+                settings[visit][conceptIds.urineCollectionSetting] = collectionSetting;
+                if (isResearch) {
                     settings[visit][conceptIds.baseline.urineCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
                 }
-                else if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical) {
+                else if (isClinical) {
                     settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.yes;
                     settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
 
                     settings[visit][conceptIds.anySpecimenCollected] = conceptIds.yes;
 
-                    if(!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                    if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
                         settings[visit][conceptIds.anySpecimenCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
                     }
                 }
+                urineTubesLength += 1
             }
         });
+    }
+    else if (settings[visit][conceptIds.baseline.urineCollectedTime] !== '' ||  settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] !== '') {
+        const participantUrineCollected = participantData[conceptIds.baseline.urineCollected] === conceptIds.yes;
+        const totalUrineTubesAvail = urineTubes.filter((tube) => biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes);
+        if (totalUrineTubesAvail.length === 0 && participantUrineCollected) {
+            delete settings[visit][conceptIds.urineCollectionSetting];
+            if(isResearch) {
+                delete settings[visit][conceptIds.baseline.urineCollectedTime];
+            }
+            else if (isClinical) {
+                settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.no;
+                delete settings[visit][conceptIds.clinicalDashboard.urineCollectedTime];
+
+                if (bloodTubesLength === 0 && mouthwashTubesLength === 0) { // anySpecimenCollected variable will only be updated to NO if mouthwash & blood specimens are not present.
+                    settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
+                    if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                        delete settings[visit][conceptIds.anySpecimenCollectedTime];
+                    }
+                }
+            }
+            derivedVariables[conceptIds.baseline.urineCollected] = conceptIds.no;
+            urineTubesLength = totalUrineTubesAvail.length;
+        }  
     }
 
     if (!settings[visit][conceptIds.mouthwashCollectionSetting]) {
         mouthwashTubes.forEach(tube => {
-            if(biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes) {
-
-                settings[visit][conceptIds.mouthwashCollectionSetting] = biospecimenData[conceptIds.collection.collectionSetting];
-
-                if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
+            const isTubeCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
+            if (isTubeCollected) {
+                settings[visit][conceptIds.mouthwashCollectionSetting] = collectionSetting;
+                if (isResearch) {
                     settings[visit][conceptIds.baseline.mouthwashCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
-
                 }
+            mouthwashTubesLength += 1
             }
         });
     }
+    else if (settings[visit][conceptIds.baseline.mouthwashCollectedTime] !== '' && participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes) {
+        const isParticipantMouthwashCollected = participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes;
+        const totalMouthwasTubesAvail = mouthwashTubes.filter((tube) => biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes);
+        if (totalMouthwasTubesAvail.length === 0 &&  isParticipantMouthwashCollected) {
+            delete settings[visit][conceptIds.mouthwashCollectionSetting]
+            if (isResearch) {
+                delete settings[visit][conceptIds.baseline.mouthwashCollectedTime];
+            }
+            derivedVariables[conceptIds.baseline.mouthwashCollected] = conceptIds.no;
+            mouthwashTubesLength = totalMouthwasTubesAvail.length;
+        }
+    }
 
-    const settingData = {
+    let settingData = {
         [conceptIds.collectionDetails]: settings,
         uid: participantData?.state?.uid
     };
+
+    // Update derived variables to 'NO' from 'YES'. After specimens, are unchecked after checking them.
+    settingData = { ...settingData, ...derivedVariables };
     await updateParticipant(settingData);
 }
 
@@ -1508,7 +1723,7 @@ export const updateBaselineData = async (siteTubesList, data) => {
 
     const response = await getParticipantCollections(data.token);
     const baselineCollections = response.data.filter(collection => collection['331584571'] === 266600170);
-    
+
     const bloodTubes = siteTubesList.filter(tube => tube.tubeType === "Blood tube");
     const urineTubes = siteTubesList.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = siteTubesList.filter(tube => tube.tubeType === "Mouthwash");
@@ -1594,6 +1809,7 @@ export const siteSpecificLocation = {
   "Colby Abbotsford": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "Minocqua": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "Merrill": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
+  "MF Pop-Up": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "Sioux Falls Imagenetics": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
   "Fargo South University": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
   "DCAM": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
@@ -1742,6 +1958,14 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'Marshfield Cancer Center',
     email: 'connectstudy@marshfieldresearch.org'
   },
+  567969985:{
+    siteSpecificLocation: 'MF Pop-Up',
+    siteAcronym: 'MFC',
+    siteCode: '303349821',
+    siteTeam: 'Marshfield Connect Study Team',
+    loginSiteName: 'Marshfield Cancer Center',
+    email: 'connectstudy@marshfieldresearch.org'
+  },
   589224449: {
     siteSpecificLocation: 'Sioux Falls Imagenetics',
     siteAcronym: 'SFH',
@@ -1807,7 +2031,7 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'National Cancer Institute',
     email: "connectstudytest@email.com",
   },
-  222222222: {
+  222222222: { 
     siteSpecificLocation: 'Frederick',
     siteAcronym: 'NIH',
     siteCode: '13',
@@ -1833,6 +2057,7 @@ export const conceptIdToSiteSpecificLocation = {
   145191545: "Ingalls Harvey",
   489380324: "River East",
   120264574: "South Loop",
+  567969985: 'MF Pop-Up',
   940329442: "Orland Park",
   691714762: "Rice Lake",
   487512085: "Wisconsin Rapids",
@@ -1856,11 +2081,11 @@ export const siteSpecificLocationToConceptId = {
   "KPHI RRL": 531313956,
   "KPNW RRL": 715632875,
   "Marshfield": 692275326,
+  "MF Pop-Up": 567969985,
   "Lake Hallie": 698283667,
   "Sioux Falls Imagenetics": 589224449,
   "DCAM": 777644826, 
   "Main Campus": 111111111,
-  "Frederick": 222222222,
   "HFH Livonia Research Clinic": 706927479,
   "Weston": 813701399,
   "Ingalls Harvey": 145191545,
@@ -1873,6 +2098,7 @@ export const siteSpecificLocationToConceptId = {
   "Minocqua": 261931804,
   "Merrill": 665277300,
   "Fargo South University": 467088902,
+  "Frederick": 222222222,
 }
 
 export const nameToKeyObj = 
@@ -2612,20 +2838,19 @@ export const translateNumToType = {
 
 export const convertISODateTime = (isoDateTime) => {
     const date = new Date(isoDateTime);
-    return setZeroDateTime(date.getMonth() + 1)+ '/' + setZeroDateTime(date.getDate()) + '/' + date.getFullYear()+ ' '+ date.getHours() + ':' + setZeroDateTime(date.getMinutes())
-}
+    return setZeroDateTime(date.getUTCMonth() + 1) + '/' + setZeroDateTime(date.getUTCDate()) + '/' + date.getUTCFullYear() + ' ' + setZeroDateTime(date.getUTCHours()) + ':' + setZeroDateTime(date.getUTCMinutes())
+};
 
-const setZeroDateTime = (dateTimeInput) => { // append 0 before min if single digit min
-    if (dateTimeInput < 10) dateTimeInput = '0' + dateTimeInput;
-    return dateTimeInput
-}
+// append 0 before min. if single digit min. or hour
+const setZeroDateTime = (dateTimeInput) => {
+    return dateTimeInput < 10 ? '0' + dateTimeInput : dateTimeInput.toString();
+};
 
 export const formatISODateTime = (dateReceived) => {
     let extractDate = dateReceived.split("T")[0]
     extractDate = extractDate.split('-')
     const formattedDateTimeStamp = extractDate[1]+'/'+extractDate[2]+'/'+extractDate[0]
     return formattedDateTimeStamp
-
 }
 
 export const numericInputValidator = (elemArr) => {
@@ -2746,7 +2971,7 @@ export const addBoxAndUpdateSiteDetails = async (boxAndSiteData) => {
 }
 
 export const triggerErrorModal = (message) => {
-    let alertList = document.getElementById("alert_placeholder");
+    const alertList = document.getElementById("alert_placeholder");
     alertList.innerHTML = `
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             ${message}
@@ -2757,14 +2982,50 @@ export const triggerErrorModal = (message) => {
 }
 
 export const triggerSuccessModal = (message) => {
-    let alertList = document.getElementById("alert_placeholder");
-    alertList.innerHTML = `
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-        </div>`;
+    const alertList = document.getElementById("alert_placeholder");
+    if (alertList) {
+        alertList.innerHTML = `
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+            </div>`;
+    }
+}
+
+export const checkTrackingNumberSource = () => {
+    const scannedBarcode = document.getElementById("scannedBarcode");
+    const showMsg = document.getElementById('showMsg');
+    if (!scannedBarcode) {
+      return;
+    }
+    scannedBarcode.addEventListener("input", (e) => {
+      const input = e.target.value.trim();
+      if (input.length === 0) {
+        showMsg.innerHTML = "";
+        return;
+      }
+      if (input.length === 22 || input.length === 20) {
+        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: blue;"></i>USPS`;
+      }
+      else if (input.length === 12) {
+        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
+      }
+      else if (input.length === 34) {
+        e.target.value = input.slice(-12);
+        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
+      }
+      else {
+        showMsg.innerHTML = "";
+      }
+    
+    // Additional checks can be added here if needed
+    //   if (uspsFirstThreeNumbersCheck(input) || (input.length === 34 && uspsFirstThreeNumbersCheck(input))) {
+    //     document.getElementById('showMsg').innerHTML = `<i class="fa fa-check-circle" aria-hidden="true"></i> USPS`
+    //     return
+    //   }
+    });
 }
 
 /**
@@ -2817,3 +3078,10 @@ export const processResponse = async (response) => {
     const data = await response.json();
     return data.response;
 }
+
+export const getCurrentDate = () => {
+    return new Date().toLocaleDateString('en-CA');
+}
+
+export const validIso8601Format = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/;
+  

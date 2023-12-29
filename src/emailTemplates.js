@@ -65,7 +65,7 @@ export const baselineMWSurveyRemainderTemplate = (ptName) => {
         Dear ${ptName || 'User'},
         <br/>
         <br/>
-        Thank you for completing your mouthwash home collection kit! We have your sample. Next, please share some information about the day you collected your sample. Visit <a href=${appLocation}>MyConnect</a> and log in using to complete a short survey. This survey asks questions about the day you collected your sample, so it is important to complete it as soon as you can.
+        Thank you for completing your mouthwash home collection kit! We have your sample. Next, please <a href=${appLocation}>share some information</a> about the day you collected your sample. Visit <a href=${appLocation}>MyConnect</a> and log in using to complete a short survey. This survey asks questions about the day you collected your sample, so it is important to complete it as soon as you can.
         Have questions? Please contact the <a href=${supportLocation}>Connect Support Center.</a>
         ${returnFooterTemplate()}`
 }
@@ -103,26 +103,34 @@ export const baselineMWThankYouTemplate = (ptName) => {
         <br/>
         <br/>
         We appreciate your participation in Connect! Have questions? Please contact the <a href=${supportLocation}>Connect Support Center.</a>
-        ${returnFooterTemplate()}`
+        ${returnFooterTemplate(true)}`
 }
 
-const returnFooterTemplate = () => {
-    return `<br/>
+const returnFooterTemplate = (isThankYouTemplate) => {
+    const commonFooter = `
+        <br/>
+        <br/>
+        Sincerely,
+        <br/>
+        the Connect team at the National Cancer Institute
+        <br/>
+        9609 Medical Center Drive, Rockville MD 20850
+        <br/>
+        <img src="https://raw.githubusercontent.com/episphere/connectApp/master/images/new_logo.png" style="width:150px;height:40px;">
+        <br/>
+        <br/>
+        <em>To protect your information, we follow federal privacy rules, including the <a href="https://www.justice.gov/archives/opcl/overview-privacy-act-1974-2015-edition">Privacy Act</a> and the <a href="https://grants.nih.gov/grants/guide/notice-files/NOT-OD-19-050.html">Common Rule</a>.</em>
+        <br/>
+        <br/>
+        <em>This message is private. If you have received it by mistake, please let us know by emailing ConnectSupport@NORC.org, and please kindly delete the message. If you are not the right recipient, please do not share this message with anyone.</em>`;
+
+    return (!isThankYouTemplate)
+        ? `${commonFooter}`
+        : `
+            <br/>
             <br/>
             Thank you for your commitment to helping us learn how to better prevent cancer.
             <br/>
             <br/>
-            Sincerely,
-            <br/>
-            the Connect team at the National Cancer Institute
-            <br/>
-            9609 Medical Center Drive, Rockville MD 20850
-            <br/>
-            <img src="https://raw.githubusercontent.com/episphere/connectApp/master/images/new_logo.png" style="width:150px;height:40px;">
-            <br/>
-            <br/>
-            <em>To protect your information, we follow federal privacy rules, including the <a href="https://www.justice.gov/archives/opcl/overview-privacy-act-1974-2015-edition">Privacy Act</a> and the <a href="https://grants.nih.gov/grants/guide/notice-files/NOT-OD-19-050.html">Common Rule</a>.</em>
-            <br/>
-            <br/>
-            <em>This message is private. If you have received it by mistake, please let us know by emailing ConnectSupport@NORC.org, and please kindly delete the message. If you are not the right recipient, please do not share this message with anyone.</em>`
-}
+            ${commonFooter}`;
+};
