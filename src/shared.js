@@ -1782,7 +1782,7 @@ export const siteSpecificLocation = {
   "Colby Abbotsford": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "Minocqua": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "Merrill": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
-  "MF Pop-up": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
+  "MF Pop-Up": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "Sioux Falls Imagenetics": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
   "Fargo South University": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
   "DCAM": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
