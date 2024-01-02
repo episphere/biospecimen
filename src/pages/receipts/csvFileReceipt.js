@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameObj, convertISODateTime, formatISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, triggerSuccessModal } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameCSVObj, convertISODateTime, formatISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, triggerSuccessModal } from "../../shared.js";
 import { conceptIds as fieldToConceptIdMapping } from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar } from "../../navbar.js";
@@ -351,7 +351,7 @@ const updateResultMappings = (filteredResult, vialMappings, collectionId, tubeId
     const withdrawalDateTime = filteredResult[fieldToConceptIdMapping.dateWithdrawn];
     
     const sampleCollectionCenter = (collectionTypeValue === fieldToConceptIdMapping.clinical)
-        ? (keyToNameObj[filteredResult[fieldToConceptIdMapping.healthcareProvider]] || '')
+        ? (keyToNameCSVObj[filteredResult[fieldToConceptIdMapping.healthcareProvider]] || '')
         : (keyToLocationObj[filteredResult[fieldToConceptIdMapping.collectionLocation]] || '');
 
     const dateReceived = filteredResult[fieldToConceptIdMapping.dateReceived]

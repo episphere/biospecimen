@@ -2103,6 +2103,7 @@ export const keyToNameAbbreviationObj = {
   1000: "allResults",
 }
 
+// Retain keyToNameObj for finalize template.
 export const keyToNameObj = 
 {
     452412599 : "Kaiser Permanente Northwest",
@@ -2115,6 +2116,20 @@ export const keyToNameObj =
     13 : "National Cancer Institute",
     300267574 : "Kaiser Permanente Hawaii",
     327912200 : "Kaiser Permanente Georgia"
+}
+
+// Use keyToNameCSVObj for clinical collections in CSV files - Kit and Package Receipt.
+export const keyToNameCSVObj = {
+    452412599 : "Kaiser Permanente NW RRL",
+    531629870 : "HealthPartners Clinical",
+    657167265 : "Sanford Health",
+    548392715 : "Henry Ford Clinical",
+    303349821 : "Marshfield Clinic",
+    125001209 : "Kaiser Permanente Colorado RRL",
+    809703864 : "University of Chicago Medicine",
+    13 : "National Cancer Institute",
+    300267574 : "Kaiser Permanente Hawaii RRL",
+    327912200 : "Kaiser Permanente GA RRL"
 }
 
 export const keyToLocationObj = 
