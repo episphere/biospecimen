@@ -150,8 +150,8 @@ export const addEventSearchSpecimen = () => {
                 tubeCollectedTemplate(participantData, specimenData);
             }
         } catch (error) {
-            console.error("Error searching for specimen: ", error);
-            showNotifications({ title: 'Error in Collection ID Search', message: `Error retrieving specimen and participant. ${error}` });
+            console.error("Error searching for specimen: ", error.message);
+            showNotifications({ title: 'Error in Collection ID Search', body: `Error retrieving specimen. ${error.message}` });
         }
     });
 }
@@ -1539,6 +1539,7 @@ const handleFinalizedCollectionUpdate = async (biospecimenData, participantData,
     showNotificationsCancelOrContinue(modalMessage, null, onCancel, onContinue);
 }
 
+// TODO: The write process would benefit from optimization. Many sequential reads/writes.
 const processSpecimenCollectionFormUpdates = async (biospecimenData, participantData, siteTubesList) => {
     const baselineVisit = (biospecimenData[conceptIds.collection.selectedVisit] === conceptIds.baseline.visitId);
     const clinicalResearchSetting = (biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research || biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical);

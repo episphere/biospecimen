@@ -1398,14 +1398,10 @@ export const getSpecimenAndParticipant = async (collectionId, isBPTL = false) =>
             }
         });
 
-        if (!response.ok) {
-            throw new Error(`Server error: ${response.status}`);
-        }
-
         const responseJSON = await response.json();
 
         if (!responseJSON.data || responseJSON.data.length !== 2) {
-            throw new Error(`Unexpected response from server: ${responseJSON.message}`);
+            throw new Error(responseJSON.message);
         }
 
         hideAnimation();
@@ -1798,7 +1794,7 @@ export const updateBaselineData = async (siteTubesList, data) => {
 
         if(!bloodCollected) {
             bloodTubes.forEach(tube => {
-                if(collection[tube.concept]['593843561'] === 353358909) {
+                if (collection[tube.concept]?.['593843561'] === 353358909) {
                     bloodCollected = true;
                 }
             });
@@ -1806,14 +1802,14 @@ export const updateBaselineData = async (siteTubesList, data) => {
 
         if(!urineCollected) {
             urineTubes.forEach(tube => {
-                if(collection[tube.concept]['593843561'] === 353358909) {
+                if (collection[tube.concept]?.['593843561'] === 353358909) {
                     urineCollected = true;
                 }
             });
         }
         if(!mouthwashCollected) {
             mouthwashTubes.forEach(tube => {
-                if(collection[tube.concept]['593843561'] === 353358909) {
+                if (collection[tube.concept]?.['593843561'] === 353358909) {
                     mouthwashCollected = true;
                 }
             });
