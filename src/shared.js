@@ -2122,11 +2122,11 @@ export const keyToNameObj =
 export const keyToNameCSVObj = {
     452412599 : "Kaiser Permanente NW RRL",
     531629870 : "HealthPartners Clinical",
-    657167265 : "Sanford Health",
+    657167265 : "Sanford Clinical",
     548392715 : "Henry Ford Clinical",
-    303349821 : "Marshfield Clinic",
+    303349821 : "Marshfield Clinical",
     125001209 : "Kaiser Permanente Colorado RRL",
-    809703864 : "University of Chicago Medicine",
+    809703864 : "University of Chicago Clinical",
     13 : "National Cancer Institute",
     300267574 : "Kaiser Permanente Hawaii RRL",
     327912200 : "Kaiser Permanente GA RRL"
