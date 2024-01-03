@@ -1087,7 +1087,7 @@ export const findReplacementTubeLabels = (specimensList) => {
     const replacementLabelRegExp = new RegExp('005[0-4]$');
     for (let specimen of specimensList) {
         const collectionId = specimen[conceptIds.collection.id];
-        if (!collectionId) return;
+        if (!collectionId) continue;
 
         const tubeDataObject = removeUnusableTubes(specimen);
         Object.keys(tubeDataObject).forEach(tubeCid => {
