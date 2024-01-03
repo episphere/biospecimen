@@ -1083,8 +1083,8 @@ const buildAvailableCollectionsObject = (specimensList, isPartiallyBoxed) => {
  */
 export const findReplacementTubeLabels = (specimensList) => {
     if (!specimensList || specimensList.length === 0) return { availableCollections: {}, specimensList: [] };
-    const replaceMentTubeLabels = {};
-    const replaceMentLabelRegExp = new RegExp('005[0-4]$');
+    const replacementTubeLabels = {};
+    const replacementLabelRegExp = new RegExp('005[0-4]$');
     for (let specimen of specimensList) {
         const collectionId = specimen[conceptIds.collection.id];
         if (!collectionId) return;
@@ -1092,13 +1092,13 @@ export const findReplacementTubeLabels = (specimensList) => {
         const tubeDataObject = removeUnusableTubes(specimen);
         Object.keys(tubeDataObject).forEach(tubeCid => {
             let scannedTubeLabel = tubeDataObject[tubeCid];
-            if (replaceMentLabelRegExp.test(scannedTubeLabel)) {
-                replaceMentTubeLabels[scannedTubeLabel] = collectionId + ' ' + specimenCollection.cidToNum[tubeCid];
+            if (replacementLabelRegExp.test(scannedTubeLabel)) {
+                replacementTubeLabels[scannedTubeLabel] = collectionId + ' ' + specimenCollection.cidToNum[tubeCid];
             }
         })
         
     }
-    return replaceMentTubeLabels;
+    return replacementTubeLabels;
 }
 
 /**
