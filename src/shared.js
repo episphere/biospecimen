@@ -2876,3 +2876,53 @@ export const showNotification = (title, body, closeButtonName, continueButtonNam
     document.body.removeChild(modalContainer);
     });
 };
+
+export const showNotificationsCancelOrContinue = (message, zIndex, onCancel, onContinue) => {
+    console.log('showNotificationsCancelOrContinue');
+        const button = document.createElement('button');
+        button.dataset.target = '#biospecimenModal';
+        button.dataset.toggle = 'modal';
+    
+        document.getElementById('root').appendChild(button);
+        button.click();
+        if (zIndex) document.getElementById('biospecimenModal').style.zIndex = zIndex;
+        const header = document.getElementById('biospecimenModalHeader');
+        const body = document.getElementById('biospecimenModalBody');
+        const continueButtonText = message.continueButtonText || 'Continue';
+        const cancelButtonText = message.cancelButtonText || 'Cancel';
+        header.innerHTML = `<h5 class="modal-title">${message.title}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>`;
+    body.innerHTML = `
+            <div class="row">
+                <div class="col">
+                    ${message.body}
+                </div>
+            </div>
+            <br><br>
+            <div class="row">
+                <div class="ml-auto" style="margin-right: 1rem;">
+                    <button type="button" class="btn btn-outline-dark" id="modalCancelBtn" data-dismiss="modal">${cancelButtonText}</button>
+                    <button type="button" class="btn btn-primary" id="modalContinueBtn">${continueButtonText}</button>
+                </div>
+            </div>`;
+    
+        document.getElementById('modalCancelBtn').addEventListener('click', () => {
+            $('#biospecimenModal').modal('hide');
+            if (onCancel) onCancel();
+        });
+    document.getElementById('modalContinueBtn').addEventListener('click', async () => {
+            try {
+                $('#biospecimenModal').modal('hide');
+                if (onContinue) await onContinue();
+            } catch (error) {
+                console.error('Error in modalContinueBtn event listener:', error);
+                showNotifications({ title: 'Error', body: `Error: please try again. ${error}` });
+            }
+        });
+    
+        document.getElementById('root').removeChild(button);
+    };
+    
+    

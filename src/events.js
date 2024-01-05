@@ -5,7 +5,7 @@ import { appState, performSearch, showAnimation, addBiospecimenUsers, getSpecime
         convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
         checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData,
         siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
-        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showNotification, showTimedNotifications } from './shared.js';
+        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showNotification, showTimedNotifications, showNotificationsCancelOrContinue } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
 import { addNewBox, buildSpecimenDataInModal, createShippingModalBody, startShipping, generateBoxManifest, populateViewShippingBoxContentsList,
@@ -655,11 +655,14 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
                             If this is not today, you may check the participant in for an additional visit.</div></div>`;
                             const closeButtonName = 'Cancel';
                             const continueButtonName = 'Continue with Check-In';
-                            const continueAction = async () => {
+                            const onContinue = async () => {
+                                document.body.removeChild(modalContainer);
+                            };
+                            const onCancel = async () => {
                                 document.body.removeChild(modalContainer);
                             };
                           
-                            showNotification(title, body, closeButtonName, continueButtonName, continueAction);
+                            showNotificationsCancelOrContinue(title, body, onCancel,onContinue);
                           };
                           
                         confirmRepeat();
@@ -789,13 +792,16 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
             const body = '<div class="row"><div class="col">Participant is checked in</div></div>';
             const closeButtonName = 'Close';
             const continueButtonName = 'Continue to Specimen Link';
-            const continueAction = async () => {
+            const onContinue = async () => {
               const updatedResponse = await findParticipant(query);
               const updatedData = updatedResponse.data[0];
               specimenTemplate(updatedData);
             };
-          
-            showNotification(title, body, closeButtonName, continueButtonName, continueAction);
+            const onCancel = async () => {
+                document.body.removeChild(modalContainer);
+            };
+            showNotificationsCancelOrContinue({ title, body }, null, onCancel, onContinue);
+            //showNotification(title, body, closeButtonName, continueButtonName, continueAction);
           };
           
         confirmVal();
