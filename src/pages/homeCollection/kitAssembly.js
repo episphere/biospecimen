@@ -111,7 +111,7 @@ const enableEnterKeystroke = () => {
 const performQCcheck = (inputBox2, inputBox1, errorTag, errorMsg) => {
   const checkInputBox2 = document.getElementById(inputBox2);
   if(errorMsg == "") {
-    document.getElementById(errorTag).innerHTML = ``
+    document.getElementById(errorTag).innerHTML = `` 
   }
   if (checkInputBox2) {
     checkInputBox2.addEventListener("input", (e) => {
@@ -121,8 +121,7 @@ const performQCcheck = (inputBox2, inputBox1, errorTag, errorMsg) => {
         console.log('qc',errorMsg,checkInputBox2Value, checkInputBox1Value );
         document.getElementById(errorTag).innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> ${errorMsg}`
       }
-      else if(errorMsg == "") {
-        console.log('qc1',errorMsg);
+      else {
         document.getElementById(errorTag).innerHTML = ``
       }
     })
