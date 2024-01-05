@@ -108,13 +108,21 @@ const confirmFileSelection = () => {
       const radioVal = radio.value;
       document.getElementById('modalShowMoreData').querySelector('#closeModal').click(); // closes modal
       showAnimation();
-      const response = await getAllBoxes(`bptlPackagesInTransit`);
-      const specimens = await getSpecimensInBoxes(response.data);
-      const replacementTubeLabelObj = findReplacementTubeLabels(specimens);
-      hideAnimation();
-      const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
-      let modifiedTransitResults = updateInTransitMapping(allBoxesShippedBySiteAndNotReceived, replacementTubeLabelObj);
-      (radioVal === 'xlsx') ? processInTransitXLSXData(modifiedTransitResults) : generateInTransitCSVData(modifiedTransitResults)
+      try {
+        const response = await getAllBoxes(`bptlPackagesInTransit`);
+        const specimens = await getSpecimensInBoxes(response.data);
+        const replacementTubeLabelObj = findReplacementTubeLabels(specimens);
+        hideAnimation();
+        const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
+        let modifiedTransitResults = updateInTransitMapping(allBoxesShippedBySiteAndNotReceived, replacementTubeLabelObj);
+        (radioVal === 'xlsx') ? processInTransitXLSXData(modifiedTransitResults) : generateInTransitCSVData(modifiedTransitResults);
+      } catch (error) {
+        hideAnimation();
+        console.error(error);
+        triggerErrorModal('Error generating file.  Please try again later');
+      }
+      
+      
     });
 });
 }
