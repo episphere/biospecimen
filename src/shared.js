@@ -2894,7 +2894,7 @@ export const showNotificationsCancelOrContinue = (message, zIndex, onCance
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>`;
-    body.innerHTML = `
+    modalContent.innerHTML = `
             <div class="row">
                 <div class="col">
                     ${message.body}
@@ -2910,6 +2910,7 @@ export const showNotificationsCancelOrContinue = (message, zIndex, onCance
     
         document.getElementById('modalCancelBtn').addEventListener('click', () => {
             $('#biospecimenModal').modal('hide');
+        console.log("onCancel")
             if (onCancel) onCancel();
         });
     document.getElementById('modalContinueBtn').addEventListener('click', async () => {
