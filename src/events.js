@@ -550,6 +550,7 @@ export const addGoToSpecimenLinkEvent = () => {
 export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
+        console.log('addEventCheckInCompleteForm submit');
         e.preventDefault();
         const btnCheckIn = document.getElementById('checkInComplete');
         btnCheckIn.disabled = true;
@@ -558,256 +559,134 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
         
         const response = await findParticipant(query);
         const data = response.data[0];
-
+        console.log('isCheckedIn', isCheckedIn);
+        console.log('checkOutFlag', checkOutFlag);
         if(isCheckedIn) {
-            
+            console.log('isCheckedIn true');
             checkOutParticipant(data);
-
             /*await swal({
                 title: "Success",
                 icon: "success",
                 text: `Participant is checked out.`,
             });*/
-            showTimedNotifications({ title: 'Success', body: 'Participant is checked out.' }); 
+            showTimedNotifications({ title: 'Success', body: 'Participant is checked out.' });
+            console.log('checkOutFlag', checkOutFlag);
             checkOutFlag === true ? location.reload() : goToParticipantSearch();
-        }
-        else {
-
+        } else {
+            // TODO: remove log statements
+            console.log('isCheckedIn false');
             const visitConcept = document.getElementById('visit-select').value;
-            
+            console.log('visitConcept', visitConcept);
             for(const visit of visitType) {
-                if(data['331584571'] && data['331584571'][visit.concept]) {
-                    const visitTime = new Date(data['331584571'][visit.concept]['840048338']);
+                console.log('visit', visit);
+                if(data[conceptIds.collection.selectedVisit] && data[conceptIds.collection.selectedVisit][visit.concept]) {
+                    const visitTime = new Date(data[conceptIds.collection.selectedVisit][visit.concept][conceptIds.checkInDateTime]);
+                    console.log('visitTime', visitTime);
                     const now = new Date();
+                    console.log('now - year, month, date', now.getYear(), now.getMonth(), now.getDate());
+                    console.log('visitTime - year, month, date', visitTime.getYear(), visitTime.getMonth(), visitTime.getDate());
                     
                     if(now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
-
+                    // if (1 === 1) { // TODO: replace this condition with the above condition. This is just to test the check-in warning.
                         const response = await getParticipantCollections(data.token);
-                        let collection = response.data.filter(res => res['331584571'] == visit.concept);
+                        let collection = response.data.filter(res => res[conceptIds.collection.selectedVisit] == visit.concept);
+                        console.log('collection', collection);
                         if (collection.length === 0) continue;
 
-                        /*const confirmRepeat = await swal({
-                            title: "Warning - Participant Previously Checked In",
-                            icon: "warning",
-                            text: "Participant " + data['399159511'] + " " + data['996038075'] + " was previously checked in on " + new Date(data['331584571'][visit.concept]['840048338']).toLocaleString() + " with Collection ID " + collection[0]['820476880'] + ".\r\nIf this is today, DO NOT check the participant in again.\r\nNote Collection ID above and see Check-In SOP for further instructions.\r\n\r\nIf this is is not today, you may check the participant in for an additional visit.",
-                            buttons: {
-                                cancel: {
-                                    text: "Cancel",
-                                    value: "cancel",
-                                    visible: true,
-                                    className: "btn btn-danger",
-                                    closeModal: true,
-                                },
-                                confirm: {
-                                    text: "Continue with Check-In",
-                                    value: 'confirmed',
-                                    visible: true,
-                                    closeModal: true,
-                                    className: "btn btn-success",
-                                }
-                            }
-                        });*/
-                       /* const confirmRepeat = () => 
-                        {
-                            const button = document.createElement('button');
-                            button.dataset.target = '#biospecimenModal';
-                            button.dataset.toggle = 'modal';
-                        
-                            document.getElementById('root').appendChild(button);
-                            button.click();
-                            //if (zIndex) document.getElementById('biospecimenModal').style.zIndex = zIndex;
-                            document.getElementById('root').removeChild(button);
-                        
-                            const header = document.getElementById('biospecimenModalHeader');
-                            const body = document.getElementById('biospecimenModalBody');
-                        
-                            // Check for the type of swal
-                                // Success swal
-                                header.innerHTML = `<h5 class="modal-title">Warning - Participant Previously Checked In</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>`;
-            body.innerHTML = `
-            <div class="row">
-                <div class="col">
-                    abc
-                </div>
-            </div>
-            </br></br>
-            <div class="row">
-                <div class="ml-auto" style="margin-right: 1rem;">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">Cancel</button>
-                    <button type="button" class="btn btn-success" data-value="confirmed" data-dismiss="modal" aria-label="Close">Continue with Check-In</button>
-                </div>
-            </div>                                  
-                                `;
-                        }; 
-
-                        if ( confirmRepeat() === "cancel") return; */
-
-                        const confirmRepeat = () => {
-                            const title = 'Warning - Participant Previously Checked In';
-                            const body = `<div class="row"><div class="col">Participant ${data['399159511']} ${data['996038075']} was previously checked in on ${new Date(data['331584571'][visit.concept]['840048338']).toLocaleString()} with Collection ID ${collection[0]['820476880']}.
-                            If this is today, DO NOT check the participant in again.
-                            Note Collection ID above and see Check-In SOP for further instructions.
-                            
-                            If this is not today, you may check the participant in for an additional visit.</div></div>`;
-                            const closeButtonName = 'Cancel';
-                            const continueButtonName = 'Continue with Check-In';
-                            const onContinue = async () => {
-                                document.body.removeChild(modalContainer);
-                            };
-                            const onCancel = async () => {
-                                document.body.removeChild(modalContainer);
-                            };
-                          
-                            showNotificationsCancelOrContinue(title, body, onCancel,onContinue);
-                          };
-                          
-                        confirmRepeat();
+                        const confirmContinueCheckIn = await handleCheckInWarning(visit, data, collection);
+                        console.log('confirmContinueCheckIn', confirmContinueCheckIn);
+                        if (!confirmContinueCheckIn) return;
                     }
                 }
             }
 
-            await checkInParticipant(data, visitConcept);
+            await handleCheckInModal(data, visitConcept, query);
 
-            /*const confirmVal = await swal({
-                title: "Success",
-                icon: "success",
-                text: "Participant is checked in.",
-                buttons: {
-                    cancel: {
-                        text: "Close",
-                        value: "cancel",
-                        visible: true,
-                        className: "btn btn-default",
-                        closeModal: true,
-                    },
-                    confirm: {
-                        text: "Continue to Specimen Link",
-                        value: 'confirmed',
-                        visible: true,
-                        className: "",
-                        closeModal: true,
-                        className: "btn btn-success",
-                    }
-                },
-            });*/
-            /* const confirmVal = () => {
-                const button = document.createElement('button');
-                button.dataset.target = '#biospecimenModal';
-                button.dataset.toggle = 'modal';
-            
-                document.getElementById('root').appendChild(button);
-                button.click();
-                //if (zIndex) document.getElementById('biospecimenModal').style.zIndex = zIndex;
-                document.getElementById('root').removeChild(button);
-            
-                const header = document.getElementById('biospecimenModalHeader');
-                const body = document.getElementById('biospecimenModalBody');
-            
-                // Check for the type of swal
-                    // Success swal
-                    header.innerHTML = `<h5 class="modal-title">Success</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>`;
-                    body.innerHTML = `
-                        <div class="row">
-                            <div class="col">
-                            Participant is checked in  
-                            </div>
-                        </div>
-                        </br></br>
-                        <div class="row">
-                            <div class="ml-auto" style="margin-right: 1rem;">
-                                <button type="button" class="btn btn-outline-dark" data-dismiss="modal" aria-label="Close">Close</button>
-                                <button type="button" class="btn btn-success" data-value="confirmed" data-dismiss="modal" aria-label="Close">Continue to Specimen Link</button>
-                            </div>
-                        </div>
-                    `;
-            };
+            // TODO: remove unused code
+            // const confirmVal = await swal({
+            //     title: "Success",
+            //     icon: "success",
+            //     text: "Participant is checked in.",
+            //     buttons: {
+            //         cancel: {
+            //             text: "Close",
+            //             value: "cancel",
+            //             visible: true,
+            //             className: "btn btn-default",
+            //             closeModal: true,
+            //         },
+            //         confirm: {
+            //             text: "Continue to Specimen Link",
+            //             value: 'confirmed',
+            //             visible: true,
+            //             className: "",
+            //             closeModal: true,
+            //             className: "btn btn-success",
+            //         }
+            //     },
+            // });
+            // console.log('confirmVal', confirmVal);
 
-            if (confirmVal() === "confirmed") {
-                const updatedResponse = await findParticipant(query);
-                const updatedData = updatedResponse.data[0];
+            // if (confirmVal === "confirmed") {
+            //     const updatedResponse = await findParticipant(query);
+            //     const updatedData = updatedResponse.data[0];
 
-                specimenTemplate(updatedData);
-            }*/
-           /* const confirmVal = () => {
-                // Create modal container
-                const modalContainer = document.createElement('div');
-                modalContainer.classList.add('modal', 'fade');
-                modalContainer.id = 'successModal';
-                modalContainer.tabIndex = '-1';
-                modalContainer.role = 'dialog';
-                modalContainer.setAttribute('aria-labelledby', 'exampleModalCenterTitle');
-                modalContainer.setAttribute('aria-hidden', 'true');
-            
-                // Create modal content
-                const modalContent = document.createElement('div');
-                modalContent.classList.add('modal-dialog', 'modal-dialog-centered');
-                modalContent.setAttribute('role', 'document');
-            
-                const modalBody = `
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Success</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col">
-                                    Participant is checked in
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-success" data-value="confirmed" data-dismiss="modal" id="continueBtn">Continue to Specimen Link</button>
-                        </div>
-                    </div>
-                `;
-            
-                modalContent.innerHTML = modalBody;
-                modalContainer.appendChild(modalContent);
-                document.body.appendChild(modalContainer);
-                modalContainer.classList.add('show');
-                modalContainer.style.display = 'block';
-                const continueBtn = document.getElementById('continueBtn');
-                continueBtn.addEventListener('click', async () => {
-                    const updatedResponse = await findParticipant(query);
-                    const updatedData = updatedResponse.data[0];
-                    specimenTemplate(updatedData);
-                    document.body.removeChild(modalContainer);
-                });
-            };
-           confirmVal();*/
-
-           const confirmVal = () => {
-            const title = 'Success';
-            const body = '<div class="row"><div class="col">Participant is checked in</div></div>';
-            const closeButtonName = 'Close';
-            const continueButtonName = 'Continue to Specimen Link';
-            const onContinue = async () => {
-              const updatedResponse = await findParticipant(query);
-              const updatedData = updatedResponse.data[0];
-              specimenTemplate(updatedData);
-            };
-            const onCancel = async () => {
-                document.body.removeChild(modalContainer);
-            };
-            showNotificationsCancelOrContinue({ title, body }, null, onCancel, onContinue);
-            //showNotification(title, body, closeButtonName, continueButtonName, continueAction);
-          };
-          
-        confirmVal();
-            
+            //     specimenTemplate(updatedData);
+            // }
         }
     });
 };
+
+const handleCheckInWarning = async (visit, data, collection) => {
+    console.log('handleCheckInWarning');
+    const message = {
+        title: "Warning - Participant Previously Checked In",
+        body: "Participant " + data[conceptIds.firstName] + " " + data[conceptIds.lastName] + " was previously checked in on " + 
+            new Date(data[conceptIds.collection.selectedVisit][visit.concept][conceptIds.checkInDateTime]).toLocaleString() +
+            " with Collection ID " + collection[0][conceptIds.collection.id] +
+            ".\r\nIf this is today, DO NOT check the participant in again.\r\nNote Collection ID above and see Check-In SOP for further instructions.\r\n\r\n" +
+            "If this is not today, you may check the participant in for an additional visit.",
+        continueButtonText: "Continue with Check-In",
+    };
+
+    const onCancel = () => { return false };
+    const onContinue = async () => { return true };
+
+    const userConfirmed = await new Promise((resolve) => {
+        showNotificationsCancelOrContinue(message, null, () => resolve(onCancel()), () => resolve(onContinue()));
+    });
+
+    return userConfirmed;
+}
+
+const handleCheckInModal = async (data, visitConcept, query) => {
+    console.log('handleCheckInModal');
+    await checkInParticipant(data, visitConcept);
+
+    // Define the message object
+    const checkInMessage = {
+        title: "Success",
+        body: "Participant is checked in.",
+        continueButtonText: "Continue to Specimen Link",
+    };
+    console.log('checkInMessage', checkInMessage);
+
+    // Define onCancel and onContinue callback functions, then call the showNotificationsCancelOrContinue modal
+    const checkInOnCancel = () => { /* Nothing to do here */ };
+    const checkInOnContinue = async () => {
+        try {
+            const updatedResponse = await findParticipant(query);
+            const updatedData = updatedResponse.data[0];
+    
+            specimenTemplate(updatedData);
+        } catch (error) {
+            console.error('Error in onContinue:', error);
+            showNotifications({ title: 'Error', body: 'There was an error checking in the participant. Please try again.' });
+        }
+    };
+
+    showNotificationsCancelOrContinue(checkInMessage, 10000, checkInOnCancel, checkInOnContinue);
+}
 
 export const addEventVisitSelection = () => {
 
@@ -863,49 +742,49 @@ export const addEventClinicalSpecimenLinkForm2 = (formData) => {
 };
 
 const existingCollectionAlert = async (collections, connectId, formData) => {
-   /* const confirmVal = await swal({
-        title: "Warning",
-        icon: "warning",
-        text: `The Following ${collections.length} Collection ID(s) already exist for this participant: 
-        ${collections.map(collection => collection['820476880']).join(', ')}`,
-        buttons: {
-            cancel: {
-                text: "Close",
-                value: "cancel",
-                visible: true,
-                className: "btn btn-default",
-                closeModal: true,
-            },
-            confirm: {
-                text: "Add New Collection",
-                value: 'confirmed',
-                visible: true,
-                className: "",
-                closeModal: true,
-                className: "btn btn-success",
-            }
-        },
-    });
-
-    if (confirmVal === "confirmed") {
-        btnsClicked(connectId, formData);
-    }*/
-    const existingCollection = () => {
-        const title = 'Warning';
-        const body = `<div class="row"><div class="col">The Following ${collections.length} Collection ID(s) already exist for this participant: 
-        ${collections.map(collection => collection['820476880']).join(', ')}</div></div>`;
-        const closeButtonName = 'Close';
-        const continueButtonName = 'Add New Collection';
-        const continueAction = async () => {
-            btnsClicked(connectId, formData);   
-        };
-      
-        showNotification(title, body, closeButtonName, continueButtonName, continueAction);
-      };
-      
-      existingCollection();
-
-}
+    /* const confirmVal = await swal({
+         title: "Warning",
+         icon: "warning",
+         text: `The Following ${collections.length} Collection ID(s) already exist for this participant: 
+         ${collections.map(collection => collection['820476880']).join(', ')}`,
+         buttons: {
+             cancel: {
+                 text: "Close",
+                 value: "cancel",
+                 visible: true,
+                 className: "btn btn-default",
+                 closeModal: true,
+             },
+             confirm: {
+                 text: "Add New Collection",
+                 value: 'confirmed',
+                 visible: true,
+                 className: "",
+                 closeModal: true,
+                 className: "btn btn-success",
+             }
+         },
+     });
+ 
+     if (confirmVal === "confirmed") {
+         btnsClicked(connectId, formData);
+     }*/
+     const existingCollection = () => {
+         const title = 'Warning';
+         const body = `<div class="row"><div class="col">The Following ${collections.length} Collection ID(s) already exist for this participant: 
+         ${collections.map(collection => collection['820476880']).join(', ')}</div></div>`;
+         const closeButtonName = 'Close';
+         const continueButtonName = 'Add New Collection';
+         const continueAction = async () => {
+             btnsClicked(connectId, formData);   
+         };
+       
+         showNotification(title, body, closeButtonName, continueButtonName, continueAction);
+       };
+       
+       existingCollection();
+ 
+ }
 
 // todo: this function handles tangled situations. Needs to be refactored
 /**
@@ -1729,7 +1608,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
     }
     else {
 
-      /*  await swal({
+        /*  await swal({
             title: "Success",
             icon: "success",
             text: "Collection specimen data has been saved",
@@ -1744,6 +1623,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
             },
         }); */
         showNotifications({ title: 'Success', body: 'Collection specimen data has been saved' });
+
         hideAnimation();
     }
 }
@@ -1912,7 +1792,7 @@ export const addEventNavBarShippingManifest = (userName) => {
         }
 
         if (selectedLocation === 'none') {
-           /* await swal({
+            /* await swal({
                 title: "Reminder",
                 icon: "warning",
                 text: "Please Select 'Shipping Location'",
@@ -1932,7 +1812,7 @@ export const addEventNavBarShippingManifest = (userName) => {
         }
 
         if(!boxesToShip.length) {
-         /* await swal({
+          /* await swal({
             title: "Reminder",
             icon: "warning",
             text: "Please select Box(es) to review and ship",
@@ -2218,7 +2098,7 @@ export const addEventSaveButton = async (boxIdAndBagsObj) => {
         }
 
         if (isMismatch) {
-           /* await swal({
+            /* await swal({
                 title: 'Error!',
                 icon: 'error',
                 text: 'Tracking Ids do not match in one of the boxes.',

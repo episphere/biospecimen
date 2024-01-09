@@ -337,6 +337,7 @@ export const showNotifications = (data, zIndex) => {
  * @param {function} onContinue - callback function to execute on continue. Example: process a retry POST request.
  */
 export const showNotificationsCancelOrContinue = (message, zIndex, onCancel, onContinue) => {
+    console.log('showNotificationsCancelOrContinue');
     const button = document.createElement('button');
     button.dataset.target = '#biospecimenModal';
     button.dataset.toggle = 'modal';
@@ -346,41 +347,43 @@ export const showNotificationsCancelOrContinue = (message, zIndex, onCancel, onC
     if (zIndex) document.getElementById('biospecimenModal').style.zIndex = zIndex;
     const header = document.getElementById('biospecimenModalHeader');
     const body = document.getElementById('biospecimenModalBody');
+    const continueButtonText = message.continueButtonText || 'Continue';
+    const cancelButtonText = message.cancelButtonText || 'Cancel';
     header.innerHTML = `<h5 class="modal-title">${message.title}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>`;
-    body.innerHTML = `
-        <div class="row">
-            <div class="col">
-                ${message.body}
+    modalContent.innerHTML = `
+            <div class="row">
+                <div class="col">
+                    ${message.body}
+                </div>
             </div>
-        </div>
-        <br><br>
-        <div class="row">
-            <div class="ml-auto" style="margin-right: 1rem;">
-                <button type="button" class="btn btn-outline-dark" id="modalCancelBtn" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="modalContinueBtn">Continue</button>
-            </div>
-        </div>`;
-
-    document.getElementById('modalCancelBtn').addEventListener('click', () => {
-        $('#biospecimenModal').modal('hide');
-        if (onCancel) onCancel();
-    });
-
-    document.getElementById('modalContinueBtn').addEventListener('click', async () => {
-        try {
+            <br><br>
+            <div class="row">
+                <div class="ml-auto" style="margin-right: 1rem;">
+                    <button type="button" class="btn btn-outline-dark" id="modalCancelBtn" data-dismiss="modal">${cancelButtonText}</button>
+                    <button type="button" class="btn btn-primary" id="modalContinueBtn">${continueButtonText}</button>
+                </div>
+            </div>`;
+    
+        document.getElementById('modalCancelBtn').addEventListener('click', () => {
             $('#biospecimenModal').modal('hide');
-            if (onContinue) await onContinue();
-        } catch (error) {
-            console.error('Error in modalContinueBtn event listener:', error);
-            showNotifications({ title: 'Error', body: `Error: please try again. ${error}` });
-        }
-    });
-
-    document.getElementById('root').removeChild(button);
-};
+            console.log("onCancel")
+            if (onCancel) onCancel();
+        });
+    document.getElementById('modalContinueBtn').addEventListener('click', async () => {
+            try {
+                $('#biospecimenModal').modal('hide');
+                if (onContinue) await onContinue();
+            } catch (error) {
+                console.error('Error in modalContinueBtn event listener:', error);
+                showNotifications({ title: 'Error', body: `Error: please try again. ${error}` });
+            }
+        });
+    
+        document.getElementById('root').removeChild(button);
+    };
 
 /**
  * Build a list of user-selectable items. User selection continues process.
@@ -3111,6 +3114,7 @@ export const showTimedNotifications = (data, zIndex, timeInMilliseconds = 1600) 
     }, timeInMilliseconds);
 };
 
+// TODO: @ramavavi rename this. Too similar to `showNotifications` function name - will be confusing fro future developers. 
 export const showNotification = (title, body, closeButtonName, continueButtonName, continueAction) => {
     const modalContainer = document.createElement('div');
     modalContainer.classList.add('modal', 'fade');
@@ -3158,54 +3162,3 @@ export const showNotification = (title, body, closeButtonName, continueButtonNam
     document.body.removeChild(modalContainer);
     });
 };
-
-export const showNotificationsCancelOrContinue = (message, zIndex, onCancel, onContinue) => {
-    console.log('showNotificationsCancelOrContinue');
-        const button = document.createElement('button');
-        button.dataset.target = '#biospecimenModal';
-        button.dataset.toggle = 'modal';
-    
-        document.getElementById('root').appendChild(button);
-        button.click();
-        if (zIndex) document.getElementById('biospecimenModal').style.zIndex = zIndex;
-        const header = document.getElementById('biospecimenModalHeader');
-        const body = document.getElementById('biospecimenModalBody');
-        const continueButtonText = message.continueButtonText || 'Continue';
-        const cancelButtonText = message.cancelButtonText || 'Cancel';
-        header.innerHTML = `<h5 class="modal-title">${message.title}</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>`;
-    modalContent.innerHTML = `
-            <div class="row">
-                <div class="col">
-                    ${message.body}
-                </div>
-            </div>
-            <br><br>
-            <div class="row">
-                <div class="ml-auto" style="margin-right: 1rem;">
-                    <button type="button" class="btn btn-outline-dark" id="modalCancelBtn" data-dismiss="modal">${cancelButtonText}</button>
-                    <button type="button" class="btn btn-primary" id="modalContinueBtn">${continueButtonText}</button>
-                </div>
-            </div>`;
-    
-        document.getElementById('modalCancelBtn').addEventListener('click', () => {
-            $('#biospecimenModal').modal('hide');
-        console.log("onCancel")
-            if (onCancel) onCancel();
-        });
-    document.getElementById('modalContinueBtn').addEventListener('click', async () => {
-            try {
-                $('#biospecimenModal').modal('hide');
-                if (onContinue) await onContinue();
-            } catch (error) {
-                console.error('Error in modalContinueBtn event listener:', error);
-                showNotifications({ title: 'Error', body: `Error: please try again. ${error}` });
-            }
-        });
-    
-        document.getElementById('root').removeChild(button);
-    };
-    
-    
