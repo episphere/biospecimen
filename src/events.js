@@ -152,8 +152,7 @@ export const addEventsearchSpecimen = () => {
                 showNotifications({ title: 'Incorrect Dashboard', body: 'Clinical Collections cannot be viewed on Research Dashboard' });
                 return;
             }
-        }
-        else {
+        } else {
             if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
                 hideAnimation();
                 showNotifications({ title: 'Incorrect Dashboard', body: 'Research Collections cannot be viewed on Clinical Dashboard' });

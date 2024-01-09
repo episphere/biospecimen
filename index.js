@@ -19,6 +19,7 @@ import { addressesPrintedScreen } from "./src/pages/homeCollection/assignKit.js"
 import { assignedScreen } from "./src/pages/homeCollection/assigned.js";
 import { shippedScreen } from "./src/pages/homeCollection/shipped.js";
 import { receivedKitsScreen } from "./src/pages/homeCollection/receivedKits.js";
+import { kitCsvScreen } from "./src/pages/homeCollection/kitCSV.js";
 import { kitShipmentScreen } from "./src/pages/homeCollection/kitShipment.js";
 import { packagesInTransitScreen } from "./src/pages/receipts/packagesInTransit.js";
 import { packageReceiptScreen } from "./src/pages/receipts/packageReceipt.js";
@@ -95,6 +96,7 @@ const manageRoutes = async () => {
         else if (route === "#printlabels") printLabelsScreen(auth, route);
         else if (route === "#assignkits") assignKitsScreen(auth, route);
         else if (route === "#kitsreceipt") kitsReceiptScreen(auth, route);
+        else if (route === "#kitscsv") kitCsvScreen(auth, route);
         else if (route === "#participantselection") printAddressesScreen(auth, route);
         else if (route === "#allParticipants") allParticipantsScreen(auth, route);
         else if (route === "#addressPrinted") addressesPrintedScreen(auth, route);

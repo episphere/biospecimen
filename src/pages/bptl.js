@@ -30,11 +30,11 @@ export const bptlScreen = async (auth, route) => {
     unAuthorizedUser();
   return;
   }
-  bptlScreenTemplate(name || response.data.email, response.data, auth, route);
+  bptlScreenTemplate(name || response.data.email, response.data);
   redirectPageToLocation();
 };
 
-const bptlScreenTemplate = (name, data, auth, route) => {
+const bptlScreenTemplate = (name, data) => {
   let template = "";
   template += `
         <div class="row align-center welcome-screen-div">
@@ -49,6 +49,7 @@ const bptlScreenTemplate = (name, data, auth, route) => {
                     <div class="p-3 border bg-light"><button type="button" href="#assignkits" class="btn btn-primary btn-lg" id="assignKits">Assign Kits</button></div>
                     <div class="p-3 border bg-light"><button type="button" href="#kitshipment" class="btn btn-primary btn-lg" id="kitShipment">Ship Kits</button></div>
                     <div class="p-3 border bg-light"><button type="button" href="#kitsreceipt" class="btn btn-primary btn-lg" id="kitsReceipt">Kits Receipt</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#kitscsv" class="btn btn-primary btn-lg" id="kitsCsv">Create .csv File</button></div>
                     <div class="p-3 border bg-light"><button type="button" href="#participantselection" class="btn btn-primary btn-lg" id="participantSelection" disabled>Reports</button></div>
                 </div>
                 <div class="col">
@@ -96,6 +97,10 @@ const redirectPageToLocation = () => {
   const kitsReceiptRedirection = document.getElementById("kitsReceipt");
   kitsReceiptRedirection && kitsReceiptRedirection.addEventListener("click", async () => {
     location.hash = "#kitsreceipt";
+  });
+  const kitCSVRedirection = document.getElementById("kitsCsv");
+  kitCSVRedirection && kitCSVRedirection.addEventListener("click", async () => {
+    location.hash = "#kitscsv";
   });
   const participantSelectionRedirection = document.getElementById("participantSelection");
   participantSelectionRedirection && participantSelectionRedirection.addEventListener("click", async () => {
