@@ -1505,7 +1505,7 @@ const collectionSubmission = async (participantData, biospecimenData, continueTo
  * If specimen has already been finalized, alert user that changes will update the specimen.
  * @param {object} biospecimenData - the updatedBiospecimenData (existing data plus form changes).
  * @param {object} participantData - the participantData from Firestore.
- * @param {array} siteTubesList - the list of tubese based on the site (from getSiteTubesLists()).
+ * @param {array} siteTubesList - the list of tubes based on the site (from getSiteTubesLists()).
  * @param {array} addedStrayTubes - tubes added this form submission.
  * @param {boolean} continueToFinalizeScreen - if true, navigate to finalize screen.
  */
