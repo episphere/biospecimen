@@ -5,7 +5,7 @@ import { appState, performSearch, showAnimation, addBiospecimenUsers, getSpecime
         convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
         checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData,
         siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
-        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showNotification, showTimedNotifications, showNotificationsCancelOrContinue } from './shared.js';
+        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showModalNotification, showTimedNotifications, showNotificationsCancelOrContinue } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
 import { addNewBox, buildSpecimenDataInModal, createShippingModalBody, startShipping, generateBoxManifest, populateViewShippingBoxContentsList,
@@ -564,75 +564,29 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
         if(isCheckedIn) {
             console.log('isCheckedIn true');
             checkOutParticipant(data);
-            /*await swal({
-                title: "Success",
-                icon: "success",
-                text: `Participant is checked out.`,
-            });*/
             showTimedNotifications({ title: 'Success', body: 'Participant is checked out.' });
             console.log('checkOutFlag', checkOutFlag);
             checkOutFlag === true ? location.reload() : goToParticipantSearch();
         } else {
             // TODO: remove log statements
-            console.log('isCheckedIn false');
             const visitConcept = document.getElementById('visit-select').value;
-            console.log('visitConcept', visitConcept);
             for(const visit of visitType) {
-                console.log('visit', visit);
                 if(data[conceptIds.collection.selectedVisit] && data[conceptIds.collection.selectedVisit][visit.concept]) {
                     const visitTime = new Date(data[conceptIds.collection.selectedVisit][visit.concept][conceptIds.checkInDateTime]);
-                    console.log('visitTime', visitTime);
                     const now = new Date();
                     console.log('now - year, month, date', now.getYear(), now.getMonth(), now.getDate());
-                    console.log('visitTime - year, month, date', visitTime.getYear(), visitTime.getMonth(), visitTime.getDate());
-                    
+                    console.log('visitTime - year, month, date', visitTime.getYear(), visitTime.getMonth(), visitTime.getDate()); 
                     if(now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
-                    // if (1 === 1) { // TODO: replace this condition with the above condition. This is just to test the check-in warning.
                         const response = await getParticipantCollections(data.token);
                         let collection = response.data.filter(res => res[conceptIds.collection.selectedVisit] == visit.concept);
-                        console.log('collection', collection);
                         if (collection.length === 0) continue;
-
                         const confirmContinueCheckIn = await handleCheckInWarning(visit, data, collection);
-                        console.log('confirmContinueCheckIn', confirmContinueCheckIn);
                         if (!confirmContinueCheckIn) return;
                     }
                 }
             }
 
             await handleCheckInModal(data, visitConcept, query);
-
-            // TODO: remove unused code
-            // const confirmVal = await swal({
-            //     title: "Success",
-            //     icon: "success",
-            //     text: "Participant is checked in.",
-            //     buttons: {
-            //         cancel: {
-            //             text: "Close",
-            //             value: "cancel",
-            //             visible: true,
-            //             className: "btn btn-default",
-            //             closeModal: true,
-            //         },
-            //         confirm: {
-            //             text: "Continue to Specimen Link",
-            //             value: 'confirmed',
-            //             visible: true,
-            //             className: "",
-            //             closeModal: true,
-            //             className: "btn btn-success",
-            //         }
-            //     },
-            // });
-            // console.log('confirmVal', confirmVal);
-
-            // if (confirmVal === "confirmed") {
-            //     const updatedResponse = await findParticipant(query);
-            //     const updatedData = updatedResponse.data[0];
-
-            //     specimenTemplate(updatedData);
-            // }
         }
     });
 };
@@ -663,7 +617,6 @@ const handleCheckInModal = async (data, visitConcept, query) => {
     console.log('handleCheckInModal');
     await checkInParticipant(data, visitConcept);
 
-    // Define the message object
     const checkInMessage = {
         title: "Success",
         body: "Participant is checked in.",
@@ -671,8 +624,7 @@ const handleCheckInModal = async (data, visitConcept, query) => {
     };
     console.log('checkInMessage', checkInMessage);
 
-    // Define onCancel and onContinue callback functions, then call the showNotificationsCancelOrContinue modal
-    const checkInOnCancel = () => { /* Nothing to do here */ };
+    const checkInOnCancel = () => {  };
     const checkInOnContinue = async () => {
         try {
             const updatedResponse = await findParticipant(query);
@@ -727,7 +679,6 @@ export const addEventClinicalSpecimenLinkForm = (formData) => {
     form.addEventListener('click', async (e) => {
         e.preventDefault();
         clinicalBtnsClicked(formData);
-     //   yesTriggerModal()
     });
 };
 
@@ -742,33 +693,6 @@ export const addEventClinicalSpecimenLinkForm2 = (formData) => {
 };
 
 const existingCollectionAlert = async (collections, connectId, formData) => {
-    /* const confirmVal = await swal({
-         title: "Warning",
-         icon: "warning",
-         text: `The Following ${collections.length} Collection ID(s) already exist for this participant: 
-         ${collections.map(collection => collection['820476880']).join(', ')}`,
-         buttons: {
-             cancel: {
-                 text: "Close",
-                 value: "cancel",
-                 visible: true,
-                 className: "btn btn-default",
-                 closeModal: true,
-             },
-             confirm: {
-                 text: "Add New Collection",
-                 value: 'confirmed',
-                 visible: true,
-                 className: "",
-                 closeModal: true,
-                 className: "btn btn-success",
-             }
-         },
-     });
- 
-     if (confirmVal === "confirmed") {
-         btnsClicked(connectId, formData);
-     }*/
      const existingCollection = () => {
          const title = 'Warning';
          const body = `<div class="row"><div class="col">The Following ${collections.length} Collection ID(s) already exist for this participant: 
@@ -779,7 +703,7 @@ const existingCollectionAlert = async (collections, connectId, formData) => {
              btnsClicked(connectId, formData);   
          };
        
-         showNotification(title, body, closeButtonName, continueButtonName, continueAction);
+         showModalNotification(title, body, closeButtonName, continueButtonName, continueAction);
        };
        
        existingCollection();
@@ -836,38 +760,6 @@ const btnsClicked = async (connectId, formData) => {
     const firstNameCidString = conceptIds.firstName.toString();
     const firstName = document.getElementById(firstNameCidString).innerText || ""
 
-    /*if (!formData?.collectionId) {
-        confirmVal = await swal({
-            title: "Confirm Collection ID",
-            icon: "info",
-            text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${firstName}`,
-            buttons: {
-                cancel: {
-                    text: "Cancel",
-                    value: "cancel",
-                    visible: true,
-                    className: "btn btn-default",
-                    closeModal: true,
-                },
-                back: {
-                    text: "Confirm and Exit",
-                    value: "back",
-                    visible: true,
-                    className: "btn btn-info",
-                },
-                confirm: {
-                    text: "Confirm and Continue",
-                    value: 'confirmed',
-                    visible: true,
-                    className: "",
-                    closeModal: true,
-                    className: "btn btn-success",
-                }
-            },
-        });
-    }
-    
-    if (confirmVal === "cancel") return;*/
 
 const showConfirmationModal = async (collectionID, firstName) => {
     return new Promise((resolve) => {
@@ -1607,23 +1499,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
         finalizeTemplate(participantData, specimenData);
     }
     else {
-
-        /*  await swal({
-            title: "Success",
-            icon: "success",
-            text: "Collection specimen data has been saved",
-            buttons: {
-                close: {
-                    text: "Close",
-                    value: "close",
-                    visible: true,
-                    className: "btn btn-success",
-                    closeModal: true,
-                }
-            },
-        }); */
         showNotifications({ title: 'Success', body: 'Collection specimen data has been saved' });
-
         hideAnimation();
     }
 }
@@ -1792,41 +1668,11 @@ export const addEventNavBarShippingManifest = (userName) => {
         }
 
         if (selectedLocation === 'none') {
-            /* await swal({
-                title: "Reminder",
-                icon: "warning",
-                text: "Please Select 'Shipping Location'",
-                className: "swal-no-box",
-                buttons: {
-                  confirm: {
-                    text: "OK",
-                    value: true,
-                    visible: true,
-                    closeModal: true,
-                    className: "swal-no-box-button",
-                  },
-                },
-              });*/
               showNotifications({ title: 'Remainder', body: 'Please Select  \'Shipping Location\' ' });
               return
         }
 
         if(!boxesToShip.length) {
-          /* await swal({
-            title: "Reminder",
-            icon: "warning",
-            text: "Please select Box(es) to review and ship",
-            className: "swal-no-box",
-            buttons: {
-              confirm: {
-                text: "OK",
-                value: true,
-                visible: true,
-                closeModal: true,
-                className: "swal-no-box-button",
-              },
-            },
-          });*/
           showNotifications({ title: 'Reminder', body: 'Please select Box(es) to review and ship' }); 
           return
         }
@@ -2098,12 +1944,6 @@ export const addEventSaveButton = async (boxIdAndBagsObj) => {
         }
 
         if (isMismatch) {
-            /* await swal({
-                title: 'Error!',
-                icon: 'error',
-                text: 'Tracking Ids do not match in one of the boxes.',
-                timer: 1600,
-              });*/
               showTimedNotifications({ title: 'Reminder', body: 'Tracking Ids do not match in one of the boxes.' });  
             return;
         }
@@ -2115,12 +1955,6 @@ export const addEventSaveButton = async (boxIdAndBagsObj) => {
           }
           
         localforage.setItem("shipData", shippingData);
-        /*await swal({
-          title: 'Success!',
-          icon: 'success',
-          text: 'Tracking input saved',
-          timer: 1600,
-        });*/
         showTimedNotifications({ title: 'Reminder', body: 'Tracking input saved.' });
     })
 }

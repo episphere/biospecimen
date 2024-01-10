@@ -52,10 +52,8 @@ export const inactivityTime = () => {
         clearTimeout(time);
         time = setTimeout(() => {
             const resposeTimeout = setTimeout(() => {
-                // log out user if they don't respond to warning after 5 minutes.
                 signOut();
             }, 300000)
-            // Show warning after 20 minutes of no activity.
             const button = document.createElement('button');
             button.dataset.toggle = 'modal';
             button.dataset.target = '#biospecimenModal'
@@ -353,7 +351,7 @@ export const showNotificationsCancelOrContinue = (message, zIndex, onCancel, onC
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>`;
-    modalContent.innerHTML = `
+    body.innerHTML = `
             <div class="row">
                 <div class="col">
                     ${message.body}
@@ -3114,11 +3112,10 @@ export const showTimedNotifications = (data, zIndex, timeInMilliseconds = 1600) 
     }, timeInMilliseconds);
 };
 
-// TODO: @ramavavi rename this. Too similar to `showNotifications` function name - will be confusing fro future developers. 
-export const showNotification = (title, body, closeButtonName, continueButtonName, continueAction) => {
+export const showModalNotification = (title, body, closeButtonName, continueButtonName, continueAction) => {
     const modalContainer = document.createElement('div');
     modalContainer.classList.add('modal', 'fade');
-    modalContainer.id = 'customModal'; // Change the ID as needed
+    modalContainer.id = 'checkinCheckoutModal'; 
     modalContainer.tabIndex = '-1';
     modalContainer.role = 'dialog';
     modalContainer.setAttribute('aria-labelledby', 'customModalTitle');
