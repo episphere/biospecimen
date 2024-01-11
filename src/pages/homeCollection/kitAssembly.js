@@ -110,7 +110,7 @@ const enableEnterKeystroke = () => {
 
 const performQCcheck = (inputBox2, inputBox1, errorTag, errorMsg) => {
   const checkInputBox2 = document.getElementById(inputBox2);
-  if (errorMsg == "") {
+  if (errorMsg === "") {
     document.getElementById(errorTag).innerHTML = `` 
   }
   if (checkInputBox2) {
@@ -277,19 +277,19 @@ const storeAssembledKit = async (kitData) => {
     }
   }
   else if (collectionUnique.data === 'Check Collection ID'){
-    alertTemplate('Check collection ID format.')
+    alertTemplate('Check collection ID format.');
     return false
   }
   else if (collectionUnique.data === 'duplicate supplykit id'){
-    alertTemplate('The supply kit and return kit are already in use.')
+    alertTemplate('The supply kit and return kit are already in use.');
     return false
   }
   else if (collectionUnique.data === 'duplicate collection id'){
-    alertTemplate('The collection card and cup ID are already in use.')
+    alertTemplate('The collection card and cup ID are already in use.');
     return false
   }
   else {
-    alertTemplate('Error')
+    alertTemplate('Error');
     return false
   }
 }
