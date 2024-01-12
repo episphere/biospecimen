@@ -550,7 +550,6 @@ export const addGoToSpecimenLinkEvent = () => {
 export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
     const form = document.getElementById('checkInCompleteForm');
     form.addEventListener('submit', async e => {
-        console.log('addEventCheckInCompleteForm submit');
         e.preventDefault();
         const btnCheckIn = document.getElementById('checkInComplete');
         btnCheckIn.disabled = true;
@@ -559,23 +558,17 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
         
         const response = await findParticipant(query);
         const data = response.data[0];
-        console.log('isCheckedIn', isCheckedIn);
-        console.log('checkOutFlag', checkOutFlag);
         if(isCheckedIn) {
-            console.log('isCheckedIn true');
             checkOutParticipant(data);
             showTimedNotifications({ title: 'Success', body: 'Participant is checked out.' });
             console.log('checkOutFlag', checkOutFlag);
             checkOutFlag === true ? location.reload() : goToParticipantSearch();
         } else {
-            // TODO: remove log statements
             const visitConcept = document.getElementById('visit-select').value;
             for(const visit of visitType) {
                 if(data[conceptIds.collection.selectedVisit] && data[conceptIds.collection.selectedVisit][visit.concept]) {
                     const visitTime = new Date(data[conceptIds.collection.selectedVisit][visit.concept][conceptIds.checkInDateTime]);
-                    const now = new Date();
-                    console.log('now - year, month, date', now.getYear(), now.getMonth(), now.getDate());
-                    console.log('visitTime - year, month, date', visitTime.getYear(), visitTime.getMonth(), visitTime.getDate()); 
+                    const now = new Date(); 
                     if(now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
                         const response = await getParticipantCollections(data.token);
                         let collection = response.data.filter(res => res[conceptIds.collection.selectedVisit] == visit.concept);
@@ -592,7 +585,6 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
 };
 
 const handleCheckInWarning = async (visit, data, collection) => {
-    console.log('handleCheckInWarning');
     const message = {
         title: "Warning - Participant Previously Checked In",
         body: "Participant " + data[conceptIds.firstName] + " " + data[conceptIds.lastName] + " was previously checked in on " + 
@@ -614,7 +606,6 @@ const handleCheckInWarning = async (visit, data, collection) => {
 }
 
 const handleCheckInModal = async (data, visitConcept, query) => {
-    console.log('handleCheckInModal');
     await checkInParticipant(data, visitConcept);
 
     const checkInMessage = {
@@ -622,7 +613,6 @@ const handleCheckInModal = async (data, visitConcept, query) => {
         body: "Participant is checked in.",
         continueButtonText: "Continue to Specimen Link",
     };
-    console.log('checkInMessage', checkInMessage);
 
     const checkInOnCancel = () => {  };
     const checkInOnContinue = async () => {
@@ -632,7 +622,6 @@ const handleCheckInModal = async (data, visitConcept, query) => {
     
             specimenTemplate(updatedData);
         } catch (error) {
-            console.error('Error in onContinue:', error);
             showNotifications({ title: 'Error', body: 'There was an error checking in the participant. Please try again.' });
         }
     };
