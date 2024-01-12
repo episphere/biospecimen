@@ -548,7 +548,6 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
         if(isCheckedIn) {
             checkOutParticipant(data);
             showTimedNotifications({ title: 'Success', body: 'Participant is checked out.' });
-            console.log('checkOutFlag', checkOutFlag);
             checkOutFlag === true ? location.reload() : goToParticipantSearch();
         } else {
             const visitConcept = document.getElementById('visit-select').value;
