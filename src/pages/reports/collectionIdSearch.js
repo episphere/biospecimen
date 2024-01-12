@@ -1,7 +1,7 @@
 import { reportsNavbar } from "./reportsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { activeReportsNavbar } from "./activeReportsNavbar.js";
-import { showAnimation, hideAnimation, showNotifications,findParticipant, errorMessage, removeAllErrors, searchSpecimen, appState } from '../../shared.js';
+import { showAnimation, hideAnimation, showNotifications, findParticipant, errorMessage, removeAllErrors, searchSpecimen, appState } from '../../shared.js';
 import { masterSpecimenIDRequirement } from '../../tubeValidation.js';
 import { finalizeTemplate } from '../finalize.js';
 import { conceptIds as fieldToConceptIdMapping } from "../../fieldToConceptIdMapping.js";
@@ -44,6 +44,7 @@ export const collectionIdSearchScreenTemplate = async (username) => {
     searchSpecimenEvent();
 };
 
+// TODO: this is basically a duplicate of events.js -> addEventSearchSpecimen(). Refactor with 'reports' update.
 const searchSpecimenEvent = () => {
     const form = document.getElementById('specimenLookupForm');
     if (!form) return;
