@@ -738,7 +738,6 @@ const btnsClicked = async (connectId, formData) => {
 
 const showConfirmationModal = async (collectionID, firstName) => {
     return new Promise((resolve) => {
-      
         const modalContainer = document.createElement('div');
         modalContainer.classList.add('modal', 'fade');
         modalContainer.id = 'confirmationModal';
@@ -778,7 +777,8 @@ const showConfirmationModal = async (collectionID, firstName) => {
         modalContainer.style.display = 'block';
         modalContainer.addEventListener('click', (event) => {
             const result = event.target.getAttribute('data-result');
-            if (result) {
+            if (result) 
+            {
                 document.body.removeChild(modalContainer);
                 resolve(result);
             }
@@ -1694,7 +1694,7 @@ export const addEventNavBarShippingManifest = (userName) => {
         }
 
         if (selectedLocation === 'none') {
-              showNotifications({ title: 'Remainder', body: 'Please Select  \'Shipping Location\' ' });
+              showNotifications({ title: 'Reminder', body: 'Please Select  \'Shipping Location\' ' });
               return
         }
 

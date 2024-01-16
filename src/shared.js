@@ -52,8 +52,10 @@ export const inactivityTime = () => {
         clearTimeout(time);
         time = setTimeout(() => {
             const resposeTimeout = setTimeout(() => {
+                // log out user if they don't respond to warning after 5 minutes.
                 signOut();
             }, 300000)
+            // Show warning after 20 minutes of no activity.
             const button = document.createElement('button');
             button.dataset.toggle = 'modal';
             button.dataset.target = '#biospecimenModal'
@@ -1767,6 +1769,7 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
     }
 
     let settingData = {
+        [conceptIds.collectionDetails]: settings,
         uid: participantData?.state?.uid
     };
 
