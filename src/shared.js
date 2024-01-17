@@ -337,7 +337,6 @@ export const showNotifications = (data, zIndex) => {
  * @param {function} onContinue - callback function to execute on continue. Example: process a retry POST request.
  */
 export const showNotificationsCancelOrContinue = (message, zIndex, onCancel, onContinue) => {
-    console.log('showNotificationsCancelOrContinue');
     const button = document.createElement('button');
     button.dataset.target = '#biospecimenModal';
     button.dataset.toggle = 'modal';
