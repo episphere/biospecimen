@@ -110,6 +110,9 @@ const enableEnterKeystroke = () => {
 
 const performQCcheck = (inputBox2, inputBox1, errorTag, errorMsg) => {
   const checkInputBox2 = document.getElementById(inputBox2);
+  if (errorMsg === "") {
+    document.getElementById(errorTag).innerHTML = `` 
+  }
   if (checkInputBox2) {
     checkInputBox2.addEventListener("input", (e) => {
       const checkInputBox2Value = e.target.value.trim();
@@ -269,30 +272,32 @@ const storeAssembledKit = async (kitData) => {
       return true
     }
     else {
-      triggerErrorModal(`Failed to save the kit.`);
+      alertTemplate(`Failed to save the kit.`);
       return false
     }
   }
   else if (collectionUnique.data === 'Check Collection ID'){
-    triggerErrorModal('Check collection ID format.')
+    alertTemplate('Check collection ID format.');
     return false
   }
   else if (collectionUnique.data === 'duplicate supplykit id'){
-    triggerErrorModal('The supply kit and return kit are already in use.')
+    alertTemplate('The supply kit and return kit are already in use.');
     return false
   }
   else if (collectionUnique.data === 'duplicate collection id'){
-    triggerErrorModal('The collection card and cup ID are already in use.')
+    alertTemplate('The collection card and cup ID are already in use.');
     return false
   }
   else {
-    triggerErrorModal('Error')
+    alertTemplate('Error');
     return false
   }
 }
 
-const alertTemplate = (message, status = "warn", duration = 1000) => {
+const alertTemplate = (message, status = "warn", duration = 3000) => {
   if (status === "success") {
+    performQCcheck('returnKitId', 'supplyKitId', 'showReturnKitErrorMsg', ``);
+    performQCcheck('cardId', 'cupId', 'showCardIdErrorMsg', ``);
     alert = `
     <div id="alert-success" class="alert alert-success alert-dismissible fade show" role="alert">
       <strong>${message}</strong>

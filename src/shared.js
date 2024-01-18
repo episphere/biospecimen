@@ -1131,6 +1131,33 @@ const buildAvailableCollectionsObject = (specimensList, isPartiallyBoxed) => {
 }
 
 /**
+ * Build the available collections object. Remove unusable tubes.
+ * Filter tubes (available collections vs strays) for use in the shipping dashboard.
+ * @param {array<object>} specimensList - list of specimens from Firestore.
+ * @returns {object} { availableCollections, specimensList } - available collections object and the updated specimens list.
+ * Note: Mouthwash tubes are always solo. They belong in available collections. The tube number is always '0007', the bag number is always '0009'.
+ */
+export const findReplacementTubeLabels = (specimensList) => {
+    if (!specimensList || specimensList.length === 0) return { availableCollections: {}, specimensList: [] };
+    const replacementTubeLabels = {};
+    const replacementLabelRegExp = new RegExp('005[0-4]$');
+    for (let specimen of specimensList) {
+        const collectionId = specimen[conceptIds.collection.id];
+        if (!collectionId) continue;
+
+        const tubeDataObject = removeUnusableTubes(specimen);
+        Object.keys(tubeDataObject).forEach(tubeCid => {
+            let scannedTubeLabel = tubeDataObject[tubeCid];
+            if (replacementLabelRegExp.test(scannedTubeLabel)) {
+                replacementTubeLabels[scannedTubeLabel] = collectionId + ' ' + specimenCollection.cidToNum[tubeCid];
+            }
+        })
+        
+    }
+    return replacementTubeLabels;
+}
+
+/**
  * Handle the fetched specimen docs. Remove the unusable (deviated or missing) tubes, then arrange remaining tubes for available collections and the stray tube list.
  * This function mutates the specimen object from the calling function AND returns the usableTubes object.
  * @param {object} specimen - specimen object.
@@ -3046,6 +3073,7 @@ export const addBoxAndUpdateSiteDetails = async (boxAndSiteData) => {
 
 export const triggerErrorModal = (message) => {
     const alertList = document.getElementById("alert_placeholder");
+    if (alertList && message) {
     alertList.innerHTML = `
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             ${message}
@@ -3053,6 +3081,7 @@ export const triggerErrorModal = (message) => {
                     <span aria-hidden="true">&times;</span>
                 </button>
         </div>`;
+    }
 }
 
 export const triggerSuccessModal = (message) => {
