@@ -552,7 +552,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
         } else {
             const visitConcept = document.getElementById('visit-select').value;
             for(const visit of visitType) {
-                if(data[conceptIds.collection.selectedVisit] && data[conceptIds.collection.selectedVisit][visit.concept]) {
+                if (data[conceptIds.collection.selectedVisit] && data[conceptIds.collection.selectedVisit][visit.concept]) {
                     const visitTime = new Date(data[conceptIds.collection.selectedVisit][visit.concept][conceptIds.checkInDateTime]);
                     const now = new Date(); 
                     if(now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {

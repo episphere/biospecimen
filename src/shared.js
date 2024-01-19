@@ -3326,13 +3326,21 @@ export const showModalNotification = (title, body, closeButtonName, continueButt
     modalContainer.style.display = 'block';
 
     const closeBtn = document.getElementById('closeBtn');
-    closeBtn.addEventListener('click', async () => {
-        document.body.removeChild(modalContainer);
-    });
+    if (closeBtn && modalContainer){ 
+        closeBtn.addEventListener('click', async () => { 
+            document.body.removeChild(modalContainer); }); 
+        }
+        else {
+            console.error('Close button or modal container is null.'); 
+        }    
         
     const continueBtn = document.getElementById('continueBtn');
-    continueBtn.addEventListener('click', async () => {
-    continueAction();
-    document.body.removeChild(modalContainer);
-    });
+    if (continueBtn && modalContainer){ 
+        continueBtn.addEventListener('click', async () => { 
+            continueAction();
+            document.body.removeChild(modalContainer); }); 
+        }
+        else {
+            console.error('Close button or modal container is null.'); 
+        }  
 };
