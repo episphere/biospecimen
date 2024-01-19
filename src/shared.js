@@ -346,6 +346,8 @@ export const showNotificationsCancelOrContinue = (message, zIndex, onCancel, onC
     if (zIndex) document.getElementById('biospecimenModal').style.zIndex = zIndex;
     const header = document.getElementById('biospecimenModalHeader');
     const body = document.getElementById('biospecimenModalBody');
+    const continueButtonText = message.continueButtonText || 'Continue';
+    const cancelButtonText = message.cancelButtonText || 'Cancel';
     header.innerHTML = `<h5 class="modal-title">${message.title}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -1819,28 +1821,28 @@ export const updateBaselineData = async (siteTubesList, data) => {
 
     baselineCollections.forEach(collection => {
 
-        if(!bloodCollected) {
+        if (!bloodCollected) {
             bloodTubes.forEach(tube => {
                 if (collection[tube.concept]?.['593843561'] === 353358909) {
                     bloodCollected = true;
                 }
             });
-        }
-
-        if(!urineCollected) {
+        } 
+        if (!urineCollected) {
             urineTubes.forEach(tube => {
                 if (collection[tube.concept]?.['593843561'] === 353358909) {
                     urineCollected = true;
                 }
             });
         }
-        if(!mouthwashCollected) {
+        if (!mouthwashCollected) {
             mouthwashTubes.forEach(tube => {
                 if (collection[tube.concept]?.['593843561'] === 353358909) {
                     mouthwashCollected = true;
                 }
             });
         }
+        
     });
 
     if (baselineCollections.length > 0 && baselineCollections[0][conceptIds.collection.collectionSetting] === conceptIds.research) {
@@ -3185,8 +3187,7 @@ export const getCurrentDate = () => {
 }
 
 export const validIso8601Format = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/;
-
-/**
+ /**
  * Traverse two objects and compare values. Useful for checking if changes have been made to a data structure or the values within it.
  * @param {object} originalData - The original object to compare against (deep copy prior to edits).
  * @param {object} currentData - The current object to compare against after edits (on form submission or similar).
@@ -3287,3 +3288,59 @@ export const validateSpecimenAndParticipantResponse = (specimenData, participant
 
     return true;
 }
+
+export const showModalNotification = (title, body, closeButtonName, continueButtonName, continueAction) => {
+    const modalContainer = document.createElement('div');
+    modalContainer.classList.add('modal', 'fade');
+    modalContainer.id = 'checkinCheckoutModal'; 
+    modalContainer.tabIndex = '-1';
+    modalContainer.role = 'dialog';
+    modalContainer.setAttribute('aria-labelledby', 'customModalTitle');
+    modalContainer.setAttribute('aria-hidden', 'true');
+  
+    const modalContent = document.createElement('div');
+    modalContent.classList.add('modal-dialog', 'modal-dialog-centered');
+    modalContent.setAttribute('role', 'document');
+  
+    modalContent.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">${title}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          ${body}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-dismiss="modal" id="closeBtn">${closeButtonName}</button>
+          <button type="button" class="btn btn-success" data-value="confirmed" data-dismiss="modal" id="continueBtn">${continueButtonName}</button>
+        </div>
+      </div>
+    `;
+  
+    document.body.appendChild(modalContainer);
+    modalContainer.appendChild(modalContent);
+    modalContainer.classList.add('show');
+    modalContainer.style.display = 'block';
+
+    const closeBtn = document.getElementById('closeBtn');
+    if (closeBtn && modalContainer){ 
+        closeBtn.addEventListener('click', async () => { 
+            document.body.removeChild(modalContainer); }); 
+        }
+        else {
+            console.error('Close button or modal container is null.'); 
+        }    
+        
+    const continueBtn = document.getElementById('continueBtn');
+    if (continueBtn && modalContainer){ 
+        continueBtn.addEventListener('click', async () => { 
+            continueAction();
+            document.body.removeChild(modalContainer); }); 
+        }
+        else {
+            console.error('Close button or modal container is null.'); 
+        }  
+};
