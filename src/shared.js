@@ -3073,7 +3073,7 @@ export const addBoxAndUpdateSiteDetails = async (boxAndSiteData) => {
 
 export const triggerErrorModal = (message) => {
     const alertList = document.getElementById("alert_placeholder");
-    if (alertList && message) {
+    if (alertList) {
     alertList.innerHTML = `
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             ${message}
