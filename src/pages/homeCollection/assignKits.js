@@ -156,8 +156,9 @@ const confirmAssignment = () => {
           triggerErrorModal('Error while assigning a kit.')
           return;
         }
-      }
-      finally {
+      } catch (error) {
+        triggerErrorModal('An error occurred:', error);
+      } finally {
         confirmAssignmentInAction = false;
       }
     })
