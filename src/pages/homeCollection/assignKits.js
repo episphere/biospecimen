@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, triggerErrorModal, triggerSuccessModal, baseAPI, processResponse, checkTrackingNumberSource } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, triggerErrorModal, triggerSuccessModal, baseAPI, processResponse, checkTrackingNumberSource, appState } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -75,11 +75,14 @@ const assignKitsTemplate = async (name) => {
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
   activeHomeCollectionNavbar();
-  populateSidePaneRows(response.data);
+  appState.setState({ participants: response.data });
+  populateSidePaneRows();
   checkTrackingNumberSource();
+  confirmAssignment();
 }
 
-const populateSidePaneRows = (participants) => {
+const populateSidePaneRows = () => {
+  let participants = appState.getState().participants;
   if (participants === false) { triggerErrorModal('No participants are currently available for kit assignment.') }
   else {
     document.getElementById('sidePane').innerHTML = ``
@@ -101,7 +104,6 @@ const populateSidePaneRows = (participants) => {
         </ul>`
     })
     selectParticipants();
-    confirmAssignment(participants);
   }
 }
 
@@ -118,32 +120,45 @@ const selectParticipants = () => {
     });
 }}
 
-const confirmAssignment = (participants) => {
+const confirmAssignment = () => {
   const confirmAssignmentBtn = document.getElementById('confirmAssignment');
   if (confirmAssignmentBtn) {
-    confirmAssignmentBtn.addEventListener('click', async () => { 
-      let participantObj = {};
-      participantObj['fullName'] = document.getElementById('fullName').value;
-      participantObj['address'] = document.getElementById('address').value;
-      participantObj[conceptIds.supplyKitTrackingNum] = document.getElementById('scannedBarcode').value.trim();
-      participantObj[conceptIds.supplyKitId] = document.getElementById('scanSupplyKit').value.trim();
-      participantObj['Connect_ID'] = document.getElementById('Connect_ID')?.value;
-      const assignmentStatus = await processConfirmedAssignment(participantObj);
-      if (assignmentStatus) {
-        document.getElementById('fullName').value = ``;
-        document.getElementById('address').value = ``;
-        document.getElementById('Connect_ID').value = ``;
-        document.getElementById('scannedBarcode').value = ``;
-        document.getElementById('scanSupplyKit').value = ``;
-        document.getElementById("showMsg").innerHTML = ``;
-       
-        const filteredParticipants  = participants.filter((participant) => {
-          return participant['connect_id'] !== parseInt(participantObj['Connect_ID']);
-        });
-        populateSidePaneRows(filteredParticipants)
-      } 
-      else {
-        triggerErrorModal('Error while assigning a kit.')
+    let confirmAssignmentInAction = false;
+    confirmAssignmentBtn.addEventListener('click', async (e) => {
+      if (confirmAssignmentInAction) { return; } // Ignore the click if confirmAssignment btn in action
+      confirmAssignmentInAction = true;
+      try {
+        e.preventDefault();
+        let participantObj = {};
+        participantObj['fullName'] = document.getElementById('fullName').value;
+        participantObj['address'] = document.getElementById('address').value;
+        participantObj[conceptIds.supplyKitTrackingNum] = document.getElementById('scannedBarcode').value.trim();
+        participantObj[conceptIds.supplyKitId] = document.getElementById('scanSupplyKit').value.trim();
+        participantObj['Connect_ID'] = document.getElementById('Connect_ID')?.value;
+        const assignmentStatus = await processConfirmedAssignment(participantObj);
+
+        if (assignmentStatus) {
+          document.getElementById('fullName').value = ``;
+          document.getElementById('address').value = ``;
+          document.getElementById('Connect_ID').value = ``;
+          document.getElementById('scannedBarcode').value = ``;
+          document.getElementById('scanSupplyKit').value = ``;
+          document.getElementById("showMsg").innerHTML = ``;
+
+          const filteredParticipants = appState.getState().participants.filter((participant) => {
+            return participant['connect_id'] !== parseInt(participantObj['Connect_ID']);
+          });
+          appState.setState({ participants: filteredParticipants });
+          populateSidePaneRows()
+          return;
+        } 
+        else {
+          triggerErrorModal('Error while assigning a kit.')
+          return;
+        }
+      }
+      finally {
+        confirmAssignmentInAction = false;
       }
     })
   }
