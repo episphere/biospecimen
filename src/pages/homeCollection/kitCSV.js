@@ -1,6 +1,6 @@
 import { nonUserNavBar } from "../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { showAnimation, hideAnimation, getIdToken, baseAPI, keyToNameObj, keyToNameAbbreviationObj, triggerErrorModal, convertISODateTime } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, baseAPI, keyToNameCSVObj, keyToNameAbbreviationObj, triggerErrorModal, convertISODateTime } from "../../shared.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
 import { receiptedCSVFileTemplate, downloadCSVfile } from '../receipts/csvFileReceipt.js';
@@ -71,7 +71,7 @@ const getKitsByReceivedDate = async (dateString) => {
 const modifyKitQueryResults = (kitsData) => {
   const csvKitArray = [];
   kitsData.forEach(kitData => {
-    const sampleCollectionCenter = keyToNameObj[kitData[conceptIds.healthcareProvider]];
+    const sampleCollectionCenter = keyToNameCSVObj[kitData[conceptIds.healthcareProvider]];
     const collectionId = kitData[conceptIds.collection.id]; // CNA899209
     const bsiID = kitData[conceptIds.collection.mouthwashTube1][conceptIds.collection.tube.scannedId]; // CNA899209 0007
     const tubeID = bsiID.split(' ')[1]; // 0007

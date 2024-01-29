@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameObj, convertISODateTime, formatISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, triggerSuccessModal } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameCSVObj, convertISODateTime, formatISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, triggerSuccessModal, getSpecimensInBoxes, findReplacementTubeLabels } from "../../shared.js";
 import { conceptIds as fieldToConceptIdMapping } from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar } from "../../navbar.js";
@@ -108,11 +108,21 @@ const confirmFileSelection = () => {
       const radioVal = radio.value;
       document.getElementById('modalShowMoreData').querySelector('#closeModal').click(); // closes modal
       showAnimation();
-      const response = await getAllBoxes(`bptlPackagesInTransit`);
-      hideAnimation();
-      const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
-      let modifiedTransitResults = updateInTransitMapping(allBoxesShippedBySiteAndNotReceived);
-      (radioVal === 'xlsx') ? processInTransitXLSXData(modifiedTransitResults) : generateInTransitCSVData(modifiedTransitResults)
+      try {
+        const response = await getAllBoxes(`bptlPackagesInTransit`);
+        const specimens = await getSpecimensInBoxes(response.data);
+        const replacementTubeLabelObj = findReplacementTubeLabels(specimens);
+        hideAnimation();
+        const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
+        let modifiedTransitResults = updateInTransitMapping(allBoxesShippedBySiteAndNotReceived, replacementTubeLabelObj);
+        (radioVal === 'xlsx') ? processInTransitXLSXData(modifiedTransitResults) : generateInTransitCSVData(modifiedTransitResults);
+      } catch (error) {
+        hideAnimation();
+        console.error(error);
+        triggerErrorModal('Error generating file.  Please try again later');
+      }
+      
+      
     });
 });
 }
@@ -189,7 +199,7 @@ const modifyBSIQueryResults = (results) => {
  * @param {object} shippedBoxes - Shipped box object contains all the related specimen bags & more
  * @returns {array} Returns an array of objects with essential information for in transit csv
 */ 
-const updateInTransitMapping = (shippedBoxes) => {
+const updateInTransitMapping = (shippedBoxes, replacementTubeLabelObj) => {
   let holdProcessedResult = []
   shippedBoxes.forEach(shippedBox => {
     const bagKeys = Object.keys(shippedBox.bags); // store specimenBagId in an array
@@ -197,6 +207,9 @@ const updateInTransitMapping = (shippedBoxes) => {
     
     specimenBags.forEach((specimenBag, index) => {
       specimenBag.arrElements.forEach((fullSpecimenIds, j, specimenBagSize) => { // grab fullSpecimenIds & loop thru content
+        if (Object.prototype.hasOwnProperty.call(replacementTubeLabelObj, fullSpecimenIds)) {
+          fullSpecimenIds = replacementTubeLabelObj[fullSpecimenIds];
+        }
         let dataHolder = {
           shipDate: shippedBox[fieldToConceptIdMapping.shippingShipDate]?.split("T")[0] || '',
           trackingNumber: shippedBox[fieldToConceptIdMapping.shippingTrackingNumber] || '',
@@ -351,7 +364,7 @@ const updateResultMappings = (filteredResult, vialMappings, collectionId, tubeId
     const withdrawalDateTime = filteredResult[fieldToConceptIdMapping.dateWithdrawn];
     
     const sampleCollectionCenter = (collectionTypeValue === fieldToConceptIdMapping.clinical)
-        ? (keyToNameObj[filteredResult[fieldToConceptIdMapping.healthcareProvider]] || '')
+        ? (keyToNameCSVObj[filteredResult[fieldToConceptIdMapping.healthcareProvider]] || '')
         : (keyToLocationObj[filteredResult[fieldToConceptIdMapping.collectionLocation]] || '');
 
     const dateReceived = filteredResult[fieldToConceptIdMapping.dateReceived]

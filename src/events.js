@@ -1,11 +1,13 @@
-import { appState, performSearch, showAnimation, addBiospecimenUsers, getSpecimensByCollectionIds, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant,
-        errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, updateBox,
-        ship, disableInput, updateNewTempDate, getSiteTubesLists, getWorkflow, fixMissingTubeData,
-        getSiteCouriers, getPage, getNumPages, removeSingleError, displayManifestContactInfo, checkShipForage, checkAlertState, retrieveDateFromIsoString,
-        convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
-        checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData, getUpdatedParticipantData,
-        siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
-        getCollectionsByVisit, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList } from './shared.js';
+import {
+    appState, performSearch, showAnimation, addBiospecimenUsers, getSpecimensByCollectionIds, hasObjectChanged, getAddedStrayTubes, hideAnimation, showNotifications, biospecimenUsers, removeBiospecimenUsers, findParticipant,
+    errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, updateBox,
+    ship, disableInput, updateNewTempDate, getSiteTubesLists, getWorkflow, fixMissingTubeData,
+    getSiteCouriers, getPage, getNumPages, removeSingleError, displayManifestContactInfo, checkShipForage, checkAlertState, retrieveDateFromIsoString,
+    convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
+    checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData,
+    siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
+    getCollectionsByVisit, getSpecimenAndParticipant, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showModalNotification, showTimedNotifications, showNotificationsCancelOrContinue, validateSpecimenAndParticipantResponse,
+} from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
 import { addNewBox, buildSpecimenDataInModal, createShippingModalBody, startShipping, generateBoxManifest, populateViewShippingBoxContentsList,
@@ -123,50 +125,35 @@ export const addEventClearAll = () => {
     });
 };
 
-export const addEventsearchSpecimen = () => {
+
+export const addEventSearchSpecimen = () => {
     const form = document.getElementById('specimenLookupForm');
     if (!form) return;
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        removeAllErrors();
-        let masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase();
-
-        if(masterSpecimenId.length > masterSpecimenIDRequirement.length) masterSpecimenId = masterSpecimenId.substring(0, masterSpecimenIDRequirement.length);
-
-        if (!masterSpecimenIDRequirement.regExp.test(masterSpecimenId) || masterSpecimenId.length !== masterSpecimenIDRequirement.length) {
-            errorMessage('masterSpecimenId', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, true);
-            return;
-        }
-        showAnimation();
-        const biospecimen = await searchSpecimen(masterSpecimenId);
-        if (biospecimen.code !== 200 || Object.keys(biospecimen.data).length === 0) {
-            hideAnimation();
-            showNotifications({ title: 'Not found', body: 'Specimen not found!' })
-            return
-        }
-        const biospecimenData = biospecimen.data;
-
-        if(getWorkflow() === 'research') {
-            if(biospecimenData[conceptIds.collection.collectionSetting] !== conceptIds.research) {
-                hideAnimation();
-                showNotifications({ title: 'Incorrect Dashboard', body: 'Clinical Collections cannot be viewed on Research Dashboard' });
+        try {
+            removeAllErrors();
+            const collectionIdSearchEle = document.getElementById('masterSpecimenId');
+            if (!collectionIdSearchEle) {
+                errorMessage('masterSpecimenId', 'Please enter a collection ID.', true);
                 return;
             }
-        } else {
-            if(biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research) {
-                hideAnimation();
-                showNotifications({ title: 'Incorrect Dashboard', body: 'Research Collections cannot be viewed on Clinical Dashboard' });
+
+            const collectionId = collectionIdSearchEle.value.toUpperCase().trim();
+            if (!masterSpecimenIDRequirement.regExp.test(collectionId) || collectionId.length !== masterSpecimenIDRequirement.length) {
+                errorMessage('masterSpecimenId', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, true);
                 return;
             }
-        }
 
-        let query = `connectId=${parseInt(biospecimenData.Connect_ID)}`;
-        const response = await findParticipant(query);
-        
-        hideAnimation();
-        const participantData = response.data[0];
-        tubeCollectedTemplate(participantData, biospecimenData);
-    })
+            const { specimenData, participantData } = await getSpecimenAndParticipant(collectionId);
+            if (validateSpecimenAndParticipantResponse(specimenData, participantData)) {
+                tubeCollectedTemplate(participantData, specimenData);
+            }
+        } catch (error) {
+            console.error("Error searching for specimen: ", error.message);
+            showNotifications({ title: 'Error in Collection ID Search', body: `Error retrieving specimen. ${error.message}` });
+        }
+    });
 }
 
 // Add specimen to box using the allBoxesList from state.
@@ -558,94 +545,75 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
         
         const response = await findParticipant(query);
         const data = response.data[0];
-
         if(isCheckedIn) {
-            
             checkOutParticipant(data);
-
-            await swal({
-                title: "Success",
-                icon: "success",
-                text: `Participant is checked out.`,
-            });
+            showTimedNotifications({ title: 'Success', body: 'Participant is checked out.' });
             checkOutFlag === true ? location.reload() : goToParticipantSearch();
-        }
-        else {
-
+        } else {
             const visitConcept = document.getElementById('visit-select').value;
-            
             for(const visit of visitType) {
-                if(data['331584571'] && data['331584571'][visit.concept]) {
-                    const visitTime = new Date(data['331584571'][visit.concept]['840048338']);
-                    const now = new Date();
-                    
+                if (data[conceptIds.collection.selectedVisit] && data[conceptIds.collection.selectedVisit][visit.concept]) {
+                    const visitTime = new Date(data[conceptIds.collection.selectedVisit][visit.concept][conceptIds.checkInDateTime]);
+                    const now = new Date(); 
                     if(now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
-
                         const response = await getParticipantCollections(data.token);
-                        let collection = response.data.filter(res => res['331584571'] == visit.concept);
+                        let collection = response.data.filter(res => res[conceptIds.collection.selectedVisit] == visit.concept);
                         if (collection.length === 0) continue;
-
-                        const confirmRepeat = await swal({
-                            title: "Warning - Participant Previously Checked In",
-                            icon: "warning",
-                            text: "Participant " + data['399159511'] + " " + data['996038075'] + " was previously checked in on " + new Date(data['331584571'][visit.concept]['840048338']).toLocaleString() + " with Collection ID " + collection[0]['820476880'] + ".\r\nIf this is today, DO NOT check the participant in again.\r\nNote Collection ID above and see Check-In SOP for further instructions.\r\n\r\nIf this is is not today, you may check the participant in for an additional visit.",
-                            buttons: {
-                                cancel: {
-                                    text: "Cancel",
-                                    value: "cancel",
-                                    visible: true,
-                                    className: "btn btn-danger",
-                                    closeModal: true,
-                                },
-                                confirm: {
-                                    text: "Continue with Check-In",
-                                    value: 'confirmed',
-                                    visible: true,
-                                    closeModal: true,
-                                    className: "btn btn-success",
-                                }
-                            }
-                        });
-
-                        if (confirmRepeat === "cancel") return;
+                        const confirmContinueCheckIn = await handleCheckInWarning(visit, data, collection);
+                        if (!confirmContinueCheckIn) return;
                     }
                 }
             }
 
-            await checkInParticipant(data, visitConcept);
-
-            const confirmVal = await swal({
-                title: "Success",
-                icon: "success",
-                text: "Participant is checked in.",
-                buttons: {
-                    cancel: {
-                        text: "Close",
-                        value: "cancel",
-                        visible: true,
-                        className: "btn btn-default",
-                        closeModal: true,
-                    },
-                    confirm: {
-                        text: "Continue to Specimen Link",
-                        value: 'confirmed',
-                        visible: true,
-                        className: "",
-                        closeModal: true,
-                        className: "btn btn-success",
-                    }
-                },
-            });
-
-            if (confirmVal === "confirmed") {
-                const updatedResponse = await findParticipant(query);
-                const updatedData = updatedResponse.data[0];
-
-                specimenTemplate(updatedData);
-            }
+            await handleCheckInModal(data, visitConcept, query);
         }
     });
 };
+
+const handleCheckInWarning = async (visit, data, collection) => {
+    const message = {
+        title: "Warning - Participant Previously Checked In",
+        body: "Participant " + data[conceptIds.firstName] + " " + data[conceptIds.lastName] + " was previously checked in on " + 
+            new Date(data[conceptIds.collection.selectedVisit][visit.concept][conceptIds.checkInDateTime]).toLocaleString() +
+            " with Collection ID " + collection[0][conceptIds.collection.id] +
+            ".\r\nIf this is today, DO NOT check the participant in again.\r\nNote Collection ID above and see Check-In SOP for further instructions.\r\n\r\n" +
+            "If this is not today, you may check the participant in for an additional visit.",
+        continueButtonText: "Continue with Check-In",
+    };
+
+    const onCancel = () => { return false };
+    const onContinue = async () => { return true };
+
+    const userConfirmed = await new Promise((resolve) => {
+        showNotificationsCancelOrContinue(message, null, () => resolve(onCancel()), () => resolve(onContinue()));
+    });
+
+    return userConfirmed;
+}
+
+const handleCheckInModal = async (data, visitConcept, query) => {
+    await checkInParticipant(data, visitConcept);
+
+    const checkInMessage = {
+        title: "Success",
+        body: "Participant is checked in.",
+        continueButtonText: "Continue to Specimen Link",
+    };
+
+    const checkInOnCancel = () => {  };
+    const checkInOnContinue = async () => {
+        try {
+            const updatedResponse = await findParticipant(query);
+            const updatedData = updatedResponse.data[0];
+    
+            specimenTemplate(updatedData);
+        } catch (error) {
+            showNotifications({ title: 'Error', body: 'There was an error checking in the participant. Please try again.' });
+        }
+    };
+
+    showNotificationsCancelOrContinue(checkInMessage, 10000, checkInOnCancel, checkInOnContinue);
+}
 
 export const addEventVisitSelection = () => {
 
@@ -686,7 +654,6 @@ export const addEventClinicalSpecimenLinkForm = (formData) => {
     form.addEventListener('click', async (e) => {
         e.preventDefault();
         clinicalBtnsClicked(formData);
-     //   yesTriggerModal()
     });
 };
 
@@ -701,34 +668,22 @@ export const addEventClinicalSpecimenLinkForm2 = (formData) => {
 };
 
 const existingCollectionAlert = async (collections, connectId, formData) => {
-    const confirmVal = await swal({
-        title: "Warning",
-        icon: "warning",
-        text: `The Following ${collections.length} Collection ID(s) already exist for this participant: 
-        ${collections.map(collection => collection['820476880']).join(', ')}`,
-        buttons: {
-            cancel: {
-                text: "Close",
-                value: "cancel",
-                visible: true,
-                className: "btn btn-default",
-                closeModal: true,
-            },
-            confirm: {
-                text: "Add New Collection",
-                value: 'confirmed',
-                visible: true,
-                className: "",
-                closeModal: true,
-                className: "btn btn-success",
-            }
-        },
-    });
-
-    if (confirmVal === "confirmed") {
-        btnsClicked(connectId, formData);
-    }
-}
+     const existingCollection = () => {
+         const title = 'Warning';
+         const body = `<div class="row"><div class="col">The Following ${collections.length} Collection ID(s) already exist for this participant: 
+         ${collections.map(collection => collection['820476880']).join(', ')}</div></div>`;
+         const closeButtonName = 'Close';
+         const continueButtonName = 'Add New Collection';
+         const continueAction = async () => {
+             btnsClicked(connectId, formData);   
+         };
+       
+         showModalNotification(title, body, closeButtonName, continueButtonName, continueAction);
+       };
+       
+       existingCollection();
+ 
+ }
 
 // todo: this function handles tangled situations. Needs to be refactored
 /**
@@ -779,41 +734,62 @@ const btnsClicked = async (connectId, formData) => {
     const collectionID = formData?.collectionId || scanSpecimenID;
     const firstNameCidString = conceptIds.firstName.toString();
     const firstName = document.getElementById(firstNameCidString).innerText || ""
-    let confirmVal = '';
 
-    if (!formData?.collectionId) {
-        confirmVal = await swal({
-            title: "Confirm Collection ID",
-            icon: "info",
-            text: `Collection ID: ${collectionID}\n Confirm ID is correct for participant: ${firstName}`,
-            buttons: {
-                cancel: {
-                    text: "Cancel",
-                    value: "cancel",
-                    visible: true,
-                    className: "btn btn-default",
-                    closeModal: true,
-                },
-                back: {
-                    text: "Confirm and Exit",
-                    value: "back",
-                    visible: true,
-                    className: "btn btn-info",
-                },
-                confirm: {
-                    text: "Confirm and Continue",
-                    value: 'confirmed',
-                    visible: true,
-                    className: "",
-                    closeModal: true,
-                    className: "btn btn-success",
-                }
-            },
+
+const showConfirmationModal = async (collectionID, firstName) => {
+    return new Promise((resolve) => {
+        const modalContainer = document.createElement('div');
+        modalContainer.classList.add('modal', 'fade');
+        modalContainer.id = 'confirmationModal';
+        modalContainer.tabIndex = '-1';
+        modalContainer.role = 'dialog';
+        modalContainer.setAttribute('aria-labelledby', 'exampleModalCenterTitle');
+        modalContainer.setAttribute('aria-hidden', 'true');
+        const modalContent = document.createElement('div');
+        modalContent.classList.add('modal-dialog', 'modal-dialog-centered');
+        modalContent.setAttribute('role', 'document');
+
+        const modalBody = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Collection ID</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Collection ID: ${collectionID}</p>
+                    <p>Confirm ID is correct for participant: ${firstName}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" data-result="cancel">Cancel</button>
+                    <button type="button" class="btn btn-info" data-result="back" data-dismiss="modal">Confirm and Exit</button>
+                    <button type="button" class="btn btn-success" data-result="confirmed" data-dismiss="modal">Confirm and Continue</button>
+                </div>
+            </div>
+        `;
+
+        modalContent.innerHTML = modalBody;
+        modalContainer.appendChild(modalContent);
+        document.body.appendChild(modalContainer);
+
+        modalContainer.classList.add('show');
+        modalContainer.style.display = 'block';
+        modalContainer.addEventListener('click', (event) => {
+            const result = event.target.getAttribute('data-result');
+            if (result) 
+            {
+                document.body.removeChild(modalContainer);
+                resolve(result);
+            }
         });
-    }
+    });
+};
 
-    if (confirmVal === "cancel") return;
-
+const confirmVal = await showConfirmationModal(collectionID, firstName);
+if (confirmVal === "cancel") {
+    return;
+}
     formData[conceptIds.collection.id] = collectionID;
     formData[conceptIds.collection.collectionSetting] = getWorkflow() === 'research' ? conceptIds.research : conceptIds.clinical;
     formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
@@ -1087,15 +1063,25 @@ const redirectSpecimenPage = async (accessionID1, accessionID3, selectedVisit, f
     specimenTemplate(data, formData);
 }
 
-export const addEventBiospecimenCollectionForm = (participantData, biospecimenData) => {
+export const addEventBiospecimenCollectionForm = async (participantData, biospecimenData) => {
     const collectionSaveExit = document.getElementById('collectionSave');
-    collectionSaveExit.addEventListener('click', () => {
-        collectionSubmission(participantData, biospecimenData);
+    collectionSaveExit.addEventListener('click', async () => {
+        try {
+            await collectionSubmission(participantData, biospecimenData);
+        } catch (error) {
+            console.error("Error saving collection: ", error);
+            showNotifications({ title: 'Error saving collection!', body: error.message });
+        }
     });
 
     const collectionSaveContinue = document.getElementById('collectionNext');
-    collectionSaveContinue.addEventListener('click', () => {
-        collectionSubmission(participantData, biospecimenData, true);
+    collectionSaveContinue.addEventListener('click', async () => {
+        try {
+            await collectionSubmission(participantData, biospecimenData, true);
+        } catch (error) {
+            console.error("Error saving collection: ", error);
+            showNotifications({ title: 'Error saving collection!', body: error.message });
+        }
     });
 };
 
@@ -1328,8 +1314,11 @@ export const createTubesForCollection = async (formData, biospecimenData) => {
     await updateSpecimen([biospecimenData]);
 }
 
-const collectionSubmission = async (participantData, biospecimenData, cntd) => {
+const collectionSubmission = async (participantData, biospecimenData, continueToFinalizeScreen) => {
     removeAllErrors();
+
+    // Make a deep copy. Check for changes at end of function prior to saving.
+    const originalSpecimenData = JSON.parse(JSON.stringify(biospecimenData));
 
     if (getWorkflow() === 'research' && biospecimenData[conceptIds.collection.collectionTime] === undefined) biospecimenData[conceptIds.collection.collectionTime] = new Date().toISOString();
 
@@ -1357,10 +1346,9 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
 
         if (tubeCheckBox) input.required = tubeCheckBox.checked;
 
-        if (!cntd && value.length === 0) return;
+        if (!continueToFinalizeScreen && value.length === 0) return;
 
         if (input.required && value.length !== totalCollectionIDLength) {
-
             hasError = true;
             hasCntdError = true;
             errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`, focus);
@@ -1385,7 +1373,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
         if (tubeConceptId && input.required) biospecimenData[tubeConceptId][conceptIds.collection.tube.scannedId] = `${masterID} ${tubeID}`.trim();
     });
 
-    if ((hasError && cntd == true) || hasCntdError) return;
+    if ((hasError && continueToFinalizeScreen == true) || hasCntdError) return;
 
     const tubesCollected = Array.from(document.getElementsByClassName('tube-collected'));
 
@@ -1458,7 +1446,7 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
 
     biospecimenData[conceptIds.collection.note] = document.getElementById('collectionAdditionalNotes').value;
 
-    if (cntd) {
+    if (continueToFinalizeScreen) {
         if (getWorkflow() === 'clinical') {
             if (biospecimenData[conceptIds.collection.scannedTime] === undefined) biospecimenData[conceptIds.collection.scannedTime] = new Date().toISOString();
         }
@@ -1476,45 +1464,102 @@ const collectionSubmission = async (participantData, biospecimenData, cntd) => {
         }
     }
 
-    showAnimation();
-    await updateSpecimen([biospecimenData]);
+    // Handle corner cases: found strays and re-finalizing collections
+    const isFinalized = biospecimenData[conceptIds.collection.isFinalized] === conceptIds.yes;
+    const isFormUpdated = hasObjectChanged(originalSpecimenData, biospecimenData);
     
+    let addedStrayTubes = [];
+    if (isFinalized && isFormUpdated) {
+        addedStrayTubes = getAddedStrayTubes(originalSpecimenData, biospecimenData);
+    }
+    
+    // Save button actions after form processing. "Save" stays on same screen. "Go to review" navigates to finalize screen when continueToFinalizeScreen = true.
+    if (!isFormUpdated) {
+        continueToFinalizeScreen ? finalizeTemplate(participantData, biospecimenData) : showTimedNotifications({ title: 'No changes detected', body: 'No changes have been made to the collection data.' });
+    } else if (isFinalized) {
+        handleFinalizedCollectionUpdate(biospecimenData, participantData, siteTubesList, addedStrayTubes, continueToFinalizeScreen);
+    } else {
+        try {
+            await processSpecimenCollectionFormUpdates(biospecimenData, participantData, siteTubesList, continueToFinalizeScreen);
+            await handleFormSaveAndNavigation(biospecimenData, continueToFinalizeScreen);
+        } catch (error) {
+            console.error(`error saving specimen ${error}`);
+            showNotifications({ title: 'Error saving collection', body: `${error}` });
+        }
+    }
+}
+
+/**
+ * Handle case where form has been updated but specimen is already finalized.
+ * If specimen has already been finalized, alert user that changes will update the specimen.
+ * @param {object} biospecimenData - the updatedBiospecimenData (existing data plus form changes).
+ * @param {object} participantData - the participantData from Firestore.
+ * @param {array} siteTubesList - the list of tubes based on the site (from getSiteTubesLists()).
+ * @param {array} addedStrayTubes - tubes added this form submission.
+ * @param {boolean} continueToFinalizeScreen - if true, navigate to finalize screen.
+ */
+const handleFinalizedCollectionUpdate = async (biospecimenData, participantData, siteTubesList, addedStrayTubes, continueToFinalizeScreen) => {
+    const modalMessage = {
+        title: `Collection ${biospecimenData[conceptIds.collection.id]} is Already Finalized`,
+        body: 'IMPORTANT: This Collection has already been finalized. Click continue if you want to update the collection and re-finalize. Click Cancel to discard changes.',
+    };
+
+    const onCancel = () => { /* Nothing to do here */ };
+    
+    // Manage boxedStatus since specimen is already finalized. If boxedStatus = notBoxed -> no update needed.
+    // If boxedStatus = partiallyBoxed || boxedStatus = boxed -> setBoxedStatus to partiallyBoxed and add the new tubes to strayTubesList.
+    const onContinue = async () => {
+        try {
+            const currentBoxedStatus = biospecimenData[conceptIds.boxedStatus];
+            if (currentBoxedStatus === conceptIds.partiallyBoxed || currentBoxedStatus === conceptIds.boxed) {
+                const strayTubesList = biospecimenData[conceptIds.strayTubesList] || [];
+                strayTubesList.push(...addedStrayTubes);
+                biospecimenData[conceptIds.strayTubesList] = strayTubesList;
+                biospecimenData[conceptIds.boxedStatus] = conceptIds.partiallyBoxed;
+            }
+            await processSpecimenCollectionFormUpdates(biospecimenData, participantData, siteTubesList, continueToFinalizeScreen);
+            await handleFormSaveAndNavigation(biospecimenData, continueToFinalizeScreen);
+        } catch (error) {
+            console.error(`Error handleFinalizedCollectionUpdate -> onContinue. ${error}`);
+            showNotifications({ title: "Error updating collection", body: error.message });
+        }
+    };
+
+    showNotificationsCancelOrContinue(modalMessage, null, onCancel, onContinue);
+}
+
+// TODO: The write process would benefit from optimization. Many sequential reads/writes.
+const processSpecimenCollectionFormUpdates = async (biospecimenData, participantData, siteTubesList) => {
     const baselineVisit = (biospecimenData[conceptIds.collection.selectedVisit] === conceptIds.baseline.visitId);
     const clinicalResearchSetting = (biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.research || biospecimenData[conceptIds.collection.collectionSetting] === conceptIds.clinical);
+    
+    try {
+        showAnimation();
 
-    await updateCollectionSettingData(biospecimenData, siteTubesList, participantData);
+        await Promise.all([
+            updateSpecimen([biospecimenData]),
+            updateCollectionSettingData(biospecimenData, siteTubesList, participantData),
+        ]);
 
-    if(baselineVisit && clinicalResearchSetting) {
-        await updateBaselineData(siteTubesList, participantData);
-    }
-
-    await checkDerivedVariables({"token": participantData["token"]});
-
-    if (cntd) {
-
-        participantData = await getUpdatedParticipantData(participantData);
-        const specimenData = (await searchSpecimen(biospecimenData[conceptIds.collection.id])).data;
-        hideAnimation();
-        finalizeTemplate(participantData, specimenData);
-    }
-    else {
-
-        await swal({
-            title: "Success",
-            icon: "success",
-            text: "Collection specimen data has been saved",
-            buttons: {
-                close: {
-                    text: "Close",
-                    value: "close",
-                    visible: true,
-                    className: "btn btn-success",
-                    closeModal: true,
-                }
-            },
-        });
+        if (baselineVisit && clinicalResearchSetting) await updateBaselineData(siteTubesList, participantData);
+        await checkDerivedVariables({ "token": participantData["token"] });
 
         hideAnimation();
+    } catch (error) {
+        hideAnimation();
+        console.error("Error saving collection: ", error);
+        showNotifications({ title: 'Error saving collection!', body: error.message });
+    }
+}
+
+const handleFormSaveAndNavigation = async (biospecimenData, continueToFinalizeScreen) => {
+    if (continueToFinalizeScreen) {
+        const { specimenData: updatedSpecimenData, participantData: updatedParticipantData } = await getSpecimenAndParticipant(biospecimenData[conceptIds.collection.id]);
+        if (validateSpecimenAndParticipantResponse(updatedSpecimenData, updatedParticipantData)) {
+            finalizeTemplate(updatedParticipantData, updatedSpecimenData);
+        }
+    } else {
+        showTimedNotifications({ title: 'Success!', body: 'Collection specimen data has been saved.' });
     }
 }
 
@@ -1548,39 +1593,6 @@ export const addEventNavBarParticipantCheckIn = () => {
         const data = response.data[0];
         checkInTemplate(data);
     })
-}
-
-export const addEventFinalizeForm = (specimenData) => {
-    const finalizedSaveExit = document.getElementById('finalizedSaveExit');
-    finalizedSaveExit.addEventListener('click', () => {
-        finalizeHandler(specimenData);
-    });
-}
-
-export const addEventFinalizeFormCntd = (specimenData) => {
-    const form = document.getElementById('finalizeForm');
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        finalizeHandler(specimenData, true);
-    });
-}
-
-// update the existing object in 'biospecimen' collection with finalized flag and timestamp
-const finalizeHandler = async (biospecimenData, cntd) => {
-
-    if (cntd) {
-        showAnimation();
-
-        biospecimenData[conceptIds.collection.isFinalized] = conceptIds.yes;
-        biospecimenData[conceptIds.collection.finalizedTime] = new Date().toISOString();
-
-        await updateSpecimen([biospecimenData]);
-
-        hideAnimation();
-        showNotifications({ title: 'Specimen Finalized', body: 'Collection Finalized Successfully!' });
-    }
-
-    searchTemplate();
 }
 
 export const addEventReturnToCollectProcess = () => {
@@ -1682,40 +1694,12 @@ export const addEventNavBarShippingManifest = (userName) => {
         }
 
         if (selectedLocation === 'none') {
-            await swal({
-                title: "Reminder",
-                icon: "warning",
-                text: "Please Select 'Shipping Location'",
-                className: "swal-no-box",
-                buttons: {
-                  confirm: {
-                    text: "OK",
-                    value: true,
-                    visible: true,
-                    closeModal: true,
-                    className: "swal-no-box-button",
-                  },
-                },
-              });
+              showNotifications({ title: 'Reminder', body: 'Please Select  \'Shipping Location\' ' });
               return
         }
 
         if(!boxesToShip.length) {
-          await swal({
-            title: "Reminder",
-            icon: "warning",
-            text: "Please select Box(es) to review and ship",
-            className: "swal-no-box",
-            buttons: {
-              confirm: {
-                text: "OK",
-                value: true,
-                visible: true,
-                closeModal: true,
-                className: "swal-no-box-button",
-              },
-            },
-          });
+          showNotifications({ title: 'Reminder', body: 'Please select Box(es) to review and ship' }); 
           return
         }
 
@@ -1986,12 +1970,7 @@ export const addEventSaveButton = async (boxIdAndBagsObj) => {
         }
 
         if (isMismatch) {
-            await swal({
-                title: 'Error!',
-                icon: 'error',
-                text: 'Tracking Ids do not match in one of the boxes.',
-                timer: 1600,
-              });
+              showTimedNotifications({ title: 'Reminder', body: 'Tracking Ids do not match in one of the boxes.' });  
             return;
         }
 
@@ -2002,12 +1981,7 @@ export const addEventSaveButton = async (boxIdAndBagsObj) => {
           }
           
         localforage.setItem("shipData", shippingData);
-        await swal({
-          title: 'Success!',
-          icon: 'success',
-          text: 'Tracking input saved',
-          timer: 1600,
-        });
+        showTimedNotifications({ title: 'Reminder', body: 'Tracking input saved.' });
     })
 }
 
@@ -2294,6 +2268,7 @@ export const populateReportManifestHeader = (currPage) => {
 
 export const populateReportManifestTable = (currPage, searchSpecimenInstituteArray) => {
     const currTable = document.getElementById('boxManifestTable');
+    const replacementTubeLabelObj = findReplacementTubeLabels(searchSpecimenInstituteArray);
     let bags = Object.keys(currPage['bags']);    
     let rowCount = 1;
     for (let i = 0; i < bags.length; i++) {
@@ -2309,8 +2284,14 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
             currRow.insertCell(1).innerHTML = currTube;
             let thisId = currTube.split(' ');
             let toAddType = 'N/A';
-            if (translateNumToType.hasOwnProperty(thisId[1])) {
+            if (Object.prototype.hasOwnProperty.call(translateNumToType, thisId[1])) {
                 toAddType = translateNumToType[thisId[1]];
+            }
+            if (Object.prototype.hasOwnProperty.call(replacementTubeLabelObj, currTube)) {
+                const [, originalTubeId] = replacementTubeLabelObj[currTube].split(' ');
+                if (Object.prototype.hasOwnProperty.call(translateNumToType, originalTubeId)) {
+                    toAddType = translateNumToType[originalTubeId];
+                }
             }
             currRow.insertCell(2).innerHTML = toAddType;
             let fullScannerName = '';

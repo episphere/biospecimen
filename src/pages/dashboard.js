@@ -1,5 +1,5 @@
-import { userAuthorization, removeActiveClass, validateUser, addEventBarCodeScanner, allStates, getWorkflow, checkedIn, verificationConversion, restrictNonBiospecimenUser } from "./../shared.js"
-import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventsearchSpecimen, addEventNavBarSpecimenSearch, addEventNavBarShipment, addEventClearAll } from "./../events.js";
+import { userAuthorization, removeActiveClass, getWorkflow, checkedIn, verificationConversion, restrictNonBiospecimenUser } from "./../shared.js"
+import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSearchSpecimen, addEventNavBarSpecimenSearch, addEventClearAll } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 
 export const userDashboard = (auth, route, goToSpecimenSearch) => {
@@ -106,7 +106,6 @@ export const searchTemplate = (goToSpecimenSearch) => {
     addEventSearchForm4();
     addEventClearAll();
     addEventNavBarSpecimenSearch();
-    //addEventNavBarShipment();
     if(goToSpecimenSearch) document.getElementById('navBarSpecimenSearch').click();
 }
 
@@ -139,9 +138,8 @@ export const searchBiospecimenTemplate = () => {
     const navBarBtn = document.getElementById('navBarSpecimenSearch');
     navBarBtn.classList.add('active');
     document.getElementById('contentBody').innerHTML = template;
-    addEventsearchSpecimen();
+    addEventSearchSpecimen();
     addEventBackToSearch('navBarSearch');
-    // addEventBarCodeScanner('masterSpecimenIdBarCodeBtn', 0, masterSpecimenIDRequirement.length);
 }
 
 export const searchResults = (result) => {

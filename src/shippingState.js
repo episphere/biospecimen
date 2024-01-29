@@ -10,7 +10,7 @@ import { conceptIds } from './fieldToConceptIdMapping.js';
  * @param {array} finalizedSpecimenList - the list of finalized specimens for the healthcare provider
  * @param {string} userName - the name of the logged in user
  */
-export const setAllShippingState = (availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName) => {
+export const setAllShippingState = (availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName, replacementTubeLabelObj) => {
     const boxesByProviderList = filterUnshippedBoxes(allBoxesList);
     const boxesByLocationList = filterBoxListBoxesByLocation(boxesByProviderList);
     const providerBoxesObj = createBoxAndBagsObj(boxesByProviderList);
@@ -27,6 +27,7 @@ export const setAllShippingState = (availableCollectionsObj, availableLocations,
         detailedProviderBoxes: detailedProviderBoxes,
         finalizedSpecimenList: finalizedSpecimenList,
         userName: userName,
+        replacementTubeLabelObj: replacementTubeLabelObj
     });
 }
 
