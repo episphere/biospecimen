@@ -110,7 +110,7 @@ const confirmFileSelection = () => {
       showAnimation();
       try {
         const response = await getAllBoxes(`bptlPackagesInTransit`);
-        const specimens = await getSpecimensInBoxes(response.data);
+        const specimens = await getSpecimensInBoxes(response.data, true);
         const replacementTubeLabelObj = findReplacementTubeLabels(specimens);
         hideAnimation();
         const allBoxesShippedBySiteAndNotReceived = getRecentBoxesShippedBySiteNotReceived(response.data);
