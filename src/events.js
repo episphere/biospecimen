@@ -139,8 +139,8 @@ export const addEventSearchSpecimen = () => {
                 return;
             }
 
-            const collectionId = collectionIdSearchEle.value.toUpperCase().trim();
-            if (!masterSpecimenIDRequirement.regExp.test(collectionId) || collectionId.length !== masterSpecimenIDRequirement.length) {
+            const collectionId = collectionIdSearchEle.value.toUpperCase().trim().substring(0, masterSpecimenIDRequirement.length);
+            if (!masterSpecimenIDRequirement.regExp.test(collectionId)) {
                 errorMessage('masterSpecimenId', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, true);
                 return;
             }
