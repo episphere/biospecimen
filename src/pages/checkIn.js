@@ -1,4 +1,4 @@
-import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getCollectionsByVisit, getParticipantCollections, getSiteTubesLists } from "./../shared.js";
+import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getParticipantCollections, getSiteTubesLists } from "./../shared.js";
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 import { conceptIds } from '../fieldToConceptIdMapping.js';
 
@@ -374,6 +374,30 @@ const participantStatus = (data, collections) => {
                     </div>
                     <div class="row">
                         <span class="full-width">${data['663265240'] === 615768760 ? data['452942800'] : data['663265240'] === 231311385 ? data['264644252'] : '<br>'}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+        <br/>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h5>Other Surveys</h5>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="col-md-12 info-box">
+                    <div class="row">
+                        <span class="full-width">Quality of Life Survey</span>
+                    </div>
+                    <div class="row">
+                        <span class="full-width">${surveyConversion[data[conceptIds.promisStatus]]}</span>
+                    </div>    
+                    <div class="row">
+                        <span class="full-width">${data[conceptIds.promisStatus] === conceptIds.modules.started ? data[conceptIds.promisStartTime] : data[conceptIds.promisStatus] === conceptIds.modules.submitted ? data[conceptIds.promiseCompleteTime] : '<br>'}</span>
                     </div>
                 </div>
             </div>
