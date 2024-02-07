@@ -797,22 +797,24 @@ export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
 }
 
 export const getPage = async (pageNumber, elementsPerPage, orderBy, filters, source) => {
-  try {
-    const idToken = await getIdToken();
-    let requestObj = {
-        method: "POST",
-        headers:{
-            Authorization:"Bearer "+idToken,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({pageNumber, elementsPerPage, orderBy, filters, source})
+    try {
+        pageNumber -= 1; // Firestore uses 0-based indexing, the Biospecimen 'reports' module uses page numbers (1-based indexing).
+
+        const idToken = await getIdToken();
+        let requestObj = {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + idToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ pageNumber, elementsPerPage, orderBy, filters, source })
+        }
+        const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
+        return response.json();
     }
-    const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
-    return response.json();
-  } 
-  catch (error) {
-    return {code: 500, message: error.message};
-  }
+    catch (error) {
+        return { code: 500, message: error.message };
+    }
 }
 
 export const bagConceptIdList = [
@@ -1523,7 +1525,6 @@ export const searchSpecimenInstitute = async () => {
  * @returns {object} returns a response object of biospecimen documents with matching collection ids from healthcare provider's box id
  */
 export const searchSpecimenByRequestedSiteAndBoxId = async (requestedSite, boxId) => {
-    logAPICallStartDev('searchSpecimenByRequestedSiteAndBoxId');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}&boxId=${boxId}`, {
     method: "GET",
@@ -1531,7 +1532,7 @@ export const searchSpecimenByRequestedSiteAndBoxId = async (requestedSite, boxId
         Authorization:"Bearer "+idToken
         }
     });
-    logAPICallEndDev('searchSpecimenByRequestedSiteAndBoxId');
+
     if (response.status === 200) {
         const responseObject = await response.json();
         return responseObject;
@@ -1576,24 +1577,32 @@ export const getLocationsInstitute = async () => {
     logAPICallEndDev('getLocationsInstitute');
     return locations;
 }
+
+/**
+ * Fetch the box count and calculate the number of pages to display on the reports screen (for pagination feature).
+ * @param {number} numPerPage - number of boxes to display per page on the reports screen.
+ * @param {object} filters - filters to apply to the report.
+ * @param {string} source - source of the report (null or 'bptlShippingReport').
+ * @returns {number} - number of pages to display on the reports screen.
+ */
 export const getNumPages = async (numPerPage, filters, source) => {
-  try {
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=getNumBoxesShipped`, {
-        method: "POST",
-        headers: {
-            Authorization:"Bearer "+idToken,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({filters, source})
-    });
-    let res = await response.json();
-    let numBoxes = res.data;
-    return Math.ceil(numBoxes/numPerPage);
-  }
-  catch (error) {
-    return {code: 500, message: error.message};
-  }
+    try {
+        const idToken = await getIdToken();
+        const response = await fetch(`${api}api=getNumBoxesShipped`, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + idToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ filters, source })
+        });
+        let res = await response.json();
+        let numBoxes = res.data;
+        return Math.ceil(numBoxes / numPerPage);
+    }
+    catch (error) {
+        return { code: 500, message: error.message };
+    }
 }
 
 export const getSiteCouriers = async () => {

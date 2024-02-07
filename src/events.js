@@ -2169,10 +2169,28 @@ export const populateCourierBox = async () => {
 
 }
 
-export const populateBoxTable = async (page, filter, source) => {
-    showAnimation();
-    let pageStuff = await getPage(page, 5, '656548982', filter, source)
-    let currTable = document.getElementById('boxTable')
+export const handleBoxReportsData = async (filter, source) => {
+    const reportPage = appState.getState().reportPage;
+    let reportPageBoxData = appState.getState().reportPageBoxData;
+    if (!reportPageBoxData) {
+        try {
+            showAnimation();
+            reportPageBoxData = await getPage(reportPage, 5, conceptIds.shippingShipDate.toString(), filter, source);
+            appState.setState({ reportPageBoxData });
+            hideAnimation();
+        } catch (error) {
+            hideAnimation();
+            showNotifications({ title: 'Error fetching data', body: error.message });
+            return;
+        }
+    }
+
+    populateBoxReportsTable(source);
+}
+
+const populateBoxReportsTable = (source) => {
+    const reportPageBoxData = appState.getState().reportPageBoxData;
+    const currTable = document.getElementById('boxTable')
     currTable.innerHTML = ''
     let rowCount = currTable.rows.length;
     let currRow = currTable.insertRow(rowCount);
@@ -2184,44 +2202,40 @@ export const populateBoxTable = async (page, filter, source) => {
     currRow.insertCell(5).innerHTML = `Received<span style="display:block;">(Yes/No)</span>`;
     currRow.insertCell(6).innerHTML = "Date Received";
     currRow.insertCell(7).innerHTML = "Condition";
-    currRow.insertCell(8).innerHTML = "Comments"
+    currRow.insertCell(8).innerHTML = "Comments";
 
-    let conversion = {
-        "712278213": "FedEx",
-        "149772928": "World Courier"
-    }
-    
-    for (let i = 0; i < pageStuff.data.length; i++) {
+    for (let i = 0; i < reportPageBoxData.data.length; i++) {
         rowCount = currTable.rows.length;
         currRow = currTable.insertRow(rowCount);
-        let currPage = convertToOldBox(pageStuff.data[i]);
-        let numTubes = 0;
-        let keys = Object.keys(currPage['bags']);
-        for (let j = 0; j < keys.length; j++) {
-            numTubes += currPage['bags'][keys[j]]['arrElements'].length;
-        }
-        const shippedDate = currPage['656548982'] ? retrieveDateFromIsoString(currPage['656548982']) : '';
-        const receivedDate = currPage['926457119'] ? retrieveDateFromIsoString(currPage['926457119']) : '';
-        const packagedCondition = currPage['238268405'] || '';
+        const currBox = convertToOldBox(reportPageBoxData.data[i]);
+        const trackingNumber = currBox[conceptIds.shippingTrackingNumber] ?? '';
+        const shippedDate = currBox[conceptIds.shippingShipDate] ? retrieveDateFromIsoString(currBox[conceptIds.shippingShipDate]) : '';
+        const receivedDate = currBox[conceptIds.siteShipmentDateReceived] ? retrieveDateFromIsoString(currBox[conceptIds.siteShipmentDateReceived]) : '';
+        const packagedCondition = currBox[conceptIds.packageCondition] || '';
+        const shippingLocation = conceptIdToSiteSpecificLocation[currBox[conceptIds.shippingLocation]];
+        const boxId = currBox[conceptIds.shippingBoxId];
+        const viewManifestButton = '<button type="button" class="button btn btn-info" id="reportsViewManifest' + i + '">View manifest</button>';
+        const isReceived = currBox[conceptIds.siteShipmentReceived] === conceptIds.yes ? 'Yes' : 'No';
+        const packageConditionValue = convertConceptIdToPackageCondition(packagedCondition, packageConditionConversion);
+        const packageComments = currBox[conceptIds.siteShipmentComments] || '';
 
-        currRow.insertCell(0).innerHTML = currPage[conceptIds.shippingTrackingNumber] ?? '';
+        currRow.insertCell(0).innerHTML = trackingNumber;
         currRow.insertCell(1).innerHTML = shippedDate;
-        currRow.insertCell(2).innerHTML = conceptIdToSiteSpecificLocation[currPage['560975149']];
-        currRow.insertCell(3).innerHTML = currPage['132929440'];
-        currRow.insertCell(4).innerHTML = '<button type="button" class="button btn btn-info" id="reportsViewManifest' + i + '">View manifest</button>';
-        currRow.insertCell(5).innerHTML = currPage['333524031'] === 353358909 ? "Yes" : "No"
+        currRow.insertCell(2).innerHTML = shippingLocation;
+        currRow.insertCell(3).innerHTML = boxId;
+        currRow.insertCell(4).innerHTML = viewManifestButton;
+        currRow.insertCell(5).innerHTML = isReceived;
         currRow.insertCell(6).innerHTML = receivedDate;
-        currRow.insertCell(7).innerHTML = convertConceptIdToPackageCondition(packagedCondition, packageConditionConversion);
-        currRow.insertCell(8).innerHTML = currPage['870456401'] || '' ;
-        addEventViewManifestButton('reportsViewManifest' + i, currPage, source);
-
+        currRow.insertCell(7).innerHTML = packageConditionValue;
+        currRow.insertCell(8).innerHTML = packageComments;
+        
+        addEventViewManifestButton('reportsViewManifest' + i, currBox, source);
     }
-    hideAnimation();
 }
 
 export const addEventViewManifestButton = (buttonId, currPage, source) => {
-    let button = document.getElementById(buttonId);
-    button.addEventListener('click', () => {
+    const button = document.getElementById(buttonId);
+    button && button.addEventListener('click', () => {
         showReportsManifest(currPage, source);
     });
 }
@@ -2308,53 +2322,89 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
     }
 }
 
-export const addPaginationFunctionality = (lastPage, filter, source) => {
-    let paginationButtons = document.getElementById('paginationButtons');
-    paginationButtons.innterHTML = ""
+/**
+ * Pagination for the box reports includes first, previous, next, last, and go to page functionality.
+ * @param {object} filter - filter object used for fetching the data.
+ * @param {string} source - source of the data (eg: null or 'bptlShippingReport')
+ */
+export const addPaginationFunctionality = (filter, source) => {
+    const numReportPages = appState.getState().numReportPages;
+    let currPageNum = appState.getState().reportPage || 1;
+
+    const paginationButtons = document.getElementById('paginationButtons');
     paginationButtons.innerHTML = `<ul class="pagination">
                                         <li class="page-item" id="firstPage"><button class="page-link" >First</button></li>
                                         <li class="page-item" id="previousPage"><button class="page-link" >Previous</button></li>
-                                        <li class="page-item" id="thisPage"><a class="page-link"  id = "middlePage">1</a></li>
+                                        <li class="page-item" id="thisPage"><a class="page-link"  id = "middlePage">${currPageNum}</a></li>
                                         <li class="page-item" id="nextPage"><button class="page-link">Next</button></li>
                                         <li class="page-item" id="lastPage"><button class="page-link">Last</button></li>
+                                        <li class="page-item" style="margin-left: 40px;"><input type="text" class="page-link" id="goToPageInput" placeholder="Enter page number" /></li>
+                                        <li class="page-item"><button class="page-link" id="goToPageButton">Go to page</button></li>
                                     </ul>`
-    let first = document.getElementById('firstPage');
-    let previous = document.getElementById('previousPage');
-    let current = document.getElementById('thisPage');
-    let next = document.getElementById('nextPage');
-    let final = document.getElementById('lastPage');
-    let middleNumber = document.getElementById('middlePage');
-    first.addEventListener('click', () => {
-        middleNumber.innerHTML = '1'
-        populateBoxTable(0, filter, source)
-    })
+    const firstEle = document.getElementById('firstPage');
+    const previousEle = document.getElementById('previousPage');
+    const nextEle = document.getElementById('nextPage');
+    const lastEle = document.getElementById('lastPage');
+    const currPageEle = document.getElementById('middlePage');
 
-    previous.addEventListener('click', () => {
-        middleNumber.innerHTML = middleNumber.innerHTML == '1' ? '1' : parseInt(middleNumber.innerHTML) - 1;
-        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter, source)
-    })
+    // Update the current page number and the UI, then load the new page
+    const setPage = (targetPageNum) => {
+        const newPageNum = parseInt(targetPageNum, 10);
+        if (currPageNum === newPageNum) return;
 
-    next.addEventListener('click', () => {
-        middleNumber.innerHTML = parseInt(middleNumber.innerHTML) >= lastPage ? (lastPage == 0 ? 1 : lastPage.toString()) : parseInt(middleNumber.innerHTML) + 1;
-        populateBoxTable(parseInt(middleNumber.innerHTML) - 1, filter, source)
-    })
+        currPageNum = newPageNum;
+        currPageEle.innerHTML = currPageNum;
+        appState.setState({ reportPage: currPageNum, reportPageBoxData: null });
 
-    final.addEventListener('click', () => {
-        middleNumber.innerHTML = lastPage == 0 ? 1 : lastPage;
-        populateBoxTable(lastPage == 0 ? 0 : lastPage - 1, filter, source)
-    })
+        handleBoxReportsData(filter, source);
 
+    }
 
+    firstEle.addEventListener('click', () => {
+        setPage(1)
+    });
+
+    previousEle.addEventListener('click', () => {
+        if (currPageNum > 1) setPage(currPageNum - 1);
+    });
+
+    nextEle.addEventListener('click', () => {
+        if (currPageNum < numReportPages) setPage(currPageNum + 1);
+    });
+
+    lastEle.addEventListener('click', () => {
+        setPage(numReportPages)
+    });
+
+    // Enable go to page feature.
+    document.getElementById('goToPageButton').addEventListener('click', () => {
+        const input = document.getElementById('goToPageInput');
+        const pageNumber = parseInt(input.value.trim(), 10);
+    
+        // Validate the input to ensure it's a valid page number within the range
+        if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= numReportPages) {
+            setPage(pageNumber);
+        } else {
+            alert(`Please enter a valid page number (1 - ${numReportPages}).`);
+        }
+    
+        input.value = '';
+    });
+
+    // Enable page navigation using the 'Enter' key.
+    document.getElementById('goToPageInput').addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            document.getElementById('goToPageButton').click();
+        }
+    });
 }
 
 export const addEventFilter = (source) => {
-
-    let filterButton = document.getElementById('submitFilter');
-    filterButton.addEventListener('click', async () => {
-        let trackingId = document.getElementById('trackingIdInput').value.trim();
-
-        let startDate = document.getElementById('startDate').value;
-        let endDate = document.getElementById('endDate').value;
+    const filterButton = document.getElementById('submitFilter');
+    filterButton && filterButton.addEventListener('click', async () => {
+        const trackingId = document.getElementById('trackingIdInput')?.value.trim() ?? '';
+        const startDate = document.getElementById('startDate')?.value ?? '';
+        const endDate = document.getElementById('endDate')?.value ?? '';
         let filter = {};
         if (trackingId !== "") {
             filter['trackingId'] = trackingId;
@@ -2368,15 +2418,23 @@ export const addEventFilter = (source) => {
             filter['endDate'] = new Date(endDateUnix).toISOString()
             if (startDate !== "") {
                 if (filter['endDate'] <= filter['startDate']) { // endDate being less than startDate, unix format will be greater the more current date and time 
-                    //throw error
+                    showNotifications({ title: 'Date Input Error', body: 'End date must be after start date. Please edit these dates and try again.' });
                     return;
                 }
             }
-
         }
-        populateBoxTable(0, filter, source);
-        let numPages = await getNumPages(5, filter, source);
-        addPaginationFunctionality(numPages, filter, source);
+
+        try {
+            showAnimation();
+            const numReportPages = await getNumPages(5, filter, source);
+            appState.setState({ reportPage: 1, reportPageBoxData: null, numReportPages });
+            handleBoxReportsData(filter, source);
+            addPaginationFunctionality(filter, source);
+            hideAnimation();
+        } catch (error) {
+            hideAnimation();
+            showNotifications({ title: 'Error fetching data', body: error.message });
+        }
     });
 }
 
@@ -2526,7 +2584,6 @@ export const getSpecimenComments = (tubeDetail) => {
  *  @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
  *  @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. 'CXA321789 0001'
  *  @returns {array} Example array - ['Hemolysis present']
- *   //TODO: future refactor - use getSpecimenDeviation() when reports data handling is updated to a state managed solution.
 */ 
 export const getSpecimenDeviationReports = (searchSpecimenInstituteArray, currTube) => {
     const { collection } = conceptIds
@@ -2559,7 +2616,6 @@ export const getSpecimenDeviationReports = (searchSpecimenInstituteArray, currTu
  * Returns a string of the Full Specimen ID's comments
  * @param {array} searchSpecimenInstituteArray - firestore biospecimen collection data array of objects or empty array depending on response
  * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. 'CXA321789 0001'
- * //TODO: future refactor - use getSpecimenComments() when reports data handling is updated to a state managed solution.
  */
 export const getSpecimenCommentsReports = (searchSpecimenInstituteArray, currTube) => {
     const { collection } = conceptIds;
@@ -2576,7 +2632,6 @@ export const getSpecimenCommentsReports = (searchSpecimenInstituteArray, currTub
  * @param {string} currTube - current specimen tube id to filter searchSpecimenInstituteArray - Ex. 'CXA321789 0001'
  * @param {object} currRow - current row of the manifest table
  * @param {number} bagsArrayIndex - current index of the bags array
- * //TODO: future refactor - use addDeviationTypeCommentsContent() when reports data handling is updated to a state managed solution.
 */
 
 export const addDeviationTypeCommentsContentReports = (searchSpecimenInstituteArray, currTube, currRow, bagsArrayIndex) => {
