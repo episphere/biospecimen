@@ -43,6 +43,8 @@ let api = '';
 
 if(location.host === urls.prod) api = 'https://api-myconnect.cancer.gov/biospecimen?';
 else if(location.host === urls.stage) api = 'https://api-myconnect-stage.cancer.gov/biospecimen?';
+//TODO: remove this!! This is for local dev only.
+else if(location.host.startsWith('localhost')) api = 'http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
 else api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
 export const baseAPI = api;
 
@@ -2937,9 +2939,30 @@ export const translateNumToType = {
   "0054": "NA"
 };
 
+/**
+ * ISO 8601 DateTime to human readable date time (UTC).
+ * @param {string} isoDateTime - ISO 8601 string from Firestore.
+ * @returns {string} - UTC DateTime in a human readable format: MM/DD/YYYY HH:MM
+ */
 export const convertISODateTime = (isoDateTime) => {
     const date = new Date(isoDateTime);
     return setZeroDateTime(date.getUTCMonth() + 1) + '/' + setZeroDateTime(date.getUTCDate()) + '/' + date.getUTCFullYear() + ' ' + setZeroDateTime(date.getUTCHours()) + ':' + setZeroDateTime(date.getUTCMinutes())
+};
+
+/**
+ * Convert ISO 8601 DateTime to human readable date time (Local).
+ * @param {string} isoDateTime - ISO DateTime (UTC)
+ * @returns {string} - Local DateTime in a human readable format: either MM/DD/YYYY HH:MM
+ */
+export const convertISODateTimeToLocal = (isoDateTime) => {
+    const date = new Date(isoDateTime);
+    const month = setZeroDateTime(date.getMonth() + 1);
+    const day = setZeroDateTime(date.getDate());
+    const year = date.getFullYear();
+    const hours = setZeroDateTime(date.getHours());
+    const minutes = setZeroDateTime(date.getMinutes());
+
+    return `${month}/${day}/${year} ${hours}:${minutes}`;
 };
 
 // append 0 before min. if single digit min. or hour
