@@ -43,8 +43,6 @@ let api = '';
 
 if(location.host === urls.prod) api = 'https://api-myconnect.cancer.gov/biospecimen?';
 else if(location.host === urls.stage) api = 'https://api-myconnect-stage.cancer.gov/biospecimen?';
-//TODO: remove this!! This is for local dev only.
-else if(location.host.startsWith('localhost')) api = 'http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
 else api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
 export const baseAPI = api;
 
