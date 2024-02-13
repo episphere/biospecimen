@@ -391,7 +391,7 @@ const participantStatus = (data, collections) => {
             <div class="col-md-4">
                 <div class="col-md-12 info-box">
                     <div class="row">
-                        <span class="full-width">Quality of Life Survey</span>
+                        <span class="full-width">3-month Quality of Life Survey</span>
                     </div>
                     <div class="row">
                         <span class="full-width">${surveyConversion[data[conceptIds.promisStatus]]}</span>
