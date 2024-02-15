@@ -206,6 +206,10 @@ export const conceptIds = {
         submitted: 231311385
     },
 
+    promisStatus: 320303124,
+    promisStartTime: 870643066,
+    promiseCompleteTime: 843688458,
+
     REASON_NOT_COLLECTED: 883732523,
     REASONS: {
         PARTICIPANT_REFUSAL: 681745422
