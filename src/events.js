@@ -2170,13 +2170,22 @@ export const populateCourierBox = async () => {
 }
 
 export const handleBoxReportsData = async (filter, source) => {
-    const reportPage = appState.getState().reportPage;
-    let reportPageBoxData = appState.getState().reportPageBoxData;
+    const currReportPageNum = appState.getState().reportData.currReportPageNum;
+    let reportPageBoxData = appState.getState().reportData.reportPageBoxData;
     if (!reportPageBoxData) {
         try {
             showAnimation();
-            reportPageBoxData = await getPage(reportPage, 5, conceptIds.shippingShipDate.toString(), filter, source);
-            appState.setState({ reportPageBoxData });
+            reportPageBoxData = await getPage(currReportPageNum, 5, conceptIds.shippingShipDate.toString(), filter, source);
+            
+            const stateUpdateObj = {
+                ...appState.getState(),
+                reportData: {
+                    ...appState.getState().reportData,
+                    reportPageBoxData
+                }
+            };
+
+            appState.setState(stateUpdateObj);
             hideAnimation();
         } catch (error) {
             hideAnimation();
@@ -2189,20 +2198,20 @@ export const handleBoxReportsData = async (filter, source) => {
 }
 
 const populateBoxReportsTable = (source) => {
-    const reportPageBoxData = appState.getState().reportPageBoxData;
+    const reportPageBoxData = appState.getState().reportData.reportPageBoxData;
     const currTable = document.getElementById('boxTable')
     currTable.innerHTML = ''
     let rowCount = currTable.rows.length;
     let currRow = currTable.insertRow(rowCount);
-    currRow.insertCell(0).innerHTML = "Tracking Number";
-    currRow.insertCell(1).innerHTML = "Date Shipped";
-    currRow.insertCell(2).innerHTML = "Shipping Location";
-    currRow.insertCell(3).innerHTML = "Box Id";
-    currRow.insertCell(4).innerHTML = "View Manifest";
+    currRow.insertCell(0).innerText = "Tracking Number";
+    currRow.insertCell(1).innerText = "Date Shipped";
+    currRow.insertCell(2).innerText = "Shipping Location";
+    currRow.insertCell(3).innerText = "Box Id";
+    currRow.insertCell(4).innerText = "View Manifest";
     currRow.insertCell(5).innerHTML = `Received<span style="display:block;">(Yes/No)</span>`;
-    currRow.insertCell(6).innerHTML = "Date Received";
-    currRow.insertCell(7).innerHTML = "Condition";
-    currRow.insertCell(8).innerHTML = "Comments";
+    currRow.insertCell(6).innerText = "Date Received";
+    currRow.insertCell(7).innerText = "Condition";
+    currRow.insertCell(8).innerText = "Comments";
 
     for (let i = 0; i < reportPageBoxData.data.length; i++) {
         rowCount = currTable.rows.length;
@@ -2219,15 +2228,15 @@ const populateBoxReportsTable = (source) => {
         const packageConditionValue = convertConceptIdToPackageCondition(packagedCondition, packageConditionConversion);
         const packageComments = currBox[conceptIds.siteShipmentComments] || '';
 
-        currRow.insertCell(0).innerHTML = trackingNumber;
-        currRow.insertCell(1).innerHTML = shippedDate;
-        currRow.insertCell(2).innerHTML = shippingLocation;
-        currRow.insertCell(3).innerHTML = boxId;
+        currRow.insertCell(0).innerText = trackingNumber;
+        currRow.insertCell(1).innerText = shippedDate;
+        currRow.insertCell(2).innerText = shippingLocation;
+        currRow.insertCell(3).innerText = boxId;
         currRow.insertCell(4).innerHTML = viewManifestButton;
-        currRow.insertCell(5).innerHTML = isReceived;
-        currRow.insertCell(6).innerHTML = receivedDate;
+        currRow.insertCell(5).innerText = isReceived;
+        currRow.insertCell(6).innerText = receivedDate;
         currRow.insertCell(7).innerHTML = packageConditionValue;
-        currRow.insertCell(8).innerHTML = packageComments;
+        currRow.insertCell(8).innerText = packageComments;
         
         addEventViewManifestButton('reportsViewManifest' + i, currBox, source);
     }
@@ -2328,8 +2337,8 @@ export const populateReportManifestTable = (currPage, searchSpecimenInstituteArr
  * @param {string} source - source of the data (eg: null or 'bptlShippingReport')
  */
 export const addPaginationFunctionality = (filter, source) => {
-    const numReportPages = appState.getState().numReportPages;
-    let currPageNum = appState.getState().reportPage || 1;
+    const numReportPages = appState.getState().reportData.numReportPages;
+    let currPageNum = appState.getState().reportData.currReportPageNum || 1;
 
     const paginationButtons = document.getElementById('paginationButtons');
     paginationButtons.innerHTML = `<ul class="pagination">
@@ -2354,7 +2363,17 @@ export const addPaginationFunctionality = (filter, source) => {
 
         currPageNum = newPageNum;
         currPageEle.innerHTML = currPageNum;
-        appState.setState({ reportPage: currPageNum, reportPageBoxData: null });
+
+        const stateUpdateObj = {
+            ...appState.getState(),
+            reportData: {
+                ...appState.getState().reportData,
+                currReportPageNum: currPageNum,
+                reportPageBoxData: null
+            }
+        };
+
+        appState.setState(stateUpdateObj);
 
         handleBoxReportsData(filter, source);
 
@@ -2384,6 +2403,10 @@ export const addPaginationFunctionality = (filter, source) => {
         // Validate the input to ensure it's a valid page number within the range
         if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= numReportPages) {
             setPage(pageNumber);
+        } else if (!isNaN(pageNumber) && (pageNumber < 1)) {
+            setPage(1);
+        } else if (!isNaN(pageNumber) && (pageNumber > numReportPages)) {
+            setPage(numReportPages);
         } else {
             alert(`Please enter a valid page number (1 - ${numReportPages}).`);
         }
@@ -2427,7 +2450,18 @@ export const addEventFilter = (source) => {
         try {
             showAnimation();
             const numReportPages = await getNumPages(5, filter, source);
-            appState.setState({ reportPage: 1, reportPageBoxData: null, numReportPages });
+
+            const stateUpdateObj = {
+                ...appState.getState(),
+                reportData: {
+                    currReportPageNum: 1,
+                    reportPageBoxData: null,
+                    numReportPages,
+                }
+            };
+
+            appState.setState(stateUpdateObj);
+
             handleBoxReportsData(filter, source);
             addPaginationFunctionality(filter, source);
             hideAnimation();

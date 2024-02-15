@@ -7,8 +7,17 @@ import { startReport } from "../reportsQuery.js";
 export const bptlShipReportsScreen = async (auth, route) => {
     const user = auth.currentUser;
     if (!user) return;
-    const username = user.displayName || user.email;;
-    appState.setState({ username, reportPage: null, reportPageBoxData: null, numReportPages: null});
+    const username = user.displayName || user.email;
+
+    appState.setState({
+        username,
+        reportData: {
+            currReportPageNum: null,
+            reportPageBoxData: null,
+            numReportPages: null
+        }
+    });
+
     bptlShipReportsScreenTemplate(username);
 };
 

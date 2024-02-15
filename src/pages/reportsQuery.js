@@ -13,7 +13,15 @@ export const reportsQuery = (auth, route) => {
                 return;
             }
             if (!response.role) return;
-            appState.setState({ reportPage: null, reportPageBoxData: null, numReportPages: null});
+            
+            appState.setState({
+                reportData: {
+                    currReportPageNum: null,
+                    reportPageBoxData: null,
+                    numReportPages: null
+                }
+            });
+
             startReport();
         } else {
             document.getElementById('navbarNavAltMarkup').innerHTML = homeNavBar();
@@ -25,16 +33,35 @@ export const reportsQuery = (auth, route) => {
 export const startReport = async (source) => {
     showAnimation();
 
-    let numReportPages = appState.getState().numReportPages;
-    let reportPage = appState.getState().reportPage;
+    let numReportPages = appState.getState().reportData.numReportPages;
+    let currReportPageNum = appState.getState().reportData.currReportPageNum;
 
     try {
         if (!numReportPages) {
             numReportPages = await getNumPages(5, {}, source);
-            reportPage = 1;
-            appState.setState({ reportPage, numReportPages });
-        } else if (!reportPage) {
-            appState.setState({ reportPage: 1 });
+            currReportPageNum = 1;
+
+            const stateUpdateObj = {
+                ...appState.getState(),
+                reportData: {
+                    ...appState.getState().reportData,
+                    currReportPageNum,
+                    numReportPages,
+                }
+            };
+
+            appState.setState(stateUpdateObj);
+
+        } else if (!currReportPageNum) {
+            const stateUpdateObj = {
+                ...appState.getState(),
+                reportData: {
+                    ...appState.getState().reportData,
+                    currReportPageNum: 1
+                }
+            };
+
+            appState.setState(stateUpdateObj);
         }
 
         document.getElementById('contentBody').innerHTML = buildShippingReportScreen(source);
@@ -169,7 +196,15 @@ const clearEventFilter = (source) => {
 
     let clearFilterButton = document.getElementById('clearFilter');
     clearFilterButton.addEventListener('click', async () => {
-        appState.setState({ reportPage: null, reportPageBoxData: null, numReportPages: null});
+        
+        appState.setState({
+            reportData: {
+                currReportPageNum: null,
+                reportPageBoxData: null,
+                numReportPages: null
+            }
+        });
+
         startReport(source);
     });
 }
