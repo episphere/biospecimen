@@ -87,7 +87,6 @@ export const populateCheckOutTable = async () => {
 }
 
 const redirectParticipantToCheckOut = (participantData) => {
-    console.log('participant List:', participantData);
     const participantCheckOutBtns = document.getElementsByClassName('participantCheckOutBtn');
     
     const handleClick = async (e) => {

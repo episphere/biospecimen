@@ -2978,7 +2978,7 @@ const setZeroDateTime = (dateTimeInput) => {
     return dateTimeInput < 10 ? '0' + dateTimeInput : dateTimeInput.toString();
 };
 
-export const formatISODateTime = (dateReceived) => {
+export const formatISODateTimeDateOnly = (dateReceived) => {
     let extractDate = dateReceived.split("T")[0]
     extractDate = extractDate.split('-')
     const formattedDateTimeStamp = extractDate[1]+'/'+extractDate[2]+'/'+extractDate[0]
