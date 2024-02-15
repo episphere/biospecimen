@@ -8,7 +8,16 @@ export const bptlShipReportsScreen = async (auth, route) => {
     const user = auth.currentUser;
     if (!user) return;
     const username = user.displayName || user.email;
-    appState.setState({ username });
+
+    appState.setState({
+        username,
+        reportData: {
+            currReportPageNum: null,
+            reportPageBoxData: null,
+            numReportPages: null
+        }
+    });
+
     bptlShipReportsScreenTemplate(username);
 };
 
