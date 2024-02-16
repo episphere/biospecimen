@@ -262,6 +262,7 @@ export const conceptIds = {
         983848564 : 'Colby Abbotsford',
         261931804 : 'Minocqua',
         665277300 : 'Merrill',
+        467088902 : 'Fargo South University',
         111111111 : 'NIH/NCI',
         807835037 : 'Other'
     },
@@ -276,6 +277,7 @@ export const conceptIds = {
         'hfhLRC': 706927479,
         'hfhPRC': 886364332,
         'sfImag': 589224449,
+        'sfFargo': 467088902,
         'ingHar': 145191545,
         'rivEas': 489380324,
         'soLo': 120264574,

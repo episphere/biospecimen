@@ -536,36 +536,49 @@ export const addGoToSpecimenLinkEvent = () => {
 
 export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
     const form = document.getElementById('checkInCompleteForm');
-    form.addEventListener('submit', async e => {
+    form && form.addEventListener('submit', async e => {
         e.preventDefault();
-        const btnCheckIn = document.getElementById('checkInComplete');
-        btnCheckIn.disabled = true;
-        
-        let query = `connectId=${parseInt(form.dataset.connectId)}`;
-        
-        const response = await findParticipant(query);
-        const data = response.data[0];
-        if(isCheckedIn) {
-            checkOutParticipant(data);
-            showTimedNotifications({ title: 'Success', body: 'Participant is checked out.' });
-            checkOutFlag === true ? location.reload() : goToParticipantSearch();
-        } else {
-            const visitConcept = document.getElementById('visit-select').value;
-            for(const visit of visitType) {
-                if (data[conceptIds.collection.selectedVisit] && data[conceptIds.collection.selectedVisit][visit.concept]) {
-                    const visitTime = new Date(data[conceptIds.collection.selectedVisit][visit.concept][conceptIds.checkInDateTime]);
-                    const now = new Date(); 
-                    if(now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
-                        const response = await getParticipantCollections(data.token);
-                        let collection = response.data.filter(res => res[conceptIds.collection.selectedVisit] == visit.concept);
-                        if (collection.length === 0) continue;
-                        const confirmContinueCheckIn = await handleCheckInWarning(visit, data, collection);
-                        if (!confirmContinueCheckIn) return;
+        try {
+            const btnCheckIn = document.getElementById('checkInComplete');
+            btnCheckIn.disabled = true;
+            
+            let query = `connectId=${parseInt(form.dataset.connectId)}`;
+            
+            const response = await findParticipant(query);
+            const data = response.data[0];
+            if (isCheckedIn) {
+                showAnimation();
+                await checkOutParticipant(data);
+                hideAnimation();
+                showTimedNotifications({ title: 'Success', body: 'Participant is checked out.' }, 100000, 1500);
+                setTimeout(() => {
+                    const closeButton = document.querySelector('#biospecimenModal .btn[data-dismiss="modal"]');
+                    if (closeButton) {
+                        closeButton.click();
+                    }
+                    checkOutFlag === true ? location.reload() : goToParticipantSearch(); 
+                }, 1500);
+            } else {
+                const visitConcept = document.getElementById('visit-select').value;
+                for (const visit of visitType) {
+                    if (data[conceptIds.collection.selectedVisit] && data[conceptIds.collection.selectedVisit][visit.concept]) {
+                        const visitTime = new Date(data[conceptIds.collection.selectedVisit][visit.concept][conceptIds.checkInDateTime]);
+                        const now = new Date(); 
+                        if (now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
+                            const response = await getParticipantCollections(data.token);
+                            let collection = response.data.filter(res => res[conceptIds.collection.selectedVisit] == visit.concept);
+                            if (collection.length === 0) continue;
+                            const confirmContinueCheckIn = await handleCheckInWarning(visit, data, collection);
+                            if (!confirmContinueCheckIn) return;
+                        }
                     }
                 }
+    
+                await handleCheckInModal(data, visitConcept, query);
             }
-
-            await handleCheckInModal(data, visitConcept, query);
+        } catch (error) {
+            const bodyMessage = isCheckedIn ? 'There was an error checking out the participant. Please try again.' : 'There was an error checking in the participant. Please try again.';
+            showNotifications({ title: 'Error', body: bodyMessage });
         }
     });
 };

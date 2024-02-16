@@ -2947,9 +2947,30 @@ export const translateNumToType = {
   "0054": "NA"
 };
 
+/**
+ * ISO 8601 DateTime to human readable date time (UTC).
+ * @param {string} isoDateTime - ISO 8601 string from Firestore.
+ * @returns {string} - UTC DateTime in a human readable format: MM/DD/YYYY HH:MM
+ */
 export const convertISODateTime = (isoDateTime) => {
     const date = new Date(isoDateTime);
     return setZeroDateTime(date.getUTCMonth() + 1) + '/' + setZeroDateTime(date.getUTCDate()) + '/' + date.getUTCFullYear() + ' ' + setZeroDateTime(date.getUTCHours()) + ':' + setZeroDateTime(date.getUTCMinutes())
+};
+
+/**
+ * Convert ISO 8601 DateTime to human readable date time (Local).
+ * @param {string} isoDateTime - ISO DateTime (UTC)
+ * @returns {string} - Local DateTime in a human readable format: either MM/DD/YYYY HH:MM
+ */
+export const convertISODateTimeToLocal = (isoDateTime) => {
+    const date = new Date(isoDateTime);
+    const month = setZeroDateTime(date.getMonth() + 1);
+    const day = setZeroDateTime(date.getDate());
+    const year = date.getFullYear();
+    const hours = setZeroDateTime(date.getHours());
+    const minutes = setZeroDateTime(date.getMinutes());
+
+    return `${month}/${day}/${year} ${hours}:${minutes}`;
 };
 
 // append 0 before min. if single digit min. or hour
@@ -2957,7 +2978,7 @@ const setZeroDateTime = (dateTimeInput) => {
     return dateTimeInput < 10 ? '0' + dateTimeInput : dateTimeInput.toString();
 };
 
-export const formatISODateTime = (dateReceived) => {
+export const formatISODateTimeDateOnly = (dateReceived) => {
     let extractDate = dateReceived.split("T")[0]
     extractDate = extractDate.split('-')
     const formattedDateTimeStamp = extractDate[1]+'/'+extractDate[2]+'/'+extractDate[0]
