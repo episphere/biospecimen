@@ -546,7 +546,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
             
             const response = await findParticipant(query);
             const data = response.data[0];
-            if(isCheckedIn) {
+            if (isCheckedIn) {
                 showAnimation();
                 await checkOutParticipant(data);
                 hideAnimation();
@@ -560,11 +560,11 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
                 }, 1500);
             } else {
                 const visitConcept = document.getElementById('visit-select').value;
-                for(const visit of visitType) {
+                for (const visit of visitType) {
                     if (data[conceptIds.collection.selectedVisit] && data[conceptIds.collection.selectedVisit][visit.concept]) {
                         const visitTime = new Date(data[conceptIds.collection.selectedVisit][visit.concept][conceptIds.checkInDateTime]);
                         const now = new Date(); 
-                        if(now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
+                        if (now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
                             const response = await getParticipantCollections(data.token);
                             let collection = response.data.filter(res => res[conceptIds.collection.selectedVisit] == visit.concept);
                             if (collection.length === 0) continue;
