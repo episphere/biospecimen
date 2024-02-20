@@ -2678,7 +2678,11 @@ export const getSiteTubesLists = (biospecimenData) => {
     const dashboardType = getWorkflow();
     const siteAcronym = getSiteAcronym();
     const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === biospecimenData[conceptIds.collectionLocation])[0]?.location : undefined;
-    const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
+    let siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
+    //After March 1, 2024 the ACD tubes will expire and no longer be collected
+    if (+new Date() >= +new Date('2024-03-01T00:00:00.000')) {
+        siteTubesList = siteTubesList.filter((tube) => tube.id !== '0005');
+    }
     return siteTubesList;
 }
 
