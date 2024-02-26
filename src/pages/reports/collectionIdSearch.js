@@ -44,7 +44,6 @@ export const collectionIdSearchScreenTemplate = async (username) => {
     searchSpecimenEvent();
 };
 
-// TODO: this is basically a duplicate of events.js -> addEventSearchSpecimen(). Refactor with 'reports' update.
 const searchSpecimenEvent = () => {
     const form = document.getElementById('specimenLookupForm');
     if (!form) return;

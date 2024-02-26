@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameCSVObj, convertISODateTime, formatISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, triggerSuccessModal, getSpecimensInBoxes, findReplacementTubeLabels } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameCSVObj, formatISODateTimeDateOnly, convertISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, triggerSuccessModal, getSpecimensInBoxes, findReplacementTubeLabels } from "../../shared.js";
 import { conceptIds as fieldToConceptIdMapping } from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar } from "../../navbar.js";
@@ -368,7 +368,7 @@ const updateResultMappings = (filteredResult, vialMappings, collectionId, tubeId
         : (keyToLocationObj[filteredResult[fieldToConceptIdMapping.collectionLocation]] || '');
 
     const dateReceived = filteredResult[fieldToConceptIdMapping.dateReceived]
-        ? formatISODateTime(filteredResult[fieldToConceptIdMapping.dateReceived])
+        ? formatISODateTimeDateOnly(filteredResult[fieldToConceptIdMapping.dateReceived])
         : '';
 
     const dateDrawn = (collectionTypeValue === fieldToConceptIdMapping.clinical)
