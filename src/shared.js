@@ -797,22 +797,24 @@ export const ship = async (boxIdToTrackingNumberMap, shippingData) => {
 }
 
 export const getPage = async (pageNumber, elementsPerPage, orderBy, filters, source) => {
-  try {
-    const idToken = await getIdToken();
-    let requestObj = {
-        method: "POST",
-        headers:{
-            Authorization:"Bearer "+idToken,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({pageNumber, elementsPerPage, orderBy, filters, source})
+    try {
+        pageNumber -= 1; // Firestore uses 0-based indexing, the Biospecimen 'reports' module uses page numbers (1-based indexing).
+
+        const idToken = await getIdToken();
+        let requestObj = {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + idToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ pageNumber, elementsPerPage, orderBy, filters, source })
+        }
+        const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
+        return response.json();
     }
-    const response = await fetch(`${api}api=getBoxesPagination`, requestObj);
-    return response.json();
-  } 
-  catch (error) {
-    return {code: 500, message: error.message};
-  }
+    catch (error) {
+        return { code: 500, message: error.message };
+    }
 }
 
 export const bagConceptIdList = [
@@ -1523,7 +1525,6 @@ export const searchSpecimenInstitute = async () => {
  * @returns {object} returns a response object of biospecimen documents with matching collection ids from healthcare provider's box id
  */
 export const searchSpecimenByRequestedSiteAndBoxId = async (requestedSite, boxId) => {
-    logAPICallStartDev('searchSpecimenByRequestedSiteAndBoxId');
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=searchSpecimen&requestedSite=${requestedSite}&boxId=${boxId}`, {
     method: "GET",
@@ -1531,7 +1532,7 @@ export const searchSpecimenByRequestedSiteAndBoxId = async (requestedSite, boxId
         Authorization:"Bearer "+idToken
         }
     });
-    logAPICallEndDev('searchSpecimenByRequestedSiteAndBoxId');
+
     if (response.status === 200) {
         const responseObject = await response.json();
         return responseObject;
@@ -1576,24 +1577,32 @@ export const getLocationsInstitute = async () => {
     logAPICallEndDev('getLocationsInstitute');
     return locations;
 }
+
+/**
+ * Fetch the box count and calculate the number of pages to display on the reports screen (for pagination feature).
+ * @param {number} numPerPage - number of boxes to display per page on the reports screen.
+ * @param {object} filters - filters to apply to the report.
+ * @param {string} source - source of the report (null or 'bptlShippingReport').
+ * @returns {number} - number of pages to display on the reports screen.
+ */
 export const getNumPages = async (numPerPage, filters, source) => {
-  try {
-    const idToken = await getIdToken();
-    const response = await fetch(`${api}api=getNumBoxesShipped`, {
-        method: "POST",
-        headers: {
-            Authorization:"Bearer "+idToken,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({filters, source})
-    });
-    let res = await response.json();
-    let numBoxes = res.data;
-    return Math.ceil(numBoxes/numPerPage);
-  }
-  catch (error) {
-    return {code: 500, message: error.message};
-  }
+    try {
+        const idToken = await getIdToken();
+        const response = await fetch(`${api}api=getNumBoxesShipped`, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + idToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ filters, source })
+        });
+        let res = await response.json();
+        let numBoxes = res.data;
+        return Math.ceil(numBoxes / numPerPage);
+    }
+    catch (error) {
+        return { code: 500, message: error.message };
+    }
 }
 
 export const getSiteCouriers = async () => {
@@ -2291,6 +2300,7 @@ export const participationConversion = {
 };
 
 export const surveyConversion = {
+    '789467219': 'Not Yet Eligible', 
     '972455046': 'Not Started',
     '615768760': 'Started',
     '231311385': 'Submitted'
@@ -2668,7 +2678,11 @@ export const getSiteTubesLists = (biospecimenData) => {
     const dashboardType = getWorkflow();
     const siteAcronym = getSiteAcronym();
     const subSiteLocation = siteLocations[dashboardType]?.[siteAcronym] ? siteLocations[dashboardType]?.[siteAcronym]?.filter(dt => dt.concept === biospecimenData[conceptIds.collectionLocation])[0]?.location : undefined;
-    const siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
+    let siteTubesList = siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] ? siteSpecificTubeRequirements[siteAcronym]?.[dashboardType]?.[subSiteLocation] : siteSpecificTubeRequirements[siteAcronym]?.[dashboardType];
+    //After March 1, 2024 the ACD tubes will expire and no longer be collected
+    if (+new Date() >= +new Date('2024-02-20T00:00:00.000')) {
+        siteTubesList = siteTubesList.filter((tube) => tube.id !== '0005');
+    }
     return siteTubesList;
 }
 
@@ -2937,9 +2951,30 @@ export const translateNumToType = {
   "0054": "NA"
 };
 
+/**
+ * ISO 8601 DateTime to human readable date time (UTC).
+ * @param {string} isoDateTime - ISO 8601 string from Firestore.
+ * @returns {string} - UTC DateTime in a human readable format: MM/DD/YYYY HH:MM
+ */
 export const convertISODateTime = (isoDateTime) => {
     const date = new Date(isoDateTime);
     return setZeroDateTime(date.getUTCMonth() + 1) + '/' + setZeroDateTime(date.getUTCDate()) + '/' + date.getUTCFullYear() + ' ' + setZeroDateTime(date.getUTCHours()) + ':' + setZeroDateTime(date.getUTCMinutes())
+};
+
+/**
+ * Convert ISO 8601 DateTime to human readable date time (Local).
+ * @param {string} isoDateTime - ISO DateTime (UTC)
+ * @returns {string} - Local DateTime in a human readable format: either MM/DD/YYYY HH:MM
+ */
+export const convertISODateTimeToLocal = (isoDateTime) => {
+    const date = new Date(isoDateTime);
+    const month = setZeroDateTime(date.getMonth() + 1);
+    const day = setZeroDateTime(date.getDate());
+    const year = date.getFullYear();
+    const hours = setZeroDateTime(date.getHours());
+    const minutes = setZeroDateTime(date.getMinutes());
+
+    return `${month}/${day}/${year} ${hours}:${minutes}`;
 };
 
 // append 0 before min. if single digit min. or hour
@@ -2947,7 +2982,7 @@ const setZeroDateTime = (dateTimeInput) => {
     return dateTimeInput < 10 ? '0' + dateTimeInput : dateTimeInput.toString();
 };
 
-export const formatISODateTime = (dateReceived) => {
+export const formatISODateTimeDateOnly = (dateReceived) => {
     let extractDate = dateReceived.split("T")[0]
     extractDate = extractDate.split('-')
     const formattedDateTimeStamp = extractDate[1]+'/'+extractDate[2]+'/'+extractDate[0]
