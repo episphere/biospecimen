@@ -1076,27 +1076,37 @@ const redirectSpecimenPage = async (accessionID1, accessionID3, selectedVisit, f
     specimenTemplate(data, formData);
 }
 
-export const addEventBiospecimenCollectionForm = async (participantData, biospecimenData) => {
+export const addEventBiospecimenCollectionFormSave = async (participantData, biospecimenData) => {
     const collectionSaveExit = document.getElementById('collectionSave');
-    collectionSaveExit.addEventListener('click', async () => {
-        try {
-            await collectionSubmission(participantData, biospecimenData);
-        } catch (error) {
-            console.error("Error saving collection: ", error);
-            showNotifications({ title: 'Error saving collection!', body: error.message });
-        }
+    collectionSaveExit && collectionSaveExit.addEventListener('click', async () => {
+        await checkFormAndSave(participantData, biospecimenData, false);
     });
 
     const collectionSaveContinue = document.getElementById('collectionNext');
-    collectionSaveContinue.addEventListener('click', async () => {
-        try {
-            await collectionSubmission(participantData, biospecimenData, true);
-        } catch (error) {
-            console.error("Error saving collection: ", error);
-            showNotifications({ title: 'Error saving collection!', body: error.message });
-        }
+    collectionSaveContinue && collectionSaveContinue.addEventListener('click', async () => {
+        await checkFormAndSave(participantData, biospecimenData, true);
     });
 };
+
+/**
+ * Validate the form and save the collection.
+ * @param {Object} participantData - Participant data object.
+ * @param {Object} biospecimenData - Biospecimen data object.
+ * @param {Boolean} shouldNavigateToReview - Boolean to indicate the button clicked. false -> 'save' (stay on page). true -> 'Go to Review' (navigate to Review screen).
+ */
+const checkFormAndSave = async (participantData, biospecimenData, shouldNavigateToReview) => {
+    try {
+        const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
+        const isFormDataValid = inputFields.every(input => validateFormInputField(input, biospecimenData, true));
+        
+        isFormDataValid ?
+            await collectionSubmission(participantData, biospecimenData, shouldNavigateToReview) :
+            showTimedNotifications({ title: 'Data Errors Exist!', body: 'Please correct data entry errors in red before saving.' });
+    } catch (error) {
+        console.error("Error saving collection: ", error);
+        showNotifications({ title: 'Error saving collection!', body: error.message });
+    }
+}
 
 export const addEventBiospecimenCollectionFormToggles = () => {
     const collectedBoxes = Array.from(document.getElementsByClassName('tube-collected'));
@@ -1256,39 +1266,12 @@ export const addEventBiospecimenCollectionFormEditAll = () => {
     });
 };
 
-export const addEventBiospecimenCollectionFormText = (participantData, biospecimenData) => {
+export const addEventBiospecimenCollectionFormInputErrorHandler = (biospecimenData) => {
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
 
     inputFields.forEach(input => {
         input.addEventListener('change', () => {
-            const siteTubesList = getSiteTubesLists(biospecimenData)
-            const tubes = siteTubesList.filter(participantData => participantData.concept === input.id.replace('Id', ''));
-
-            removeSingleError(input.id);
-
-            let value = getValue(`${input.id}`).toUpperCase();
-            if (value.length != 0) {
-
-                const tubeCheckBox = document.getElementById(input.id.replace('Id',''));
-
-                if (tubeCheckBox) input.required = tubeCheckBox.checked;
-
-                const masterID = value.substr(0, masterSpecimenIDRequirement.length);
-                const tubeID = value.substr(masterSpecimenIDRequirement.length + 1, totalCollectionIDLength);
-
-                if (input.required && value.length !== totalCollectionIDLength) {
-                    errorMessage(input.id, `Combination of Collection ID and Full Specimen ID should be ${totalCollectionIDLength} characters long and in the following format CXA123456 1234.`);
-                }
-                else if (input.required && masterID !== biospecimenData['820476880']) {
-                    errorMessage(input.id, 'Invalid Collection ID.');
-                }
-                else if (input.required && tubes.length === 0) {
-                    errorMessage(input.id, 'Invalid Full Specimen ID.');
-                }
-                else if (input.required && (tubes[0].id !== tubeID && !additionalTubeIDRequirement.regExp.test(tubeID))) {
-                    errorMessage(input.id, 'Invalid Full Specimen ID.');
-                }
-            }
+            validateFormInputField(input, biospecimenData);
         });
 
         input.addEventListener('keyup', e => {
@@ -1303,6 +1286,43 @@ export const addEventBiospecimenCollectionFormText = (participantData, biospecim
         });
     });
 };
+
+/**
+ * Validate form input field. If the input is not valid, display an error message.
+ * This function is used for both the initial form input validation and the form input validation after the user clicks 'Submit'.
+ * If the input is a tube, it can be an exact match to the tube ID or a replacement label (0050-0054). If the input is a bag, it must be an exact match to the bag ID.
+ * @param {Object} inputTube - The tube data input by the user.
+ * @param {Object} biospecimenData - The biospecimen data object.
+ * @returns {Boolean} - Returns true if the input is valid, otherwise returns false.
+ */
+const validateFormInputField = (inputTube, biospecimenData) => {
+    removeSingleError(inputTube.id);
+    
+    const collectionID = biospecimenData[conceptIds.collection.id];
+    const siteTubesList = getSiteTubesLists(biospecimenData);
+    const siteTubeData = siteTubesList.find(siteTube => siteTube.concept === inputTube.id.replace('Id', ''));
+    const validationID = collectionID + ' ' + siteTubeData.id;
+    const inputTubeIDString = getValue(`${inputTube.id}`).toUpperCase();
+    const replcementTubeRegExp = /^CXA\d{6}\s(0050|0051|0052|0053|0054)$/;
+    
+    const tubeCheckBox = document.getElementById(inputTube.id.replace('Id',''));
+    if (tubeCheckBox && tubeCheckBox.checked) {
+        const isBagID = siteTubeData.id === '0008' || siteTubeData.id === '0009';
+        const isTubeIDEntryValid = isBagID ?
+            validationID === inputTubeIDString :
+            validationID === inputTubeIDString || (collectionID === inputTubeIDString.substr(0, masterSpecimenIDRequirement.length) && replcementTubeRegExp.test(inputTubeIDString));
+
+        if (!isTubeIDEntryValid) {
+            const errorMessageText = isBagID ?
+                `Invalid entry. Bag ID must be ${validationID}` :
+                `Invalid entry. Specimen ID must be ${validationID}. Replacement labels 0050-0054 are valid.`;
+            errorMessage(inputTube.id, errorMessageText);
+            return false;
+        }
+    }
+
+    return true;
+}
 
 export const createTubesForCollection = async (formData, biospecimenData) => {
     const { collectionTime, scannedTime, tube } = conceptIds.collection;
