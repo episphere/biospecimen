@@ -21,9 +21,11 @@ export const welcomeScreen = async (auth, route) => {
 }
 
 const clinicalOnlySiteArray = ['KPNW', 'KPCO', 'KPHI', 'KPGA'];
-const researchOnlySiteArray = ['MFC', 'UCM', 'SFH'];
+// Allow SFH access to both dashboards in non-prod environments
+const researchOnlySiteArray = location.host === urls.prod ? ['MFC', 'UCM', 'SFH'] : ['MFC', 'UCM'];
 
 const welcomeScreenTemplate = (name, data, auth, route) => {
+    console.log('data', data)
     let template = '';
     let dashboardSelectionStr = '';
 
