@@ -25,7 +25,6 @@ const clinicalOnlySiteArray = ['KPNW', 'KPCO', 'KPHI', 'KPGA'];
 const researchOnlySiteArray = location.host === urls.prod ? ['MFC', 'UCM', 'SFH'] : ['MFC', 'UCM'];
 
 const welcomeScreenTemplate = (name, data, auth, route) => {
-    console.log('data', data)
     let template = '';
     let dashboardSelectionStr = '';
 
