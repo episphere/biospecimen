@@ -79,7 +79,8 @@ const renderCollectionLocationList = () => {
                 appState.getState().siteAcronym === 'SFH' ? `
                     <li><a class="dropdown-item" data-siteKey="sfImag" id="sfImag">Sioux Falls Imagenetics</a></li>
                     <li><a class="dropdown-item" data-siteKey="sfFargo" id="sfFargo">Fargo South University</a></li>
-                    <li><a class="dropdown-item" data-siteKey="sfBM" id="sfBM">Bismarck Medical Center</a></li>`:
+                    <li><a class="dropdown-item" data-siteKey="sfBM" id="sfBM">Bismarck Medical Center</a></li>
+                    <li><a class="dropdown-item" data-siteKey="sfSC" id="sfSC">Sioux Falls Sanford Center</a></li>`:
                 appState.getState().siteAcronym === 'UCM' ? `
                     <li><a class="dropdown-item" data-siteKey="ucDcam" id="ucDcam">UC-DCAM</a></li>
                     <li><a class="dropdown-item" data-siteKey="ingHar" id="ingHar">Ingalls Harvey</a></li>

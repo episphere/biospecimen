@@ -1872,6 +1872,22 @@ export const updateBaselineData = async (siteTubesList, data) => {
     await updateParticipant(baselineData);
 }
 
+
+export const nameToKeyObj = 
+{
+    "kpNW": 452412599,
+    "hPartners" : 531629870,
+    "snfrdHealth": 657167265,
+    "hfHealth": 548392715,
+    "maClinic": 303349821,
+    "kpCO": 125001209,
+    "uChiM": 809703864,
+    "nci": 13,
+    "kpHI": 300267574,
+    "kpGA": 327912200,
+    "allResults": 1000
+}
+
 export const siteFullNames = {
     'NCI': 'National Cancer Institute',
     'KPGA': 'Kaiser Permanente Georgia',
@@ -1888,7 +1904,7 @@ export const siteFullNames = {
 
 export const siteSpecificLocation = {
   "HP Research Clinic" : {"siteAcronym":"HP", "siteCode":531629870, "loginSiteName": "HealthPartners Research Clinic"},
-  "HP Park Nicollet": {"siteAcronym": "HP", "siteCode": 531629870, "loginSiteName": "HealthPartners Research Clinic"},
+  "HP Park Nicollet": {"siteAcronym": "HP", "siteCode": nameToKeyObj.hPartners, "loginSiteName": "HealthPartners Research Clinic"},
   "Henry Ford Main Campus": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
   "Henry Ford West Bloomfield Hospital": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
   "Henry Ford Medical Center- Fairlane": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
@@ -1909,7 +1925,8 @@ export const siteSpecificLocation = {
   "MF Pop-Up": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "Sioux Falls Imagenetics": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
   "Fargo South University": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
-  "Bismarck Medical Center": {"siteAcronym": "SFH", "siteCode": 657167265, "loginSiteName": "Sanford Health"},
+  "Bismarck Medical Center": {"siteAcronym": "SFH", "siteCode": nameToKeyObj.snfrdHealth, "loginSiteName": "Sanford Health"},
+  "Sioux Falls Sanford Center": {"siteAcronym": "SFH", "siteCode": nameToKeyObj.snfrdHealth, "loginSiteName": "Sanford Health"},
   "DCAM": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "Ingalls Harvey": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "River East": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
@@ -1928,10 +1945,10 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'HealthPartners Research Clinic',
     email: 'communityresearchdepartment@healthpartners.com',
   },
-  574368418: {
+  [conceptIds.nameToKeyObj.hpPN]: {
     siteSpecificLocation: 'HP Park Nicollet',
     siteAcronym: 'HP',
-    siteCode: '531629870',
+    siteCode: nameToKeyObj.hPartners,
     siteTeam: 'HealthPartners Connect Study Team',
     loginSiteName: 'HealthPartners Research Clinic',
     email: 'communityresearchdepartment@healthpartners.com',
@@ -1968,7 +1985,7 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'Henry Ford Health System',
     email: 'ConnectBioHFH@hfhs.org',
   },
-  322059622: {
+  [conceptIds.nameToKeyObj.hfhPU]: {
     siteSpecificLocation: 'HFH Pop-Up"',
     siteAcronym: 'HFHS',
     siteCode: '548392715',
@@ -2088,10 +2105,18 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'Sanford Health',
     email: 'connectstudy@sanfordhealth.org',
   },
-  127626388: {
-    siteSpecificLocation: 'Bismarck Medical Center"',
+  [conceptIds.nameToKeyObj.sfBM]: {
+    siteSpecificLocation: 'Bismarck Medical Center',
     siteAcronym: 'SFH',
-    siteCode: '657167265',
+    siteCode: nameToKeyObj.snfrdHealth,
+    siteTeam: 'Sanford Connect Study Team',
+    loginSiteName: 'Sanford Health',
+    email: 'connectstudy@sanfordhealth.org',
+  },
+  [conceptIds.nameToKeyObj.sfSC]: {
+    siteSpecificLocation: 'Sioux Falls Sanford Center',
+    siteAcronym: 'SFH',
+    siteCode: nameToKeyObj.snfrdHealth,
     siteTeam: 'Sanford Connect Study Team',
     loginSiteName: 'Sanford Health',
     email: 'connectstudy@sanfordhealth.org',
@@ -2191,9 +2216,10 @@ export const conceptIdToSiteSpecificLocation = {
   777644826: "DCAM",
   111111111: "Main Campus",
   222222222: "Frederick",
-  574368418: "HP Park Nicollet",
-  322059622: "HFH Pop-Up",
-  127626388: "Bismarck Medical Center"
+  [conceptIds.nameToKeyObj.hpPN]: "HP Park Nicollet",
+  [conceptIds.nameToKeyObj.hfhPU]: "HFH Pop-Up",
+  [conceptIds.nameToKeyObj.sfBM]: "Bismarck Medical Center",
+  [conceptIds.nameToKeyObj.sfSC]: "Sioux Falls Sanford Center",
 }
 
 export const siteSpecificLocationToConceptId = {
@@ -2224,25 +2250,12 @@ export const siteSpecificLocationToConceptId = {
   "Merrill": 665277300,
   "Fargo South University": 467088902,
   "Frederick": 222222222,
-  "HP Park Nicollet": 574368418,
-  "HFH Pop-Up": 322059622,
-  "Bismarck Medical Center": 127626388,
+  "HP Park Nicollet": conceptIds.nameToKeyObj.hpPN,
+  "HFH Pop-Up": conceptIds.nameToKeyObj.hfhPU,
+  "Bismarck Medical Center": conceptIds.nameToKeyObj.sfBM,
+  "Sioux Falls Sanford Center": conceptIds.nameToKeyObj.sfSC,
 }
 
-export const nameToKeyObj = 
-{
-    "kpNW": 452412599,
-    "hPartners" : 531629870,
-    "snfrdHealth": 657167265,
-    "hfHealth": 548392715,
-    "maClinic": 303349821,
-    "kpCO": 125001209,
-    "uChiM": 809703864,
-    "nci": 13,
-    "kpHI": 300267574,
-    "kpGA": 327912200,
-    "allResults": 1000
-}
 
 export const keyToNameAbbreviationObj = {
   452412599: "kpNW",
@@ -2294,11 +2307,11 @@ export const keyToLocationObj =
     567969985: "MF Pop-Up",
     698283667: "Lake Hallie",
     834825425: "HP Research Clinic",
-    574368418 : "HP Park Nicollet",
+    [conceptIds.nameToKeyObj.hpPN] : "HP Park Nicollet",
     736183094: "HFH K-13 Research Clinic",
     886364332: "Henry Ford Health Pavilion",
     706927479: "HFH Livonia Research Clinic",
-    322059622 : "HFH Pop-Up",
+    [conceptIds.nameToKeyObj.hfhPU] : "HFH Pop-Up",
     813701399: "Weston",
     145191545: "Ingalls Harvey",
     489380324: "River East",
@@ -2312,7 +2325,8 @@ export const keyToLocationObj =
     665277300: "Merrill",
     467088902: "Fargo South University",
     589224449: "Sioux Falls Imagenetics",
-    127626388 : "Bismarck Medical Center",
+    [conceptIds.nameToKeyObj.sfBM] : "Bismarck Medical Center",
+    [conceptIds.nameToKeyObj.sfSC] : "Sioux Falls Sanford Center",
     111111111: "NIH",
     13:"NCI"
 
@@ -2509,13 +2523,13 @@ export const siteLocations = {
                 {location: 'Wisconsin Rapids', concept: 487512085}, {location: 'Colby Abbotsford', concept: 983848564}, {location: 'Minocqua', concept: 261931804}, {location: 'Merrill', concept: 665277300},
                 {location: 'MF Pop-Up', concept: 567969985}
               ],
-        'HP': [{location: 'HP Research Clinic', concept: 834825425}, {location: 'HP Park Nicollet', concept: 574368418}],
+        'HP': [{location: 'HP Research Clinic', concept: 834825425}, {location: 'HP Park Nicollet', concept: conceptIds.nameToKeyObj.hpPN}],
         // HFH Pop-up
         'HFHS': [{location: 'HFH K-13 Research Clinic', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332},
                 {location: 'HFH Livonia Research Clinic', concept: 706927479},
-                {location: 'HFH Pop-Up', concept: 322059622}],
+                {location: 'HFH Pop-Up', concept: conceptIds.nameToKeyObj.hfhPU}],
         // Bismarck
-        'SFH': [{location: 'Sioux Falls Imagenetics', concept: 589224449}, {location: 'Fargo South University', concept: 467088902}, {location: 'Bismarck Medical Center', concept: 127626388}],
+        'SFH': [{location: 'Sioux Falls Imagenetics', concept: 589224449}, {location: 'Fargo South University', concept: 467088902}, {location: 'Bismarck Medical Center', concept: conceptIds.nameToKeyObj.sfBM}, {location: 'Sioux Falls Sanford Center', concept: conceptIds.nameToKeyObj.sfSC}],
         'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}]
     },
     'clinical': {
