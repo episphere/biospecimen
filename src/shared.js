@@ -1173,28 +1173,44 @@ const arrangeFetchedTubes = (specimen, isPartiallyBoxed) => {
     if (!collectionId) return;
     const bloodUrineCollection = `${collectionId} 0008`;
     const mouthwashCollection = `${collectionId} 0009`;
-    
-    const tubeDataObject = removeUnusableTubes(specimen);
-    const allTubeIdsInSpecimen = Object.values(tubeDataObject);
 
-    const allMouthwashTubes = allTubeIdsInSpecimen.filter(tubeId => tubeId.split(' ')[1] === '0007');
-    const allBloodUrineTubes = allTubeIdsInSpecimen.filter(tubeId => tubeId.split(' ')[1] !== '0007');
+    const tubeDataObject = removeUnusableTubes(specimen);
+    const allTubeIdsInSpecimen = Object.keys(tubeDataObject);
+
+    const allMouthwashTubes = allTubeIdsInSpecimen
+        .filter(cid => cid === conceptIds.collection.mouthwashTube1.toString())
+        .map(cid => tubeDataObject[cid].split(' ')[1]);
+    const allBloodUrineTubes = allTubeIdsInSpecimen
+        .filter(cid => cid !== conceptIds.collection.mouthwashTube1.toString())
+        .map(cid => tubeDataObject[cid].split(' ')[1]);
     let strayTubeArray = specimen[conceptIds.strayTubesList] ?? [];
 
     // Handle mouthwash tubes. Mouthwash tubes always belong in available collections (not the stray tubes list).
     // If mouthwash tube is in stray tubes (this happens for partiallyBoxed specimens when other tubes in the specimen are boxed first),
     // Add it to available collections and remove from stray tubes list.
     if (allMouthwashTubes.length > 0) {
+        const allMouthwashTubesFullIds = allMouthwashTubes.map(tubeId => collectionId + ' ' + tubeId);
+        
         if (isPartiallyBoxed) {
-            // Mouthwash tubes will be in the stray tubes array.
-            const index = strayTubeArray.findIndex(str => str.endsWith('0007'));
-            if (index !== -1) {
-                const mouthwashTube = strayTubeArray[index];
-                if (mouthwashTube) {
+            // If the collection is partially boxed and the mouthwash tube is in the stray tube list, add it to available collections and remove from stray tubes list.
+            // If it isn't in the stray tubes list, it's already boxed. Skip it.
+            if (allMouthwashTubesFullIds.some(fullTubeId => strayTubeArray.includes(fullTubeId))) {
+                const index = strayTubeArray.findIndex(str => str.endsWith('0007'));
+                if (index !== -1) {
+                    const mouthwashTube = strayTubeArray[index];
+                    if (mouthwashTube) {
+                        usableTubes[mouthwashCollection] = [mouthwashTube.slice(-4)];
+                        strayTubeArray.splice(index, 1);
+                    }
+                // If Mouthwash tube is not found under 0007, search under replacement tube values 0050-0054
+                } else if (miscTubeIdSet.has(allMouthwashTubes[0])){
+                    const mouthwashTube = allMouthwashTubes[0];
                     usableTubes[mouthwashCollection] = [mouthwashTube.slice(-4)];
-                    strayTubeArray.splice(index, 1);
+                    const tubeIdToFilter = collectionId + ' ' + mouthwashTube;
+                    strayTubeArray = strayTubeArray.filter(tubeId => tubeId !== tubeIdToFilter);
                 }
             }
+        // It the collection is not boxed, assign directly.
         } else {
             usableTubes[mouthwashCollection] = allMouthwashTubes.map(str => str.slice(-4));
         }
@@ -1202,13 +1218,17 @@ const arrangeFetchedTubes = (specimen, isPartiallyBoxed) => {
     
     // Compare all blood/urine tubes to stray tubes list.
     // If all allBloodUrineTubes are in the strayTubesList, add them to available collections and remove from stray tubes list.
+    // If all tubes are not in the strayTubesList, some are are already boxed. The remaining tubes belong in the stray tubes list (usableTubes['unlabelled']).
     if (allBloodUrineTubes.length > 0) {
+        // If the collection is partially boxed, check whether all blood/urine tubes are in the stray tubes list.
         if (isPartiallyBoxed || strayTubeArray.length > 0) {
-            const areAllTubesInStrayTubeArray = allBloodUrineTubes.every(tubeId => strayTubeArray.includes(tubeId));
+            const allBloodUrineTubesFullIds = allBloodUrineTubes.map(tubeId => collectionId + ' ' + tubeId);
+            const areAllTubesInStrayTubeArray = allBloodUrineTubesFullIds.every(tubeId => strayTubeArray.includes(tubeId));
             if (areAllTubesInStrayTubeArray) {
                 usableTubes[bloodUrineCollection] = allBloodUrineTubes.map(str => str.slice(-4));
-                strayTubeArray = strayTubeArray.filter(tubeId => !allBloodUrineTubes.includes(tubeId));
+                strayTubeArray = strayTubeArray.filter(tubeId => !allBloodUrineTubesFullIds.includes(tubeId));
             }
+        // If the collection is not boxed, assign directly.
         } else {
             usableTubes[bloodUrineCollection] = allBloodUrineTubes.map(str => str.slice(-4));
         }
@@ -1227,6 +1247,8 @@ const tubeDeviationFlags = [
     conceptIds.collection.deviationType.mislabel,
     conceptIds.collection.deviationType.notFound,
 ];
+
+export const miscTubeIdSet = new Set(['0050', '0051', '0052', '0053', '0054']);
 
 /**
  * Remove deviated unshippable tubes and missing tubes from the specimen object. Do not remove deviated shippable tubes.
@@ -1384,13 +1406,31 @@ const isolateSpecimensInCurrentBoxes = (specimensList, tubeIdSet) => {
     return updatedSpecimensList;
 }
 
+/**
+ * Filter out duplicate specimens from the combined list of boxed, unboxed, and partially boxed specimens.
+ * If the collectionId already exists in uniqueSpecimens, check all tubes in the specimen and add the missing tubes to uniqueSpecimens[collectionId].
+ * @param {Array} specimensList - list of specimens to filter (may contain duplicates).
+ * @returns {Array} - list of unique specimens.
+ */
 export const filterDuplicateSpecimensInList = (specimensList) => {
-    return specimensList.reduce((acc, curr) => {
-        if (!acc.some(obj => obj[conceptIds.collection.id] === curr[conceptIds.collection.id])) {
-            acc.push(curr);
+    const uniqueSpecimens = {};
+
+    specimensList.forEach(specimen => {
+        const collectionId = specimen[conceptIds.collection.id];
+        
+        if (uniqueSpecimens[collectionId]) {
+            specimenCollection.tubeCidList.forEach(tubeCid => {
+                if (!uniqueSpecimens[collectionId][tubeCid] && specimen[tubeCid] && specimen[tubeCid][conceptIds.collection.tube.scannedId]) {
+                    uniqueSpecimens[collectionId][tubeCid] = specimen[tubeCid];
+                }
+            });
+        } else {
+            uniqueSpecimens[collectionId] = specimen;
         }
-        return acc;
-    }, []);
+    });
+
+    // Convert the object values back to an array
+    return Object.values(uniqueSpecimens);
 }
 
 // searches boxes collection by login site (789843387) and Site-specific location id (560975149)

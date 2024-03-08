@@ -158,7 +158,7 @@ export const addEventSearchSpecimen = () => {
 
 // Add specimen to box using the allBoxesList from state.
 // Return early if (1) no shipping location selected, (2) if the input is empty, (3) if item is already shipped, (4) if item is already in a box.
-export const addEventAddSpecimenToBox = () => {
+export const addEventAddSpecimenToBox = (currBoxId) => {
     const form = document.getElementById('addSpecimenForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
@@ -212,10 +212,10 @@ export const addEventAddSpecimenToBox = () => {
         }
     });
 
-    addEventSubmitSpecimenBuildModal();
+    addEventSubmitSpecimenBuildModal(currBoxId);
 }
 
-const addEventSubmitSpecimenBuildModal = () => {
+const addEventSubmitSpecimenBuildModal = (currBoxId) => {
     const submitButtonSpecimen = document.getElementById('submitMasterSpecimenId');
     submitButtonSpecimen.addEventListener('click', async e => {
         e.preventDefault();
@@ -227,7 +227,7 @@ const addEventSubmitSpecimenBuildModal = () => {
         const biospecimensList = specimenTablesResult.biospecimensList;
         const tableIndex = specimenTablesResult.tableIndex;
 
-        if (biospecimensList.length == 0) {
+        if (biospecimensList.length === 0) {
             showNotifications({ title: 'Not found', body: 'The specimen with entered search criteria was not found!' });
             hideAnimation();
             const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -238,7 +238,21 @@ const addEventSubmitSpecimenBuildModal = () => {
 
         createShippingModalBody(biospecimensList, masterSpecimenId, foundInOrphan);
         addEventAddSpecimensToListModalButton(masterSpecimenId, tableIndex, foundInOrphan);
+        addEventCancelAddSpecimenToListModalButton(currBoxId);
     })
+}
+
+/**
+ * Handle the cancel button click event in the modal.
+ * This refresh clears existing event listeners (duplicates existed prior to this handler).
+ * @param {String} currBoxId - the current box id in the shipping dashboard
+ */
+export const addEventCancelAddSpecimenToListModalButton = (currBoxId) => {
+    const cancelButton = document.getElementById('shippingModalCancel');
+    cancelButton && cancelButton.addEventListener('click', () => {
+        document.getElementById('shippingCloseButton').click();
+        startShipping(appState.getState().userName, true, currBoxId);
+    });
 }
 
 export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrphan) => {
@@ -276,6 +290,7 @@ export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrpha
             try {
                 const boxUpdateResponse = await updateBox(boxToUpdate);
                 hideAnimation();
+                console.log('boxUpdateResponse', boxUpdateResponse);
                 if (boxUpdateResponse.code === 200) {
                     updateShippingStateAddBagToBox(currBoxId, bagId, boxToUpdate, boxUpdateResponse.data);
                     await startShipping(appState.getState().userName, true, currBoxId);
