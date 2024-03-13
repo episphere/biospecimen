@@ -290,7 +290,6 @@ export const addEventAddSpecimensToListModalButton = (bagId, tableIndex, isOrpha
             try {
                 const boxUpdateResponse = await updateBox(boxToUpdate);
                 hideAnimation();
-                console.log('boxUpdateResponse', boxUpdateResponse);
                 if (boxUpdateResponse.code === 200) {
                     updateShippingStateAddBagToBox(currBoxId, bagId, boxToUpdate, boxUpdateResponse.data);
                     await startShipping(appState.getState().userName, true, currBoxId);

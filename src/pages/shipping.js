@@ -148,7 +148,7 @@ const getStoredLocationOnInit = () => {
  * Note: Orphan panel is currently hidden by request of the product team. Retain for future use.
  *       Future orphan panel use would require completed state management implementation in the 'currDeleteButton' event listener.
  */
-    const populateAvailableCollectionsList = async (availableCollectionsObj, loadFromState = false) => {
+const populateAvailableCollectionsList = async (availableCollectionsObj, loadFromState = false) => {
 
     if (loadFromState) {
         availableCollectionsObj = appState.getState().availableCollectionsObj ?? {};
