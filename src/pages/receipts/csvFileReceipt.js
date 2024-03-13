@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameCSVObj, formatISODateTimeDateOnly, convertISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, triggerSuccessModal, getSpecimensInBoxes, findReplacementTubeLabels } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameCSVObj, formatISODateTimeDateOnly, convertISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, miscTubeIdSet, triggerSuccessModal, getSpecimensInBoxes, findReplacementTubeLabels } from "../../shared.js";
 import { conceptIds as fieldToConceptIdMapping } from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar } from "../../navbar.js";
@@ -172,7 +172,6 @@ const getSpecimensByReceivedDate = async (dateFilter) => {
  * BPTL wants to know what the original ID label should be (Ex: 0001-0024, 0060, not 0050-0054).
  * These need to be mapped to the key in the specimen object
  */
-const miscTubeIdSet = new Set(['0050', '0051', '0052', '0053', '0054']);
 
 const modifyBSIQueryResults = (results) => {
     const csvDataArray = [];
