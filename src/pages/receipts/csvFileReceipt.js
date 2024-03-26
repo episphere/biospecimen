@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameCSVObj, formatISODateTimeDateOnly, convertISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, triggerSuccessModal, getSpecimensInBoxes, findReplacementTubeLabels } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameCSVObj, formatISODateTimeDateOnly, convertISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, miscTubeIdSet, triggerSuccessModal, getSpecimensInBoxes, findReplacementTubeLabels } from "../../shared.js";
 import { conceptIds as fieldToConceptIdMapping } from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar } from "../../navbar.js";
@@ -172,7 +172,6 @@ const getSpecimensByReceivedDate = async (dateFilter) => {
  * BPTL wants to know what the original ID label should be (Ex: 0001-0024, 0060, not 0050-0054).
  * These need to be mapped to the key in the specimen object
  */
-const miscTubeIdSet = new Set(['0050', '0051', '0052', '0053', '0054']);
 
 const modifyBSIQueryResults = (results) => {
     const csvDataArray = [];
@@ -252,10 +251,10 @@ const vialMapping = {
             '0001': ['10 ml Serum separator tube', 'SST', 'Serum', '10'],
             '0002': ['10 ml Serum separator tube', 'SST', 'Serum', '10'],
             '0003': ['10 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '10'],
-            '0004': ['10 ml Vacutainer', 'EDTA', 'WHOLE BL', '10'],
+            '0004': ['10 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '10'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
-            '0007': ['15 ml Nalgene jar', 'Crest Alcohol Free', 'Saliva', '15'],
+            '0007': ['15ml Nalgene jar', 'Crest Alcohol Free', 'Saliva', '15'],
             '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
     },
@@ -264,7 +263,7 @@ const vialMapping = {
             '0001': ['10 ml Serum separator tube', 'SST', 'Serum', '10'],
             '0002': ['10 ml Serum separator tube', 'SST', 'Serum', '10'],
             '0003': ['10 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '10'],
-            '0004': ['10 ml Vacutainer', 'EDTA', 'WHOLE BL', '10'],
+            '0004': ['10 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '10'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
             '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
@@ -276,8 +275,8 @@ const vialMapping = {
             '0012': ['5 ml Serum separator tube', 'SST', 'Serum', '5'],
             '0003': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
             '0013': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
-            '0004': ['4 ml Vacutainer', 'EDTA', 'WHOLE BL', '4'],
-            '0014': ['4 ml Vacutainer', 'EDTA', 'WHOLE BL', '4'],
+            '0004': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['6 ml Vacutainer', 'No Additive', 'Urine', '6'],
             '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
@@ -289,8 +288,8 @@ const vialMapping = {
             '0012': ['5 ml Serum separator tube', 'SST', 'Serum', '5'],
             '0003': ['4.5 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4.5'],
             '0013': ['4.5 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4.5'],
-            '0004': ['4 ml Vacutainer', 'EDTA', 'WHOLE BL', '4'],
-            '0014': ['4 ml Vacutainer', 'EDTA', 'WHOLE BL', '4'],
+            '0004': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
             '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
@@ -302,9 +301,9 @@ const vialMapping = {
             '0012': ['5 ml Serum separator tube', 'SST', 'Serum', '5'],
             '0003': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
             '0013': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
-            '0004': ['3 ml Vacutainer', 'EDTA', 'WHOLE BL', '3'],
-            '0014': ['3 ml Vacutainer', 'EDTA', 'WHOLE BL', '3'],
-            '0024': ['3 ml Vacutainer', 'EDTA', 'WHOLE BL', '3'],
+            '0004': ['3 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '3'],
+            '0014': ['3 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '3'],
+            '0024': ['3 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '3'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
             '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
@@ -317,8 +316,8 @@ const vialMapping = {
             '0021': ['3.5 ml Serum separator tube', 'SST', 'Serum', '3.5'],
             '0003': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
             '0013': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
-            '0004': ['4 ml Vacutainer', 'EDTA', 'WHOLE BL', '4'],
-            '0014': ['4 ml Vacutainer', 'EDTA', 'WHOLE BL', '4'],
+            '0004': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
             '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
@@ -331,12 +330,12 @@ const vialMapping = {
             '0021': ['5 ml Serum separator tube', 'SST', 'Serum', '5'],
             '0003': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
             '0013': ['4 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '4'],
-            '0004': ['4 ml Vacutainer', 'EDTA', 'WHOLE BL', '4'],
-            '0014': ['4 ml Vacutainer', 'EDTA', 'WHOLE BL', '4'],
-            '0024': ['4 ml Vacutainer', 'EDTA', 'WHOLE BL', '4'],
+            '0004': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0014': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
+            '0024': ['4 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '4'],
             '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
-            '0007': ['15 ml Nalgene jar', 'Crest Alcohol Free', 'Saliva', '15'],
+            '0007': ['15ml Nalgene jar', 'Crest Alcohol Free', 'Saliva', '15'],
             '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
     }

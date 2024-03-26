@@ -1,5 +1,5 @@
 import { addBoxAndUpdateSiteDetails, appState, conceptIdToSiteSpecificLocation, combineAvailableCollectionsObjects, displayManifestContactInfo, filterDuplicateSpecimensInList, getAllBoxes, getBoxes, getSpecimensInBoxes, getUnshippedBoxes, getLocationsInstitute, getSiteMostRecentBoxId, getSpecimensByBoxedStatus, hideAnimation, locationConceptIDToLocationMap,
-        removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
+        miscTubeIdSet, removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
         translateNumToType, userAuthorization, getSiteAcronym, findReplacementTubeLabels } from "../shared.js"
 import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs,
         addEventCompleteShippingButton, addEventModalAddBox, addEventNavBarBoxManifest, addEventNavBarShipment, addEventNavBarShippingManifest, addEventNavBarAssignTracking, addEventLocationSelect,
@@ -109,12 +109,12 @@ const buildShippingInterface = async (userName, loadFromState, currBoxId) => {
             availableCollectionsObj = combineAvailableCollectionsObjects(specimens.notBoxed.availableCollections, specimens.partiallyBoxed.availableCollections);
             replacementTubeLabelObj = findReplacementTubeLabels(finalizedSpecimenList);
         }
-
+        
         populateAvailableCollectionsList(availableCollectionsObj, loadFromState);
         setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName, replacementTubeLabelObj);
         populateViewShippingBoxContentsList(currBoxId);
         populateBoxesToShipTable();
-        addShippingEventListeners();
+        addShippingEventListeners(currBoxId);
 
     } catch (error) {
         console.error("Error building shipping interface:", error);
@@ -124,14 +124,14 @@ const buildShippingInterface = async (userName, loadFromState, currBoxId) => {
     }
 };
 
-const addShippingEventListeners = () => {
+const addShippingEventListeners = (currBoxId) => {
     const userName = appState.getState().userName;
     addEventNavBarShipment("navBarShippingDash", userName);
     addEventNavBarShippingManifest(userName);
     addEventBoxSelectListChanged();
     addEventNavBarBoxManifest("navBarBoxManifest");
     addEventLocationSelect("selectLocationList", "shipping_location");
-    addEventAddSpecimenToBox();
+    addEventAddSpecimenToBox(currBoxId);
     addEventModalAddBox();
 }
 
@@ -148,7 +148,7 @@ const getStoredLocationOnInit = () => {
  * Note: Orphan panel is currently hidden by request of the product team. Retain for future use.
  *       Future orphan panel use would require completed state management implementation in the 'currDeleteButton' event listener.
  */
-    const populateAvailableCollectionsList = async (availableCollectionsObj, loadFromState = false) => {
+const populateAvailableCollectionsList = async (availableCollectionsObj, loadFromState = false) => {
 
     if (loadFromState) {
         availableCollectionsObj = appState.getState().availableCollectionsObj ?? {};
@@ -610,13 +610,20 @@ export const createShippingModalBody = (biospecimensList, masterBiospecimenId, i
     populateModalSelect(boxIdAndBagsObj);
 
     if (isBagEmpty) {
-        showNotifications({ title: 'Not found', body: 'The participant with entered search criteria not found!' });
+        showNotifications({ title: 'Not found', body: 'The specimen with entered search criteria not found!' });
         document.getElementById('shippingCloseButton').click();
         hideAnimation();
     }
 }
 
 const shouldAddModalRow = (isOrphan, splitTubeIdArray, tubeId) => {
+    // If the tube has a replacement label, use the original tube Id to determine if it should be added to the modal.
+    if (miscTubeIdSet.has(tubeId)) {
+        const fullTubeIdToSearch = splitTubeIdArray[0] + ' ' + tubeId;
+        const replacementTubeLabelObj = appState.getState().replacementTubeLabelObj;
+        const standardTubeId = replacementTubeLabelObj[fullTubeIdToSearch];
+        tubeId = standardTubeId ? standardTubeId.split(' ')[1] : tubeId;
+    }
     if (isOrphan) return true;
     if (splitTubeIdArray.length >= 2 && splitTubeIdArray[1] == '0008') {
         //look for all non-mouthwash (0007)
@@ -737,6 +744,13 @@ const handleAvailableCollectionsTableRows = (tableIndex, tubesToDelete) => {
 }
 
 const assignBagId = (tubeId, collectionId) => {
+    // If the tube has a replacement label, use the original tube Id to assign the bag Id.
+    if (miscTubeIdSet.has(tubeId)) {
+        const fullTubeIdToSearch = collectionId + ' ' + tubeId;
+        const standardTubeId = appState.getState().replacementTubeLabelObj[fullTubeIdToSearch];
+        tubeId = standardTubeId ? standardTubeId.split(' ')[1] : tubeId;
+    }
+
     if (tubeId === '0007') {
         return collectionId + ' 0009';
     } else {
