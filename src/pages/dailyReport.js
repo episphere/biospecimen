@@ -69,14 +69,18 @@ const renderCollectionLocationList = () => {
                     <li><a class="dropdown-item" data-siteKey="merr" id="merr">Merrill</a></li>
                     <li><a class="dropdown-item" data-siteKey="mfPopUp" id="mfPopUp">MF Pop-Up</a></li>`:
                     appState.getState().siteAcronym === 'HP' ? `
-                    <li><a class="dropdown-item" data-siteKey="hpRC" id="hpRC">HP Research Clinic</a></li>`:
+                    <li><a class="dropdown-item" data-siteKey="hpRC" id="hpRC">HP Research Clinic</a></li>
+                    <li><a class="dropdown-item" data-siteKey="hpPN" id="hpPN">HP Park Nicollet</a></li>`:
                 appState.getState().siteAcronym === 'HFHS' ? `
                     <li><a class="dropdown-item" data-siteKey="hfhKRC" id="hfhKRC">HFH K-13 Research Clinic</a></li>
                     <li><a class="dropdown-item" data-siteKey="hfhPRC" id="hfhPRC">HFH Cancer Pavilion Research Clinic</a></li>
-                    <li><a class="dropdown-item" data-siteKey="hfhLRC" id="hfhLRC">HFH Livonia Research Clinic</a></li>`:
+                    <li><a class="dropdown-item" data-siteKey="hfhLRC" id="hfhLRC">HFH Livonia Research Clinic</a></li>
+                    <li><a class="dropdown-item" data-siteKey="hfhPU" id="hfhPU">HFH Pop-Up</a></li>`:
                 appState.getState().siteAcronym === 'SFH' ? `
                     <li><a class="dropdown-item" data-siteKey="sfImag" id="sfImag">Sioux Falls Imagenetics</a></li>
-                    <li><a class="dropdown-item" data-siteKey="sfFargo" id="sfFargo">Fargo South University</a></li>`:
+                    <li><a class="dropdown-item" data-siteKey="sfFargo" id="sfFargo">Fargo South University</a></li>
+                    <li><a class="dropdown-item" data-siteKey="sfBM" id="sfBM">Bismarck Medical Center</a></li>
+                    <li><a class="dropdown-item" data-siteKey="sfSC" id="sfSC">Sioux Falls Sanford Center</a></li>`:
                 appState.getState().siteAcronym === 'UCM' ? `
                     <li><a class="dropdown-item" data-siteKey="ucDcam" id="ucDcam">UC-DCAM</a></li>
                     <li><a class="dropdown-item" data-siteKey="ingHar" id="ingHar">Ingalls Harvey</a></li>

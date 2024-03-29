@@ -1,4 +1,4 @@
-import { addEventSelectAllCollection, addEventBiospecimenCollectionForm, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormEditAll, addEventBiospecimenCollectionFormText } from './../events.js'
+import { addEventSelectAllCollection, addEventBiospecimenCollectionFormToggles, addEventBackToSearch, addEventBiospecimenCollectionFormEdit, addEventBiospecimenCollectionFormEditAll, addEventBiospecimenCollectionFormInputErrorHandler, addEventBiospecimenCollectionFormSave } from './../events.js'
 import { checkTubeDataConsistency, removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorkflow, findParticipant, checkedIn } from '../shared.js';
 import { checkInTemplate } from './checkIn.js';
 import { conceptIds } from '../fieldToConceptIdMapping.js';
@@ -244,11 +244,11 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
     generateBarCode('connectIdBarCode', participantData.Connect_ID);
     addEventSelectAllCollection();
     addEventBackToSearch('backToSearch');
-    addEventBiospecimenCollectionForm(participantData, biospecimenData);
     addEventBiospecimenCollectionFormToggles();
     addEventBiospecimenCollectionFormEdit();
     addEventBiospecimenCollectionFormEditAll();
-    addEventBiospecimenCollectionFormText(participantData, biospecimenData);
+    addEventBiospecimenCollectionFormInputErrorHandler(biospecimenData);
+    addEventBiospecimenCollectionFormSave(participantData, biospecimenData);
     
     document.getElementById('collectionCheckout')?.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -258,7 +258,7 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
             checkInTemplate(participantData);
             document.body.scrollIntoView();
         } catch (error) {
-            console.log("Error occured while trying to check out.");
+            console.error("Error occured while trying to check out.");
         }
      });
 }
