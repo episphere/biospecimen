@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, getWorkflow, checkedIn, verificationConversion, restrictNonBiospecimenUser } from "./../shared.js"
+import { userAuthorization, removeActiveClass, getWorkflow, checkedIn, participantCanCheckIn, verificationConversion, restrictNonBiospecimenUser } from "./../shared.js"
 import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSearchSpecimen, addEventNavBarSpecimenSearch, addEventClearAll } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 
@@ -184,15 +184,16 @@ export const searchResults = (result) => {
             <td>${data['912301837'] === 208325815 || data['912301837'] === 622008261 || data['912301837'] === 458508122 ? `<i class="fas fa-2x fa-check"></i>` :  `<i class="fas fa-2x fa-times"></i>`}</td>`;
 
         const isCheckedIn = checkedIn(data);
+        const canCheckIn = participantCanCheckIn(data);
         if (getWorkflow() === 'research') {
         template += `
             <tr>
                 ${tdTemplate}
                 <td>
-                    <button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID} data-check-in-btn-uid=${data.state.uid}>${!isCheckedIn ? `Go to Check-In` : `Go to Check-Out`}</button>
+                    ${canCheckIn ? `<button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID} data-check-in-btn-uid=${data.state.uid}>${!isCheckedIn ? `Go to Check-In` : `Go to Check-Out`}</button>` : ``}
                 </td>
                 <td>
-                    ${isCheckedIn ? `<button class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>` : ``}
+                    ${isCheckedIn && canCheckIn ? `<button class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>` : ``}
                 </td>
             </tr>
         `
@@ -201,7 +202,7 @@ export const searchResults = (result) => {
             <tr>
                 ${tdTemplate}
                 <td>
-                    <button class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>
+                    ${canCheckIn ? `<button class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>` : ``}
                 </td>
             </tr>
         ` 
