@@ -2386,6 +2386,7 @@ export const participationConversion = {
     '872012139': 'Revoked HIPAA only',
     '854021266': 'Withdrew consent',
     '241236037': 'Destroy data',
+    '884452262': 'Data destroyed',
     '458508122': 'Refused all future activities',
     '618686157': 'Deceased'
 };
@@ -2746,6 +2747,24 @@ export const checkOutParticipant = async (data) => {
          
          await updateParticipant(checkOutData);
     }
+};
+
+export const participantCanCheckIn = (data) => {
+    let canCheckIn = false; // Default to false
+    let participationStatusCode = data[conceptIds.participationStatus];
+    if(participationStatusCode) {
+        // Do all comparisons with strings to be safe
+        canCheckIn = [
+            conceptIds.participationStatusCodes.revokedHIPAA.toString(),
+            conceptIds.participationStatusCodes.withdrewConsent.toString(),
+            conceptIds.participationStatusCodes.destroyData.toString(),
+            conceptIds.participationStatusCodes.dataDestroyed.toString(),
+            conceptIds.participationStatusCodes.refusedAllFutureActivities.toString(),
+            conceptIds.participationStatusCodes.deceased.toString()
+        ].indexOf(participationStatusCode.toString()) === -1;
+    }
+
+    return canCheckIn;
 };
 
 export const getCollectionsByVisit = async (data) => {
