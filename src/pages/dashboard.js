@@ -202,7 +202,7 @@ export const searchResults = (result) => {
             <tr>
                 ${tdTemplate}
                 <td>
-                    ${canCheckIn ? `<button class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>` : ``}
+                <button ${!canCheckIn ? `disabled` : ``} class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>
                 </td>
             </tr>
         ` 

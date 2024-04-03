@@ -2750,11 +2750,12 @@ export const checkOutParticipant = async (data) => {
 };
 
 export const participantCanCheckIn = (data) => {
+    let yesString = conceptIds.yes + '';
     if(
-        data[conceptIds.withdrewConsent] === conceptIds.yes ||
-        data[conceptIds.revokedHIPAA] === conceptIds.yes ||
-        data[conceptIds.destroyData] === conceptIds.yes ||
-        data[conceptIds.dataDestroyed] === conceptIds.yes
+        (data[conceptIds.withdrewConsent] + '') === yesString ||
+        (data[conceptIds.revokedHIPAA] + '') === yesString ||
+        (data[conceptIds.destroyData] + '') === yesString ||
+        (data[conceptIds.dataDestroyed] + '') === yesString
     ) {
         return false;
     } else {

@@ -12,7 +12,7 @@ export const checkInTemplate = async (data, checkOutFlag) => {
     }
 
     const isCheckedIn = checkedIn(data);
-    const canCheckInOrOut = participantCanCheckIn(data);
+    const canCheckIn = participantCanCheckIn(data);
     const visit = getCheckedInVisit(data);
 
     const response = await getParticipantCollections(data.token);
@@ -78,14 +78,24 @@ export const checkInTemplate = async (data, checkOutFlag) => {
 
     template += await participantStatus(data, collections);
 
-    if(canCheckInOrOut) {
-        template += `
-                <div class="col">
-                    <button class="btn btn-outline-primary btn-block text-nowrap" ${!isCheckedIn ? `disabled` : visitCollections.length > 0 ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
-                </div>
 
-            </form>
-        `;
+    if(canCheckIn) {
+        template += `
+            <div class="col">
+                <button class="btn btn-outline-primary btn-block text-nowrap" ${!isCheckedIn ? `disabled` : visitCollections.length > 0 ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
+            </div>
+
+        </form>
+    `;
+    } else {
+        // Disable only the check-in button if the user has withdrawn consent
+        template += `
+            <div class="col">
+                <button class="btn btn-outline-primary btn-block text-nowrap" ${isCheckedIn ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
+            </div>
+
+        </form>
+    `;
     }
     
 
