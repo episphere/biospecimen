@@ -1,4 +1,4 @@
-import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getParticipantCollections, getSiteTubesLists } from "./../shared.js";
+import { generateBarCode, removeActiveClass, visitType, checkedIn, participantCanCheckIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getParticipantCollections, getSiteTubesLists } from "./../shared.js";
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 import { conceptIds } from '../fieldToConceptIdMapping.js';
 
@@ -12,6 +12,7 @@ export const checkInTemplate = async (data, checkOutFlag) => {
     }
 
     const isCheckedIn = checkedIn(data);
+    const canCheckInOrOut = participantCanCheckIn(data);
     const visit = getCheckedInVisit(data);
 
     const response = await getParticipantCollections(data.token);
@@ -77,13 +78,16 @@ export const checkInTemplate = async (data, checkOutFlag) => {
 
     template += await participantStatus(data, collections);
 
-    template += `
-            <div class="col">
-                <button class="btn btn-outline-primary btn-block text-nowrap" ${!isCheckedIn ? `disabled` : visitCollections.length > 0 ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
-            </div>
+    if(canCheckInOrOut) {
+        template += `
+                <div class="col">
+                    <button class="btn btn-outline-primary btn-block text-nowrap" ${!isCheckedIn ? `disabled` : visitCollections.length > 0 ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
+                </div>
 
-        </form>
-    `;
+            </form>
+        `;
+    }
+    
 
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);
