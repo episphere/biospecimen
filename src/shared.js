@@ -2750,21 +2750,16 @@ export const checkOutParticipant = async (data) => {
 };
 
 export const participantCanCheckIn = (data) => {
-    let canCheckIn = false; // Default to false
-    let participationStatusCode = data[conceptIds.participationStatus];
-    if(participationStatusCode) {
-        // Do all comparisons with strings to be safe
-        canCheckIn = [
-            conceptIds.participationStatusCodes.revokedHIPAA.toString(),
-            conceptIds.participationStatusCodes.withdrewConsent.toString(),
-            conceptIds.participationStatusCodes.destroyData.toString(),
-            conceptIds.participationStatusCodes.dataDestroyed.toString(),
-            conceptIds.participationStatusCodes.refusedAllFutureActivities.toString(),
-            conceptIds.participationStatusCodes.deceased.toString()
-        ].indexOf(participationStatusCode.toString()) === -1;
+    if(
+        data[conceptIds.withdrewConsent] === conceptIds.yes ||
+        data[conceptIds.revokedHIPAA] === conceptIds.yes ||
+        data[conceptIds.destroyData] === conceptIds.yes ||
+        data[conceptIds.dataDestroyed] === conceptIds.yes
+    ) {
+        return false;
+    } else {
+        return true;
     }
-
-    return canCheckIn;
 };
 
 export const getCollectionsByVisit = async (data) => {

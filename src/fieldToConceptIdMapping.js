@@ -67,6 +67,12 @@ export const conceptIds = {
         refusedAllFutureActivities: 458508122,
         deceased: 618686157
     },
+
+    // Individual yes/no properties on the data
+    withdrewConsent: 747006172,
+    revokedHIPAA: 773707518,
+    destroyData: 831041022,
+    dataDestroyed: 861639549,
     
     // collection id
     collectionId: 825582494, //TODO: this ref should be named objectId or similar. collectionId is 820476880. 
