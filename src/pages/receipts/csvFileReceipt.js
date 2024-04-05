@@ -268,6 +268,15 @@ const vialMapping = {
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
             '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
+        hPartners: {
+            '0001': ['10 ml Serum separator tube', 'SST', 'Serum', '10'],
+            '0002': ['10 ml Serum separator tube', 'SST', 'Serum', '10'],
+            '0003': ['10 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '10'],
+            '0004': ['10 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '10'],
+            '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
+            '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
+        },
         kpCO: {
             '0001': ['5 ml Serum separator tube', 'SST', 'Serum', '5'],
             '0002': ['5 ml Serum separator tube', 'SST', 'Serum', '5'],
