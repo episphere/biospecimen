@@ -322,7 +322,7 @@ const vialMapping = {
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
             '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
-        snfrdHealth: {
+        sanfordHealth: {
           '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
           '0002': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
           '0011': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
