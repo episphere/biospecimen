@@ -322,6 +322,18 @@ const vialMapping = {
             '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
             '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
         },
+        snfrdHealth: {
+          '0001': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+          '0002': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+          '0011': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+          '0012': ['5 mL Serum separator tube', 'SST', 'Serum', '5'],
+          '0003': ['4.5 ml Vacutainer', 'Lithium Heparin Separator', 'Plasma', '4.5'],
+          '0013': ['4.5 ml Vacutainer', 'Lithium Heparin Separator', 'Plasma', '4.5'],
+          '0004': ['3 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '3'],
+          '0014': ['3 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '3'],
+          '0024': ['3 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '3'],
+          '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10']
+        },
         default: {
             '0001': ['5 ml Serum separator tube', 'SST', 'Serum', '5'],
             '0002': ['5 ml Serum separator tube', 'SST', 'Serum', '5'],
