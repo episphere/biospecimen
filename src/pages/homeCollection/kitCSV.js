@@ -128,5 +128,5 @@ const vialMapping = {
 
 const generateKitCSVData = (items) => {
   const csv = 'Study ID, Sample Collection Center, Sample ID, Sequence, BSI ID, Subject ID, Date Received, Date Drawn, Vial Type, Additive/Preservative, Material Type, Volume, Volume Estimate, Volume Unit, Vial Warnings, Hemolyzed, Label Status, Visit\r\n';
-//   downloadCSVfile(items, csv, 'Kit-data-export');
+  downloadCSVfile(items, csv, 'Kit-data-export');
 }
