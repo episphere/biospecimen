@@ -21,7 +21,6 @@ export const welcomeScreen = async (auth, route) => {
 }
 
 const clinicalOnlySiteArray = ['KPNW', 'KPCO', 'KPHI', 'KPGA'];
-// Allow UCM access to both dashboards in non-prod environments (949)
 const researchOnlySiteArray = location.host === urls.prod ? ['MFC', 'UCM'] : ['MFC'];
 
 const welcomeScreenTemplate = (name, data, auth, route) => {
