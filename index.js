@@ -66,8 +66,6 @@ window.onload = () => {
     }
     else {
         !firebase.apps.length ? firebase.initializeApp(devFirebaseConfig()) : firebase.app();
-        // TODO: remove this!! This is for local dev testing only.
-        if (location.host.startsWith('localhost')) firebase.functions().useFunctionsEmulator('http://localhost:5001');
         !isLocalDev && window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'dev' });
     }
 
