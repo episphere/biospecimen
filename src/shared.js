@@ -105,7 +105,6 @@ export const validateUser = async () => {
 }
 
 export const findParticipant = async (query) => {
-    console.log('Query:', query);
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=getFilteredParticipants&${query}`, {
         method: "GET",
