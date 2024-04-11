@@ -1917,7 +1917,7 @@ export const nameToKeyObj =
 {
     "kpNW": 452412599,
     "hPartners" : 531629870,
-    "snfrdHealth": 657167265,
+    "sanfordHealth": 657167265,
     "hfHealth": 548392715,
     "maClinic": 303349821,
     "kpCO": 125001209,
@@ -1965,8 +1965,8 @@ export const siteSpecificLocation = {
   "MF Pop-Up": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
   "Sioux Falls Imagenetics": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
   "Fargo South University": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
-  "Bismarck Medical Center": {"siteAcronym": "SFH", "siteCode": nameToKeyObj.snfrdHealth, "loginSiteName": "Sanford Health"},
-  "Sioux Falls Sanford Center": {"siteAcronym": "SFH", "siteCode": nameToKeyObj.snfrdHealth, "loginSiteName": "Sanford Health"},
+  "Bismarck Medical Center": {"siteAcronym": "SFH", "siteCode": nameToKeyObj.sanfordHealth, "loginSiteName": "Sanford Health"},
+  "Sioux Falls Sanford Center": {"siteAcronym": "SFH", "siteCode": nameToKeyObj.sanfordHealth, "loginSiteName": "Sanford Health"},
   "DCAM": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "Ingalls Harvey": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
   "River East": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
@@ -2148,7 +2148,7 @@ export const locationConceptIDToLocationMap = {
   [conceptIds.nameToKeyObj.sfBM]: {
     siteSpecificLocation: 'Bismarck Medical Center',
     siteAcronym: 'SFH',
-    siteCode: nameToKeyObj.snfrdHealth,
+    siteCode: nameToKeyObj.sanfordHealth,
     siteTeam: 'Sanford Connect Study Team',
     loginSiteName: 'Sanford Health',
     email: 'connectstudy@sanfordhealth.org',
@@ -2156,7 +2156,7 @@ export const locationConceptIDToLocationMap = {
   [conceptIds.nameToKeyObj.sfSC]: {
     siteSpecificLocation: 'Sioux Falls Sanford Center',
     siteAcronym: 'SFH',
-    siteCode: nameToKeyObj.snfrdHealth,
+    siteCode: nameToKeyObj.sanfordHealth,
     siteTeam: 'Sanford Connect Study Team',
     loginSiteName: 'Sanford Health',
     email: 'connectstudy@sanfordhealth.org',
@@ -2300,7 +2300,7 @@ export const siteSpecificLocationToConceptId = {
 export const keyToNameAbbreviationObj = {
   452412599: "kpNW",
   531629870: "hPartners",
-  657167265: "snfrdHealth",
+  657167265: "sanfordHealth",
   548392715: "hfHealth",
   303349821: "maClinic",
   125001209: "kpCO",
