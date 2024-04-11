@@ -21,7 +21,10 @@ export const homeCollectionNavbar = () => {
                       <a class="nav-link" aria-current="page" href="#kitsreceipt" id="kitsReceipt">Kits Receipt</a>
                     </li>
                     <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#kitscsv" id="kitsCsv">Create .csv File</a>
+                        <a class="nav-link" aria-current="page" href="#kitscsv" id="kitsCsv">Create .csv File</a>
+                  </li>
+                  <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="#kit_status_reports" id="kitStatusReports">Kit Reports</a>
                   </li>
                 </ul>`;
   return template;

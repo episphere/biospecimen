@@ -1,7 +1,7 @@
 import { getIdToken, findParticipant, showAnimation, hideAnimation} from "../../shared.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
+import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
+import { displayKitStatusReportsHeader } from "./participantSelectionHeaders.js";
 import { fakeParticipants, printAddressesParticipants} from "./fakeParticipants.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 
@@ -9,16 +9,16 @@ import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 const fakeParticipantsData = JSON.parse(JSON.stringify(fakeParticipants));
 export const fakeParticipantsState = [...fakeParticipantsData];
 
-export const printAddressesScreen = async (auth, route) => {
+export const kitStatusReportsScreen = async (auth) => {
     const user = auth.currentUser;
     if (!user) return;
     const username = user.displayName ? user.displayName : user.email;
-    printaddressesTemplate(username, auth, route, fakeParticipantsData);
+    kitStatusReportsTemplate(username, fakeParticipantsState);
 };
 
-const printaddressesTemplate = async (name, auth, route, printAddressesParticipants) => {
+const kitStatusReportsTemplate = async (name, fakeParticipantsState) => {
     let template = ``;
-    template += renderParticipantSelectionHeader();
+    template += displayKitStatusReportsHeader();
     template += ` <div class="container-fluid">
                     <div id="root root-margin">
                       <div id="alert_placeholder"></div>
@@ -43,7 +43,7 @@ const printaddressesTemplate = async (name, auth, route, printAddressesParticipa
                                         </tr>
                                     </thead>   
                                     <tbody>
-                                      ${createParticipantRows(printAddressesParticipants)}
+                                      <!--${createParticipantRows(fakeParticipantsState)}-->
                                     </tbody>
                                   </table>
                             </div>
@@ -55,18 +55,16 @@ const printaddressesTemplate = async (name, auth, route, printAddressesParticipa
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
     activeHomeCollectionNavbar()
-    generateParticipantCsvGetter();
-    participantSelectionDropdown();
+    // generateParticipantCsvGetter();
+    kitStatusSelectionDropdown();
 };
 
 // REFACTOR
-export const participantSelectionDropdown = () => {
-    const participantDropdown = document.querySelector(
-        ".participantSelectionDropdown"
-    );
+export const kitStatusSelectionDropdown = () => {
+    const participantDropdown = document.querySelector(".kitStatusSelectionDropdown");
     // CHECKS THE CURRENT HASH AFTER ON LOAD AND SETS OPTION TO SELECTED
-    if (location.hash === "#participantselection") {
-        document.getElementById("select-pending").setAttribute("selected", "selected");
+    if (location.hash === "#kit_status_reports") { // TODO: enable only shipped  option, change this default later
+        document.getElementById("select-shipped").setAttribute("selected", "selected");
     }
     if (location.hash === "#allParticipants") {
         document.getElementById("select-all").setAttribute("selected", "selected");
@@ -80,7 +78,7 @@ export const participantSelectionDropdown = () => {
     if (location.hash === "#shipped") {
         document.getElementById("select-shipped").setAttribute("selected", "selected");
     }
-    if(location.hash === "#received"){
+    if (location.hash === "#received"){
         document.getElementById("select-received").setAttribute("selected","selected");
     }
 
@@ -105,7 +103,7 @@ export const participantSelectionDropdown = () => {
             location.hash = "#allParticipants";
             return;
         } else if (selection === "shipped") {
-            location.hash = "#shipped";
+            location.hash = "#kit_status_reports";
             return
         } else if(selection === "received") {
             location.hash = "#received"
