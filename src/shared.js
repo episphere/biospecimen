@@ -2750,17 +2750,10 @@ export const checkOutParticipant = async (data) => {
 };
 
 export const participantCanCheckIn = (data) => {
-    if (
-        data[conceptIds.withdrewConsent] === conceptIds.yes ||
-        data[conceptIds.revokedHIPAA] === conceptIds.yes ||
-        data[conceptIds.destroyData] === conceptIds.yes ||
-        data[conceptIds.dataDestroyed] === conceptIds.yes
-    ) {
-        return false;
-    } 
-    
-    return true;
-    
+    return data[conceptIds.withdrewConsent] !== conceptIds.yes &&
+        data[conceptIds.revokedHIPAA] !== conceptIds.yes &&
+        data[conceptIds.destroyData] !== conceptIds.yes &&
+        data[conceptIds.dataDestroyed] !== conceptIds.yes;
 };
 
 export const getCollectionsByVisit = async (data) => {
