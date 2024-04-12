@@ -2751,16 +2751,17 @@ export const checkOutParticipant = async (data) => {
 
 export const participantCanCheckIn = (data) => {
     let yesString = conceptIds.yes + '';
-    if(
+    if (
         (data[conceptIds.withdrewConsent] + '') === yesString ||
         (data[conceptIds.revokedHIPAA] + '') === yesString ||
         (data[conceptIds.destroyData] + '') === yesString ||
         (data[conceptIds.dataDestroyed] + '') === yesString
     ) {
         return false;
-    } else {
-        return true;
-    }
+    } 
+    
+    return true;
+    
 };
 
 export const getCollectionsByVisit = async (data) => {

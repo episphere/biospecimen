@@ -79,7 +79,7 @@ export const checkInTemplate = async (data, checkOutFlag) => {
     template += await participantStatus(data, collections);
 
 
-    if(canCheckIn) {
+    if (canCheckIn) {
         template += `
             <div class="col">
                 <button class="btn btn-outline-primary btn-block text-nowrap" ${!isCheckedIn ? `disabled` : visitCollections.length > 0 ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
