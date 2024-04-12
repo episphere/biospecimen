@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, getWorkflow, checkedIn, verificationConversion, restrictNonBiospecimenUser } from "./../shared.js"
+import { userAuthorization, removeActiveClass, getWorkflow, checkedIn, participantCanCheckIn, verificationConversion, restrictNonBiospecimenUser } from "./../shared.js"
 import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSearchSpecimen, addEventNavBarSpecimenSearch, addEventClearAll } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 
@@ -184,6 +184,7 @@ export const searchResults = (result) => {
             <td>${data['912301837'] === 208325815 || data['912301837'] === 622008261 || data['912301837'] === 458508122 ? `<i class="fas fa-2x fa-check"></i>` :  `<i class="fas fa-2x fa-times"></i>`}</td>`;
 
         const isCheckedIn = checkedIn(data);
+        const canCheckIn = participantCanCheckIn(data);
         if (getWorkflow() === 'research') {
         template += `
             <tr>
@@ -201,7 +202,7 @@ export const searchResults = (result) => {
             <tr>
                 ${tdTemplate}
                 <td>
-                    <button class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>
+                <button ${!canCheckIn ? `disabled` : ``} class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>
                 </td>
             </tr>
         ` 

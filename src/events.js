@@ -3,7 +3,7 @@ import {
     errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, updateBox,
     ship, disableInput, updateNewTempDate, getSiteTubesLists, getWorkflow, fixMissingTubeData,
     getSiteCouriers, getPage, getNumPages, removeSingleError, displayManifestContactInfo, checkShipForage, checkAlertState, retrieveDateFromIsoString,
-    convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
+    convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, participantCanCheckIn, shippingPrintManifestReminder,
     checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData,
     siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
     getCollectionsByVisit, getSpecimenAndParticipant, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showModalNotification, showTimedNotifications, showNotificationsCancelOrContinue, validateSpecimenAndParticipantResponse, findReplacementTubeLabels,
@@ -646,10 +646,20 @@ export const addEventVisitSelection = () => {
 
     const visitSelection = document.getElementById('visit-select');
     if(visitSelection) {
-        visitSelection.addEventListener('change', () => {
+        visitSelection.addEventListener('change', async () => {
 
             const checkInButton = document.getElementById('checkInComplete');
-            checkInButton.disabled = !visitSelection.value;
+            
+            // This should only apply to users who have not revoked their participation
+            const form = document.getElementById('checkInCompleteForm');
+            let query = `connectId=${parseInt(form.dataset.connectId)}`;
+            
+            const response = await findParticipant(query);
+            const data = response.data[0];
+            let canCheckIn = participantCanCheckIn(data);
+            if(canCheckIn) {
+                checkInButton.disabled = !visitSelection.value;
+            }
         });
     }
 }

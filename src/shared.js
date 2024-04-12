@@ -2386,6 +2386,7 @@ export const participationConversion = {
     '872012139': 'Revoked HIPAA only',
     '854021266': 'Withdrew consent',
     '241236037': 'Destroy data',
+    '884452262': 'Data destroyed',
     '458508122': 'Refused all future activities',
     '618686157': 'Deceased'
 };
@@ -2746,6 +2747,13 @@ export const checkOutParticipant = async (data) => {
          
          await updateParticipant(checkOutData);
     }
+};
+
+export const participantCanCheckIn = (data) => {
+    return data[conceptIds.withdrewConsent] !== conceptIds.yes &&
+        data[conceptIds.revokedHIPAA] !== conceptIds.yes &&
+        data[conceptIds.destroyData] !== conceptIds.yes &&
+        data[conceptIds.dataDestroyed] !== conceptIds.yes;
 };
 
 export const getCollectionsByVisit = async (data) => {
