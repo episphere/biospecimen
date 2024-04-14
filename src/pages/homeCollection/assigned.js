@@ -1,4 +1,4 @@
-import { getIdToken, findParticipant, showAnimation, hideAnimation, getParticipantSelection} from "../../shared.js";
+import { getIdToken, findParticipant, showAnimation, hideAnimation, getParticipantsByKitStatus} from "../../shared.js";
 import { displayKitStatusReportsHeader } from "./participantSelectionHeaders.js";
 import { kitStatusSelectionDropdown } from "./kitStatusReports.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
@@ -13,7 +13,7 @@ export const assignedScreen = async (auth, route) => {
 
 const assignedTemplate = async (name, auth, route) => {
   showAnimation();
-  const response = await getParticipantSelection("assigned");
+  const response = await getParticipantsByKitStatus("assigned");
   hideAnimation();
   let template = ``;
   template += displayKitStatusReportsHeader();

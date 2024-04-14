@@ -43,6 +43,8 @@ let api = '';
 
 if(location.host === urls.prod) api = 'https://api-myconnect.cancer.gov/biospecimen?';
 else if(location.host === urls.stage) api = 'https://api-myconnect-stage.cancer.gov/biospecimen?';
+//TODO: remove this!! This is for local dev only.
+else if(location.host.startsWith('localhost')) api = 'http://localhost:5001/nih-nci-dceg-connect-dev/us-central1/biospecimen?';
 else api = 'https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?';
 export const baseAPI = api;
 
@@ -2807,19 +2809,27 @@ export const SSOConfig = (email) => {
     return { tenantID, provider }
 }
 
-export const getParticipantSelection = async (filter) => {
+/**
+ * returns an object with participant data based on their kit status
+ * @param {string} type - the kit status type as concept Id
+*/
 
-    const idToken = await getIdToken();
-    const response = await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=getParticipantSelection&type=${filter}`, 
-    {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + idToken,
-      },
-    });
-    return response.json();
-  }
-     
+export const getParticipantsByKitStatus = async (kitStatus) => {
+    try {
+        const idToken = await getIdToken();
+        const response = await fetch(`${api}api=getParticipantsByKitStatus&type=${kitStatus}`, {
+            method: "GET",
+            headers: {
+                Authorization: "Bearer " + idToken,
+            },
+        });
+        return response.json();
+    } catch (error) {
+        console.error("Error in getting participants by kit status:", error);
+        throw error;
+    }
+};
+
 export const isDeviceMobile = /(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(window.navigator.userAgent) ||
     /Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(window.navigator.userAgent) || window.innerWidth < 1300;
 

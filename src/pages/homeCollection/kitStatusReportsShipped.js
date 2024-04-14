@@ -1,8 +1,9 @@
-import { showAnimation, hideAnimation, getParticipantSelection } from "../../shared.js";
+import { showAnimation, hideAnimation, getParticipantsByKitStatus } from "../../shared.js";
 import { displayKitStatusReportsHeader } from "./participantSelectionHeaders.js";
 import { kitStatusSelectionDropdown } from "./kitStatusReports.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
+import { conceptIds } from "../../fieldToConceptIdMapping.js";
 
 
 export const kitStatusReportsShippedScreen = async (auth, route) => {
@@ -14,7 +15,8 @@ export const kitStatusReportsShippedScreen = async (auth, route) => {
 
 const kitStatusShippedTemplate = async (name, auth, route) => {
   showAnimation();
-  const response = await getParticipantSelection("shipped"); // change later
+  const response = await getParticipantsByKitStatus(conceptIds.shipped);
+  console.log(response.data);
   hideAnimation();
     let template = ``;
     template += displayKitStatusReportsHeader();
@@ -37,7 +39,7 @@ const kitStatusShippedTemplate = async (name, auth, route) => {
                                     </tr>
                                 </thead>   
                                 <tbody>
-                                    ${createShippedRows(response.data)}
+                                    
                                 </tbody>
                             </table>
                     </div>
@@ -58,20 +60,23 @@ const kitStatusShippedTemplate = async (name, auth, route) => {
   kitStatusSelectionDropdown();
 };
 
-const createShippedRows = (participantRows) => {
-  let template = ``;
-  participantRows.forEach((i) => {
-    template += `
-                      <tr class="row-color-enrollment-dark participantRow">
-                          <td>${i.first_name}</td>
-                          <td>${i.last_name}</td>
-                          <td>${i.kit_status}</td>
-                          <td>${i.study_site}</td>
-                          <td>${i.pickup_date}</td>
-                          <td>${i.supply_kitId}</td>
-                          <td>${i.usps_trackingNum}</td>
-                          <td>${i.confirm_pickup}</td>
-                      </tr>`;
-  });
-  return template;
-};
+
+
+// ${createShippedRows(response.data)}
+// const createShippedRows = (participantRows) => {
+//   let template = ``;
+//   participantRows.forEach((i) => {
+//     template += `
+//                       <tr class="row-color-enrollment-dark participantRow">
+//                           <td>${i.first_name}</td>
+//                           <td>${i.last_name}</td>
+//                           <td>${i.kit_status}</td>
+//                           <td>${i.study_site}</td>
+//                           <td>${i.pickup_date}</td>
+//                           <td>${i.supply_kitId}</td>
+//                           <td>${i.usps_trackingNum}</td>
+//                           <td>${i.confirm_pickup}</td>
+//                       </tr>`;
+//   });
+//   return template;
+// };

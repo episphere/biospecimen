@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getParticipantSelection, convertTime } from "../../shared.js";
+import { showAnimation, hideAnimation, getParticipantsByKitStatus, convertTime } from "../../shared.js";
 import { displayKitStatusReportsHeader } from "./participantSelectionHeaders.js";
 import { kitStatusSelectionDropdown } from "./kitStatusReports.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
@@ -13,7 +13,7 @@ export const receivedKitsScreen = async (auth,route) => {
 
 const receivedKitsTemplate = async (name,auth,route) => {
   showAnimation();
-  const response = await getParticipantSelection("received");
+  const response = await getParticipantsByKitStatus("received");
   hideAnimation();
   let template = ``;
 

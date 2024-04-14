@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, getParticipantSelection} from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, getParticipantsByKitStatus} from "../../shared.js";
 import { displayKitStatusReportsHeader } from "./participantSelectionHeaders.js";
 import { kitStatusSelectionDropdown } from "./kitStatusReports.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
@@ -15,7 +15,7 @@ let kitAssignmentInfoText = "";
 
 const addressesPrintedTemplate = async (name, auth, route) => {
   showAnimation();
-  const response = await getParticipantSelection("addressPrinted");
+  const response = await getParticipantsByKitStatus("addressPrinted");
   hideAnimation();
   let template = ``;
   template += displayKitStatusReportsHeader();
