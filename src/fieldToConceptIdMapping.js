@@ -318,6 +318,7 @@ export const conceptIds = {
     UKID: 687158491,
     kitType: 379252329,
     mouthwashKitType: 976461859,
+    mouthwashSurveyCompletionStatus: 547363263,
     kitStatus: 221592017,
     pending: 517216441,
     addressPrinted: 849527480,
