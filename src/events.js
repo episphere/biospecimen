@@ -3,7 +3,7 @@ import {
     errorMessage, removeAllErrors, storeSpecimen, updateSpecimen, searchSpecimen, generateBarCode, updateBox,
     ship, disableInput, updateNewTempDate, getSiteTubesLists, getWorkflow, fixMissingTubeData,
     getSiteCouriers, getPage, getNumPages, removeSingleError, displayManifestContactInfo, checkShipForage, checkAlertState, retrieveDateFromIsoString,
-    convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, shippingPrintManifestReminder,
+    convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, participantCanCheckIn, shippingPrintManifestReminder,
     checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData,
     siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
     getCollectionsByVisit, getSpecimenAndParticipant, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showModalNotification, showTimedNotifications, showNotificationsCancelOrContinue, validateSpecimenAndParticipantResponse, findReplacementTubeLabels,
@@ -32,8 +32,8 @@ export const addEventSearchForm1 = () => {
 
     form.addEventListener('submit', e => {
         e.preventDefault();
-        const firstName = document.getElementById('firstName').value;
-        const lastName = document.getElementById('lastName').value;
+        const firstName = document.getElementById('firstName').value?.toLowerCase();
+        const lastName = document.getElementById('lastName').value?.toLowerCase();
         const dobEl = document.getElementById('dob');
         let dob = dobEl.value;
 
@@ -52,14 +52,17 @@ export const addEventSearchForm1 = () => {
             return;
         }
 
-        if (!firstName && !lastName && !dob) return;
-
-        let query = '';
-        if (firstName) query += `firstName=${firstName}&`;
-        if (lastName) query += `lastName=${lastName}&`;
-        if (dob) query += `dob=${dob}`;
+        const params = new URLSearchParams()
+        if (firstName) params.append('firstName', firstName);
+        if (lastName) params.append('lastName', lastName);
+        if (dob) params.append('dob', dob);
         
-        performSearch(query);
+        if (params.size === 0) {
+            showTimedNotifications({ title: 'Error', body: 'Please enter at least one field to search.' }, 10000, 1500);
+            return;
+        }
+
+        performSearch(params.toString());
     })
 };
 
@@ -646,10 +649,20 @@ export const addEventVisitSelection = () => {
 
     const visitSelection = document.getElementById('visit-select');
     if(visitSelection) {
-        visitSelection.addEventListener('change', () => {
+        visitSelection.addEventListener('change', async () => {
 
             const checkInButton = document.getElementById('checkInComplete');
-            checkInButton.disabled = !visitSelection.value;
+            
+            // This should only apply to users who have not revoked their participation
+            const form = document.getElementById('checkInCompleteForm');
+            let query = `connectId=${parseInt(form.dataset.connectId)}`;
+            
+            const response = await findParticipant(query);
+            const data = response.data[0];
+            let canCheckIn = participantCanCheckIn(data);
+            if(canCheckIn) {
+                checkInButton.disabled = !visitSelection.value;
+            }
         });
     }
 }

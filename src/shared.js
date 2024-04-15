@@ -106,7 +106,7 @@ export const validateUser = async () => {
 
 export const findParticipant = async (query) => {
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=getParticipants&type=filter&${query}`, {
+    const response = await fetch(`${api}api=getFilteredParticipants&${query}`, {
         method: "GET",
         headers: {
             Authorization:"Bearer "+idToken
@@ -1915,6 +1915,13 @@ export const updateBaselineData = async (siteTubesList, data) => {
 
 export const healthProviderAbbrToConceptIdObj = {
     "kpNW": 452412599,
+    "hPartners" : 531629870,
+    "sanfordHealth": 657167265,
+    "hfHealth": 548392715,
+    "maClinic": 303349821,
+    "kpCO": 125001209,
+    "uChiM": 809703864,
+    "nci": 13,
     "kpHI": 300267574,
     "kpGA": 327912200,
     "kpCO": 125001209,
@@ -2384,6 +2391,7 @@ export const participationConversion = {
     '872012139': 'Revoked HIPAA only',
     '854021266': 'Withdrew consent',
     '241236037': 'Destroy data',
+    '884452262': 'Data destroyed',
     '458508122': 'Refused all future activities',
     '618686157': 'Deceased'
 };
@@ -2744,6 +2752,13 @@ export const checkOutParticipant = async (data) => {
          
          await updateParticipant(checkOutData);
     }
+};
+
+export const participantCanCheckIn = (data) => {
+    return data[conceptIds.withdrewConsent] !== conceptIds.yes &&
+        data[conceptIds.revokedHIPAA] !== conceptIds.yes &&
+        data[conceptIds.destroyData] !== conceptIds.yes &&
+        data[conceptIds.dataDestroyed] !== conceptIds.yes;
 };
 
 export const getCollectionsByVisit = async (data) => {
