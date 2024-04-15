@@ -106,7 +106,7 @@ export const validateUser = async () => {
 
 export const findParticipant = async (query) => {
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=getParticipants&type=filter&${query}`, {
+    const response = await fetch(`${api}api=getFilteredParticipants&${query}`, {
         method: "GET",
         headers: {
             Authorization:"Bearer "+idToken

@@ -32,8 +32,8 @@ export const addEventSearchForm1 = () => {
 
     form.addEventListener('submit', e => {
         e.preventDefault();
-        const firstName = document.getElementById('firstName').value;
-        const lastName = document.getElementById('lastName').value;
+        const firstName = document.getElementById('firstName').value?.toLowerCase();
+        const lastName = document.getElementById('lastName').value?.toLowerCase();
         const dobEl = document.getElementById('dob');
         let dob = dobEl.value;
 
@@ -52,14 +52,17 @@ export const addEventSearchForm1 = () => {
             return;
         }
 
-        if (!firstName && !lastName && !dob) return;
-
-        let query = '';
-        if (firstName) query += `firstName=${firstName}&`;
-        if (lastName) query += `lastName=${lastName}&`;
-        if (dob) query += `dob=${dob}`;
+        const params = new URLSearchParams()
+        if (firstName) params.append('firstName', firstName);
+        if (lastName) params.append('lastName', lastName);
+        if (dob) params.append('dob', dob);
         
-        performSearch(query);
+        if (params.size === 0) {
+            showTimedNotifications({ title: 'Error', body: 'Please enter at least one field to search.' }, 10000, 1500);
+            return;
+        }
+
+        performSearch(params.toString());
     })
 };
 
