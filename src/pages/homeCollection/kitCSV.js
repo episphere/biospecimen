@@ -1,6 +1,6 @@
 import { nonUserNavBar } from "../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { showAnimation, hideAnimation, getIdToken, baseAPI, keyToNameCSVObj, keyToNameAbbreviationObj, triggerErrorModal, convertISODateTime } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, baseAPI, keyToNameCSVObj, conceptIdToHealthProviderAbbrObj, triggerErrorModal, convertISODateTime } from "../../shared.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
 import { receiptedCSVFileTemplate, downloadCSVfile } from '../receipts/csvFileReceipt.js';
@@ -78,7 +78,7 @@ const modifyKitQueryResults = (kitsData) => {
     const Connect_ID = kitData['Connect_ID'];
     const dateReceived = convertISODateTime(kitData[conceptIds.collection.mouthwashTube1][conceptIds.receivedDateTime]);
     const dateDrawn = convertISODateTime(kitData[conceptIds.dateWithdrawn]);
-    const vialMappings = getVialTypesMapping('home', keyToNameAbbreviationObj[kitData[conceptIds.healthcareProvider]], tubeID);
+    const vialMappings = getVialTypesMapping('home', conceptIdToHealthProviderAbbrObj[kitData[conceptIds.healthcareProvider]], tubeID);
     const vialType = vialMappings[0] || '';
     const additivePreservative = vialMappings[1] || '';
     const materialType = vialMappings[2] || '';

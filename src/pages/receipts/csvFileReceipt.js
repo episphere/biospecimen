@@ -1,4 +1,4 @@
-import { showAnimation, hideAnimation, getIdToken, keyToNameAbbreviationObj, keyToLocationObj, baseAPI, keyToNameCSVObj, formatISODateTimeDateOnly, convertISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, miscTubeIdSet, triggerSuccessModal, getSpecimensInBoxes, findReplacementTubeLabels } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, conceptIdToHealthProviderAbbrObj, keyToLocationObj, baseAPI, keyToNameCSVObj, formatISODateTimeDateOnly, convertISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, miscTubeIdSet, triggerSuccessModal, getSpecimensInBoxes, findReplacementTubeLabels } from "../../shared.js";
 import { conceptIds as fieldToConceptIdMapping } from "../../fieldToConceptIdMapping.js";
 import { receiptsNavbar } from "./receiptsNavbar.js";
 import { nonUserNavBar } from "../../navbar.js";
@@ -259,7 +259,16 @@ const vialMapping = {
         },
     },
     clinical: {
-        hfHealth: {
+        henryFordHealth: {
+            '0001': ['10 ml Serum separator tube', 'SST', 'Serum', '10'],
+            '0002': ['10 ml Serum separator tube', 'SST', 'Serum', '10'],
+            '0003': ['10 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '10'],
+            '0004': ['10 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '10'],
+            '0005': ['6 ml Vacutainer', 'ACD', 'WHOLE BL', '6'],
+            '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10'],
+            '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
+        },
+        healthPartners: {
             '0001': ['10 ml Serum separator tube', 'SST', 'Serum', '10'],
             '0002': ['10 ml Serum separator tube', 'SST', 'Serum', '10'],
             '0003': ['10 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '10'],
@@ -360,7 +369,7 @@ const getVialTypesMappings = (tubeId, collectionType, healthcareProvider) => {
     }
     
     const collectionTypeString = collectionType === fieldToConceptIdMapping.research ? 'research' : 'clinical';
-    const healthcareProviderString = keyToNameAbbreviationObj[healthcareProvider] || 'default';
+    const healthcareProviderString = conceptIdToHealthProviderAbbrObj[healthcareProvider] || 'default';
 
     if (collectionTypeString === 'research') {
         return vialMapping[collectionTypeString]?.default?.[tubeId] || ['', '', '', ''];
