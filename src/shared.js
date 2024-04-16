@@ -2808,8 +2808,9 @@ export const SSOConfig = (email) => {
 }
 
 /**
- * returns an object with participant data based on their kit status
+ * fetch request to get an array of participants's data based on the biomouthwash kit's kit status
  * @param {string} type - the kit status type as concept Id
+ * @returns {Array} - an array of custom objects based on participant's kit status
 */
 
 export const getParticipantsByKitStatus = async (kitStatus) => {
