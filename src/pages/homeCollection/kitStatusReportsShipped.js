@@ -26,10 +26,8 @@ const kitStatusShippedTemplate = async (name) => {
                         <div id="root root-margin">
                             <div class="table">
                                 <h3 style="text-align: center; margin: 0 0 1rem;">Kits Shipped</h3>
-                                ${displayKitStatusFilter()}
                                 ${displayKitStatusShippedTable(shippedKitStatusParticipantsArray)}
                             </div>
-                            ${displayPagination()}    
                         </div>
                     </div>`;
                     
@@ -62,33 +60,35 @@ const displayKitStatusShippedTable = (shippedKitStatusParticipantsArray) => {
             </div>`;
 }
 
-const displayPagination = () => { 
-    return `<nav aria-label="Page navigation" id="paginationButtons">
-                <ul class="pagination">
-                    <li class="page-item" id="firstPage"><button class="page-link">First</button></li>
-                    <li class="page-item" id="previousPage"><button class="page-link">Previous</button></li>
-                    <li class="page-item" id="thisPage"><a class="page-link" id="middlePage">1</a></li>
-                    <li class="page-item" id="nextPage"><button class="page-link">Next</button></li>
-                    <li class="page-item" id="lastPage"><button class="page-link">Last</button></li>
-                </ul>
-            </nav>`;
-}
+// TODO - Add displayPagination function functionality
+// const displayPagination = () => { 
+//     return `<nav aria-label="Page navigation" id="paginationButtons">
+//                 <ul class="pagination">
+//                     <li class="page-item" id="firstPage"><button class="page-link">First</button></li>
+//                     <li class="page-item" id="previousPage"><button class="page-link">Previous</button></li>
+//                     <li class="page-item" id="thisPage"><a class="page-link" id="middlePage">1</a></li>
+//                     <li class="page-item" id="nextPage"><button class="page-link">Next</button></li>
+//                     <li class="page-item" id="lastPage"><button class="page-link">Last</button></li>
+//                 </ul>
+//             </nav>`;
+// }
 
-const displayKitStatusFilter = () => {
-    return `<div class="row">
-                <div class="col-lg-10" style="margin-bottom:20px">
-                    <h4>Filters</h4>
-                    <label for="trackingIdInput" style="margin-right:0.5rem;">Tracking ID: </label>
-                    <input type="text" id="trackingIdInput" style="margin-right:30px; height:38px; padding:5px;" placeholder="Tracking ID">
-                    <span style="display:inline-block; margin-right:.5rem;">Date Shipped:</span>
-                    <input type="date" id="startDate" style="height:38px; padding:5px;">
-                    <span style="display:inline-block; margin:0 .75rem">to</span>
-                    <input type="date" id="endDate" style="margin-right:30px; height:38px; padding:5px;">
-                    <button id="submitFilter" class="btn btn-primary">Apply filter</button>
-                    <button id="clearFilter" class="btn btn-danger">Clear filter(s)</button>
-                </div>
-            </div>`
-}
+// TODO - Add kit status filter functionality
+// const displayKitStatusFilter = () => {
+//     return `<div class="row">
+//                 <div class="col-lg-10" style="margin-bottom:20px">
+//                     <h4>Filters</h4>
+//                     <label for="trackingIdInput" style="margin-right:0.5rem;">Tracking ID: </label>
+//                     <input type="text" id="trackingIdInput" style="margin-right:30px; height:38px; padding:5px;" placeholder="Tracking ID">
+//                     <span style="display:inline-block; margin-right:.5rem;">Date Shipped:</span>
+//                     <input type="date" id="startDate" style="height:38px; padding:5px;">
+//                     <span style="display:inline-block; margin:0 .75rem">to</span>
+//                     <input type="date" id="endDate" style="margin-right:30px; height:38px; padding:5px;">
+//                     <button id="submitFilter" class="btn btn-primary">Apply filter</button>
+//                     <button id="clearFilter" class="btn btn-danger">Clear filter(s)</button>
+//                 </div>
+//             </div>`
+// }
 
 /**
  * Returns rows for the shipped kits table
@@ -97,7 +97,7 @@ const displayKitStatusFilter = () => {
 */
 const createShippedRows = (shippedKitStatusParticipantsArray) => {
     let template = ``;
-    for (const  particpantObj of shippedKitStatusParticipantsArray) {
+    for (const particpantObj of shippedKitStatusParticipantsArray) {
 
     const connectID = particpantObj["Connect_ID"];
     const healthcareProvider = keyToNameObj[particpantObj[conceptIds.healthcareProvider]];
