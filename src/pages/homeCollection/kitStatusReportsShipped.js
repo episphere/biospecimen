@@ -17,7 +17,6 @@ const kitStatusShippedTemplate = async (name) => {
     showAnimation();
     const response = await getParticipantsByKitStatus(conceptIds.shipped);
     const shippedKitStatusParticipantsArray = response.data;
-    console.log(response.data);
     hideAnimation();
 
     let template = `
