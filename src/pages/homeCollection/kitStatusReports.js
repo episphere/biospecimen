@@ -2,21 +2,16 @@ import { getIdToken, findParticipant, showAnimation, hideAnimation} from "../../
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { displayKitStatusReportsHeader } from "./participantSelectionHeaders.js";
-import { fakeParticipants, printAddressesParticipants} from "./fakeParticipants.js";
 import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
-
-// Stringify array of objects and parse fake participants Data
-const fakeParticipantsData = JSON.parse(JSON.stringify(fakeParticipants));
-export const fakeParticipantsState = [...fakeParticipantsData];
 
 export const kitStatusReportsScreen = async (auth) => {
     const user = auth.currentUser;
     if (!user) return;
     const username = user.displayName ? user.displayName : user.email;
-    kitStatusReportsTemplate(username, fakeParticipantsState);
+    kitStatusReportsTemplate(username);
 };
 
-const kitStatusReportsTemplate = async (name, fakeParticipantsState) => {
+const kitStatusReportsTemplate = async (name) => {
     let template = ``;
     template += displayKitStatusReportsHeader();
     template += ` <div class="container-fluid">
