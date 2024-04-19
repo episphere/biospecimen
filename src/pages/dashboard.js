@@ -185,12 +185,14 @@ export const searchResults = (result) => {
 
         const isCheckedIn = checkedIn(data);
         const canCheckIn = participantCanCheckIn(data);
+        const disabledString = !canCheckIn ? `disabled` : ``;
+        const btnClass = !canCheckIn ? 'btn-secondary disabled' : 'btn-outline-primary';
         if (getWorkflow() === 'research') {
         template += `
             <tr>
                 ${tdTemplate}
                 <td>
-                    <button ${!canCheckIn ? `disabled` : ``}  class="btn  ${!canCheckIn ? 'btn-secondary disabled' : 'btn-outline-primary'} text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID} data-check-in-btn-uid=${data.state.uid}>${!isCheckedIn ? `Go to Check-In` : `Go to Check-Out`}</button>
+                    <button ${disabledString}  class="btn  ${btnClass} text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID} data-check-in-btn-uid=${data.state.uid}>${!isCheckedIn ? `Go to Check-In` : `Go to Check-Out`}</button>
                 </td>
                 <td>
                     ${isCheckedIn ? `<button class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>` : ``}
@@ -202,7 +204,7 @@ export const searchResults = (result) => {
             <tr>
                 ${tdTemplate}
                 <td>
-                <button ${!canCheckIn ? `disabled` : ``} class="btn ${!canCheckIn ? 'btn-secondary disabled' : 'btn-outline-primary'} text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>
+                <button ${disabledString} class="btn ${btnClass} text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>
                 </td>
             </tr>
         ` 
