@@ -3418,15 +3418,20 @@ export const getAddedStrayTubes = (originalSpecimenData, currentSpecimenData) =>
  * Helper function for collectionId search (getSpecimenAndParticipant()).
  * @param {object} specimenData - specimen data object.
  * @param {object} participantData - participant data object.
+ * @param {boolean} isBPTL - True if user is BPTL. False otherwise.
  * @returns {boolean} - True if both objects are found. False if either is missing.
  */
-export const validateSpecimenAndParticipantResponse = (specimenData, participantData) => {
+export const validateSpecimenAndParticipantResponse = (specimenData, participantData, isBPTL = false) => {
     if (!specimenData || !participantData) {
         if (!specimenData) showNotifications({ title: 'Not found', body: 'Specimen not found!' });
         else showNotifications({ title: 'Not found', body: 'Participant not found!' });
         return false;
     }
 
+    // No need to check workflow if isBPTL -- they can access all collections.
+    if (isBPTL) return true;
+
+    // Check if the collection is on the correct dashboard.
     if (getWorkflow() === 'research' && specimenData[conceptIds.collection.collectionSetting] !== conceptIds.research) {
         hideAnimation();
         showNotifications({ title: 'Incorrect Dashboard', body: 'Clinical Collections cannot be viewed on Research Dashboard' });

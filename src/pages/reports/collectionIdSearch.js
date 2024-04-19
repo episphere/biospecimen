@@ -1,7 +1,7 @@
 import { reportsNavbar } from "./reportsNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
 import { activeReportsNavbar } from "./activeReportsNavbar.js";
-import { showAnimation, hideAnimation, showNotifications, findParticipant, errorMessage, removeAllErrors, searchSpecimen, appState } from '../../shared.js';
+import { showAnimation, getSpecimenAndParticipant, hideAnimation, showNotifications, errorMessage, removeAllErrors, appState, validateSpecimenAndParticipantResponse } from '../../shared.js';
 import { masterSpecimenIDRequirement } from '../../tubeValidation.js';
 import { finalizeTemplate } from '../finalize.js';
 import { conceptIds as fieldToConceptIdMapping } from "../../fieldToConceptIdMapping.js";
@@ -41,41 +41,46 @@ export const collectionIdSearchScreenTemplate = async (username) => {
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
     activeReportsNavbar();
-    searchSpecimenEvent();
+    collectionIdSearchBPTL();
 };
 
-const searchSpecimenEvent = () => {
+const collectionIdSearchBPTL = () => {
     const form = document.getElementById('specimenLookupForm');
     if (!form) return;
     form.addEventListener('submit', async e => {
         e.preventDefault();
         removeAllErrors();
-        let masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase();
 
+        let masterSpecimenId = document.getElementById('masterSpecimenId').value.toUpperCase();
         if(masterSpecimenId.length > masterSpecimenIDRequirement.length) masterSpecimenId = masterSpecimenId.substring(0, masterSpecimenIDRequirement.length);
+
+        if (masterSpecimenId.startsWith('CHA')) {
+            errorMessage('masterSpecimenId', `Error: Future Implementation. Home Collection search is not implemented yet.`, true);
+            return;
+        }
 
         if (!masterSpecimenIDRequirement.regExp.test(masterSpecimenId) || masterSpecimenId.length !== masterSpecimenIDRequirement.length) {
             errorMessage('masterSpecimenId', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, true);
             return;
         }
-        showAnimation();
-        const biospecimen = await searchSpecimen(masterSpecimenId, true);
-        if (biospecimen.code !== 200 || Object.keys(biospecimen.data).length === 0) {
-            hideAnimation();
-            showNotifications({ title: 'Not found', body: 'Specimen not found!' })
-            return
-        }
-        const biospecimenData = biospecimen.data;
-        let query = `connectId=${parseInt(biospecimenData.Connect_ID)}&allSiteSearch=${true}`;
-        const response = await findParticipant(query);
-        hideAnimation();
+        
         try {
-            const participantData = response.data[0];
-            localStorage.setItem('workflow', biospecimenData[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical ? `clinical` : `research`);
-            finalizeTemplate(participantData, biospecimenData, true); // Boolean flag: true; is passed down to finalizeTemplate & to distinguish collection id search from bptl and biospecimen."
+            showAnimation();
+            const isBPTL = true; // defined for process clarity.
+            const { specimenData, participantData } = await getSpecimenAndParticipant(masterSpecimenId, isBPTL);
+            
+            if (!validateSpecimenAndParticipantResponse(specimenData, participantData, isBPTL)) return;
+            
+            localStorage.setItem('workflow', specimenData[fieldToConceptIdMapping.collectionType] === fieldToConceptIdMapping.clinical ? `clinical` : `research`); // Note: this has been in the codebase. Not sure it's necessary.
+
+            // Boolean flag: true; is passed down to finalizeTemplate & to distinguish collection id search from bptl and biospecimen."
+            finalizeTemplate(participantData, specimenData, true);
+
+        } catch {
+            console.error(`Error in collectionIdSearchBPTL: Couldn't find collection ${masterSpecimenId}.`);
+            showNotifications({ title: 'Error: Not found', body: `Error: Couldn't find collection ${masterSpecimenId}.` });
+        } finally {
+            hideAnimation();
         }
-        catch {
-            showNotifications({ title: 'Not found', body: 'Participant not found!' })
-        }
-    })
+    });
 }
