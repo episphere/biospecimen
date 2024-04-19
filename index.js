@@ -13,7 +13,7 @@ import { kitAssemblyScreen } from "./src/pages/homeCollection/kitAssembly.js";
 import { printLabelsScreen } from "./src/pages/homeCollection/printLabels.js";
 import { assignKitsScreen } from "./src/pages/homeCollection/assignKits.js";
 import { kitsReceiptScreen } from "./src/pages/homeCollection/kitsReceipt.js";
-// import { displayKitStatusReportsScreen } from "./src/pages/homeCollection/kitStatusReports.js";
+// import { displayKitStatusReportsScreen } from "./src/pages/homeCollection/kitStatusReports.js"; // TODO: This will be added back in once the new kitStatusReports page is created
 import { allParticipantsScreen } from "./src/pages/homeCollection/allParticipants.js";
 import { addressesPrintedScreen } from "./src/pages/homeCollection/assignKit.js";
 import { assignedScreen } from "./src/pages/homeCollection/assigned.js";
@@ -97,11 +97,11 @@ const manageRoutes = async () => {
         else if (route === "#assignkits") assignKitsScreen(auth, route);
         else if (route === "#kitsreceipt") kitsReceiptScreen(auth, route);
         else if (route === "#kitscsv") kitCsvScreen(auth, route);
-        else if (route === "#kitStatusReports") displayKitStatusReportsShippedScreen(auth, route); // Temporarily make displayKitStatusReportsScreen route to displayKitStatusReportsShippedScreen route
+        else if (route === "#kitStatusReports") displayKitStatusReportsShippedScreen(auth, route); // Temporarily make kitStatusReports route call displayKitStatusReportsShippedScreen
         else if (route === "#allParticipants") allParticipantsScreen(auth, route);
         else if (route === "#addressPrinted") addressesPrintedScreen(auth, route);
         else if (route === "#assigned") assignedScreen(auth, route);
-        else if (route === "#status_shipped") kitStatusReportsShipped(auth, route); 
+        else if (route === "#status_shipped") kitStatusReportsShipped(auth, route);
         else if (route === "#received") receivedKitsScreen(auth,route);
         else if (route === "#kitshipment") kitShipmentScreen(auth, route);
         else if (route === "#packagesintransit") packagesInTransitScreen(auth, route);
