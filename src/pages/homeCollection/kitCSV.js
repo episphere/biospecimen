@@ -1,6 +1,6 @@
 import { nonUserNavBar } from "../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { showAnimation, hideAnimation, getIdToken, baseAPI, keyToNameCSVObj, keyToNameAbbreviationObj, triggerErrorModal, convertISODateTime } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, baseAPI, keyToNameCSVObj, conceptIdToHealthProviderAbbrObj, triggerErrorModal, convertISODateTime } from "../../shared.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
 import { receiptedCSVFileTemplate, downloadCSVfile } from '../receipts/csvFileReceipt.js';
