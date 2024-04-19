@@ -335,7 +335,7 @@ export const conceptIds = {
     returnKitId: 194252513,
     collectionCupId: 259846815,
     collectionCardId: 786397882,
-    UKID: 687158491,
+    uniqueKitID: 687158491,
     kitType: 379252329,
     mouthwashKitType: 976461859,
     mouthwashSurveyCompletionStatus: 547363263,

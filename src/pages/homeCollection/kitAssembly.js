@@ -6,7 +6,7 @@ import { conceptIds } from '../../fieldToConceptIdMapping.js';
 
 const contentBody = document.getElementById("contentBody");
 localStorage.setItem('tmpKitData', JSON.stringify([]));
-appState.setState({UKID: ``});
+appState.setState({uniqueKitID: ``});
 
 export const kitAssemblyScreen = async (auth) => {
   const user = auth.currentUser;
@@ -208,9 +208,9 @@ const editAssembledKits = () => {
         document.getElementById('returnKitId').value = editKitObj[conceptIds.returnKitId]
         document.getElementById('cupId').value = editKitObj[conceptIds.collectionCupId].slice(0, -4) + " " + editKitObj[conceptIds.collectionCupId].slice(-4)
         document.getElementById('cardId').value = editKitObj[conceptIds.collectionCardId].slice(0, -4) + " " + editKitObj[conceptIds.collectionCardId].slice(-4)
-        appState.setState({UKID: editKitObj[conceptIds.UKID]})
+        appState.setState({uniqueKitID: editKitObj[conceptIds.uniqueKitID]})
       });
-    }); // state to indicate if its an edit & also pass the UKID
+    }); // state to indicate if its an edit & also pass the uniqueKitID
 }}
 
 const checkUniqueness = async (supplyKitId, collectionId) => {
@@ -227,16 +227,16 @@ const checkUniqueness = async (supplyKitId, collectionId) => {
 const storeAssembledKit = async (kitData) => {
   const idToken = await getIdToken();
   showAnimation();
-  const collectionUnique = appState.getState().UKID !== '' ? { data: true } : await checkUniqueness(kitData[conceptIds.supplyKitId], kitData?.[conceptIds.collectionCupId].replace(/\s/g, "\n"));
+  const collectionUnique = appState.getState().uniqueKitID !== '' ? { data: true } : await checkUniqueness(kitData[conceptIds.supplyKitId], kitData?.[conceptIds.collectionCupId].replace(/\s/g, "\n"));
   hideAnimation();
   if (collectionUnique.data === true) {
     kitData[conceptIds.kitStatus] = conceptIds.pending;
-    kitData[conceptIds.UKID] = "MW" + Math.random().toString(16).slice(2);
+    kitData[conceptIds.uniqueKitID] = "MW" + Math.random().toString(16).slice(2);
     kitData[conceptIds.pendingDateTimeStamp] = new Date().toISOString();
     let api = `addKitData`
-    if (appState.getState().UKID !== ``) { 
+    if (appState.getState().uniqueKitID !== ``) { 
       api = `updateKitData` 
-      kitData[conceptIds.UKID] = appState.getState().UKID
+      kitData[conceptIds.uniqueKitID] = appState.getState().uniqueKitID
     }
     const response = await fetch(`${baseAPI}api=${api}`, {
       method: "POST",
@@ -252,17 +252,17 @@ const storeAssembledKit = async (kitData) => {
       alertTemplate(`Kit saved successfully!`, `success`);
       const existingKitData = JSON.parse(localStorage.getItem('tmpKitData'));
       existingKitData.push(kitData);
-      if (appState.getState().UKID !== ``) {
+      if (appState.getState().uniqueKitID !== ``) {
         const filteredKitData = [];
         const seenValues = new Set();
         for (let i = existingKitData.length - 1; i >= 0; i--) { // removes previously assembled kit
-          const key = existingKitData[i][conceptIds.UKID];
+          const key = existingKitData[i][conceptIds.uniqueKitID];
           if (!seenValues.has(key)) {
               seenValues.add(key);
               filteredKitData.push(existingKitData[i]);
           }
       }
-        appState.setState({UKID: ``})
+        appState.setState({uniqueKitID: ``})
         localStorage.setItem('tmpKitData', JSON.stringify(filteredKitData))
       }
       else {
