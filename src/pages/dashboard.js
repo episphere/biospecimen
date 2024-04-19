@@ -1,4 +1,4 @@
-import { userAuthorization, removeActiveClass, getWorkflow, checkedIn, participantCanCheckIn, verificationConversion, restrictNonBiospecimenUser } from "./../shared.js"
+import { userAuthorization, removeActiveClass, getWorkflow, checkedIn, participantCanCheckIn, verificationConversion, restrictNonBiospecimenUser, participationConversion } from "./../shared.js"
 import {  addGoToCheckInEvent, addGoToSpecimenLinkEvent, addEventSearchForm1, addEventBackToSearch, addEventSearchForm2, addEventSearchForm3, addEventSearchForm4, addEventSearchSpecimen, addEventNavBarSpecimenSearch, addEventClearAll } from "./../events.js";
 import { homeNavBar, bodyNavBar } from '../navbar.js';
 
@@ -151,7 +151,7 @@ export const searchResults = (result) => {
         </br>
         
         <div class="row">
-            <table class="table table-borderless table-striped">
+            <table style="text-align: center" class="table table-borderless table-striped">
                 <thead>
                     <tr>
                         <th>Last name</th>
@@ -181,7 +181,7 @@ export const searchResults = (result) => {
             <td>${data['521824358']} ${data['442166669'] ? data['442166669'] : ''}</br>${data['703385619']} ${data['634434746']} ${data['892050548']}</td>
             <td>${data.Connect_ID}</td>
             <td>${verificationConversion[[data['821247024']]]}</td>
-            <td>${data['912301837'] === 208325815 || data['912301837'] === 622008261 || data['912301837'] === 458508122 ? `<i class="fas fa-2x fa-check"></i>` :  `<i class="fas fa-2x fa-times"></i>`}</td>`;
+            <td><div class="row"><span class="full-width mx-auto">${data['912301837'] === 208325815 || data['912301837'] === 622008261 || data['912301837'] === 458508122 ? `<i class="fas fa-2x fa-check"></i>` :  `<i class="fas fa-2x fa-times"></i>`}</span></div><div class="row"><span class="full-width">${participationConversion[data['912301837']]}</span></div></td>`;
 
         const isCheckedIn = checkedIn(data);
         const canCheckIn = participantCanCheckIn(data);
@@ -190,7 +190,7 @@ export const searchResults = (result) => {
             <tr>
                 ${tdTemplate}
                 <td>
-                    <button class="btn btn-outline-primary text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID} data-check-in-btn-uid=${data.state.uid}>${!isCheckedIn ? `Go to Check-In` : `Go to Check-Out`}</button>
+                    <button ${!canCheckIn ? `disabled` : ``}  class="btn  ${!canCheckIn ? 'btn-secondary disabled' : 'btn-outline-primary'} text-nowrap" data-check-in-btn-connect-id=${data.Connect_ID} data-check-in-btn-uid=${data.state.uid}>${!isCheckedIn ? `Go to Check-In` : `Go to Check-Out`}</button>
                 </td>
                 <td>
                     ${isCheckedIn ? `<button class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>` : ``}
@@ -202,7 +202,7 @@ export const searchResults = (result) => {
             <tr>
                 ${tdTemplate}
                 <td>
-                <button ${!canCheckIn ? `disabled` : ``} class="btn btn-outline-primary text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>
+                <button ${!canCheckIn ? `disabled` : ``} class="btn ${!canCheckIn ? 'btn-secondary disabled' : 'btn-outline-primary'} text-nowrap" data-specimen-link-connect-id=${data.Connect_ID}>Specimen Link</button>
                 </td>
             </tr>
         ` 
