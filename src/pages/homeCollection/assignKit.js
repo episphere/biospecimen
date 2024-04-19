@@ -2,7 +2,7 @@ import { showAnimation, hideAnimation, getIdToken, getParticipantsByKitStatus} f
 import { displayKitStatusReportsHeader } from "./participantSelectionHeaders.js";
 import { kitStatusSelectionDropdown } from "./kitStatusReports.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 
 export const addressesPrintedScreen = async (auth, route) => {
   const user = auth.currentUser;

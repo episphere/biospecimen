@@ -2,11 +2,11 @@ import { showAnimation, hideAnimation, getParticipantsByKitStatus, convertISODat
 import { displayKitStatusReportsHeader } from "./participantSelectionHeaders.js";
 import { kitStatusSelectionDropdown } from "./kitStatusReports.js";
 import { nonUserNavBar } from "../../navbar.js";
-import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from "../../fieldToConceptIdMapping.js";
 
 
-export const kitStatusReportsShippedScreen = async (auth, route) => {
+export const displayKitStatusReportsShippedScreen = async (auth, route) => {
     const user = auth.currentUser;
     if (!user) return;
     const username = user.displayName ? user.displayName : user.email;
@@ -19,7 +19,7 @@ const kitStatusShippedTemplate = async (name) => {
     const shippedKitStatusParticipantsArray = response.data;
     hideAnimation();
 
-    let template = `
+    const template = `
                     ${displayKitStatusReportsHeader()}
                     <div class="container-fluid">
                         <div id="root root-margin">
@@ -57,37 +57,7 @@ const displayKitStatusShippedTable = (shippedKitStatusParticipantsArray) => {
                     </tbody>
                 </table>
             </div>`;
-}
-
-// TODO - Add displayPagination function functionality
-// const displayPagination = () => { 
-//     return `<nav aria-label="Page navigation" id="paginationButtons">
-//                 <ul class="pagination">
-//                     <li class="page-item" id="firstPage"><button class="page-link">First</button></li>
-//                     <li class="page-item" id="previousPage"><button class="page-link">Previous</button></li>
-//                     <li class="page-item" id="thisPage"><a class="page-link" id="middlePage">1</a></li>
-//                     <li class="page-item" id="nextPage"><button class="page-link">Next</button></li>
-//                     <li class="page-item" id="lastPage"><button class="page-link">Last</button></li>
-//                 </ul>
-//             </nav>`;
-// }
-
-// TODO - Add kit status filter functionality
-// const displayKitStatusFilter = () => {
-//     return `<div class="row">
-//                 <div class="col-lg-10" style="margin-bottom:20px">
-//                     <h4>Filters</h4>
-//                     <label for="trackingIdInput" style="margin-right:0.5rem;">Tracking ID: </label>
-//                     <input type="text" id="trackingIdInput" style="margin-right:30px; height:38px; padding:5px;" placeholder="Tracking ID">
-//                     <span style="display:inline-block; margin-right:.5rem;">Date Shipped:</span>
-//                     <input type="date" id="startDate" style="height:38px; padding:5px;">
-//                     <span style="display:inline-block; margin:0 .75rem">to</span>
-//                     <input type="date" id="endDate" style="margin-right:30px; height:38px; padding:5px;">
-//                     <button id="submitFilter" class="btn btn-primary">Apply filter</button>
-//                     <button id="clearFilter" class="btn btn-danger">Clear filter(s)</button>
-//                 </div>
-//             </div>`
-// }
+};
 
 /**
  * Returns rows for the shipped kits table

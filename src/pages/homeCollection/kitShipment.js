@@ -1,7 +1,7 @@
 import { nonUserNavBar } from "./../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource } from "../../shared.js";
-import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { baselineMWKitRemainderTemplate } from "../../emailTemplates.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
 

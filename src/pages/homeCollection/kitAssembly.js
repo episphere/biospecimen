@@ -1,7 +1,7 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
-import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
 
 const contentBody = document.getElementById("contentBody");

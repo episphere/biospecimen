@@ -2824,8 +2824,8 @@ export const getParticipantsByKitStatus = async (kitStatus) => {
         });
         return response.json();
     } catch (error) {
-        console.error("Error in getting participants by kit status:", error);
-        throw error;
+        console.error("Failed to get participants by kit status", error);
+        throw new Error("Failed to get participants by kit status"); 
     }
 };
 
