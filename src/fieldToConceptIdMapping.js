@@ -53,6 +53,26 @@ export const conceptIds = {
     tempProbe: 105891443,
     yes: 353358909,
     no: 104430631,
+
+    // Participation status
+
+    participationStatus: 912301837,
+    participationStatusCodes: {
+        noRefusal: 208325815,
+        refusedSomeActivities: 622008261,
+        revokedHIPAA: 872012139,
+        withdrewConsent: 854021266,
+        destroyData: 241236037,
+        dataDestroyed: 884452262,
+        refusedAllFutureActivities: 458508122,
+        deceased: 618686157
+    },
+
+    // Individual yes/no properties on the data
+    withdrewConsent: 747006172,
+    revokedHIPAA: 773707518,
+    destroyData: 831041022,
+    dataDestroyed: 861639549,
     
     // collection id
     collectionId: 825582494, //TODO: this ref should be named objectId or similar. collectionId is 820476880. 

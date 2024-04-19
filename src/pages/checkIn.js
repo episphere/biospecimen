@@ -1,4 +1,4 @@
-import { generateBarCode, removeActiveClass, visitType, checkedIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getParticipantCollections, getSiteTubesLists } from "./../shared.js";
+import { generateBarCode, removeActiveClass, visitType, checkedIn, participantCanCheckIn, getCheckedInVisit, verificationConversion, participationConversion, surveyConversion, getParticipantCollections, getSiteTubesLists } from "./../shared.js";
 import { addEventContactInformationModal, addEventCheckInCompleteForm, addEventBackToSearch, addEventVisitSelection } from "./../events.js";
 import { conceptIds } from '../fieldToConceptIdMapping.js';
 
@@ -12,6 +12,7 @@ export const checkInTemplate = async (data, checkOutFlag) => {
     }
 
     const isCheckedIn = checkedIn(data);
+    const canCheckIn = participantCanCheckIn(data);
     const visit = getCheckedInVisit(data);
 
     const response = await getParticipantCollections(data.token);
@@ -77,13 +78,26 @@ export const checkInTemplate = async (data, checkOutFlag) => {
 
     template += await participantStatus(data, collections);
 
-    template += `
+
+    if (canCheckIn) {
+        template += `
             <div class="col">
                 <button class="btn btn-outline-primary btn-block text-nowrap" ${!isCheckedIn ? `disabled` : visitCollections.length > 0 ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
             </div>
 
         </form>
     `;
+    } else {
+        // Disable only the check-in button if the user has withdrawn consent
+        template += `
+            <div class="col">
+                <button class="btn btn-outline-primary btn-block text-nowrap" ${isCheckedIn ? `` : `disabled`} type="submit" id="checkInComplete">${isCheckedIn ? `Check-Out` : `Check-In`}</button>
+            </div>
+
+        </form>
+    `;
+    }
+    
 
     document.getElementById('contentBody').innerHTML = template;
     generateBarCode('connectIdBarCode', data.Connect_ID);

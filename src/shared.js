@@ -106,7 +106,7 @@ export const validateUser = async () => {
 
 export const findParticipant = async (query) => {
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=getParticipants&type=filter&${query}`, {
+    const response = await fetch(`${api}api=getFilteredParticipants&${query}`, {
         method: "GET",
         headers: {
             Authorization:"Bearer "+idToken
@@ -1913,11 +1913,10 @@ export const updateBaselineData = async (siteTubesList, data) => {
 }
 
 
-export const nameToKeyObj = 
-{
+export const healthProviderAbbrToConceptIdObj = {
     "kpNW": 452412599,
     "hPartners" : 531629870,
-    "snfrdHealth": 657167265,
+    "sanfordHealth": 657167265,
     "hfHealth": 548392715,
     "maClinic": 303349821,
     "kpCO": 125001209,
@@ -1925,6 +1924,13 @@ export const nameToKeyObj =
     "nci": 13,
     "kpHI": 300267574,
     "kpGA": 327912200,
+    "kpCO": 125001209,
+    "healthPartners" : 531629870,
+    "sanfordHealth": 657167265,
+    "henryFordHealth": 548392715,
+    "marshfieldClinic": 303349821,
+    "uOfChicagoMed": 809703864,
+    "nci": 13,
     "allResults": 1000
 }
 
@@ -1943,37 +1949,37 @@ export const siteFullNames = {
 }
 
 export const siteSpecificLocation = {
-  "HP Research Clinic" : {"siteAcronym":"HP", "siteCode":531629870, "loginSiteName": "HealthPartners Research Clinic"},
-  "HP Park Nicollet": {"siteAcronym": "HP", "siteCode": nameToKeyObj.hPartners, "loginSiteName": "HealthPartners Research Clinic"},
-  "Henry Ford Main Campus": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
-  "Henry Ford West Bloomfield Hospital": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
-  "Henry Ford Medical Center- Fairlane": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
-  "HFH Livonia Research Clinic": {"siteAcronym":"HFHS", "siteCode":548392715, "loginSiteName": "Henry Ford Health System"},
-  "HFH Pop-Up": {"siteAcronym": "HFHS", "siteCode": 548392715, "loginSiteName": "Henry Ford Health System"},
-  "KPCO RRL": {"siteAcronym":"KPCO", "siteCode":125001209, "loginSiteName": "Kaiser Permanente Colorado"},
-  "KPGA RRL":{"siteAcronym":"KPGA", "siteCode":327912200, "loginSiteName": "Kaiser Permanente Georgia"},
-  "KPHI RRL": {"siteAcronym":"KPHI", "siteCode":300267574, "loginSiteName": "Kaiser Permanente Hawaii"},
-  "KPNW RRL": {"siteAcronym":"KPNW", "siteCode":452412599, "loginSiteName": "Kaiser Permanente Northwest"},
-  "Marshfield": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
-  "Lake Hallie": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
-  "Weston": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
-  "Rice Lake": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
-  "Wisconsin Rapids": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
-  "Colby Abbotsford": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
-  "Minocqua": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
-  "Merrill": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
-  "MF Pop-Up": {"siteAcronym":"MFC", "siteCode":303349821, "loginSiteName": "Marshfield Clinic Health System"},
-  "Sioux Falls Imagenetics": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
-  "Fargo South University": {"siteAcronym":"SFH", "siteCode":657167265, "loginSiteName": "Sanford Health"},
-  "Bismarck Medical Center": {"siteAcronym": "SFH", "siteCode": nameToKeyObj.snfrdHealth, "loginSiteName": "Sanford Health"},
-  "Sioux Falls Sanford Center": {"siteAcronym": "SFH", "siteCode": nameToKeyObj.snfrdHealth, "loginSiteName": "Sanford Health"},
-  "DCAM": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
-  "Ingalls Harvey": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
-  "River East": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
-  "South Loop": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
-  "Orland Park": {"siteAcronym":"UCM", "siteCode":809703864, "loginSiteName": "University of Chicago Medicine"},
-  "Main Campus": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
-  "Frederick": {"siteAcronym":"NIH", "siteCode":13, "loginSiteName": "National Cancer Institute"},
+  "HP Research Clinic" : {"siteAcronym":"HP", "siteCode": healthProviderAbbrToConceptIdObj.healthPartners, "loginSiteName": "HealthPartners Research Clinic"},
+  "HP Park Nicollet": {"siteAcronym": "HP", "siteCode": healthProviderAbbrToConceptIdObj.healthPartners, "loginSiteName": "HealthPartners Research Clinic"},
+  "Henry Ford Main Campus": {"siteAcronym":"HFHS", "siteCode": healthProviderAbbrToConceptIdObj.henryFordHealth, "loginSiteName": "Henry Ford Health System"},
+  "Henry Ford West Bloomfield Hospital": {"siteAcronym":"HFHS", "siteCode":healthProviderAbbrToConceptIdObj.henryFordHealth, "loginSiteName": "Henry Ford Health System"},
+  "Henry Ford Medical Center- Fairlane": {"siteAcronym":"HFHS", "siteCode":healthProviderAbbrToConceptIdObj.henryFordHealth, "loginSiteName": "Henry Ford Health System"},
+  "HFH Livonia Research Clinic": {"siteAcronym":"HFHS", "siteCode":healthProviderAbbrToConceptIdObj.henryFordHealth, "loginSiteName": "Henry Ford Health System"},
+  "HFH Pop-Up": {"siteAcronym": "HFHS", "siteCode": healthProviderAbbrToConceptIdObj.henryFordHealth, "loginSiteName": "Henry Ford Health System"},
+  "KPCO RRL": {"siteAcronym":"KPCO", "siteCode": healthProviderAbbrToConceptIdObj.kpCO, "loginSiteName": "Kaiser Permanente Colorado"},
+  "KPGA RRL":{"siteAcronym":"KPGA", "siteCode": healthProviderAbbrToConceptIdObj.kpGA, "loginSiteName": "Kaiser Permanente Georgia"},
+  "KPHI RRL": {"siteAcronym":"KPHI", "siteCode": healthProviderAbbrToConceptIdObj.kpHI, "loginSiteName": "Kaiser Permanente Hawaii"},
+  "KPNW RRL": {"siteAcronym":"KPNW", "siteCode":healthProviderAbbrToConceptIdObj.kpNW, "loginSiteName": "Kaiser Permanente Northwest"},
+  "Marshfield": {"siteAcronym":"MFC", "siteCode": healthProviderAbbrToConceptIdObj.marshfieldClinic, "loginSiteName": "Marshfield Clinic Health System"},
+  "Lake Hallie": {"siteAcronym":"MFC", "siteCode": healthProviderAbbrToConceptIdObj.marshfieldClinic, "loginSiteName": "Marshfield Clinic Health System"},
+  "Weston": {"siteAcronym":"MFC", "siteCode": healthProviderAbbrToConceptIdObj.marshfieldClinic, "loginSiteName": "Marshfield Clinic Health System"},
+  "Rice Lake": {"siteAcronym":"MFC", "siteCode": healthProviderAbbrToConceptIdObj.marshfieldClinic, "loginSiteName": "Marshfield Clinic Health System"},
+  "Wisconsin Rapids": {"siteAcronym":"MFC", "siteCode": healthProviderAbbrToConceptIdObj.marshfieldClinic, "loginSiteName": "Marshfield Clinic Health System"},
+  "Colby Abbotsford": {"siteAcronym":"MFC", "siteCode": healthProviderAbbrToConceptIdObj.marshfieldClinic, "loginSiteName": "Marshfield Clinic Health System"},
+  "Minocqua": {"siteAcronym":"MFC", "siteCode": healthProviderAbbrToConceptIdObj.marshfieldClinic, "loginSiteName": "Marshfield Clinic Health System"},
+  "Merrill": {"siteAcronym":"MFC", "siteCode": healthProviderAbbrToConceptIdObj.marshfieldClinic, "loginSiteName": "Marshfield Clinic Health System"},
+  "MF Pop-Up": {"siteAcronym":"MFC", "siteCode": healthProviderAbbrToConceptIdObj.marshfieldClinic, "loginSiteName": "Marshfield Clinic Health System"},
+  "Sioux Falls Imagenetics": {"siteAcronym":"SFH", "siteCode": healthProviderAbbrToConceptIdObj.sanfordHealth, "loginSiteName": "Sanford Health"},
+  "Fargo South University": {"siteAcronym":"SFH", "siteCode": healthProviderAbbrToConceptIdObj.sanfordHealth, "loginSiteName": "Sanford Health"},
+  "Bismarck Medical Center": {"siteAcronym": "SFH", "siteCode": healthProviderAbbrToConceptIdObj.sanfordHealth, "loginSiteName": "Sanford Health"},
+  "Sioux Falls Sanford Center": {"siteAcronym": "SFH", "siteCode": healthProviderAbbrToConceptIdObj.sanfordHealth, "loginSiteName": "Sanford Health"},
+  "DCAM": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
+  "Ingalls Harvey": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
+  "River East": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
+  "South Loop": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
+  "Orland Park": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
+  "Main Campus": {"siteAcronym":"NIH", "siteCode": healthProviderAbbrToConceptIdObj.nci, "loginSiteName": "National Cancer Institute"},
+  "Frederick": {"siteAcronym":"NIH", "siteCode": healthProviderAbbrToConceptIdObj.nci, "loginSiteName": "National Cancer Institute"},
 }
 
 export const locationConceptIDToLocationMap = {
@@ -1988,7 +1994,7 @@ export const locationConceptIDToLocationMap = {
   [conceptIds.nameToKeyObj.hpPN]: {
     siteSpecificLocation: 'HP Park Nicollet',
     siteAcronym: 'HP',
-    siteCode: nameToKeyObj.hPartners,
+    siteCode: `${healthProviderAbbrToConceptIdObj.healthPartners}`,
     siteTeam: 'HealthPartners Connect Study Team',
     loginSiteName: 'HealthPartners Research Clinic',
     email: 'communityresearchdepartment@healthpartners.com',
@@ -2148,7 +2154,7 @@ export const locationConceptIDToLocationMap = {
   [conceptIds.nameToKeyObj.sfBM]: {
     siteSpecificLocation: 'Bismarck Medical Center',
     siteAcronym: 'SFH',
-    siteCode: nameToKeyObj.snfrdHealth,
+    siteCode: `${healthProviderAbbrToConceptIdObj.sanfordHealth}`,
     siteTeam: 'Sanford Connect Study Team',
     loginSiteName: 'Sanford Health',
     email: 'connectstudy@sanfordhealth.org',
@@ -2156,7 +2162,7 @@ export const locationConceptIDToLocationMap = {
   [conceptIds.nameToKeyObj.sfSC]: {
     siteSpecificLocation: 'Sioux Falls Sanford Center',
     siteAcronym: 'SFH',
-    siteCode: nameToKeyObj.snfrdHealth,
+    siteCode: `${healthProviderAbbrToConceptIdObj.sanfordHealth}`,
     siteTeam: 'Sanford Connect Study Team',
     loginSiteName: 'Sanford Health',
     email: 'connectstudy@sanfordhealth.org',
@@ -2296,15 +2302,14 @@ export const siteSpecificLocationToConceptId = {
   "Sioux Falls Sanford Center": conceptIds.nameToKeyObj.sfSC,
 }
 
-
-export const keyToNameAbbreviationObj = {
+export const conceptIdToHealthProviderAbbrObj = {
   452412599: "kpNW",
-  531629870: "hPartners",
-  657167265: "snfrdHealth",
-  548392715: "hfHealth",
-  303349821: "maClinic",
+  531629870: "healthPartners",
+  657167265: "sanfordHealth",
+  548392715: "henryFordHealth",
+  303349821: "marshfieldClinic",
   125001209: "kpCO",
-  809703864: "uChiM",
+  809703864: "uOfChicagoMed",
   13: "nci",
   300267574: "kpHI",
   327912200: "kpGA",
@@ -2386,6 +2391,7 @@ export const participationConversion = {
     '872012139': 'Revoked HIPAA only',
     '854021266': 'Withdrew consent',
     '241236037': 'Destroy data',
+    '884452262': 'Data destroyed',
     '458508122': 'Refused all future activities',
     '618686157': 'Deceased'
 };
@@ -2746,6 +2752,13 @@ export const checkOutParticipant = async (data) => {
          
          await updateParticipant(checkOutData);
     }
+};
+
+export const participantCanCheckIn = (data) => {
+    return data[conceptIds.withdrewConsent] !== conceptIds.yes &&
+        data[conceptIds.revokedHIPAA] !== conceptIds.yes &&
+        data[conceptIds.destroyData] !== conceptIds.yes &&
+        data[conceptIds.dataDestroyed] !== conceptIds.yes;
 };
 
 export const getCollectionsByVisit = async (data) => {

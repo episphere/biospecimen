@@ -78,7 +78,7 @@ const modifyKitQueryResults = (kitsData) => {
     const Connect_ID = kitData['Connect_ID'];
     const dateReceived = convertISODateTime(kitData[conceptIds.collection.mouthwashTube1][conceptIds.receivedDateTime]);
     const dateDrawn = convertISODateTime(kitData[conceptIds.dateWithdrawn]);
-    const vialMappings = getVialTypesMapping('home', keyToNameAbbreviationObj[kitData[conceptIds.healthcareProvider]], tubeID);
+    const vialMappings = getVialTypesMapping('home', conceptIdToHealthProviderAbbrObj[kitData[conceptIds.healthcareProvider]], tubeID);
     const vialType = vialMappings[0] || '';
     const additivePreservative = vialMappings[1] || '';
     const materialType = vialMappings[2] || '';
