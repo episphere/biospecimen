@@ -2,7 +2,7 @@ import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource, getCurrentDate } from "../../shared.js";
 import { baselineMWSurveyRemainderTemplate, baselineMWThankYouTemplate } from "../../emailTemplates.js";
 import { nonUserNavBar } from "./../../navbar.js";
-import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from "../../fieldToConceptIdMapping.js";
 import { displayPackageConditionListEmptyModal, displaySelectedPackageConditionListModal, checkSelectPackageConditionsList, targetAnchorTagEl, addListenersOnPageLoad, beforeUnloadMessage, enableCollectionCardFields, enableCollectionCheckBox } from "../receipts/packageReceipt.js";
 

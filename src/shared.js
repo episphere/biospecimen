@@ -2820,19 +2820,28 @@ export const SSOConfig = (email) => {
     return { tenantID, provider }
 }
 
-export const getParticipantSelection = async (filter) => {
+/**
+ * fetch request to get an array of participants's data based on the biomouthwash kit's kit status
+ * @param {string} type - the kit status type as concept Id
+ * @returns {Array} - an array of custom objects based on participant's kit status
+*/
 
-    const idToken = await getIdToken();
-    const response = await fetch(`https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/biospecimen?api=getParticipantSelection&type=${filter}`, 
-    {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + idToken,
-      },
-    });
-    return response.json();
-  }
-     
+export const getParticipantsByKitStatus = async (kitStatus) => {
+    try {
+        const idToken = await getIdToken();
+        const response = await fetch(`${api}api=getParticipantsByKitStatus&type=${kitStatus}`, {
+            method: "GET",
+            headers: {
+                Authorization: "Bearer " + idToken,
+            },
+        });
+        return response.json();
+    } catch (error) {
+        console.error("Failed to get participants by kit status", error);
+        throw new Error("Failed to get participants by kit status"); 
+    }
+};
+
 export const isDeviceMobile = /(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(window.navigator.userAgent) ||
     /Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(window.navigator.userAgent) || window.innerWidth < 1300;
 
