@@ -50,7 +50,7 @@ const bptlScreenTemplate = (name, data) => {
                     <div class="p-3 border bg-light"><button type="button" href="#kitshipment" class="btn btn-primary btn-lg" id="kitShipment">Ship Kits</button></div>
                     <div class="p-3 border bg-light"><button type="button" href="#kitsreceipt" class="btn btn-primary btn-lg" id="kitsReceipt">Kits Receipt</button></div>
                     <div class="p-3 border bg-light"><button type="button" href="#kitscsv" class="btn btn-primary btn-lg" id="kitsCsv">Create .csv File</button></div>
-                    <div class="p-3 border bg-light"><button type="button" href="#participantselection" class="btn btn-primary btn-lg" id="participantSelection" disabled>Reports</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#kitStatusReports" class="btn btn-primary btn-lg" id="kitStatusReports">Reports</button></div>
                 </div>
                 <div class="col">
                     <h4>Supplies</h4>
@@ -102,9 +102,9 @@ const redirectPageToLocation = () => {
   kitCSVRedirection && kitCSVRedirection.addEventListener("click", async () => {
     location.hash = "#kitscsv";
   });
-  const participantSelectionRedirection = document.getElementById("participantSelection");
-  participantSelectionRedirection && participantSelectionRedirection.addEventListener("click", async () => {
-      location.hash = "#participantselection";
+  const kitStatusReportsRedirection = document.getElementById("kitStatusReports");
+  kitStatusReportsRedirection && kitStatusReportsRedirection.addEventListener("click", async () => {
+      location.hash = "#kitStatusReports";
     });
   const packagesInTransitRedirection = document.getElementById("packagesInTransit");
   packagesInTransitRedirection && packagesInTransitRedirection.addEventListener("click", async () => {

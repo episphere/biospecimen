@@ -1,8 +1,8 @@
-import { getIdToken, findParticipant, showAnimation, hideAnimation, getParticipantSelection} from "../../shared.js";
-import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
-import { participantSelectionDropdown } from "./printAddresses.js";
+import { getIdToken, findParticipant, showAnimation, hideAnimation, getParticipantsByKitStatus} from "../../shared.js";
+import { displayKitStatusReportsHeader } from "./participantSelectionHeaders.js";
+import { kitStatusSelectionDropdown } from "./kitStatusReports.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 
 export const assignedScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -13,10 +13,10 @@ export const assignedScreen = async (auth, route) => {
 
 const assignedTemplate = async (name, auth, route) => {
   showAnimation();
-  const response = await getParticipantSelection("assigned");
+  const response = await getParticipantsByKitStatus("assigned");
   hideAnimation();
   let template = ``;
-  template += renderParticipantSelectionHeader();
+  template += displayKitStatusReportsHeader();
   template += ` <div class="container-fluid">
                     <div id="root root-margin">
                       <div id="alert_placeholder"></div>
@@ -68,7 +68,7 @@ const assignedTemplate = async (name, auth, route) => {
 </div>`;
   document.getElementById("contentBody").innerHTML = template;
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
-  participantSelectionDropdown();
+  kitStatusSelectionDropdown();
   activeHomeCollectionNavbar()
                                       
   redirectToKitShipment();

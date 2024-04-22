@@ -1,7 +1,7 @@
 import { nonUserNavBar } from "./../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource } from "../../shared.js";
-import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { baselineMWKitRemainderTemplate } from "../../emailTemplates.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
 
@@ -47,13 +47,13 @@ const verifyScannedCode = async () => {
     scannedCodeInput.addEventListener("change", async () => {
       showAnimation();
       const isScannedCodeValid = await checkScannedCodeValid(scannedCodeInput.value)
-      isScannedCodeValid.data?.valid ? confirmPickupTemplate(isScannedCodeValid.data?.UKID) : tryAgainTemplate();
+      isScannedCodeValid.data?.valid ? confirmPickupTemplate(isScannedCodeValid.data?.uniqueKitID) : tryAgainTemplate();
       hideAnimation();
     });
   }
 };
 
-const confirmPickupTemplate = (UKID) => {
+const confirmPickupTemplate = (uniqueKitID) => {
   const cardBody = document.getElementById("cardBody");
   cardBody.innerHTML = `        
                   <div class="card-body">
@@ -68,7 +68,7 @@ const confirmPickupTemplate = (UKID) => {
                         <button type="submit" class="btn btn-danger" id="cancelResponse">Cancel</button>
                         <button type="submit" class="btn btn-primary" id="saveResponse">Save</button>
                       </div>`;
-  saveResponse(UKID);
+  saveResponse(uniqueKitID);
   cancelResponse();
 };
 
@@ -82,10 +82,10 @@ const tryAgainTemplate = () => {
   verifyScannedCode();
 };
 
-const saveResponse = (UKID) => {
+const saveResponse = (uniqueKitID) => {
   const saveResponseBtn = document.getElementById("saveResponse");
   let data = {};
-  data[conceptIds.UKID] = UKID;
+  data[conceptIds.uniqueKitID] = uniqueKitID;
   if (saveResponseBtn) {
     saveResponseBtn.addEventListener("click", (e) => {
       data[conceptIds.shippedDateTime] = convertDateReceivedinISO(document.getElementById("inputDate").value);
@@ -147,6 +147,15 @@ const setShippedResponse = async (data) => {
   }
 };
 
+/**
+ * Checks the validity of a scanned code.
+ * @param {string} scannedCode - The USPS/FedEx Tracking Number to verify.
+ * @returns {Promise<{valid: boolean, uniqueKitID: string} | boolean>} A promise that resolves to:
+ *   * An object containing: 
+ *      * valid: {boolean} - Indicates if the scanned code is valid.
+ *      * uniqueKitID: {string} - The unique identifier for the Supply Kit, if available.
+ *   * OR a false if the scanned code is not a supply kit tracking number or if the kit status is already assigned.
+ */
 const checkScannedCodeValid = async (scannedCode) => {
   const idToken = await getIdToken();
   const response = await fetch(`${baseAPI}api=verifyScannedCode&id=${scannedCode}`, {
