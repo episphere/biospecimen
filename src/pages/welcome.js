@@ -21,7 +21,7 @@ export const welcomeScreen = async (auth, route) => {
 }
 
 const clinicalOnlySiteArray = ['KPNW', 'KPCO', 'KPHI', 'KPGA'];
-const researchOnlySiteArray = location.host === urls.prod ? ['MFC', 'UCM'] : ['MFC'];
+const researchOnlySiteArray = location.host === urls.prod ? ['MFC', 'UCM', 'BSWH'] : ['MFC', 'BSWH'];
 
 const welcomeScreenTemplate = (name, data, auth, route) => {
     let template = '';
