@@ -387,15 +387,13 @@ const updateResultMappings = (filteredResult, vialMappings, collectionId, tubeId
         ? (keyToNameCSVObj[filteredResult[fieldToConceptIdMapping.healthcareProvider]] || '')
         : (keyToLocationObj[filteredResult[fieldToConceptIdMapping.collectionLocation]] || '');
 
-        // Dummy date for clinical files requested in issue 936
-        const dateReceived = (collectionTypeValue === fieldToConceptIdMapping.clinical) ?
-        '01/01/1999 12pm'
-        : ( filteredResult[fieldToConceptIdMapping.dateReceived]
-            ? formatISODateTimeDateOnly(filteredResult[fieldToConceptIdMapping.dateReceived])
-            : '');
+    const dateReceived = filteredResult[fieldToConceptIdMapping.dateReceived]
+        ? formatISODateTimeDateOnly(filteredResult[fieldToConceptIdMapping.dateReceived])
+        : '';
 
+    // Dummy date for clinical files requested in issue 936
     const dateDrawn = (collectionTypeValue === fieldToConceptIdMapping.clinical)
-        ? (clinicalDateTime ? convertISODateTime(clinicalDateTime) : '')
+        ? '01/01/1999 12pm'
         : (withdrawalDateTime ? convertISODateTime(withdrawalDateTime) : '');
 
     const vialType = vialMappings[0] || '';
