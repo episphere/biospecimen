@@ -289,6 +289,15 @@ export const conceptIds = {
         467088902 : 'Fargo South University',
         111111111 : 'NIH/NCI',
         807835037 : 'Other'
+
+        /*
+        BSWH Comments~ 
+        : 'BCC- HWC'
+		: 'BCC- All Saints (FW)'
+		: 'BCC- Plano'
+		: 'BCC- Worth St'
+        : 'BCC- Irving'
+        */
     },
 
     nameToKeyObj : {
@@ -319,6 +328,15 @@ export const conceptIds = {
         "ucmPopUp": 319518299,
         "orPark": 940329442,
         "mfPopUp": 567969985,
+        /*
+        BSWH Comments~
+        This will be changed to better property names
+        'bccHwc': 123456789,
+        'bccAllSaints': 123456789,
+        'bccPlano': 123456789,
+        'bccWorthSt': 123456789,
+        'bccIrving': 123456789
+        */
         'all': 1000
 
     },
