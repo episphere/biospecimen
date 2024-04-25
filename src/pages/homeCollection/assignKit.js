@@ -1,8 +1,8 @@
-import { showAnimation, hideAnimation, getIdToken, getParticipantSelection} from "../../shared.js";
-import { renderParticipantSelectionHeader } from "./participantSelectionHeaders.js";
-import { participantSelectionDropdown } from "./printAddresses.js";
+import { showAnimation, hideAnimation, getIdToken, getParticipantsByKitStatus} from "../../shared.js";
+import { displayKitStatusReportsHeader } from "./participantSelectionHeaders.js";
+import { kitStatusSelectionDropdown } from "./kitStatusReports.js";
 import { nonUserNavBar, unAuthorizedUser } from "./../../navbar.js";
-import { activeHomeCollectionNavbar } from "./activeHomeCollectionNavbar.js";
+import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 
 export const addressesPrintedScreen = async (auth, route) => {
   const user = auth.currentUser;
@@ -15,10 +15,10 @@ let kitAssignmentInfoText = "";
 
 const addressesPrintedTemplate = async (name, auth, route) => {
   showAnimation();
-  const response = await getParticipantSelection("addressPrinted");
+  const response = await getParticipantsByKitStatus("addressPrinted");
   hideAnimation();
   let template = ``;
-  template += renderParticipantSelectionHeader();
+  template += displayKitStatusReportsHeader();
   template += `<div class="container-fluid">
                     <div id="root root-margin">
                         <div class="table-responsive">
@@ -48,7 +48,7 @@ const addressesPrintedTemplate = async (name, auth, route) => {
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   activeHomeCollectionNavbar()
   assignKitButton();
-  participantSelectionDropdown();
+  kitStatusSelectionDropdown();
   
 };
 

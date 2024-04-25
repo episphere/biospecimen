@@ -198,7 +198,7 @@ const getBPTLMetrics = async () => {
 
 const getAllParticipants = async () => {
     const idToken = await getIdToken();
-    const response = await fetch(`${api}api=getParticipantSelection&type=all`, {
+    const response = await fetch(`${api}api=getParticipantsByKitStatus&type=all`, {
         method: "GET",
         headers: {
             Authorization: "Bearer" + idToken,

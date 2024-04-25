@@ -13,11 +13,11 @@ import { kitAssemblyScreen } from "./src/pages/homeCollection/kitAssembly.js";
 import { printLabelsScreen } from "./src/pages/homeCollection/printLabels.js";
 import { assignKitsScreen } from "./src/pages/homeCollection/assignKits.js";
 import { kitsReceiptScreen } from "./src/pages/homeCollection/kitsReceipt.js";
-import { printAddressesScreen } from "./src/pages/homeCollection/printAddresses.js";
+// import { displayKitStatusReportsScreen } from "./src/pages/homeCollection/kitStatusReports.js"; // TODO: This will be added back in once the new kitStatusReports page is created
 import { allParticipantsScreen } from "./src/pages/homeCollection/allParticipants.js";
 import { addressesPrintedScreen } from "./src/pages/homeCollection/assignKit.js";
 import { assignedScreen } from "./src/pages/homeCollection/assigned.js";
-import { shippedScreen } from "./src/pages/homeCollection/shipped.js";
+import { displayKitStatusReportsShippedScreen } from "./src/pages/homeCollection/kitStatusReportsShipped.js";
 import { receivedKitsScreen } from "./src/pages/homeCollection/receivedKits.js";
 import { kitCsvScreen } from "./src/pages/homeCollection/kitCSV.js";
 import { kitShipmentScreen } from "./src/pages/homeCollection/kitShipment.js";
@@ -29,6 +29,8 @@ import { collectionIdSearchScreen } from "./src/pages/reports/collectionIdSearch
 import { bptlShipReportsScreen } from "./src/pages/reports/shippingReport.js";
 import { checkOutReportTemplate } from "./src/pages/checkOutReport.js";
 import { dailyReportTemplate } from "./src/pages/dailyReport.js";
+
+// test again
 
 let auth = '';
 
@@ -97,11 +99,11 @@ const manageRoutes = async () => {
         else if (route === "#assignkits") assignKitsScreen(auth, route);
         else if (route === "#kitsreceipt") kitsReceiptScreen(auth, route);
         else if (route === "#kitscsv") kitCsvScreen(auth, route);
-        else if (route === "#participantselection") printAddressesScreen(auth, route);
+        else if (route === "#kitStatusReports") displayKitStatusReportsShippedScreen(auth, route); // Temporarily make kitStatusReports route call displayKitStatusReportsShippedScreen
         else if (route === "#allParticipants") allParticipantsScreen(auth, route);
         else if (route === "#addressPrinted") addressesPrintedScreen(auth, route);
         else if (route === "#assigned") assignedScreen(auth, route);
-        else if (route === "#shipped") shippedScreen(auth, route);
+        else if (route === "#status_shipped") kitStatusReportsShipped(auth, route);
         else if (route === "#received") receivedKitsScreen(auth,route);
         else if (route === "#kitshipment") kitShipmentScreen(auth, route);
         else if (route === "#packagesintransit") packagesInTransitScreen(auth, route);
