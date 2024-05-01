@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, triggerErrorModal, triggerSuccessModal, baseAPI, processResponse, checkTrackingNumberSource, appState } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, triggerErrorModal, triggerSuccessModal, baseAPI, processResponse, checkTrackingNumberSource, appState, numericInputValidator } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -74,6 +74,7 @@ const assignKitsTemplate = async (name) => {
 
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
+  numericInputValidator(['scannedBarcode']);
   activeHomeCollectionNavbar();
   appState.setState({ participants: response.data });
   populateSidePaneRows();
