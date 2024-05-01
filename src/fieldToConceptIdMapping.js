@@ -297,6 +297,7 @@ export const conceptIds = {
 		: 'BCC- Plano'
 		: 'BCC- Worth St'
         : 'BCC- Irving'
+        : 'NTX Biorepository'
         */
     },
 
@@ -329,13 +330,14 @@ export const conceptIds = {
         "orPark": 940329442,
         "mfPopUp": 567969985,
         /*
-        BSWH Comments~
+        BSWH Comments~  connectbiospecimen@BSWHealth.org
         This will be changed to better property names
         'bccHwc': 123456789,
         'bccAllSaints': 123456789,
         'bccPlano': 123456789,
         'bccWorthSt': 123456789,
-        'bccIrving': 123456789
+        'bccIrving': 123456789,
+        'ntxBiorepo: 123456789, // NTX Biorepository
         */
         'all': 1000
 
