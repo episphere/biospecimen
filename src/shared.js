@@ -1980,13 +1980,12 @@ export const siteSpecificLocation = {
   "River East": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
   "South Loop": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
   "Orland Park": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
-
-  "BCC- HWC": {"SiteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
-  "BCC- All Saints (FW)": {"SiteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
-  "BCC- Plano": {"SiteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
-  "BCC- Worth St": {"SiteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
-  "BCC- Irving": {"SiteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
-
+  "BCC- HWC": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- All Saints (FW)": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- Plano": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- Worth St": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- Irving": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
+  "NTX Biorepository": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
   "Main Campus": {"siteAcronym":"NIH", "siteCode": healthProviderAbbrToConceptIdObj.nci, "loginSiteName": "National Cancer Institute"},
   "Frederick": {"siteAcronym":"NIH", "siteCode": healthProviderAbbrToConceptIdObj.nci, "loginSiteName": "National Cancer Institute"},
 
@@ -2227,52 +2226,60 @@ export const locationConceptIDToLocationMap = {
     email: 'connectbiospecimen@bsd.uchicago.edu',
   },
   /*
-  // BSWH COMMENT~ - Add generated concepts ids to the keys
+  // BSWH COMMENT~ - Add generated concepts ids to the keys ('Numnber goes here': location)
     BCC- HWC 
     : {
         siteSpecificLocation: 'BCC- HWC',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
-        siteTeam: 'Baylor Scott & White Health Connect Study Team',
+        siteTeam: 'BSWH Connect Study Team',
         loginSiteName: 'Baylor Scott & White Health',
-        email: '',
+        email: 'connectbiospecimen@BSWHealth.org',
     },
     BCC- All Saints (FW)
     : {
         siteSpecificLocation: 'BCC- All Saints (FW)',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
-        siteTeam: 'Baylor Scott & White Health Connect Study Team',
+        siteTeam: 'BSWH Connect Study Team',
         loginSiteName: 'Baylor Scott & White Health',
-        email: '',
+        email: 'connectbiospecimen@BSWHealth.org',
     }
     // BCC- Plano
     : {
         siteSpecificLocation: 'BCC- Plano',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
-        siteTeam: 'Baylor Scott & White Health Connect Study Team',
+        siteTeam: 'BSWH Connect Study Team',
         loginSiteName: 'Baylor Scott & White Health',
-        email: '',
+        email: 'connectbiospecimen@BSWHealth.org',
     }
     // BCC- Worth St
     : {
         siteSpecificLocation: 'BCC- Worth St',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
-        siteTeam: 'Baylor Scott & White Health Connect Study Team',
+        siteTeam: 'BSWH Connect Study Team',
         loginSiteName: 'Baylor Scott & White Health',
-        email: '',
+        email: 'connectbiospecimen@BSWHealth.org',
     }
     // BCC- Irving
     : {
         siteSpecificLocation: 'BCC- Irving',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
-        siteTeam: 'Baylor Scott & White Health Connect Study Team',
+        siteTeam: 'BSWH Connect Study Team',
         loginSiteName: 'Baylor Scott & White Health',
-        email: '',
-    }
+        email: 'connectbiospecimen@BSWHealth.org',
+    },
+    // NTX Biorepository
+    : {
+        siteSpecificLocation: 'NTX Biorepository',
+        siteAcronym: 'BSWH',
+        siteCode: '472940358',
+        siteTeam: 'BSWH Connect Study Team',
+        loginSiteName: 'Baylor Scott & White Health',
+        email: '
 
   */
   111111111: {
@@ -2331,6 +2338,7 @@ export const conceptIdToSiteSpecificLocation = {
   // : BCC- Plano
   // : BCC- Worth St
   // : BCC- Irving
+  // : NTX Biorepository
 
 }
 
@@ -2373,6 +2381,7 @@ export const siteSpecificLocationToConceptId = {
     "BCC- Plano": ,
     "BCC- Worth St": ,
     "BCC- Irving": ,
+    "NTX Biorepository": ,
   */
 }
 
@@ -2455,6 +2464,7 @@ export const keyToLocationObj =
     : "BCC- Plano",
     : "BCC- Worth St",
     : "BCC- Irving",
+    : "NTX Biorepository",
     
     */
     111111111: "NIH",
@@ -2662,7 +2672,7 @@ export const siteLocations = {
         // Bismarck
         'SFH': [{location: 'Sioux Falls Imagenetics', concept: 589224449}, {location: 'Fargo South University', concept: 467088902}, {location: 'Bismarck Medical Center', concept: conceptIds.nameToKeyObj.sfBM}, {location: 'Sioux Falls Sanford Center', concept: conceptIds.nameToKeyObj.sfSC}],
         // BSWH COMMENT~ - Add generated concepts ids to the keys
-        'BSWH': [{location: 'BCC- HWC', concept: 472940358}, {location: 'BCC- All Saints (FW)', concept: 472940358}, {location: 'BCC- Plano', concept: 472940358}, {location: 'BCC- Worth St', concept: 472940358}, {location: 'BCC- Irving', concept: 472940358}],
+        'BSWH': [{location: 'BCC- HWC', concept: 472940358}, {location: 'BCC- All Saints (FW)', concept: 472940358}, {location: 'BCC- Plano', concept: 472940358}, {location: 'BCC- Worth St', concept: 472940358}, {location: 'BCC- Irving', concept: 472940358}, {location: 'NTX Biorepository', concept: 472940358},],
 
         'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}]
 
