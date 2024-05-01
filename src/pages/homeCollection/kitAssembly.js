@@ -32,10 +32,15 @@ const kitAssemblyTemplate = async (name) => {
               <div id="alert_placeholder"></div>
                   <form>
                         <div class="form-group row">
-                          <label for="scannedBarcode" class="col-md-4 col-form-label">Tracking Number</label>
+                          <label for="scannedBarcode" class="col-md-4 col-form-label">Return Tracking Number</label>
                           <div class="col-md-8">
-                            <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan Barcode" required />
-                            <span id="showMsg" style="font-size: 14px;"></span>
+                            <div class="form-group row">
+                              <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan Barcode" required />
+                              <span id="showMsg" style="font-size: 14px;"></span>
+                            </div>
+                            <div class="form-group row">
+                              <input type="text" class="form-control" id="scannedBarcode2" placeholder="Re-Enter (scan/type) Barcode" required />
+                            </div>
                           </div>
                         </div>
                         <div class="form-group row">
@@ -90,7 +95,7 @@ const kitAssemblyTemplate = async (name) => {
 
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
-  numericInputValidator(['scannedBarcode']);
+  numericInputValidator(['scannedBarcode', 'scannedBarcode2']);
   activeHomeCollectionNavbar();
   processAssembledKit();
   enableEnterKeystroke();

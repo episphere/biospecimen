@@ -1,6 +1,6 @@
 import { nonUserNavBar } from "./../../navbar.js";
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource } from "../../shared.js";
+import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource, numericInputValidator } from "../../shared.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { baselineMWKitRemainderTemplate } from "../../emailTemplates.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -26,7 +26,7 @@ const kitShipmentTemplate = async (name) => {
                       <div class="container-fluid" style="padding-top: 50px;">     
                           <div class="card">
                           <div class="card-body">
-                          <span> <h3 style="text-align: center; margin: 0 0 1rem;">Scan tracking number</h3> </span>
+                          <span> <h3 style="text-align: center; margin: 0 0 1rem;">Scan Supply Kit Tracking Number</h3> </span>
                             <div style="text-align: center;  padding-bottom: 25px; "> 
                               <span id="fieldModified"> Scan Barcode</span>  : <input required type="text" name="scannedBarcode" id="scannedBarcode"  /> 
                               <span id="showMsg" style="font-size: 14px;"></span>
@@ -37,6 +37,7 @@ const kitShipmentTemplate = async (name) => {
                   </div>
              </div>`;
   document.getElementById("contentBody").innerHTML = template;
+  numericInputValidator(['scannedBarcode']);
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   activeHomeCollectionNavbar();
 };

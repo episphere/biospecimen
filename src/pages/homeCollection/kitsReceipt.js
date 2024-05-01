@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource, getCurrentDate } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource, getCurrentDate, numericInputValidator } from "../../shared.js";
 import { baselineMWSurveyRemainderTemplate, baselineMWThankYouTemplate } from "../../emailTemplates.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
@@ -33,7 +33,7 @@ const kitsReceiptTemplate = async (name) => {
                   <div class="mt-3" >
                   <br />
                   <div class="row form-group">
-                    <label class="col-form-label col-md-4" for="scannedBarcode">Scan Barcode</label>
+                    <label class="col-form-label col-md-4" for="scannedBarcode">Scan Return Kit Tracking Number</label>
                     <div style="display:inline-block;">
                       <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" style="width: 600px;" placeholder="Scan Barcode">
                       <span id="showMsg" style="padding-left: 10px;"></span>
@@ -109,6 +109,7 @@ template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false
   
 
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
+  numericInputValidator(['scannedBarcode']);
   contentBody.innerHTML = template;
   activeHomeCollectionNavbar();
   checkTrackingNumberSource();
