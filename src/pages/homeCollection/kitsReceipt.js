@@ -129,6 +129,8 @@ const performCollectionIdcheck = () => {
     collectionIdField.addEventListener("input", (e) => {
       if (collectionIdField.value.length < 14) {
         document.getElementById('showCollectionErrorMsg').innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> Enter Correct Collection ID`
+      } else {
+        document.getElementById('showCollectionErrorMsg').innerHTML = ``
       }
     })
   }
