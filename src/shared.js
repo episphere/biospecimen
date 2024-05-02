@@ -3118,6 +3118,14 @@ export const numericInputValidator = (elemArr) => {
     })
 }
 
+export const autoTabInputField = ( inputFieldSource, inputFieldDestination ) => {
+    document.getElementById(inputFieldSource)?.addEventListener('keyup', e => {
+        if (e.key === 'Enter') {
+            document.getElementById(inputFieldDestination)?.focus();
+        }
+    })
+}
+
 export const collectionInputValidator = (elemArr) => {
     elemArr.forEach(elem => {
         if (document.getElementById(elem)) {

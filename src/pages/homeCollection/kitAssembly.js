@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource, numericInputValidator } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource, numericInputValidator, autoTabInputField } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -36,10 +36,11 @@ const kitAssemblyTemplate = async (name) => {
                           <div class="col-md-8">
                             <div class="form-group row">
                               <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan Barcode" required />
-                              <span id="showMsg" style="font-size: 14px;"></span>
                             </div>
+                            <label for="scannedBarcode2" class="sr-only">Confirm Return Tracking Number</label>
                             <div class="form-group row">
-                              <input type="text" class="form-control" id="scannedBarcode2" placeholder="Re-Enter (scan/type) Barcode" required />
+                              <input autocomplete="off" type="text" class="form-control" id="scannedBarcode2" placeholder="Re-Enter (scan/type) Barcode" required />
+                              <span id="showMsg" style="font-size: 14px;"></span>
                             </div>
                           </div>
                         </div>
@@ -95,12 +96,21 @@ const kitAssemblyTemplate = async (name) => {
 
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
+
+  // Set up automatic tabbing between inputs upon scanning (assuming the scanner automatically inputs the enter key at the end)
+  let autoTabArr = ['scannedBarcode', 'scannedBarcode2', 'supplyKitId', 'returnKitId', 'cupId', 'cardId'];
+  for(let i = 0; i < autoTabArr.length - 1; i++) {
+    autoTabInputField(autoTabArr[i], autoTabArr[i + 1]);
+  }
+
+  document.getElementById('scannedBarcode2').onpaste = e => e.preventDefault();
   numericInputValidator(['scannedBarcode', 'scannedBarcode2']);
   activeHomeCollectionNavbar();
   processAssembledKit();
   enableEnterKeystroke();
   dropdownTrigger('Select Kit Type');
   checkTrackingNumberSource();
+  performQCcheck('scannedBarcode2', 'scannedBarcode', 'showMsg', `Return Tracking Number doesn't match`);
   performQCcheck('returnKitId', 'supplyKitId', 'showReturnKitErrorMsg', `Supply Kit & Return Kit need to be same`);
   performQCcheck('cardId', 'cupId', 'showCardIdErrorMsg', `Cup ID & Card ID need to be same`);
 };
@@ -141,6 +151,8 @@ const processAssembledKit = () => {
       const queryScannedBarcodeValue = document.getElementById('scannedBarcode')?.value?.trim();
       const scannedBarcodeValue = (queryScannedBarcodeValue !== undefined) ? queryScannedBarcodeValue : 0;
 
+      const confirmScannedBarcodeValue = document.getElementById('scannedBarcode2')?.value?.trim();
+
       const querySupplyKitIdValue = document.getElementById('supplyKitId').value.trim();
       const supplyKitIdValue = (querySupplyKitIdValue !== undefined) ? querySupplyKitIdValue: 0;
 
@@ -153,7 +165,11 @@ const processAssembledKit = () => {
       const queryCollectionCardIdValue = document.getElementById('cardId')?.value?.trim();
       const collectionCardIdValue = (queryCollectionCardIdValue !== undefined) ? queryCollectionCardIdValue : 0;
 
-      if (scannedBarcodeValue.length === 0 || supplyKitIdValue.length === 0 ||  returnKitIdValue.length === 0 ||
+      if (queryScannedBarcodeValue !== confirmScannedBarcodeValue) {
+        triggerErrorModal('Return tracking number doesn\'t match.');
+        return;
+      }
+      else if (scannedBarcodeValue.length === 0 || supplyKitIdValue.length === 0 ||  returnKitIdValue.length === 0 ||
         collectionCupIdValue.length === 0 || collectionCardIdValue.length === 0 || document.getElementById('dropdownSites').innerHTML !== 'Mouthwash') {
           triggerErrorModal('One or more fields are missing.');
           return
@@ -303,6 +319,7 @@ const storeAssembledKit = async (kitData) => {
 const alertTemplate = (message, status = "warn", duration = 3000) => {
   if (status === "success") {
     performQCcheck('returnKitId', 'supplyKitId', 'showReturnKitErrorMsg', ``);
+    performQCcheck('scannedBarcode2', 'scannedBarcode', 'showMsg', ``);
     performQCcheck('cardId', 'cupId', 'showCardIdErrorMsg', ``);
     alert = `
     <div id="alert-success" class="alert alert-success alert-dismissible fade show" role="alert">

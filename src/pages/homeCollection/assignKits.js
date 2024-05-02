@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, triggerErrorModal, triggerSuccessModal, baseAPI, processResponse, checkTrackingNumberSource, appState, numericInputValidator, errorMessage, removeAllErrors } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, triggerErrorModal, triggerSuccessModal, baseAPI, processResponse, checkTrackingNumberSource, appState, numericInputValidator, errorMessage, removeAllErrors, autoTabInputField } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -54,15 +54,16 @@ const assignKitsTemplate = async (name) => {
                   </div>
                 </div>
                 <div class="form-group row">
-                <label for="scannedBarcode" class="col-md-4 col-form-label">Supply Kit Tracking Number</label>
-                <div class="col-md-8">
-                  <div class="form-group row">
-                    <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan Barcode">
-                    <span id="showMsg" style="font-size: 14px;"></span>
-                  </div>
-                  <div class="form-group row">
-                    <input type="text" class="form-control" id="scannedBarcode2" placeholder="Re-Enter (scan/type) Barcode">
-                  </div>
+                  <label for="scannedBarcode" class="col-md-4 col-form-label">Supply Kit Tracking Number</label>
+                  <div class="col-md-8">
+                    <div class="form-group row">
+                      <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan Barcode">
+                      <span id="showMsg" style="font-size: 14px;"></span>
+                    </div>
+                    <div class="form-group row">
+                      <label for="scannedBarcode2" class="sr-only">Confirm Supply Kit Tracking Number</label>
+                      <input autocomplete="off" type="text" class="form-control" id="scannedBarcode2" placeholder="Re-Enter (scan/type) Barcode">
+                    </div>
                 </div>
               </div>
         </form>
@@ -79,6 +80,14 @@ const assignKitsTemplate = async (name) => {
 
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
+
+  // Set up automatic tabbing between inputs upon scanning (assuming the scanner automatically inputs the enter key at the end)
+  let autoTabArr = ['fullName', 'address', 'Connect_ID', 'scanSupplyKit', 'scannedBarcode', 'scannedBarcode2'];
+  for(let i = 0; i < autoTabArr.length - 1; i++) {
+    autoTabInputField(autoTabArr[i], autoTabArr[i + 1]);
+  }
+
+  document.getElementById('scannedBarcode2').onpaste = e => e.preventDefault();
   numericInputValidator(['scannedBarcode', 'scannedBarcode2']);
   activeHomeCollectionNavbar();
   appState.setState({ participants: response.data });
