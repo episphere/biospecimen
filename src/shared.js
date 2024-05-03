@@ -2562,7 +2562,7 @@ export const disableInput = (id, disable) => {
 
 export const siteLocations = {
     'research': {
-        'UCM': [{location: 'UC-DCAM', concept: 777644826}, {location: 'Ingalls Harvey', concept: 145191545}, {location: 'River East', concept: 489380324}, {location: 'South Loop', concept: 120264574},
+        'UCM': [{location: 'UC-DCAM', concept: 777644826}, {location: 'Ingalls Harvey', concept: 145191545},
                 {location: 'UCM Pop-Up', concept: 319518299}, {location: 'Orland Park', concept: 940329442}          
               ],
         'MFC': [{location: 'Marshfield', concept: 692275326}, {location: 'Lake Hallie', concept: 698283667}, {location: 'Weston', concept: 813701399}, {location: 'Rice Lake', concept: 691714762}, 
@@ -2579,7 +2579,8 @@ export const siteLocations = {
         'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}]
     },
     'clinical': {
-        'KPHI': [{location:'KPHI RRL', concept: 531313956}]
+        'KPHI': [{location:'KPHI RRL', concept: 531313956}],
+        'UCM': [{location: 'River East', concept: 489380324}, {location: 'South Loop', concept: 120264574}]
     }
 }
 
