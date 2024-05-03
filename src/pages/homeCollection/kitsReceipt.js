@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource, getCurrentDate, numericInputValidator, autoTabInputField } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource, getCurrentDate, numericInputValidator, autoTabAcrossArray } from "../../shared.js";
 import { baselineMWSurveyRemainderTemplate, baselineMWThankYouTemplate } from "../../emailTemplates.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
@@ -112,11 +112,8 @@ template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false
   contentBody.innerHTML = template;
 
   // Set up automatic tabbing between inputs upon scanning (assuming the scanner automatically inputs the enter key at the end)
-  let autoTabArr = ['scannedBarcode', 'packageCondition', 'receivePackageComments', 'dateReceived', 'collectionCheckBox', 'collectionId', 'dateCollectionCard', 'timeCollectionCard', 'collectionComments'];
-  for(let i = 0; i < autoTabArr.length - 1; i++) {
-    autoTabInputField(autoTabArr[i], autoTabArr[i + 1]);
-  }
-
+  autoTabAcrossArray(['scannedBarcode', 'packageCondition', 'receivePackageComments', 'dateReceived', 'collectionCheckBox', 'collectionId', 'dateCollectionCard', 'timeCollectionCard', 'collectionComments']);
+  
   numericInputValidator(['scannedBarcode']);
   activeHomeCollectionNavbar();
   checkTrackingNumberSource();

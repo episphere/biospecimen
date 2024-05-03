@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, triggerErrorModal, triggerSuccessModal, baseAPI, processResponse, checkTrackingNumberSource, appState, numericInputValidator, errorMessage, removeAllErrors, autoTabInputField } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, triggerErrorModal, triggerSuccessModal, baseAPI, processResponse, checkTrackingNumberSource, appState, numericInputValidator, errorMessage, removeAllErrors, autoTabAcrossArray } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -82,10 +82,7 @@ const assignKitsTemplate = async (name) => {
   contentBody.innerHTML = template;
 
   // Set up automatic tabbing between inputs upon scanning (assuming the scanner automatically inputs the enter key at the end)
-  let autoTabArr = ['fullName', 'address', 'Connect_ID', 'scanSupplyKit', 'scannedBarcode', 'scannedBarcode2'];
-  for(let i = 0; i < autoTabArr.length - 1; i++) {
-    autoTabInputField(autoTabArr[i], autoTabArr[i + 1]);
-  }
+  autoTabAcrossArray(['fullName', 'address', 'Connect_ID', 'scanSupplyKit', 'scannedBarcode', 'scannedBarcode2']);
 
   document.getElementById('scannedBarcode2').onpaste = e => e.preventDefault();
   numericInputValidator(['scannedBarcode', 'scannedBarcode2']);
@@ -148,7 +145,7 @@ const confirmAssignment = () => {
         const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
         const scannedBarcode2 = document.getElementById('scannedBarcode2').value.trim();
         if(scannedBarcode && scannedBarcode2 && scannedBarcode !== scannedBarcode2) {
-          let msg = 'Supply Kit Tracking Number doesn\'t match';
+          const msg = 'Supply Kit Tracking Number doesn\'t match';
           errorMessage('scannedBarcode2', msg, true, false);
           throw new Error(msg);
         }

@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource, numericInputValidator, autoTabInputField } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource, numericInputValidator, autoTabAcrossArray } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -98,10 +98,7 @@ const kitAssemblyTemplate = async (name) => {
   contentBody.innerHTML = template;
 
   // Set up automatic tabbing between inputs upon scanning (assuming the scanner automatically inputs the enter key at the end)
-  let autoTabArr = ['scannedBarcode', 'scannedBarcode2', 'supplyKitId', 'returnKitId', 'cupId', 'cardId'];
-  for(let i = 0; i < autoTabArr.length - 1; i++) {
-    autoTabInputField(autoTabArr[i], autoTabArr[i + 1]);
-  }
+  autoTabAcrossArray(['scannedBarcode', 'scannedBarcode2', 'supplyKitId', 'returnKitId', 'cupId', 'cardId']);
 
   document.getElementById('scannedBarcode2').onpaste = e => e.preventDefault();
   numericInputValidator(['scannedBarcode', 'scannedBarcode2']);

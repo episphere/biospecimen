@@ -534,7 +534,6 @@ const closeBiospecimenModal = () => {
 export const errorMessage = (id, msg, focus, offset) => {
     const currentElement = document.getElementById(id);
     const parentElement = currentElement.parentNode;
-    console.log('parentElement', parentElement);
     if(Array.from(parentElement.querySelectorAll('.form-error')).length > 0) return;
     if(msg){
         const div = document.createElement('div');
@@ -545,8 +544,6 @@ export const errorMessage = (id, msg, focus, offset) => {
         span.innerHTML = msg;
         div.append(span);
         parentElement.appendChild(div);
-        console.log('div', div);
-        console.log('parentElement', parentElement);
     }
     currentElement.classList.add('invalid');
     if(focus) currentElement.focus();
@@ -3124,6 +3121,12 @@ export const autoTabInputField = ( inputFieldSource, inputFieldDestination ) => 
             document.getElementById(inputFieldDestination)?.focus();
         }
     })
+}
+
+export const autoTabAcrossArray = (autoTabArr) => {
+    for(let i = 0; i < autoTabArr.length - 1; i++) {
+        autoTabInputField(autoTabArr[i], autoTabArr[i + 1]);
+    }
 }
 
 export const collectionInputValidator = (elemArr) => {
