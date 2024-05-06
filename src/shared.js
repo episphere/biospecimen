@@ -3116,6 +3116,20 @@ export const numericInputValidator = (elemArr) => {
     })
 }
 
+export const autoTabInputField = ( inputFieldSource, inputFieldDestination ) => {
+    document.getElementById(inputFieldSource)?.addEventListener('keyup', e => {
+        if (e.key === 'Enter') {
+            document.getElementById(inputFieldDestination)?.focus();
+        }
+    })
+}
+
+export const autoTabAcrossArray = (autoTabArr) => {
+    for(let i = 0; i < autoTabArr.length - 1; i++) {
+        autoTabInputField(autoTabArr[i], autoTabArr[i + 1]);
+    }
+}
+
 export const collectionInputValidator = (elemArr) => {
     elemArr.forEach(elem => {
         if (document.getElementById(elem)) {

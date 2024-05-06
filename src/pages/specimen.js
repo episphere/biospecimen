@@ -1,4 +1,4 @@
-import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorkflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode, searchSpecimen, collectionInputValidator, addSelectionEventListener } from "./../shared.js";
+import { addEventBarCodeScanner, collectionSettings, generateBarCode, getWorkflow, removeActiveClass, siteLocations, visitType, getCheckedInVisit, getSiteAcronym, numericInputValidator, getSiteCode, searchSpecimen, collectionInputValidator, addSelectionEventListener, autoTabInputField } from "./../shared.js";
 import { addEventSpecimenLinkForm, addEventClinicalSpecimenLinkForm, addEventClinicalSpecimenLinkForm2, addEventNavBarParticipantCheckIn, addEventBackToSearch } from "./../events.js";
 import { masterSpecimenIDRequirement } from "../tubeValidation.js";
 
@@ -141,7 +141,7 @@ export const specimenTemplate = async (data, formData) => {
                 <button class="barcode-input-clear" hidden="true" type="button" id="clearScanAccessionID" title="Clear scanned barcode" data-enable-input="accessionID4" data-barcode-input="accessionID3"><i class="fas fa-times"></i></button>
             </div>
             <div class="form-group row">
-                <input autocomplete="off" type="text" class="form-control col-md-5 offset-4" placeholder="Re-Enter (scan/type) in Accession ID from Urine Tube" id="accessionID4"maxlength="11"/>
+                <input autocomplete="off" type="text" class="form-control col-md-5 offset-4" placeholder="Re-Enter (scan/type) in Accession ID from Urine Tube" id="accessionID4" maxlength="11"/>
             </div>
             
         <div class="form-group row">
@@ -189,12 +189,4 @@ export const specimenTemplate = async (data, formData) => {
     generateBarCode('connectIdBarCode', data.Connect_ID);
     addEventBackToSearch('navBarSearch');
     addEventNavBarParticipantCheckIn();
-}
-
-const autoTabInputField = ( inputFieldSource, inputFieldDestination ) => {
-    document.getElementById(inputFieldSource).addEventListener('keyup', e => {
-        if (e.key === 'Enter') {
-            document.getElementById(inputFieldDestination).focus();
-        }
-    })
 }
