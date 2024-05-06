@@ -288,17 +288,13 @@ export const conceptIds = {
         665277300 : 'Merrill',
         467088902 : 'Fargo South University',
         111111111 : 'NIH/NCI',
-        807835037 : 'Other'
-
-        /*
-        BSWH Comments~ 
-        : 'BCC- HWC'
-		: 'BCC- All Saints (FW)'
-		: 'BCC- Plano'
-		: 'BCC- Worth St'
-        : 'BCC- Irving'
-        : 'NTX Biorepository'
-        */
+        807835037 : 'Other',
+        723351427:'BCC- HWC, BC',
+		807443231:'BCC- All Saints (FW)',
+		475614532:'BCC- Plano',
+		809370237:'BCC- Worth St',
+        856158129:'BCC- Irving',
+        436956777:'NTX Biorepository'
     },
 
     nameToKeyObj : {
@@ -329,18 +325,13 @@ export const conceptIds = {
         "ucmPopUp": 319518299,
         "orPark": 940329442,
         "mfPopUp": 567969985,
-        /*
-        BSWH Comments~  connectbiospecimen@BSWHealth.org
-        This will be changed to better property names
-        'bccHwc': 123456789,
-        'bccAllSaints': 123456789,
-        'bccPlano': 123456789,
-        'bccWorthSt': 123456789,
-        'bccIrving': 123456789,
-        'ntxBiorepo: 123456789, // NTX Biorepository
-        */
+        'bccHwc': 723351427,
+        'bccAllSaints': 807443231,
+        'bccPlano': 475614532,
+        'bccWorthSt': 809370237,
+        'bccIrving': 856158129,
+        'ntxBiorepo': 436956777,
         'all': 1000
-
     },
     boxedStatus: 771580890,
     notBoxed: 657483796,

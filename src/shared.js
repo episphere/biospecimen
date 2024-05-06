@@ -1980,7 +1980,7 @@ export const siteSpecificLocation = {
   "River East": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
   "South Loop": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
   "Orland Park": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
-  "BCC- HWC": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- HWC, BC": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
   "BCC- All Saints (FW)": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
   "BCC- Plano": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
   "BCC- Worth St": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.bswh, "loginSiteName": "Baylor Scott & White Health"},
@@ -2225,46 +2225,39 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'University of Chicago Medicine',
     email: 'connectbiospecimen@bsd.uchicago.edu',
   },
-  /*
-  // BSWH COMMENT~ - Add generated concepts ids to the keys ('Numnber goes here': location)
-    BCC- HWC 
-    : {
-        siteSpecificLocation: 'BCC- HWC',
+    723351427: {
+        siteSpecificLocation: 'BCC- HWC, BC',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
         siteTeam: 'BSWH Connect Study Team',
         loginSiteName: 'Baylor Scott & White Health',
         email: 'connectbiospecimen@BSWHealth.org',
     },
-    BCC- All Saints (FW)
-    : {
+    807443231: {
         siteSpecificLocation: 'BCC- All Saints (FW)',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
         siteTeam: 'BSWH Connect Study Team',
         loginSiteName: 'Baylor Scott & White Health',
         email: 'connectbiospecimen@BSWHealth.org',
-    }
-    // BCC- Plano
-    : {
+    },
+    475614532: {
         siteSpecificLocation: 'BCC- Plano',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
         siteTeam: 'BSWH Connect Study Team',
         loginSiteName: 'Baylor Scott & White Health',
         email: 'connectbiospecimen@BSWHealth.org',
-    }
-    // BCC- Worth St
-    : {
+    },
+    809370237: {
         siteSpecificLocation: 'BCC- Worth St',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
         siteTeam: 'BSWH Connect Study Team',
         loginSiteName: 'Baylor Scott & White Health',
         email: 'connectbiospecimen@BSWHealth.org',
-    }
-    // BCC- Irving
-    : {
+    },
+    856158129: {
         siteSpecificLocation: 'BCC- Irving',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
@@ -2272,31 +2265,29 @@ export const locationConceptIDToLocationMap = {
         loginSiteName: 'Baylor Scott & White Health',
         email: 'connectbiospecimen@BSWHealth.org',
     },
-    // NTX Biorepository
-    : {
+    436956777: {
         siteSpecificLocation: 'NTX Biorepository',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
         siteTeam: 'BSWH Connect Study Team',
         loginSiteName: 'Baylor Scott & White Health',
-        email: '
-
-  */
-  111111111: {
-    siteSpecificLocation: 'Main Campus',
-    siteAcronym: 'NIH',
-    siteCode: '13',
-    siteTeam: "NIH Connect Study Team",
-    loginSiteName: 'National Cancer Institute',
-    email: "connectstudytest@email.com",
-  },
-  222222222: { 
-    siteSpecificLocation: 'Frederick',
-    siteAcronym: 'NIH',
-    siteCode: '13',
-    siteTeam: "NIH Connect Study Team",
-    loginSiteName: 'National Cancer Institute',
-    email: "connectstudytest@email.com",
+        email: 'connectbiospecimen@BSWHealth.org'
+    },
+    111111111: {
+        siteSpecificLocation: 'Main Campus',
+        siteAcronym: 'NIH',
+        siteCode: '13',
+        siteTeam: "NIH Connect Study Team",
+        loginSiteName: 'National Cancer Institute',
+        email: "connectstudytest@email.com",
+    },
+    222222222: { 
+        siteSpecificLocation: 'Frederick',
+        siteAcronym: 'NIH',
+        siteCode: '13',
+        siteTeam: "NIH Connect Study Team",
+        loginSiteName: 'National Cancer Institute',
+        email: "connectstudytest@email.com",
     },
 };
 
@@ -2332,14 +2323,12 @@ export const conceptIdToSiteSpecificLocation = {
   [conceptIds.nameToKeyObj.hfhPU]: "HFH Pop-Up",
   [conceptIds.nameToKeyObj.sfBM]: "Bismarck Medical Center",
   [conceptIds.nameToKeyObj.sfSC]: "Sioux Falls Sanford Center",
-  // // BSWH COMMENT~ - Add generated concepts ids to the keys
-  // : BCC- HWC
-  // : BCC- All Saints (FW)
-  // : BCC- Plano
-  // : BCC- Worth St
-  // : BCC- Irving
-  // : NTX Biorepository
-
+  723351427:"BCC- HWC, BC",
+  807443231:"BCC- All Saints (FW)",
+  475614532:"BCC- Plano",
+  809370237:"BCC- Worth St",
+  856158129:"BCC- Irving",
+  436956777:"NTX Biorepository",
 }
 
 export const siteSpecificLocationToConceptId = {
@@ -2374,15 +2363,12 @@ export const siteSpecificLocationToConceptId = {
   "HFH Pop-Up": conceptIds.nameToKeyObj.hfhPU,
   "Bismarck Medical Center": conceptIds.nameToKeyObj.sfBM,
   "Sioux Falls Sanford Center": conceptIds.nameToKeyObj.sfSC,
-  /*
-  BSWH COMMMENTS~ - Needs Concept Ids
-    "BCC- HWC": ,
-    "BCC- All Saints (FW)": ,
-    "BCC- Plano": ,
-    "BCC- Worth St": ,
-    "BCC- Irving": ,
-    "NTX Biorepository": ,
-  */
+  "BCC- HWC, BC": 723351427,
+  "BCC- All Saints (FW)": 807443231,
+  "BCC- Plano": 475614532,
+  "BCC- Worth St": 809370237,
+  "BCC- Irving": 856158129,
+  "NTX Biorepository": 436956777,
 }
 
 export const conceptIdToHealthProviderAbbrObj = {
@@ -2457,16 +2443,12 @@ export const keyToLocationObj =
     589224449: "Sioux Falls Imagenetics",
     [conceptIds.nameToKeyObj.sfBM] : "Bismarck Medical Center",
     [conceptIds.nameToKeyObj.sfSC] : "Sioux Falls Sanford Center",
-    /*
-    BSWH COMMENT~ - Add generated concepts ids to the keys
-    : "BCC- HWC",
-    : "BCC- All Saints (FW)",
-    : "BCC- Plano",
-    : "BCC- Worth St",
-    : "BCC- Irving",
-    : "NTX Biorepository",
-    
-    */
+    723351427:'BCC- HWC, BC',
+    807443231:'BCC- All Saints (FW)',
+    475614532:'BCC- Plano',
+    809370237:'BCC- Worth St',
+    856158129:'BCC- Irving',
+    436956777:'NTX Biorepository',
     111111111: "NIH",
     13:"NCI"
 
@@ -2664,15 +2646,21 @@ export const siteLocations = {
                 {location: 'Wisconsin Rapids', concept: 487512085}, {location: 'Colby Abbotsford', concept: 983848564}, {location: 'Minocqua', concept: 261931804}, {location: 'Merrill', concept: 665277300},
                 {location: 'MF Pop-Up', concept: 567969985}
               ],
-        'HP': [{location: 'HP Research Clinic', concept: 834825425}, {location: 'HP Park Nicollet', concept: conceptIds.nameToKeyObj.hpPN}],
+        'HP': [{location: 'HP Research Clinic', concept: 834825425}, 
+                {location: 'HP Park Nicollet', concept: conceptIds.nameToKeyObj.hpPN}],
         // HFH Pop-up
         'HFHS': [{location: 'HFH K-13 Research Clinic', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332},
                 {location: 'HFH Livonia Research Clinic', concept: 706927479},
                 {location: 'HFH Pop-Up', concept: conceptIds.nameToKeyObj.hfhPU}],
         // Bismarck
         'SFH': [{location: 'Sioux Falls Imagenetics', concept: 589224449}, {location: 'Fargo South University', concept: 467088902}, {location: 'Bismarck Medical Center', concept: conceptIds.nameToKeyObj.sfBM}, {location: 'Sioux Falls Sanford Center', concept: conceptIds.nameToKeyObj.sfSC}],
-        // BSWH COMMENT~ - Add generated concepts ids to the keys
-        'BSWH': [{location: 'BCC- HWC', concept: 472940358}, {location: 'BCC- All Saints (FW)', concept: 472940358}, {location: 'BCC- Plano', concept: 472940358}, {location: 'BCC- Worth St', concept: 472940358}, {location: 'BCC- Irving', concept: 472940358}, {location: 'NTX Biorepository', concept: 472940358},],
+
+        'BSWH': [{location: 'BCC- HWC, BC', concept: 723351427}, 
+                {location: 'BCC- All Saints (FW)', concept: 807443231}, 
+                {location: 'BCC- Plano', concept: 475614532}, 
+                {location: 'BCC- Worth St', concept: 809370237}, 
+                {location: 'BCC- Irving', concept: 856158129}, 
+                {location: 'NTX Biorepository', concept: 436956777}],
 
         'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}]
 
