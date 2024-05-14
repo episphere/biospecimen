@@ -81,11 +81,25 @@ const assignKitsTemplate = async (name) => {
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
 
+  const scannedBarcode2 = document.getElementById('scannedBarcode2');
+  scannedBarcode2.onpaste = e => e.preventDefault();
+  scannedBarcode2.addEventListener("input", (e) => {
+    const scannedBarcodeValue = document.getElementById('scannedBarcode').value.trim();
+    const scannedBarcode2Value = e.target.value.trim();
+    
+    if(scannedBarcodeValue && scannedBarcode2Value && scannedBarcodeValue !== scannedBarcode2Value) {
+      const msg = 'Supply Kit Tracking Number doesn\'t match';
+      errorMessage('scannedBarcode2', msg, true, false);
+    } else {
+      removeAllErrors();
+    }
+  });
+
   // Set up automatic tabbing between inputs upon scanning (assuming the scanner automatically inputs the enter key at the end)
   autoTabAcrossArray(['fullName', 'address', 'Connect_ID', 'scanSupplyKit', 'scannedBarcode', 'scannedBarcode2']);
-
-  document.getElementById('scannedBarcode2').onpaste = e => e.preventDefault();
+  
   numericInputValidator(['scannedBarcode', 'scannedBarcode2']);
+  
   activeHomeCollectionNavbar();
   appState.setState({ participants: response.data });
   populateSidePaneRows();

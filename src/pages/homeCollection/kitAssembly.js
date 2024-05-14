@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource, numericInputValidator, autoTabAcrossArray } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource, numericInputValidator, autoTabAcrossArray, performQCcheck } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -32,12 +32,12 @@ const kitAssemblyTemplate = async (name) => {
               <div id="alert_placeholder"></div>
                   <form>
                         <div class="form-group row">
-                          <label for="scannedBarcode" class="col-md-4 col-form-label">Return Tracking Number</label>
+                          <label for="scannedBarcode" class="col-md-4 col-form-label">Return Kit Tracking Number</label>
                           <div class="col-md-8">
                             <div class="form-group row">
                               <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan Barcode" required />
                             </div>
-                            <label for="scannedBarcode2" class="sr-only">Confirm Return Tracking Number</label>
+                            <label for="scannedBarcode2" class="sr-only">Confirm Return Kit Tracking Number</label>
                             <div class="form-group row">
                               <input autocomplete="off" type="text" class="form-control" id="scannedBarcode2" placeholder="Re-Enter (scan/type) Barcode" required />
                               <span id="showMsg" style="font-size: 14px;"></span>
@@ -119,25 +119,6 @@ const enableEnterKeystroke = () => {
         document.getElementById("saveKit").click();
     }
 });
-}
-
-const performQCcheck = (inputBox2, inputBox1, errorTag, errorMsg) => {
-  const checkInputBox2 = document.getElementById(inputBox2);
-  if (errorMsg === "") {
-    document.getElementById(errorTag).innerHTML = `` 
-  }
-  if (checkInputBox2) {
-    checkInputBox2.addEventListener("input", (e) => {
-      const checkInputBox2Value = e.target.value.trim();
-      const checkInputBox1Value = document.getElementById(inputBox1).value.trim();
-      if (checkInputBox2Value !== checkInputBox1Value) {
-        document.getElementById(errorTag).innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> ${errorMsg}`
-      }
-      else {
-        document.getElementById(errorTag).innerHTML = ``
-      }
-    })
-  }
 }
 
 const processAssembledKit = () => {
