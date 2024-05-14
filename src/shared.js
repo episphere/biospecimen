@@ -3130,6 +3130,25 @@ export const autoTabAcrossArray = (autoTabArr) => {
     }
 }
 
+export const performQCcheck = (inputBox2, inputBox1, errorTag, errorMsg) => {
+    const checkInputBox2 = document.getElementById(inputBox2);
+    if (errorMsg === "") {
+      document.getElementById(errorTag).innerHTML = `` 
+    }
+    if (checkInputBox2) {
+      checkInputBox2.addEventListener("input", (e) => {
+        const checkInputBox2Value = e.target.value.trim();
+        const checkInputBox1Value = document.getElementById(inputBox1).value.trim();
+        if (checkInputBox2Value !== checkInputBox1Value) {
+          document.getElementById(errorTag).innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> ${errorMsg}`
+        }
+        else {
+          document.getElementById(errorTag).innerHTML = ``
+        }
+      })
+    }
+};
+
 export const collectionInputValidator = (elemArr) => {
     elemArr.forEach(elem => {
         if (document.getElementById(elem)) {
