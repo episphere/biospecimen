@@ -2639,7 +2639,7 @@ export const disableInput = (id, disable) => {
 
 export const siteLocations = {
     'research': {
-        'UCM': [{location: 'UC-DCAM', concept: 777644826}, {location: 'Ingalls Harvey', concept: 145191545}, {location: 'River East', concept: 489380324}, {location: 'South Loop', concept: 120264574},
+        'UCM': [{location: 'UC-DCAM', concept: 777644826}, {location: 'Ingalls Harvey', concept: 145191545},
                 {location: 'UCM Pop-Up', concept: 319518299}, {location: 'Orland Park', concept: 940329442}          
               ],
         'MFC': [{location: 'Marshfield', concept: 692275326}, {location: 'Lake Hallie', concept: 698283667}, {location: 'Weston', concept: 813701399}, {location: 'Rice Lake', concept: 691714762}, 
@@ -2666,7 +2666,8 @@ export const siteLocations = {
 
     },
     'clinical': {
-        'KPHI': [{location:'KPHI RRL', concept: 531313956}]
+        'KPHI': [{location:'KPHI RRL', concept: 531313956}],
+        'UCM': [{location: 'River East', concept: 489380324}, {location: 'South Loop', concept: 120264574}]
     }
 }
 
@@ -3201,6 +3202,39 @@ export const numericInputValidator = (elemArr) => {
         }
     })
 }
+
+export const autoTabInputField = ( inputFieldSource, inputFieldDestination ) => {
+    document.getElementById(inputFieldSource)?.addEventListener('keyup', e => {
+        if (e.key === 'Enter') {
+            document.getElementById(inputFieldDestination)?.focus();
+        }
+    })
+}
+
+export const autoTabAcrossArray = (autoTabArr) => {
+    for(let i = 0; i < autoTabArr.length - 1; i++) {
+        autoTabInputField(autoTabArr[i], autoTabArr[i + 1]);
+    }
+}
+
+export const performQCcheck = (inputBox2, inputBox1, errorTag, errorMsg) => {
+    const checkInputBox2 = document.getElementById(inputBox2);
+    if (errorMsg === "") {
+      document.getElementById(errorTag).innerHTML = `` 
+    }
+    if (checkInputBox2) {
+      checkInputBox2.addEventListener("input", (e) => {
+        const checkInputBox2Value = e.target.value.trim();
+        const checkInputBox1Value = document.getElementById(inputBox1).value.trim();
+        if (checkInputBox2Value !== checkInputBox1Value) {
+          document.getElementById(errorTag).innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> ${errorMsg}`
+        }
+        else {
+          document.getElementById(errorTag).innerHTML = ``
+        }
+      })
+    }
+};
 
 export const collectionInputValidator = (elemArr) => {
     elemArr.forEach(elem => {

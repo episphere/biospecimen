@@ -47,7 +47,8 @@ const displayKitStatusShippedTable = (shippedKitStatusParticipantsArray) => {
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Study Site </th>
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Shipped Date</th>
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit ID</th>
-                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit ID Tracking Number</th>
+                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Collection ID</th>
+                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit Tracking Number</th>
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Return Kit Tracking Number</th>
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Mouthwash Survey Completion Status</th>
                         </tr>
@@ -72,6 +73,7 @@ const createShippedRows = (shippedKitStatusParticipantsArray) => {
     const healthcareProvider = keyToNameObj[particpantObj[conceptIds.healthcareProvider]];
     const mouthwashShippedDate = convertISODateTime(particpantObj[conceptIds.shippedDateTime]).split(/\s+/)[0];
     const supplyKitId = particpantObj[conceptIds.supplyKitId];
+    const collectionCardId = particpantObj[conceptIds.collectionCardId];
     const supplyKitTrackingNum = particpantObj[conceptIds.supplyKitTrackingNum];
     const returnKitTrackingNum = particpantObj[conceptIds.returnKitTrackingNum];
     const mouthwashSurveyStatus = convertSurveyCompletionStatus(particpantObj[conceptIds.mouthwashSurveyCompletionStatus]);
@@ -82,6 +84,7 @@ const createShippedRows = (shippedKitStatusParticipantsArray) => {
                     <td>${healthcareProvider}</td>
                     <td>${mouthwashShippedDate}</td>
                     <td>${supplyKitId}</td>
+                    <td>${collectionCardId}</td>
                     <td>${supplyKitTrackingNum}</td>
                     <td>${returnKitTrackingNum}</td>
                     <td>${mouthwashSurveyStatus}</td>
