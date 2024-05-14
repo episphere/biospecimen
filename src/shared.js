@@ -1931,7 +1931,7 @@ export const healthProviderAbbrToConceptIdObj = {
     "marshfieldClinic": 303349821,
     "uOfChicagoMed": 809703864,
     "nci": 13,
-    "baylorSWH": 472940358,
+    "BSWH": 472940358,
     "allResults": 1000
 }
 
@@ -1980,12 +1980,12 @@ export const siteSpecificLocation = {
   "River East": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
   "South Loop": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
   "Orland Park": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
-  "BCC- HWC, BC": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.baylorSWH, "loginSiteName": "Baylor Scott & White Health"},
-  "BCC- All Saints (FW)": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.baylorSWH, "loginSiteName": "Baylor Scott & White Health"},
-  "BCC- Plano": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.baylorSWH, "loginSiteName": "Baylor Scott & White Health"},
-  "BCC- Worth St": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.baylorSWH, "loginSiteName": "Baylor Scott & White Health"},
-  "BCC- Irving": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.baylorSWH, "loginSiteName": "Baylor Scott & White Health"},
-  "NTX Biorepository": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.baylorSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- HWC, BC": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- All Saints (FW)": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- Plano": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- Worth St": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- Irving": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "NTX Biorepository": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
   "Main Campus": {"siteAcronym":"NIH", "siteCode": healthProviderAbbrToConceptIdObj.nci, "loginSiteName": "National Cancer Institute"},
   "Frederick": {"siteAcronym":"NIH", "siteCode": healthProviderAbbrToConceptIdObj.nci, "loginSiteName": "National Cancer Institute"},
 
