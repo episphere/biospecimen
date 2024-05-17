@@ -157,18 +157,23 @@ const processAssembledKit = () => {
             kitObj[conceptIds.collectionCupId] = collectionCupIdValue
             kitObj[conceptIds.collectionCardId] = collectionCardIdValue;
             kitObj[conceptIds.kitType] = conceptIds.mouthwashKitType;
-            const responseStoredStatus = await storeAssembledKit(kitObj);
-            if (responseStoredStatus) {
-            document.getElementById('scannedBarcode').value = ``;
-            document.getElementById('scannedBarcode2').value = ``;
-            document.getElementById('supplyKitId').value = ``;
-            document.getElementById('returnKitId').value = ``;
-            document.getElementById('cupId').value = ``;
-            document.getElementById('cardId').value = ``;
-            document.getElementById("showMsg").innerHTML = ``;
+            try {
+                const responseStoredStatus = await storeAssembledKit(kitObj);
+                if (responseStoredStatus) {
+                    document.getElementById('scannedBarcode').value = ``;
+                    document.getElementById('scannedBarcode2').value = ``;
+                    document.getElementById('supplyKitId').value = ``;
+                    document.getElementById('returnKitId').value = ``;
+                    document.getElementById('cupId').value = ``;
+                    document.getElementById('cardId').value = ``;
+                    document.getElementById("showMsg").innerHTML = ``;
+                    }
+            } catch (error) { 
+                console.error(error);
+                triggerErrorModal('Failed to save the kit.');
             }
         }
-    })
+    });
   }
 }
 
@@ -226,17 +231,22 @@ const checkUniqueness = async (supplyKitId, collectionId) => {
 const storeAssembledKit = async (kitData) => {
   const idToken = await getIdToken();
   showAnimation();
-  const collectionUnique = appState.getState().uniqueKitID !== '' ? { data: true } : await checkUniqueness(kitData[conceptIds.supplyKitId], kitData?.[conceptIds.collectionCupId].replace(/\s/g, "\n"));
+  const collectionUnique = appState.getState().uniqueKitID !== ''
+    ? { data: true } 
+    : await checkUniqueness(kitData[conceptIds.supplyKitId], kitData?.[conceptIds.collectionCupId].replace(/\s/g, "\n"));
   hideAnimation();
+
   if (collectionUnique.data === true) {
     kitData[conceptIds.kitStatus] = conceptIds.pending;
     kitData[conceptIds.uniqueKitID] = "MW" + Math.random().toString(16).slice(2);
     kitData[conceptIds.pendingDateTimeStamp] = new Date().toISOString();
-    let api = `addKitData`
+    let api = `addKitData`;
+
     if (appState.getState().uniqueKitID !== ``) { 
-      api = `updateKitData` 
-      kitData[conceptIds.uniqueKitID] = appState.getState().uniqueKitID
+      api = `updateKitData`;
+      kitData[conceptIds.uniqueKitID] = appState.getState().uniqueKitID;
     }
+
     const response = await fetch(`${baseAPI}api=${api}`, {
       method: "POST",
       body: JSON.stringify(kitData),
@@ -247,15 +257,19 @@ const storeAssembledKit = async (kitData) => {
     });
 
     const responseStatus = await processResponse(response);
+
     if (responseStatus === true) {
       alertTemplate(`Kit saved successfully!`, `success`);
       const existingKitData = JSON.parse(localStorage.getItem('tmpKitData'));
       existingKitData.push(kitData);
+
       if (appState.getState().uniqueKitID !== ``) {
         const filteredKitData = [];
         const seenValues = new Set();
+
         for (let i = existingKitData.length - 1; i >= 0; i--) { // removes previously assembled kit
           const key = existingKitData[i][conceptIds.uniqueKitID];
+
           if (!seenValues.has(key)) {
               seenValues.add(key);
               filteredKitData.push(existingKitData[i]);
