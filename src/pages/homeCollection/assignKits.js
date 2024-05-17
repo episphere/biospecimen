@@ -89,7 +89,7 @@ const assignKitsTemplate = async (name) => {
     
     if(scannedBarcodeValue && scannedBarcode2Value && scannedBarcodeValue !== scannedBarcode2Value) {
       const msg = 'Supply Kit Tracking Number doesn\'t match';
-      errorMessage('scannedBarcode2', msg, true, false);
+      errorMessage('scannedBarcode2', msg, true, false, true);
     } else {
       removeAllErrors();
     }
@@ -176,6 +176,7 @@ const confirmAssignment = () => {
           document.getElementById('address').value = ``;
           document.getElementById('Connect_ID').value = ``;
           document.getElementById('scannedBarcode').value = ``;
+          document.getElementById('scannedBarcode2').value = ``;
           document.getElementById('scanSupplyKit').value = ``;
           document.getElementById("showMsg").innerHTML = ``;
 
