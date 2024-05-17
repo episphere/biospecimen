@@ -531,22 +531,29 @@ const closeBiospecimenModal = () => {
     document.body.classList.remove('modal-open');
 };
 
-export const errorMessage = (id, msg, focus, offset) => {
+export const errorMessage = (id, msg, focus, offset, icon) => {
     const currentElement = document.getElementById(id);
     const parentElement = currentElement.parentNode;
-    if(Array.from(parentElement.querySelectorAll('.form-error')).length > 0) return;
-    if(msg){
+    if (Array.from(parentElement.querySelectorAll('.form-error')).length > 0) return;
+    if (msg){
         const div = document.createElement('div');
         div.classList = ['error-text'];
+        if (icon) { 
+            const iconElement = document.createElement('i');
+            iconElement.classList = ['fa fa-exclamation-circle'];
+            iconElement.style.color = 'red';
+            iconElement.style.marginRight = '.2rem';
+            div.appendChild(iconElement);
+        }
         const span = document.createElement('span');
         span.classList = ['form-error']
-        if(offset) span.classList.add('offset-4');
+        if (offset) span.classList.add('offset-4');
         span.innerHTML = msg;
         div.append(span);
         parentElement.appendChild(div);
     }
     currentElement.classList.add('invalid');
-    if(focus) currentElement.focus();
+    if (focus) currentElement.focus();
 }
 
 export const shippingPrintManifestReminder = (boxesToShip, userName, tempCheckStatus, currShippingLocationNumber) => {
@@ -3140,7 +3147,8 @@ export const performQCcheck = (inputBox2, inputBox1, errorTag, errorMsg) => {
         const checkInputBox2Value = e.target.value.trim();
         const checkInputBox1Value = document.getElementById(inputBox1).value.trim();
         if (checkInputBox2Value !== checkInputBox1Value) {
-          document.getElementById(errorTag).innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> ${errorMsg}`
+          document.getElementById(errorTag).innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i>
+                                                        <span style="color:red;">${errorMsg}</span>`
         }
         else {
           document.getElementById(errorTag).innerHTML = ``
@@ -3295,16 +3303,16 @@ export const checkTrackingNumberSource = () => {
         return;
       }
       if (input.length === 22 || input.length === 20) {
-        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: blue;"></i>USPS`;
-      }
-      else if (input.length === 12) {
-        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
-      }
-      else if (input.length === 34) {
+        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: blue;"></i>
+                            <span style="color: black;">USPS</span>`;
+      } else if (input.length === 12) {
+        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>
+                            <span style="color: black;">FedEx</span>`;
+      } else if (input.length === 34) {
         e.target.value = input.slice(-12);
-        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>FedEx`;
-      }
-      else {
+        showMsg.innerHTML = `<i class="fa fa-check-circle" style="font-size: 14px; color: orange;"></i>
+                            <span style="color: black;">FedEx</span>`;
+      } else {
         showMsg.innerHTML = "";
       }
     
