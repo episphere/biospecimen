@@ -147,11 +147,9 @@ const processAssembledKit = () => {
             triggerErrorModal('Return Kit tracking number doesn\'t match.');
             return;
         } else if (scannedBarcodeValue.length === 0 || supplyKitIdValue.length === 0 ||  returnKitIdValue.length === 0 ||
-            collectionCupIdValue.length === 0 || collectionCardIdValue.length === 0) {
+            collectionCupIdValue.length === 0 || collectionCardIdValue.length === 0 || document.getElementById('dropdownSites').innerHTML !== 'Mouthwash') {
             triggerErrorModal('One or more fields are missing.');
             return
-        } else if (document.getElementById('dropdownSites').innerHTML !== 'Mouthwash') {
-            triggerErrorModal('Please select a Kit Type.');
         } else {
             kitObj[conceptIds.returnKitTrackingNum] = scannedBarcodeValue;
             kitObj[conceptIds.supplyKitId] = supplyKitIdValue;
