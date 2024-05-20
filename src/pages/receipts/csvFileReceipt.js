@@ -343,6 +343,14 @@ const vialMapping = {
           '0024': ['3 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '3'],
           '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10']
         },
+        uOfChicagoMed: {
+          '0001': ['10 ml Serum separator tube', 'SST', 'Serum', '10'],
+          '0002': ['10 ml Serum separator tube', 'SST', 'Serum', '10'],
+          '0003': ['10 ml Vacutainer', 'Lithium Heparin', 'WHOLE BL', '10'],
+          '0004': ['10 ml Vacutainer', 'EDTA = K2', 'WHOLE BL', '10'],
+          '0060': ['Streck Tube', 'Streck DNA', 'WHOLE BL', '10'],
+          '0006': ['10 ml Vacutainer', 'No Additive', 'Urine', '10']
+        },
         default: {
             '0001': ['5 ml Serum separator tube', 'SST', 'Serum', '5'],
             '0002': ['5 ml Serum separator tube', 'SST', 'Serum', '5'],
