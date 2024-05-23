@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource, getCurrentDate } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource, getCurrentDate, numericInputValidator, autoTabAcrossArray } from "../../shared.js";
 import { baselineMWSurveyRemainderTemplate, baselineMWThankYouTemplate } from "../../emailTemplates.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
@@ -33,7 +33,7 @@ const kitsReceiptTemplate = async (name) => {
                   <div class="mt-3" >
                   <br />
                   <div class="row form-group">
-                    <label class="col-form-label col-md-4" for="scannedBarcode">Scan Barcode</label>
+                    <label class="col-form-label col-md-4" for="scannedBarcode">Scan Return Kit Tracking Number</label>
                     <div style="display:inline-block;">
                       <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" style="width: 600px;" placeholder="Scan Barcode">
                       <span id="showMsg" style="padding-left: 10px;"></span>
@@ -110,6 +110,11 @@ template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false
 
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
+
+  // Set up automatic tabbing between inputs upon scanning (assuming the scanner automatically inputs the enter key at the end)
+  autoTabAcrossArray(['scannedBarcode', 'packageCondition', 'receivePackageComments', 'dateReceived', 'collectionCheckBox', 'collectionId', 'dateCollectionCard', 'timeCollectionCard', 'collectionComments']);
+  
+  numericInputValidator(['scannedBarcode']);
   activeHomeCollectionNavbar();
   checkTrackingNumberSource();
   performCollectionIdcheck();
@@ -121,6 +126,8 @@ const performCollectionIdcheck = () => {
     collectionIdField.addEventListener("input", (e) => {
       if (collectionIdField.value.length < 14) {
         document.getElementById('showCollectionErrorMsg').innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> Enter Correct Collection ID`
+      } else {
+        document.getElementById('showCollectionErrorMsg').innerHTML = ``
       }
     })
   }

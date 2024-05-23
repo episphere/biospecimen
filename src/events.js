@@ -1126,7 +1126,7 @@ const checkFormAndSave = async (participantData, biospecimenData, shouldNavigate
         const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
         const isFormDataValid = inputFields.every(input => validateFormInputField(input, biospecimenData, true));
         
-        isFormDataValid ?
+        isFormDataValid || !shouldNavigateToReview ?
             await collectionSubmission(participantData, biospecimenData, shouldNavigateToReview) :
             showTimedNotifications({ title: 'Data Errors Exist!', body: 'Please correct data entry errors in red before saving.' });
     } catch (error) {
@@ -1342,7 +1342,7 @@ const validateFormInputField = (inputTube, biospecimenData) => {
         if (!isTubeIDEntryValid) {
             const errorMessageText = isBagID ?
                 `Invalid entry. Bag ID must be ${validationID}` :
-                `Invalid entry. Specimen ID must be ${validationID}. Replacement labels 0050-0054 are valid.`;
+                `Invalid entry. Specimen ID must be ${validationID}.`;
             errorMessage(inputTube.id, errorMessageText);
             return false;
         }

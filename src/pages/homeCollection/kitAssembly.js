@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource, numericInputValidator, autoTabAcrossArray, performQCcheck } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -32,10 +32,16 @@ const kitAssemblyTemplate = async (name) => {
               <div id="alert_placeholder"></div>
                   <form>
                         <div class="form-group row">
-                          <label for="scannedBarcode" class="col-md-4 col-form-label">Tracking Number</label>
+                          <label for="scannedBarcode" class="col-md-4 col-form-label">Return Kit Tracking Number</label>
                           <div class="col-md-8">
-                            <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan Barcode" required />
-                            <span id="showMsg" style="font-size: 14px;"></span>
+                            <div class="form-group row">
+                              <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan Barcode" required />
+                            </div>
+                            <label for="scannedBarcode2" class="sr-only">Confirm Return Kit Tracking Number</label>
+                            <div class="form-group row">
+                              <input autocomplete="off" type="text" class="form-control" id="scannedBarcode2" placeholder="Re-Enter (scan/type) Barcode" required />
+                              <span id="showMsg" style="font-size: 14px;"></span>
+                            </div>
                           </div>
                         </div>
                         <div class="form-group row">
@@ -48,7 +54,7 @@ const kitAssemblyTemplate = async (name) => {
                           <label for="returnKitId" class="col-md-4 col-form-label">Return Kit ID</label>
                           <div class="col-md-8">
                             <input type="text" class="form-control" id="returnKitId" placeholder="Enter Return Kit ID" required />
-                            <span id="showReturnKitErrorMsg" style="font-size: 14px;"></span>
+                            <span id="showReturnKitErrorMsg" style="font-size: 14px; color: red;"></span>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -61,7 +67,7 @@ const kitAssemblyTemplate = async (name) => {
                           <label for="cardId" class="col-md-4 col-form-label">Card ID</label>
                           <div class="col-md-8">
                             <input type="text" class="form-control" id="cardId" placeholder="Enter Card ID" required />
-                            <span id="showCardIdErrorMsg" style="font-size: 14px;"></span>
+                            <span id="showCardIdErrorMsg" style="font-size: 14px; color: red;"></span>
                           </div>
                       </div>
                       <div class="form-group row">
@@ -90,11 +96,18 @@ const kitAssemblyTemplate = async (name) => {
 
   document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
   contentBody.innerHTML = template;
+
+  // Set up automatic tabbing between inputs upon scanning (assuming the scanner automatically inputs the enter key at the end)
+  autoTabAcrossArray(['scannedBarcode', 'scannedBarcode2', 'supplyKitId', 'returnKitId', 'cupId', 'cardId']);
+
+  document.getElementById('scannedBarcode2').onpaste = e => e.preventDefault();
+  numericInputValidator(['scannedBarcode', 'scannedBarcode2']);
   activeHomeCollectionNavbar();
   processAssembledKit();
   enableEnterKeystroke();
   dropdownTrigger('Select Kit Type');
   checkTrackingNumberSource();
+  performQCcheck('scannedBarcode2', 'scannedBarcode', 'showMsg', `Return Kit Tracking Number doesn't match`);
   performQCcheck('returnKitId', 'supplyKitId', 'showReturnKitErrorMsg', `Supply Kit & Return Kit need to be same`);
   performQCcheck('cardId', 'cupId', 'showCardIdErrorMsg', `Cup ID & Card ID need to be same`);
 };
@@ -108,68 +121,59 @@ const enableEnterKeystroke = () => {
 });
 }
 
-const performQCcheck = (inputBox2, inputBox1, errorTag, errorMsg) => {
-  const checkInputBox2 = document.getElementById(inputBox2);
-  if (errorMsg === "") {
-    document.getElementById(errorTag).innerHTML = `` 
-  }
-  if (checkInputBox2) {
-    checkInputBox2.addEventListener("input", (e) => {
-      const checkInputBox2Value = e.target.value.trim();
-      const checkInputBox1Value = document.getElementById(inputBox1).value.trim();
-      if (checkInputBox2Value !== checkInputBox1Value) {
-        document.getElementById(errorTag).innerHTML = `<i class="fa fa-exclamation-circle" style="font-size: 14px; color: red;"></i> ${errorMsg}`
-      }
-      else {
-        document.getElementById(errorTag).innerHTML = ``
-      }
-    })
-  }
-}
-
 const processAssembledKit = () => {
   const saveKitButton = document.getElementById('saveKit');
   if (saveKitButton) {
     saveKitButton.addEventListener('click', async () => { 
-      let kitObj = {};
-      const queryScannedBarcodeValue = document.getElementById('scannedBarcode')?.value?.trim();
-      const scannedBarcodeValue = (queryScannedBarcodeValue !== undefined) ? queryScannedBarcodeValue : 0;
+        let kitObj = {};
+        const queryScannedBarcodeValue = document.getElementById('scannedBarcode')?.value?.trim();
+        const scannedBarcodeValue = (queryScannedBarcodeValue !== undefined) ? queryScannedBarcodeValue : 0;
 
-      const querySupplyKitIdValue = document.getElementById('supplyKitId').value.trim();
-      const supplyKitIdValue = (querySupplyKitIdValue !== undefined) ? querySupplyKitIdValue: 0;
+        const confirmScannedBarcodeValue = document.getElementById('scannedBarcode2')?.value?.trim();
 
-      const queryReturnKitIdValue = document.getElementById('returnKitId')?.value?.trim();
-      const returnKitIdValue = (queryReturnKitIdValue !== undefined) ? queryReturnKitIdValue : 0;
+        const querySupplyKitIdValue = document.getElementById('supplyKitId').value.trim();
+        const supplyKitIdValue = (querySupplyKitIdValue !== undefined) ? querySupplyKitIdValue: 0;
 
-      const queryCollectionCupIdValue = document.getElementById('cupId')?.value?.trim();
-      const collectionCupIdValue = (queryCollectionCupIdValue !== undefined) ? queryCollectionCupIdValue : 0;
+        const queryReturnKitIdValue = document.getElementById('returnKitId')?.value?.trim();
+        const returnKitIdValue = (queryReturnKitIdValue !== undefined) ? queryReturnKitIdValue : 0;
 
-      const queryCollectionCardIdValue = document.getElementById('cardId')?.value?.trim();
-      const collectionCardIdValue = (queryCollectionCardIdValue !== undefined) ? queryCollectionCardIdValue : 0;
+        const queryCollectionCupIdValue = document.getElementById('cupId')?.value?.trim();
+        const collectionCupIdValue = (queryCollectionCupIdValue !== undefined) ? queryCollectionCupIdValue : 0;
 
-      if (scannedBarcodeValue.length === 0 || supplyKitIdValue.length === 0 ||  returnKitIdValue.length === 0 ||
-        collectionCupIdValue.length === 0 || collectionCardIdValue.length === 0 || document.getElementById('dropdownSites').innerHTML !== 'Mouthwash') {
-          triggerErrorModal('One or more fields are missing.');
-          return
+        const queryCollectionCardIdValue = document.getElementById('cardId')?.value?.trim();
+        const collectionCardIdValue = (queryCollectionCardIdValue !== undefined) ? queryCollectionCardIdValue : 0;
+
+        if (queryScannedBarcodeValue !== confirmScannedBarcodeValue) {
+            triggerErrorModal('Return Kit tracking number doesn\'t match.');
+            return;
+        } else if (scannedBarcodeValue.length === 0 || supplyKitIdValue.length === 0 ||  returnKitIdValue.length === 0 ||
+            collectionCupIdValue.length === 0 || collectionCardIdValue.length === 0 || document.getElementById('dropdownSites').innerHTML !== 'Mouthwash') {
+            triggerErrorModal('One or more fields are missing.');
+            return
+        } else {
+            kitObj[conceptIds.returnKitTrackingNum] = scannedBarcodeValue;
+            kitObj[conceptIds.supplyKitId] = supplyKitIdValue;
+            kitObj[conceptIds.returnKitId] = returnKitIdValue;
+            kitObj[conceptIds.collectionCupId] = collectionCupIdValue
+            kitObj[conceptIds.collectionCardId] = collectionCardIdValue;
+            kitObj[conceptIds.kitType] = conceptIds.mouthwashKitType;
+            try {
+                const responseStoredStatus = await storeAssembledKit(kitObj);
+                if (responseStoredStatus) {
+                    document.getElementById('scannedBarcode').value = ``;
+                    document.getElementById('scannedBarcode2').value = ``;
+                    document.getElementById('supplyKitId').value = ``;
+                    document.getElementById('returnKitId').value = ``;
+                    document.getElementById('cupId').value = ``;
+                    document.getElementById('cardId').value = ``;
+                    document.getElementById("showMsg").innerHTML = ``;
+                    }
+            } catch (error) { 
+                console.error(error);
+                triggerErrorModal('Failed to save the kit.');
+            }
         }
-      else {
-        kitObj[conceptIds.returnKitTrackingNum] = scannedBarcodeValue;
-        kitObj[conceptIds.supplyKitId] = supplyKitIdValue;
-        kitObj[conceptIds.returnKitId] = returnKitIdValue;
-        kitObj[conceptIds.collectionCupId] = collectionCupIdValue
-        kitObj[conceptIds.collectionCardId] = collectionCardIdValue;
-        kitObj[conceptIds.kitType] = conceptIds.mouthwashKitType;
-        const responseStoredStatus = await storeAssembledKit(kitObj);
-        if (responseStoredStatus) {
-          document.getElementById('scannedBarcode').value = ``;
-          document.getElementById('supplyKitId').value = ``;
-          document.getElementById('returnKitId').value = ``;
-          document.getElementById('cupId').value = ``;
-          document.getElementById('cardId').value = ``;
-          document.getElementById("showMsg").innerHTML = ``;
-        }
-      }
-    })
+    });
   }
 }
 
@@ -227,17 +231,22 @@ const checkUniqueness = async (supplyKitId, collectionId) => {
 const storeAssembledKit = async (kitData) => {
   const idToken = await getIdToken();
   showAnimation();
-  const collectionUnique = appState.getState().uniqueKitID !== '' ? { data: true } : await checkUniqueness(kitData[conceptIds.supplyKitId], kitData?.[conceptIds.collectionCupId].replace(/\s/g, "\n"));
+  const collectionUnique = appState.getState().uniqueKitID !== ''
+    ? { data: true } 
+    : await checkUniqueness(kitData[conceptIds.supplyKitId], kitData?.[conceptIds.collectionCupId].replace(/\s/g, "\n"));
   hideAnimation();
+
   if (collectionUnique.data === true) {
     kitData[conceptIds.kitStatus] = conceptIds.pending;
     kitData[conceptIds.uniqueKitID] = "MW" + Math.random().toString(16).slice(2);
     kitData[conceptIds.pendingDateTimeStamp] = new Date().toISOString();
-    let api = `addKitData`
+    let api = `addKitData`;
+
     if (appState.getState().uniqueKitID !== ``) { 
-      api = `updateKitData` 
-      kitData[conceptIds.uniqueKitID] = appState.getState().uniqueKitID
+      api = `updateKitData`;
+      kitData[conceptIds.uniqueKitID] = appState.getState().uniqueKitID;
     }
+
     const response = await fetch(`${baseAPI}api=${api}`, {
       method: "POST",
       body: JSON.stringify(kitData),
@@ -248,15 +257,19 @@ const storeAssembledKit = async (kitData) => {
     });
 
     const responseStatus = await processResponse(response);
+
     if (responseStatus === true) {
       alertTemplate(`Kit saved successfully!`, `success`);
       const existingKitData = JSON.parse(localStorage.getItem('tmpKitData'));
       existingKitData.push(kitData);
+
       if (appState.getState().uniqueKitID !== ``) {
         const filteredKitData = [];
         const seenValues = new Set();
+
         for (let i = existingKitData.length - 1; i >= 0; i--) { // removes previously assembled kit
           const key = existingKitData[i][conceptIds.uniqueKitID];
+
           if (!seenValues.has(key)) {
               seenValues.add(key);
               filteredKitData.push(existingKitData[i]);
@@ -297,6 +310,7 @@ const storeAssembledKit = async (kitData) => {
 const alertTemplate = (message, status = "warn", duration = 3000) => {
   if (status === "success") {
     performQCcheck('returnKitId', 'supplyKitId', 'showReturnKitErrorMsg', ``);
+    performQCcheck('scannedBarcode2', 'scannedBarcode', 'showMsg', ``);
     performQCcheck('cardId', 'cupId', 'showCardIdErrorMsg', ``);
     alert = `
     <div id="alert-success" class="alert alert-success alert-dismissible fade show" role="alert">
