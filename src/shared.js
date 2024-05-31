@@ -1621,7 +1621,6 @@ export const getLocationsInstitute = async () => {
     let locations = [];
     for (let i = 0; i < arr.length; i++) {
         let currJSON = arr[i];
-        console.log("currJSON", currJSON)   
         locations = locations.concat(currJSON[conceptIds.shippingLocation]);
     }
     
