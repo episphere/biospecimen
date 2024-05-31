@@ -1616,11 +1616,16 @@ export const getLocationsInstitute = async () => {
     });
     const res = await response.json();
     const arr = res.response;
+    const siteAcronym = arr[0].siteAcronym;
+    
     let locations = [];
-    for(let i = 0; i < arr.length; i++){
+    for (let i = 0; i < arr.length; i++) {
         let currJSON = arr[i];
         locations = locations.concat(currJSON[conceptIds.shippingLocation]);
     }
+    
+    if (siteAcronym === 'BSWH') locations.sort((a, b) => a.localeCompare(b));
+
     logAPICallEndDev('getLocationsInstitute');
     return locations;
 }
@@ -1987,8 +1992,8 @@ export const siteSpecificLocation = {
   "River East": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
   "South Loop": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
   "Orland Park": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
-  "BCC- HWC, BC": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
-  "BCC- All Saints (FW)": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- HWC": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "FW All Saints": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
   "BCC- Plano": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
   "BCC- Worth St": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
   "BCC- Irving": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
@@ -2233,7 +2238,7 @@ export const locationConceptIDToLocationMap = {
     email: 'connectbiospecimen@bsd.uchicago.edu',
   },
     723351427: {
-        siteSpecificLocation: 'BCC- HWC, BC',
+        siteSpecificLocation: 'BCC- HWC',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
         siteTeam: 'BSWH Connect Study Team',
@@ -2241,7 +2246,7 @@ export const locationConceptIDToLocationMap = {
         email: 'connectbiospecimen@BSWHealth.org',
     },
     807443231: {
-        siteSpecificLocation: 'BCC- All Saints (FW)',
+        siteSpecificLocation: 'FW All Saints',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
         siteTeam: 'BSWH Connect Study Team',
@@ -2330,12 +2335,12 @@ export const conceptIdToSiteSpecificLocation = {
   [conceptIds.nameToKeyObj.hfhPU]: "HFH Pop-Up",
   [conceptIds.nameToKeyObj.sfBM]: "Bismarck Medical Center",
   [conceptIds.nameToKeyObj.sfSC]: "Sioux Falls Sanford Center",
-  723351427:"BCC- HWC, BC",
-  807443231:"BCC- All Saints (FW)",
-  475614532:"BCC- Plano",
-  809370237:"BCC- Worth St",
-  856158129:"BCC- Irving",
-  436956777:"NTX Biorepository",
+  723351427: "BCC- HWC",
+  807443231: "FW All Saints",
+  475614532: "BCC- Plano",
+  809370237: "BCC- Worth St",
+  856158129: "BCC- Irving",
+  436956777: "NTX Biorepository",
 }
 
 export const siteSpecificLocationToConceptId = {
@@ -2370,8 +2375,8 @@ export const siteSpecificLocationToConceptId = {
   "HFH Pop-Up": conceptIds.nameToKeyObj.hfhPU,
   "Bismarck Medical Center": conceptIds.nameToKeyObj.sfBM,
   "Sioux Falls Sanford Center": conceptIds.nameToKeyObj.sfSC,
-  "BCC- HWC, BC": 723351427,
-  "BCC- All Saints (FW)": 807443231,
+  "BCC- HWC": 723351427,
+  "FW All Saints": 807443231,
   "BCC- Plano": 475614532,
   "BCC- Worth St": 809370237,
   "BCC- Irving": 856158129,
@@ -2450,8 +2455,8 @@ export const keyToLocationObj =
     589224449: "Sioux Falls Imagenetics",
     [conceptIds.nameToKeyObj.sfBM] : "Bismarck Medical Center",
     [conceptIds.nameToKeyObj.sfSC] : "Sioux Falls Sanford Center",
-    723351427:'BCC- HWC, BC',
-    807443231:'BCC- All Saints (FW)',
+    723351427:'BCC- HWC',
+    807443231:'FW All Saints',
     475614532:'BCC- Plano',
     809370237:'BCC- Worth St',
     856158129:'BCC- Irving',
@@ -2662,8 +2667,8 @@ export const siteLocations = {
         // Bismarck
         'SFH': [{location: 'Sioux Falls Imagenetics', concept: 589224449}, {location: 'Fargo South University', concept: 467088902}, {location: 'Bismarck Medical Center', concept: conceptIds.nameToKeyObj.sfBM}, {location: 'Sioux Falls Sanford Center', concept: conceptIds.nameToKeyObj.sfSC}],
 
-        'BSWH': [{location: 'BCC- HWC, BC', concept: 723351427}, 
-                {location: 'BCC- All Saints (FW)', concept: 807443231}, 
+        'BSWH': [{location: 'BCC- HWC', concept: 723351427}, 
+                {location: 'FW All Saints', concept: 807443231}, 
                 {location: 'BCC- Plano', concept: 475614532}, 
                 {location: 'BCC- Worth St', concept: 809370237}, 
                 {location: 'BCC- Irving', concept: 856158129}, 
