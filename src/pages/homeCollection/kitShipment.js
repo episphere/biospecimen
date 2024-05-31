@@ -1,8 +1,6 @@
 import { nonUserNavBar } from "./../../navbar.js";
-import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal, sendClientEmail, processResponse, checkTrackingNumberSource } from "../../shared.js";
-import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { baselineMWKitRemainderTemplate } from "../../emailTemplates.js";
+import { homeCollectionNavbar, activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
+import { showAnimation, hideAnimation, getIdToken, baseAPI, convertDateReceivedinISO, triggerSuccessModal, triggerErrorModal, processResponse, checkTrackingNumberSource, sendInstantNotification } from "../../shared.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
 
 export const kitShipmentScreen = async (auth) => {
@@ -116,35 +114,36 @@ const setShippedResponse = async (data) => {
   );
   const returnedPtInfo = await processResponse(response);
   if (returnedPtInfo.status === true) {
-    triggerSuccessModal('Shipment confirmed.')
+    triggerSuccessModal('Shipment confirmed.');
     document.getElementById("scannedBarcode").value = ``;
     document.getElementById("cardBody").innerHTML = ``;
     document.getElementById("showMsg").innerHTML = ``;
 
-    const emailData = {
-      email: returnedPtInfo.prefEmail,
-      subject: "Next step for Connect: Your mouthwash home collection kit and survey",
-      message: baselineMWKitRemainderTemplate(returnedPtInfo.ptName),
-      notificationType: "email",
-      time: new Date().toISOString(),
+    const requestData = {
+      category: "Baseline Mouthwash Home Collection Kit Reminders",
       attempt: "1st contact",
-      category: "Biospecimen Home Collection Kit Reminder",
+      email: returnedPtInfo.prefEmail,
       token: returnedPtInfo.token,
       uid: returnedPtInfo.uid,
-      read: false
+      connectId: returnedPtInfo.Connect_ID,
+      preferredLanguage: returnedPtInfo.preferredLanguage,
+      substitutions: {
+        firstName: returnedPtInfo.ptName || "User",
+      },
     };
 
     try {
-      await(sendClientEmail(emailData));
-    }
-    catch (e) {
-      console.error(`Error sending email to user ${returnedPtInfo.prefEmail} \d`, e);
+      await sendInstantNotification(requestData);
+    } catch (e) {
+      console.error(`Error sending email to user ${returnedPtInfo.prefEmail}`, e);
       throw new Error(`Error sending email to user ${returnedPtInfo.prefEmail}: ${e.message}`);
     }
     return true;
+
   } else {
-    triggerErrorModal('Error in shipping: Please check the tracking number.')
+    triggerErrorModal('Error in shipping: Please check the tracking number.');
   }
+  
 };
 
 /**
@@ -159,10 +158,10 @@ const setShippedResponse = async (data) => {
 const checkScannedCodeValid = async (scannedCode) => {
   const idToken = await getIdToken();
   const response = await fetch(`${baseAPI}api=verifyScannedCode&id=${scannedCode}`, {
-      method: "GET",
-      headers: {
-          Authorization:"Bearer "+idToken
-      }
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + idToken,
+    },
   });
   return await response.json();
-}
+};
