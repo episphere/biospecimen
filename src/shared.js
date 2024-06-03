@@ -2801,31 +2801,31 @@ export const checkInParticipant = async (data, visitConcept) => {
   const uid = data.state.uid;
   let shouldSendBioEmail = false;
 
-  if (data["331584571"]) {
-    visits = data["331584571"];
+  if (data[conceptIds.selectedVisit]) {
+    visits = data[conceptIds.selectedVisit];
 
     if (!visits[visitConcept]) {
-      if (visitConcept === "266600170") shouldSendBioEmail = true;
+      if (visitConcept === conceptIds.baseline.visitId.toString()) shouldSendBioEmail = true;
 
       visits[visitConcept] = {
-        840048338: new Date(),
+        [conceptIds.checkInDateTime]: new Date(),
       };
     }
 
-    visits[visitConcept]["135591601"] = 353358909;
+    visits[visitConcept][conceptIds.checkInComplete] = conceptIds.yes;
   } else {
     shouldSendBioEmail = true;
 
     visits = {
       [visitConcept]: {
-        135591601: 353358909,
-        840048338: new Date(),
+        [conceptIds.checkInComplete]: conceptIds.yes,
+        [conceptIds.checkInDateTime]: new Date(),
       },
     };
   }
 
   const checkInData = {
-    331584571: visits,
+    [conceptIds.collection.selectedVisit]: visits,
     uid,
   };
 
