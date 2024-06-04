@@ -67,6 +67,13 @@ export const conceptIds = {
         refusedAllFutureActivities: 458508122,
         deceased: 618686157
     },
+    authenticationEmail: 421823980,
+    authenticationPhone: 348474836,
+    signInMechanism: 995036844,
+    preferredEmail: 869588347,
+    preferredLanguage: 255077064,
+    english: 163149180,
+    spanish: 773342525,
 
     // Individual yes/no properties on the data
     withdrewConsent: 747006172,
@@ -132,6 +139,7 @@ export const conceptIds = {
     },
     checkOutDateTime: 343048998,
     checkInDateTime: 840048338,
+    checkInComplete: 135591601,
 
     // not shipped specimen deviation id
     brokenSpecimenDeviation: 472864016,
@@ -297,7 +305,7 @@ export const conceptIds = {
         436956777: 'NTX Biorepository'
     },
 
-    nameToKeyObj : {
+    nameToKeyObj: {
         'ucDcam': 777644826,
         'marshfield': 692275326,
         'weston': 813701399,
@@ -406,4 +414,4 @@ export const packageConditionConversion = {
     "541085383": "Incorrect Material Type Returned",
     "427719697": "Collection Cup Not Returned",
     "100618603": "Other"
-}
+};

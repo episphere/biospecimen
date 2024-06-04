@@ -1,15 +1,12 @@
 import { userNavBar, adminNavBar, nonUserNavBar, unAuthorizedUser } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
-import { generateShippingManifest } from "./pages/shipping.js"
-import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
-import { workflows, specimenCollection } from "./tubeValidation.js";
+import { generateShippingManifest } from "./pages/shipping.js";
+import { masterSpecimenIDRequirement, siteSpecificTubeRequirements, workflows, specimenCollection } from "./tubeValidation.js";
 import { signOut } from "./pages/signIn.js";
 import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
 import { conceptIds } from './fieldToConceptIdMapping.js';
-import { baselineEmailTemplate } from "./emailTemplates.js";
-
 
 export const urls = {
     'stage': 'biospecimen-myconnect-stage.cancer.gov',
@@ -169,6 +166,25 @@ export const sendClientEmail = async (array) => {
     
     return response;
 }
+
+export const sendInstantNotification = async (requestData) => {
+  const idToken = await getIdToken();
+  const requestObj = {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + idToken,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(requestData),
+  };
+  const resp = await fetch(`${api}api=sendInstantNotification`, requestObj);
+  const respJson = await resp.json();
+    if (!resp.ok) {
+      triggerErrorModal(`Error occurred when sending out notification, with message "${respJson.message}".`);
+  }
+
+  return respJson;
+};
 
 export const biospecimenUsers = async () => {
     const idToken = await getIdToken();
@@ -2492,6 +2508,11 @@ export const surveyConversion = {
     '231311385': 'Submitted'
 };
 
+const cidToLangMapper = {
+  [conceptIds.english]: "english",
+  [conceptIds.spanish]: "spanish",
+};
+
 export const addEventBarCodeScanner = (id, start, end) => {
     const liveStreamConfig = {
         inputStream: {
@@ -2776,60 +2797,87 @@ export const getCheckedInVisit = (data) => {
 };
 
 export const checkInParticipant = async (data, visitConcept) => {
-    
-    let visits;
-    const user_uid = data.state.uid;
-    let sendBioEmail = false;
+  let visits;
+  const uid = data.state.uid;
+  let shouldSendBioEmail = false;
 
-    if(data['331584571']) {
+  if (data[conceptIds.selectedVisit]) {
+    visits = data[conceptIds.selectedVisit];
 
-        visits = data['331584571'];
+    if (!visits[visitConcept]) {
+      if (visitConcept === conceptIds.baseline.visitId.toString()) shouldSendBioEmail = true;
 
-        if(!visits[visitConcept]) {
-
-            if(visitConcept === '266600170') sendBioEmail = true;
-
-            visits[visitConcept] = {
-                '840048338': new Date()
-            }
-        }
-
-        visits[visitConcept]['135591601'] = 353358909;
-    }
-    else {
-        sendBioEmail = true;
-
-        visits = {
-            [visitConcept]: {
-                '135591601': 353358909,
-                '840048338': new Date()
-            }
-        };
+      visits[visitConcept] = {
+        [conceptIds.checkInDateTime]: new Date(),
+      };
     }
 
-    const checkInData = {
-        '331584571': visits,
-        uid: user_uid
+    visits[visitConcept][conceptIds.checkInComplete] = conceptIds.yes;
+  } else {
+    shouldSendBioEmail = true;
+
+    visits = {
+      [visitConcept]: {
+        [conceptIds.checkInComplete]: conceptIds.yes,
+        [conceptIds.checkInDateTime]: new Date(),
+      },
     };
-        
-    if(sendBioEmail) {
-        const emailData = {
-            email: data['869588347'],
-            subject: "Please complete a short survey about your samples",
-            message: baselineEmailTemplate(data),
-            notificationType: "email",
-            time: new Date().toISOString(),
-            attempt: "1st contact",
-            category: "Biospecimen Survey Reminder",
-            token: data.token,
-            uid: data.state.uid,
-            read: false
-        };
-        
-        await(sendClientEmail(emailData));
-    }
+  }
 
-    await updateParticipant(checkInData);
+  const checkInData = {
+    [conceptIds.collection.selectedVisit]: visits,
+    uid,
+  };
+
+  if (shouldSendBioEmail) {
+    const preferredLanguage = cidToLangMapper[data[conceptIds.preferredLanguage]] || "english";
+    const requestData = {
+      category: "Baseline Research Biospecimen Survey Reminders",
+      attempt: "1st contact",
+      email: data[conceptIds.preferredEmail],
+      token: data.token,
+      uid: data.state.uid,
+      connectId: data.Connect_ID,
+      preferredLanguage,
+      substitutions: {
+        firstName: data[conceptIds.prefName] || data[conceptIds.firstName] || "User",
+        loginDetails: getLoginDetails(data),
+      },
+    };
+
+    await sendInstantNotification(requestData);
+  }
+
+  await updateParticipant(checkInData);
+};
+
+const getEmailLoginInfo = (participantEmail) => {
+  const [prefix, domain] = participantEmail.split("@");
+  const changedPrefix =
+    prefix.length > 3
+      ? prefix.slice(0, 2) + "*".repeat(prefix.length - 3) + prefix.slice(-1)
+      : prefix.slice(0, -1) + "*";
+  return changedPrefix + "@" + domain;
+};
+
+const getPhoneLoginInfo = (participantPhone) => {
+  return "***-***-" + participantPhone.slice(-4);
+};
+
+const getLoginDetails = (data) => {
+  if (data[conceptIds.signInMechanism] === "phone" && data[conceptIds.authenticationPhone]) {
+    return getPhoneLoginInfo(data[conceptIds.authenticationPhone]);
+  }
+
+  if (data[conceptIds.signInMechanism] === "password" && data[conceptIds.authenticationEmail]) {
+    return getEmailLoginInfo(data[conceptIds.authenticationEmail]);
+  }
+
+  if (data[conceptIds.signInMechanism] === "passwordAndPhone" && data[conceptIds.authenticationEmail] && data[conceptIds.authenticationPhone]) {
+    return getPhoneLoginInfo(data[conceptIds.authenticationPhone]) + ", " + getEmailLoginInfo(data[conceptIds.authenticationEmail]);
+  }
+
+  return "";
 };
 
 export const checkOutParticipant = async (data) => {
@@ -3278,21 +3326,23 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
         if(collections.length == 1) sendBaselineEmail = true;
     } 
     
-    if(sendBaselineEmail) {
-        const emailData = {
-            email: data['869588347'],
-            subject: "Please complete a short survey about your samples",
-            message: baselineEmailTemplate(data, true),
-            notificationType: "email",
-            time: new Date().toISOString(),
+    if (sendBaselineEmail) {
+        const preferredLanguage = cidToLangMapper[data[conceptIds.preferredLanguage]] || "english";
+        const requestData = {
+            category: "Baseline Clinical Blood and Urine Sample Survey Reminders",
             attempt: "1st contact",
-            category: "Baseline Clinical Biospecimen Survey Reminder",
+            email: data[conceptIds.preferredEmail],
             token: data.token,
             uid: data.state.uid,
-            read: false
+            connectId: data.Connect_ID,
+            preferredLanguage,
+            substitutions: {
+                firstName: data[conceptIds.prefName] || data[conceptIds.firstName] || "User",
+                loginDetails: getLoginDetails(data)
+            }
         };
         
-        await sendClientEmail(emailData);
+        await sendInstantNotification(requestData);
     }
 }
 
