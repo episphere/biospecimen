@@ -1,5 +1,5 @@
 import { homeCollectionNavbar, activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, processResponse, checkTrackingNumberSource, getCurrentDate, numericInputValidator, autoTabAcrossArray, sendInstantNotification } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, processResponse, checkTrackingNumberSource, getCurrentDate, numericInputValidator, autoTabAcrossArray, sendInstantNotification, getLoginDetails } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { conceptIds } from "../../fieldToConceptIdMapping.js";
 import { displayPackageConditionListEmptyModal, displaySelectedPackageConditionListModal, checkSelectPackageConditionsList, targetAnchorTagEl, addListenersOnPageLoad, beforeUnloadMessage, enableCollectionCardFields, enableCollectionCheckBox } from "../receipts/packageReceipt.js";
@@ -227,7 +227,15 @@ const storePackageReceipt = async (data) => {
     };
 
     if (returnedPtInfo.surveyStatus !== conceptIds.modules.submitted) {
+      const loginDetails = getLoginDetails(returnedPtInfo);
+      if (!loginDetails) {
+        triggerErrorModal("Login details not found for this participant. Please check user profile data.");
+
+        return;
+      }
+
       requestData.category = "Baseline Mouthwash Sample Survey Reminders";
+      requestData.substitutions.loginDetails = loginDetails;
     } else {
       requestData.category = "Mouthwash Home Collection Acknowledgement";
     }

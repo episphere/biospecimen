@@ -2830,6 +2830,13 @@ export const checkInParticipant = async (data, visitConcept) => {
   };
 
   if (shouldSendBioEmail) {
+    const loginDetails = getLoginDetails(data);
+    if (!loginDetails) {
+      triggerErrorModal("Login details not found for this participant. Please check user profile data.");
+
+      return;
+    }
+
     const preferredLanguage = cidToLangMapper[data[conceptIds.preferredLanguage]] || "english";
     const requestData = {
       category: "Baseline Research Biospecimen Survey Reminders",
@@ -2840,8 +2847,8 @@ export const checkInParticipant = async (data, visitConcept) => {
       connectId: data.Connect_ID,
       preferredLanguage,
       substitutions: {
+        loginDetails,
         firstName: data[conceptIds.prefName] || data[conceptIds.firstName] || "User",
-        loginDetails: getLoginDetails(data),
       },
     };
 
@@ -2864,7 +2871,7 @@ const getPhoneLoginInfo = (participantPhone) => {
   return "***-***-" + participantPhone.slice(-4);
 };
 
-const getLoginDetails = (data) => {
+export const getLoginDetails = (data) => {
   if (data[conceptIds.signInMechanism] === "phone" && data[conceptIds.authenticationPhone]) {
     return getPhoneLoginInfo(data[conceptIds.authenticationPhone]);
   }
@@ -3327,6 +3334,13 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
     } 
     
     if (sendBaselineEmail) {
+        const loginDetails = getLoginDetails(data);
+        if (!loginDetails) {
+            triggerErrorModal("Login details not found for this participant. Please check user profile data.");
+
+            return;
+        }
+
         const preferredLanguage = cidToLangMapper[data[conceptIds.preferredLanguage]] || "english";
         const requestData = {
             category: "Baseline Clinical Blood and Urine Sample Survey Reminders",
@@ -3337,8 +3351,8 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
             connectId: data.Connect_ID,
             preferredLanguage,
             substitutions: {
+                loginDetails,
                 firstName: data[conceptIds.prefName] || data[conceptIds.firstName] || "User",
-                loginDetails: getLoginDetails(data)
             }
         };
         
