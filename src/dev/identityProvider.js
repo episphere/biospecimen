@@ -7,7 +7,7 @@ export const devSSOConfig = (email) => {
         { tenantID: 'UCM-SSO-tovai', provider: 'saml.connect-uchicago', regex: /uchicago.edu/i },
         { tenantID: 'NORC-SSO-dilvf', provider: 'saml.connect-norc', regex: /norc.org/i },
         { tenantID: 'KP-SSO-wulix', provider: 'saml.connect-kp', regex: /kp.org/i },
-        { tenantID: 'MFC-SSO-fljvd', provider: 'saml.connect-mfc', regex: /(marshfieldresearch.org | marshfieldclinic.org)/i },
+        { tenantID: 'MFC-SSO-fljvd', provider: 'saml.connect-mfc', regex: /(marshfieldresearch.org|marshfieldclinic.org)/i },
         { tenantID: 'BSWH-SSO-y2jj3', provider: 'saml.connect-bswh', regex: /bswhealth.org/i }
     ];
 
