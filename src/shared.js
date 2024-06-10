@@ -2903,17 +2903,17 @@ export const SSOConfig = (email) => {
     let tenantID = '';
     let provider = '';
     if(location.host === urls.prod) {
-        let config = prodSSOConfig(tenantID, provider, email);
+        let config = prodSSOConfig(email);
         tenantID = config.tenantID;
         provider = config.provider;
     }
     else if(location.host === urls.stage) {
-        let config = stageSSOConfig(tenantID, provider, email);
+        let config = stageSSOConfig(email);
         tenantID = config.tenantID;
         provider = config.provider;
     }
     else {
-        let config = devSSOConfig(tenantID, provider, email);
+        let config = devSSOConfig(email);
         tenantID = config.tenantID;
         provider = config.provider;
     }
