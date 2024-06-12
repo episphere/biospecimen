@@ -85,7 +85,14 @@ const assignKitsTemplate = async (name) => {
   scannedBarcode2.onpaste = e => e.preventDefault();
   scannedBarcode2.addEventListener("input", (e) => {
     const scannedBarcodeValue = document.getElementById('scannedBarcode').value.trim();
-    const scannedBarcode2Value = e.target.value.trim();
+    let scannedBarcode2Value = e.target.value.trim();
+    
+    // Trim FedEx tracking numbers (1033)
+  // Already done for the scannedBarcode input in checkTrackingNumberSource
+    if (scannedBarcode2Value.length === 34) {
+      scannedBarcode2Value = scannedBarcode2Value.slice(-12);
+      e.target.value = scannedBarcode2Value;
+    }
     
     if(scannedBarcodeValue && scannedBarcode2Value && scannedBarcodeValue !== scannedBarcode2Value) {
       const msg = 'Supply Kit Tracking Number doesn\'t match';

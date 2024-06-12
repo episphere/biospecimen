@@ -36,11 +36,12 @@ const kitAssemblyTemplate = async (name) => {
                           <div class="col-md-8">
                             <div class="form-group row">
                               <input type="text" class="form-control" id="scannedBarcode" placeholder="Scan Barcode" required />
+                              <span id="showMsg" style="font-size: 14px;"></span>
                             </div>
                             <label for="scannedBarcode2" class="sr-only">Confirm Return Kit Tracking Number</label>
                             <div class="form-group row">
                               <input autocomplete="off" type="text" class="form-control" id="scannedBarcode2" placeholder="Re-Enter (scan/type) Barcode" required />
-                              <span id="showMsg" style="font-size: 14px;"></span>
+                              <span id="showErrorMsg" style="font-size: 14px;"></span>
                             </div>
                           </div>
                         </div>
@@ -100,14 +101,23 @@ const kitAssemblyTemplate = async (name) => {
   // Set up automatic tabbing between inputs upon scanning (assuming the scanner automatically inputs the enter key at the end)
   autoTabAcrossArray(['scannedBarcode', 'scannedBarcode2', 'supplyKitId', 'returnKitId', 'cupId', 'cardId']);
 
-  document.getElementById('scannedBarcode2').onpaste = e => e.preventDefault();
+  const scannedBarcode2 = document.getElementById('scannedBarcode2');
+  scannedBarcode2.onpaste = e => e.preventDefault();
   numericInputValidator(['scannedBarcode', 'scannedBarcode2']);
   activeHomeCollectionNavbar();
   processAssembledKit();
   enableEnterKeystroke();
   dropdownTrigger('Select Kit Type');
   checkTrackingNumberSource();
-  performQCcheck('scannedBarcode2', 'scannedBarcode', 'showMsg', `Return Kit Tracking Number doesn't match`);
+  // Trim FedEx tracking numbers (1033)
+  // Already done for the scannedBarcode input in checkTrackingNumberSource
+  scannedBarcode2.addEventListener("input", (e) => {
+    const input = e.target.value.trim();
+    if (input.length === 34) {
+      e.target.value = input.slice(-12);
+    }
+  });
+  performQCcheck('scannedBarcode2', 'scannedBarcode', 'showErrorMsg', `Return Kit Tracking Number doesn't match`);
   performQCcheck('returnKitId', 'supplyKitId', 'showReturnKitErrorMsg', `Supply Kit & Return Kit need to be same`);
   performQCcheck('cardId', 'cupId', 'showCardIdErrorMsg', `Cup ID & Card ID need to be same`);
 };
@@ -167,6 +177,7 @@ const processAssembledKit = () => {
                     document.getElementById('cupId').value = ``;
                     document.getElementById('cardId').value = ``;
                     document.getElementById("showMsg").innerHTML = ``;
+                    document.getElementById("showErrorMsg").innerHTML = ``;
                     }
             } catch (error) { 
                 console.error(error);
@@ -310,7 +321,7 @@ const storeAssembledKit = async (kitData) => {
 const alertTemplate = (message, status = "warn", duration = 3000) => {
   if (status === "success") {
     performQCcheck('returnKitId', 'supplyKitId', 'showReturnKitErrorMsg', ``);
-    performQCcheck('scannedBarcode2', 'scannedBarcode', 'showMsg', ``);
+    performQCcheck('scannedBarcode2', 'scannedBarcode', 'showErrorMsg', ``);
     performQCcheck('cardId', 'cupId', 'showCardIdErrorMsg', ``);
     alert = `
     <div id="alert-success" class="alert alert-success alert-dismissible fade show" role="alert">
