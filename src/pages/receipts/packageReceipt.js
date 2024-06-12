@@ -724,6 +724,7 @@ const controlCollectionCardField = (dropdownSelection) => {
     enableCollectionCardFields() 
   }
 }
+
 export const validatePackageInformation = () => {
   
   const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected');
