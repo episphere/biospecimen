@@ -137,9 +137,9 @@ const formSubmit = () => {
       e.preventDefault();
       const modalHeaderEl = document.getElementById("modalHeader");
       const modalBodyEl = document.getElementById("modalBody");
-      const packageInfoIsValid = validatePackageInformation();
+      const isPackageInfoValid = validatePackageInformation();
 
-      if(packageInfoIsValid) {
+      if (isPackageInfoValid) {
         displaySelectedPackageConditionListModal(modalHeaderEl, modalBodyEl, true);
       } else {
         displayInvalidPackageInformationModal(modalHeaderEl, modalBodyEl);
