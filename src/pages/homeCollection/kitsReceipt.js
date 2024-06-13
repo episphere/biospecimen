@@ -2,7 +2,7 @@ import { homeCollectionNavbar, activeHomeCollectionNavbar } from "./homeCollecti
 import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, processResponse, checkTrackingNumberSource, getCurrentDate, numericInputValidator, autoTabAcrossArray, sendInstantNotification, getLoginDetails } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { conceptIds } from "../../fieldToConceptIdMapping.js";
-import { displayPackageConditionListEmptyModal, displaySelectedPackageConditionListModal, checkSelectPackageConditionsList, targetAnchorTagEl, addListenersOnPageLoad, beforeUnloadMessage, enableCollectionCardFields, enableCollectionCheckBox } from "../receipts/packageReceipt.js";
+import { displayInvalidPackageInformationModal, displaySelectedPackageConditionListModal, validatePackageInformation, checkSelectPackageConditionsList, targetAnchorTagEl, addListenersOnPageLoad, beforeUnloadMessage, enableCollectionCardFields, enableCollectionCheckBox } from "../receipts/packageReceipt.js";
 
 const contentBody = document.getElementById("contentBody");
 
@@ -137,12 +137,12 @@ const formSubmit = () => {
       e.preventDefault();
       const modalHeaderEl = document.getElementById("modalHeader");
       const modalBodyEl = document.getElementById("modalBody");
-      const isSelectPackageConditionsListEmpty = checkSelectPackageConditionsList();
+      const isPackageInfoValid = validatePackageInformation();
 
-      if (isSelectPackageConditionsListEmpty) {
-          displayPackageConditionListEmptyModal(modalHeaderEl, modalBodyEl);
+      if (isPackageInfoValid) {
+        displaySelectedPackageConditionListModal(modalHeaderEl, modalBodyEl, true);
       } else {
-          displaySelectedPackageConditionListModal(modalHeaderEl, modalBodyEl, true);
+        displayInvalidPackageInformationModal(modalHeaderEl, modalBodyEl);
       }
   });
 };

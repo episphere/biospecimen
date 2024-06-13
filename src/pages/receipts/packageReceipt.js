@@ -723,7 +723,44 @@ const controlCollectionCardField = (dropdownSelection) => {
     document.getElementById('collectionCheckBox').removeAttribute("disabled")
     enableCollectionCardFields() 
   }
-} 
+}
+
+export const validatePackageInformation = () => {
+  
+  const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected');
+  const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList);
+  const scannedBarcode = document.getElementById("scannedBarcode").value;
+  const dateReceived = document.getElementById("dateReceived").value;
+  const collectionId = document.getElementById("collectionId").value;
+  const dateCollectionCard = document.getElementById("dateCollectionCard").value;
+  const timeCollectionCard = document.getElementById("timeCollectionCard");
+
+  return (parseSelectPackageConditionsList.length !== 0) &&
+    !!scannedBarcode && !!dateReceived && !!collectionId && !!dateCollectionCard && !!timeCollectionCard;
+};
+
+export const displayInvalidPackageInformationModal = (modalHeaderEl,modalBodyEl) => {
+    modalHeaderEl.innerHTML = `
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>`
+    modalBodyEl.innerHTML =  `<div class="row">
+        <div class="col">
+            <div style="display:flex; justify-content:center; margin-bottom:1rem;">
+            <i class="fas fa-exclamation-triangle fa-5x" style="color:#ffc107"></i>
+            </div>
+            <p style="text-align:center; font-size:1.4rem; margin-bottom:1.2rem; ">
+                <span style="display:block; font-weight:600;font-size:1.8rem; margin-bottom: 0.5rem;">Package Condition</span> 
+                One or more fields are missing.
+            </p>
+        </div>
+    </div>
+    <div class="row" style="display:flex; justify-content:center;">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" target="_blank">Close</button>
+    </div>
+    </div>`
+};
+
 export const checkSelectPackageConditionsList = () => {
     const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected')
     const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList)
