@@ -165,7 +165,10 @@ export const confirmKitReceipt = () => {
         kitObj[conceptIds.collectionCupId] = document.getElementById('collectionId').value;
         const dateCollectionCard = document.getElementById('dateCollectionCard').value;
         const timeCollectionCard = document.getElementById('timeCollectionCard').value;
-        kitObj[conceptIds.collectionDateTimeStamp] = dateCollectionCard + 'T' + timeCollectionCard
+        if(dateCollectionCard && timeCollectionCard) {
+          kitObj[conceptIds.collectionDateTimeStamp] = dateCollectionCard + 'T' + timeCollectionCard
+        }
+        
         document.getElementById('collectionCheckBox').checked === true ? 
         kitObj[conceptIds.collectionCardFlag] = true : kitObj[conceptIds.collectionCardFlag] = false
         kitObj[conceptIds.collectionAddtnlNotes] = document.getElementById('collectionComments').value;

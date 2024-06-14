@@ -733,7 +733,7 @@ export const validatePackageInformation = () => {
   const dateReceived = document.getElementById("dateReceived").value;
   const collectionId = document.getElementById("collectionId").value;
   const dateCollectionCard = document.getElementById("dateCollectionCard").value;
-  const timeCollectionCard = document.getElementById("timeCollectionCard");
+  const timeCollectionCard = document.getElementById("timeCollectionCard").value;
 
   return (parseSelectPackageConditionsList.length !== 0) &&
     !!scannedBarcode && !!dateReceived && !!collectionId && !!dateCollectionCard && !!timeCollectionCard;
