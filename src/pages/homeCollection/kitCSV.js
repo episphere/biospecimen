@@ -36,7 +36,9 @@ const csvFileButtonSubmit = () => {
       showAnimation();
       try {
           const results = await getKitsByReceivedDate(dateString);
+          console.log('results', results);
           const modifiedResults = modifyKitQueryResults(results.data);
+          console.log('modifiedResults', modifiedResults);
           generateKitCSVData(modifiedResults);
           hideAnimation();
       } catch (e) {
@@ -111,13 +113,34 @@ const modifyKitQueryResults = (kitsData) => {
 
 const getVialTypesMapping = (collectionType, site, tubeId) => {
   if (collectionType === 'home') {
-    return vialMapping[collectionType]?.[site]?.[tubeId] || ['', '', '', ''];
+    return vialMapping[collectionType]?.[site]?.[tubeId] || ["15ml Nalgene jar",	"Crest Alcohol Free",	"Saliva",	"10"];
   }
 }
 
 const vialMapping = {
   'home': {
+    'henryFordHealth': {
+      '0007' : ["15ml Nalgene jar",	"Crest Alcohol Free",	"Saliva",	"10"]
+    },
+    'healthPartners': {
+      '0007' : ["15ml Nalgene jar",	"Crest Alcohol Free",	"Saliva",	"10"]
+    },
     'kpCO':{
+      '0007' : ["15ml Nalgene jar",	"Crest Alcohol Free",	"Saliva",	"10"]
+    },
+    'kpGA': {
+      '0007' : ["15ml Nalgene jar",	"Crest Alcohol Free",	"Saliva",	"10"]
+    },
+    'kpHI': {
+      '0007' : ["15ml Nalgene jar",	"Crest Alcohol Free",	"Saliva",	"10"]
+    },
+    'kpNW': {
+      '0007' : ["15ml Nalgene jar",	"Crest Alcohol Free",	"Saliva",	"10"]
+    },
+    'sanfordHealth': {
+      '0007' : ["15ml Nalgene jar",	"Crest Alcohol Free",	"Saliva",	"10"]
+    },
+    'uOfChicagoMed': {
       '0007' : ["15ml Nalgene jar",	"Crest Alcohol Free",	"Saliva",	"10"]
     },
     'nci':{  // testing only
