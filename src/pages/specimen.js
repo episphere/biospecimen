@@ -54,9 +54,18 @@ export const specimenTemplate = async (data, formData) => {
                 <select class="form-control col-md-5" id="collectionLocation">
                     <option value='none'>Please Select Location</option>`
 
-            siteLocations[workflow][siteAcronym].forEach(site => {
-                template += `<option ${locationSelection === site.concept.toString() ? 'selected="selected"' : ""} value='${site.concept}'>${site.location}</option>`
-            });
+            if (siteAcronym === 'BSWH') {
+                const siteLocationArray = siteLocations[workflow][siteAcronym];
+                const sortedBSWHLocations = siteLocationArray.sort((a, b) => a.location.localeCompare(b.location));
+                
+                sortedBSWHLocations.forEach(site => {
+                    template += `<option ${locationSelection === site.concept.toString() ? 'selected="selected"' : ""} value='${site.concept}'>${site.location}</option>`
+                });
+            } else {
+                siteLocations[workflow][siteAcronym].forEach(site => {
+                    template += `<option ${locationSelection === site.concept.toString() ? 'selected="selected"' : ""} value='${site.concept}'>${site.location}</option>`
+                });
+            }
 
             template += `
                 </select>`
