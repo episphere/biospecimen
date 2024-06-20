@@ -1703,8 +1703,9 @@ export const addEventReturnToPackaging = () => {
 export const addEventShipPrintManifest = (id) => {
   const btn = document.getElementById(id)
   btn.addEventListener('click', e => {
-    window.print()
-    if(e.target.classList.contains("print-manifest")) {
+    window.scrollTo(top);
+    window.print();
+    if (e.target.classList.contains("print-manifest")) {
       e.target.classList.remove("print-manifest")
     } else return
   })

@@ -490,6 +490,7 @@ export const generateBoxManifest = (currBox) => {
     populateBoxManifestHeader(currBox, currShippingLocationNumberObj);
     populateBoxManifestTable(currBox);
     document.getElementById('printBox').addEventListener('click', e => {
+        window.scrollTo(top);
         window.print();
     });
 
