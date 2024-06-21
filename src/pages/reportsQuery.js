@@ -144,6 +144,7 @@ export const showReportsManifest = async (currBox, source) => {
         populateReportManifestHeader(currBox);
         populateReportManifestTable(currBox, collectionsInBoxArray);
         document.getElementById('printBox').addEventListener('click', e => {
+            window.scrollTo(0, 0);
             window.print();
         });
         document.getElementById('returnToReports').addEventListener('click', e => {
