@@ -17,5 +17,5 @@ export const prodSSOConfig = (email) => {
         }
     }
     
-    return { tenantID: '', provider: '' };
+    return { tenantID: '', provider: '' }; 
 }
