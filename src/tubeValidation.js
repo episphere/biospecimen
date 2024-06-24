@@ -411,7 +411,11 @@ export const siteSpecificTubeRequirements = {
     'KPHI': {
         'research': workflows.research,
         'clinical': workflows.clinical
-    }
+    },
+    'BSWH': {
+        'research': workflows.research,
+        'clinical': workflows.clinical
+    },
 }
 
 export const totalCollectionIDLength = 14;

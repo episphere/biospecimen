@@ -67,6 +67,13 @@ export const conceptIds = {
         refusedAllFutureActivities: 458508122,
         deceased: 618686157
     },
+    authenticationEmail: 421823980,
+    authenticationPhone: 348474836,
+    signInMechanism: 995036844,
+    preferredEmail: 869588347,
+    preferredLanguage: 255077064,
+    english: 163149180,
+    spanish: 773342525,
 
     // Individual yes/no properties on the data
     withdrewConsent: 747006172,
@@ -132,6 +139,7 @@ export const conceptIds = {
     },
     checkOutDateTime: 343048998,
     checkInDateTime: 840048338,
+    checkInComplete: 135591601,
 
     // not shipped specimen deviation id
     brokenSpecimenDeviation: 472864016,
@@ -262,36 +270,42 @@ export const conceptIds = {
     },
 
     collectionLocationMapping: {
-        777644826 : 'UC-DCAM',
-        692275326 : 'Marshfield',
-        813701399 : 'Weston',
-        698283667 : 'Lake Hallie',
-        834825425 : 'HP Research Clinic',
-        574368418 : "HP Park Nicollet",
-        736183094 : 'HFH K-13 Research Clinic',
-        886364332 : 'HFH Cancer Pavilion Research Clinic',
-        706927479 : 'HFH Livonia Research Clinic',
-        322059622 : "HFH Pop-Up",
-        589224449 : 'Sioux Falls Imagenetics',
-        127626388 : "Bismarck Medical Center",
+        777644826: 'UC-DCAM',
+        692275326: 'Marshfield',
+        813701399: 'Weston',
+        698283667: 'Lake Hallie',
+        834825425: 'HP Research Clinic',
+        574368418: "HP Park Nicollet",
+        736183094: 'HFH K-13 Research Clinic',
+        886364332: 'HFH Cancer Pavilion Research Clinic',
+        706927479: 'HFH Livonia Research Clinic',
+        322059622: "HFH Pop-Up",
+        589224449: 'Sioux Falls Imagenetics',
+        127626388: "Bismarck Medical Center",
         246137578: 'Sioux Falls Sanford Center',
-        145191545 : 'Ingalls Harvey',
-        489380324 : 'River East',
-        319518299 : 'UCM Pop-Up',
-        940329442 : 'Orland Park',
-        567969985 : 'MF Pop-Up',
-        120264574 : 'South Loop',
-        691714762 : 'Rice Lake',
-        487512085 : 'Wisconsin Rapids',
-        983848564 : 'Colby Abbotsford',
-        261931804 : 'Minocqua',
-        665277300 : 'Merrill',
-        467088902 : 'Fargo South University',
-        111111111 : 'NIH/NCI',
-        807835037 : 'Other'
+        145191545: 'Ingalls Harvey',
+        489380324: 'River East',
+        319518299: 'UCM Pop-Up',
+        940329442: 'Orland Park',
+        567969985: 'MF Pop-Up',
+        120264574: 'South Loop',
+        691714762: 'Rice Lake',
+        487512085: 'Wisconsin Rapids',
+        983848564: 'Colby Abbotsford',
+        261931804: 'Minocqua',
+        665277300: 'Merrill',
+        467088902: 'Fargo South University',
+        111111111: 'NIH/NCI',
+        807835037: 'Other',
+        723351427: 'BCC- HWC',
+		807443231: 'FW All Saints',
+		475614532: 'BCC- Plano',
+		809370237: 'BCC- Worth St',
+        856158129: 'BCC- Irving',
+        436956777: 'NTX Biorepository'
     },
 
-    nameToKeyObj : {
+    nameToKeyObj: {
         'ucDcam': 777644826,
         'marshfield': 692275326,
         'weston': 813701399,
@@ -319,8 +333,13 @@ export const conceptIds = {
         "ucmPopUp": 319518299,
         "orPark": 940329442,
         "mfPopUp": 567969985,
+        'bccHwc': 723351427,
+        'bccAllSaints': 807443231,
+        'bccPlano': 475614532,
+        'bccWorthSt': 809370237,
+        'bccIrving': 856158129,
+        'ntxBiorepo': 436956777,
         'all': 1000
-
     },
     boxedStatus: 771580890,
     notBoxed: 657483796,
@@ -395,4 +414,4 @@ export const packageConditionConversion = {
     "541085383": "Incorrect Material Type Returned",
     "427719697": "Collection Cup Not Returned",
     "100618603": "Other"
-}
+};

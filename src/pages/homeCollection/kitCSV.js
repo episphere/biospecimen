@@ -111,18 +111,8 @@ const modifyKitQueryResults = (kitsData) => {
 
 const getVialTypesMapping = (collectionType, site, tubeId) => {
   if (collectionType === 'home') {
-    return vialMapping[collectionType]?.[site]?.[tubeId] || ['', '', '', ''];
-  }
-}
-
-const vialMapping = {
-  'home': {
-    'kpCO':{
-      '0007' : ["15ml Nalgene jar",	"Crest Alcohol Free",	"Saliva",	"10"]
-    },
-    'nci':{  // testing only
-      '0007' : ["15ml Nalgene jar",	"Crest Alcohol Free",	"Saliva",	"10"]
-    }
+    // Home collections, currently the only type used, always return the same value
+    return ["15ml Nalgene jar",	"Crest Alcohol Free",	"Saliva",	"10"];
   }
 }
 

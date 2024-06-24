@@ -1,15 +1,12 @@
 import { userNavBar, adminNavBar, nonUserNavBar, unAuthorizedUser } from "./navbar.js";
 import { searchResults } from "./pages/dashboard.js";
-import { generateShippingManifest } from "./pages/shipping.js"
-import { masterSpecimenIDRequirement, siteSpecificTubeRequirements } from "./tubeValidation.js"
-import { workflows, specimenCollection } from "./tubeValidation.js";
+import { generateShippingManifest } from "./pages/shipping.js";
+import { masterSpecimenIDRequirement, siteSpecificTubeRequirements, workflows, specimenCollection } from "./tubeValidation.js";
 import { signOut } from "./pages/signIn.js";
 import { devSSOConfig } from './dev/identityProvider.js';
 import { stageSSOConfig } from './stage/identityProvider.js';
 import { prodSSOConfig } from './prod/identityProvider.js';
 import { conceptIds } from './fieldToConceptIdMapping.js';
-import { baselineEmailTemplate } from "./emailTemplates.js";
-
 
 export const urls = {
     'stage': 'biospecimen-myconnect-stage.cancer.gov',
@@ -169,6 +166,25 @@ export const sendClientEmail = async (array) => {
     
     return response;
 }
+
+export const sendInstantNotification = async (requestData) => {
+  const idToken = await getIdToken();
+  const requestObj = {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + idToken,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(requestData),
+  };
+  const resp = await fetch(`${api}api=sendInstantNotification`, requestObj);
+  const respJson = await resp.json();
+    if (!resp.ok) {
+      triggerErrorModal(`Error occurred when sending out notification, with message "${respJson.message}".`);
+  }
+
+  return respJson;
+};
 
 export const biospecimenUsers = async () => {
     const idToken = await getIdToken();
@@ -1616,11 +1632,16 @@ export const getLocationsInstitute = async () => {
     });
     const res = await response.json();
     const arr = res.response;
+    const siteAcronym = arr[0].siteAcronym;
+    
     let locations = [];
-    for(let i = 0; i < arr.length; i++){
+    for (let i = 0; i < arr.length; i++) {
         let currJSON = arr[i];
         locations = locations.concat(currJSON[conceptIds.shippingLocation]);
     }
+    
+    if (siteAcronym === 'BSWH') locations.sort((a, b) => a.localeCompare(b));
+
     logAPICallEndDev('getLocationsInstitute');
     return locations;
 }
@@ -1938,6 +1959,7 @@ export const healthProviderAbbrToConceptIdObj = {
     "marshfieldClinic": 303349821,
     "uOfChicagoMed": 809703864,
     "nci": 13,
+    "BSWH": 472940358,
     "allResults": 1000
 }
 
@@ -1952,6 +1974,7 @@ export const siteFullNames = {
     'KPCO': 'Kaiser Permanente Colorado',
     'HP': 'HealthPartners Research Clinic',
     'HFHS': 'Henry Ford Health System',
+    'BSWH': 'Baylor Scott & White Health',
     'NIH': "National Institutes of Health"
 }
 
@@ -1985,8 +2008,15 @@ export const siteSpecificLocation = {
   "River East": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
   "South Loop": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
   "Orland Park": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
+  "BCC- HWC": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "FW All Saints": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- Plano": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- Worth St": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- Irving": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "NTX Biorepository": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
   "Main Campus": {"siteAcronym":"NIH", "siteCode": healthProviderAbbrToConceptIdObj.nci, "loginSiteName": "National Cancer Institute"},
   "Frederick": {"siteAcronym":"NIH", "siteCode": healthProviderAbbrToConceptIdObj.nci, "loginSiteName": "National Cancer Institute"},
+
 }
 
 export const locationConceptIDToLocationMap = {
@@ -2223,21 +2253,69 @@ export const locationConceptIDToLocationMap = {
     loginSiteName: 'University of Chicago Medicine',
     email: 'connectbiospecimen@bsd.uchicago.edu',
   },
-  111111111: {
-    siteSpecificLocation: 'Main Campus',
-    siteAcronym: 'NIH',
-    siteCode: '13',
-    siteTeam: "NIH Connect Study Team",
-    loginSiteName: 'National Cancer Institute',
-    email: "connectstudytest@email.com",
-  },
-  222222222: { 
-    siteSpecificLocation: 'Frederick',
-    siteAcronym: 'NIH',
-    siteCode: '13',
-    siteTeam: "NIH Connect Study Team",
-    loginSiteName: 'National Cancer Institute',
-    email: "connectstudytest@email.com",
+    723351427: {
+        siteSpecificLocation: 'BCC- HWC',
+        siteAcronym: 'BSWH',
+        siteCode: '472940358',
+        siteTeam: 'BSWH Connect Study Team',
+        loginSiteName: 'Baylor Scott & White Health',
+        email: 'connectbiospecimen@BSWHealth.org',
+    },
+    807443231: {
+        siteSpecificLocation: 'FW All Saints',
+        siteAcronym: 'BSWH',
+        siteCode: '472940358',
+        siteTeam: 'BSWH Connect Study Team',
+        loginSiteName: 'Baylor Scott & White Health',
+        email: 'connectbiospecimen@BSWHealth.org',
+    },
+    475614532: {
+        siteSpecificLocation: 'BCC- Plano',
+        siteAcronym: 'BSWH',
+        siteCode: '472940358',
+        siteTeam: 'BSWH Connect Study Team',
+        loginSiteName: 'Baylor Scott & White Health',
+        email: 'connectbiospecimen@BSWHealth.org',
+    },
+    809370237: {
+        siteSpecificLocation: 'BCC- Worth St',
+        siteAcronym: 'BSWH',
+        siteCode: '472940358',
+        siteTeam: 'BSWH Connect Study Team',
+        loginSiteName: 'Baylor Scott & White Health',
+        email: 'connectbiospecimen@BSWHealth.org',
+    },
+    856158129: {
+        siteSpecificLocation: 'BCC- Irving',
+        siteAcronym: 'BSWH',
+        siteCode: '472940358',
+        siteTeam: 'BSWH Connect Study Team',
+        loginSiteName: 'Baylor Scott & White Health',
+        email: 'connectbiospecimen@BSWHealth.org',
+    },
+    436956777: {
+        siteSpecificLocation: 'NTX Biorepository',
+        siteAcronym: 'BSWH',
+        siteCode: '472940358',
+        siteTeam: 'BSWH Connect Study Team',
+        loginSiteName: 'Baylor Scott & White Health',
+        email: 'connectbiospecimen@BSWHealth.org'
+    },
+    111111111: {
+        siteSpecificLocation: 'Main Campus',
+        siteAcronym: 'NIH',
+        siteCode: '13',
+        siteTeam: "NIH Connect Study Team",
+        loginSiteName: 'National Cancer Institute',
+        email: "connectstudytest@email.com",
+    },
+    222222222: { 
+        siteSpecificLocation: 'Frederick',
+        siteAcronym: 'NIH',
+        siteCode: '13',
+        siteTeam: "NIH Connect Study Team",
+        loginSiteName: 'National Cancer Institute',
+        email: "connectstudytest@email.com",
     },
 };
 
@@ -2273,6 +2351,12 @@ export const conceptIdToSiteSpecificLocation = {
   [conceptIds.nameToKeyObj.hfhPU]: "HFH Pop-Up",
   [conceptIds.nameToKeyObj.sfBM]: "Bismarck Medical Center",
   [conceptIds.nameToKeyObj.sfSC]: "Sioux Falls Sanford Center",
+  723351427: "BCC- HWC",
+  807443231: "FW All Saints",
+  475614532: "BCC- Plano",
+  809370237: "BCC- Worth St",
+  856158129: "BCC- Irving",
+  436956777: "NTX Biorepository",
 }
 
 export const siteSpecificLocationToConceptId = {
@@ -2307,6 +2391,12 @@ export const siteSpecificLocationToConceptId = {
   "HFH Pop-Up": conceptIds.nameToKeyObj.hfhPU,
   "Bismarck Medical Center": conceptIds.nameToKeyObj.sfBM,
   "Sioux Falls Sanford Center": conceptIds.nameToKeyObj.sfSC,
+  "BCC- HWC": 723351427,
+  "FW All Saints": 807443231,
+  "BCC- Plano": 475614532,
+  "BCC- Worth St": 809370237,
+  "BCC- Irving": 856158129,
+  "NTX Biorepository": 436956777,
 }
 
 export const conceptIdToHealthProviderAbbrObj = {
@@ -2335,7 +2425,8 @@ export const keyToNameObj =
     809703864 : "University of Chicago Medicine",
     13 : "National Cancer Institute",
     300267574 : "Kaiser Permanente Hawaii",
-    327912200 : "Kaiser Permanente Georgia"
+    327912200 : "Kaiser Permanente Georgia",
+    472940358: "Baylor Scott & White Health"
 }
 
 // Use keyToNameCSVObj for clinical collections in CSV files - Kit and Package Receipt.
@@ -2349,7 +2440,8 @@ export const keyToNameCSVObj = {
     809703864 : "University of Chicago Clinical",
     13 : "National Cancer Institute",
     300267574 : "Kaiser Permanente Hawaii RRL",
-    327912200 : "Kaiser Permanente GA RRL"
+    327912200 : "Kaiser Permanente GA RRL",
+    472940358: "Baylor Scott & White Health"
 }
 
 export const keyToLocationObj = 
@@ -2379,6 +2471,12 @@ export const keyToLocationObj =
     589224449: "Sioux Falls Imagenetics",
     [conceptIds.nameToKeyObj.sfBM] : "Bismarck Medical Center",
     [conceptIds.nameToKeyObj.sfSC] : "Sioux Falls Sanford Center",
+    723351427:'BCC- HWC',
+    807443231:'FW All Saints',
+    475614532:'BCC- Plano',
+    809370237:'BCC- Worth St',
+    856158129:'BCC- Irving',
+    436956777:'NTX Biorepository',
     111111111: "NIH",
     13:"NCI"
 
@@ -2408,6 +2506,11 @@ export const surveyConversion = {
     '972455046': 'Not Started',
     '615768760': 'Started',
     '231311385': 'Submitted'
+};
+
+const cidToLangMapper = {
+  [conceptIds.english]: "english",
+  [conceptIds.spanish]: "spanish",
 };
 
 export const addEventBarCodeScanner = (id, start, end) => {
@@ -2576,14 +2679,24 @@ export const siteLocations = {
                 {location: 'Wisconsin Rapids', concept: 487512085}, {location: 'Colby Abbotsford', concept: 983848564}, {location: 'Minocqua', concept: 261931804}, {location: 'Merrill', concept: 665277300},
                 {location: 'MF Pop-Up', concept: 567969985}
               ],
-        'HP': [{location: 'HP Research Clinic', concept: 834825425}, {location: 'HP Park Nicollet', concept: conceptIds.nameToKeyObj.hpPN}],
+        'HP': [{location: 'HP Research Clinic', concept: 834825425}, 
+                {location: 'HP Park Nicollet', concept: conceptIds.nameToKeyObj.hpPN}],
         // HFH Pop-up
         'HFHS': [{location: 'HFH K-13 Research Clinic', concept: 736183094}, {location: 'HFH Cancer Pavilion Research Clinic', concept: 886364332},
                 {location: 'HFH Livonia Research Clinic', concept: 706927479},
                 {location: 'HFH Pop-Up', concept: conceptIds.nameToKeyObj.hfhPU}],
         // Bismarck
         'SFH': [{location: 'Sioux Falls Imagenetics', concept: 589224449}, {location: 'Fargo South University', concept: 467088902}, {location: 'Bismarck Medical Center', concept: conceptIds.nameToKeyObj.sfBM}, {location: 'Sioux Falls Sanford Center', concept: conceptIds.nameToKeyObj.sfSC}],
+
+        'BSWH': [{location: 'BCC- HWC', concept: 723351427}, 
+                {location: 'FW All Saints', concept: 807443231}, 
+                {location: 'BCC- Plano', concept: 475614532}, 
+                {location: 'BCC- Worth St', concept: 809370237}, 
+                {location: 'BCC- Irving', concept: 856158129}, 
+                {location: 'NTX Biorepository', concept: 436956777}],
+
         'NIH': [{location: 'NIH-1', concept: 111111111}, {location: 'NIH-2', concept: 222222222}]
+
     },
     'clinical': {
         'KPHI': [{location:'KPHI RRL', concept: 531313956}],
@@ -2684,60 +2797,94 @@ export const getCheckedInVisit = (data) => {
 };
 
 export const checkInParticipant = async (data, visitConcept) => {
-    
-    let visits;
-    const user_uid = data.state.uid;
-    let sendBioEmail = false;
+  let visits;
+  const uid = data.state.uid;
+  let shouldSendBioEmail = false;
 
-    if(data['331584571']) {
+  if (data[conceptIds.selectedVisit]) {
+    visits = data[conceptIds.selectedVisit];
 
-        visits = data['331584571'];
+    if (!visits[visitConcept]) {
+      if (visitConcept === conceptIds.baseline.visitId.toString()) shouldSendBioEmail = true;
 
-        if(!visits[visitConcept]) {
-
-            if(visitConcept === '266600170') sendBioEmail = true;
-
-            visits[visitConcept] = {
-                '840048338': new Date()
-            }
-        }
-
-        visits[visitConcept]['135591601'] = 353358909;
-    }
-    else {
-        sendBioEmail = true;
-
-        visits = {
-            [visitConcept]: {
-                '135591601': 353358909,
-                '840048338': new Date()
-            }
-        };
+      visits[visitConcept] = {
+        [conceptIds.checkInDateTime]: new Date(),
+      };
     }
 
-    const checkInData = {
-        '331584571': visits,
-        uid: user_uid
+    visits[visitConcept][conceptIds.checkInComplete] = conceptIds.yes;
+  } else {
+    shouldSendBioEmail = true;
+
+    visits = {
+      [visitConcept]: {
+        [conceptIds.checkInComplete]: conceptIds.yes,
+        [conceptIds.checkInDateTime]: new Date(),
+      },
     };
-        
-    if(sendBioEmail) {
-        const emailData = {
-            email: data['869588347'],
-            subject: "Please complete a short survey about your samples",
-            message: baselineEmailTemplate(data),
-            notificationType: "email",
-            time: new Date().toISOString(),
-            attempt: "1st contact",
-            category: "Biospecimen Survey Reminder",
-            token: data.token,
-            uid: data.state.uid,
-            read: false
-        };
-        
-        await(sendClientEmail(emailData));
+  }
+
+  const checkInData = {
+    [conceptIds.collection.selectedVisit]: visits,
+    uid,
+  };
+
+  if (shouldSendBioEmail) {
+    const loginDetails = getLoginDetails(data);
+    if (!loginDetails) {
+      triggerErrorModal("Login details not found for this participant. Please check user profile data.");
+
+      return;
     }
 
-    await updateParticipant(checkInData);
+    const preferredLanguage = cidToLangMapper[data[conceptIds.preferredLanguage]] || "english";
+    const requestData = {
+      category: "Baseline Research Biospecimen Survey Reminders",
+      attempt: "1st contact",
+      email: data[conceptIds.preferredEmail],
+      token: data.token,
+      uid: data.state.uid,
+      connectId: data.Connect_ID,
+      preferredLanguage,
+      substitutions: {
+        loginDetails,
+        firstName: data[conceptIds.prefName] || data[conceptIds.firstName] || "User",
+      },
+    };
+
+    await sendInstantNotification(requestData);
+  }
+
+  await updateParticipant(checkInData);
+};
+
+const getEmailLoginInfo = (participantEmail) => {
+  const [prefix, domain] = participantEmail.split("@");
+  const changedPrefix =
+    prefix.length > 3
+      ? prefix.slice(0, 2) + "*".repeat(prefix.length - 3) + prefix.slice(-1)
+      : prefix.slice(0, -1) + "*";
+  return changedPrefix + "@" + domain;
+};
+
+const getPhoneLoginInfo = (participantPhone) => {
+  return "***-***-" + participantPhone.slice(-4);
+};
+
+export const getLoginDetails = (data) => {
+  if (data[conceptIds.signInMechanism] === "phone" && data[conceptIds.authenticationPhone]) {
+    return getPhoneLoginInfo(data[conceptIds.authenticationPhone]);
+  }
+
+  if (data[conceptIds.signInMechanism] === "password" && data[conceptIds.authenticationEmail]) {
+    return getEmailLoginInfo(data[conceptIds.authenticationEmail]);
+  }
+
+  if (data[conceptIds.signInMechanism] === "passwordAndPhone" && data[conceptIds.authenticationEmail] && data[conceptIds.authenticationPhone]) {
+    return getPhoneLoginInfo(data[conceptIds.authenticationPhone]) + ", " + getEmailLoginInfo(data[conceptIds.authenticationEmail]);
+  }
+
+  return "";
 };
 
 export const checkOutParticipant = async (data) => {
@@ -2811,17 +2958,17 @@ export const SSOConfig = (email) => {
     let tenantID = '';
     let provider = '';
     if(location.host === urls.prod) {
-        let config = prodSSOConfig(tenantID, provider, email);
+        let config = prodSSOConfig(email);
         tenantID = config.tenantID;
         provider = config.provider;
     }
     else if(location.host === urls.stage) {
-        let config = stageSSOConfig(tenantID, provider, email);
+        let config = stageSSOConfig(email);
         tenantID = config.tenantID;
         provider = config.provider;
     }
     else {
-        let config = devSSOConfig(tenantID, provider, email);
+        let config = devSSOConfig(email);
         tenantID = config.tenantID;
         provider = config.provider;
     }
@@ -3186,21 +3333,30 @@ export const checkSurveyEmailTrigger = async (data, visitType) => {
         if(collections.length == 1) sendBaselineEmail = true;
     } 
     
-    if(sendBaselineEmail) {
-        const emailData = {
-            email: data['869588347'],
-            subject: "Please complete a short survey about your samples",
-            message: baselineEmailTemplate(data, true),
-            notificationType: "email",
-            time: new Date().toISOString(),
+    if (sendBaselineEmail) {
+        const loginDetails = getLoginDetails(data);
+        if (!loginDetails) {
+            triggerErrorModal("Login details not found for this participant. Please check user profile data.");
+
+            return;
+        }
+
+        const preferredLanguage = cidToLangMapper[data[conceptIds.preferredLanguage]] || "english";
+        const requestData = {
+            category: "Baseline Clinical Blood and Urine Sample Survey Reminders",
             attempt: "1st contact",
-            category: "Baseline Clinical Biospecimen Survey Reminder",
+            email: data[conceptIds.preferredEmail],
             token: data.token,
             uid: data.state.uid,
-            read: false
+            connectId: data.Connect_ID,
+            preferredLanguage,
+            substitutions: {
+                loginDetails,
+                firstName: data[conceptIds.prefName] || data[conceptIds.firstName] || "User",
+            }
         };
         
-        await sendClientEmail(emailData);
+        await sendInstantNotification(requestData);
     }
 }
 
