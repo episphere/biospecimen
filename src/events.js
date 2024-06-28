@@ -539,7 +539,6 @@ export const addGoToCheckInEvent = () => {
 
 export const addGoToSpecimenLinkEvent = () => {
     const specimenLinkButtons = document.querySelectorAll('button[data-specimen-link-connect-id]');
-
     for (const btn of specimenLinkButtons) {
         btn.addEventListener('click', async () => {
         let query = `connectId=${parseInt(btn.dataset.specimenLinkConnectId)}`;
@@ -563,6 +562,8 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
             
             const response = await findParticipant(query);
             const data = response.data[0];
+            console.log("🚀 ~ addEventCheckInCompleteForm ~ data:", data)
+
             if (isCheckedIn) {
                 showAnimation();
                 await checkOutParticipant(data);
@@ -577,12 +578,19 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
                 }, 1500);
             } else {
                 const visitConcept = document.getElementById('visit-select').value;
+                
+                const isClinicalUrineOrBloodCollected = checkClinicalBloodOrUrineCollected(data)
+
+                if (isClinicalUrineOrBloodCollected) return;
+
+
                 for (const visit of visitType) {
                     if (data[conceptIds.collection.selectedVisit] && data[conceptIds.collection.selectedVisit][visit.concept]) {
                         const visitTime = new Date(data[conceptIds.collection.selectedVisit][visit.concept][conceptIds.checkInDateTime]);
-                        const now = new Date(); 
+                        const now = new Date();
                         if (now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
                             const response = await getParticipantCollections(data.token);
+                            console.log("🚀 ~ addEventCheckInCompleteForm ~ response:", response)
                             let collection = response.data.filter(res => res[conceptIds.collection.selectedVisit] == visit.concept);
                             if (collection.length === 0) continue;
                             const confirmContinueCheckIn = await handleCheckInWarning(visit, data, collection);
@@ -591,7 +599,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
                     }
                 }
     
-                await handleCheckInModal(data, visitConcept, query);
+                // await handleCheckInModal(data, visitConcept, query);
             }
         } catch (error) {
             const bodyMessage = isCheckedIn ? 'There was an error checking out the participant. Please try again.' : 'There was an error checking in the participant. Please try again.';
@@ -599,6 +607,23 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
         }
     });
 };
+
+/**
+ * Checks if the participant has a clinical blood or urine collected and any specimen collected at Regional. If participant has clinical blood or urine collected, show a notification and return true.
+ * @param {Object} data - participant data
+ * @returns {Boolean} - true if participant has any clinical blood or urine collected, false otherwise
+*/
+const checkClinicalBloodOrUrineCollected = (data) => {
+    const isBloodOrUrineCollected = data?.[conceptIds.collectionDetails]?.[conceptIds.baseline.visitId]?.[conceptIds.clinicalBloodOrUrineCollected];
+    const anySpecimenCollectedRRL = data?.[conceptIds.collectionDetails]?.[conceptIds.baseline.visitId]?.[conceptIds.anySpecimenCollected];
+
+    if (isBloodOrUrineCollected === conceptIds.yes && anySpecimenCollectedRRL === conceptIds.yes) { 
+        const bodyMessage = 'Check In not allowed, participant already has clinical collection for this timepoint.'
+        showNotifications({ title: 'Check In Error', body: bodyMessage });
+        return true;
+    }
+    return false;
+}
 
 const handleCheckInWarning = async (visit, data, collection) => {
     const message = {
@@ -674,12 +699,14 @@ export const goToParticipantSearch = () => {
 export const addEventSpecimenLinkForm = (formData) => {
     const form = document.getElementById('researchSpecimenContinue');
     const connectId = document.getElementById('researchSpecimenContinue').dataset.connectId;
+    // Note: Can use this connectId value to get related biospecimen documents
 
     if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
 
     form.addEventListener('click', async (e) => {
         e.preventDefault();
         const collections = await getCollectionsByVisit(formData);
+        console.log("🚀 ~ form.addEventListener ~ collections:", collections, "--", "formData:", formData)
         if (collections.length) {
             existingCollectionAlert(collections, connectId, formData);
         } else {
@@ -732,6 +759,7 @@ const existingCollectionAlert = async (collections, connectId, formData) => {
  * @param {*} formData 
  */
 const btnsClicked = async (connectId, formData) => { 
+    console.log("🚀 ~ btnsClicked ~ connectId, formData:", connectId, formData)
     removeAllErrors();
 
     let scanSpecimenID = document.getElementById('scanSpecimenID')?.value && document.getElementById('scanSpecimenID')?.value.toUpperCase();
@@ -749,18 +777,17 @@ const btnsClicked = async (connectId, formData) => {
         errorMessage('scanSpecimenID', 'Please Scan Collection ID or Type in Manually', focus, true);
         focus = false;
         errorMessage('scanSpecimenID2', 'Please Scan Collection ID or Type in Manually', focus, true);
-    }
-    else if (scanSpecimenID !== scanSpecimenID2 && !formData?.collectionId) {
+    } else if (scanSpecimenID !== scanSpecimenID2 && !formData?.collectionId) {
         hasError = true;
         errorMessage('scanSpecimenID2', 'Entered Collection ID doesn\'t match.', focus, true);
-    }
-    else if (scanSpecimenID && scanSpecimenID2) {
+    } else if (scanSpecimenID && scanSpecimenID2) {
         if (!masterSpecimenIDRequirement.regExp.test(scanSpecimenID) || scanSpecimenID.length !== masterSpecimenIDRequirement.length) {
             hasError = true;
             errorMessage('scanSpecimenID', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, focus, true);
             focus = false;
         }
     }
+
     if (collectionLocation && collectionLocation.value === 'none') {
         hasError = true;
         errorMessage('collectionLocation', `Please Select Collection Location.`, focus, true);
@@ -775,6 +802,68 @@ const btnsClicked = async (connectId, formData) => {
     const firstNameCidString = conceptIds.firstName.toString();
     const firstName = document.getElementById(firstNameCidString).innerText || ""
 
+
+    const confirmVal = await showConfirmationModal(collectionID, firstName);
+
+    if (confirmVal === "cancel") return;
+
+    formData[conceptIds.collection.id] = collectionID;
+    formData[conceptIds.collection.collectionSetting] = getWorkflow() === 'research' ? conceptIds.research : conceptIds.clinical;
+    formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
+    formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
+    
+    let query = `connectId=${parseInt(connectId)}`;
+
+    showAnimation();
+    const response = await findParticipant(query);
+    const particpantData = response.data[0];
+    let specimenData;
+    
+    if (!formData?.collectionId) {
+        specimenData = (await searchSpecimen(formData[conceptIds.collection.id])).data;
+        
+    }
+    hideAnimation();
+    console.log("🚀 ~ btnsClicked ~ specimenData:", specimenData)
+    if (specimenData?.Connect_ID && parseInt(specimenData.Connect_ID) !== particpantData.Connect_ID) {
+        showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different Connect ID.' })
+        return;
+    }
+
+    showAnimation();
+    formData[conceptIds.collection.selectedVisit] = formData?.[conceptIds.collection.selectedVisit] || parseInt(getCheckedInVisit(particpantData));
+    console.log("🚀 ~ btnsClicked ~ parseInt(getCheckedInVisit(particpantData)):", parseInt(getCheckedInVisit(particpantData)))
+    console.log("____")
+    console.log("🚀 ~ btnsClicked ~ formData?.[conceptIds.collection.selectedVisit]:", formData?.[conceptIds.collection.selectedVisit])
+    
+    
+    if (!formData?.collectionId) {
+        console.log("Form data to be added:", formData);
+        const storeResponse = await storeSpecimen([formData]);  
+        if (storeResponse.code === 400) {
+            hideAnimation();
+            showNotifications({ title: 'Specimen already exists!', body: `Collection ID ${collectionID} is already associated with a different Connect ID` });
+            return;
+        }
+    }
+
+    const biospecimenData = (await searchSpecimen(formData?.collectionId || formData[conceptIds.collection.id])).data;
+    await createTubesForCollection(formData, biospecimenData);
+    
+    // if 'clinical' and no existing collection ID, check email trigger
+    if (formData[conceptIds.collection.collectionSetting] === conceptIds.clinical && !formData?.collectionId) {
+        await checkSurveyEmailTrigger(particpantData, formData[conceptIds.collection.selectedVisit]);
+    }
+
+    hideAnimation();
+    if (formData?.collectionId || confirmVal == "confirmed") {
+        tubeCollectedTemplate(particpantData, biospecimenData);
+
+    } else {
+        searchTemplate();
+    }
+}
+    
 
 const showConfirmationModal = async (collectionID, firstName) => {
     return new Promise((resolve) => {
@@ -826,60 +915,6 @@ const showConfirmationModal = async (collectionID, firstName) => {
     });
 };
 
-const confirmVal = await showConfirmationModal(collectionID, firstName);
-if (confirmVal === "cancel") {
-    return;
-}
-    formData[conceptIds.collection.id] = collectionID;
-    formData[conceptIds.collection.collectionSetting] = getWorkflow() === 'research' ? conceptIds.research : conceptIds.clinical;
-    formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
-    formData['token'] = document.getElementById('specimenLinkForm').dataset.participantToken;
-    
-    let query = `connectId=${parseInt(connectId)}`;
-
-    showAnimation();
-    const response = await findParticipant(query);
-    const particpantData = response.data[0];
-    let specimenData;
-    
-    if (!formData?.collectionId) {
-        specimenData = (await searchSpecimen(formData[conceptIds.collection.id])).data;
-    }
-    hideAnimation();
-
-    if (specimenData?.Connect_ID && parseInt(specimenData.Connect_ID) !== particpantData.Connect_ID) {
-        showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different Connect ID.' })
-        return;
-    }
-
-    showAnimation();
-    formData[conceptIds.collection.selectedVisit] = formData?.[conceptIds.collection.selectedVisit] || parseInt(getCheckedInVisit(particpantData));
-    
-    if (!formData?.collectionId) {
-        const storeResponse = await storeSpecimen([formData]);  
-        if (storeResponse.code === 400) {
-            hideAnimation();
-            showNotifications({ title: 'Specimen already exists!', body: `Collection ID ${collectionID} is already associated with a different Connect ID` });
-            return;
-        }
-    }
-
-    const biospecimenData = (await searchSpecimen(formData?.collectionId || formData[conceptIds.collection.id])).data;
-    await createTubesForCollection(formData, biospecimenData);
-    
-    // if 'clinical' and no existing collection ID, check email trigger
-    if (formData[conceptIds.collection.collectionSetting] === conceptIds.clinical && !formData?.collectionId) {
-        await checkSurveyEmailTrigger(particpantData, formData[conceptIds.collection.selectedVisit]);
-    }
-
-    hideAnimation();
-    if (formData?.collectionId || confirmVal == "confirmed") {
-        tubeCollectedTemplate(particpantData, biospecimenData);
-
-    } else {
-        searchTemplate();
-    }
-}
 
 /**
  * Check accession number inputs after clicking 'Submit' button

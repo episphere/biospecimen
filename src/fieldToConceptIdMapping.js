@@ -140,6 +140,7 @@ export const conceptIds = {
     checkOutDateTime: 343048998,
     checkInDateTime: 840048338,
     checkInComplete: 135591601,
+    clinicalBloodOrUrineCollected: 156605577,
 
     // not shipped specimen deviation id
     brokenSpecimenDeviation: 472864016,

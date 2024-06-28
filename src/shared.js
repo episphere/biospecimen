@@ -2801,9 +2801,8 @@ export const checkInParticipant = async (data, visitConcept) => {
   const uid = data.state.uid;
   let shouldSendBioEmail = false;
 
-  if (data[conceptIds.selectedVisit]) {
-    visits = data[conceptIds.selectedVisit];
-
+  if (data[conceptIds.collection.selectedVisit]) {
+    visits = data[conceptIds.collection.selectedVisit];
     if (!visits[visitConcept]) {
       if (visitConcept === conceptIds.baseline.visitId.toString()) shouldSendBioEmail = true;
 
