@@ -578,10 +578,9 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
                 }, 1500);
             } else {
                 const visitConcept = document.getElementById('visit-select').value;
-                
                 const isClinicalUrineOrBloodCollected = checkClinicalBloodOrUrineCollected(data);
-                if (isClinicalUrineOrBloodCollected) return;
 
+                if (isClinicalUrineOrBloodCollected) return;
 
                 for (const visit of visitType) {
                     if (data[conceptIds.collection.selectedVisit] && data[conceptIds.collection.selectedVisit][visit.concept]) {
@@ -696,7 +695,6 @@ export const goToParticipantSearch = () => {
 export const addEventSpecimenLinkForm = (formData) => {
     const form = document.getElementById('researchSpecimenContinue');
     const connectId = document.getElementById('researchSpecimenContinue').dataset.connectId;
-    // Note: Can use this connectId value to get related biospecimen documents
 
     if (document.getElementById('navBarParticipantCheckIn')) document.getElementById('navBarParticipantCheckIn').dataset.connectId = connectId;
 

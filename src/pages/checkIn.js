@@ -12,11 +12,8 @@ export const checkInTemplate = async (data, checkOutFlag) => {
     }
 
     const isCheckedIn = checkedIn(data);
-    console.log("Check In template data", data)
-    console.log("🚀 ~ checkInTemplate ~ isCheckedIn:", isCheckedIn)
     const canCheckIn = participantCanCheckIn(data);
     const visit = getCheckedInVisit(data);
-    console.log("🚀 ~ checkInTemplate ~ visit:", visit)
 
     const response = await getParticipantCollections(data.token);
     let collections = [];
@@ -79,7 +76,6 @@ export const checkInTemplate = async (data, checkOutFlag) => {
             <hr/>
     `;
     
-    console.log("collections", collections)
     template += await participantStatus(data, collections);
 
 
@@ -135,11 +131,9 @@ const participantStatus = (data, collections) => {
     let siteTubesList = getSiteTubesLists({'951355211': conceptIds.research});
 
     const bloodTubes = siteTubesList?.filter(tube => tube.tubeType === "Blood tube");
-    console.log("🚀 ~ participantStatus ~ bloodTubes:", bloodTubes)
     const urineTubes = siteTubesList?.filter(tube => tube.tubeType === "Urine");
-    console.log("🚀 ~ participantStatus ~ urineTubes:", urineTubes)
     const mouthwashTubes = siteTubesList?.filter(tube => tube.tubeType === "Mouthwash");
-    console.log("🚀 ~ participantStatus ~ mouthwashTubes:", mouthwashTubes)
+
 
     collections = collections.filter(collection => collection[conceptIds.collection.selectedVisit] == conceptIds.baseline.visitId);
 
