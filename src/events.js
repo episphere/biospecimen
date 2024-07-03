@@ -539,6 +539,7 @@ export const addGoToCheckInEvent = () => {
 
 export const addGoToSpecimenLinkEvent = () => {
     const specimenLinkButtons = document.querySelectorAll('button[data-specimen-link-connect-id]');
+
     for (const btn of specimenLinkButtons) {
         btn.addEventListener('click', async () => {
         let query = `connectId=${parseInt(btn.dataset.specimenLinkConnectId)}`;
@@ -562,7 +563,6 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
             
             const response = await findParticipant(query);
             const data = response.data[0];
-            console.log("🚀 ~ addEventCheckInCompleteForm ~ data:", data)
 
             if (isCheckedIn) {
                 showAnimation();
@@ -579,8 +579,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
             } else {
                 const visitConcept = document.getElementById('visit-select').value;
                 
-                const isClinicalUrineOrBloodCollected = checkClinicalBloodOrUrineCollected(data)
-
+                const isClinicalUrineOrBloodCollected = checkClinicalBloodOrUrineCollected(data);
                 if (isClinicalUrineOrBloodCollected) return;
 
 
@@ -590,7 +589,6 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
                         const now = new Date();
                         if (now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
                             const response = await getParticipantCollections(data.token);
-                            console.log("🚀 ~ addEventCheckInCompleteForm ~ response:", response)
                             let collection = response.data.filter(res => res[conceptIds.collection.selectedVisit] == visit.concept);
                             if (collection.length === 0) continue;
                             const confirmContinueCheckIn = await handleCheckInWarning(visit, data, collection);
@@ -599,7 +597,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
                     }
                 }
     
-                // await handleCheckInModal(data, visitConcept, query);
+                await handleCheckInModal(data, visitConcept, query);
             }
         } catch (error) {
             const bodyMessage = isCheckedIn ? 'There was an error checking out the participant. Please try again.' : 'There was an error checking in the participant. Please try again.';
@@ -609,15 +607,14 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
 };
 
 /**
- * Checks if the participant has a clinical blood or urine collected and any specimen collected at Regional. If participant has clinical blood or urine collected, show a notification and return true.
+ * Checks if the participant has a clinical blood or urine collected variable under baseline. If participant has clinical blood or urine collected, show a notification and return true.
  * @param {Object} data - participant data
  * @returns {Boolean} - true if participant has any clinical blood or urine collected, false otherwise
 */
 const checkClinicalBloodOrUrineCollected = (data) => {
     const isBloodOrUrineCollected = data?.[conceptIds.collectionDetails]?.[conceptIds.baseline.visitId]?.[conceptIds.clinicalBloodOrUrineCollected];
-    const anySpecimenCollectedRRL = data?.[conceptIds.collectionDetails]?.[conceptIds.baseline.visitId]?.[conceptIds.anySpecimenCollected];
 
-    if (isBloodOrUrineCollected === conceptIds.yes && anySpecimenCollectedRRL === conceptIds.yes) { 
+    if (isBloodOrUrineCollected === conceptIds.yes) { 
         const bodyMessage = 'Check In not allowed, participant already has clinical collection for this timepoint.'
         showNotifications({ title: 'Check In Error', body: bodyMessage });
         return true;
@@ -706,7 +703,7 @@ export const addEventSpecimenLinkForm = (formData) => {
     form.addEventListener('click', async (e) => {
         e.preventDefault();
         const collections = await getCollectionsByVisit(formData);
-        console.log("🚀 ~ form.addEventListener ~ collections:", collections, "--", "formData:", formData)
+
         if (collections.length) {
             existingCollectionAlert(collections, connectId, formData);
         } else {
@@ -758,8 +755,7 @@ const existingCollectionAlert = async (collections, connectId, formData) => {
  * @param {string} connectId 
  * @param {*} formData 
  */
-const btnsClicked = async (connectId, formData) => { 
-    console.log("🚀 ~ btnsClicked ~ connectId, formData:", connectId, formData)
+const btnsClicked = async (connectId, formData) => {
     removeAllErrors();
 
     let scanSpecimenID = document.getElementById('scanSpecimenID')?.value && document.getElementById('scanSpecimenID')?.value.toUpperCase();
@@ -824,18 +820,15 @@ const btnsClicked = async (connectId, formData) => {
         
     }
     hideAnimation();
-    console.log("🚀 ~ btnsClicked ~ specimenData:", specimenData)
+
     if (specimenData?.Connect_ID && parseInt(specimenData.Connect_ID) !== particpantData.Connect_ID) {
         showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different Connect ID.' })
         return;
     }
 
     showAnimation();
+
     formData[conceptIds.collection.selectedVisit] = formData?.[conceptIds.collection.selectedVisit] || parseInt(getCheckedInVisit(particpantData));
-    console.log("🚀 ~ btnsClicked ~ parseInt(getCheckedInVisit(particpantData)):", parseInt(getCheckedInVisit(particpantData)))
-    console.log("____")
-    console.log("🚀 ~ btnsClicked ~ formData?.[conceptIds.collection.selectedVisit]:", formData?.[conceptIds.collection.selectedVisit])
-    
     
     if (!formData?.collectionId) {
         console.log("Form data to be added:", formData);
