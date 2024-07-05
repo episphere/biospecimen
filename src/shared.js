@@ -489,8 +489,64 @@ export const showNotificationsSelectableList = (message, items, onCancel, onCont
             errorMessageDiv.style.display = 'block';
         }
     });
-
     document.getElementById('root').removeChild(button);
+};
+
+/**
+ * Display confirmation modal to the user and returns a promise with the user's choice.
+ *  
+ * @param {string} collectionID - the collection ID to display in the modal.
+ * @param {string} firstName - the participant's first name to display in the modal.
+ * @returns {Promise<string>} - the user's choice on button click: 'cancel', 'back', or 'confirmed'.
+*/
+export const showConfirmationModal =  (collectionID, firstName) => {
+    return new Promise((resolve) => {
+        const modalContainer = document.createElement('div');
+        modalContainer.classList.add('modal', 'fade');
+        modalContainer.id = 'confirmationModal';
+        modalContainer.tabIndex = '-1';
+        modalContainer.role = 'dialog';
+        modalContainer.setAttribute('aria-labelledby', 'exampleModalCenterTitle');
+        modalContainer.setAttribute('aria-hidden', 'true');
+        const modalContent = document.createElement('div');
+        modalContent.classList.add('modal-dialog', 'modal-dialog-centered');
+        modalContent.setAttribute('role', 'document');
+
+        const modalBody = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Collection ID</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Collection ID: ${collectionID}</p>
+                    <p>Confirm ID is correct for participant: ${firstName}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" data-result="cancel">Cancel</button>
+                    <button type="button" class="btn btn-info" data-result="back" data-dismiss="modal">Confirm and Exit</button>
+                    <button type="button" class="btn btn-success" data-result="confirmed" data-dismiss="modal">Confirm and Continue</button>
+                </div>
+            </div>
+        `;
+
+        modalContent.innerHTML = modalBody;
+        modalContainer.appendChild(modalContent);
+        document.body.appendChild(modalContainer);
+
+        modalContainer.classList.add('show');
+        modalContainer.style.display = 'block';
+        modalContainer.addEventListener('click', (event) => {
+            const result = event.target.getAttribute('data-result');
+            if (result) 
+            {
+                document.body.removeChild(modalContainer);
+                resolve(result);
+            }
+        });
+    });
 };
 
 export const showTimedNotifications = (data, zIndex, timeInMilliseconds = 2600) => {

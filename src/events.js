@@ -6,7 +6,8 @@ import {
     convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, participantCanCheckIn, shippingPrintManifestReminder,
     checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData,
     siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
-    getCollectionsByVisit, getSpecimenAndParticipant, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showModalNotification, showTimedNotifications, showNotificationsCancelOrContinue, validateSpecimenAndParticipantResponse, findReplacementTubeLabels,
+    getCollectionsByVisit, getSpecimenAndParticipant, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showModalNotification, showTimedNotifications, showNotificationsCancelOrContinue, validateSpecimenAndParticipantResponse, findReplacementTubeLabels, 
+    showConfirmationModal,
 } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
@@ -818,7 +819,6 @@ const btnsClicked = async (connectId, formData) => {
         
     }
     hideAnimation();
-
     if (specimenData?.Connect_ID && parseInt(specimenData.Connect_ID) !== particpantData.Connect_ID) {
         showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different Connect ID.' })
         return;
@@ -854,57 +854,6 @@ const btnsClicked = async (connectId, formData) => {
         searchTemplate();
     }
 }
-    
-
-const showConfirmationModal = async (collectionID, firstName) => {
-    return new Promise((resolve) => {
-        const modalContainer = document.createElement('div');
-        modalContainer.classList.add('modal', 'fade');
-        modalContainer.id = 'confirmationModal';
-        modalContainer.tabIndex = '-1';
-        modalContainer.role = 'dialog';
-        modalContainer.setAttribute('aria-labelledby', 'exampleModalCenterTitle');
-        modalContainer.setAttribute('aria-hidden', 'true');
-        const modalContent = document.createElement('div');
-        modalContent.classList.add('modal-dialog', 'modal-dialog-centered');
-        modalContent.setAttribute('role', 'document');
-
-        const modalBody = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Collection ID</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Collection ID: ${collectionID}</p>
-                    <p>Confirm ID is correct for participant: ${firstName}</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" data-result="cancel">Cancel</button>
-                    <button type="button" class="btn btn-info" data-result="back" data-dismiss="modal">Confirm and Exit</button>
-                    <button type="button" class="btn btn-success" data-result="confirmed" data-dismiss="modal">Confirm and Continue</button>
-                </div>
-            </div>
-        `;
-
-        modalContent.innerHTML = modalBody;
-        modalContainer.appendChild(modalContent);
-        document.body.appendChild(modalContainer);
-
-        modalContainer.classList.add('show');
-        modalContainer.style.display = 'block';
-        modalContainer.addEventListener('click', (event) => {
-            const result = event.target.getAttribute('data-result');
-            if (result) 
-            {
-                document.body.removeChild(modalContainer);
-                resolve(result);
-            }
-        });
-    });
-};
 
 
 /**
