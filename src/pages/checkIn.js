@@ -75,7 +75,7 @@ export const checkInTemplate = async (data, checkOutFlag) => {
             
             <hr/>
     `;
-
+    
     template += await participantStatus(data, collections);
 
 
@@ -133,6 +133,7 @@ const participantStatus = (data, collections) => {
     const bloodTubes = siteTubesList?.filter(tube => tube.tubeType === "Blood tube");
     const urineTubes = siteTubesList?.filter(tube => tube.tubeType === "Urine");
     const mouthwashTubes = siteTubesList?.filter(tube => tube.tubeType === "Mouthwash");
+
 
     collections = collections.filter(collection => collection[conceptIds.collection.selectedVisit] == conceptIds.baseline.visitId);
 
