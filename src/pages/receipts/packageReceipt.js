@@ -369,12 +369,6 @@ const clearPackageReceiptForm = (isSuccess) => {
     
     const dateReceived = document.getElementById("dateReceived");
     if (dateReceived) dateReceived.value = getCurrentDate();
-
-    const dateCollectionCard = document.getElementById("dateCollectionCard");
-    if (dateCollectionCard) dateCollectionCard.value = '';
-
-    const timeCollectionCard = document.getElementById("timeCollectionCard");
-    if (timeCollectionCard) timeCollectionCard.value = '';
     
     const collectionComments = document.getElementById("collectionComments");
     if (collectionComments) collectionComments.value = '';
