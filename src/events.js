@@ -608,11 +608,11 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
 
 /**
  * Checks if the participant has any specimen collected (clinical blood or clinical urine) under baseline from the dashboard or collected clinical blood or urine derivations from the site EMR API. If participant has either a clinical blood or urine dashboard variable or other blood/urine derived variables from the site EMR API, show a notification and return true.
- * @param {Object} data - participant data
+ * @param {Object} participantData - participant document data from find participant query
  * @returns {Boolean} - true if participant has any clinical blood or urine collected derivations, false otherwise
 */
-const checkClinicalBloodOrUrineCollected = (data) => {
-    const collectionDetailsBaseline = data?.[conceptIds.collectionDetails]?.[conceptIds.baseline.visitId];
+const checkClinicalBloodOrUrineCollected = (participantData) => {
+    const collectionDetailsBaseline = participantData?.[conceptIds.collectionDetails]?.[conceptIds.baseline.visitId];
     if (!collectionDetailsBaseline) return false;
 
     const collectedBaselineStatuses = [
@@ -621,7 +621,7 @@ const checkClinicalBloodOrUrineCollected = (data) => {
         collectionDetailsBaseline?.[conceptIds.clinicalSiteUrineCollected],
         collectionDetailsBaseline?.[conceptIds.clinicalSiteBloodRRLReceived],
         collectionDetailsBaseline?.[conceptIds.clinicalSiteUrineRRLReceived]
-    ]
+    ];
 
     if (collectedBaselineStatuses.includes(conceptIds.yes)) { 
         const modalIcon = `<i class="fas fa-exclamation-circle" style="color: red; font-size: 1.4rem;"></i>`
