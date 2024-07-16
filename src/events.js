@@ -624,8 +624,9 @@ const checkClinicalBloodOrUrineCollected = (data) => {
     ]
 
     if (collectedBaselineStatuses.includes(conceptIds.yes)) { 
-        const bodyMessage = 'Check In not allowed, participant already has clinical collection for this timepoint.'
-        showNotifications({ title: 'Check In Error', body: bodyMessage });
+        const modalIcon = `<i class="fas fa-exclamation-circle" style="color: red; font-size: 1.4rem;"></i>`
+        const bodyMessage = `Check In not allowed, participant already has clinical collection for this timepoint. If you have questions, contact the Connect Biospeicmen Team: <a href="mailto:connectbioteam@nih.gov">connectbioteam@nih.gov</a>.`
+        showNotifications({ title: `${modalIcon} WARNING`, body: bodyMessage });
         return true;
     }
     return false;
