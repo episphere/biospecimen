@@ -607,7 +607,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
 };
 
 /**
- * Checks if the participant has any specimen collected (clinical blood or a clinical urine) under baseline from the dashboard or collected clinical/blood derivations from the site EMR API. If participant has either a clinical blood or urine dashboard variable or other blood/urine derived variables from the site EMR API, show a notification and return true.
+ * Checks if the participant has any specimen collected (clinical blood or clinical urine) under baseline from the dashboard or collected clinical blood or urine derivations from the site EMR API. If participant has either a clinical blood or urine dashboard variable or other blood/urine derived variables from the site EMR API, show a notification and return true.
  * @param {Object} data - participant data
  * @returns {Boolean} - true if participant has any clinical blood or urine collected derivations, false otherwise
 */
