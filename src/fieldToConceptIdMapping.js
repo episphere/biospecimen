@@ -142,6 +142,12 @@ export const conceptIds = {
     checkInComplete: 135591601,
     clinicalBloodOrUrineCollected: 156605577,
 
+    // Site EMR API Clinical baseline derivations
+    clinicalSiteBloodCollected: 693370086,
+    clinicalSiteUrineCollected: 786930107,
+    clinicalSiteBloodRRLReceived: 728696253,
+    clinicalSiteUrineRRLReceived: 453452655,
+
     // not shipped specimen deviation id
     brokenSpecimenDeviation: 472864016,
     discardSpecimenDeviation: 810960823,

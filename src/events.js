@@ -607,16 +607,26 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
 };
 
 /**
- * Checks if the participant has a clinical blood or urine collected variable under baseline. If participant has clinical blood or urine collected, show a notification and return true.
- * @param {Object} data - participant data
- * @returns {Boolean} - true if participant has any clinical blood or urine collected, false otherwise
+ * Checks if the participant has any specimen collected (clinical blood or clinical urine) under baseline from the dashboard or collected clinical blood or urine derivations from the site EMR API. If participant has either a clinical blood or urine dashboard variable or other blood/urine derived variables from the site EMR API, show a notification and return true.
+ * @param {Object} participantData - participant document data from find participant query
+ * @returns {Boolean} - true if participant has any clinical blood or urine collected derivations, false otherwise
 */
-const checkClinicalBloodOrUrineCollected = (data) => {
-    const isBloodOrUrineCollected = data?.[conceptIds.collectionDetails]?.[conceptIds.baseline.visitId]?.[conceptIds.clinicalBloodOrUrineCollected];
+const checkClinicalBloodOrUrineCollected = (participantData) => {
+    const collectionDetailsBaseline = participantData?.[conceptIds.collectionDetails]?.[conceptIds.baseline.visitId];
+    if (!collectionDetailsBaseline) return false;
 
-    if (isBloodOrUrineCollected === conceptIds.yes) { 
-        const bodyMessage = 'Check In not allowed, participant already has clinical collection for this timepoint.'
-        showNotifications({ title: 'Check In Error', body: bodyMessage });
+    const collectedBaselineStatuses = [
+        collectionDetailsBaseline?.[conceptIds.anySpecimenCollected],
+        collectionDetailsBaseline?.[conceptIds.clinicalSiteBloodCollected],
+        collectionDetailsBaseline?.[conceptIds.clinicalSiteUrineCollected],
+        collectionDetailsBaseline?.[conceptIds.clinicalSiteBloodRRLReceived],
+        collectionDetailsBaseline?.[conceptIds.clinicalSiteUrineRRLReceived]
+    ];
+
+    if (collectedBaselineStatuses.includes(conceptIds.yes)) { 
+        const modalIcon = `<i class="fas fa-exclamation-circle" style="color: red; font-size: 1.4rem;"></i>`
+        const bodyMessage = `Check In not allowed, participant already has clinical collection for this timepoint. If you have questions, contact the Connect Biospeicmen Team: <a href="mailto:connectbioteam@nih.gov">connectbioteam@nih.gov</a>.`
+        showNotifications({ title: `${modalIcon} WARNING`, body: bodyMessage });
         return true;
     }
     return false;
