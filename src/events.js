@@ -571,7 +571,6 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
                 hideAnimation();
                 showTimedNotifications({ title: 'Success', body: 'Participant is checked out.' }, 100000, 1500);
                 setTimeout(() => {
-                    dismissBiospecimenModal();
                     checkOutFlag === true ? location.reload() : goToParticipantSearch(); 
                 }, 1500);
             } else {
@@ -626,7 +625,6 @@ const checkClinicalBloodOrUrineCollected = (participantData) => {
         const bodyMessage = `Check In not allowed, participant already has clinical collection for this timepoint. If you have questions, contact the Connect Biospeicmen Team: <a href="mailto:connectbioteam@nih.gov">connectbioteam@nih.gov</a>.`
 
         showNotifications({ title: `${modalIcon} WARNING`, body: bodyMessage });
-        const biospecimenModal = document.getElementById('biospecimenModal');
         return true;
     }
     return false;
