@@ -608,7 +608,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
  * @param {Object} participantData - participant document data from find participant query
  * @returns {Boolean} - true if participant has any clinical blood or urine collected derivations, false otherwise
 */
-const checkClinicalBloodOrUrineCollected = (participantData) => {    
+const checkClinicalBloodOrUrineCollected = (participantData) => {
     const collectionDetailsBaseline = participantData?.[conceptIds.collectionDetails]?.[conceptIds.baseline.visitId];
     
     if (!collectionDetailsBaseline) return false;
