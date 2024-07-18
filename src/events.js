@@ -558,7 +558,6 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
         e.preventDefault();
         try {
             const btnCheckIn = document.getElementById('checkInComplete');
-            btnCheckIn.disabled = true;
             
             let query = `connectId=${parseInt(form.dataset.connectId)}`;
             
@@ -599,6 +598,8 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
     
                 await handleCheckInModal(data, visitConcept, query);
             }
+            btnCheckIn.disabled = true;
+            
         } catch (error) {
             const bodyMessage = isCheckedIn ? 'There was an error checking out the participant. Please try again.' : 'There was an error checking in the participant. Please try again.';
             showNotifications({ title: 'Error', body: bodyMessage });
