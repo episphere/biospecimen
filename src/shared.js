@@ -2326,7 +2326,7 @@ export const locationConceptIDToLocationMap = {
         loginSiteName: 'Baylor Scott & White Health',
         email: 'connectbiospecimen@BSWHealth.org',
     },
-    'placeholder': {
+    288564244: {
         siteSpecificLocation: 'BCC- Fort Worth',
         siteAcronym: 'BSWH',
         siteCode: '472940358',
@@ -2418,7 +2418,7 @@ export const conceptIdToSiteSpecificLocation = {
   [conceptIds.nameToKeyObj.sfSC]: "Sioux Falls Sanford Center",
   723351427: "BCC- HWC",
   807443231: "FW All Saints",
-  'placeholder': "BCC- Fort Worth",
+  288564244: "BCC- Fort Worth",
   475614532: "BCC- Plano",
   809370237: "BCC- Worth St",
   856158129: "BCC- Irving",
@@ -2459,7 +2459,7 @@ export const siteSpecificLocationToConceptId = {
   "Sioux Falls Sanford Center": conceptIds.nameToKeyObj.sfSC,
   "BCC- HWC": 723351427,
   "FW All Saints": 807443231,
-  "BCC- Fort Worth": '', // placeholder
+  "BCC- Fort Worth": 288564244,
   "BCC- Plano": 475614532,
   "BCC- Worth St": 809370237,
   "BCC- Irving": 856158129,
@@ -2538,15 +2538,15 @@ export const keyToLocationObj =
     589224449: "Sioux Falls Imagenetics",
     [conceptIds.nameToKeyObj.sfBM] : "Bismarck Medical Center",
     [conceptIds.nameToKeyObj.sfSC] : "Sioux Falls Sanford Center",
-    723351427:'BCC- HWC',
-    807443231:'FW All Saints',
-    '':'BCC- Fort Worth',
-    475614532:'BCC- Plano',
-    809370237:'BCC- Worth St',
-    856158129:'BCC- Irving',
-    436956777:'NTX Biorepository',
+    723351427: 'BCC- HWC',
+    807443231: 'FW All Saints',
+    288564244: 'BCC- Fort Worth',
+    475614532: 'BCC- Plano',
+    809370237: 'BCC- Worth St',
+    856158129: 'BCC- Irving',
+    436956777: 'NTX Biorepository',
     111111111: "NIH",
-    13:"NCI"
+    13: "NCI"
 
 }
 
@@ -2758,7 +2758,7 @@ export const siteLocations = {
 
         'BSWH': [{location: 'BCC- HWC', concept: 723351427}, 
                 {location: 'FW All Saints', concept: 807443231}, 
-                {location: 'BCC- Fort Worth', concept: 'placeholder'}, 
+                {location: 'BCC- Fort Worth', concept: 288564244}, 
                 {location: 'BCC- Plano', concept: 475614532}, 
                 {location: 'BCC- Worth St', concept: 809370237}, 
                 {location: 'BCC- Irving', concept: 856158129}, 
