@@ -7,7 +7,7 @@ import {
     checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData,
     siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
     getCollectionsByVisit, getSpecimenAndParticipant, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showModalNotification, showTimedNotifications, showNotificationsCancelOrContinue, validateSpecimenAndParticipantResponse, findReplacementTubeLabels, 
-    showConfirmationModal,
+    showConfirmationModal, dismissBiospecimenModal
 } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
@@ -571,10 +571,6 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
                 hideAnimation();
                 showTimedNotifications({ title: 'Success', body: 'Participant is checked out.' }, 100000, 1500);
                 setTimeout(() => {
-                    const closeButton = document.querySelector('#biospecimenModal .btn[data-dismiss="modal"]');
-                    if (closeButton) {
-                        closeButton.click();
-                    }
                     checkOutFlag === true ? location.reload() : goToParticipantSearch(); 
                 }, 1500);
             } else {
@@ -613,6 +609,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
 */
 const checkClinicalBloodOrUrineCollected = (participantData) => {
     const collectionDetailsBaseline = participantData?.[conceptIds.collectionDetails]?.[conceptIds.baseline.visitId];
+    
     if (!collectionDetailsBaseline) return false;
 
     const collectedBaselineStatuses = [
@@ -623,9 +620,10 @@ const checkClinicalBloodOrUrineCollected = (participantData) => {
         collectionDetailsBaseline?.[conceptIds.clinicalSiteUrineRRLReceived]
     ];
 
-    if (collectedBaselineStatuses.includes(conceptIds.yes)) { 
+    if (collectedBaselineStatuses.includes(conceptIds.yes)) {
         const modalIcon = `<i class="fas fa-exclamation-circle" style="color: red; font-size: 1.4rem;"></i>`
         const bodyMessage = `Check In not allowed, participant already has clinical collection for this timepoint. If you have questions, contact the Connect Biospeicmen Team: <a href="mailto:connectbioteam@nih.gov">connectbioteam@nih.gov</a>.`
+
         showNotifications({ title: `${modalIcon} WARNING`, body: bodyMessage });
         return true;
     }
@@ -662,12 +660,15 @@ const handleCheckInModal = async (data, visitConcept, query) => {
         continueButtonText: "Continue to Specimen Link",
     };
 
-    const checkInOnCancel = () => {  };
+    const checkInOnCancel = () => {
+        dismissBiospecimenModal();
+      };
     const checkInOnContinue = async () => {
         try {
             const updatedResponse = await findParticipant(query);
             const updatedData = updatedResponse.data[0];
-    
+
+            dismissBiospecimenModal();
             specimenTemplate(updatedData);
         } catch (error) {
             showNotifications({ title: 'Error', body: 'There was an error checking in the participant. Please try again.' });
@@ -839,7 +840,6 @@ const btnsClicked = async (connectId, formData) => {
     formData[conceptIds.collection.selectedVisit] = formData?.[conceptIds.collection.selectedVisit] || parseInt(getCheckedInVisit(particpantData));
     
     if (!formData?.collectionId) {
-        console.log("Form data to be added:", formData);
         const storeResponse = await storeSpecimen([formData]);  
         if (storeResponse.code === 400) {
             hideAnimation();

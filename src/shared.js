@@ -578,10 +578,7 @@ export const showTimedNotifications = (data, zIndex, timeInMilliseconds = 2600) 
 
     // Programmatically close the modal on a timer.
     setTimeout(() => {
-        const closeButton = document.querySelector('#biospecimenModal .btn[data-dismiss="modal"]');
-        if (closeButton) {
-            closeButton.click();
-        }
+        dismissBiospecimenModal()
     }, timeInMilliseconds);
 };
 
@@ -602,6 +599,15 @@ const closeBiospecimenModal = () => {
 
     document.body.classList.remove('modal-open');
 };
+
+/**
+ * Targets close button on biospecimen bootstrap modal and closes it. Can be used to close and dismiss modal for other buttons on the modal.
+ * */  
+export const dismissBiospecimenModal = () => { 
+    const closeButton = document.querySelector('#biospecimenModal .btn[data-dismiss="modal"]');
+
+    if (closeButton) closeButton.click();
+}
 
 export const errorMessage = (id, msg, focus, offset, icon) => {
     const currentElement = document.getElementById(id);
