@@ -2072,6 +2072,7 @@ export const siteSpecificLocation = {
   "Orland Park": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
   "BCC- HWC": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
   "FW All Saints": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- Fort Worth": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
   "BCC- Plano": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
   "BCC- Worth St": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
   "BCC- Irving": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
@@ -2331,6 +2332,14 @@ export const locationConceptIDToLocationMap = {
         loginSiteName: 'Baylor Scott & White Health',
         email: 'connectbiospecimen@BSWHealth.org',
     },
+    288564244: {
+        siteSpecificLocation: 'BCC- Fort Worth',
+        siteAcronym: 'BSWH',
+        siteCode: '472940358',
+        siteTeam: 'BSWH Connect Study Team',
+        loginSiteName: 'Baylor Scott & White Health',
+        email: 'connectbiospecimen@BSWHealth.org',
+    },
     475614532: {
         siteSpecificLocation: 'BCC- Plano',
         siteAcronym: 'BSWH',
@@ -2415,6 +2424,7 @@ export const conceptIdToSiteSpecificLocation = {
   [conceptIds.nameToKeyObj.sfSC]: "Sioux Falls Sanford Center",
   723351427: "BCC- HWC",
   807443231: "FW All Saints",
+  288564244: "BCC- Fort Worth",
   475614532: "BCC- Plano",
   809370237: "BCC- Worth St",
   856158129: "BCC- Irving",
@@ -2455,6 +2465,7 @@ export const siteSpecificLocationToConceptId = {
   "Sioux Falls Sanford Center": conceptIds.nameToKeyObj.sfSC,
   "BCC- HWC": 723351427,
   "FW All Saints": 807443231,
+  "BCC- Fort Worth": 288564244,
   "BCC- Plano": 475614532,
   "BCC- Worth St": 809370237,
   "BCC- Irving": 856158129,
@@ -2533,14 +2544,15 @@ export const keyToLocationObj =
     589224449: "Sioux Falls Imagenetics",
     [conceptIds.nameToKeyObj.sfBM] : "Bismarck Medical Center",
     [conceptIds.nameToKeyObj.sfSC] : "Sioux Falls Sanford Center",
-    723351427:'BCC- HWC',
-    807443231:'FW All Saints',
-    475614532:'BCC- Plano',
-    809370237:'BCC- Worth St',
-    856158129:'BCC- Irving',
-    436956777:'NTX Biorepository',
+    723351427: 'BCC- HWC',
+    807443231: 'FW All Saints',
+    288564244: 'BCC- Fort Worth',
+    475614532: 'BCC- Plano',
+    809370237: 'BCC- Worth St',
+    856158129: 'BCC- Irving',
+    436956777: 'NTX Biorepository',
     111111111: "NIH",
-    13:"NCI"
+    13: "NCI"
 
 }
 
@@ -2752,6 +2764,7 @@ export const siteLocations = {
 
         'BSWH': [{location: 'BCC- HWC', concept: 723351427}, 
                 {location: 'FW All Saints', concept: 807443231}, 
+                {location: 'BCC- Fort Worth', concept: 288564244}, 
                 {location: 'BCC- Plano', concept: 475614532}, 
                 {location: 'BCC- Worth St', concept: 809370237}, 
                 {location: 'BCC- Irving', concept: 856158129}, 
