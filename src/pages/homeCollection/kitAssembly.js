@@ -204,7 +204,7 @@ const renderSidePane = () => {
         Return Kit ID = ${ kitObject[conceptIds.returnKitId] } |
         Cup Id = ${ kitObject[conceptIds.collectionCupId] } |
         Card Id = ${ kitObject[conceptIds.collectionCardId] }
-        <button type="button" class="btn btn-outline-primary detailedRow" data-kitObject=${JSON.stringify(kitObject)} id="editAssembledKits">Edit</button>
+        <button type="button" class="btn btn-outline-primary detailedRow" data-kitObject=${encodeURIComponent(JSON.stringify(kitObject))} id="editAssembledKits">Edit</button>
       </ul>`
   })
   editAssembledKits();
@@ -217,7 +217,8 @@ const editAssembledKits = () => {
   if (detailedRow) {
     Array.from(detailedRow).forEach(function(editKitBtn) {
       editKitBtn.addEventListener('click', () => {
-        const editKitObj = JSON.parse(editKitBtn.getAttribute('data-kitObject'));
+        let data = decodeURIComponent(editKitBtn.getAttribute('data-kitObject'));
+        const editKitObj = JSON.parse(data);
         document.getElementById('scannedBarcode').value = editKitObj[conceptIds.returnKitTrackingNum]
         document.getElementById('supplyKitId').value = editKitObj[conceptIds.supplyKitId]
         document.getElementById('returnKitId').value = editKitObj[conceptIds.returnKitId]
@@ -228,9 +229,9 @@ const editAssembledKits = () => {
     }); // state to indicate if its an edit & also pass the uniqueKitID
 }}
 
-const checkUniqueness = async (supplyKitId, collectionId) => {
+const checkUniqueness = async (supplyKitId, collectionId, returnKitTrackingNumber) => {
   const idToken = await getIdToken();
-  const response = await fetch(`${baseAPI}api=collectionUniqueness&supplyKitId=${supplyKitId}&collectionId=${collectionId}`, {
+  const response = await fetch(`${baseAPI}api=collectionUniqueness&supplyKitId=${supplyKitId}&collectionId=${collectionId}&returnKitTrackingNumber=${returnKitTrackingNumber}`, {
       method: "GET",
       headers: {
           Authorization:"Bearer "+idToken
@@ -244,7 +245,7 @@ const storeAssembledKit = async (kitData) => {
   showAnimation();
   const collectionUnique = appState.getState().uniqueKitID !== ''
     ? { data: true } 
-    : await checkUniqueness(kitData[conceptIds.supplyKitId], kitData?.[conceptIds.collectionCupId].replace(/\s/g, "\n"));
+    : await checkUniqueness(kitData[conceptIds.supplyKitId], kitData?.[conceptIds.collectionCupId].replace(/\s/g, "\n"), kitData[conceptIds.returnKitTrackingNum]);
   hideAnimation();
 
   if (collectionUnique.data === true) {
@@ -310,6 +311,14 @@ const storeAssembledKit = async (kitData) => {
   }
   else if (collectionUnique.data === 'duplicate collection id'){
     alertTemplate('The collection card and cup ID are already in use.');
+    return false
+  }
+  else if (collectionUnique.data === 'duplicate return kit tracking number'){
+    alertTemplate('This tracking number has already been used.');
+    return false
+  }
+  else if (collectionUnique.data === 'return kit tracking number is for supply kit'){
+    alertTemplate('This tracking number has already been used.');
     return false
   }
   else {
