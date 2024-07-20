@@ -29,6 +29,7 @@ import { collectionIdSearchScreen } from "./src/pages/reports/collectionIdSearch
 import { bptlShipReportsScreen } from "./src/pages/reports/shippingReport.js";
 import { checkOutReportTemplate } from "./src/pages/checkOutReport.js";
 import { dailyReportTemplate } from "./src/pages/dailyReport.js";
+import appVersion from "./appVersion.js";
 
 //test
 
@@ -136,3 +137,13 @@ const userLoggedIn = () => {
         });
     });
 };
+
+(function displayAppVersion() {
+    document.addEventListener('DOMContentLoaded', function() {
+        const contentWrapper = document.querySelector('.footer-content .content-wrapper');
+
+        const newElement = document.createElement('div');
+        newElement.innerHTML = `<p id="appVersion">${appVersion.versionNumber}</p>`;
+        contentWrapper.appendChild(newElement);
+    });
+})();

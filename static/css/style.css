@@ -473,3 +473,7 @@ box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
     cursor: not-allowed;
     background-color: #e0e0e0;
 }
+
+#appVersion {
+    font-size: 0.8rem;
+}
