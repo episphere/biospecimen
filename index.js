@@ -138,26 +138,6 @@ const userLoggedIn = () => {
     });
 };
 
-
-const fetchAppVersionFromCache = async () => {
-    try {
-      const cache = await caches.open('app-version-cache');
-      const response = await cache.match('./appVersion.js');
-  
-      if (!response) return;
-  
-      const appVersionText = await response.text();
-      const versionMatch = appVersionText.match(/"versionNumber":\s*"(.+?)"/);       
-
-      if (!versionMatch) return;
-  
-      return versionMatch[1];
-    } catch (error) {
-      console.error('Error fetching app version:', error);
-      return 'Error fetching version';
-    }
-  }
-
 /**
  * This function is an async function that checks if the service worker is supported by the browser
  * If it is supported, it registers the service worker
@@ -204,3 +184,22 @@ const updateVersionDisplay = async () => {
         versionElement.textContent = versionNumber;
     }
 };
+
+const fetchAppVersionFromCache = async () => {
+    try {
+        const cache = await caches.open('app-version-cache');
+        const response = await cache.match('./appVersion.js');
+
+        if (!response) return;
+
+        const appVersionText = await response.text();
+        const versionMatch = appVersionText.match(/"versionNumber"\s*:\s*"(v\d+\.\d+\.\d+)"/);       
+
+        if (!versionMatch) return;
+
+        return versionMatch[1];
+    } catch (error) {
+        console.error('Error fetching app version:', error);
+        return 'Error fetching version';
+    }
+}
