@@ -29,7 +29,6 @@ import { collectionIdSearchScreen } from "./src/pages/reports/collectionIdSearch
 import { bptlShipReportsScreen } from "./src/pages/reports/shippingReport.js";
 import { checkOutReportTemplate } from "./src/pages/checkOutReport.js";
 import { dailyReportTemplate } from "./src/pages/dailyReport.js";
-import appVersion from "./appVersion.js";
 
 //test
 
@@ -50,14 +49,15 @@ const datadogConfig = {
 
 const isLocalDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
-window.onload = () => {
-    if ("serviceWorker" in navigator) {
-        try {
-            navigator.serviceWorker.register("./serviceWorker.js");
-        } catch (error) {
-            console.log(error);
-        }
+
+window.onload = async () => {
+    try {
+        await registerServiceWorker();
+        await updateVersionDisplay();
+    } catch (error) {
+        console.log(error);
     }
+
 
     if(location.host === urls.prod) {
         !firebase.apps.length ? firebase.initializeApp(prodFirebaseConfig()) : firebase.app();
@@ -138,12 +138,69 @@ const userLoggedIn = () => {
     });
 };
 
-(function displayAppVersion() {
-    document.addEventListener('DOMContentLoaded', function() {
-        const contentWrapper = document.querySelector('.footer-content .content-wrapper');
 
-        const newElement = document.createElement('div');
-        newElement.innerHTML = `<p id="appVersion">${appVersion.versionNumber}</p>`;
-        contentWrapper.appendChild(newElement);
-    });
-})();
+const fetchAppVersionFromCache = async () => {
+    try {
+      const cache = await caches.open('app-version-cache');
+      const response = await cache.match('./appVersion.js');
+  
+      if (!response) return;
+  
+      const appVersionText = await response.text();
+      const versionMatch = appVersionText.match(/"versionNumber":\s*"(.+?)"/);       
+
+      if (!versionMatch) return;
+  
+      return versionMatch[1];
+    } catch (error) {
+      console.error('Error fetching app version:', error);
+      return 'Error fetching version';
+    }
+  }
+
+/**
+ * This function is an async function that checks if the service worker is supported by the browser
+ * If it is supported, it registers the service worker
+ * If the service worker is already installed and there is a new service worker available, it refreshes the page
+*/
+const registerServiceWorker = async () => {
+    if ("serviceWorker" in navigator) {
+        try {
+        const registration = await navigator.serviceWorker.register("./serviceWorker.js");
+        // console.log('Service Worker registered');
+
+        registration.addEventListener('updatefound', () => { // This event fires when a new service worker is found
+            const newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => { // This event fires when the state of the service worker changes
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New content is available, refresh the page
+                console.log("Refreshing page");
+                window.location.reload();
+            }
+            });
+        });
+        } catch (error) {
+        console.log('Service Worker registration failed:', error);
+        }
+    }
+};
+
+/**
+ * Fetches the app version from the cache storage and updates the version display in the footer
+*/
+const updateVersionDisplay = async () => {
+    const versionNumber = await fetchAppVersionFromCache();
+    if (!versionNumber) return;
+
+    let versionElement = document.getElementById('appVersion');
+
+    if (!versionElement) { 
+        const contentWrapper = document.querySelector('.footer-content .content-wrapper');
+        if (!contentWrapper || !versionNumber) return;
+
+        versionElement = document.createElement('p');
+        versionElement.id = 'appVersion';
+        contentWrapper.appendChild(versionElement);
+        versionElement.textContent = versionNumber;
+    }
+};

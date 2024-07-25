@@ -1,4 +1,6 @@
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
+importScripts('./appVersion.js');
+
 workbox.setConfig({debug: false});
 const { registerRoute } = workbox.routing;
 const { CacheFirst, NetworkFirst, StaleWhileRevalidate, NetworkOnly } = workbox.strategies;
@@ -59,3 +61,28 @@ registerRoute(
     ],
   })
 );
+
+const cacheVersionName = `app-version-cache`;
+const precacheVersionAssets = ['/appVersion.js'];
+
+self.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(cacheVersionName)
+            .then((cache) => {
+                return cache.keys()
+                    .then((keys) => {
+                        const deletionPromises = keys
+                            .filter(key => key.url.includes('app-version-cache')) //
+                            .map(key => cache.delete(key));
+                            return Promise.all(deletionPromises);
+            })
+            .then(() => cache.addAll(precacheVersionAssets));
+            })
+            .then(() => {
+                self.skipWaiting(); // Forces the waiting service worker to become the active service worker
+            })
+            .catch(error => {
+                console.error('Cache update failed:', error);
+            })
+    );
+});
