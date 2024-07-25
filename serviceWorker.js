@@ -72,7 +72,7 @@ self.addEventListener('install', (event) => {
                 return cache.keys()
                     .then((keys) => {
                         const deletionPromises = keys
-                            .filter(key => key.url.includes('app-version-cache')) //
+                            .filter(key => key.url.includes('app-version-cache'))
                             .map(key => cache.delete(key));
                             return Promise.all(deletionPromises);
             })
