@@ -147,7 +147,7 @@ const registerServiceWorker = async () => {
     if ("serviceWorker" in navigator) {
         try {
         const registration = await navigator.serviceWorker.register("./serviceWorker.js");
-        // console.log('Service Worker registered');
+        console.log('Service Worker registered with scope:', registration.scope);
 
         registration.addEventListener('updatefound', () => { // This event fires when a new service worker is found
             const newWorker = registration.installing;
