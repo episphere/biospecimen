@@ -66,7 +66,7 @@ const datadogConfig = {
 
 const isLocalDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
-window.onload = async () => {
+window.onload = () => {
     if(location.host === urls.prod) {
         !firebase.apps.length ? firebase.initializeApp(prodFirebaseConfig()) : firebase.app();
         window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'prod' });
