@@ -1,19 +1,22 @@
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
-importScripts('./appVersion.js');
 
+const appVersion = "v24.7.0";
 workbox.setConfig({debug: false});
 const { registerRoute } = workbox.routing;
-const { CacheFirst, NetworkFirst, StaleWhileRevalidate, NetworkOnly } = workbox.strategies;
-const { CacheableResponse, CacheableResponsePlugin } = workbox.cacheableResponse;
+const { CacheFirst, NetworkFirst } = workbox.strategies;
 const { ExpirationPlugin } = workbox.expiration;
-const { BackgroundSyncPlugin } = workbox.backgroundSync
 const googleAnalytics = workbox.googleAnalytics;
+const cacheNameMapper = {
+  "static-cache": `static-cache-${appVersion}`,
+  "images-cache": `images-cache-${appVersion}`,
+};
+const currCacheNameArray = Object.values(cacheNameMapper);
 
 googleAnalytics.initialize();
-registerRoute(/\.(?:js|css)$/, new NetworkFirst({cacheName: 'static-cache'}));
+registerRoute(/\.(?:js|css|html)$/, new NetworkFirst({ cacheName: cacheNameMapper["static-cache"] }));
 registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico)$/,
     new CacheFirst({
-        cacheName: 'images-cache',
+        cacheName: cacheNameMapper["images-cache"],
         plugins: [
             new ExpirationPlugin({
                 maxEntries: 30,
@@ -23,66 +26,26 @@ registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico)$/,
     })
 );
 
-registerRoute(
-    new RegExp('https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/.+'),
-    new NetworkFirst({
-        cacheName: 'api-cache',
-        plugins: [
-            new CacheableResponsePlugin({
-                statuses: [200],
-            })
-        ]
-    }),
-    'GET'
-);
-
-
-const bgSyncPlugin = new BackgroundSyncPlugin('connectBiospecimen', {
-    maxRetentionTime: 24 * 60 // Retry for max of 24 Hours (specified in minutes)
+self.addEventListener("install", () => {
+  self.skipWaiting();
 });
 
-registerRoute(
-    new RegExp('https://us-central1-nih-nci-dceg-connect-dev.cloudfunctions.net/.+'),
-    new NetworkOnly({
-      plugins: [bgSyncPlugin]
-    }),
-    'POST'
-);
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (!currCacheNameArray.includes(cacheName)) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
 
-registerRoute(
-  /index\.html$/,
-  new NetworkFirst({
-    cacheName: 'index-html-cache',
-    networkTimeoutSeconds: 3,
-    plugins: [
-      new CacheableResponsePlugin({
-        statuses: [0, 200],
-      }),
-    ],
-  })
-);
-
-const cacheVersionName = `app-version-cache`;
-const precacheVersionAssets = ['/appVersion.js'];
-
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(cacheVersionName)
-            .then((cache) => {
-                return cache.keys()
-                    .then((keys) => {
-                        const deletionPromises = keys
-                            .filter(key => key.url.includes('app-version-cache'))
-                            .map(key => cache.delete(key));
-                            return Promise.all(deletionPromises);
-            })
-            .then(() => cache.addAll(precacheVersionAssets));
-            })
-            .then(() => {
-                self.skipWaiting(); // Forces the waiting service worker to become the active service worker
-            })
-            .catch(error => {
-                console.error('Cache update failed:', error);
-            })
-    );
+self.addEventListener("message", (event) => {
+  if (event.data.action === "getAppVersion") {
+    event.source.postMessage({ action: "sendAppVersion", payload: appVersion });
+  }
 });

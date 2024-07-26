@@ -30,7 +30,24 @@ import { bptlShipReportsScreen } from "./src/pages/reports/shippingReport.js";
 import { checkOutReportTemplate } from "./src/pages/checkOutReport.js";
 import { dailyReportTemplate } from "./src/pages/dailyReport.js";
 
-//test
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./serviceWorker.js").catch((error) => {
+    console.error("Service worker registration failed.", error);
+    return;
+  });
+
+  navigator.serviceWorker.ready.then(() => {
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ action: "getAppVersion" });
+    }
+  });
+
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data.action === "sendAppVersion") {
+      document.getElementById("appVersion").textContent = event.data.payload;
+    }
+  });
+}
 
 let auth = '';
 
@@ -49,16 +66,7 @@ const datadogConfig = {
 
 const isLocalDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
-
 window.onload = async () => {
-    try {
-        await registerServiceWorker();
-        await updateVersionDisplay();
-    } catch (error) {
-        console.log(error);
-    }
-
-
     if(location.host === urls.prod) {
         !firebase.apps.length ? firebase.initializeApp(prodFirebaseConfig()) : firebase.app();
         window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'prod' });
@@ -104,7 +112,7 @@ const manageRoutes = async () => {
         else if (route === "#allParticipants") allParticipantsScreen(auth, route);
         else if (route === "#addressPrinted") addressesPrintedScreen(auth, route);
         else if (route === "#assigned") assignedScreen(auth, route);
-        else if (route === "#status_shipped") kitStatusReportsShipped(auth, route);
+        // else if (route === "#status_shipped") kitStatusReportsShipped(auth, route);
         else if (route === "#received") receivedKitsScreen(auth,route);
         else if (route === "#kitshipment") kitShipmentScreen(auth, route);
         else if (route === "#packagesintransit") packagesInTransitScreen(auth, route);
@@ -137,60 +145,3 @@ const userLoggedIn = () => {
         });
     });
 };
-
-/**
- * This function is an async function that checks if the service worker is supported by the browser
- * If it is supported, it registers the service worker
- * If the service worker is already installed and there is a new service worker available, it refreshes the page
-*/
-const registerServiceWorker = async () => {
-    if ("serviceWorker" in navigator) {
-        try {
-        const registration = await navigator.serviceWorker.register("./serviceWorker.js");
-        console.log('Service Worker registered with scope:', registration.scope);
-
-        registration.addEventListener('updatefound', () => { // This event fires when a new service worker is found
-            const newWorker = registration.installing;
-            newWorker.addEventListener('statechange', () => { // This event fires when the state of the service worker changes
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // New content is available, refresh the page
-                console.log("Refreshing page");
-                window.location.reload();
-            }
-            });
-        });
-        } catch (error) {
-        console.log('Service Worker registration failed:', error);
-        }
-    }
-};
-
-/**
- * Fetches the app version from the cache storage and updates the version display in the footer
-*/
-const updateVersionDisplay = async () => {
-    const versionNumber = await fetchAppVersionFromCache();
-    const versionElement = document.getElementById('appVersion');
-
-    if (!versionNumber || !versionElement) return;
-    versionElement.textContent = `${versionNumber}`;
-    };
-
-const fetchAppVersionFromCache = async () => {
-    try {
-        const cache = await caches.open('app-version-cache');
-        const response = await cache.match('./appVersion.js');
-
-        if (!response) return;
-
-        const appVersionText = await response.text();
-        const versionMatch = appVersionText.match(/"versionNumber"\s*:\s*"(v\d+\.\d+\.\d+)"/);       
-
-        if (!versionMatch) return;
-
-        return versionMatch[1];
-    } catch (error) {
-        console.error('Error fetching app version:', error);
-        return 'Error fetching version';
-    }
-}
