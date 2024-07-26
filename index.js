@@ -170,20 +170,11 @@ const registerServiceWorker = async () => {
 */
 const updateVersionDisplay = async () => {
     const versionNumber = await fetchAppVersionFromCache();
-    if (!versionNumber) return;
+    const versionElement = document.getElementById('appVersion');
 
-    let versionElement = document.getElementById('appVersion');
-
-    if (!versionElement) { 
-        const contentWrapper = document.querySelector('.footer-content .content-wrapper');
-        if (!contentWrapper || !versionNumber) return;
-
-        versionElement = document.createElement('p');
-        versionElement.id = 'appVersion';
-        contentWrapper.appendChild(versionElement);
-        versionElement.textContent = versionNumber;
-    }
-};
+    if (!versionNumber || !versionElement) return;
+    versionElement.textContent = `${versionNumber}`;
+    };
 
 const fetchAppVersionFromCache = async () => {
     try {
