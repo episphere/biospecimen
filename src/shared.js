@@ -489,8 +489,64 @@ export const showNotificationsSelectableList = (message, items, onCancel, onCont
             errorMessageDiv.style.display = 'block';
         }
     });
-
     document.getElementById('root').removeChild(button);
+};
+
+/**
+ * Display confirmation modal to the user and returns a promise with the user's choice.
+ *  
+ * @param {string} collectionID - the collection ID to display in the modal.
+ * @param {string} firstName - the participant's first name to display in the modal.
+ * @returns {Promise<string>} - the user's choice on button click: 'cancel', 'back', or 'confirmed'.
+*/
+export const showConfirmationModal =  (collectionID, firstName) => {
+    return new Promise((resolve) => {
+        const modalContainer = document.createElement('div');
+        modalContainer.classList.add('modal', 'fade');
+        modalContainer.id = 'confirmationModal';
+        modalContainer.tabIndex = '-1';
+        modalContainer.role = 'dialog';
+        modalContainer.setAttribute('aria-labelledby', 'exampleModalCenterTitle');
+        modalContainer.setAttribute('aria-hidden', 'true');
+        const modalContent = document.createElement('div');
+        modalContent.classList.add('modal-dialog', 'modal-dialog-centered');
+        modalContent.setAttribute('role', 'document');
+
+        const modalBody = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Collection ID</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Collection ID: ${collectionID}</p>
+                    <p>Confirm ID is correct for participant: ${firstName}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" data-result="cancel">Cancel</button>
+                    <button type="button" class="btn btn-info" data-result="back" data-dismiss="modal">Confirm and Exit</button>
+                    <button type="button" class="btn btn-success" data-result="confirmed" data-dismiss="modal">Confirm and Continue</button>
+                </div>
+            </div>
+        `;
+
+        modalContent.innerHTML = modalBody;
+        modalContainer.appendChild(modalContent);
+        document.body.appendChild(modalContainer);
+
+        modalContainer.classList.add('show');
+        modalContainer.style.display = 'block';
+        modalContainer.addEventListener('click', (event) => {
+            const result = event.target.getAttribute('data-result');
+            if (result) 
+            {
+                document.body.removeChild(modalContainer);
+                resolve(result);
+            }
+        });
+    });
 };
 
 export const showTimedNotifications = (data, zIndex, timeInMilliseconds = 2600) => {
@@ -522,10 +578,7 @@ export const showTimedNotifications = (data, zIndex, timeInMilliseconds = 2600) 
 
     // Programmatically close the modal on a timer.
     setTimeout(() => {
-        const closeButton = document.querySelector('#biospecimenModal .btn[data-dismiss="modal"]');
-        if (closeButton) {
-            closeButton.click();
-        }
+        dismissBiospecimenModal()
     }, timeInMilliseconds);
 };
 
@@ -546,6 +599,15 @@ const closeBiospecimenModal = () => {
 
     document.body.classList.remove('modal-open');
 };
+
+/**
+ * Targets close button on biospecimen bootstrap modal and closes it. Can be used to close and dismiss modal for other buttons on the modal.
+ * */  
+export const dismissBiospecimenModal = () => { 
+    const closeButton = document.querySelector('#biospecimenModal .btn[data-dismiss="modal"]');
+
+    if (closeButton) closeButton.click();
+}
 
 export const errorMessage = (id, msg, focus, offset, icon) => {
     const currentElement = document.getElementById(id);
@@ -2010,6 +2072,7 @@ export const siteSpecificLocation = {
   "Orland Park": {"siteAcronym":"UCM", "siteCode": healthProviderAbbrToConceptIdObj.uOfChicagoMed, "loginSiteName": "University of Chicago Medicine"},
   "BCC- HWC": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
   "FW All Saints": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
+  "BCC- Fort Worth": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
   "BCC- Plano": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
   "BCC- Worth St": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
   "BCC- Irving": {"SiteAcronym":"BSWH", "siteCode": healthProviderAbbrToConceptIdObj.BSWH, "loginSiteName": "Baylor Scott & White Health"},
@@ -2269,6 +2332,14 @@ export const locationConceptIDToLocationMap = {
         loginSiteName: 'Baylor Scott & White Health',
         email: 'connectbiospecimen@BSWHealth.org',
     },
+    288564244: {
+        siteSpecificLocation: 'BCC- Fort Worth',
+        siteAcronym: 'BSWH',
+        siteCode: '472940358',
+        siteTeam: 'BSWH Connect Study Team',
+        loginSiteName: 'Baylor Scott & White Health',
+        email: 'connectbiospecimen@BSWHealth.org',
+    },
     475614532: {
         siteSpecificLocation: 'BCC- Plano',
         siteAcronym: 'BSWH',
@@ -2353,6 +2424,7 @@ export const conceptIdToSiteSpecificLocation = {
   [conceptIds.nameToKeyObj.sfSC]: "Sioux Falls Sanford Center",
   723351427: "BCC- HWC",
   807443231: "FW All Saints",
+  288564244: "BCC- Fort Worth",
   475614532: "BCC- Plano",
   809370237: "BCC- Worth St",
   856158129: "BCC- Irving",
@@ -2393,6 +2465,7 @@ export const siteSpecificLocationToConceptId = {
   "Sioux Falls Sanford Center": conceptIds.nameToKeyObj.sfSC,
   "BCC- HWC": 723351427,
   "FW All Saints": 807443231,
+  "BCC- Fort Worth": 288564244,
   "BCC- Plano": 475614532,
   "BCC- Worth St": 809370237,
   "BCC- Irving": 856158129,
@@ -2471,14 +2544,15 @@ export const keyToLocationObj =
     589224449: "Sioux Falls Imagenetics",
     [conceptIds.nameToKeyObj.sfBM] : "Bismarck Medical Center",
     [conceptIds.nameToKeyObj.sfSC] : "Sioux Falls Sanford Center",
-    723351427:'BCC- HWC',
-    807443231:'FW All Saints',
-    475614532:'BCC- Plano',
-    809370237:'BCC- Worth St',
-    856158129:'BCC- Irving',
-    436956777:'NTX Biorepository',
+    723351427: 'BCC- HWC',
+    807443231: 'FW All Saints',
+    288564244: 'BCC- Fort Worth',
+    475614532: 'BCC- Plano',
+    809370237: 'BCC- Worth St',
+    856158129: 'BCC- Irving',
+    436956777: 'NTX Biorepository',
     111111111: "NIH",
-    13:"NCI"
+    13: "NCI"
 
 }
 
@@ -2690,6 +2764,7 @@ export const siteLocations = {
 
         'BSWH': [{location: 'BCC- HWC', concept: 723351427}, 
                 {location: 'FW All Saints', concept: 807443231}, 
+                {location: 'BCC- Fort Worth', concept: 288564244}, 
                 {location: 'BCC- Plano', concept: 475614532}, 
                 {location: 'BCC- Worth St', concept: 809370237}, 
                 {location: 'BCC- Irving', concept: 856158129}, 
@@ -2801,9 +2876,8 @@ export const checkInParticipant = async (data, visitConcept) => {
   const uid = data.state.uid;
   let shouldSendBioEmail = false;
 
-  if (data[conceptIds.selectedVisit]) {
-    visits = data[conceptIds.selectedVisit];
-
+  if (data[conceptIds.collection.selectedVisit]) {
+    visits = data[conceptIds.collection.selectedVisit];
     if (!visits[visitConcept]) {
       if (visitConcept === conceptIds.baseline.visitId.toString()) shouldSendBioEmail = true;
 

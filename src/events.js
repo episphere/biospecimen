@@ -6,7 +6,8 @@ import {
     convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, participantCanCheckIn, shippingPrintManifestReminder,
     checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData,
     siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
-    getCollectionsByVisit, getSpecimenAndParticipant, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showModalNotification, showTimedNotifications, showNotificationsCancelOrContinue, validateSpecimenAndParticipantResponse, findReplacementTubeLabels,
+    getCollectionsByVisit, getSpecimenAndParticipant, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showModalNotification, showTimedNotifications, showNotificationsCancelOrContinue, validateSpecimenAndParticipantResponse, findReplacementTubeLabels, 
+    showConfirmationModal, dismissBiospecimenModal
 } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
@@ -557,30 +558,30 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
         e.preventDefault();
         try {
             const btnCheckIn = document.getElementById('checkInComplete');
-            btnCheckIn.disabled = true;
             
             let query = `connectId=${parseInt(form.dataset.connectId)}`;
             
             const response = await findParticipant(query);
             const data = response.data[0];
+
             if (isCheckedIn) {
                 showAnimation();
                 await checkOutParticipant(data);
                 hideAnimation();
                 showTimedNotifications({ title: 'Success', body: 'Participant is checked out.' }, 100000, 1500);
                 setTimeout(() => {
-                    const closeButton = document.querySelector('#biospecimenModal .btn[data-dismiss="modal"]');
-                    if (closeButton) {
-                        closeButton.click();
-                    }
                     checkOutFlag === true ? location.reload() : goToParticipantSearch(); 
                 }, 1500);
             } else {
                 const visitConcept = document.getElementById('visit-select').value;
+                const isClinicalUrineOrBloodCollected = checkClinicalBloodOrUrineCollected(data);
+
+                if (isClinicalUrineOrBloodCollected) return;
+
                 for (const visit of visitType) {
                     if (data[conceptIds.collection.selectedVisit] && data[conceptIds.collection.selectedVisit][visit.concept]) {
                         const visitTime = new Date(data[conceptIds.collection.selectedVisit][visit.concept][conceptIds.checkInDateTime]);
-                        const now = new Date(); 
+                        const now = new Date();
                         if (now.getYear() == visitTime.getYear() && now.getMonth() == visitTime.getMonth() && now.getDate() == visitTime.getDate()) {
                             const response = await getParticipantCollections(data.token);
                             let collection = response.data.filter(res => res[conceptIds.collection.selectedVisit] == visit.concept);
@@ -592,6 +593,7 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
                 }
     
                 await handleCheckInModal(data, visitConcept, query);
+                btnCheckIn.disabled = true;
             }
         } catch (error) {
             const bodyMessage = isCheckedIn ? 'There was an error checking out the participant. Please try again.' : 'There was an error checking in the participant. Please try again.';
@@ -599,6 +601,34 @@ export const addEventCheckInCompleteForm = (isCheckedIn, checkOutFlag) => {
         }
     });
 };
+
+/**
+ * Checks if the participant has any specimen collected (clinical blood or clinical urine) under baseline from the dashboard or collected clinical blood or urine derivations from the site EMR API. If participant has either a clinical blood or urine dashboard variable or other blood/urine derived variables from the site EMR API, show a notification and return true.
+ * @param {Object} participantData - participant document data from find participant query
+ * @returns {Boolean} - true if participant has any clinical blood or urine collected derivations, false otherwise
+*/
+const checkClinicalBloodOrUrineCollected = (participantData) => {
+    const collectionDetailsBaseline = participantData?.[conceptIds.collectionDetails]?.[conceptIds.baseline.visitId];
+    
+    if (!collectionDetailsBaseline) return false;
+
+    const collectedBaselineStatuses = [
+        collectionDetailsBaseline?.[conceptIds.anySpecimenCollected],
+        collectionDetailsBaseline?.[conceptIds.clinicalSiteBloodCollected],
+        collectionDetailsBaseline?.[conceptIds.clinicalSiteUrineCollected],
+        collectionDetailsBaseline?.[conceptIds.clinicalSiteBloodRRLReceived],
+        collectionDetailsBaseline?.[conceptIds.clinicalSiteUrineRRLReceived]
+    ];
+
+    if (collectedBaselineStatuses.includes(conceptIds.yes)) {
+        const modalIcon = `<i class="fas fa-exclamation-circle" style="color: red; font-size: 1.4rem;"></i>`
+        const bodyMessage = `Check In not allowed, participant already has clinical collection for this timepoint. If you have questions, contact the Connect Biospeicmen Team: <a href="mailto:connectbioteam@nih.gov">connectbioteam@nih.gov</a>.`
+
+        showNotifications({ title: `${modalIcon} WARNING`, body: bodyMessage });
+        return true;
+    }
+    return false;
+}
 
 const handleCheckInWarning = async (visit, data, collection) => {
     const message = {
@@ -630,12 +660,15 @@ const handleCheckInModal = async (data, visitConcept, query) => {
         continueButtonText: "Continue to Specimen Link",
     };
 
-    const checkInOnCancel = () => {  };
+    const checkInOnCancel = () => {
+        dismissBiospecimenModal();
+      };
     const checkInOnContinue = async () => {
         try {
             const updatedResponse = await findParticipant(query);
             const updatedData = updatedResponse.data[0];
-    
+
+            dismissBiospecimenModal();
             specimenTemplate(updatedData);
         } catch (error) {
             showNotifications({ title: 'Error', body: 'There was an error checking in the participant. Please try again.' });
@@ -680,6 +713,7 @@ export const addEventSpecimenLinkForm = (formData) => {
     form.addEventListener('click', async (e) => {
         e.preventDefault();
         const collections = await getCollectionsByVisit(formData);
+
         if (collections.length) {
             existingCollectionAlert(collections, connectId, formData);
         } else {
@@ -731,7 +765,7 @@ const existingCollectionAlert = async (collections, connectId, formData) => {
  * @param {string} connectId 
  * @param {*} formData 
  */
-const btnsClicked = async (connectId, formData) => { 
+const btnsClicked = async (connectId, formData) => {
     removeAllErrors();
 
     let scanSpecimenID = document.getElementById('scanSpecimenID')?.value && document.getElementById('scanSpecimenID')?.value.toUpperCase();
@@ -749,18 +783,17 @@ const btnsClicked = async (connectId, formData) => {
         errorMessage('scanSpecimenID', 'Please Scan Collection ID or Type in Manually', focus, true);
         focus = false;
         errorMessage('scanSpecimenID2', 'Please Scan Collection ID or Type in Manually', focus, true);
-    }
-    else if (scanSpecimenID !== scanSpecimenID2 && !formData?.collectionId) {
+    } else if (scanSpecimenID !== scanSpecimenID2 && !formData?.collectionId) {
         hasError = true;
         errorMessage('scanSpecimenID2', 'Entered Collection ID doesn\'t match.', focus, true);
-    }
-    else if (scanSpecimenID && scanSpecimenID2) {
+    } else if (scanSpecimenID && scanSpecimenID2) {
         if (!masterSpecimenIDRequirement.regExp.test(scanSpecimenID) || scanSpecimenID.length !== masterSpecimenIDRequirement.length) {
             hasError = true;
             errorMessage('scanSpecimenID', `Collection ID must be ${masterSpecimenIDRequirement.length} characters long and in CXA123456 format.`, focus, true);
             focus = false;
         }
     }
+
     if (collectionLocation && collectionLocation.value === 'none') {
         hasError = true;
         errorMessage('collectionLocation', `Please Select Collection Location.`, focus, true);
@@ -776,60 +809,10 @@ const btnsClicked = async (connectId, formData) => {
     const firstName = document.getElementById(firstNameCidString).innerText || ""
 
 
-const showConfirmationModal = async (collectionID, firstName) => {
-    return new Promise((resolve) => {
-        const modalContainer = document.createElement('div');
-        modalContainer.classList.add('modal', 'fade');
-        modalContainer.id = 'confirmationModal';
-        modalContainer.tabIndex = '-1';
-        modalContainer.role = 'dialog';
-        modalContainer.setAttribute('aria-labelledby', 'exampleModalCenterTitle');
-        modalContainer.setAttribute('aria-hidden', 'true');
-        const modalContent = document.createElement('div');
-        modalContent.classList.add('modal-dialog', 'modal-dialog-centered');
-        modalContent.setAttribute('role', 'document');
+    const confirmVal = await showConfirmationModal(collectionID, firstName);
 
-        const modalBody = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Collection ID</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Collection ID: ${collectionID}</p>
-                    <p>Confirm ID is correct for participant: ${firstName}</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" data-result="cancel">Cancel</button>
-                    <button type="button" class="btn btn-info" data-result="back" data-dismiss="modal">Confirm and Exit</button>
-                    <button type="button" class="btn btn-success" data-result="confirmed" data-dismiss="modal">Confirm and Continue</button>
-                </div>
-            </div>
-        `;
+    if (confirmVal === "cancel") return;
 
-        modalContent.innerHTML = modalBody;
-        modalContainer.appendChild(modalContent);
-        document.body.appendChild(modalContainer);
-
-        modalContainer.classList.add('show');
-        modalContainer.style.display = 'block';
-        modalContainer.addEventListener('click', (event) => {
-            const result = event.target.getAttribute('data-result');
-            if (result) 
-            {
-                document.body.removeChild(modalContainer);
-                resolve(result);
-            }
-        });
-    });
-};
-
-const confirmVal = await showConfirmationModal(collectionID, firstName);
-if (confirmVal === "cancel") {
-    return;
-}
     formData[conceptIds.collection.id] = collectionID;
     formData[conceptIds.collection.collectionSetting] = getWorkflow() === 'research' ? conceptIds.research : conceptIds.clinical;
     formData['Connect_ID'] = parseInt(document.getElementById('specimenLinkForm').dataset.connectId);
@@ -844,15 +827,16 @@ if (confirmVal === "cancel") {
     
     if (!formData?.collectionId) {
         specimenData = (await searchSpecimen(formData[conceptIds.collection.id])).data;
+        
     }
     hideAnimation();
-
     if (specimenData?.Connect_ID && parseInt(specimenData.Connect_ID) !== particpantData.Connect_ID) {
         showNotifications({ title: 'Collection ID Duplication', body: 'Entered Collection ID is already associated with a different Connect ID.' })
         return;
     }
 
     showAnimation();
+
     formData[conceptIds.collection.selectedVisit] = formData?.[conceptIds.collection.selectedVisit] || parseInt(getCheckedInVisit(particpantData));
     
     if (!formData?.collectionId) {
@@ -880,6 +864,7 @@ if (confirmVal === "cancel") {
         searchTemplate();
     }
 }
+
 
 /**
  * Check accession number inputs after clicking 'Submit' button
