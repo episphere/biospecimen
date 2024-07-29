@@ -30,7 +30,24 @@ import { bptlShipReportsScreen } from "./src/pages/reports/shippingReport.js";
 import { checkOutReportTemplate } from "./src/pages/checkOutReport.js";
 import { dailyReportTemplate } from "./src/pages/dailyReport.js";
 
-//test
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./serviceWorker.js").catch((error) => {
+    console.error("Service worker registration failed.", error);
+    return;
+  });
+
+  navigator.serviceWorker.ready.then(() => {
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ action: "getAppVersion" });
+    }
+  });
+
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data.action === "sendAppVersion") {
+      document.getElementById("appVersion").textContent = event.data.payload;
+    }
+  });
+}
 
 let auth = '';
 
@@ -50,14 +67,6 @@ const datadogConfig = {
 const isLocalDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
 window.onload = () => {
-    if ("serviceWorker" in navigator) {
-        try {
-            navigator.serviceWorker.register("./serviceWorker.js");
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
     if(location.host === urls.prod) {
         !firebase.apps.length ? firebase.initializeApp(prodFirebaseConfig()) : firebase.app();
         window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'prod' });
@@ -103,7 +112,6 @@ const manageRoutes = async () => {
         else if (route === "#allParticipants") allParticipantsScreen(auth, route);
         else if (route === "#addressPrinted") addressesPrintedScreen(auth, route);
         else if (route === "#assigned") assignedScreen(auth, route);
-        else if (route === "#status_shipped") kitStatusReportsShipped(auth, route);
         else if (route === "#received") receivedKitsScreen(auth,route);
         else if (route === "#kitshipment") kitShipmentScreen(auth, route);
         else if (route === "#packagesintransit") packagesInTransitScreen(auth, route);

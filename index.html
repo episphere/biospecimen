@@ -95,22 +95,11 @@
                         <li class="menu-item"><a class="footer-links" href="http://www.usa.gov/">USA.gov</a></li>
                     </ul>
                     <p class="menu footer-tagline">NIH…Turning Discovery Into Health<sup>®</sup></p>
+                    <p id="appVersion"></p>
                 </div>
             </div>
         </div>
     </footer>
-    <script>
-        if(location.host !== 'biospecimen-myconnect.cancer.gov') {
-            (function () {
-                const sentryScript = document.createElement('script');
-                sentryScript.src = 'https://browser.sentry-cdn.com/6.13.3/bundle.tracing.min.js';
-                document.head.appendChild(sentryScript);
-                sentryScript.addEventListener('load', () => {
-                    Sentry.init({ dsn: 'https://113d31d0985947ae9f1876b0e31209cd@o1088108.ingest.sentry.io/6139072' });
-                })
-            })();
-        }
-    </script> 
     <script src="index.js" type="module"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
