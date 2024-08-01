@@ -202,7 +202,7 @@ const storePackageReceipt = async (data) => {
     document.getElementById("receivePackageComments").value = "";
     document.getElementById("dateReceived").value = getCurrentDate();
     document.getElementById("collectionComments").value = "";
-    document.getElementById("collectionId").value = "";
+    
     enableCollectionCardFields();
     enableCollectionCheckBox();
     document.getElementById("packageCondition").setAttribute("data-selected", "[]");

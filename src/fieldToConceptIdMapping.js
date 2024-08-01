@@ -140,6 +140,13 @@ export const conceptIds = {
     checkOutDateTime: 343048998,
     checkInDateTime: 840048338,
     checkInComplete: 135591601,
+    clinicalBloodOrUrineCollected: 156605577,
+
+    // Site EMR API Clinical baseline derivations
+    clinicalSiteBloodCollected: 693370086,
+    clinicalSiteUrineCollected: 786930107,
+    clinicalSiteBloodRRLReceived: 728696253,
+    clinicalSiteUrineRRLReceived: 453452655,
 
     // not shipped specimen deviation id
     brokenSpecimenDeviation: 472864016,
@@ -299,6 +306,7 @@ export const conceptIds = {
         807835037: 'Other',
         723351427: 'BCC- HWC',
 		807443231: 'FW All Saints',
+        288564244: 'BCC- Fort Worth',
 		475614532: 'BCC- Plano',
 		809370237: 'BCC- Worth St',
         856158129: 'BCC- Irving',
@@ -335,6 +343,7 @@ export const conceptIds = {
         "mfPopUp": 567969985,
         'bccHwc': 723351427,
         'bccAllSaints': 807443231,
+        'bccFortWorth': 288564244,
         'bccPlano': 475614532,
         'bccWorthSt': 809370237,
         'bccIrving': 856158129,
