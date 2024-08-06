@@ -9,3 +9,4 @@ scratch.js
 node_modules/
 package.json
 package-lock.json
+local-dev/

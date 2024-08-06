@@ -2,6 +2,10 @@ import { inactivityTime, urls } from "./src/shared.js";
 import { firebaseConfig as devFirebaseConfig } from "./src/dev/config.js";
 import { firebaseConfig as stageFirebaseConfig } from "./src/stage/config.js";
 import { firebaseConfig as prodFirebaseConfig } from "./src/prod/config.js";
+// When doing local development, uncomment this and comment out the line below it.
+// Get the API key from Box or the DevOps team
+// import { firebaseConfig as  localDevFirebaseConfig} from "./src/local-dev/config.js";
+const localDevFirebaseConfig = stageFirebaseConfig;
 import { manageUsers } from "./src/pages/users.js";
 import { userDashboard } from "./src/pages/dashboard.js";
 import { shippingDashboard } from "./src/pages/shipping.js";
@@ -75,7 +79,9 @@ window.onload = () => {
         !firebase.apps.length ? firebase.initializeApp(stageFirebaseConfig()) : firebase.app();
         window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'stage' });
     }
-    else {
+    else if (isLocalDev) {
+        !firebase.apps.length ? firebase.initializeApp(localDevFirebaseConfig()) : firebase.app();
+    } else {
         !firebase.apps.length ? firebase.initializeApp(devFirebaseConfig()) : firebase.app();
         !isLocalDev && window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'dev' });
     }
