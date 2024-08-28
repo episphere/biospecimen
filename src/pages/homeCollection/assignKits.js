@@ -16,6 +16,7 @@ export const assignKitsScreen = async (auth) => {
 const assignKitsTemplate = async (name) => {
   showAnimation();
   const response = await getEligibleParticipantsForKitAssignment();
+  console.log("🚀 ~ assignKitsTemplate ~ response:", response)
   hideAnimation();
   let template = ``;
   template += homeCollectionNavbar();
@@ -134,7 +135,7 @@ const populateSidePaneRows = () => {
           data-zipCode= '${participant.zip_code}'
           data-connectId= '${participant.connect_id}'
           id="selectParticipants">Select</button>
-        </ul>`
+        </ul>`;
     })
     selectParticipants();
   }

@@ -1,7 +1,7 @@
 import { getIdToken, showAnimation, hideAnimation, baseAPI, convertDateReceivedinISO, checkTrackingNumberSource, getCurrentDate, locationConceptIDToLocationMap, retrieveDateFromIsoString, showNotificationsCancelOrContinue, showNotificationsSelectableList, triggerSuccessModal, showNotifications, validIso8601Format } from "../../shared.js";
 import { nonUserNavBar } from "../../navbar.js";
-import { receiptsNavbar } from "./receiptsNavbar.js";
-import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
+import { siteCollectionNavbar } from "./siteCollectionNavbar.js";
+import { activeSiteCollectionNavbar } from "./activeSiteCollectionNavbar.js";
 import { conceptIds as fieldMapping, packageConditionConversion } from "../../fieldToConceptIdMapping.js";
 import { confirmKitReceipt } from "../homeCollection/kitsReceipt.js";
 
@@ -28,7 +28,7 @@ export const packageReceiptScreen = async (auth, route) => {
 
 const packageReceiptTemplate = async (name, auth, route) => {
     let template = ``;
-    template += receiptsNavbar();
+    template += siteCollectionNavbar();
     template += `  <div id="root root-margin" style="padding-top: 25px;">
                       <div id="alert_placeholder"></div>
                       <span> <h3 style="text-align: center; margin: 0 0 1rem;">Package Receipt</h3> </span>
@@ -131,7 +131,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
         
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
-    activeReceiptsNavbar();
+    activeSiteCollectionNavbar();
 };
 
 const checkCardIncluded = () => {

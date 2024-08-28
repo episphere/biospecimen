@@ -1,8 +1,8 @@
 import { showAnimation, hideAnimation, getIdToken, conceptIdToHealthProviderAbbrObj, keyToLocationObj, baseAPI, keyToNameCSVObj, formatISODateTimeDateOnly, convertISODateTime, getAllBoxes, conceptIdToSiteSpecificLocation, showNotifications, getCurrentDate, miscTubeIdSet, triggerSuccessModal, getSpecimensInBoxes, findReplacementTubeLabels } from "../../shared.js";
 import { conceptIds as fieldToConceptIdMapping } from "../../fieldToConceptIdMapping.js";
-import { receiptsNavbar } from "./receiptsNavbar.js";
+import { siteCollectionNavbar } from "./siteCollectionNavbar.js";
 import { nonUserNavBar } from "../../navbar.js";
-import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
+import { activeSiteCollectionNavbar } from "./activeSiteCollectionNavbar.js";
 import { getRecentBoxesShippedBySiteNotReceived } from "./packagesInTransit.js";
 import { specimenCollection } from "../../tubeValidation.js";
 
@@ -12,7 +12,7 @@ export const csvFileReceiptScreen = async (auth) => {
   const username = user.displayName ? user.displayName : user.email;
 
   csvFileReceiptTemplate(username);
-  activeReceiptsNavbar();
+  activeSiteCollectionNavbar();
   csvFileButtonSubmit();
   getInTransitFileType();
   loadSheetJScdn();
@@ -20,7 +20,7 @@ export const csvFileReceiptScreen = async (auth) => {
 
 const csvFileReceiptTemplate = async (username) => {
   let template = "";
-  template += receiptsNavbar();
+  template += siteCollectionNavbar();
   template += `<div id="root root-margin" style="margin-top:3rem;">
                 <div id="alert_placeholder"></div>
                 <span> <h4 style="text-align: center; margin: 1rem 0;">In Transit</h4> </span>

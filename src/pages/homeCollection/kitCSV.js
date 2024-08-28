@@ -3,7 +3,7 @@ import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { showAnimation, hideAnimation, getIdToken, baseAPI, keyToNameCSVObj, conceptIdToHealthProviderAbbrObj, triggerErrorModal, convertISODateTime } from "../../shared.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
-import { receiptedCSVFileTemplate, downloadCSVfile } from '../receipts/csvFileReceipt.js';
+import { receiptedCSVFileTemplate, downloadCSVfile } from '../siteCollection/csvFileReceipt.js';
 
 export const kitCsvScreen = (auth) => {
   const user = auth.currentUser;
