@@ -3,7 +3,8 @@ import { firebaseConfig as devFirebaseConfig } from "./src/dev/config.js";
 import { firebaseConfig as stageFirebaseConfig } from "./src/stage/config.js";
 import { firebaseConfig as prodFirebaseConfig } from "./src/prod/config.js";
 // When doing local development, uncomment this and comment out the line below it.
-// Get the API key from Box or the DevOps team
+// Get the API key file from Box or the DevOps team
+// Do not accept PRs with the localDevFirebaseConfig import uncommented
 // import { firebaseConfig as  localDevFirebaseConfig} from "./src/local-dev/config.js";
 const localDevFirebaseConfig = stageFirebaseConfig;
 import { manageUsers } from "./src/pages/users.js";
