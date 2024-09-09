@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource, numericInputValidator, autoTabAcrossArray, performQCcheck } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource, numericInputValidator, capsEnforcer, autoTabAcrossArray, performQCcheck } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -104,6 +104,7 @@ const kitAssemblyTemplate = async (name) => {
   const scannedBarcode2 = document.getElementById('scannedBarcode2');
   scannedBarcode2.onpaste = e => e.preventDefault();
   numericInputValidator(['scannedBarcode', 'scannedBarcode2']);
+  capsEnforcer(['supplyKitId', 'returnKitId', 'cupId', 'cardId']);
   activeHomeCollectionNavbar();
   processAssembledKit();
   enableEnterKeystroke();
