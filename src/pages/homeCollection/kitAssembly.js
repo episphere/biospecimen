@@ -142,16 +142,16 @@ const processAssembledKit = () => {
         const confirmScannedBarcodeValue = document.getElementById('scannedBarcode2')?.value?.trim();
 
         const querySupplyKitIdValue = document.getElementById('supplyKitId').value.trim();
-        const supplyKitIdValue = (querySupplyKitIdValue !== undefined) ? querySupplyKitIdValue: 0;
+        const supplyKitIdValue = (querySupplyKitIdValue !== undefined) ? querySupplyKitIdValue.toUpperCase(): 0;
 
         const queryReturnKitIdValue = document.getElementById('returnKitId')?.value?.trim();
-        const returnKitIdValue = (queryReturnKitIdValue !== undefined) ? queryReturnKitIdValue : 0;
+        const returnKitIdValue = (queryReturnKitIdValue !== undefined) ? queryReturnKitIdValue.toUpperCase() : 0;
 
         const queryCollectionCupIdValue = document.getElementById('cupId')?.value?.trim();
-        const collectionCupIdValue = (queryCollectionCupIdValue !== undefined) ? queryCollectionCupIdValue : 0;
+        const collectionCupIdValue = (queryCollectionCupIdValue !== undefined) ? queryCollectionCupIdValue.toUpperCase() : 0;
 
         const queryCollectionCardIdValue = document.getElementById('cardId')?.value?.trim();
-        const collectionCardIdValue = (queryCollectionCardIdValue !== undefined) ? queryCollectionCardIdValue : 0;
+        const collectionCardIdValue = (queryCollectionCardIdValue !== undefined) ? queryCollectionCardIdValue.toUpperCase() : 0;
 
         if (queryScannedBarcodeValue !== confirmScannedBarcodeValue) {
             triggerErrorModal('Return Kit tracking number doesn\'t match.');
@@ -160,6 +160,10 @@ const processAssembledKit = () => {
             collectionCupIdValue.length === 0 || collectionCardIdValue.length === 0 || document.getElementById('dropdownSites').innerHTML !== 'Mouthwash') {
             triggerErrorModal('One or more fields are missing.');
             return
+        } else if (supplyKitIdValue !== returnKitIdValue) {
+          triggerErrorModal('Supply Kit ID number doesn\'t match Return Kit.');
+        } else if (collectionCupIdValue !== collectionCardIdValue) {
+          triggerErrorModal('Collection Cup ID doesn\'t match Collection Card.');
         } else {
             kitObj[conceptIds.returnKitTrackingNum] = scannedBarcodeValue;
             kitObj[conceptIds.supplyKitId] = supplyKitIdValue;
