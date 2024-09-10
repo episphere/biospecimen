@@ -3334,6 +3334,17 @@ export const formatISODateTimeDateOnly = (dateReceived) => {
     return formattedDateTimeStamp
 }
 
+export const capsEnforcer = (elemArr) => {
+    elemArr.forEach(elemId => {
+        let elem = document.getElementById(elemId);
+        if (elem) {
+            elem.addEventListener('input', (e) => {
+                elem.value = (e.target.value + '').toUpperCase();
+            });
+        }
+    });
+}
+
 export const numericInputValidator = (elemArr) => {
     elemArr.forEach(elem => {
         if (document.getElementById(elem)) {
