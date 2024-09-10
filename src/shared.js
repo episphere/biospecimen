@@ -3335,10 +3335,11 @@ export const formatISODateTimeDateOnly = (dateReceived) => {
 }
 
 export const capsEnforcer = (elemArr) => {
-    elemArr.forEach(elem => {
-        if (document.getElementById(elem)) {
-            document.getElementById(elem).addEventListener('input', (e) => {
-                document.getElementById(elem).value = (e.target.value + '').toUpperCase();
+    elemArr.forEach(elemId => {
+        let elem = document.getElementById(elemId);
+        if (elem) {
+            elem.addEventListener('input', (e) => {
+                elem.value = (e.target.value + '').toUpperCase();
             });
         }
     });

@@ -138,21 +138,21 @@ const processAssembledKit = () => {
     saveKitButton.addEventListener('click', async () => { 
         let kitObj = {};
         const queryScannedBarcodeValue = document.getElementById('scannedBarcode')?.value?.trim();
-        const scannedBarcodeValue = (queryScannedBarcodeValue !== undefined) ? queryScannedBarcodeValue : 0;
+        const scannedBarcodeValue = (queryScannedBarcodeValue !== undefined) ? queryScannedBarcodeValue : "";
 
         const confirmScannedBarcodeValue = document.getElementById('scannedBarcode2')?.value?.trim();
 
         const querySupplyKitIdValue = document.getElementById('supplyKitId').value.trim();
-        const supplyKitIdValue = (querySupplyKitIdValue !== undefined) ? querySupplyKitIdValue.toUpperCase(): 0;
+        const supplyKitIdValue = (querySupplyKitIdValue !== undefined) ? querySupplyKitIdValue.toUpperCase(): "";
 
         const queryReturnKitIdValue = document.getElementById('returnKitId')?.value?.trim();
-        const returnKitIdValue = (queryReturnKitIdValue !== undefined) ? queryReturnKitIdValue.toUpperCase() : 0;
+        const returnKitIdValue = (queryReturnKitIdValue !== undefined) ? queryReturnKitIdValue.toUpperCase() : "";
 
         const queryCollectionCupIdValue = document.getElementById('cupId')?.value?.trim();
-        const collectionCupIdValue = (queryCollectionCupIdValue !== undefined) ? queryCollectionCupIdValue.toUpperCase() : 0;
+        const collectionCupIdValue = (queryCollectionCupIdValue !== undefined) ? queryCollectionCupIdValue.toUpperCase() : "";
 
         const queryCollectionCardIdValue = document.getElementById('cardId')?.value?.trim();
-        const collectionCardIdValue = (queryCollectionCardIdValue !== undefined) ? queryCollectionCardIdValue.toUpperCase() : 0;
+        const collectionCardIdValue = (queryCollectionCardIdValue !== undefined) ? queryCollectionCardIdValue.toUpperCase() : "";
 
         if (queryScannedBarcodeValue !== confirmScannedBarcodeValue) {
             triggerErrorModal('Return Kit tracking number doesn\'t match.');
