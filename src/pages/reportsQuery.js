@@ -1,7 +1,6 @@
 import { userAuthorization, removeActiveClass, restrictNonBiospecimenUser, hideAnimation, showAnimation, getNumPages, conceptIdToSiteSpecificLocation, searchSpecimenByRequestedSiteAndBoxId, appState, showNotifications } from "./../shared.js";
 import { handleBoxReportsData, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality, addEventFilter } from "./../events.js";
 import { homeNavBar, reportSideNavBar } from '../navbar.js';
-// import { reportsNavbar } from "./reports/reportsNavbar.js";
 import { siteCollectionNavbar } from "./siteCollection/siteCollectionNavbar.js";
 import { conceptIds } from '../fieldToConceptIdMapping.js';
 

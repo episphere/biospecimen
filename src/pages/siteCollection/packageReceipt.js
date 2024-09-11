@@ -5,120 +5,87 @@ import { activeSiteCollectionNavbar } from "./activeSiteCollectionNavbar.js";
 import { conceptIds as fieldMapping, packageConditionConversion } from "../../fieldToConceptIdMapping.js";
 import { confirmKitReceipt } from "../homeCollection/kitsReceipt.js";
 
-
 const inputObject = {
-  inputChange: false
-}
+    inputChange: false
+  }
+
+// add to state
+// let hasUnsavedChanges = false;
 
 export const packageReceiptScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
-  packageReceiptTemplate(username, auth, route);
-  addDefaultDateReceived(getCurrentDate);
-  checkTrackingNumberSource();
-  checkCardIncluded();
-  disableCollectionCardFields();
-  enableCollectionCardFields();
-  formSubmit(); 
-  targetAnchorTagEl();
+  packageReceiptTemplate(username); //
+  checkTrackingNumberSource(); //
+  formSubmit();
+//   updateUnsavedChanges();
+  setupLeavingPageMessage();
   addListenersOnPageLoad();
-  dropdownTrigger();
 }
 
-const packageReceiptTemplate = async (name, auth, route) => {
+const packageReceiptTemplate = async (name) => {
     let template = ``;
     template += siteCollectionNavbar();
-    template += `  <div id="root root-margin" style="padding-top: 25px;">
-                      <div id="alert_placeholder"></div>
-                      <span> <h3 style="text-align: center; margin: 0 0 1rem;">Package Receipt</h3> </span>
-                      <div class="mt-3" >
-                        <h5 style="text-align: left;">Receive Packages</h5>
-                        <div style=" display:inline-block;" class="dropdown">
-                          <button class="btn btn-secondary dropdown-toggle dropdown-toggle-sites" id="dropdownSelection" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Select Shipment
-                          </button>
-                          <ul class="dropdown-menu" id="dropdownMenuButtonSelection" aria-labelledby="dropdownMenuButton">
-                              <li><a class="dropdown-item" data-siteKey="homeCollection" id="homeCollection">Home Collection Shipment</a></li>
-                              <li><a class="dropdown-item" data-siteKey="siteShipment" id="siteShipment">Site Shipment</a></li>
-                          </ul>
-                      </div>
-                      <br />
+    template += `<div id="root root-margin" style="padding-top: 25px;">
+                    <div id="alert_placeholder"></div>
+                    <span> <h3 style="text-align: center; margin: 0 0 1rem;">Package Receipt</h3> </span>
+                    <div class="mt-3" >
+                        <br>
+                        <div class="row form-group">
+                            <label class="col-form-label col-md-4" for="scannedBarcode">Scan FedEx/USPS Barcode</label>
+                            <div style="display:inline-block;">
+                            <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" data-track-changes style="width: 600px;" placeholder="Scan a Fedex or USPS barcode">
+                            <span id="showMsg" style="padding-left: 10px;"></span>
+                            <br>
+                            <br>
+                            <span>
+                                <p><i>Press command/control while clicking with the mouse to make multiple selections</i></p>
+                            </span>
+                        </div>
+                    </div>
+
                     <div class="row form-group">
-                      <label class="col-form-label col-md-4" for="scannedBarcode">Scan FedEx/USPS Barcode</label>
-                      <div style="display:inline-block;">
-                        <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" style="width: 600px;" placeholder="Scan a Fedex or USPS barcode">
-                        <span id="showMsg" style="padding-left: 10px;"></span>
-                        <br />
-                        <br />
-                        <span><h6><i>Press command/control while clicking with the mouse to make multiple selections</i></h6></span>
-                      </div>
-                    </div>
-                        
-                        <div class="row form-group">
-                            <label class="col-form-label col-md-4" for="packageCondition">Select Package Condition</label>
-                             <div style="display:inline-block; max-width:90%;"> 
-                                <select required class="col form-control" id="packageCondition" style="width:100%" multiple="multiple" data-selected="[]">
-                                    <option id="select-dashboard" value="">-- Select Package Condition --</option>
-                                    <option id="select-packageGoodCondition" value=${fieldMapping.packageGood}>Package in good condition</option>
-                                    <option id="select-noIcePack" value=${fieldMapping.coldPacksNone}>No Ice Pack</option>
-                                    <option id="select-warmIcePack" value=${fieldMapping.coldPacksWarm}>Warm Ice Pack</option>
-                                    <option id="select-incorrectMaterialTypeSent" value=${fieldMapping.vialsIncorrectMaterialType}>Vials - Incorrect Material Type Sent</option>
-                                    <option id="select-noLabelonVials" value=${fieldMapping.vialsMissingLabels}>No Label on Vials</option>
-                                    <option id="select-returnedEmptyVials" value=${fieldMapping.vialsEmpty}>Returned Empty Vials</option>
-                                    <option id="select-participantRefusal" value=${fieldMapping.participantRefusal}>Participant Refusal</option>
-                                    <option id="select-crushed" value=${fieldMapping.crushed}>Crushed</option>
-                                    <option id="select-damagedContainer" value=${fieldMapping.damagedContainer}>Damaged Container (outer and inner)</option>
-                                    <option id="select-materialThawed" value=${fieldMapping.materialThawed}>Material Thawed</option>
-                                    <option id="select-insufficientIce" value=${fieldMapping.coldPacksInsufficient}>Insufficient Ice</option>
-                                    <option id="select-improperPackaging" value=${fieldMapping.improperPackaging}>Improper Packaging</option>
-                                    <option id="select-damagedVials" value=${fieldMapping.damagedVials}>Damaged Vials</option>
-                                    <option id="select-other" value=${fieldMapping.other}>Other</option>
-                                    <option id="select-noPreNotification" value=${fieldMapping.noPreNotification}>No Pre-notification</option>
-                                    <option id="select-noRefrigerant" value=${fieldMapping.noRefrigerant}>No Refrigerant</option>
-                                    <option id="select-infoDoNotMatch" value=${fieldMapping.manifestDoNotMatch}>Manifest/Vial/Paperwork info do not match</option>
-                                    <option id="select-shipmentDelay" value=${fieldMapping.shipmentDelay}>Shipment Delay</option>
-                                    <option id="select-noManifestProvided" value=${fieldMapping.manifestNotProvided}>No Manifest provided</option>
-                                </select>
-                           </div>
-                        </div>
-                        <div class="row form-group">
-                            <label class="col-form-label col-md-4" for="receivePackageComments">Comment</label>
-                            <textarea class="col-md-8 form-control" id="receivePackageComments" cols="30" rows="3" placeholder="Any comments?"></textarea>
-                        </div>
-                        <div class="row form-group">
-                            <label class="col-form-label col-md-4" for="dateReceived">Date Received</label>
-                            <input autocomplete="off" required class="col-md-8 form-control" type="date" type="text" id="dateReceived" value=${getCurrentDate()}>
-                        </div>
-                        <div id="collectionCard">
-                            <h5 style="text-align: left;">Collection Card Data Entry for Home Mouthwash Kits</h5>
-                            <div class="row form-group">
-                                <label class="col-form-label col-md-4 for="collectionCheckBox">Check if card not included</label>
-                                <input type="checkbox" name="collectionCheckBox" id="collectionCheckBox">
-                            </div>
-                            <div class="row form-group">
-                                <label class="col-form-label col-md-4" for="collectionId">Collection ID</label>
-                                <input autocomplete="off" class="col-md-8 form-control" type="text" id="collectionId" placeholder="Scan or Enter a Collection ID">
-                            </div>
-                            <div class="row form-group">
-                                <label class="col-form-label col-md-4" for="dateCollectionCard">Enter Collection Date from Collection Card</label>
-                                <input autocomplete="off" class="col-md-8 form-control" type="date" id="dateCollectionCard">
-                            </div>
-                            <div class="row form-group">
-                                <label class="col-form-label col-md-4" for="timeCollectionCard">Enter Collection Time from Collection Card</label>
-                                <input autocomplete="off" class="col-md-8 form-control" type="time" step="1" id="timeCollectionCard">
-                            </div>
-                            <div class="row form-group">
-                                <label class="col-form-label col-md-4" for="collectionComments">Comments on Card Returned</label>
-                                <textarea class="col-md-8 form-control" id="collectionComments" cols="30" rows="3" placeholder="Comments on the card?"></textarea>
-                            </div>
-                          </div>
-                        
-                        <div class="mt-4 mb-4" style="display:inline-block;">
-                            <button type="button" class="btn btn-danger" id="clearForm">Clear</button>
-                            <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#modalShowMoreData" id="save">Save</button>
+                        <label class="col-form-label col-md-4" for="packageCondition">Select Package Condition</label>
+                        <div style="display:inline-block; max-width:90%;"> 
+                            <select required class="col form-control" id="packageCondition" data-track-changes style="width:100%" multiple="multiple" data-selected="[]">
+                                <option id="select-dashboard" value="">-- Select Package Condition --</option>
+                                <option id="select-packageGoodCondition" value=${fieldMapping.packageGood}>Package in good condition</option>
+                                <option id="select-noIcePack" value=${fieldMapping.coldPacksNone}>No Ice Pack</option>
+                                <option id="select-warmIcePack" value=${fieldMapping.coldPacksWarm}>Warm Ice Pack</option>
+                                <option id="select-incorrectMaterialTypeSent" value=${fieldMapping.vialsIncorrectMaterialType}>Vials - Incorrect Material Type Sent</option>
+                                <option id="select-noLabelonVials" value=${fieldMapping.vialsMissingLabels}>No Label on Vials</option>
+                                <option id="select-returnedEmptyVials" value=${fieldMapping.vialsEmpty}>Returned Empty Vials</option>
+                                <option id="select-participantRefusal" value=${fieldMapping.participantRefusal}>Participant Refusal</option>
+                                <option id="select-crushed" value=${fieldMapping.crushed}>Crushed</option>
+                                <option id="select-damagedContainer" value=${fieldMapping.damagedContainer}>Damaged Container (outer and inner)</option>
+                                <option id="select-materialThawed" value=${fieldMapping.materialThawed}>Material Thawed</option>
+                                <option id="select-insufficientIce" value=${fieldMapping.coldPacksInsufficient}>Insufficient Ice</option>
+                                <option id="select-improperPackaging" value=${fieldMapping.improperPackaging}>Improper Packaging</option>
+                                <option id="select-damagedVials" value=${fieldMapping.damagedVials}>Damaged Vials</option>
+                                <option id="select-other" value=${fieldMapping.other}>Other</option>
+                                <option id="select-noPreNotification" value=${fieldMapping.noPreNotification}>No Pre-notification</option>
+                                <option id="select-noRefrigerant" value=${fieldMapping.noRefrigerant}>No Refrigerant</option>
+                                <option id="select-infoDoNotMatch" value=${fieldMapping.manifestDoNotMatch}>Manifest/Vial/Paperwork info do not match</option>
+                                <option id="select-shipmentDelay" value=${fieldMapping.shipmentDelay}>Shipment Delay</option>
+                                <option id="select-noManifestProvided" value=${fieldMapping.manifestNotProvided}>No Manifest provided</option>
+                            </select>
                         </div>
                     </div>
+
+                    <div class="row form-group">
+                        <label class="col-form-label col-md-4" for="receivePackageComments">Comment</label>
+                        <textarea class="col-md-8 form-control" id="receivePackageComments" cols="30" rows="5" placeholder="Any comments?" data-track-changes></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-form-label col-md-4" for="dateReceived">Date Received</label>
+                        <input autocomplete="off" required class="col-md-8 form-control" type="date" type="text" id="dateReceived" value=${getCurrentDate()} data-track-changes>
+                    </div>
+                    <div class="mt-4 mb-4" style="display:inline-block;">
+                        <button type="button" class="btn btn-danger" id="clearForm">Clear</button>
+                        <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#modalShowMoreData" id="save">Save</button>
+                    </div>
+
                 </div>`;
     template += `<div class="modal fade" id="modalShowMoreData" data-keyboard="false" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
                     <div class="modal-dialog modal-md modal-dialog-centered" role="document">
@@ -134,29 +101,7 @@ const packageReceiptTemplate = async (name, auth, route) => {
     activeSiteCollectionNavbar();
 };
 
-const checkCardIncluded = () => {
-  const a = document.getElementById('collectionCheckBox')
-  if (a) {
-    a.addEventListener("change", () => {
-      a.checked ? disableCollectionCardFields() : enableCollectionCardFields()
-    })
-}}
-
-const disableCollectionCardFields = () => {
-  document.getElementById('collectionId').disabled = true;
-  document.getElementById('dateCollectionCard').disabled = true;
-  document.getElementById('timeCollectionCard').disabled = true;
-  document.getElementById('collectionComments').disabled = true;
-}
-
-export const enableCollectionCardFields = () => {
-  document.getElementById('collectionId').disabled = false;
-  document.getElementById('dateCollectionCard').disabled = false;
-  document.getElementById('timeCollectionCard').disabled = false;
-  document.getElementById('collectionComments').disabled = false;
-}
-
-
+// add validation checks before sending off to the server
 const formSubmit = () => {
     const form = document.getElementById("save");
     form.addEventListener("click", (e) => {
@@ -164,12 +109,13 @@ const formSubmit = () => {
         const modalHeaderEl = document.getElementById("modalHeader");
         const modalBodyEl = document.getElementById("modalBody");
         const isSelectPackageConditionsListEmpty = checkSelectPackageConditionsList();
+        console.log("🚀 ~ form.addEventListener ~ isSelectPackageConditionsListEmpty:", isSelectPackageConditionsListEmpty)
 
         if (isSelectPackageConditionsListEmpty) {
-            displayPackageConditionListEmptyModal(modalHeaderEl, modalBodyEl);
-        } else {
-            displaySelectedPackageConditionListModal(modalHeaderEl, modalBodyEl);
+            return displayPackageConditionListEmptyModal(modalHeaderEl, modalBodyEl);
         }
+
+        displaySelectedPackageConditionListModal(modalHeaderEl, modalBodyEl);
     });
 };
 
@@ -181,36 +127,41 @@ const confirmPackageReceipt = () => {
               let receiptedPackageObj = {};
               let packageConditions = [];
               const scannedBarcode = document.getElementById('scannedBarcode').value.trim();
-              const onlyFedexCourierType = identifyCourierType(scannedBarcode);
+              const onlyFedexCourierType = scannedBarcode.length >= 12;
+
               if (onlyFedexCourierType === true) {
-                  receiptedPackageObj['scannedBarcode'] = scannedBarcode
+                  receiptedPackageObj['scannedBarcode'] = scannedBarcode;
                   for (let option of document.getElementById('packageCondition').options) {
-                      if (option.selected) {packageConditions.push(option.value)}
+                      if (option.selected) { packageConditions.push(option.value) };
                   }
 
                   receiptedPackageObj[`${fieldMapping.packageCondition}`] = packageConditions;
                   
                   if (scannedBarcode.length === 12 || (!uspsFirstThreeNumbersCheck(scannedBarcode))) {  
-                      receiptedPackageObj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes
+                      receiptedPackageObj[`${fieldMapping.siteShipmentReceived}`] = fieldMapping.yes;
                       receiptedPackageObj[`${fieldMapping.siteShipmentComments}`] = document.getElementById('receivePackageComments').value.trim();
                       receiptedPackageObj[`${fieldMapping.siteShipmentDateReceived}`] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
                   } else { 
                       receiptedPackageObj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
                       receiptedPackageObj['dateReceived'] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
-                      if(document.getElementById('collectionId').value) {
-                          receiptedPackageObj['collectionId'] = document.getElementById('collectionId').value;
-                          receiptedPackageObj['dateCollectionCard'] = document.getElementById('dateCollectionCard').value;
-                          receiptedPackageObj['timeCollectionCard'] = document.getElementById('timeCollectionCard').value;
-                          document.getElementById('collectionCheckBox').checked === true ? 
-                          receiptedPackageObj['collectionCheckBox'] = true : receiptedPackageObj['collectionCheckBox'] = false
-                          receiptedPackageObj['collectionComments'] = document.getElementById('collectionComments').value;
-                      }    
+                    //   if(document.getElementById('collectionId').value) {
+                    //       receiptedPackageObj['collectionId'] = document.getElementById('collectionId').value;
+                    //       receiptedPackageObj['dateCollectionCard'] = document.getElementById('dateCollectionCard').value;
+                    //       receiptedPackageObj['timeCollectionCard'] = document.getElementById('timeCollectionCard').value;
+                    //       document.getElementById('collectionCheckBox').checked === true ? 
+                    //         receiptedPackageObj['collectionCheckBox'] = true : 
+                    //         receiptedPackageObj['collectionCheckBox'] = false
+                    //       receiptedPackageObj['collectionComments'] = document.getElementById('collectionComments').value;
+                    //   }    
                   }
                   
-                  window.removeEventListener("beforeunload",beforeUnloadMessage)
-                  targetAnchorTagEl();
+                  window.removeEventListener("beforeunload",beforeUnloadHandler)
+                  setupLeavingPageMessage();
+                  console.log("receiptedPackageObj", receiptedPackageObj);
+                  console.log("packageConditions", packageConditions);
                   await storeSpecimenPackageReceipt(receiptedPackageObj);
               }
+            //   throw errorMessage('Test Error: Please try again');
           } catch (error) {
               console.error(error)
               showNotifications({ title: 'Error', body: `Error: please try again. ${error}` });
@@ -221,13 +172,12 @@ const confirmPackageReceipt = () => {
 
 
 
-const identifyCourierType = (scannedBarcode) => {
- if (scannedBarcode.length === 12 || scannedBarcode.length > 12) {
-    return true
-  }
-  else {
-    return false
-}}
+// const identifyCourierType = (scannedBarcode) => {
+//     if (scannedBarcode.length >= 12) {
+//         return true
+//     }
+//     return false
+// }
 
 const storeSpecimenPackageReceipt = async (receiptedPackageData) => {
   try {
@@ -243,6 +193,7 @@ const storeSpecimenPackageReceipt = async (receiptedPackageData) => {
       });
 
       const responseData = await response.json();
+      console.log("🚀 ~ storeSpecimenPackageReceipt ~ responseData:", responseData)
       hideAnimation();
       
       if (responseData.code === 200) {
@@ -264,7 +215,7 @@ const storeSpecimenPackageReceipt = async (receiptedPackageData) => {
   } catch (error) {
       hideAnimation();
       console.error('Error: please try again.', error);
-      showNotifications({ title: 'Error', body: `Error: please try again. ${error}` });
+      showNotifications({ title: 'Error: Specimens Not Received', body: `Error: please try again. ${error}` });
   }
 };
 
@@ -344,7 +295,7 @@ const handleAlreadyReceivedPackage = (receiptedPackageData) => {
     // Define what happens when the user clicks "Continue"
     const onContinue = async () => {
         receiptedPackageData['forceWriteOverride'] = true;
-        await storeSpecimenPackageReceipt(receiptedPackageData);
+        // await storeSpecimenPackageReceipt(receiptedPackageData);
     };
 
     showNotificationsCancelOrContinue(modalMessage, null, onCancel, onContinue);
@@ -409,30 +360,34 @@ export const enableCollectionCheckBox = () => {
   collectionCheckBoxEl.checked = false
 }
 
-/*
-=========================================
-FUNCTIONS FOR UNSAVED CHANGES
-=========================================
+/**
+ * Add event listener to body element to listen for specific event clicks to handle unsaved changes when user tries to navigate away from the page.
+ * @param {boolean} inputChange - If true, add event listener to window object. If false, remove event listener from window object.
 */
+export const setupLeavingPageMessage = (inputChange = false) => {  
+    if (inputChange) {
+        document.body.addEventListener('click', checkLinkNavigation);
+      } else {
+        document.body.removeEventListener('click', checkLinkNavigation);
+      }
+};
 
-/* TARGET ALL ANCHOR TAG ELEMENTS */ 
-export const targetAnchorTagEl = (inputChange = false) => {
-  // Target all items with anchor tags, convert HTML Collection to a normal array of elements
-  // Filter and remove current anchor tag with the current location.hash
-  const allAnchorTags = Array.from(document.getElementsByTagName("a"));
-  const filteredAnchorTags = allAnchorTags.filter(el => el.getAttribute("href") !== location.hash)
-  
-  if(inputChange) {
-    filteredAnchorTags.forEach(el => {
-        el.addEventListener("click", unsavedChangesRoutingMessage)
-    })
-  }
-  else {
-    filteredAnchorTags.forEach(el => {
-      el.removeEventListener("click", unsavedChangesRoutingMessage)
-    })
-  }
-}
+const checkLinkNavigation = (e) => { 
+    if (e.target.tagName === 'A' && e.target.getAttribute('href') !== location.hash) {
+        unsavedChangesRoutingMessage(e);
+    }
+};
+
+const unsavedChangesRoutingMessage = (e) => {
+    const result = confirm("Changes were made and will not be saved. Are you sure you want to leave the page?");
+    if (!result) {
+      e.preventDefault();
+    } else { 
+      // IMPORTANT - REMOVES EVENT LISTENER FROM WINDOW OBJECT AFTER ROUTE CHANGE IS CONFIRMED
+      window.removeEventListener("beforeunload", beforeUnloadHandler)
+    }
+};
+
 
 /* ADD EVENT LISTENERS TO INPUTS THAT CAN BE SUBMITTED WHEN PAGE LOADS */ 
 export const addListenersOnPageLoad = () => {
@@ -457,39 +412,20 @@ export const addListenersOnPageLoad = () => {
   collectionCheckBoxEl.addEventListener("change",isChecked)
   collectionIdEl.addEventListener("input", hasInputChanged)
   dateCollectionCardEl.addEventListener("change", hasInputChanged)
+//   dateCollectionCardEl.addEventListener("input", hasInputChanged)
   timeCollectionCardEl.addEventListener("input", hasInputChanged)
   collectionCommentsEl.addEventListener("input", hasInputChanged)
-}
-
-/* NAMED EVENT LISTENERS FOR UNSAVED CHANGES ADDED / REMOVED */
-
-const unsavedChangesRoutingMessage = (e) => {
-  unsavedMessageConfirmation(e)
-}
-
-// Reusable message alert
-const unsavedMessageConfirmation = (e) => {
-  const result = confirm("Changes were made and will not be saved.\n\nAre you sure you want to leave the page? ")
-  if(!result) {
-    e.preventDefault()
-    return false
-  }
-  else { 
-    // IMPORTANT - REMOVES EVENT LISTENER FROM WINDOW OBJECT AFTER ROUTE CHANGE IS CONFIRMED
-    window.removeEventListener("beforeunload",beforeUnloadMessage)
-    return true
-  }
 }
 
 /*
 WINDOW
 */
-export const beforeUnloadMessage = (e) => { 
+
+export const beforeUnloadHandler = (e) => { 
   e.preventDefault()
-  // Chrome requires returnValue to be set.
+  // Include for legacy browsers.
   e.returnValue = "";
-  return
-}
+};
 
 /*
 INPUT ELEMENTS - scannedBarcodeInputEl, receivePackageCommentsEl, dateReceivedEl
@@ -498,13 +434,13 @@ const hasInputChanged = (e) => {
   // array of input has no value of true (false to true)
   if(e.target.value.trim() ==="" && !checkAllInputChanges()) {
     inputObject.inputChange = false
-    targetAnchorTagEl(inputObject.inputChange)
+    setupLeavingPageMessage(inputObject.inputChange)
     clearChanges(inputObject.inputChange)
     unsavedMessageUnload(inputObject.inputChange)
   }
   else if(e.target.value.trim() !== ""){
     inputObject.inputChange = true
-    targetAnchorTagEl(inputObject.inputChange)
+    setupLeavingPageMessage(inputObject.inputChange)
     clearChanges(inputObject.inputChange)
     unsavedMessageUnload(inputObject.inputChange)
     return
@@ -517,13 +453,13 @@ INPUT(DATE) ELEMENT - dateReceivedEl
 const hasInputDateChanged = (e) => {
     if(e.target.value.trim() === getCurrentDate() && !checkAllInputChanges()) {
       inputObject.inputChange = false
-      targetAnchorTagEl(inputObject.inputChange)
+      setupLeavingPageMessage(inputObject.inputChange)
       clearChanges(inputObject.inputChange)
       unsavedMessageUnload(inputObject.inputChange)
     }
     else if(e.target.value.trim() !== getCurrentDate()){
       inputObject.inputChange = true
-      targetAnchorTagEl(inputObject.inputChange)
+      setupLeavingPageMessage(inputObject.inputChange)
       clearChanges(inputObject.inputChange)
       unsavedMessageUnload(inputObject.inputChange)
       return
@@ -534,14 +470,14 @@ const hasInputDateChanged = (e) => {
 const isChecked = (e) => {
   if(e.target.checked) {
     inputObject.inputChange = true
-    targetAnchorTagEl(inputObject.inputChange)
+    setupLeavingPageMessage(inputObject.inputChange)
     clearChanges(inputObject.inputChange)
     unsavedMessageUnload(inputObject.inputChange)
   }
   // if no check and array of input has no value of true (false to true)
   else if (!e.target.checked && !checkAllInputChanges()){
     inputObject.inputChange = false
-    targetAnchorTagEl(inputObject.inputChange)
+    setupLeavingPageMessage(inputObject.inputChange)
     clearChanges(inputObject.inputChange)
     unsavedMessageUnload(inputObject.inputChange)
   }
@@ -558,7 +494,7 @@ const handleConditionChange = (e) => {
     inputObject.inputChange = true
     document.getElementById("packageCondition").setAttribute("data-selected",`${JSON.stringify(filteredArr)}`)
     // call function to add eventlistener to anchor tags  
-    targetAnchorTagEl(inputObject.inputChange)
+    setupLeavingPageMessage(inputObject.inputChange)
     clearChanges(inputObject.inputChange)
     unsavedMessageUnload(inputObject.inputChange)
   }
@@ -569,7 +505,7 @@ const handleConditionChange = (e) => {
     if(!checkAllInputChanges()){
       inputObject.inputChange = false
       // call function to remove eventlistener from anchor tags
-      targetAnchorTagEl(inputObject.inputChange)
+      setupLeavingPageMessage(inputObject.inputChange)
       clearChanges(inputObject.inputChange)
       unsavedMessageUnload(inputObject.inputChange)
     }
@@ -581,7 +517,7 @@ const cancelConfirm = () => {
   let result = confirm("Changes were made and will not be saved.")
 
   if(result){
-    document.getElementById("courierType").innerHTML = ``;
+    // document.getElementById("courierType").innerHTML = ``; // nor used anymore
     document.getElementById("scannedBarcode").value = "";
     document.getElementById("packageCondition").value = "";
     document.getElementById("receivePackageComments").value = "";
@@ -592,9 +528,9 @@ const cancelConfirm = () => {
     enableCollectionCardFields()
     enableCollectionCheckBox()
     document.getElementById("packageCondition").setAttribute("data-selected","[]")
-    targetAnchorTagEl()
+    setupLeavingPageMessage()
     clearButtonEl.removeEventListener("click",cancelConfirm)
-    window.removeEventListener("beforeunload",beforeUnloadMessage)
+    window.removeEventListener("beforeunload",beforeUnloadHandler)
     
     if (document.getElementById("collectionId").value) {
       document.getElementById("collectionId").value = "";
@@ -606,9 +542,9 @@ const cancelConfirm = () => {
       enableCollectionCardFields();
       enableCollectionCheckBox();
       document.getElementById("packageCondition").setAttribute("data-selected","[]");
-      targetAnchorTagEl()
+      setupLeavingPageMessage();
       clearButtonEl.removeEventListener("click",cancelConfirm);
-      window.removeEventListener("beforeunload",beforeUnloadMessage);
+      window.removeEventListener("beforeunload",beforeUnloadHandler);
 
     }
   }
@@ -621,10 +557,10 @@ const cancelConfirm = () => {
 
 const unsavedMessageUnload = (inputChange) => {
   if(inputChange) {
-    window.addEventListener("beforeunload",beforeUnloadMessage)
+    window.addEventListener("beforeunload",beforeUnloadHandler)
   }
   else if (!inputChange) {
-    window.removeEventListener("beforeunload",beforeUnloadMessage)
+    window.removeEventListener("beforeunload",beforeUnloadHandler)
   }
 }
 
@@ -640,13 +576,6 @@ const clearChanges = (inputChanges) => {
 };
 
 const checkAllInputChanges = () => {
-  /*
-  Get values, data-sets, checked ---> 
-  Compare to --> 
-  empty string, data-selected not "", checkbox not checked
-  || document.getElementById("packageCondition").getAttribute("data-selected").length !== 0
-  */ 
-  // Input Change made !== "" or checked === true or data selected any option element selected !== "select packaage condition"
 
   const condition1 = document.getElementById("scannedBarcode").value !== "" 
   const condition2 = parseDataSelected(document.getElementById("packageCondition").getAttribute("data-selected"))
@@ -686,58 +615,10 @@ const parseDataSelected = (value) => {
   return false
 }
 
-const addDefaultDateReceived = (getCurrentDate) => {
-  const dateReceivedEl = document.getElementById("dateReceived")
-  if(getCurrentDate()){
-    dateReceivedEl.value = getCurrentDate()
-  }
-  else dateReceivedEl.value = ""
-}
-
 const uspsFirstThreeNumbersCheck = (input) => {
-  const regExp = /^420[0-9]{31}$/
+  const regExp = /^420[0-9]{31}$/;
   return regExp.test(input);
 }
-
-const dropdownTrigger = () => {
-  let a = document.getElementById('dropdownSelection');
-  let dropdownMenuButton = document.getElementById('dropdownMenuButtonSelection');
-  const tempCategory = a.innerHTML.trim();
-  if (dropdownMenuButton) {
-      dropdownMenuButton.addEventListener('click', async (e) => {
-          if (tempCategory === 'Select Shipment' || tempCategory === 'Home Collection Shipment' || tempCategory === 'Site Shipment') {
-              a.innerHTML = e.target.textContent;
-              controlCollectionCardField(e.target.textContent)
-          }
-      })
-  }
-}
-
-const controlCollectionCardField = (dropdownSelection) => {
-  if (dropdownSelection === 'Site Shipment') {
-    document.getElementById('collectionCheckBox').checked = false;
-    document.getElementById('collectionCheckBox').disabled = true;
-    disableCollectionCardFields()
-  } else { 
-    document.getElementById('collectionCheckBox').checked = false;
-    document.getElementById('collectionCheckBox').removeAttribute("disabled")
-    enableCollectionCardFields() 
-  }
-}
-
-export const validatePackageInformation = () => {
-  
-  const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected');
-  const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList);
-  const scannedBarcode = document.getElementById("scannedBarcode").value;
-  const dateReceived = document.getElementById("dateReceived").value;
-  const collectionId = document.getElementById("collectionId").value;
-  const dateCollectionCard = document.getElementById("dateCollectionCard").value;
-  const timeCollectionCard = document.getElementById("timeCollectionCard").value;
-
-  return (parseSelectPackageConditionsList.length !== 0) &&
-    !!scannedBarcode && !!dateReceived && !!collectionId && !!dateCollectionCard && !!timeCollectionCard;
-};
 
 export const displayInvalidPackageInformationModal = (modalHeaderEl,modalBodyEl) => {
     modalHeaderEl.innerHTML = `
@@ -770,7 +651,7 @@ export const checkSelectPackageConditionsList = () => {
     else return false
 }
 
-export const displayPackageConditionListEmptyModal = (modalHeaderEl,modalBodyEl) => {
+export const displayPackageConditionListEmptyModal = (modalHeaderEl, modalBodyEl) => {
     modalHeaderEl.innerHTML = `
     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">&times;</span>
@@ -792,14 +673,14 @@ export const displayPackageConditionListEmptyModal = (modalHeaderEl,modalBodyEl)
     </div>`
 }
 
-export const displaySelectedPackageConditionListModal = (modalHeaderEl,modalBodyEl, isKitReceipt) => {
+export const displaySelectedPackageConditionListModal = (modalHeaderEl, modalBodyEl, isKitReceipt) => {
     const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected');
     const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList);
     modalHeaderEl.innerHTML = `
     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>`
-    modalBodyEl.innerHTML =  `<div class="row">
+    modalBodyEl.innerHTML = `<div class="row">
         <div class="col">
             <div style="display:flex; justify-content:center; margin-bottom:1rem;">
             <i class="fas fa-exclamation-triangle fa-5x" style="color:#ffc107"></i>
@@ -856,3 +737,17 @@ const clickConfirmPackageConditionListButton = (modalHeaderEl,modalBodyEl, isKit
 
     })    
 }
+
+
+// const validatePackageInformation = () => {
+//     const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected');
+//     const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList);
+//     const scannedBarcode = document.getElementById("scannedBarcode").value;
+//     const dateReceived = document.getElementById("dateReceived").value;
+//     const collectionId = document.getElementById("collectionId").value;
+//     const dateCollectionCard = document.getElementById("dateCollectionCard").value;
+//     const timeCollectionCard = document.getElementById("timeCollectionCard").value;
+
+//     return (parseSelectPackageConditionsList.length !== 0) &&
+//         !!scannedBarcode && !!dateReceived && !!collectionId && !!dateCollectionCard && !!timeCollectionCard;
+// };

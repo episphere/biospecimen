@@ -89,13 +89,17 @@ window.onload = () => {
             inactivityTime();
         }
     });
-    
     manageRoutes();
 };
 
 window.onhashchange = () => {
     manageRoutes();
 };
+
+window.addEventListener('hashchange', function(e) { // prevent default smooth scroll behavior for hash change
+    e.preventDefault();
+    window.scrollTo(0, 0);
+});
 
 const manageRoutes = async () => {
     const route = window.location.hash || "#";
