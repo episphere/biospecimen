@@ -401,7 +401,7 @@ const updateResultMappings = (filteredResult, vialMappings, collectionId, tubeId
 
     // Dummy date for clinical files requested in issue 936
     const dateDrawn = (collectionTypeValue === fieldToConceptIdMapping.clinical)
-        ? '01/01/1999 12pm'
+        ? '01/01/1999 12:00:00 PM'
         : (withdrawalDateTime ? convertISODateTime(withdrawalDateTime) : '');
 
     const vialType = vialMappings[0] || '';
