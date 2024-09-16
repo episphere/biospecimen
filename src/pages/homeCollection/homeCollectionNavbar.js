@@ -1,33 +1,34 @@
 export const homeCollectionNavbar = () => {
-  let template = ``;
-  template += `
-            <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#bptl" id="bptl">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#kitAssembly" id="kitAssembly">Kit Assembly</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#printLabels" id="printLabels">Print Labels</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#assignKits" id="assignKits">Assign Kits</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#kitShipment" id="kitShipment">Kit Shipment</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#kitsReceipt" id="kitsReceipt">Kits Receipt</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#kitsCsv" id="kitsCsv">Create .csv File</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#kitStatusReports" id="kitStatusReports">Kit Reports</a>
-                </li>
-            </ul>`;
-  return template;
+    let template = ``;
+    template += `
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#bptl" id="bptl">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#kitAssembly" id="kitAssembly">Kit Assembly</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#printLabels" id="printLabels">Print Labels</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#assignKits" id="assignKits">Assign Kits</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#kitShipment" id="kitShipment">Kit Shipment</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#kitsReceipt" id="kitsReceipt">Kits Receipt</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#kitsCsv" id="kitsCsv">Create .csv File</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#kitStatusReports" id="kitStatusReports">Kit Reports</a>
+            </li>
+        </ul>
+    `;
+    return template;
 };
 
 export const activeHomeCollectionNavbar = () => {

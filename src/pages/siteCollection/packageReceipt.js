@@ -6,14 +6,12 @@ import { conceptIds as fieldMapping, packageConditionConversion } from "../../fi
 import { confirmKitReceipt } from "../homeCollection/kitsReceipt.js";
 
 let hasUnsavedChanges = false;
-console.log("🚀 ~ hasUnsavedChanges:", hasUnsavedChanges)
 
 export const packageReceiptScreen = async (auth, route) => {
   const user = auth.currentUser;
   if (!user) return;
   const username = user.displayName ? user.displayName : user.email;
   packageReceiptTemplate(username);
-  initializePackageConditionSelect();
   checkTrackingNumberSource();
   formSubmit();
   setupLeavingPageMessage();
@@ -33,7 +31,7 @@ const packageReceiptTemplate = async (name) => {
                 <div class="row form-group">
                     <label class="col-form-label col-md-4" for="scannedBarcode">Scan FedEx/USPS Barcode</label>
                     <div style="display:inline-block;">
-                    <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode" data-track-changes style="width: 600px;" placeholder="Scan a Fedex or USPS barcode">
+                    <input autocomplete="off" required="" class="col-md-8" type="text" id="scannedBarcode"  style="width: 600px;" placeholder="Scan a Fedex or USPS barcode">
                     <span id="showMsg" style="padding-left: 10px;"></span>
                     <br>
                     <br>
@@ -46,7 +44,7 @@ const packageReceiptTemplate = async (name) => {
             <div class="row form-group">
                 <label class="col-form-label col-md-4" for="packageCondition">Select Package Condition</label>
                 <div style="display:inline-block; max-width:90%;"> 
-                    <select required class="col form-control" id="packageCondition" data-track-changes style="width:100%" multiple="multiple" data-selected="[]">
+                    <select required class="col form-control" id="packageCondition"  style="width:100%" multiple="multiple" data-selected="[]" data-initial-value="[]">
                         <option id="select-dashboard" value="">-- Select Package Condition --</option>
                         <option id="select-packageGoodCondition" value=${fieldMapping.packageGood}>Package in good condition</option>
                         <option id="select-noIcePack" value=${fieldMapping.coldPacksNone}>No Ice Pack</option>
@@ -73,11 +71,11 @@ const packageReceiptTemplate = async (name) => {
 
             <div class="row form-group">
                 <label class="col-form-label col-md-4" for="receivePackageComments">Comment</label>
-                <textarea class="col-md-8 form-control" id="receivePackageComments" cols="30" rows="5" placeholder="Any comments?" data-track-changes></textarea>
+                <textarea class="col-md-8 form-control" id="receivePackageComments" cols="30" rows="5" placeholder="Any comments?" ></textarea>
             </div>
             <div class="row form-group">
                 <label class="col-form-label col-md-4" for="dateReceived">Date Received</label>
-                <input autocomplete="off" required class="col-md-8 form-control" type="date" type="text" id="dateReceived" value=${getCurrentDate()} data-track-changes>
+                <input autocomplete="off" required class="col-md-8 form-control" type="date" type="text" id="dateReceived" value=${getCurrentDate()}>
             </div>
             <div class="mt-4 mb-4" style="display:inline-block;">
                 <button type="button" class="btn btn-danger" id="clearForm">Clear</button>
@@ -106,10 +104,7 @@ const formSubmit = () => {
         e.preventDefault();
         const modalHeaderEl = document.getElementById("modalHeader");
         const modalBodyEl = document.getElementById("modalBody");
-        // const isSelectPackageConditionsListEmpty = checkSelectPackageConditionsList();
         const isPackageInfoValid = validatePackageInformation(false);
-        // displayInvalidPackageInformationModal
-        // console.log("🚀 ~ form.addEventListener ~ isSelectPackageConditionsListEmpty:", isSelectPackageConditionsListEmpty)
 
         if (isPackageInfoValid) {
             return displaySelectedPackageConditionListModal(modalHeaderEl, modalBodyEl);
@@ -144,8 +139,6 @@ const confirmPackageReceipt = () => {
                       receiptedPackageObj['receivePackageComments'] = document.getElementById('receivePackageComments').value.trim();
                       receiptedPackageObj['dateReceived'] = convertDateReceivedinISO(document.getElementById('dateReceived').value);
                   }
-                  console.log("receiptedPackageObj", receiptedPackageObj);
-                  console.log("packageConditions", packageConditions);
                   await storeSpecimenPackageReceipt(receiptedPackageObj);
               }
           } catch (error) {
@@ -155,14 +148,6 @@ const confirmPackageReceipt = () => {
       });
   }
 };
-
-
-// const identifyCourierType = (scannedBarcode) => {
-//     if (scannedBarcode.length >= 12) {
-//         return true
-//     }
-//     return false
-// }
 
 const storeSpecimenPackageReceipt = async (receiptedPackageData) => {
   try {
@@ -178,7 +163,6 @@ const storeSpecimenPackageReceipt = async (receiptedPackageData) => {
       });
 
       const responseData = await response.json();
-      console.log("🚀 ~ storeSpecimenPackageReceipt ~ responseData:", responseData)
       hideAnimation();
       
       if (responseData.code === 200) {
@@ -285,19 +269,13 @@ const handleAlreadyReceivedPackage = (receiptedPackageData) => {
 
     showNotificationsCancelOrContinue(modalMessage, null, onCancel, onContinue);
 };
-
+// TODO: Add empty input values to the inputChangeList array of objects.
 const clearPackageReceiptForm = (isSuccess) => {
     if (isSuccess) {
         window.removeEventListener("beforeunload", handleBeforeUnload);
         setupLeavingPageMessage();
         triggerSuccessModal('Package Receipted Successfully');
     }
-
-    // add custom clearValue
-    // 
-
-    const courierType = document.getElementById("courierType");
-    if (courierType) courierType.innerHTML = '';
 
     const scannedBarcode = document.getElementById("scannedBarcode");
     if (scannedBarcode) scannedBarcode.value = '';
@@ -309,20 +287,16 @@ const clearPackageReceiptForm = (isSuccess) => {
     if (receivePackageComments) receivePackageComments.value = '';
     
     const dateReceived = document.getElementById("dateReceived");
-    if (dateReceived) dateReceived.value = getCurrentDate(); // customClearValue
+    if (dateReceived) dateReceived.value = getCurrentDate();
     
     const collectionComments = document.getElementById("collectionComments");
     if (collectionComments) collectionComments.value = '';
 
     const collectionId = document.getElementById("collectionId");
     if (collectionId) collectionId.value = '';
-    
-    // enableCollectionCardFields();
-    // enableCollectionCheckBox();
 
-    if (packageCondition) packageCondition.setAttribute("data-selected","[]");
+    if (packageCondition) packageCondition.setAttribute("data-selected", "[]");
 
-    // TODO: Handled null case, maybe this logic can be removed, but I'm not aware of the impact re: enableCollectionCardFields() and enableCollectionCheckBox(). Leaving for now.
     if (collectionId.value) {
         collectionId.value = '';
         const dateCollectionCard = document.getElementById("dateCollectionCard");
@@ -337,17 +311,14 @@ const clearPackageReceiptForm = (isSuccess) => {
         const collectionComments = document.getElementById("collectionComments");
         if (collectionComments) collectionComments.value = '';
 
-        // enableCollectionCardFields();
-        // enableCollectionCheckBox();
-
-        if (packageCondition) packageCondition.setAttribute("data-selected","[]"); //custom clear value
+        if (packageCondition) packageCondition.setAttribute("data-selected","[]");
     }
 }
 
 export const enableCollectionCheckBox = () => {
-  const collectionCheckBoxEl = document.getElementById("collectionCheckBox")
-  collectionCheckBoxEl.removeAttribute("disabled")
-  collectionCheckBoxEl.checked = false
+  const collectionCheckBoxEl = document.getElementById("collectionCheckBox");
+  collectionCheckBoxEl.removeAttribute("disabled");
+  collectionCheckBoxEl.checked = false;
 }
 
 /**
@@ -450,107 +421,65 @@ const handleCheckboxChange = (e) => {
  * @param {Event} e - The select event object.
 */
 const handlePackageConditionChange = (e) => {
-    // const hasInputChanges = checkAllInputChanges();
-    // // const packageConditions = Array.from(e.target.selectedOptions, option => option.value)
-    // //     .filter(condition => condition !== "");
-    // console.log("🚀 ~ handlePackageConditionChange ~ hasInputChanges:", hasInputChanges)
-    
-    // console.log("🚀 ~ handlePackageConditionChange ~ packageConditions:", packageConditions)
-
-    
-    // const currentValue = e.target.getAttribute("data-selected");
-    // console.log("🚀 ~ handlePackageConditionChange ~ currentValue:", currentValue)
-    
-
-    // if (initialValue === currentValue) { 
-    //     hasUnsavedChanges = false;
-    //     handleUnsavedChangesListeners(hasUnsavedChanges);
-    // } else { 
-    //     hasUnsavedChanges = true;
-    //     handleUnsavedChangesListeners(hasUnsavedChanges);
-    // }
-
-
-
-    // if (packageConditions.length > 0) {
-    //     hasUnsavedChanges = true;
-    //     document.getElementById("packageCondition").setAttribute("data-selected",`${JSON.stringify(packageConditions)}`);
-    //     console.log("🚀 ~ handlePackageConditionChange ~ document.getElementById(packageCondition):", document.getElementById("packageCondition"))
-    //     handleUnsavedChangesListeners(hasUnsavedChanges);
-
-    // } else if (!hasInputChanges){
-    //     document.getElementById("packageCondition").setAttribute("data-selected","[]")
-    //     hasUnsavedChanges = false;
-    //     handleUnsavedChangesListeners(hasUnsavedChanges);
-    // }
-
-    // console.log("🚀 ~ handlePackageConditionChange ~ packageConditions:", packageConditions)
-    // document.getElementById("packageCondition").setAttribute("data-selected", JSON.stringify(packageConditions));
-    // hasUnsavedChanges = packageConditions.length > 0 || hasInputChanges;
-    // console.log("🚀 ~ handlePackageConditionChange ~ hasInputChanges:", hasInputChanges)
-    // console.log("🚀 ~ handlePackageConditionChange ~ packageConditions.length > 0:", packageConditions.length > 0)
-
-
-    let arr = Array.from(e.target.selectedOptions, option => option.value);
-    // Removes Empty String from first option value
-    const filteredArr = arr.filter(condition => condition !== "")
+    const packageConditions = Array.from(e.target.selectedOptions, option => option.value)
+        .filter(condition => condition !== "")
   
-    if(filteredArr.length) {
-      // filteredArr.forEach(condition => packageConditionsArr.push(condition))
-      hasUnsavedChanges = true
-      document.getElementById("packageCondition").setAttribute("data-selected",`${JSON.stringify(filteredArr)}`)
-      // call function to add eventlistener to anchor tags  
-          handleUnsavedChangesListeners(hasUnsavedChanges);
-    }
-    // if no check and array of input has no value of true (false to true)
-    else if(!filteredArr.length){
-      // set data-selected attribute
-      document.getElementById("packageCondition").setAttribute("data-selected","[]")
-      if(!checkAllInputChanges()){
-        hasUnsavedChanges = false
-        // call function to remove eventlistener from anchor tags
-            handleUnsavedChangesListeners(hasUnsavedChanges);
-      }
-}
-};
+    if (packageConditions.length) {
+        hasUnsavedChanges = true
+        document.getElementById("packageCondition").setAttribute("data-selected",`${JSON.stringify(packageConditions)}`)
 
-const cancelConfirm = () => {
-  const clearButtonEl = document.getElementById("clearForm");
-  let result = confirm("Changes were made and will not be saved.")
-
-  // reset value can 
-  if(result){
-    document.getElementById("scannedBarcode").value = "";
-    document.getElementById("packageCondition").value = "";
-    document.getElementById("receivePackageComments").value = "";
-    document.getElementById("dateReceived").value = getCurrentDate();
-    
-    document.getElementById("collectionComments").value = "";
-    document.getElementById("collectionId").value = "";
-    // enableCollectionCardFields() // remove?
-    // enableCollectionCheckBox() // remove?
-    document.getElementById("collectionCheckBox").checked = false;
-    document.getElementById("packageCondition").setAttribute("data-selected","[]")
-    setupLeavingPageMessage()
-    clearButtonEl?.removeEventListener("click", cancelConfirm)
-    window.removeEventListener("beforeunload", handleBeforeUnload);
-    
-    if (document.getElementById("collectionId").value) {
-      document.getElementById("collectionId").value = "";
-      document.getElementById("dateCollectionCard").value = "";
-      document.getElementById("timeCollectionCard").value = "";
-      document.getElementById("collectionCheckBox").checked = false;
-      document.getElementById("collectionComments").value = "";
-
-    //   enableCollectionCardFields();
-    //   enableCollectionCheckBox();
+        handleUnsavedChangesListeners(hasUnsavedChanges);
+    } else if (!packageConditions.length){
       document.getElementById("packageCondition").setAttribute("data-selected","[]");
-      setupLeavingPageMessage();
-      clearButtonEl?.removeEventListener("click", cancelConfirm);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
 
+      if (!checkAllInputChanges()) {
+        hasUnsavedChanges = false
+        handleUnsavedChangesListeners(hasUnsavedChanges);
+      }
     }
-  }
+};
+// TODO: Add empty input values to the inputChangeList array of objects.
+const cancelConfirm = () => {
+    const clearButtonEl = document.getElementById("clearForm");
+    const result = confirm("Changes were made and will not be saved.")
+
+    if (result) {
+        const scannedBarcode = document.getElementById("scannedBarcode").value;
+        if (scannedBarcode) document.getElementById("scannedBarcode").value = "";
+        
+        const packageCondition = document.getElementById("packageCondition");
+        if (packageCondition) packageCondition.value = "";
+
+        const receivePackageComments = document.getElementById("receivePackageComments");
+        if (receivePackageComments) receivePackageComments.value = "";
+    
+        const dateReceived = document.getElementById("dateReceived");
+        if (dateReceived) dateReceived.value = getCurrentDate();;
+        
+        const collectionCheckBox = document.getElementById("collectionCheckBox");
+        if (collectionCheckBox) collectionCheckBox.checked = false;
+
+        const collectionId = document.getElementById("collectionId");
+        if (collectionId) collectionId.value = "";
+
+        const dateCollectionCard = document.getElementById("dateCollectionCard");
+        if (dateCollectionCard) dateCollectionCard.value = "";
+        
+        const timeCollectionCard = document.getElementById("timeCollectionCard");
+        if (timeCollectionCard) timeCollectionCard.value = "";
+
+        const collectionComments = document.getElementById("collectionComments");
+        if (collectionComments) collectionComments.value = "";
+
+        
+        const clearButtonEl = document.getElementById("clearForm");
+        clearButtonEl.removeEventListener("click", cancelConfirm);
+        packageCondition.setAttribute("data-selected","[]")
+        
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+        setupLeavingPageMessage()
+    }
 };
 
 /**
@@ -558,23 +487,22 @@ const cancelConfirm = () => {
  * @param {boolean} hasUnsavedChanges - If true, add event listener to window object. If false, remove event listener from window object.
 */
 const toggleBeforeUnloadListener = (hasUnsavedChanges) => {
-  if (hasUnsavedChanges) {
-    window.addEventListener("beforeunload", handleBeforeUnload);
-  } else {
-    window.removeEventListener("beforeunload", handleBeforeUnload);
-  }
+    if (hasUnsavedChanges) {
+        window.addEventListener("beforeunload", handleBeforeUnload);
+    } else {
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+    }
 };
 
 // Add two parameters and check truthy and falsy values
 // toggle clearFormClickListener
 const toggleClearFormBtnListener = (inputChanges) => {
-  const clearButtonEl = document.getElementById("clearForm");
-  if(inputChanges) {
-    clearButtonEl.addEventListener("click",cancelConfirm)
-  }
-  else {
-    clearButtonEl.removeEventListener("click",cancelConfirm)
-  }
+    const clearButtonEl = document.getElementById("clearForm");
+    if (inputChanges) {
+        clearButtonEl.addEventListener("click", cancelConfirm);
+    } else {
+        clearButtonEl.removeEventListener("click", cancelConfirm);
+    }
 };
 
 /**
@@ -606,13 +534,10 @@ const inputChangeList = [
     },
     {
         selector: "packageCondition",
-        // check: (input) => input.getAttribute("data-selected") !== "[]",
         check: (input) => {
-                const currentValue = input.getAttribute("data-selected");
-                console.log("🚀 ~ currentValue:", currentValue)
-                const initialValue = input.getAttribute("data-initial-value");
-                console.log("🚀 ~ initialValue:", initialValue)
-                return currentValue !== initialValue;
+            const initialValue = input.getAttribute("data-initial-value");
+            const currentValue = input.getAttribute("data-selected");
+            return currentValue !== initialValue;
         },
         listenerType: "change",
         onlyKitsReceipt: false,
@@ -834,90 +759,3 @@ const handleUnsavedChangesListeners = (hasUnsavedChanges) => {
     toggleClearFormBtnListener(hasUnsavedChanges);
     toggleBeforeUnloadListener(hasUnsavedChanges);
 };
-
-/**
- * Set the attribute data-initial-value and data-selected to initial value of packageCondition select element.
-*/
-export const initializePackageConditionSelect = () => {
-    const packageCondition = document.getElementById("packageCondition");
-    console.log("🚀 ~ initializePackageConditionSelect ~ packageCondition:", packageCondition)
-    const initialValue = "[]";
-    console.log("🚀 ~ initializePackageConditionSelect ~ initialValue:", initialValue)
-    packageCondition.setAttribute("data-initial-value", initialValue);
-    packageCondition.setAttribute("data-selected", initialValue);
-}
-
-
-// // ------- CODE COPY ------- //
-
-// export const addListenersOnPageLoad = () => {
-//     // Receive Packages: barcode, packageconditions,receive package comments, date received
-
-//     const scannedBarcodeInputEl = document.getElementById("scannedBarcode"); -
-//     const packageConditionEl = document.getElementById("packageCondition");
-//     const receivePackageCommentsEl = document.getElementById("receivePackageComments"); -
-//     const dateReceivedEl = document.getElementById("dateReceived"); -
-  
-//     scannedBarcodeInputEl.addEventListener("input", hasInputChanged) - 
-//     packageConditionEl.addEventListener("change",handleConditionChange) -
-//     receivePackageCommentsEl.addEventListener("input", hasInputChanged)-
-//     dateReceivedEl.addEventListener("input", hasInputDateChanged) // make custom change event -
-  
-//     // Collection Card Date Entry: collectionCheckBox,collectionId, dateCollectionCard,timeCollectionCard,collectionComments
-  
-//     const collectionCheckBoxEl = document.getElementById("collectionCheckBox")-
-//     const collectionIdEl = document.getElementById("collectionId")-
-//     const dateCollectionCardEl = document.getElementById("dateCollectionCard")-
-//     const timeCollectionCardEl = document.getElementById("timeCollectionCard")-
-//     const collectionCommentsEl = document.getElementById("collectionComments")-
-//     collectionCheckBoxEl.addEventListener("change",isChecked)-
-//     collectionIdEl.addEventListener("input", hasInputChanged)-
-//     dateCollectionCardEl.addEventListener("change", hasInputChanged)-
-//   //   dateCollectionCardEl.addEventListener("input", hasInputChanged)-
-//     timeCollectionCardEl.addEventListener("input", hasInputChanged)-
-//     collectionCommentsEl.addEventListener("input", hasInputChanged)-
-//   }
-
-/*
-
-hasInputChanged --> handleInputChange -
-
-hasInputDateChange --> handleInputDateChange (custom)-
-
-isChecked --> handleCheckboxChange (custom) -
-
-handleConditionChange --> handlePackageConditionChange (custom)
-
-
-
-  // SELECT ELEMENT - packageConditionEl
-  const handleConditionChange = (e) => {
-    let arr = Array.from(e.target.selectedOptions, option => option.value);
-    // Removes Empty String from first option value
-    const filteredArr = arr.filter(condition => condition !== "")
-  
-    if(filteredArr.length) {
-      // filteredArr.forEach(condition => packageConditionsArr.push(condition))
-      inputObject.inputChange = true
-      document.getElementById("packageCondition").setAttribute("data-selected",`${JSON.stringify(filteredArr)}`)
-      // call function to add eventlistener to anchor tags  
-      setupLeavingPageMessage(inputObject.inputChange)
-      clearChanges(inputObject.inputChange)
-      unsavedMessageUnload(inputObject.inputChange)
-    }
-    // if no check and array of input has no value of true (false to true)
-    else if(!filteredArr.length){
-      // set data-selected attribute
-      document.getElementById("packageCondition").setAttribute("data-selected","[]")
-      if(!checkAllInputChanges()){
-        inputObject.inputChange = false
-        // call function to remove eventlistener from anchor tags
-        setupLeavingPageMessage(inputObject.inputChange)
-        clearChanges(inputObject.inputChange)
-        unsavedMessageUnload(inputObject.inputChange)
-      }
-    }
-  
-
-
-*/
