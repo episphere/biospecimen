@@ -97,7 +97,7 @@ const packageReceiptTemplate = async (name) => {
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(name);
     activeSiteCollectionNavbar();
 };
-//check for logs later
+
 const formSubmit = () => {
     const form = document.getElementById("save");
     form.addEventListener("click", (e) => {
