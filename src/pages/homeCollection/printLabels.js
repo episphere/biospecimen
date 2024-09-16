@@ -57,9 +57,7 @@ const printLabelsTemplate = (name) => {
 const initializeTotalAddressesToPrint = async () => {
   showAnimation();
   const totalAddresses = await getTotalAddressesToPrint();
-  console.log("🚀 ~ initializeTotalAddressesToPrint ~ totalAddresses:", totalAddresses)
   const processedAddresses = totalAddresses.data.filter(obj => obj.length !== 0)
-  console.log("🚀 ~ initializeTotalAddressesToPrint ~ processedAddresses:", processedAddresses)
   appState.setState({'totalAddresses': processedAddresses})
   appState.setState({'totalAddressesLength': processedAddresses.length })
   hideAnimation();
