@@ -2,7 +2,7 @@ import { homeCollectionNavbar, activeHomeCollectionNavbar } from "./homeCollecti
 import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, processResponse, checkTrackingNumberSource, getCurrentDate, numericInputValidator, autoTabAcrossArray, sendInstantNotification, getLoginDetails } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { conceptIds } from "../../fieldToConceptIdMapping.js";
-import { displayInvalidPackageInformationModal, displaySelectedPackageConditionListModal, checkSelectPackageConditionsList, setupLeavingPageMessage, addListenersOnPageLoad, beforeUnloadHandler, enableCollectionCheckBox } from "../siteCollection/packageReceipt.js";
+import { displayInvalidPackageInformationModal, displaySelectedPackageConditionListModal, checkSelectPackageConditionsList, setupLeavingPageMessage, addFormInputListenersOnLoad, handleBeforeUnload, enableCollectionCheckBox, validatePackageInformation } from "../siteCollection/packageReceipt.js";
 
 const contentBody = document.getElementById("contentBody");
 
@@ -14,7 +14,7 @@ export const kitsReceiptScreen = async (auth) => {
   kitsReceiptTemplate(name);
   hideAnimation();
   setupLeavingPageMessage();
-  addListenersOnPageLoad();
+  addFormInputListenersOnLoad(true);
   formSubmit(); 
 }
 
@@ -173,7 +173,7 @@ export const confirmKitReceipt = () => {
         kitObj[conceptIds.collectionCardFlag] = true : kitObj[conceptIds.collectionCardFlag] = false;
         kitObj[conceptIds.collectionAddtnlNotes] = document.getElementById('collectionComments').value;
       }
-      window.removeEventListener("beforeunload",beforeUnloadHandler)
+      window.removeEventListener("beforeunload", handleBeforeUnload);
       setupLeavingPageMessage();
       storePackageReceipt(kitObj);
     })
@@ -262,31 +262,4 @@ const enableCollectionCardFields = () => {
     document.getElementById('dateCollectionCard').disabled = false;
     document.getElementById('timeCollectionCard').disabled = false;
     document.getElementById('collectionComments').disabled = false;
-};
-
-/**
- * Returns true if all required fields are filled out, false otherwise.
- * @param {boolean} isMouthwashKit - True if the kit being received is a mouthwash kit, false otherwise.
- * @returns {boolean} - True if all required fields are filled out, false otherwise.
-*/
-const validatePackageInformation = (isMouthwashKit = false) => {
-    const selectPackageConditionsList = document.getElementById('packageCondition').getAttribute('data-selected');
-    const parseSelectPackageConditionsList = JSON.parse(selectPackageConditionsList);
-    const scannedBarcode = document.getElementById("scannedBarcode").value;
-    const dateReceived = document.getElementById("dateReceived").value;
-    const collectionId = document.getElementById("collectionId").value;
-    const dateCollectionCard = document.getElementById("dateCollectionCard").value;
-    const timeCollectionCard = document.getElementById("timeCollectionCard").value;
-
-    if (isMouthwashKit === true) {
-        return (parseSelectPackageConditionsList.length !== 0) 
-            && !!scannedBarcode 
-            && !!dateReceived 
-            && !!collectionId 
-            && !!dateCollectionCard 
-            && !!timeCollectionCard;
-    }
-    return (selectPackageConditionsList.length !== 0) 
-        && !!scannedBarcode 
-        && !!dateReceived;
 };
