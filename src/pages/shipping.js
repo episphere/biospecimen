@@ -154,6 +154,7 @@ const populateAvailableCollectionsList = async (availableCollectionsObj, loadFro
         availableCollectionsObj = appState.getState().availableCollectionsObj ?? {};
     }
 
+
     const bagIdList = Object.keys(availableCollectionsObj).sort();
     const tableEle = document.getElementById("specimenList");
     tableEle.innerHTML = buildPopulateSpecimensHeader();
@@ -163,11 +164,19 @@ const populateAvailableCollectionsList = async (availableCollectionsObj, loadFro
 
     for (const bagId of bagIdList) {
         if (bagId !== "unlabelled") {
+            const specimen = availableCollectionsObj[bagId].specimen;
             const rowEle = tableEle.insertRow();
             rowEle.insertCell(0).innerHTML = bagId;
             rowEle.insertCell(1).innerHTML = availableCollectionsObj[bagId].length;
+            if (specimen && specimen[conceptIds.collectionType] === conceptIds.clinical) {
+                rowEle.insertCell(2).textContent = 'Clinical';
+            } else if (specimen && specimen[conceptIds.collectionType] === conceptIds.research) {
+                rowEle.insertCell(2).textContent = conceptIds.collectionLocationMapping[specimen[conceptIds.collectionLocation]];
+            } else {
+                console.warn('Specimen match not found for', specimen);
+            }
 
-            const hiddenChannel = rowEle.insertCell(2)
+            const hiddenChannel = rowEle.insertCell(3)
             hiddenChannel.innerHTML = JSON.stringify(availableCollectionsObj[bagId]);
             hiddenChannel.style.display = "none";
             if (numRows % 2 === 0) {
@@ -1295,6 +1304,7 @@ export const buildPopulateSpecimensHeader = () => {
         <tr>
             <th>Specimen Bag ID</th>
             <th># Specimens in Bag</th>
+            <th>Collection Location</th>
         </th>
     `;
 }

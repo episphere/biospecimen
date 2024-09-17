@@ -1212,6 +1212,7 @@ const buildAvailableCollectionsObject = (specimensList, isPartiallyBoxed) => {
                 availableCollections[bagKey] = [];
             }
             availableCollections[bagKey] = [...availableCollections[bagKey], ...usableTubesObj[bagKey]];
+            availableCollections[bagKey].specimen = specimen;
         }
     }
     return { availableCollections, specimensList };
