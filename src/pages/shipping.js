@@ -168,7 +168,7 @@ const populateAvailableCollectionsList = async (availableCollectionsObj, loadFro
             const rowEle = tableEle.insertRow();
             rowEle.insertCell(0).innerHTML = bagId;
             rowEle.insertCell(1).innerHTML = availableCollectionsObj[bagId].length;
-            if(specimen && specimen[conceptIds.collectionType] === conceptIds.clinical) {
+            if (specimen && specimen[conceptIds.collectionType] === conceptIds.clinical) {
                 rowEle.insertCell(2).innerHTML = 'Clinical';
             } else if (specimen && specimen[conceptIds.collectionType] === conceptIds.research) {
                 rowEle.insertCell(2).innerHTML = conceptIds.collectionLocationMapping[specimen[conceptIds.collectionLocation]];
