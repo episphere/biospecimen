@@ -1,6 +1,6 @@
-import { reportsNavbar } from "./reportsNavbar.js";
+import { siteCollectionNavbar } from "./siteCollectionNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
-import { activeReportsNavbar } from "./activeReportsNavbar.js";
+import { activeSiteCollectionNavbar } from "./activeSiteCollectionNavbar.js";
 import { showAnimation, getSpecimenAndParticipant, hideAnimation, showNotifications, errorMessage, removeAllErrors, appState, validateSpecimenAndParticipantResponse } from '../../shared.js';
 import { masterSpecimenIDRequirement } from '../../tubeValidation.js';
 import { finalizeTemplate } from '../finalize.js';
@@ -16,7 +16,7 @@ export const collectionIdSearchScreen = async (auth, route) => {
 
 export const collectionIdSearchScreenTemplate = async (username) => {
     let template = "";
-    template += reportsNavbar();
+    template += siteCollectionNavbar();
     template += ` 
               <div id="root root-margin" style="padding-top: 25px;">
                 <h3 style="text-align: center; margin: 1rem 0;">Collection ID Search</h3>
@@ -40,7 +40,7 @@ export const collectionIdSearchScreenTemplate = async (username) => {
 
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
-    activeReportsNavbar();
+    activeSiteCollectionNavbar();
     collectionIdSearchBPTL();
 };
 

@@ -134,7 +134,7 @@ const populateSidePaneRows = () => {
           data-zipCode= '${participant.zip_code}'
           data-connectId= '${participant.connect_id}'
           id="selectParticipants">Select</button>
-        </ul>`
+        </ul>`;
     })
     selectParticipants();
   }
