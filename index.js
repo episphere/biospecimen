@@ -2,6 +2,10 @@ import { inactivityTime, urls } from "./src/shared.js";
 import { firebaseConfig as devFirebaseConfig } from "./src/dev/config.js";
 import { firebaseConfig as stageFirebaseConfig } from "./src/stage/config.js";
 import { firebaseConfig as prodFirebaseConfig } from "./src/prod/config.js";
+// When doing local development, uncomment this
+// Get the API key file from Box or the DevOps team
+// Do not accept PRs with the localDevFirebaseConfig import uncommented
+// import { firebaseConfig as  localDevFirebaseConfig} from "./src/local-dev/config.js";
 import { manageUsers } from "./src/pages/users.js";
 import { userDashboard } from "./src/pages/dashboard.js";
 import { shippingDashboard } from "./src/pages/shipping.js";
@@ -74,7 +78,13 @@ window.onload = () => {
         !firebase.apps.length ? firebase.initializeApp(stageFirebaseConfig()) : firebase.app();
         window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'stage' });
     }
-    else {
+    else if (isLocalDev) {
+        if (typeof localDevFirebaseConfig === 'undefined') {
+            console.error('Local development requires a localDevFirebaseConfig function to be defined in src/local-dev/config.js.');
+            return;
+        }
+        !firebase.apps.length ? firebase.initializeApp(localDevFirebaseConfig()) : firebase.app();
+    } else {
         !firebase.apps.length ? firebase.initializeApp(devFirebaseConfig()) : firebase.app();
         !isLocalDev && window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'dev' });
     }

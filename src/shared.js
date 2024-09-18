@@ -1212,6 +1212,7 @@ const buildAvailableCollectionsObject = (specimensList, isPartiallyBoxed) => {
                 availableCollections[bagKey] = [];
             }
             availableCollections[bagKey] = [...availableCollections[bagKey], ...usableTubesObj[bagKey]];
+            availableCollections[bagKey].specimen = specimen;
         }
     }
     return { availableCollections, specimensList };
@@ -3332,6 +3333,17 @@ export const formatISODateTimeDateOnly = (dateReceived) => {
     extractDate = extractDate.split('-')
     const formattedDateTimeStamp = extractDate[1]+'/'+extractDate[2]+'/'+extractDate[0]
     return formattedDateTimeStamp
+}
+
+export const capsEnforcer = (elemArr) => {
+    elemArr.forEach(elemId => {
+        let elem = document.getElementById(elemId);
+        if (elem) {
+            elem.addEventListener('input', (e) => {
+                elem.value = (e.target.value + '').toUpperCase();
+            });
+        }
+    });
 }
 
 export const numericInputValidator = (elemArr) => {
