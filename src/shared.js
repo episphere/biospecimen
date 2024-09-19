@@ -2691,7 +2691,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                         let currRow = shippingTable.rows[i];
                         if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
                             tableIndex = i;
-                            biospecimensList = JSON.parse(currRow.cells[2].innerText)
+                            biospecimensList = JSON.parse(currRow.cells[3].innerText)
                             foundInShipping = true;
                         }
                         

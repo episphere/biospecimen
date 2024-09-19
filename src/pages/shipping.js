@@ -580,7 +580,7 @@ export const buildSpecimenDataInModal = (masterSpecimenId) =>{
         const currRow = shippingTable.rows[i];
         if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) {
             tableIndex = i;
-            biospecimensList = JSON.parse(currRow.cells[2].innerText)
+            biospecimensList = JSON.parse(currRow.cells[3].innerText)
         }
     }
 
@@ -738,16 +738,16 @@ const handleAvailableCollectionsTableRows = (tableIndex, tubesToDelete) => {
     const availableCollectionsTable = document.getElementById('specimenList');
     
     // handle an orphan tube scanned if currArr is undefined  
-    const currArr = availableCollectionsTable?.rows[tableIndex]?.cells[2]?.innerText;
+    const currArr = availableCollectionsTable?.rows[tableIndex]?.cells[3]?.innerText;
     if(currArr != undefined) {
-        const parseCurrArr = JSON.parse(availableCollectionsTable.rows[tableIndex].cells[2].innerText);
+        const parseCurrArr = JSON.parse(currArr);
         for (let i = 0; i < tubesToDelete.length; i++) {
             parseCurrArr.splice(parseCurrArr.indexOf(tubesToDelete[i]), 1);
         }
         if (parseCurrArr.length == 0) {
             availableCollectionsTable.deleteRow(tableIndex);
         } else {
-            availableCollectionsTable.rows[tableIndex].cells[2].innerText = JSON.stringify(parseCurrArr);
+            availableCollectionsTable.rows[tableIndex].cells[3].innerText = JSON.stringify(parseCurrArr);
             availableCollectionsTable.rows[tableIndex].cells[1].innerText = parseCurrArr.length;
         }
     }
