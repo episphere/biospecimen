@@ -163,11 +163,9 @@ const storeSpecimenPackageReceipt = async (receiptedPackageData) => {
       });
 
       const responseData = await response.json();
-      console.log("🚀 ~ storeSpecimenPackageReceipt ~ responseData:", responseData)
       hideAnimation();
       
       if (responseData.code === 200) {
-        console.log("Success!!!")
           clearPackageReceiptForm(true);
       } else if (responseData.code === 409) {
           switch (responseData.message) {
@@ -181,7 +179,6 @@ const storeSpecimenPackageReceipt = async (receiptedPackageData) => {
                   throw new Error('Bad arg in response data message. Please report this error.');
           }    
       } else {
-        console.log("Not 200 or 409!!!")
           showNotifications({ title: `Error: ${responseData.code}` , body: `Error: ${responseData.message}` });
       }
   } catch (error) {
@@ -284,7 +281,7 @@ const clearPackageReceiptForm = (isSuccess) => {
         triggerSuccessModal('Package Receipted Successfully');
     }
     resetFormInputs();
-}
+};
 
 /**
  * Resets all form inputs defined in the inputChangeList.
@@ -293,17 +290,17 @@ const clearPackageReceiptForm = (isSuccess) => {
  */
 const resetFormInputs = () => {
     inputChangeList.forEach(({ selector, reset }) => {
-      const inputEl = document.getElementById(selector);
+        const inputEl = document.getElementById(selector);
 
-      if (inputEl) reset(inputEl);
+        if (inputEl) reset(inputEl);
     });
-  };
+};
 
 export const enableCollectionCheckBox = () => {
   const collectionCheckBoxEl = document.getElementById("collectionCheckBox");
   collectionCheckBoxEl.removeAttribute("disabled");
   collectionCheckBoxEl.checked = false;
-}
+};
 
 /**
  * Adds or removes click event listener to body element to handle unsaved changes when user tries to navigate away from the page.
