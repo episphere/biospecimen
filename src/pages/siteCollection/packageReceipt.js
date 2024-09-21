@@ -348,6 +348,7 @@ const unsavedChangesRoutingMessage = (e) => {
         e.preventDefault();
     } else {
         window.removeEventListener("beforeunload", handleBeforeUnload);
+        document.body.removeEventListener('click', checkLinkNavigation);
     }
 };
 
@@ -356,7 +357,7 @@ const unsavedChangesRoutingMessage = (e) => {
  * @param {boolean} isKitReceipt - If true, add event listeners to only kit receipt inputs. If false, add event listeners to all inputs.
 */
 export const addFormInputListenersOnLoad = (isKitReceipt = false) => {
-    let inputChangeCheckList = inputChangeList.filter((input) => isKitReceipt || !input.onlyKitsReceipt);
+    const inputChangeCheckList = inputChangeList.filter((input) => isKitReceipt || !input.onlyKitsReceipt);
 
     inputChangeCheckList.forEach(({ selector, listenerType, customHandler }) => {
         const inputEl = document.getElementById(selector);
@@ -471,12 +472,9 @@ const cancelConfirm = () => {
         const collectionComments = document.getElementById("collectionComments");
         if (collectionComments) collectionComments.value = "";
 
-        
-        const clearButtonEl = document.getElementById("clearForm");
         clearButtonEl.removeEventListener("click", cancelConfirm);
         packageCondition.setAttribute("data-selected","[]")
         
-        window.removeEventListener("beforeunload", handleBeforeUnload);
         window.removeEventListener("beforeunload", handleBeforeUnload);
         setupLeavingPageMessage()
     }
@@ -487,10 +485,9 @@ const cancelConfirm = () => {
  * @param {boolean} hasUnsavedChanges - If true, add event listener to window object. If false, remove event listener from window object.
 */
 const toggleBeforeUnloadListener = (hasUnsavedChanges) => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
     if (hasUnsavedChanges) {
         window.addEventListener("beforeunload", handleBeforeUnload);
-    } else {
-        window.removeEventListener("beforeunload", handleBeforeUnload);
     }
 };
 
