@@ -2,7 +2,7 @@ import { homeCollectionNavbar, activeHomeCollectionNavbar } from "./homeCollecti
 import { getIdToken, showAnimation, hideAnimation, convertDateReceivedinISO, baseAPI, triggerSuccessModal, triggerErrorModal, processResponse, checkTrackingNumberSource, getCurrentDate, numericInputValidator, autoTabAcrossArray, sendInstantNotification, getLoginDetails } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { conceptIds } from "../../fieldToConceptIdMapping.js";
-import { displayInvalidPackageInformationModal, displaySelectedPackageConditionListModal, checkSelectPackageConditionsList, setupLeavingPageMessage, addFormInputListenersOnLoad, handleBeforeUnload, enableCollectionCheckBox, validatePackageInformation } from "../siteCollection/packageReceipt.js";
+import { displayInvalidPackageInformationModal, displaySelectedPackageConditionListModal, setupLeavingPageMessage, addFormInputListenersOnLoad, handleBeforeUnload, enableCollectionCheckBox, validatePackageInformation } from "../siteCollection/sitePackageReceipt.js";
 
 const contentBody = document.getElementById("contentBody");
 

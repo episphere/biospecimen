@@ -25,7 +25,7 @@ const packageReceiptTemplate = async (name) => {
     template += `
         <div id="root root-margin" style="padding-top: 25px;">
             <div id="alert_placeholder"></div>
-            <span> <h3 style="text-align: center; margin: 0 0 1rem;">Package Receipt</h3> </span>
+            <span> <h3 style="text-align: center; margin: 0 0 1rem;">Site Package Receipt</h3> </span>
             <div class="mt-3" >
                 <br>
                 <div class="row form-group">
@@ -163,9 +163,11 @@ const storeSpecimenPackageReceipt = async (receiptedPackageData) => {
       });
 
       const responseData = await response.json();
+      console.log("🚀 ~ storeSpecimenPackageReceipt ~ responseData:", responseData)
       hideAnimation();
       
       if (responseData.code === 200) {
+        console.log("Success!!!")
           clearPackageReceiptForm(true);
       } else if (responseData.code === 409) {
           switch (responseData.message) {
@@ -179,6 +181,7 @@ const storeSpecimenPackageReceipt = async (receiptedPackageData) => {
                   throw new Error('Bad arg in response data message. Please report this error.');
           }    
       } else {
+        console.log("Not 200 or 409!!!")
           showNotifications({ title: `Error: ${responseData.code}` , body: `Error: ${responseData.message}` });
       }
   } catch (error) {
@@ -269,51 +272,33 @@ const handleAlreadyReceivedPackage = (receiptedPackageData) => {
 
     showNotificationsCancelOrContinue(modalMessage, null, onCancel, onContinue);
 };
-// TODO: Add empty input values to the inputChangeList array of objects.
+
+/**
+ * On a successful save of the package receipt, clear the form, remove event listeners, and display a success alert.
+ * @param {boolean} isSuccess - If true, reset the form inputs, display a success alert, remove beforeunload listener, call setupLeavingPageMessage function. If false, reset the form inputs.
+*/
 const clearPackageReceiptForm = (isSuccess) => {
     if (isSuccess) {
         window.removeEventListener("beforeunload", handleBeforeUnload);
         setupLeavingPageMessage();
         triggerSuccessModal('Package Receipted Successfully');
     }
-
-    const scannedBarcode = document.getElementById("scannedBarcode");
-    if (scannedBarcode) scannedBarcode.value = '';
-    
-    const packageCondition = document.getElementById("packageCondition");
-    if (packageCondition) packageCondition.value = '';
-    
-    const receivePackageComments = document.getElementById("receivePackageComments");
-    if (receivePackageComments) receivePackageComments.value = '';
-    
-    const dateReceived = document.getElementById("dateReceived");
-    if (dateReceived) dateReceived.value = getCurrentDate();
-    
-    const collectionComments = document.getElementById("collectionComments");
-    if (collectionComments) collectionComments.value = '';
-
-    const collectionId = document.getElementById("collectionId");
-    if (collectionId) collectionId.value = '';
-
-    if (packageCondition) packageCondition.setAttribute("data-selected", "[]");
-
-    if (collectionId.value) {
-        collectionId.value = '';
-        const dateCollectionCard = document.getElementById("dateCollectionCard");
-        if (dateCollectionCard) dateCollectionCard.value = '';
-
-        const timeCollectionCard = document.getElementById("timeCollectionCard");
-        if (timeCollectionCard) timeCollectionCard.value = '';
-
-        const collectionCheckBox = document.getElementById("collectionCheckBox");
-        if (collectionCheckBox) collectionCheckBox.checked = false;
-
-        const collectionComments = document.getElementById("collectionComments");
-        if (collectionComments) collectionComments.value = '';
-
-        if (packageCondition) packageCondition.setAttribute("data-selected","[]");
-    }
+    resetFormInputs();
 }
+
+/**
+ * Resets all form inputs defined in the inputChangeList.
+ * This function iterates through the inputChangeList, finds each input element,
+ * and applies the corresponding reset function if the element exists.
+ */
+const resetFormInputs = () => {
+    inputChangeList.forEach(({ selector, reset }) => {
+      const inputEl = document.getElementById(selector);
+      console.log("🚀 ~ inputChangeList.forEach ~ inputEl:", inputEl)
+      
+      if (inputEl) reset(inputEl);
+    });
+  };
 
 export const enableCollectionCheckBox = () => {
   const collectionCheckBoxEl = document.getElementById("collectionCheckBox");
@@ -438,45 +423,20 @@ const handlePackageConditionChange = (e) => {
       }
     }
 };
-// TODO: Add empty input values to the inputChangeList array of objects.
+
+/**
+ * User confirms to clear the form, reset the input elements initial values and remove event listeners. Calls the reset function from the inputChangeList array of objects.
+*/
 const cancelConfirm = () => {
     const clearButtonEl = document.getElementById("clearForm");
     const result = confirm("Changes were made and will not be saved.")
 
     if (result) {
-        const scannedBarcode = document.getElementById("scannedBarcode").value;
-        if (scannedBarcode) document.getElementById("scannedBarcode").value = "";
-        
-        const packageCondition = document.getElementById("packageCondition");
-        if (packageCondition) packageCondition.value = "";
-
-        const receivePackageComments = document.getElementById("receivePackageComments");
-        if (receivePackageComments) receivePackageComments.value = "";
-    
-        const dateReceived = document.getElementById("dateReceived");
-        if (dateReceived) dateReceived.value = getCurrentDate();;
-        
-        const collectionCheckBox = document.getElementById("collectionCheckBox");
-        if (collectionCheckBox) collectionCheckBox.checked = false;
-
-        const collectionId = document.getElementById("collectionId");
-        if (collectionId) collectionId.value = "";
-
-        const dateCollectionCard = document.getElementById("dateCollectionCard");
-        if (dateCollectionCard) dateCollectionCard.value = "";
-        
-        const timeCollectionCard = document.getElementById("timeCollectionCard");
-        if (timeCollectionCard) timeCollectionCard.value = "";
-
-        const collectionComments = document.getElementById("collectionComments");
-        if (collectionComments) collectionComments.value = "";
-
-        
-        const clearButtonEl = document.getElementById("clearForm");
+        inputChangeList.forEach(({ selector, reset }) => { 
+            const inputEl = document.getElementById(selector);
+            if (inputEl) reset(inputEl);
+        });
         clearButtonEl.removeEventListener("click", cancelConfirm);
-        packageCondition.setAttribute("data-selected","[]")
-        
-        window.removeEventListener("beforeunload", handleBeforeUnload);
         window.removeEventListener("beforeunload", handleBeforeUnload);
         setupLeavingPageMessage()
     }
@@ -506,7 +466,7 @@ const toggleClearFormBtnListener = (inputChanges) => {
 };
 
 /**
- * Checks if any input has changed for their respective forms, package receipt or mouthwash kit receipt. Uses the inputChangeList array of objects to check if inputs have changed.
+ * Checks if any input has changed for their respective forms, site package receipt or mouthwash kit receipt. Uses the inputChangeList array of objects to check if inputs have changed.
  * @param {boolean} isKitReceipt - If true, add event listeners to only kit receipt inputs. If false, add event listeners to all inputs.
  * @returns {boolean} true if any input has changed, false otherwise.
 */
@@ -531,6 +491,11 @@ const inputChangeList = [
         check: (input) => input.value.trim() !== "",
         listenerType: "input",
         onlyKitsReceipt: false,
+        reset: (input) => { 
+            const showMsg = document.getElementById("showMsg");
+            showMsg.textContent = "";
+            input.value = "";
+        },
     },
     {
         selector: "packageCondition",
@@ -542,12 +507,17 @@ const inputChangeList = [
         listenerType: "change",
         onlyKitsReceipt: false,
         customHandler: handlePackageConditionChange,
+        reset: (input) => { 
+            input.value = ""; 
+            input.setAttribute("data-selected", "[]");
+        },
     },
     {
         selector: "receivePackageComments",
         check: (input) => input.value.trim() !== "",
         listenerType: "input",
         onlyKitsReceipt: false,
+        reset: (input) => input.value = "",
     },
     {
         selector: "dateReceived",
@@ -555,6 +525,7 @@ const inputChangeList = [
         listenerType: "input",
         onlyKitsReceipt: false,
         customHandler: handleInputDateChange,
+        reset: (input) => input.value = getCurrentDate(),
     },
     {
         selector: "collectionCheckBox",
@@ -562,30 +533,35 @@ const inputChangeList = [
         listenerType: "change",
         onlyKitsReceipt: true,
         customHandler: handleCheckboxChange,
+        reset: (input) => input.checked = false,
     },
     {
         selector: "collectionId",
         check: (input) => input.value.trim() !== "",
         listenerType: "input",
         onlyKitsReceipt: true,
+        reset: (input) => input.value = "",
     },
     {
         selector: "dateCollectionCard",
         check: (input) => input.value.trim() !== "",
         listenerType: "change",
         onlyKitsReceipt: true,
+        reset: (input) => input.value = "",
     },
     {
         selector: "timeCollectionCard",
         check: (input) => input.value.trim() !== "",
         listenerType: "input",
         onlyKitsReceipt: true,
+        reset: (input) => input.value = "",
     },
     {
         selector: "collectionComments",
         check: (input) => input.value.trim() !== "",
         listenerType: "input",
         onlyKitsReceipt: true,
+        reset: (input) => input.value = "",
     }
 ];
 

@@ -9,7 +9,7 @@ export const siteCollectionNavbar = () => {
                 <a class="nav-link" aria-current="page" href="#packagesInTransit" id="packagesInTransit"> Packages in Transit</a>
             </li>
             <li id="packageReceiptNavItem" class="nav-item">
-                <a class="nav-link" aria-current="page" href="#packageReceipt" id="packageReceipt">Packages Receipt</a>
+                <a class="nav-link" aria-current="page" href="#sitePackageReceipt" id="sitePackageReceipt">Packages Receipt</a>
             </li>
             <li id="csvFileReceiptNavItem" class="nav-item">
                 <a class="nav-link" aria-current="page" href="#csvFileReceipt" id="csvFileReceipt">Create .csv file</a>

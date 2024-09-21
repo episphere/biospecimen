@@ -61,10 +61,10 @@ const bptlScreenTemplate = (name, data) => {
                 <div class="col">
                     <h4>Site Collection</h4>
                     <div class="p-3 border bg-light"><button type="button" href="#packagesInTransit" class="btn btn-primary btn-lg" id="packagesInTransit">Packages in Transit from Sites</button></div>
-                    <div class="p-3 border bg-light"><button type="button" href="#packageReceipt" class="btn btn-primary btn-lg" id="packageReceipt">Package Receipt</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#sitePackageReceipt" class="btn btn-primary btn-lg" id="sitePackageReceipt">Site Package Receipt</button></div>
                     <div class="p-3 border bg-light"><button type="button" href="#csvFileReceipt" class="btn btn-primary btn-lg" id="csvFileReceipt">Create .csv File</button></div>
                     <div class="p-3 border bg-light"><button type="button" href="#collectionIdSearch" id="collectionIdSearch" class="btn btn-primary btn-lg">Collection ID Search</button></div>
-                    <div class="p-3 border bg-light"><button type="button" href="#bptlShipReports" id="bptlShipReports" class="btn btn-primary btn-lg">Shipping Report</button></div>
+                    <div class="p-3 border bg-light"><button type="button" href="#bptlShipReports" id="bptlShipReports" class="btn btn-primary btn-lg">Site Shipping Report</button></div>
                 </div>
             </div>
         </div>
@@ -83,7 +83,7 @@ const redirectPageToLocation = () => {
         { id: "kitsCsv", hash: "#kitsCsv" },
         { id: "kitStatusReports", hash: "#kitStatusReports" },
         { id: "packagesInTransit", hash: "#packagesInTransit" },
-        { id: "packageReceipt", hash: "#packageReceipt" },
+        { id: "sitePackageReceipt", hash: "#sitePackageReceipt" },
         { id: "csvFileReceipt", hash: "#csvFileReceipt" },
         { id: "collectionIdSearch", hash: "#collectionIdSearch" },
         { id: "bptlShipReports", hash: "#bptlShipReports" }
