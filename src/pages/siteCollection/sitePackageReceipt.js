@@ -294,8 +294,7 @@ const clearPackageReceiptForm = (isSuccess) => {
 const resetFormInputs = () => {
     inputChangeList.forEach(({ selector, reset }) => {
       const inputEl = document.getElementById(selector);
-      console.log("🚀 ~ inputChangeList.forEach ~ inputEl:", inputEl)
-      
+
       if (inputEl) reset(inputEl);
     });
   };
@@ -432,10 +431,7 @@ const cancelConfirm = () => {
     const result = confirm("Changes were made and will not be saved.")
 
     if (result) {
-        inputChangeList.forEach(({ selector, reset }) => { 
-            const inputEl = document.getElementById(selector);
-            if (inputEl) reset(inputEl);
-        });
+        resetFormInputs();
         clearButtonEl.removeEventListener("click", cancelConfirm);
         window.removeEventListener("beforeunload", handleBeforeUnload);
         setupLeavingPageMessage()
