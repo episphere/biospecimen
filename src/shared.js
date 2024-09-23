@@ -1330,7 +1330,7 @@ const arrangeFetchedTubes = (specimen, isPartiallyBoxed) => {
  * Creates an easy lookup dictionary for specimens by the bag/tube ID
  * Partially boxed status does not matter
  * 
- * @param {array<object>} specimensList - list of specimens from Firestore.
+ * @param {array<object>} specimensList - list of biospecimens from Firestore.
  *  @returns {object} object keyed by bag ID
  */
 export const createBagToSpecimenDict = (specimensList) => {
