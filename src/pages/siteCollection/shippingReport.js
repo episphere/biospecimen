@@ -27,7 +27,7 @@ export const bptlShipReportsScreen = async (auth, route) => {
 export const bptlShipReportsScreenTemplate = async (username) => {
     const template = `${siteCollectionNavbar()}
         <div id="root root-margin" style="padding-top: 25px;">
-        <h3 style="text-align: center; margin: 1rem 0;">Shipping Report Screen</h3>
+        <h3 style="text-align: center; margin: 1rem 0;">Site Shipping Report</h3>
             <div>
                 ${startReport('bptlShippingReport')}
             </div>

@@ -7,7 +7,7 @@ export const activeSiteCollectionNavbar = () => {
     packagesInTransitNavItem.classList.add("active");
     packagesInTransitNavItem.style.backgroundColor = "#bbcffc85";
     packagesInTransitNavItem.style.borderRadius = "4px 4px 0 0";
-    } else if (location.hash === "#packageReceipt") {
+    } else if (location.hash === "#sitePackageReceipt") {
     const packageReceiptNavItem = document.getElementById("packageReceiptNavItem");
     packageReceiptNavItem.classList.add("active");
     packageReceiptNavItem.style.backgroundColor = "#bbcffc85";

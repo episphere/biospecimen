@@ -92,7 +92,7 @@ const buildShippingReportScreen = (source) => {
                 </div>` : 
                 `${siteCollectionNavbar()}
                     <div id="root root-margin">
-                        <h3 style="text-align: center; margin: 1rem 0;">Shipping Report Screen</h3>`
+                        <h3 style="text-align: center; margin: 1rem 0;">Site Shipping Report</h3>`
         }
                 <div class="col-lg-10">
                     <div class="row">

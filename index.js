@@ -26,7 +26,7 @@ import { receivedKitsScreen } from "./src/pages/homeCollection/receivedKits.js";
 import { kitCsvScreen } from "./src/pages/homeCollection/kitCSV.js";
 import { kitShipmentScreen } from "./src/pages/homeCollection/kitShipment.js";
 import { packagesInTransitScreen } from "./src/pages/siteCollection/packagesInTransit.js";
-import { packageReceiptScreen } from "./src/pages/siteCollection/packageReceipt.js";
+import { packageReceiptScreen } from "./src/pages/siteCollection/sitePackageReceipt.js";
 import { csvFileReceiptScreen } from "./src/pages/siteCollection/csvFileReceipt.js";
 import { collectionIdSearchScreen } from "./src/pages/siteCollection/collectionIdSearch.js";
 import { bptlShipReportsScreen } from "./src/pages/siteCollection/shippingReport.js";
@@ -128,7 +128,7 @@ const manageRoutes = async () => {
         else if (route === "#received") receivedKitsScreen(auth,route);
         else if (route === "#kitShipment") kitShipmentScreen(auth, route);
         else if (route === "#packagesInTransit") packagesInTransitScreen(auth, route);
-        else if (route === "#packageReceipt") packageReceiptScreen(auth, route);
+        else if (route === "#sitePackageReceipt") packageReceiptScreen(auth, route);
         else if (route === "#csvFileReceipt") csvFileReceiptScreen(auth, route);
         else if (route === "#collectionIdSearch") collectionIdSearchScreen(auth, route);
         else if (route === "#reports") reportsQuery(auth, route);
