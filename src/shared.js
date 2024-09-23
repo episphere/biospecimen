@@ -1339,7 +1339,6 @@ export const createBagToSpecimenDict = (specimensList) => {
     const specimenLookupDict = {};
     for (let specimen of specimensList) {
         const usableTubes = arrangeFetchedTubes(specimen, false);
-
         const usableBagKeys = Object.keys(usableTubes);
 
         for (const bagKey of usableBagKeys) {
