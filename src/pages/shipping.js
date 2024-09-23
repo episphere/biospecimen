@@ -1,6 +1,6 @@
 import { addBoxAndUpdateSiteDetails, appState, conceptIdToSiteSpecificLocation, combineAvailableCollectionsObjects, displayManifestContactInfo, filterDuplicateSpecimensInList, getAllBoxes, getBoxes, getSpecimensInBoxes, getUnshippedBoxes, getLocationsInstitute, getSiteMostRecentBoxId, getSpecimensByBoxedStatus, hideAnimation, locationConceptIDToLocationMap,
         miscTubeIdSet, removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
-        translateNumToType, userAuthorization, getSiteAcronym, findReplacementTubeLabels } from "../shared.js"
+        translateNumToType, userAuthorization, getSiteAcronym, findReplacementTubeLabels, createBagToSpecimenDict } from "../shared.js"
 import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs,
         addEventCompleteShippingButton, addEventModalAddBox, addEventNavBarBoxManifest, addEventNavBarShipment, addEventNavBarShippingManifest, addEventNavBarAssignTracking, addEventLocationSelect,
         addEventPreventTrackingConfirmPaste, addEventReturnToPackaging, addEventReturnToReviewShipmentContents, addEventSaveButton, addEventSaveAndContinueButton, addEventShipPrintManifest,
@@ -109,8 +109,10 @@ const buildShippingInterface = async (userName, loadFromState, currBoxId) => {
             availableCollectionsObj = combineAvailableCollectionsObjects(specimens.notBoxed.availableCollections, specimens.partiallyBoxed.availableCollections);
             replacementTubeLabelObj = findReplacementTubeLabels(finalizedSpecimenList);
         }
-        
-        populateAvailableCollectionsList(availableCollectionsObj, loadFromState);
+
+        const specimenLookup = createBagToSpecimenDict(finalizedSpecimenList);
+
+        populateAvailableCollectionsList(availableCollectionsObj, specimenLookup, loadFromState);
         setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName, replacementTubeLabelObj);
         populateViewShippingBoxContentsList(currBoxId);
         populateBoxesToShipTable();
@@ -144,11 +146,12 @@ const getStoredLocationOnInit = () => {
 /**
  * Populate the 'Available Collections' table.
  * @param {object} availableCollectionsObj - object containing available collections where available collections are keys and values are arrays of tubeIds. Stray tubes are in the 'unlabelled' key.
+ * @param {object} specimenLookup - object keyed to look up specimen by collection bag ID
  * @param {boolean} loadFromState - if true, load data from state instead of fetching from server.
  * Note: Orphan panel is currently hidden by request of the product team. Retain for future use.
  *       Future orphan panel use would require completed state management implementation in the 'currDeleteButton' event listener.
  */
-const populateAvailableCollectionsList = async (availableCollectionsObj, loadFromState = false) => {
+const populateAvailableCollectionsList = async (availableCollectionsObj, specimenLookup = {}, loadFromState = false) => {
 
     if (loadFromState) {
         availableCollectionsObj = appState.getState().availableCollectionsObj ?? {};
@@ -164,7 +167,7 @@ const populateAvailableCollectionsList = async (availableCollectionsObj, loadFro
 
     for (const bagId of bagIdList) {
         if (bagId !== "unlabelled") {
-            const specimen = availableCollectionsObj[bagId].specimen;
+            const specimen = specimenLookup[bagId];
             const rowEle = tableEle.insertRow();
             rowEle.insertCell(0).innerHTML = bagId;
             rowEle.insertCell(1).innerHTML = availableCollectionsObj[bagId].length;
@@ -173,7 +176,8 @@ const populateAvailableCollectionsList = async (availableCollectionsObj, loadFro
             } else if (specimen && specimen[conceptIds.collectionType] === conceptIds.research) {
                 rowEle.insertCell(2).textContent = conceptIds.collectionLocationMapping[specimen[conceptIds.collectionLocation]];
             } else {
-                console.warn('Specimen match not found for', specimen);
+                console.warn('Specimen match not found for bag ID %s', bagId, specimen);
+                rowEle.insertCell(2).textContent = '';
             }
 
             const hiddenChannel = rowEle.insertCell(3)

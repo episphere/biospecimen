@@ -1326,6 +1326,29 @@ const arrangeFetchedTubes = (specimen, isPartiallyBoxed) => {
     return usableTubes;
 }
 
+/**
+ * Creates an easy lookup dictionary for specimens by the bag/tube ID
+ * Partially boxed status does not matter
+ * 
+ * @param {array<object>} specimensList - list of biospecimens from Firestore.
+ *  @returns {object} object keyed by bag ID
+ */
+export const createBagToSpecimenDict = (specimensList) => {
+    if (!specimensList || specimensList.length === 0) return {};
+
+    const specimenLookupDict = {};
+    for (let specimen of specimensList) {
+        const usableTubes = arrangeFetchedTubes(specimen, false);
+        const usableBagKeys = Object.keys(usableTubes);
+
+        for (const bagKey of usableBagKeys) {
+            specimenLookupDict[bagKey] = specimen;
+        }
+    }
+
+    return specimenLookupDict;
+}
+
 const tubeDeviationFlags = [
     conceptIds.collection.deviationType.broken,
     conceptIds.collection.deviationType.discard,
