@@ -1,6 +1,6 @@
 import { addBoxAndUpdateSiteDetails, appState, conceptIdToSiteSpecificLocation, combineAvailableCollectionsObjects, displayManifestContactInfo, filterDuplicateSpecimensInList, getAllBoxes, getBoxes, getSpecimensInBoxes, getUnshippedBoxes, getLocationsInstitute, getSiteMostRecentBoxId, getSpecimensByBoxedStatus, hideAnimation, locationConceptIDToLocationMap,
         miscTubeIdSet, removeActiveClass, removeBag, removeMissingSpecimen, showAnimation, showNotifications, siteSpecificLocation, siteSpecificLocationToConceptId, sortBiospecimensList,
-        translateNumToType, userAuthorization, getSiteAcronym, findReplacementTubeLabels } from "../shared.js"
+        translateNumToType, userAuthorization, getSiteAcronym, findReplacementTubeLabels, createBagToSpecimenDict } from "../shared.js"
 import { addDeviationTypeCommentsContent, addEventAddSpecimenToBox, addEventBackToSearch, addEventBoxSelectListChanged, addEventCheckValidTrackInputs,
         addEventCompleteShippingButton, addEventModalAddBox, addEventNavBarBoxManifest, addEventNavBarShipment, addEventNavBarShippingManifest, addEventNavBarAssignTracking, addEventLocationSelect,
         addEventPreventTrackingConfirmPaste, addEventReturnToPackaging, addEventReturnToReviewShipmentContents, addEventSaveButton, addEventSaveAndContinueButton, addEventShipPrintManifest,
@@ -109,8 +109,10 @@ const buildShippingInterface = async (userName, loadFromState, currBoxId) => {
             availableCollectionsObj = combineAvailableCollectionsObjects(specimens.notBoxed.availableCollections, specimens.partiallyBoxed.availableCollections);
             replacementTubeLabelObj = findReplacementTubeLabels(finalizedSpecimenList);
         }
-        
-        populateAvailableCollectionsList(availableCollectionsObj, loadFromState);
+
+        const specimenLookup = createBagToSpecimenDict(finalizedSpecimenList);
+
+        populateAvailableCollectionsList(availableCollectionsObj, specimenLookup, loadFromState);
         setAllShippingState(availableCollectionsObj, availableLocations, allBoxesList, finalizedSpecimenList, userName, replacementTubeLabelObj);
         populateViewShippingBoxContentsList(currBoxId);
         populateBoxesToShipTable();
@@ -144,15 +146,17 @@ const getStoredLocationOnInit = () => {
 /**
  * Populate the 'Available Collections' table.
  * @param {object} availableCollectionsObj - object containing available collections where available collections are keys and values are arrays of tubeIds. Stray tubes are in the 'unlabelled' key.
+ * @param {object} specimenLookup - object keyed to look up specimen by collection bag ID
  * @param {boolean} loadFromState - if true, load data from state instead of fetching from server.
  * Note: Orphan panel is currently hidden by request of the product team. Retain for future use.
  *       Future orphan panel use would require completed state management implementation in the 'currDeleteButton' event listener.
  */
-const populateAvailableCollectionsList = async (availableCollectionsObj, loadFromState = false) => {
+const populateAvailableCollectionsList = async (availableCollectionsObj, specimenLookup = {}, loadFromState = false) => {
 
     if (loadFromState) {
         availableCollectionsObj = appState.getState().availableCollectionsObj ?? {};
     }
+
 
     const bagIdList = Object.keys(availableCollectionsObj).sort();
     const tableEle = document.getElementById("specimenList");
@@ -163,11 +167,20 @@ const populateAvailableCollectionsList = async (availableCollectionsObj, loadFro
 
     for (const bagId of bagIdList) {
         if (bagId !== "unlabelled") {
+            const specimen = specimenLookup[bagId];
             const rowEle = tableEle.insertRow();
             rowEle.insertCell(0).innerHTML = bagId;
             rowEle.insertCell(1).innerHTML = availableCollectionsObj[bagId].length;
+            if (specimen && specimen[conceptIds.collectionType] === conceptIds.clinical) {
+                rowEle.insertCell(2).textContent = 'Clinical';
+            } else if (specimen && specimen[conceptIds.collectionType] === conceptIds.research) {
+                rowEle.insertCell(2).textContent = conceptIds.collectionLocationMapping[specimen[conceptIds.collectionLocation]];
+            } else {
+                console.warn('Specimen match not found for bag ID %s', bagId, specimen);
+                rowEle.insertCell(2).textContent = '';
+            }
 
-            const hiddenChannel = rowEle.insertCell(2)
+            const hiddenChannel = rowEle.insertCell(3)
             hiddenChannel.innerHTML = JSON.stringify(availableCollectionsObj[bagId]);
             hiddenChannel.style.display = "none";
             if (numRows % 2 === 0) {
@@ -571,7 +584,7 @@ export const buildSpecimenDataInModal = (masterSpecimenId) =>{
         const currRow = shippingTable.rows[i];
         if (currRow.cells[0] !== undefined && currRow.cells[0].innerText == masterSpecimenId.toUpperCase()) {
             tableIndex = i;
-            biospecimensList = JSON.parse(currRow.cells[2].innerText)
+            biospecimensList = JSON.parse(currRow.cells[3].innerText)
         }
     }
 
@@ -729,16 +742,16 @@ const handleAvailableCollectionsTableRows = (tableIndex, tubesToDelete) => {
     const availableCollectionsTable = document.getElementById('specimenList');
     
     // handle an orphan tube scanned if currArr is undefined  
-    const currArr = availableCollectionsTable?.rows[tableIndex]?.cells[2]?.innerText;
+    const currArr = availableCollectionsTable?.rows[tableIndex]?.cells[3]?.innerText;
     if(currArr != undefined) {
-        const parseCurrArr = JSON.parse(availableCollectionsTable.rows[tableIndex].cells[2].innerText);
+        const parseCurrArr = JSON.parse(currArr);
         for (let i = 0; i < tubesToDelete.length; i++) {
             parseCurrArr.splice(parseCurrArr.indexOf(tubesToDelete[i]), 1);
         }
         if (parseCurrArr.length == 0) {
             availableCollectionsTable.deleteRow(tableIndex);
         } else {
-            availableCollectionsTable.rows[tableIndex].cells[2].innerText = JSON.stringify(parseCurrArr);
+            availableCollectionsTable.rows[tableIndex].cells[3].innerText = JSON.stringify(parseCurrArr);
             availableCollectionsTable.rows[tableIndex].cells[1].innerText = parseCurrArr.length;
         }
     }
@@ -1295,6 +1308,7 @@ export const buildPopulateSpecimensHeader = () => {
         <tr>
             <th>Specimen Bag ID</th>
             <th># Specimens in Bag</th>
+            <th>Collection Location</th>
         </th>
     `;
 }

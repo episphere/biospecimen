@@ -1,7 +1,7 @@
 import { userAuthorization, removeActiveClass, restrictNonBiospecimenUser, hideAnimation, showAnimation, getNumPages, conceptIdToSiteSpecificLocation, searchSpecimenByRequestedSiteAndBoxId, appState, showNotifications } from "./../shared.js";
 import { handleBoxReportsData, populateReportManifestHeader, populateReportManifestTable, addPaginationFunctionality, addEventFilter } from "./../events.js";
 import { homeNavBar, reportSideNavBar } from '../navbar.js';
-import { reportsNavbar } from "./reports/reportsNavbar.js";
+import { siteCollectionNavbar } from "./siteCollection/siteCollectionNavbar.js";
 import { conceptIds } from '../fieldToConceptIdMapping.js';
 
 export const reportsQuery = (auth, route) => {
@@ -90,9 +90,9 @@ const buildShippingReportScreen = (source) => {
                     <h2>Reports</h2>
                     ${reportSideNavBar()}
                 </div>` : 
-                `${reportsNavbar()}
+                `${siteCollectionNavbar()}
                     <div id="root root-margin">
-                        <h3 style="text-align: center; margin: 1rem 0;">Shipping Report Screen</h3>`
+                        <h3 style="text-align: center; margin: 1rem 0;">Site Shipping Report</h3>`
         }
                 <div class="col-lg-10">
                     <div class="row">

@@ -1,8 +1,8 @@
 import { showAnimation, hideAnimation, getAllBoxes, conceptIdToSiteSpecificLocation, searchSpecimenByRequestedSiteAndBoxId, appState } from "../../shared.js";
 import { conceptIds as fieldToConceptIdMapping } from "../../fieldToConceptIdMapping.js";
-import { receiptsNavbar } from "./receiptsNavbar.js";
+import { siteCollectionNavbar } from "./siteCollectionNavbar.js";
 import { nonUserNavBar, unAuthorizedUser } from "../../navbar.js";
-import { activeReceiptsNavbar } from "./activeReceiptsNavbar.js";
+import { activeSiteCollectionNavbar } from "./activeSiteCollectionNavbar.js";
 import { convertTime } from "../../shared.js";
 import { getSpecimenDeviationReports, getSpecimenCommentsReports } from "../../events.js";
 
@@ -41,7 +41,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     let template = '';
     
     template += `
-    ${receiptsNavbar()}
+    ${siteCollectionNavbar()}
     <div class="container-fluid">
         <div id="root root-margin">
             <div class="table-responsive">
@@ -80,7 +80,7 @@ const packagesInTransitTemplate = async (username, auth, route) => {
     </div>`;
     document.getElementById("contentBody").innerHTML = template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
-    activeReceiptsNavbar();
+    activeSiteCollectionNavbar();
     createPackagesInTransitRows(allBoxesShippedBySiteAndNotReceived, sumSamplesArr);
 
     const manifestModalBodyEl = document.getElementById("manifest-modal-body");

@@ -1,6 +1,6 @@
-import { reportsNavbar } from "./reportsNavbar.js";
+import { siteCollectionNavbar } from "./siteCollectionNavbar.js";
+import { activeSiteCollectionNavbar } from "./activeSiteCollectionNavbar.js";
 import { nonUserNavBar } from "../../navbar.js";
-import { activeReportsNavbar } from "./activeReportsNavbar.js";
 import { appState } from '../../shared.js';
 import { startReport } from "../reportsQuery.js";
 
@@ -25,17 +25,17 @@ export const bptlShipReportsScreen = async (auth, route) => {
 // to distinguish shipping report functionality from bptl and biospecimen."
 
 export const bptlShipReportsScreenTemplate = async (username) => {
-    const template = ` ${reportsNavbar()}
+    const template = `${siteCollectionNavbar()}
         <div id="root root-margin" style="padding-top: 25px;">
-        <h3 style="text-align: center; margin: 1rem 0;">Shipping Report Screen</h3>
+        <h3 style="text-align: center; margin: 1rem 0;">Site Shipping Report</h3>
             <div>
                 ${startReport('bptlShippingReport')}
             </div>
         </div>
     `;
 
-    document.getElementById("contentBody").innerHTML = template;
+    document.getElementById("contentBody").innerHTML = await template;
     document.getElementById("navbarNavAltMarkup").innerHTML = nonUserNavBar(username);
-    activeReportsNavbar();
+    activeSiteCollectionNavbar();
 };
 

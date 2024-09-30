@@ -1,5 +1,5 @@
 import { homeCollectionNavbar } from "./homeCollectionNavbar.js";
-import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource, numericInputValidator, autoTabAcrossArray, performQCcheck } from "../../shared.js";
+import { getIdToken, showAnimation, hideAnimation, appState, baseAPI, triggerErrorModal, processResponse, checkTrackingNumberSource, numericInputValidator, capsEnforcer, autoTabAcrossArray, performQCcheck } from "../../shared.js";
 import { nonUserNavBar } from "./../../navbar.js";
 import { activeHomeCollectionNavbar } from "./homeCollectionNavbar.js";
 import { conceptIds } from '../../fieldToConceptIdMapping.js';
@@ -104,6 +104,7 @@ const kitAssemblyTemplate = async (name) => {
   const scannedBarcode2 = document.getElementById('scannedBarcode2');
   scannedBarcode2.onpaste = e => e.preventDefault();
   numericInputValidator(['scannedBarcode', 'scannedBarcode2']);
+  capsEnforcer(['supplyKitId', 'returnKitId', 'cupId', 'cardId']);
   activeHomeCollectionNavbar();
   processAssembledKit();
   enableEnterKeystroke();
@@ -137,21 +138,21 @@ const processAssembledKit = () => {
     saveKitButton.addEventListener('click', async () => { 
         let kitObj = {};
         const queryScannedBarcodeValue = document.getElementById('scannedBarcode')?.value?.trim();
-        const scannedBarcodeValue = (queryScannedBarcodeValue !== undefined) ? queryScannedBarcodeValue : 0;
+        const scannedBarcodeValue = (queryScannedBarcodeValue !== undefined) ? queryScannedBarcodeValue : "";
 
         const confirmScannedBarcodeValue = document.getElementById('scannedBarcode2')?.value?.trim();
 
         const querySupplyKitIdValue = document.getElementById('supplyKitId').value.trim();
-        const supplyKitIdValue = (querySupplyKitIdValue !== undefined) ? querySupplyKitIdValue: 0;
+        const supplyKitIdValue = (querySupplyKitIdValue !== undefined) ? querySupplyKitIdValue.toUpperCase(): "";
 
         const queryReturnKitIdValue = document.getElementById('returnKitId')?.value?.trim();
-        const returnKitIdValue = (queryReturnKitIdValue !== undefined) ? queryReturnKitIdValue : 0;
+        const returnKitIdValue = (queryReturnKitIdValue !== undefined) ? queryReturnKitIdValue.toUpperCase() : "";
 
         const queryCollectionCupIdValue = document.getElementById('cupId')?.value?.trim();
-        const collectionCupIdValue = (queryCollectionCupIdValue !== undefined) ? queryCollectionCupIdValue : 0;
+        const collectionCupIdValue = (queryCollectionCupIdValue !== undefined) ? queryCollectionCupIdValue.toUpperCase() : "";
 
         const queryCollectionCardIdValue = document.getElementById('cardId')?.value?.trim();
-        const collectionCardIdValue = (queryCollectionCardIdValue !== undefined) ? queryCollectionCardIdValue : 0;
+        const collectionCardIdValue = (queryCollectionCardIdValue !== undefined) ? queryCollectionCardIdValue.toUpperCase() : "";
 
         if (queryScannedBarcodeValue !== confirmScannedBarcodeValue) {
             triggerErrorModal('Return Kit tracking number doesn\'t match.');
@@ -160,6 +161,10 @@ const processAssembledKit = () => {
             collectionCupIdValue.length === 0 || collectionCardIdValue.length === 0 || document.getElementById('dropdownSites').innerHTML !== 'Mouthwash') {
             triggerErrorModal('One or more fields are missing.');
             return
+        } else if (supplyKitIdValue !== returnKitIdValue) {
+          triggerErrorModal('Supply Kit ID number doesn\'t match Return Kit.');
+        } else if (collectionCupIdValue !== collectionCardIdValue) {
+          triggerErrorModal('Collection Cup ID doesn\'t match Collection Card.');
         } else {
             kitObj[conceptIds.returnKitTrackingNum] = scannedBarcodeValue;
             kitObj[conceptIds.supplyKitId] = supplyKitIdValue;
