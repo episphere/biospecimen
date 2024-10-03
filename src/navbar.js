@@ -163,10 +163,10 @@ export const reportSideNavBar = () => {
                 <a class="nav-link active" href="#reports" id="navBarShippingReport">Shipping Report</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#checkoutreport" id="navBarCheckoutReport">Check-Out Report</a>
+                <a class="nav-link" href="#checkoutReport" id="navBarCheckoutReport">Check-Out Report</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#dailyreport" id="navBarDailyReport">Daily Review Report</a>
+                <a class="nav-link" href="#dailyReport" id="navBarDailyReport">Daily Review Report</a>
             </li>
         </ul>`;
 }
