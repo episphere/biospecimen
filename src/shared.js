@@ -1212,6 +1212,7 @@ const buildAvailableCollectionsObject = (specimensList, isPartiallyBoxed) => {
                 availableCollections[bagKey] = [];
             }
             availableCollections[bagKey] = [...availableCollections[bagKey], ...usableTubesObj[bagKey]];
+            availableCollections[bagKey].specimen = specimen;
         }
     }
     return { availableCollections, specimensList };
@@ -1323,6 +1324,29 @@ const arrangeFetchedTubes = (specimen, isPartiallyBoxed) => {
     if (strayTubeArray.length !== 0) usableTubes['unlabelled'] = strayTubeArray;
 
     return usableTubes;
+}
+
+/**
+ * Creates an easy lookup dictionary for specimens by the bag/tube ID
+ * Partially boxed status does not matter
+ * 
+ * @param {array<object>} specimensList - list of biospecimens from Firestore.
+ *  @returns {object} object keyed by bag ID
+ */
+export const createBagToSpecimenDict = (specimensList) => {
+    if (!specimensList || specimensList.length === 0) return {};
+
+    const specimenLookupDict = {};
+    for (let specimen of specimensList) {
+        const usableTubes = arrangeFetchedTubes(specimen, false);
+        const usableBagKeys = Object.keys(usableTubes);
+
+        for (const bagKey of usableBagKeys) {
+            specimenLookupDict[bagKey] = specimen;
+        }
+    }
+
+    return specimenLookupDict;
 }
 
 const tubeDeviationFlags = [
@@ -2690,7 +2714,7 @@ export const addEventBarCodeScanner = (id, start, end) => {
                         let currRow = shippingTable.rows[i];
                         if(currRow.cells[0]!==undefined && currRow.cells[0].innerText == masterSpecimenId){
                             tableIndex = i;
-                            biospecimensList = JSON.parse(currRow.cells[2].innerText)
+                            biospecimensList = JSON.parse(currRow.cells[3].innerText)
                             foundInShipping = true;
                         }
                         
@@ -3332,6 +3356,17 @@ export const formatISODateTimeDateOnly = (dateReceived) => {
     extractDate = extractDate.split('-')
     const formattedDateTimeStamp = extractDate[1]+'/'+extractDate[2]+'/'+extractDate[0]
     return formattedDateTimeStamp
+}
+
+export const capsEnforcer = (elemArr) => {
+    elemArr.forEach(elemId => {
+        let elem = document.getElementById(elemId);
+        if (elem) {
+            elem.addEventListener('input', (e) => {
+                elem.value = (e.target.value + '').toUpperCase();
+            });
+        }
+    });
 }
 
 export const numericInputValidator = (elemArr) => {

@@ -2,6 +2,10 @@ import { inactivityTime, urls } from "./src/shared.js";
 import { firebaseConfig as devFirebaseConfig } from "./src/dev/config.js";
 import { firebaseConfig as stageFirebaseConfig } from "./src/stage/config.js";
 import { firebaseConfig as prodFirebaseConfig } from "./src/prod/config.js";
+// When doing local development, uncomment this
+// Get the API key file from Box or the DevOps team
+// Do not accept PRs with the localDevFirebaseConfig import uncommented
+// import { firebaseConfig as  localDevFirebaseConfig} from "./src/local-dev/config.js";
 import { manageUsers } from "./src/pages/users.js";
 import { userDashboard } from "./src/pages/dashboard.js";
 import { shippingDashboard } from "./src/pages/shipping.js";
@@ -21,12 +25,11 @@ import { displayKitStatusReportsShippedScreen } from "./src/pages/homeCollection
 import { receivedKitsScreen } from "./src/pages/homeCollection/receivedKits.js";
 import { kitCsvScreen } from "./src/pages/homeCollection/kitCSV.js";
 import { kitShipmentScreen } from "./src/pages/homeCollection/kitShipment.js";
-import { packagesInTransitScreen } from "./src/pages/receipts/packagesInTransit.js";
-import { packageReceiptScreen } from "./src/pages/receipts/packageReceipt.js";
-import { csvFileReceiptScreen } from "./src/pages/receipts/csvFileReceipt.js";
-import { kitReportsScreen } from "./src/pages/reports/kitReports.js";
-import { collectionIdSearchScreen } from "./src/pages/reports/collectionIdSearch.js";
-import { bptlShipReportsScreen } from "./src/pages/reports/shippingReport.js";
+import { packagesInTransitScreen } from "./src/pages/siteCollection/packagesInTransit.js";
+import { packageReceiptScreen } from "./src/pages/siteCollection/sitePackageReceipt.js";
+import { csvFileReceiptScreen } from "./src/pages/siteCollection/csvFileReceipt.js";
+import { collectionIdSearchScreen } from "./src/pages/siteCollection/collectionIdSearch.js";
+import { bptlShipReportsScreen } from "./src/pages/siteCollection/shippingReport.js";
 import { checkOutReportTemplate } from "./src/pages/checkOutReport.js";
 import { dailyReportTemplate } from "./src/pages/dailyReport.js";
 
@@ -75,7 +78,13 @@ window.onload = () => {
         !firebase.apps.length ? firebase.initializeApp(stageFirebaseConfig()) : firebase.app();
         window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'stage' });
     }
-    else {
+    else if (isLocalDev) {
+        if (typeof localDevFirebaseConfig === 'undefined') {
+            console.error('Local development requires a localDevFirebaseConfig function to be defined in src/local-dev/config.js.');
+            return;
+        }
+        !firebase.apps.length ? firebase.initializeApp(localDevFirebaseConfig()) : firebase.app();
+    } else {
         !firebase.apps.length ? firebase.initializeApp(devFirebaseConfig()) : firebase.app();
         !isLocalDev && window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'dev' });
     }
@@ -88,13 +97,17 @@ window.onload = () => {
             inactivityTime();
         }
     });
-    
     manageRoutes();
 };
 
 window.onhashchange = () => {
     manageRoutes();
 };
+
+window.addEventListener('hashchange', function(e) { // prevent default smooth scroll behavior for hash change
+    e.preventDefault();
+    window.scrollTo(0, 0);
+});
 
 const manageRoutes = async () => {
     const route = window.location.hash || "#";
@@ -103,26 +116,25 @@ const manageRoutes = async () => {
         else if (route === "#shipping") shippingDashboard(auth, route);
         else if (route === "#welcome") welcomeScreen(auth, route);
         else if (route === "#bptl") bptlScreen(auth, route);
-        else if (route === "#kitassembly") kitAssemblyScreen(auth, route);
-        else if (route === "#printlabels") printLabelsScreen(auth, route);
-        else if (route === "#assignkits") assignKitsScreen(auth, route);
-        else if (route === "#kitsreceipt") kitsReceiptScreen(auth, route);
-        else if (route === "#kitscsv") kitCsvScreen(auth, route);
+        else if (route === "#kitAssembly") kitAssemblyScreen(auth, route);
+        else if (route === "#printLabels") printLabelsScreen(auth, route);
+        else if (route === "#assignKits") assignKitsScreen(auth, route);
+        else if (route === "#kitsReceipt") kitsReceiptScreen(auth, route);
+        else if (route === "#kitsCsv") kitCsvScreen(auth, route);
         else if (route === "#kitStatusReports") displayKitStatusReportsShippedScreen(auth, route); // Temporarily make kitStatusReports route call displayKitStatusReportsShippedScreen
         else if (route === "#allParticipants") allParticipantsScreen(auth, route);
         else if (route === "#addressPrinted") addressesPrintedScreen(auth, route);
         else if (route === "#assigned") assignedScreen(auth, route);
         else if (route === "#received") receivedKitsScreen(auth,route);
-        else if (route === "#kitshipment") kitShipmentScreen(auth, route);
-        else if (route === "#packagesintransit") packagesInTransitScreen(auth, route);
-        else if (route === "#packagereceipt") packageReceiptScreen(auth, route);
-        else if (route === "#csvfilereceipt") csvFileReceiptScreen(auth, route);
-        else if (route === "#kitreports") kitReportsScreen(auth, route);
-        else if (route === "#collectionidsearch") collectionIdSearchScreen(auth, route);
+        else if (route === "#kitShipment") kitShipmentScreen(auth, route);
+        else if (route === "#packagesInTransit") packagesInTransitScreen(auth, route);
+        else if (route === "#sitePackageReceipt") packageReceiptScreen(auth, route);
+        else if (route === "#csvFileReceipt") csvFileReceiptScreen(auth, route);
+        else if (route === "#collectionIdSearch") collectionIdSearchScreen(auth, route);
         else if (route === "#reports") reportsQuery(auth, route);
-        else if (route === "#checkoutreport") checkOutReportTemplate(auth, route);
-        else if (route === "#dailyreport") dailyReportTemplate(auth, route);
-        else if (route === "#bptlshipreports") bptlShipReportsScreen(auth, route);
+        else if (route === "#checkoutReport") checkOutReportTemplate(auth, route);
+        else if (route === "#dailyReport") dailyReportTemplate(auth, route);
+        else if (route === "#bptlShipReports") bptlShipReportsScreen(auth, route);
         else if (route === "#manage_users") manageUsers(auth, route);
         else if (route === "#sign_out") signOut();
         else window.location.hash = "#welcome";

@@ -1,7 +1,7 @@
 import { removeActiveClass, generateBarCode, visitType, getSiteTubesLists, getWorkflow, updateSpecimen, appState, keyToNameObj, showNotifications } from "./../shared.js";
 import { addEventReturnToCollectProcess } from "./../events.js";
 import {searchTemplate} from "./dashboard.js";
-import { collectionIdSearchScreenTemplate } from "./reports/collectionIdSearch.js";
+import { collectionIdSearchScreenTemplate } from "./siteCollection/collectionIdSearch.js";
 import { conceptIds } from "./../fieldToConceptIdMapping.js";
 
 export const finalizeTemplate = (participantData, specimenData, bptlCollectionFlag) => {
