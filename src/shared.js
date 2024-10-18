@@ -123,8 +123,6 @@ export const getDailyParticipant = async () => {
   return await response.json();
 }
 
-
-
 export const updateParticipant = async (dataObj) => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=updateParticipantDataNotSite`, {
@@ -802,6 +800,25 @@ export const updateSpecimen = async (array) => {
     const response = await fetch(`${api}api=updateSpecimen`, requestObj);
     logAPICallEndDev('updateSpecimen');
     return response.json();
+}
+
+export const finalizeSpecimen = async (biospecimenData, participantData, siteTubesList) => {
+    // Used when finalizing specimen to update both participant and specimen data
+    logAPICallStartDev('finalizeSpecimen');
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body:  JSON.stringify({biospecimenData, participantData, siteTubesList}),
+    }
+    const response = await fetch(`${api}api=finalizeSpecimen`, requestObj);
+    console.log('response', response);
+    logAPICallEndDev('finalizeSpecimen');
+    return response.json();
+    
 }
 
 export const checkDerivedVariables = async (participantObjToken) => {
@@ -1729,6 +1746,9 @@ export const getLocationsInstitute = async () => {
     if (siteAcronym === 'BSWH') locations.sort((a, b) => a.localeCompare(b));
 
     logAPICallEndDev('getLocationsInstitute');
+    // For the purposes of 1008 we are filtering out some locations.
+    // This will require more discussion for a long-term implementation
+    locations = locations.filter(loc => ['River East', 'South Loop', 'Orland Park', 'Henry Ford West Bloomfield Hospital', 'Henry Ford Medical Center-Fairlane'].indexOf(loc) === -1);
     return locations;
 }
 
@@ -1811,9 +1831,7 @@ export const getUpdatedParticipantData = async (participantData) => {
     return responseParticipant.data[0];
 }
 
-export const updateCollectionSettingData = async (biospecimenData, tubes, participantData) => {
-    participantData = await getUpdatedParticipantData(participantData);
-
+export const generateCollectionSettingData = (biospecimenData, tubes, participantData) => {
     let settings;
     let derivedVariables = {};
     let visit = biospecimenData[conceptIds.collection.selectedVisit];
@@ -1964,6 +1982,14 @@ export const updateCollectionSettingData = async (biospecimenData, tubes, partic
 
     // Update derived variables to 'NO' from 'YES'. After specimens, are unchecked after checking them.
     settingData = { ...settingData, ...derivedVariables };
+    return settingData;
+}
+
+export const updateCollectionSettingData = async (biospecimenData, tubes, participantData) => {
+    participantData = await getUpdatedParticipantData(participantData);
+
+    const settingData = generateCollectionSettingData(biospecimenData, tubes, participantData);
+    
     await updateParticipant(settingData);
 }
 

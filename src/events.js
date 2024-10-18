@@ -7,7 +7,7 @@ import {
     checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData,
     siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
     getCollectionsByVisit, getSpecimenAndParticipant, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showModalNotification, showTimedNotifications, showNotificationsCancelOrContinue, validateSpecimenAndParticipantResponse, findReplacementTubeLabels, 
-    showConfirmationModal, dismissBiospecimenModal
+    showConfirmationModal, dismissBiospecimenModal, getIdToken, finalizeSpecimen
 } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
@@ -1581,13 +1581,8 @@ const processSpecimenCollectionFormUpdates = async (biospecimenData, participant
     try {
         showAnimation();
 
-        await Promise.all([
-            updateSpecimen([biospecimenData]),
-            updateCollectionSettingData(biospecimenData, siteTubesList, participantData),
-        ]);
-
-        if (baselineVisit && clinicalResearchSetting) await updateBaselineData(siteTubesList, participantData);
-        await checkDerivedVariables({ "token": participantData["token"] });
+        const idToken = await getIdToken();
+        await finalizeSpecimen(biospecimenData, participantData, siteTubesList);
 
         hideAnimation();
     } catch (error) {
