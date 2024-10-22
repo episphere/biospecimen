@@ -56,7 +56,7 @@ const printLabelsTemplate = (name) => {
 
 const initializeTotalAddressesToPrint = async () => {
   showAnimation();
-  const totalAddressCount = await(getAddressesToPrintCount());
+  const totalAddressCount = await getAddressesToPrintCount();
   appState.setState({'totalAddressesLength': totalAddressCount.data })
   hideAnimation();
 }
