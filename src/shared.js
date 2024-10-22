@@ -1985,14 +1985,6 @@ export const generateCollectionSettingData = (biospecimenData, tubes, participan
     return settingData;
 }
 
-export const updateCollectionSettingData = async (biospecimenData, tubes, participantData) => {
-    participantData = await getUpdatedParticipantData(participantData);
-
-    const settingData = generateCollectionSettingData(biospecimenData, tubes, participantData);
-    
-    await updateParticipant(settingData);
-}
-
 export const updateBaselineData = async (siteTubesList, data) => {
     data = await getUpdatedParticipantData(data);
 
