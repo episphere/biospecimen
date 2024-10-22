@@ -817,7 +817,6 @@ export const submitSpecimen = async (biospecimenData, participantData, siteTubes
         body:  JSON.stringify({biospecimenData, participantData, siteTubesList}),
     }
     const response = await fetch(`${api}api=submitSpecimen`, requestObj);
-    console.log('response', response);
     return response.json();
     
 }
