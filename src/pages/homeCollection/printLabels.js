@@ -55,10 +55,15 @@ const printLabelsTemplate = (name) => {
 };
 
 const initializeTotalAddressesToPrint = async () => {
-  showAnimation();
-  const totalAddressCount = await getAddressesToPrintCount();
-  appState.setState({'totalAddressesLength': totalAddressCount.data })
-  hideAnimation();
+  try {
+    showAnimation();
+    const totalAddressCount = await getAddressesToPrintCount();
+    appState.setState({'totalAddressesLength': totalAddressCount.data })
+    hideAnimation();
+  } catch(err) {
+    console.error('Error initializing total addresses to print', err);
+  }
+  
 }
 
 export const getAddressesToPrintCount = async () => {
