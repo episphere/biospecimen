@@ -804,7 +804,6 @@ export const updateSpecimen = async (array) => {
 
 export const finalizeSpecimen = async (biospecimenData, participantData, siteTubesList) => {
     // Used when finalizing specimen to update both participant and specimen data
-    logAPICallStartDev('finalizeSpecimen');
     const idToken = await getIdToken();
     let requestObj = {
         method: "POST",
@@ -816,7 +815,6 @@ export const finalizeSpecimen = async (biospecimenData, participantData, siteTub
     }
     const response = await fetch(`${api}api=finalizeSpecimen`, requestObj);
     console.log('response', response);
-    logAPICallEndDev('finalizeSpecimen');
     return response.json();
     
 }
