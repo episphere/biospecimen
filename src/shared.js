@@ -802,7 +802,10 @@ export const updateSpecimen = async (array) => {
     return response.json();
 }
 
-export const finalizeSpecimen = async (biospecimenData, participantData, siteTubesList) => {
+// Distinct from updateSpecimen in that this triggers a larger workflow which also
+// updates the participant and gets the derived variables
+// while updateSpecimen only updates a specimen record
+export const submitSpecimen = async (biospecimenData, participantData, siteTubesList) => {
     // Used when finalizing specimen to update both participant and specimen data
     const idToken = await getIdToken();
     let requestObj = {
@@ -813,7 +816,7 @@ export const finalizeSpecimen = async (biospecimenData, participantData, siteTub
         },
         body:  JSON.stringify({biospecimenData, participantData, siteTubesList}),
     }
-    const response = await fetch(`${api}api=finalizeSpecimen`, requestObj);
+    const response = await fetch(`${api}api=submitSpecimen`, requestObj);
     console.log('response', response);
     return response.json();
     

@@ -5,9 +5,9 @@ import {
     getSiteCouriers, getPage, getNumPages, removeSingleError, displayManifestContactInfo, checkShipForage, checkAlertState, retrieveDateFromIsoString,
     convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, participantCanCheckIn, shippingPrintManifestReminder,
     checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData,
-    siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
+    siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, convertToOldBox, translateNumToType,
     getCollectionsByVisit, getSpecimenAndParticipant, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showModalNotification, showTimedNotifications, showNotificationsCancelOrContinue, validateSpecimenAndParticipantResponse, findReplacementTubeLabels, 
-    showConfirmationModal, dismissBiospecimenModal, getIdToken, finalizeSpecimen
+    showConfirmationModal, dismissBiospecimenModal, getIdToken, submitSpecimen
 } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
@@ -1582,7 +1582,7 @@ const processSpecimenCollectionFormUpdates = async (biospecimenData, participant
         showAnimation();
 
         const idToken = await getIdToken();
-        await finalizeSpecimen(biospecimenData, participantData, siteTubesList);
+        await submitSpecimen(biospecimenData, participantData, siteTubesList);
 
         hideAnimation();
     } catch (error) {
