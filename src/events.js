@@ -1581,9 +1581,10 @@ const processSpecimenCollectionFormUpdates = async (biospecimenData, participant
     try {
         showAnimation();
 
-        const idToken = await getIdToken();
-        await submitSpecimen(biospecimenData, participantData, siteTubesList);
-
+        const {code, message} = await submitSpecimen(biospecimenData, participantData, siteTubesList);
+        if(code !== 200) {
+            throw new Error(message);
+        }
         hideAnimation();
     } catch (error) {
         hideAnimation();
