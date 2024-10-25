@@ -1365,7 +1365,10 @@ const collectionSubmission = async (participantData, biospecimenData, continueTo
     // Make a deep copy. Check for changes at end of function prior to saving.
     const originalSpecimenData = JSON.parse(JSON.stringify(biospecimenData));
 
-    if (getWorkflow() === 'research' && biospecimenData[conceptIds.collection.collectionTime] === undefined) biospecimenData[conceptIds.collection.collectionTime] = new Date().toISOString();
+
+    if (getWorkflow() === 'research' && biospecimenData[conceptIds.collection.collectionTime] === undefined) {
+        biospecimenData[conceptIds.collection.collectionTime] = new Date().toISOString();
+    }
 
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
     const siteTubesList = getSiteTubesLists(biospecimenData);
@@ -1495,17 +1498,17 @@ const collectionSubmission = async (participantData, biospecimenData, continueTo
         if (getWorkflow() === 'clinical') {
             if (biospecimenData[conceptIds.collection.scannedTime] === undefined) biospecimenData[conceptIds.collection.scannedTime] = new Date().toISOString();
         }
+    }
 
-        if (getWorkflow() === 'research') {
-            let initials = document.getElementById('collectionInitials')
-            if(initials && initials.value.trim().length == 0) {
-                errorMessage(initials.id, 'This field is required. Please enter the phlebotomist\'s initials.', focus);
-                focus = false;
-                return;
-            }
-            else {
-                biospecimenData[conceptIds.collection.phlebotomistInitials] = initials.value.trim();
-            }
+    if (getWorkflow() === 'research') {
+        let initials = document.getElementById('collectionInitials')
+        if(initials && initials.value.trim().length == 0) {
+            errorMessage(initials.id, 'This field is required. Please enter the phlebotomist\'s initials.', focus);
+            focus = false;
+            return;
+        }
+        else {
+            biospecimenData[conceptIds.collection.phlebotomistInitials] = initials.value.trim();
         }
     }
 
@@ -1533,6 +1536,7 @@ const collectionSubmission = async (participantData, biospecimenData, continueTo
         }
     }
 }
+
 
 /**
  * Handle case where form has been updated but specimen is already finalized.
