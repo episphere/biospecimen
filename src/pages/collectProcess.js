@@ -24,21 +24,17 @@ export const tubeCollectedTemplate = (participantData, biospecimenData) => {
                 </div>
                 <div class="row">Collection ID: ${biospecimenData[conceptIds.collection.id]}</div>
                 <div class="row">Collection ID Link Date/Time: ${getWorkflow() === 'research' ? new Date(biospecimenData[conceptIds.collection.collectionTime]).toLocaleString(): new Date(biospecimenData[conceptIds.collection.scannedTime]).toLocaleString()}</div>
-                ${getWorkflow() === 'research' ? `
-                    <div class="row">
-                        <div>Collection Phlebotomist Initials:&nbsp</div>
-                        <input 
-                            type="text"
-                            ${biospecimenData[conceptIds.collection.phlebotomistInitials] ? `value=${biospecimenData[conceptIds.collection.phlebotomistInitials]}` : ``}
-                            id="collectionInitials"
-                            style="text-transform:uppercase"
-                            onpaste="return false;"
-                            required
-                        /> 
-                    </div>` 
-                    
-                    : ''
-                }
+                <div class="row">
+                    <div>${getWorkflow() === 'research' ? `Collection Phlebotomist Initials:&nbsp` : `Initials of team member completing Collection Data Entry:&nbsp`}</div>
+                    <input 
+                        type="text"
+                        ${biospecimenData[conceptIds.collection.phlebotomistInitials] ? `value=${biospecimenData[conceptIds.collection.phlebotomistInitials]}` : ``}
+                        id="collectionInitials"
+                        style="text-transform:uppercase"
+                        onpaste="return false;"
+                        required
+                    /> 
+                </div>
             </div>
             ${biospecimenData[conceptIds.collection.selectedVisit] ? `
                 <div class="ml-auto form-group">
