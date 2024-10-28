@@ -123,6 +123,8 @@ export const getDailyParticipant = async () => {
   return await response.json();
 }
 
+
+
 export const updateParticipant = async (dataObj) => {
     const idToken = await getIdToken();
     const response = await fetch(`${api}api=updateParticipantDataNotSite`, {
@@ -800,25 +802,6 @@ export const updateSpecimen = async (array) => {
     const response = await fetch(`${api}api=updateSpecimen`, requestObj);
     logAPICallEndDev('updateSpecimen');
     return response.json();
-}
-
-// Distinct from updateSpecimen in that this triggers a larger workflow which also
-// updates the participant and gets the derived variables
-// while updateSpecimen only updates a specimen record
-export const submitSpecimen = async (biospecimenData, participantData, siteTubesList) => {
-    // Used when submitting specimen to update both participant and specimen data
-    const idToken = await getIdToken();
-    let requestObj = {
-        method: "POST",
-        headers:{
-            Authorization:"Bearer "+idToken,
-            "Content-Type": "application/json"
-        },
-        body:  JSON.stringify({biospecimenData, participantData, siteTubesList}),
-    }
-    const response = await fetch(`${api}api=submitSpecimen`, requestObj);
-    return response.json();
-    
 }
 
 export const checkDerivedVariables = async (participantObjToken) => {
@@ -1746,9 +1729,6 @@ export const getLocationsInstitute = async () => {
     if (siteAcronym === 'BSWH') locations.sort((a, b) => a.localeCompare(b));
 
     logAPICallEndDev('getLocationsInstitute');
-    // For the purposes of 1008 we are filtering out some locations.
-    // This will require more discussion for a long-term implementation
-    locations = locations.filter(loc => ['River East', 'South Loop', 'Orland Park', 'Henry Ford West Bloomfield Hospital', 'Henry Ford Medical Center-Fairlane'].indexOf(loc) === -1);
     return locations;
 }
 
@@ -1829,6 +1809,162 @@ export const getUpdatedParticipantData = async (participantData) => {
     const query = `connectId=${parseInt(participantData['Connect_ID'])}`;
     let responseParticipant = await findParticipant(query);
     return responseParticipant.data[0];
+}
+
+export const updateCollectionSettingData = async (biospecimenData, tubes, participantData) => {
+    participantData = await getUpdatedParticipantData(participantData);
+
+    let settings;
+    let derivedVariables = {};
+    let visit = biospecimenData[conceptIds.collection.selectedVisit];
+
+    const bloodTubes = tubes.filter(tube => tube.tubeType === "Blood tube");
+    const urineTubes = tubes.filter(tube => tube.tubeType === "Urine");
+    const mouthwashTubes = tubes.filter(tube => tube.tubeType === "Mouthwash");
+
+    let bloodTubesLength = 0
+    let urineTubesLength = 0
+    let mouthwashTubesLength = 0
+
+    const collectionSetting = biospecimenData[conceptIds.collection.collectionSetting];
+    const isResearch = collectionSetting === conceptIds.research;
+    const isClinical = collectionSetting === conceptIds.clinical;
+
+    if (participantData[conceptIds.collectionDetails]) {
+        settings = participantData[conceptIds.collectionDetails];
+        if (!settings[visit]) settings[visit] = {};
+
+    } else {
+        settings = {
+            [visit]: {}
+        }
+    }
+
+    if (!settings[visit][conceptIds.bloodCollectionSetting]) {
+        bloodTubes.forEach(tube => {
+            const tubeIsCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
+            if(tubeIsCollected) {
+                settings[visit][conceptIds.bloodCollectionSetting] = collectionSetting;
+                if(isResearch) {
+                    settings[visit][conceptIds.baseline.bloodCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
+                }
+                else if(isClinical) {
+                    settings[visit][conceptIds.clinicalDashboard.bloodCollected] = conceptIds.yes;
+                    settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
+
+                    settings[visit][conceptIds.anySpecimenCollected] = conceptIds.yes;
+
+                    if(!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                        settings[visit][conceptIds.anySpecimenCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
+                    }
+                }
+                bloodTubesLength += 1
+            }
+        });
+    }
+    else if (settings[visit][conceptIds.baseline.bloodCollectedTime] !== '' ||  settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime] !== ''){
+        const participantBloodCollected = participantData[conceptIds.baseline.bloodCollected] === conceptIds.yes;
+        const totalBloodTubesAvail = bloodTubes.filter((tube) => biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes);
+        if (totalBloodTubesAvail.length === 0 && participantBloodCollected) {
+            delete settings[visit][conceptIds.bloodCollectionSetting]; // derived variables & timestamp are updated only if all the blood tubes are unchecked
+            if (isResearch) {
+                delete settings[visit][conceptIds.baseline.bloodCollectedTime];
+            }
+            else if (isClinical) {
+                settings[visit][conceptIds.clinicalDashboard.bloodCollected] = conceptIds.no;
+                delete settings[visit][conceptIds.clinicalDashboard.bloodCollectedTime];
+
+                if (urineTubesLength === 0 && mouthwashTubesLength === 0) { // anySpecimenCollected variable will only be updated to NO if mouthwash & urine specimens are not present.
+                    settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
+                    if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                        delete settings[visit][conceptIds.anySpecimenCollectedTime];
+                    }
+                }
+            }
+            derivedVariables[conceptIds.baseline.bloodCollected] = conceptIds.no;
+            bloodTubesLength = totalBloodTubesAvail.length;
+        }
+    }
+
+    if (!settings[visit][conceptIds.urineCollectionSetting]) {
+        urineTubes.forEach(tube => {
+            const tubeIsCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
+            if (tubeIsCollected) {
+                settings[visit][conceptIds.urineCollectionSetting] = collectionSetting;
+                if (isResearch) {
+                    settings[visit][conceptIds.baseline.urineCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
+                }
+                else if (isClinical) {
+                    settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.yes;
+                    settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
+
+                    settings[visit][conceptIds.anySpecimenCollected] = conceptIds.yes;
+
+                    if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                        settings[visit][conceptIds.anySpecimenCollectedTime] = biospecimenData[conceptIds.collection.scannedTime];
+                    }
+                }
+                urineTubesLength += 1
+            }
+        });
+    }
+    else if (settings[visit][conceptIds.baseline.urineCollectedTime] !== '' ||  settings[visit][conceptIds.clinicalDashboard.urineCollectedTime] !== '') {
+        const participantUrineCollected = participantData[conceptIds.baseline.urineCollected] === conceptIds.yes;
+        const totalUrineTubesAvail = urineTubes.filter((tube) => biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes);
+        if (totalUrineTubesAvail.length === 0 && participantUrineCollected) {
+            delete settings[visit][conceptIds.urineCollectionSetting];
+            if(isResearch) {
+                delete settings[visit][conceptIds.baseline.urineCollectedTime];
+            }
+            else if (isClinical) {
+                settings[visit][conceptIds.clinicalDashboard.urineCollected] = conceptIds.no;
+                delete settings[visit][conceptIds.clinicalDashboard.urineCollectedTime];
+
+                if (bloodTubesLength === 0 && mouthwashTubesLength === 0) { // anySpecimenCollected variable will only be updated to NO if mouthwash & blood specimens are not present.
+                    settings[visit][conceptIds.anySpecimenCollected] = conceptIds.no;
+                    if (!(settings[visit][conceptIds.anySpecimenCollectedTime])) {
+                        delete settings[visit][conceptIds.anySpecimenCollectedTime];
+                    }
+                }
+            }
+            derivedVariables[conceptIds.baseline.urineCollected] = conceptIds.no;
+            urineTubesLength = totalUrineTubesAvail.length;
+        }  
+    }
+
+    if (!settings[visit][conceptIds.mouthwashCollectionSetting]) {
+        mouthwashTubes.forEach(tube => {
+            const isTubeCollected = biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes;
+            if (isTubeCollected) {
+                settings[visit][conceptIds.mouthwashCollectionSetting] = collectionSetting;
+                if (isResearch) {
+                    settings[visit][conceptIds.baseline.mouthwashCollectedTime] = biospecimenData[conceptIds.collection.collectionTime];
+                }
+            mouthwashTubesLength += 1
+            }
+        });
+    }
+    else if (settings[visit][conceptIds.baseline.mouthwashCollectedTime] !== '' && participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes) {
+        const isParticipantMouthwashCollected = participantData[conceptIds.baseline.mouthwashCollected] === conceptIds.yes;
+        const totalMouthwasTubesAvail = mouthwashTubes.filter((tube) => biospecimenData[tube.concept][conceptIds.collection.tube.isCollected] === conceptIds.yes);
+        if (totalMouthwasTubesAvail.length === 0 &&  isParticipantMouthwashCollected) {
+            delete settings[visit][conceptIds.mouthwashCollectionSetting]
+            if (isResearch) {
+                delete settings[visit][conceptIds.baseline.mouthwashCollectedTime];
+            }
+            derivedVariables[conceptIds.baseline.mouthwashCollected] = conceptIds.no;
+            mouthwashTubesLength = totalMouthwasTubesAvail.length;
+        }
+    }
+
+    let settingData = {
+        [conceptIds.collectionDetails]: settings,
+        uid: participantData?.state?.uid
+    };
+
+    // Update derived variables to 'NO' from 'YES'. After specimens, are unchecked after checking them.
+    settingData = { ...settingData, ...derivedVariables };
+    await updateParticipant(settingData);
 }
 
 export const updateBaselineData = async (siteTubesList, data) => {

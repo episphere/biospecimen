@@ -5,9 +5,9 @@ import {
     getSiteCouriers, getPage, getNumPages, removeSingleError, displayManifestContactInfo, checkShipForage, checkAlertState, retrieveDateFromIsoString,
     convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, participantCanCheckIn, shippingPrintManifestReminder,
     checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData,
-    siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, convertToOldBox, translateNumToType,
+    siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
     getCollectionsByVisit, getSpecimenAndParticipant, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showModalNotification, showTimedNotifications, showNotificationsCancelOrContinue, validateSpecimenAndParticipantResponse, findReplacementTubeLabels, 
-    showConfirmationModal, dismissBiospecimenModal, getIdToken, submitSpecimen
+    showConfirmationModal, dismissBiospecimenModal
 } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
@@ -1585,10 +1585,14 @@ const processSpecimenCollectionFormUpdates = async (biospecimenData, participant
     try {
         showAnimation();
 
-        const {code, message} = await submitSpecimen(biospecimenData, participantData, siteTubesList);
-        if(code !== 200) {
-            throw new Error(message);
-        }
+        await Promise.all([
+            updateSpecimen([biospecimenData]),
+            updateCollectionSettingData(biospecimenData, siteTubesList, participantData),
+        ]);
+
+        if (baselineVisit && clinicalResearchSetting) await updateBaselineData(siteTubesList, participantData);
+        await checkDerivedVariables({ "token": participantData["token"] });
+
         hideAnimation();
     } catch (error) {
         hideAnimation();
