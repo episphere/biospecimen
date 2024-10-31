@@ -1,6 +1,6 @@
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
 
-const appVersion = "v24.9.0";
+const appVersion = "v24.10.0";
 workbox.setConfig({debug: false});
 const { registerRoute } = workbox.routing;
 const { CacheFirst, NetworkFirst } = workbox.strategies;
