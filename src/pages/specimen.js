@@ -49,20 +49,30 @@ export const specimenTemplate = async (data, formData) => {
         const siteAcronym = getSiteAcronym();
                 
         if(siteLocations[workflow] && siteLocations[workflow][siteAcronym]) {
+
+            
+            // For the purposes of 1008 we are filtering out some locations.
+            // This will require more discussion for a long-term implementation
+            let siteLocationArray = siteLocations[workflow][siteAcronym]; // Form of [{location, concept}]
+            siteLocationArray = siteLocationArray.filter(loc => 
+                ['River East', 'South Loop', 'Orland Park', 'Henry Ford West Bloomfield Hospital'].indexOf(loc.location) === -1
+                // 'Henry Ford Medical Center- Fairlane' has inconsistent spacing across environments: play it safe by omitting any combination of "Henry Ford" and "Fairlane"
+                && (!loc.location.includes('Fairlane') || !loc.location.includes('Henry Ford')) 
+            );
+            
             template += `
                 <label class="col-md-4 col-form-label" for="collectionLocation">Select Collection Location</label>
                 <select class="form-control col-md-5" id="collectionLocation">
                     <option value='none'>Please Select Location</option>`
 
             if (siteAcronym === 'BSWH') {
-                const siteLocationArray = siteLocations[workflow][siteAcronym];
                 const sortedBSWHLocations = siteLocationArray.sort((a, b) => a.location.localeCompare(b.location));
                 
                 sortedBSWHLocations.forEach(site => {
                     template += `<option ${locationSelection === site.concept.toString() ? 'selected="selected"' : ""} value='${site.concept}'>${site.location}</option>`
                 });
             } else {
-                siteLocations[workflow][siteAcronym].forEach(site => {
+                siteLocationArray.forEach(site => {
                     template += `<option ${locationSelection === site.concept.toString() ? 'selected="selected"' : ""} value='${site.concept}'>${site.location}</option>`
                 });
             }

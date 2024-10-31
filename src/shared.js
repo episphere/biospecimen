@@ -1729,6 +1729,13 @@ export const getLocationsInstitute = async () => {
     if (siteAcronym === 'BSWH') locations.sort((a, b) => a.localeCompare(b));
 
     logAPICallEndDev('getLocationsInstitute');
+    // For the purposes of 1008 we are filtering out some locations.
+    // This will require more discussion for a long-term implementation
+    locations = locations.filter(loc => 
+        ['River East', 'South Loop', 'Orland Park', 'Henry Ford West Bloomfield Hospital', 'Henry Ford Medical Center- Fairlane'].indexOf(loc) === -1
+        // 'Henry Ford Medical Center- Fairlane' has inconsistent spacing across environments: play it safe by omitting any combination of "Henry Ford" and "Fairlane"
+        && (!loc.includes('Fairlane') || !loc.includes('Henry Ford')) 
+    );
     return locations;
 }
 
