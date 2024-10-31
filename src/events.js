@@ -1500,17 +1500,18 @@ const collectionSubmission = async (participantData, biospecimenData, continueTo
         }
     }
 
-    if (getWorkflow() === 'research') {
-        let initials = document.getElementById('collectionInitials')
-        if(initials && initials.value.trim().length == 0) {
-            errorMessage(initials.id, 'This field is required. Please enter the phlebotomist\'s initials.', focus);
-            focus = false;
-            return;
-        }
-        else {
-            biospecimenData[conceptIds.collection.phlebotomistInitials] = initials.value.trim();
-        }
+    
+    let initials = document.getElementById('collectionInitials')
+    if(initials && initials.value.trim().length == 0) {
+        const errorLabel = getWorkflow() === 'research' ? 'phlebotomist\'s initials' : 'initials of team member completing Collection Data Entry';
+        errorMessage(initials.id, `This field is required. Please enter the ${errorLabel}.`, focus);
+        focus = false;
+        return;
     }
+    else {
+        biospecimenData[conceptIds.collection.phlebotomistInitials] = initials.value.trim();
+    }
+    
 
     // Handle corner cases: found strays and re-finalizing collections
     const isFinalized = biospecimenData[conceptIds.collection.isFinalized] === conceptIds.yes;
