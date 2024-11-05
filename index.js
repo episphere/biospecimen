@@ -5,7 +5,7 @@ import { firebaseConfig as prodFirebaseConfig } from "./src/prod/config.js";
 // When doing local development, uncomment this
 // Get the API key file from Box or the DevOps team
 // Do not accept PRs with the localDevFirebaseConfig import uncommented
-import { firebaseConfig as  localDevFirebaseConfig} from "./src/local-dev/config.js";
+// import { firebaseConfig as  localDevFirebaseConfig} from "./src/local-dev/config.js";
 import { manageUsers } from "./src/pages/users.js";
 import { userDashboard } from "./src/pages/dashboard.js";
 import { shippingDashboard } from "./src/pages/shipping.js";
