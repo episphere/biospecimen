@@ -2270,7 +2270,7 @@ const populateBoxReportsTable = (source) => {
         const currBox = convertToOldBox(reportPageBoxData.data[i]);
         const trackingNumber = currBox[conceptIds.shippingTrackingNumber] ?? '';
         const shippedDate = currBox[conceptIds.shippingShipDate] ? retrieveDateFromIsoString(currBox[conceptIds.shippingShipDate]) : '';
-        const shippedBy = `<a style="word-break: break-word;" href="mailto:${currBox[conceptIds.shippedByFirstName]}">${currBox[conceptIds.shippedByFirstName]}</a>`;
+        const shippedBy = `<a href="mailto:${currBox[conceptIds.shippedByFirstName]}">${currBox[conceptIds.shippedByFirstName]}</a>`;
         const receivedDate = currBox[conceptIds.siteShipmentDateReceived] ? retrieveDateFromIsoString(currBox[conceptIds.siteShipmentDateReceived]) : '';
         const packagedCondition = currBox[conceptIds.packageCondition] || '';
         const shippingLocation = conceptIdToSiteSpecificLocation[currBox[conceptIds.shippingLocation]];
