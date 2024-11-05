@@ -1438,6 +1438,15 @@ const collectionSubmission = async (participantData, biospecimenData, continueTo
         const deviation = document.getElementById(tube.id + 'Deviation');
         const comment = document.getElementById(tube.id + 'DeviatedExplanation');
 
+        // Validate that Reason Not Collected is entered if sample not collected
+        if (!tube.checked && reason) {
+            if (!reason.value) {
+                hasError = true;
+                errorMessage(reason.id, 'Reason Not Collected must be entered', focus, true);
+                focus = false;
+            }
+        }
+
         // Reason selected dropdown
         if (reason) {
             if (reason.value) {
