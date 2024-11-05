@@ -45,7 +45,6 @@ const displayKitStatusShippedTable = (shippedKitStatusParticipantsArray) => {
                         <tr style="top: 0; position: sticky;">
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Connect ID</th>
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Study Site</th>
-                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Shipped By</th>
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Shipped Date</th>
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit ID</th>
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Collection ID</th>
@@ -72,7 +71,6 @@ const createShippedRows = (shippedKitStatusParticipantsArray) => {
 
     const connectID = particpantObj["Connect_ID"];
     const healthcareProvider = keyToNameObj[particpantObj[conceptIds.healthcareProvider]];
-    const shippedBy = particpantObj[conceptIds.shippedByFirstName];
     const mouthwashShippedDate = convertISODateTime(particpantObj[conceptIds.shippedDateTime]).split(/\s+/)[0];
     const supplyKitId = particpantObj[conceptIds.supplyKitId];
     const collectionCardId = particpantObj[conceptIds.collectionCardId];
@@ -83,7 +81,6 @@ const createShippedRows = (shippedKitStatusParticipantsArray) => {
                 <tr class="row-color-enrollment-dark participantRow">
                     <td>${connectID}</td>
                     <td>${healthcareProvider}</td>
-                    <td>${shippedBy}</td>
                     <td>${mouthwashShippedDate}</td>
                     <td>${supplyKitId}</td>
                     <td>${collectionCardId}</td>
