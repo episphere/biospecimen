@@ -44,7 +44,7 @@ const displayKitStatusShippedTable = (shippedKitStatusParticipantsArray) => {
                     <thead> 
                         <tr style="top: 0; position: sticky;">
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Connect ID</th>
-                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Study Site </th>
+                            <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Study Site</th>
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Shipped Date</th>
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Supply Kit ID</th>
                             <th class="sticky-row" style="background-color: #f7f7f7;" scope="col">Collection ID</th>
@@ -77,7 +77,6 @@ const createShippedRows = (shippedKitStatusParticipantsArray) => {
     const supplyKitTrackingNum = particpantObj[conceptIds.supplyKitTrackingNum];
     const returnKitTrackingNum = particpantObj[conceptIds.returnKitTrackingNum];
     const mouthwashSurveyStatus = convertSurveyCompletionStatus(particpantObj[conceptIds.mouthwashSurveyCompletionStatus]);
-
     template += `
                 <tr class="row-color-enrollment-dark participantRow">
                     <td>${connectID}</td>
