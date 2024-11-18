@@ -55,17 +55,35 @@ const printLabelsTemplate = (name) => {
 };
 
 const initializeTotalAddressesToPrint = async () => {
-  showAnimation();
-  const totalAddresses = await getTotalAddressesToPrint();
-  const processedAddresses = totalAddresses.data.filter(obj => obj.length !== 0)
-  appState.setState({'totalAddresses': processedAddresses})
-  appState.setState({'totalAddressesLength': processedAddresses.length })
-  hideAnimation();
+  try {
+    showAnimation();
+    const totalAddressCount = await getAddressesToPrintCount();
+    appState.setState({'totalAddressesLength': totalAddressCount.data })
+    hideAnimation();
+  } catch(err) {
+    console.error('Error initializing total addresses to print', err);
+  }
+  
 }
 
-export const getTotalAddressesToPrint = async () => {
+export const getAddressesToPrintCount = async () => {
   const idToken = await getIdToken();
-  const response = await fetch(`${baseAPI}api=totalAddressesToPrint`, {
+  const response = await fetch(`${baseAPI}api=totalAddressesToPrintCount`, {
+      method: "GET",
+      headers: {
+          Authorization:"Bearer "+idToken
+      }
+  });
+  return await response.json();
+}
+
+export const getTotalAddressesToPrint = async (limit) => {
+  const idToken = await getIdToken();
+  let url = `${baseAPI}api=totalAddressesToPrint`;
+  if(limit) {
+    url += `&limit=${limit}`
+  }
+  const response = await fetch(url, {
       method: "GET",
       headers: {
           Authorization:"Bearer "+idToken
@@ -77,26 +95,26 @@ export const getTotalAddressesToPrint = async () => {
 const generateParticipantCsvGetter = (name) => {
   const generateCsvButton = document.getElementById("generateCsv");
   if (generateCsvButton) {
-    generateCsvButton.addEventListener("click", () => {
+    generateCsvButton.addEventListener("click", async () => {
+      const totalAddressesLength = appState.getState().totalAddressesLength;
         const numberToPrint = document.getElementById("numberToPrint").value;
-          if (numberToPrint) {
-            const arrayLengthToProcess = appState.getState().totalAddressesLength
-            if (arrayLengthToProcess >= numberToPrint) {
-              const arrayToProcess = appState.getState().totalAddresses.filter(obj => obj.length !== 0)
-              const remainingArrayToProcess = arrayToProcess.slice(numberToPrint, appState.getState().totalAddressesLength)
-              appState.setState({totalAddresses: remainingArrayToProcess })
-              appState.setState({'totalAddressesLength': remainingArrayToProcess.length })
-              generateParticipantCsv(arrayToProcess.slice(0, numberToPrint));
+        if(!numberToPrint || !totalAddressesLength) {
+          triggerErrorModal(`No labels to print`);
+        } else if (numberToPrint > totalAddressesLength) {
+          triggerErrorModal(`Max labels to print: ${arrayLengthToProcess}`);
+        } else {
+          const totalAddressesRes = await getTotalAddressesToPrint(numberToPrint);
+          if (totalAddressesRes.code === 200) {
+              const arrayToProcess = totalAddressesRes.data;
+              appState.setState({'totalAddressesLength': totalAddressesLength - numberToPrint }); // No need for another API call
+              generateParticipantCsv(arrayToProcess);
               printLabelsTemplate(name);
               triggerSuccessModal('Success!');                 // Display success message
-            }
-            else if (appState.getState().totalAddressesLength === 0) {
-              triggerErrorModal(`No labels to print`)
-            }
-            else {
-              triggerErrorModal(`Max labels to print: ${arrayLengthToProcess}`);
-            } 
+          } else {
+            console.error('response', totalAddressesRes);
+            triggerErrorModal(`Error getting records; please review console.`);
           }
+        }
       });
   }
 };

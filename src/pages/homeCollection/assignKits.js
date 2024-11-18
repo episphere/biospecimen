@@ -178,7 +178,7 @@ const confirmAssignment = () => {
         participantObj['Connect_ID'] = document.getElementById('Connect_ID')?.value;
         const assignmentStatus = await processConfirmedAssignment(participantObj);
 
-        if (assignmentStatus == true) {
+        if (assignmentStatus === true) {
           document.getElementById('fullName').value = ``;
           document.getElementById('address').value = ``;
           document.getElementById('Connect_ID').value = ``;
