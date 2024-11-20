@@ -801,7 +801,7 @@ export const updateSpecimen = async (array) => {
     }
     const response = await fetch(`${api}api=updateSpecimen`, requestObj);
     logAPICallEndDev('updateSpecimen');
-    return response.json();
+    return await response.json();
 }
 
 // Distinct from updateSpecimen in that this triggers a larger workflow which also
