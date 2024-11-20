@@ -1280,7 +1280,6 @@ export const addEventBiospecimenCollectionFormEditAll = () => {
 
 export const addEventBiospecimenCollectionFormInputErrorHandler = (biospecimenData) => {
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
-
     inputFields.forEach(input => {
         input.addEventListener('change', () => {
             validateFormInputField(input, biospecimenData);
@@ -1295,6 +1294,14 @@ export const addEventBiospecimenCollectionFormInputErrorHandler = (biospecimenDa
                     inputFieldsEnabled[inputIndex + 1].focus();
                 }
             }
+        });
+    });
+
+    // validate reason not collected dropdowns on change
+    const reasonNotCollectedDropdowns = Array.from(document.getElementsByClassName('reason-not-collected'));
+    reasonNotCollectedDropdowns.forEach(reason => {
+        reason.addEventListener('change', () => {
+            removeSingleError(reason.id);
         });
     });
 };
@@ -1331,6 +1338,14 @@ const validateFormInputField = (inputTube, biospecimenData) => {
             errorMessage(inputTube.id, errorMessageText);
             return false;
         }
+    } 
+
+    // 1065 Require reason not collected for Research Collections when sample is not collected
+    const reason = document.getElementById(inputTube.id.replace('Id', '') + 'Reason');
+    removeSingleError(reason.id);
+    if (tubeCheckBox && !tubeCheckBox.checked && reason && !reason.value) {
+        errorMessage(reason.id, 'Reason Not Collected must be entered', focus, true);
+        return false;
     }
 
     return true;
