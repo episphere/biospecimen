@@ -113,7 +113,7 @@ const generateParticipantCsvGetter = (name) => {
               triggerSuccessModal('Success!');                 // Display success message
           } else {
             console.error('response', totalAddressesRes);
-            triggerErrorModal(`Error getting records; please review console.`);
+            triggerErrorModal(`${totalAddressesRes.code} error getting records: ${totalAddressesRes.message}`);
           }
         }
       });
