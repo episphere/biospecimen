@@ -1300,7 +1300,7 @@ export const addEventBiospecimenCollectionFormInputErrorHandler = (biospecimenDa
     // validate reason not collected dropdowns on change
     const reasonNotCollectedDropdowns = Array.from(document.getElementsByClassName('reason-not-collected'));
     reasonNotCollectedDropdowns.forEach(reason => {
-        reason.addEventListener('change', () => {
+        reason && reason.addEventListener('change', () => {
             removeSingleError(reason.id);
         });
     });
@@ -1342,7 +1342,7 @@ const validateFormInputField = (inputTube, biospecimenData) => {
 
     // 1065 Require reason not collected for Research Collections when sample is not collected
     const reason = document.getElementById(inputTube.id.replace('Id', '') + 'Reason');
-    removeSingleError(reason.id);
+    reason && removeSingleError(reason.id);    
     if (tubeCheckBox && !tubeCheckBox.checked && reason && !reason.value) {
         errorMessage(reason.id, 'Reason Not Collected must be entered', focus, true);
         return false;
