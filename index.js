@@ -2,10 +2,6 @@ import { inactivityTime, urls } from "./src/shared.js";
 import { firebaseConfig as devFirebaseConfig } from "./src/dev/config.js";
 import { firebaseConfig as stageFirebaseConfig } from "./src/stage/config.js";
 import { firebaseConfig as prodFirebaseConfig } from "./src/prod/config.js";
-// When doing local development, uncomment this
-// Get the API key file from Box or the DevOps team
-// Do not accept PRs with the localDevFirebaseConfig import uncommented
-// import { firebaseConfig as  localDevFirebaseConfig} from "./src/local-dev/config.js";
 import { manageUsers } from "./src/pages/users.js";
 import { userDashboard } from "./src/pages/dashboard.js";
 import { shippingDashboard } from "./src/pages/shipping.js";
@@ -34,23 +30,31 @@ import { checkOutReportTemplate } from "./src/pages/checkOutReport.js";
 import { dailyReportTemplate } from "./src/pages/dailyReport.js";
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./serviceWorker.js").catch((error) => {
-    console.error("Service worker registration failed.", error);
-    return;
-  });
-
-  navigator.serviceWorker.ready.then(() => {
-    if (navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({ action: "getAppVersion" });
-    }
-  });
-
-  navigator.serviceWorker.addEventListener("message", (event) => {
-    if (event.data.action === "sendAppVersion") {
-      document.getElementById("appVersion").textContent = event.data.payload;
-    }
-  });
-}
+    navigator.serviceWorker
+      .register("./serviceWorker.js")
+      .then((registration) => {
+        registration.onupdatefound = () => {
+          const sw = registration.installing;
+          if (sw) {
+            sw.onstatechange = () => sw.state === "activated" && sw.postMessage({ action: "getAppVersion" });
+          }
+        };
+      })
+      .catch((err) => {
+        console.error("Service worker registration failed.", err);
+      });
+  
+    navigator.serviceWorker.ready.then(() => {
+      const sw = navigator.serviceWorker.controller;
+      sw && sw.postMessage({ action: "getAppVersion" });
+    });
+  
+    navigator.serviceWorker.addEventListener("message", (event) => {
+      if (event.data.action === "sendAppVersion") {
+        document.getElementById("appVersion").textContent = event.data.payload;
+      }
+    });
+  }
 
 let auth = '';
 
@@ -69,7 +73,7 @@ const datadogConfig = {
 
 const isLocalDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
-window.onload = () => {
+window.onload = async () => {
     if(location.host === urls.prod) {
         !firebase.apps.length ? firebase.initializeApp(prodFirebaseConfig()) : firebase.app();
         window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'prod' });
@@ -79,8 +83,9 @@ window.onload = () => {
         window.DD_RUM && window.DD_RUM.init({ ...datadogConfig, env: 'stage' });
     }
     else if (isLocalDev) {
-        if (typeof localDevFirebaseConfig === 'undefined') {
-            console.error('Local development requires a localDevFirebaseConfig function to be defined in src/local-dev/config.js.');
+        const { firebaseConfig: localDevFirebaseConfig} = await import("./src/local-dev/config.js");
+        if (!localDevFirebaseConfig) {
+            console.error('Local development requires a firebaseConfig function defined in src/local-dev/config.js.');
             return;
         }
         !firebase.apps.length ? firebase.initializeApp(localDevFirebaseConfig()) : firebase.app();
