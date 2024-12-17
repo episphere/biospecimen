@@ -801,7 +801,26 @@ export const updateSpecimen = async (array) => {
     }
     const response = await fetch(`${api}api=updateSpecimen`, requestObj);
     logAPICallEndDev('updateSpecimen');
-    return response.json();
+    return await response.json();
+}
+
+// Distinct from updateSpecimen in that this triggers a larger workflow which also
+// updates the participant and gets the derived variables
+// while updateSpecimen only updates a specimen record
+export const submitSpecimen = async (biospecimenData, participantData, siteTubesList) => {
+    // Used when submitting specimen to update both participant and specimen data
+    const idToken = await getIdToken();
+    let requestObj = {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+idToken,
+            "Content-Type": "application/json"
+        },
+        body:  JSON.stringify({biospecimenData, participantData, siteTubesList}),
+    }
+    const response = await fetch(`${api}api=submitSpecimen`, requestObj);
+    return await response.json();
+    
 }
 
 export const checkDerivedVariables = async (participantObjToken) => {

@@ -5,9 +5,9 @@ import {
     getSiteCouriers, getPage, getNumPages, removeSingleError, displayManifestContactInfo, checkShipForage, checkAlertState, retrieveDateFromIsoString,
     convertConceptIdToPackageCondition, checkFedexShipDuplicate, shippingDuplicateMessage, checkInParticipant, checkOutParticipant, getCheckedInVisit, participantCanCheckIn, shippingPrintManifestReminder,
     checkNonAlphanumericStr, shippingNonAlphaNumericStrMessage, visitType, getParticipantCollections, updateBaselineData,
-    siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, updateCollectionSettingData, convertToOldBox, translateNumToType,
+    siteSpecificLocationToConceptId, conceptIdToSiteSpecificLocation, locationConceptIDToLocationMap, convertToOldBox, translateNumToType,
     getCollectionsByVisit, getSpecimenAndParticipant, getUserProfile, checkDuplicateTrackingIdFromDb, checkAccessionId, checkSurveyEmailTrigger, checkDerivedVariables, isDeviceMobile, replaceDateInputWithMaskedInput, bagConceptIdList, showModalNotification, showTimedNotifications, showNotificationsCancelOrContinue, validateSpecimenAndParticipantResponse, findReplacementTubeLabels, 
-    showConfirmationModal, dismissBiospecimenModal
+    showConfirmationModal, dismissBiospecimenModal, submitSpecimen
 } from './shared.js';
 import { searchTemplate, searchBiospecimenTemplate } from './pages/dashboard.js';
 import { showReportsManifest } from './pages/reportsQuery.js';
@@ -1280,7 +1280,6 @@ export const addEventBiospecimenCollectionFormEditAll = () => {
 
 export const addEventBiospecimenCollectionFormInputErrorHandler = (biospecimenData) => {
     const inputFields = Array.from(document.getElementsByClassName('input-barcode-id'));
-
     inputFields.forEach(input => {
         input.addEventListener('change', () => {
             validateFormInputField(input, biospecimenData);
@@ -1295,6 +1294,14 @@ export const addEventBiospecimenCollectionFormInputErrorHandler = (biospecimenDa
                     inputFieldsEnabled[inputIndex + 1].focus();
                 }
             }
+        });
+    });
+
+    // validate reason not collected dropdowns on change
+    const reasonNotCollectedDropdowns = Array.from(document.getElementsByClassName('reason-not-collected'));
+    reasonNotCollectedDropdowns.forEach(reason => {
+        reason && reason.addEventListener('change', () => {
+            removeSingleError(reason.id);
         });
     });
 };
@@ -1331,6 +1338,14 @@ const validateFormInputField = (inputTube, biospecimenData) => {
             errorMessage(inputTube.id, errorMessageText);
             return false;
         }
+    } 
+
+    // 1065 Require reason not collected for Research Collections when sample is not collected
+    const reason = document.getElementById(inputTube.id.replace('Id', '') + 'Reason');
+    reason && removeSingleError(reason.id);    
+    if (tubeCheckBox && !tubeCheckBox.checked && reason && !reason.value) {
+        errorMessage(reason.id, 'Reason Not Collected must be entered', focus, true);
+        return false;
     }
 
     return true;
@@ -1500,17 +1515,18 @@ const collectionSubmission = async (participantData, biospecimenData, continueTo
         }
     }
 
-    if (getWorkflow() === 'research') {
-        let initials = document.getElementById('collectionInitials')
-        if(initials && initials.value.trim().length == 0) {
-            errorMessage(initials.id, 'This field is required. Please enter the phlebotomist\'s initials.', focus);
-            focus = false;
-            return;
-        }
-        else {
-            biospecimenData[conceptIds.collection.phlebotomistInitials] = initials.value.trim();
-        }
+    
+    let initials = document.getElementById('collectionInitials')
+    if(initials && initials.value.trim().length == 0) {
+        const errorLabel = getWorkflow() === 'research' ? 'phlebotomist\'s initials' : 'initials of team member completing Collection Data Entry';
+        errorMessage(initials.id, `This field is required. Please enter the ${errorLabel}.`, focus);
+        focus = false;
+        return;
     }
+    else {
+        biospecimenData[conceptIds.collection.phlebotomistInitials] = initials.value.trim();
+    }
+    
 
     // Handle corner cases: found strays and re-finalizing collections
     const isFinalized = biospecimenData[conceptIds.collection.isFinalized] === conceptIds.yes;
@@ -1585,13 +1601,10 @@ const processSpecimenCollectionFormUpdates = async (biospecimenData, participant
     try {
         showAnimation();
 
-        await Promise.all([
-            updateSpecimen([biospecimenData]),
-            updateCollectionSettingData(biospecimenData, siteTubesList, participantData),
-        ]);
-
-        if (baselineVisit && clinicalResearchSetting) await updateBaselineData(siteTubesList, participantData);
-        await checkDerivedVariables({ "token": participantData["token"] });
+        const {code, message} = await submitSpecimen(biospecimenData, participantData, siteTubesList);
+        if(code !== 200) {
+            throw new Error(message);
+        }
 
         hideAnimation();
     } catch (error) {
