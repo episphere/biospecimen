@@ -178,7 +178,7 @@ const confirmAssignment = () => {
         participantObj['Connect_ID'] = document.getElementById('Connect_ID')?.value;
         const assignmentStatus = await processConfirmedAssignment(participantObj);
 
-        if (assignmentStatus) {
+        if (assignmentStatus === true) {
           document.getElementById('fullName').value = ``;
           document.getElementById('address').value = ``;
           document.getElementById('Connect_ID').value = ``;
@@ -195,7 +195,7 @@ const confirmAssignment = () => {
           return;
         } 
         else {
-          triggerErrorModal('Error while assigning a kit.')
+          triggerErrorModal('Error while assigning a kit: ' + assignmentStatus);
           return;
         }
       } catch (error) {
@@ -219,14 +219,15 @@ const processConfirmedAssignment = async (assignment) => {
         },
     });
     hideAnimation();
-    const responseStatus = await processResponse(response);
+    const responseJson = await response.json();
+    const responseStatus = responseJson.success;
     if (responseStatus === true) {
         triggerSuccessModal('The kit has been assigned to the participant.')
         return true
     }
     else {
         triggerErrorModal(`Unable to assign a kit to the participant. Please check the supply kit and connect the ID.`)
-        return false
+        return responseJson.message;
     }
 }
 
