@@ -33,15 +33,18 @@ export const finalizeTemplate = (participantData, specimenData, bptlCollectionFl
                 ${bptlCollectionFlag === true ? 
                     `<div class="row">
                         <div>Collection Setting: Research</div>
-                    </div>` : ``}` 
+                    </div>` : ``}
+                    <div class="row">
+                    <div>Collection Phlebotomist Initials: ${specimenData[conceptIds.collection.phlebotomistInitials] || ''}</div>
+                    </div>` 
                     : `<div class="row">
-                    ${bptlCollectionFlag === true ? `
-                        <div>Collection Setting: Clinical</div>` : ``}
+                        ${bptlCollectionFlag === true ? `
+                            <div>Collection Setting: Clinical</div>` : ``}
+                    </div>
+                    <div class="row">
+                        <div>Initials of Team Member Completing Clincial Collection Data Entry: ${specimenData[conceptIds.collection.phlebotomistInitials] || ''}</div>
                     </div>`
                 }
-                <div class="row">
-                    <div>Collection Phlebotomist Initials: ${specimenData[conceptIds.collection.phlebotomistInitials] || ''}</div>
-                </div>
                 ${bptlCollectionFlag === true ? `<div class="row"> Site: ${keyToNameObj[participantData[conceptIds.healthcareProvider]]} </div>` : ``}
             </div>
             ${specimenData[conceptIds.collection.selectedVisit] ? `
